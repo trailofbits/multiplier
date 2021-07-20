@@ -1,14 +1,15 @@
 #pragma once
 
-#include "glyphcache.h"
-#include "textmodel.h"
+#include <memory>
+#include <optional>
+#include <unordered_map>
 
 #include <QFontMetricsF>
 #include <QFrame>
 #include <QRectF>
 
-#include <memory>
-#include <optional>
+#include "glyphcache.h"
+#include "textmodel.h"
 
 namespace drgui {
 
