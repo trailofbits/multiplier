@@ -1,0 +1,3 @@
+[submodule "libraries/pasta/src"]
+	path = libraries/pasta/src
+	url = git@github.com:trailofbits/pasta
