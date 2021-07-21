@@ -6,13 +6,13 @@
   the LICENSE file found in the root directory of this source tree.
 */
 
-#include "textview.h"
+#include <tob/itextview.h>
 
 #include <QMainWindow>
 
 #include <memory>
 
-namespace drgui {
+namespace multiplier {
 
 class MainWindow final : public QMainWindow {
   Q_OBJECT
@@ -31,9 +31,6 @@ private:
   std::unique_ptr<PrivateData> d;
 
   MainWindow();
-
-private slots:
-  void onTokenClicked(const QPoint mouse_position, const Qt::MouseButton &button, TokenID token_id);
 };
 
-} // namespace drgui
+} // namespace multiplier

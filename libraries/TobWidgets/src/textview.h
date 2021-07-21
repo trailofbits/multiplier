@@ -1,36 +1,35 @@
+/*
+  Copyright (c) 2021-present, Trail of Bits, Inc.
+  All rights reserved.
+
+  This source code is licensed in accordance with the terms specified in
+  the LICENSE file found in the root directory of this source tree.
+*/
+
 #pragma once
 
+#include <tob/itextmodel.h>
+#include <tob/itextview.h>
+
 #include <memory>
-#include <optional>
-#include <unordered_map>
 
 #include <QFontMetricsF>
-#include <QFrame>
 #include <QRectF>
 
 #include "glyphcache.h"
-#include "textmodel.h"
 
-namespace drgui {
+namespace tob::widgets {
 
-struct TextViewTheme final {
-  QColor background;
-  QColor foreground;
-  std::unordered_map<TokenColorID, QColor> color_map;
-};
-
-class TextView final : public QFrame {
+class TextView final : public ITextView {
   Q_OBJECT
+  Q_INTERFACES(tob::widgets::ITextView)
 
 public:
-  TextView(TextModel &model, QWidget *parent = nullptr);
-  virtual ~TextView();
+  TextView(ITextModel &model, QWidget *parent);
+  virtual ~TextView() override;
 
-  void setTheme(const TextViewTheme &theme);
-  std::optional<QString> getSelection();
-
-  TextView(const TextView &) = delete;
-  TextView &operator=(const TextView &) = delete;
+  virtual void setTheme(const TextViewTheme &theme) override;
+  virtual std::optional<QString> getSelection() override;
 
 protected:
   virtual void resizeEvent(QResizeEvent *event) override;
@@ -98,9 +97,9 @@ public:
 
   static void resizeViewport(Context &context, qreal pixel_ratio, const QSizeF &size);
   static void moveViewport(Context &context, const QPointF &point);
-  static void drawViewport(Context &context, const TextModel &model);
+  static void drawViewport(Context &context, const ITextModel &model);
 
-  static void createTokenIndex(Context &context, TextModel &model);
+  static void createTokenIndex(Context &context, ITextModel &model);
   static void resetScene(Context &context);
   static void generateScene(Context &context);
   static std::optional<Cursor> createCursor(Context &context, const QPointF &pos);
@@ -110,4 +109,4 @@ signals:
   void tokenClicked(const QPoint &mouse_position, const Qt::MouseButton &button, TokenID token_id);
 };
 
-} // namespace drgui
+} // namespace tob::widgets

@@ -1,6 +1,13 @@
+/*
+  Copyright (c) 2021-present, Trail of Bits, Inc.
+  All rights reserved.
+
+  This source code is licensed in accordance with the terms specified in
+  the LICENSE file found in the root directory of this source tree.
+*/
+
 #include "glyphcache.h"
 
-#include <QDebug>
 #include <QFontMetrics>
 #include <QMap>
 #include <QPainter>
@@ -8,7 +15,7 @@
 #include <list>
 #include <unordered_map>
 
-namespace drgui {
+namespace tob::widgets {
 
 struct GlyphCache::PrivateData final {
   qreal pixel_ratio{};
@@ -80,4 +87,4 @@ void GlyphCache::generateGlyph(QPixmap &pixmap, QChar c) {
   painter.drawText(d->glyph_rect, Qt::AlignCenter | Qt::TextSingleLine, c);
 }
 
-} // namespace drgui
+} // namespace tob::widgets

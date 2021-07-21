@@ -1,3 +1,11 @@
+/*
+  Copyright (c) 2021-present, Trail of Bits, Inc.
+  All rights reserved.
+
+  This source code is licensed in accordance with the terms specified in
+  the LICENSE file found in the root directory of this source tree.
+*/
+
 #include "textmodel.h"
 
 #include <QMap>
@@ -8,7 +16,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace drgui {
+namespace tob::widgets {
 
 struct Token final {
   TokenID id{kInvalidTokenID};
@@ -24,7 +32,9 @@ struct TextModel::PrivateData final {
   std::unordered_map<TokenID, Token> token_map;
 };
 
-TextModel::TextModel(QObject *parent) : QObject(parent), d(new PrivateData) { generateTestData(); }
+TextModel::TextModel(QObject *parent) : ITextModel(parent), d(new PrivateData) {
+  generateTestData();
+}
 
 void TextModel::generateTestData() {
   static TokenID token_id_generator{kInvalidTokenID};
@@ -124,4 +134,4 @@ TokenAttribute TextModel::tokenAttributes(TokenID token_id) const {
   return token.attributes;
 }
 
-} // namespace drgui
+} // namespace tob::widgets

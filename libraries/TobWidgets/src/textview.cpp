@@ -1,11 +1,18 @@
+/*
+  Copyright (c) 2021-present, Trail of Bits, Inc.
+  All rights reserved.
+
+  This source code is licensed in accordance with the terms specified in
+  the LICENSE file found in the root directory of this source tree.
+*/
+
 #include "textview.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QPainter>
 #include <QResizeEvent>
 
-namespace drgui {
+namespace tob::widgets {
 
 namespace {
 
@@ -20,13 +27,14 @@ QColor invertColor(const QColor &color) {
 } // namespace
 
 struct TextView::PrivateData final {
-  PrivateData(TextModel &model_) : model(model_) {}
+  PrivateData(ITextModel &model_) : model(model_) {}
 
-  TextModel &model;
+  ITextModel &model;
   Context context;
 };
 
-TextView::TextView(TextModel &model, QWidget *parent) : QFrame(parent), d(new PrivateData(model)) {
+TextView::TextView(ITextModel &model, QWidget *parent)
+    : ITextView(parent), d(new PrivateData(model)) {
   setFont(QFont("Hack"));
   setFocusPolicy(Qt::StrongFocus);
 
@@ -57,9 +65,9 @@ std::optional<QString> TextView::getSelection() {
 
     auto token = d->model.tokenData(token_id);
 
-    if (selection.first_cursor.token_id == token_id &&
-        selection.last_cursor.token_id == token_id) {
-      auto length = static_cast<int>(selection.last_cursor.offset - selection.first_cursor.offset) + 1;
+    if (selection.first_cursor.token_id == token_id && selection.last_cursor.token_id == token_id) {
+      auto length =
+          static_cast<int>(selection.last_cursor.offset - selection.first_cursor.offset) + 1;
       output += token.mid(static_cast<int>(selection.first_cursor.offset), length);
 
     } else if (selection.first_cursor.token_id == token_id) {
@@ -183,7 +191,7 @@ void TextView::moveViewport(Context &context, const QPointF &point) {
   context.viewport.moveTo(point);
 }
 
-void TextView::drawViewport(Context &context, const TextModel &model) {
+void TextView::drawViewport(Context &context, const ITextModel &model) {
   if (!context.opt_scene) {
     generateScene(context);
   }
@@ -266,7 +274,7 @@ void TextView::drawViewport(Context &context, const TextModel &model) {
   }
 }
 
-void TextView::createTokenIndex(Context &context, TextModel &model) {
+void TextView::createTokenIndex(Context &context, ITextModel &model) {
   auto token_height = context.font_metrics->height();
 
   TokenEntityRowList token_index;
@@ -371,4 +379,4 @@ void TextView::sanitizeSelection(Selection &selection) {
   }
 }
 
-} // namespace drgui
+} // namespace tob::widgets

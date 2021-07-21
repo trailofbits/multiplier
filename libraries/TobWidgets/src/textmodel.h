@@ -1,45 +1,36 @@
+/*
+  Copyright (c) 2021-present, Trail of Bits, Inc.
+  All rights reserved.
+
+  This source code is licensed in accordance with the terms specified in
+  the LICENSE file found in the root directory of this source tree.
+*/
+
 #pragma once
 
-#include <QObject>
-#include <QVariant>
+#include <tob/itextmodel.h>
 
 #include <memory>
 
-namespace drgui {
+namespace tob::widgets {
 
-using TokenID = std::uint64_t;
-constexpr TokenID kInvalidTokenID{0};
-
-using TokenGroupID = std::uint64_t;
-constexpr TokenGroupID kInvalidTokenGroupID{0};
-
-using TokenColorID = std::uint64_t;
-constexpr TokenColorID kInvalidTokenColorID{0};
-
-enum TokenAttribute : std::uint32_t {
-  TokenAttribute_Interactive = 1,
-  TokenAttribute_DisplayOnGutter = 2,
-};
-
-using TokenIDList = std::vector<TokenID>;
-
-class TextModel final : public QObject {
+class TextModel final : public ITextModel {
   Q_OBJECT
 
 public:
-  TextModel(QObject *parent = nullptr);
+  TextModel(QObject *parent);
   virtual ~TextModel();
 
   void generateTestData();
 
-  TokenID firstTokenID() const;
-  TokenID lastTokenID() const;
+  virtual TokenID firstTokenID() const override;
+  virtual TokenID lastTokenID() const override;
 
-  TokenGroupID tokenGroupID(TokenID token_id) const;
-  QString tokenData(TokenID token_id) const;
-  TokenColorID tokenColor(TokenID token_id) const;
-  QVariant tokenProperty(TokenID token_id, int property_id) const;
-  TokenAttribute tokenAttributes(TokenID token_id) const;
+  virtual TokenGroupID tokenGroupID(TokenID token_id) const override;
+  virtual QString tokenData(TokenID token_id) const override;
+  virtual TokenColorID tokenColor(TokenID token_id) const override;
+  virtual QVariant tokenProperty(TokenID token_id, int property_id) const override;
+  virtual TokenAttribute tokenAttributes(TokenID token_id) const override;
 
   TextModel(const TextModel &) = delete;
   TextModel &operator=(const TextModel &) = delete;
@@ -52,4 +43,4 @@ signals:
   void modelReset();
 };
 
-} // namespace drgui
+} // namespace tob::widgets

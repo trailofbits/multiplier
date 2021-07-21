@@ -6,7 +6,12 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(PLATFORM_LINUX true)
 
-importExternalLibrary("${CMAKE_FIND_PACKAGE_NAME}" "libz3.a;z3" "z3.h")
-add_library(z3::libz3 ALIAS thirdparty_z3)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  set(PLATFORM_MACOS true)
+
+else()
+  message(FATAL_ERROR "Unsupported platform")
+endif()

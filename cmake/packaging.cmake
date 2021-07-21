@@ -7,8 +7,8 @@
 #
 
 # Common settings
-set(CPACK_PACKAGE_DESCRIPTION "Dr.GUI is a Qt-based user interface for dds")
-set(CPACK_PACKAGE_NAME "DrGUI")
+set(CPACK_PACKAGE_DESCRIPTION "Multiplier")
+set(CPACK_PACKAGE_NAME "Multiplier")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_VENDOR "Trail of Bits")
 set(CPACK_PACKAGE_CONTACT "peter@trailofbits.com")

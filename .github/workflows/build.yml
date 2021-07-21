@@ -1,0 +1,100 @@
+name: build
+
+on:
+  push:
+    branches:
+      - '*'
+
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build_linux_native:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Clone the repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: '1'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential \
+                            cmake \
+                            ninja-build \
+                            libpfm4-dev \
+                            rpm \
+                            elfutils \
+                            clang-10 \
+                            libclang-10-dev \
+                            llvm-10-dev \
+                            qtbase5-dev -y
+
+    - name: Configure the project
+      run: |
+        mkdir build
+        
+        cmake -DCMAKE_VERBOSE_MAKEFILE=true \
+              -DCMAKE_C_COMPILER=clang \
+              -DCMAKE_CXX_COMPILER=clang++ \
+              -DMU_USE_SYSTEM_DEPS=true \
+              -S . \
+              -B build \
+              -G Ninja
+
+    - name: Build the project
+      run: |
+        cmake --build build
+
+    - name: Build the DEB package
+      run: |
+        cmake -DCPACK_GENERATOR=DEB \
+          -S . \
+          -B build
+
+        cmake --build build --target package
+
+    - name: Build the RPM package
+      run: |
+        cmake -DCPACK_GENERATOR=RPM \
+          -S . \
+          -B build
+
+        cmake --build build --target package
+
+    - name: Build the ZIP package
+      run: |
+        cmake -DCPACK_GENERATOR=ZIP \
+          -S . \
+          -B build
+
+        cmake --build build --target package
+
+    - name: Locate the packages
+      id: packages
+      shell: bash
+      run: |
+        echo ::set-output name=DEB_PACKAGE::$(ls build/*.deb)
+        echo ::set-output name=RPM_PACKAGE::$(ls build/*.rpm)
+        echo ::set-output name=ZIP_PACKAGE::$(ls build/*.zip)
+
+    - name: Store the DEB package
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux_native_deb
+        path: ${{ steps.packages.outputs.DEB_PACKAGE }}
+
+    - name: Store the RPM package
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux_native_rpm
+        path: ${{ steps.packages.outputs.RPM_PACKAGE }}
+
+    - name: Store the ZIP package
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux_native_zip
+        path: ${{ steps.packages.outputs.ZIP_PACKAGE }}
