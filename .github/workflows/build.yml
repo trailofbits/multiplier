@@ -10,37 +10,107 @@ on:
       - '*'
 
 jobs:
-  build_linux_native:
-    runs-on: ubuntu-20.04
+  build_linux:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        build_type: [RelWithDebInfo, Debug]
 
     steps:
+    - name: Initialize the deploy keys
+      run: |
+        mkdir -p "${HOME}/.ssh"
+        if [[ ! -d "${HOME}/.ssh" ]] ; then
+          echo "Failed to create the .ssh directory"
+          exit 1
+        fi
+
+        chmod 700 "${HOME}/.ssh"
+        if [[ $? != 0 ]] ; then
+          echo 'Failed to set the permissions for the .ssh directory'
+          exit 1
+        fi
+
+        echo "${{ secrets.TRAILOFBITS_PASTA_DEPLOY_KEY }}" | base64 -d > "${HOME}/.ssh/id_rsa"
+        if [[ $? != 0 ]] ; then
+          echo "Failed to decode the deploy key for trailofbits/pasta"
+          exit 1
+        fi
+
+        if [[ ! -f "${HOME}/.ssh/id_rsa" ]] ; then
+          echo "Failed to install the deploy key for trailofbits/pasta"
+          exit 1
+        fi
+
+        chmod 600 "${HOME}/.ssh/id_rsa"
+        if [[ $? != 0 ]] ; then
+          echo "Failed to set the permissions for the deploy key"
+          exit 1
+        fi
+
     - name: Clone the repository
       uses: actions/checkout@v2
       with:
         fetch-depth: '1'
 
+    - name: Initialize the submodules
+      run: |
+        git submodule update --init --recursive
+
     - name: Install system dependencies
       run: |
-        sudo apt update
-        sudo apt install -y build-essential \
-                            cmake \
-                            ninja-build \
-                            libpfm4-dev \
-                            rpm \
-                            elfutils \
-                            clang-10 \
-                            libclang-10-dev \
-                            llvm-10-dev \
-                            qtbase5-dev -y
+        sudo apt-get update
+        sudo apt-get install -f -y build-essential \
+                                   cmake \
+                                   ninja-build \
+                                   libpfm4-dev \
+                                   rpm \
+                                   elfutils \
+                                   clang \
+                                   qtbase5-dev \
+                                   curl \
+                                   ccache
+
+    - name: Create the build folders
+      run: |
+        mkdir -p \
+          cache/downloads \
+          build
+
+    - name: CACHE
+      run: |
+        date
+
+    - name: Install the cxx-common libraries
+      id: cxxcommon
+      env:
+        CXXCOMMON_VERSION: "0.1.4"
+        LLVM_VERSION: "12"
+
+      run: |
+        folder_name="vcpkg_${{ matrix.os }}_llvm-${LLVM_VERSION}_amd64"
+        archive_name="${folder_name}.tar.xz"
+        archive_path="cache/downloads/${archive_name}"
+
+        if [ ! -f "${archive_path}" ] ; then
+          curl "https://github.com/lifting-bits/cxx-common/releases/download/v${CXXCOMMON_VERSION}/${archive_name}" \
+            -L \
+            -o "${archive_path}"
+        fi
+
+        tar -C build -xf "$(realpath ${archive_path})"
+        echo ::set-output name=PATH::$(realpath build/${folder_name})
 
     - name: Configure the project
       run: |
-        mkdir build
-        
+       
         cmake -DCMAKE_VERBOSE_MAKEFILE=true \
               -DCMAKE_C_COMPILER=clang \
               -DCMAKE_CXX_COMPILER=clang++ \
-              -DMU_USE_SYSTEM_DEPS=true \
+              -DMU_USE_SYSTEM_DEPS=false \
+              -DVCPKG_ROOT=${{ steps.cxxcommon.outputs.PATH }} \
               -S . \
               -B build \
               -G Ninja

@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.19)
 
 include("cmake/options.cmake")
 if(NOT MU_USE_SYSTEM_DEPS)
-  include("cmake/vcpkg_helper.cmake")
+  include("libraries/pasta/src/cmake/vcpkg_helper.cmake")
 endif()
 
 project("multiplier")
