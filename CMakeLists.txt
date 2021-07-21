@@ -9,6 +9,8 @@
 cmake_minimum_required(VERSION 3.19)
 
 include("cmake/options.cmake")
+include("cmake/ccache.cmake")
+
 if(NOT MU_USE_SYSTEM_DEPS)
   include("libraries/pasta/src/cmake/vcpkg_helper.cmake")
 endif()

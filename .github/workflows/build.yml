@@ -77,11 +77,18 @@ jobs:
       run: |
         mkdir -p \
           cache/downloads \
-          build
+          cache/ccache \
+          build \
 
-    - name: CACHE
-      run: |
-        date
+    - name: Generate the cache key
+      id: cache_key
+      run: echo ::set-output name=VALUE::build_${{ matrix.os }}_type-${{ matrix.build_type }}
+
+    - name: Update the cache
+      uses: actions/cache@v1.0.3
+      with:
+        path: cache
+        key: ${{ steps.cache_key.outputs.VALUE }}
 
     - name: Install the cxx-common libraries
       id: cxxcommon
@@ -154,17 +161,152 @@ jobs:
     - name: Store the DEB package
       uses: actions/upload-artifact@v1
       with:
-        name: linux_native_deb
+        name: linux_deb
         path: ${{ steps.packages.outputs.DEB_PACKAGE }}
 
     - name: Store the RPM package
       uses: actions/upload-artifact@v1
       with:
-        name: linux_native_rpm
+        name: linux_rpm
         path: ${{ steps.packages.outputs.RPM_PACKAGE }}
 
     - name: Store the ZIP package
       uses: actions/upload-artifact@v1
       with:
-        name: linux_native_zip
+        name: linux_zip
+        path: ${{ steps.packages.outputs.ZIP_PACKAGE }}
+
+
+
+
+  build_macos:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-10.15]
+        build_type: [RelWithDebInfo, Debug]
+
+    steps:
+    - name: Initialize the deploy keys
+      run: |
+        mkdir -p "${HOME}/.ssh"
+        if [[ ! -d "${HOME}/.ssh" ]] ; then
+          echo "Failed to create the .ssh directory"
+          exit 1
+        fi
+
+        chmod 700 "${HOME}/.ssh"
+        if [[ $? != 0 ]] ; then
+          echo 'Failed to set the permissions for the .ssh directory'
+          exit 1
+        fi
+
+        echo "${{ secrets.TRAILOFBITS_PASTA_DEPLOY_KEY }}" | base64 -d > "${HOME}/.ssh/id_rsa"
+        if [[ $? != 0 ]] ; then
+          echo "Failed to decode the deploy key for trailofbits/pasta"
+          exit 1
+        fi
+
+        if [[ ! -f "${HOME}/.ssh/id_rsa" ]] ; then
+          echo "Failed to install the deploy key for trailofbits/pasta"
+          exit 1
+        fi
+
+        chmod 600 "${HOME}/.ssh/id_rsa"
+        if [[ $? != 0 ]] ; then
+          echo "Failed to set the permissions for the deploy key"
+          exit 1
+        fi
+
+    - name: Clone the repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: '1'
+
+    - name: Initialize the submodules
+      run: |
+        git submodule update --init --recursive
+
+    - name: Install system dependencies
+      run: |
+        brew update
+        brew install cmake \
+                     ninja \
+                     ccache \
+                     qt@5 \
+                     coreutils
+
+    - name: Create the build folders
+      run: |
+        mkdir -p \
+          cache/downloads \
+          cache/ccache \
+          build
+
+    - name: Generate the cache key
+      id: cache_key
+      run: echo ::set-output name=VALUE::build_${{ matrix.os }}_type-${{ matrix.build_type }}
+
+    - name: Update the cache
+      uses: actions/cache@v1.0.3
+      with:
+        path: cache
+        key: ${{ steps.cache_key.outputs.VALUE }}
+
+    - name: Install the cxx-common libraries
+      id: cxxcommon
+      env:
+        CXXCOMMON_VERSION: "0.1.4"
+        LLVM_VERSION: "12_xcode-12.4"
+
+      run: |
+        folder_name="vcpkg_${{ matrix.os }}_llvm-${LLVM_VERSION}_amd64"
+        archive_name="${folder_name}.tar.xz"
+        archive_path="cache/downloads/${archive_name}"
+
+        if [ ! -f "${archive_path}" ] ; then
+          curl "https://github.com/lifting-bits/cxx-common/releases/download/v${CXXCOMMON_VERSION}/${archive_name}" \
+            -L \
+            -o "${archive_path}"
+        fi
+
+        tar -C build -xf "$(realpath ${archive_path})"
+        echo ::set-output name=PATH::$(realpath build/${folder_name})
+
+    - name: Configure the project
+      run: |
+       
+        cmake -DCMAKE_VERBOSE_MAKEFILE=true \
+              -DCMAKE_C_COMPILER=clang \
+              -DCMAKE_CXX_COMPILER=clang++ \
+              -DMU_USE_SYSTEM_DEPS=false \
+              -DVCPKG_ROOT=${{ steps.cxxcommon.outputs.PATH }} \
+              -DQt5_DIR:PATH="/usr/local/opt/qt@5/lib/cmake/Qt5" \
+              -S . \
+              -B build \
+              -G Ninja
+
+    - name: Build the project
+      run: |
+        cmake --build build
+
+    - name: Build the ZIP package
+      run: |
+        cmake -DCPACK_GENERATOR=ZIP \
+          -S . \
+          -B build
+
+        cmake --build build --target package
+
+    - name: Locate the packages
+      id: packages
+      shell: bash
+      run: |
+        echo ::set-output name=ZIP_PACKAGE::$(ls build/*.zip)
+
+    - name: Store the ZIP package
+      uses: actions/upload-artifact@v1
+      with:
+        name: macos_zip
         path: ${{ steps.packages.outputs.ZIP_PACKAGE }}
