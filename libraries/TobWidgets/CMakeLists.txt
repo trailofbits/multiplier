@@ -19,6 +19,8 @@ add_library(TobWidgets
   include/tob/itextmodel.h
 
   include/tob/itextview.h
+  src/itextview.cpp
+
   src/textview.h
   src/textview.cpp
 

@@ -27,11 +27,12 @@ class ITextView : public QFrame {
   Q_OBJECT
 
 public:
-  static ITextView *create(const QWidget *parent = nullptr);
+  static ITextView *create(QWidget *parent = nullptr);
 
   ITextView(QWidget *parent) : QFrame(parent) {}
   virtual ~ITextView() = default;
 
+  virtual void setModel(ITextModel::Ptr model) = 0;
   virtual void setTheme(const TextViewTheme &theme) = 0;
   virtual std::optional<QString> getSelection() = 0;
 
