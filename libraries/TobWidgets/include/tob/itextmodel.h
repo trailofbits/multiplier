@@ -35,6 +35,8 @@ class ITextModel : public QObject {
   Q_OBJECT
 
 public:
+  using Ptr = std::shared_ptr<ITextModel>;
+
   ITextModel(QObject *parent) : QObject(parent){};
   virtual ~ITextModel() = default;
 

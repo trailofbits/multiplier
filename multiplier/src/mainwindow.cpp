@@ -8,8 +8,7 @@
 
 #include "mainwindow.h"
 #include "compilecommandsindex.h"
-
-#include <tob/itextview.h>
+#include "document.h"
 
 #include <QAction>
 #include <QCloseEvent>
@@ -19,8 +18,6 @@
 #include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QPlainTextEdit>
-#include <QSplitter>
 
 namespace multiplier {
 
@@ -221,31 +218,15 @@ void MainWindow::onHelpAboutAction() {}
 void MainWindow::onCompileCommandsIndexItemActivated(const QString &working_directory,
                                                      const QString &source_file_path,
                                                      const QString &compile_command) {
-  QFile source_code_file(source_file_path);
-  if (!source_code_file.open(QIODevice::ReadOnly)) {
-    QMessageBox::critical(this, tr("IO Error"),
-                          tr("Failed to open the following source code file: ") + source_file_path);
-    return;
-  }
 
-  auto source_code = QString(source_code_file.readAll());
-
-  auto code_viewer = new QPlainTextEdit();
-  code_viewer->setReadOnly(true);
-  code_viewer->setPlainText(source_code);
-
-  auto ast_viewer = new QPlainTextEdit();
-  ast_viewer->setReadOnly(true);
-  ast_viewer->setPlainText("AST HERE");
-
-  auto splitter = new QSplitter();
-  splitter->addWidget(code_viewer);
-  splitter->addWidget(ast_viewer);
+  static_cast<void>(working_directory);
+  static_cast<void>(compile_command);
 
   auto window_title = source_file_path.split("/").takeLast();
+  auto document = new Document(source_file_path);
 
   auto container = new QMdiSubWindow();
-  container->setWidget(splitter);
+  container->setWidget(document);
   container->setWindowTitle(window_title);
   container->setAttribute(Qt::WA_DeleteOnClose);
 

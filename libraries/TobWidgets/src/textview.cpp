@@ -27,14 +27,11 @@ QColor invertColor(const QColor &color) {
 } // namespace
 
 struct TextView::PrivateData final {
-  PrivateData(ITextModel &model_) : model(model_) {}
-
-  ITextModel &model;
+  ITextModel::Ptr model;
   Context context;
 };
 
-TextView::TextView(ITextModel &model, QWidget *parent)
-    : ITextView(parent), d(new PrivateData(model)) {
+TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
   setFont(QFont("Hack"));
   setFocusPolicy(Qt::StrongFocus);
 
@@ -43,11 +40,14 @@ TextView::TextView(ITextModel &model, QWidget *parent)
 
   d->context.theme.background = palette().color(QPalette::Base);
   d->context.theme.foreground = palette().color(QPalette::Text);
-
-  onModelReset();
 }
 
 TextView::~TextView() {}
+
+void TextView::setModel(ITextModel::Ptr model) {
+  d->model = model;
+  onModelReset();
+}
 
 void TextView::setTheme(const TextViewTheme &theme) { d->context.theme = theme; }
 
@@ -63,7 +63,7 @@ std::optional<QString> TextView::getSelection() {
   for (auto token_id = selection.first_cursor.token_id; token_id <= selection.last_cursor.token_id;
        ++token_id) {
 
-    auto token = d->model.tokenData(token_id);
+    auto token = d->model->tokenData(token_id);
 
     if (selection.first_cursor.token_id == token_id && selection.last_cursor.token_id == token_id) {
       auto length =
@@ -97,7 +97,7 @@ void TextView::resizeEvent(QResizeEvent *event) {
 }
 
 void TextView::paintEvent(QPaintEvent *event) {
-  drawViewport(d->context, d->model);
+  drawViewport(d->context, *d->model.get());
 
   QPainter painter(this);
   painter.fillRect(event->rect(), QBrush(d->context.theme.background));
@@ -172,7 +172,7 @@ void TextView::focusOutEvent(QFocusEvent *event) {
 
 void TextView::onModelReset() {
   moveViewport(d->context, QPointF(0.0, 0.0));
-  createTokenIndex(d->context, d->model);
+  createTokenIndex(d->context, *d->model.get());
   resetScene(d->context);
 }
 

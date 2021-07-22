@@ -12,16 +12,18 @@
 
 #include <memory>
 
-namespace tob::widgets {
+using namespace tob::widgets;
+
+namespace multiplier {
 
 class TextModel final : public ITextModel {
   Q_OBJECT
 
 public:
-  TextModel(QObject *parent);
+  TextModel(const QString &path, QObject *parent = nullptr);
   virtual ~TextModel();
 
-  void generateTestData();
+  void generateTestData(const QString &path);
 
   virtual TokenID firstTokenID() const override;
   virtual TokenID lastTokenID() const override;
@@ -43,4 +45,4 @@ signals:
   void modelReset();
 };
 
-} // namespace tob::widgets
+} // namespace multiplier

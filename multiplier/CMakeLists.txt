@@ -17,6 +17,9 @@ add_executable(multiplier
 
   src/compilecommandsindex.h
   src/compilecommandsindex.cpp
+
+  src/document.h
+  src/document.cpp
 )
 
 target_link_libraries(multiplier PRIVATE

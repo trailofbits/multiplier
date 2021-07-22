@@ -16,7 +16,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace tob::widgets {
+namespace multiplier {
 
 struct Token final {
   TokenID id{kInvalidTokenID};
@@ -32,11 +32,12 @@ struct TextModel::PrivateData final {
   std::unordered_map<TokenID, Token> token_map;
 };
 
-TextModel::TextModel(QObject *parent) : ITextModel(parent), d(new PrivateData) {
-  generateTestData();
+TextModel::TextModel(const QString &path, QObject *parent)
+    : ITextModel(parent), d(new PrivateData) {
+  generateTestData(path);
 }
 
-void TextModel::generateTestData() {
+void TextModel::generateTestData(const QString &path) {
   static TokenID token_id_generator{kInvalidTokenID};
   static TokenColorID color_id_generator{kInvalidTokenColorID};
 
@@ -55,8 +56,7 @@ void TextModel::generateTestData() {
   };
 
   std::ifstream input_file;
-  input_file.open("/home/alessandro/Projects/TrailOfBits/widget_test/src/textview.cpp",
-                  std::ios::in);
+  input_file.open(path.toStdString().c_str(), std::ios::in);
   if (!input_file) {
     throw std::runtime_error("Failed to open the input file");
   }
@@ -134,4 +134,4 @@ TokenAttribute TextModel::tokenAttributes(TokenID token_id) const {
   return token.attributes;
 }
 
-} // namespace tob::widgets
+} // namespace multiplier
