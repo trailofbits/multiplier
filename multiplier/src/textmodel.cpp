@@ -8,7 +8,9 @@
 
 #include "textmodel.h"
 
+#include <QDebug>
 #include <QMap>
+#include <QRegularExpression>
 #include <QString>
 
 #include <fstream>
@@ -41,6 +43,8 @@ void TextModel::generateTestData(const QString &path) {
   static TokenID token_id_generator{kInvalidTokenID};
   static TokenColorID color_id_generator{kInvalidTokenColorID};
 
+  qDebug() << "Opening:" << path;
+
   auto L_addToken = [&](const QString &str) {
     ++token_id_generator;
     color_id_generator = (color_id_generator + 1) % 10;
@@ -63,7 +67,7 @@ void TextModel::generateTestData(const QString &path) {
 
   std::string line;
   while (std::getline(input_file, line)) {
-    auto token_list = QString(line.c_str()).split(QRegExp("\\b"));
+    auto token_list = QString(line.c_str()).split(QRegularExpression("\\b"));
     for (const auto &token : token_list) {
       L_addToken(token);
     }

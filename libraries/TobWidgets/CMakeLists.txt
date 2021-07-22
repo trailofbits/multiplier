@@ -35,8 +35,8 @@ target_link_libraries(TobWidgets PRIVATE
   tobwidgets_cxx_settings
 )
 
-find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(Qt${MU_QT_VERSION} COMPONENTS Core Widgets REQUIRED)
 target_link_libraries(TobWidgets PRIVATE
-  Qt5::Core
-  Qt5::Widgets
+  Qt${MU_QT_VERSION}::Core
+  Qt${MU_QT_VERSION}::Widgets
 )
