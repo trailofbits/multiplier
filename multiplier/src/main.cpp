@@ -39,7 +39,10 @@ QPalette getPalette() {
 }
 
 void initializeTheme() {
+#ifndef __linux__
   qApp->setStyle("Fusion");
+#endif
+
   qApp->setPalette(getPalette());
 }
 

@@ -16,13 +16,11 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 add_library(TobWidgets
+  include/tob/itextmodel.h
+
   include/tob/itextview.h
   src/textview.h
   src/textview.cpp
-
-  include/tob/itextmodel.h
-  src/textmodel.h
-  src/textmodel.cpp
 
   src/glyphcache.h
   src/glyphcache.cpp
