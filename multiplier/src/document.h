@@ -12,6 +12,10 @@
 
 #include <memory>
 
+#include <tob/itextview.h>
+
+using namespace tob::widgets;
+
 namespace multiplier {
 
 class Document : public QFrame {
@@ -27,6 +31,12 @@ public:
 private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
+
+private slots:
+  void onTokenClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+                      TokenID token_id);
+
+  void onCopyAction();
 };
 
 } // namespace multiplier

@@ -51,6 +51,8 @@ void TextView::setModel(ITextModel::Ptr model) {
 
 void TextView::setTheme(const TextViewTheme &theme) { d->context.theme = theme; }
 
+bool TextView::hasSelection() const { return d->context.opt_selection.has_value(); }
+
 std::optional<QString> TextView::getSelection() {
   if (!d->context.opt_selection.has_value()) {
     return std::nullopt;
