@@ -24,8 +24,8 @@ add_executable(multiplier
 
 target_link_libraries(multiplier PRIVATE
   mu_cxx_settings
-  Qt5::Core
-  Qt5::Widgets
+  Qt${MU_QT_VERSION}::Core
+  Qt${MU_QT_VERSION}::Widgets
 )
 
 find_package(pasta REQUIRED)
@@ -37,6 +37,17 @@ find_package(TobWidgets REQUIRED)
 target_link_libraries(multiplier PRIVATE
   TobWidgets
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  target_sources(multiplier PRIVATE
+    src/macos_utils.h
+    src/macos_utils.mm
+  )
+
+  target_link_libraries(multiplier PRIVATE
+    "-framework AppKit"
+  )
+endif()
 
 if(MU_ENABLE_INSTALL)
   install(TARGETS multiplier DESTINATION bin)

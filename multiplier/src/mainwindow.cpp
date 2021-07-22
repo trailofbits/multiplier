@@ -10,6 +10,10 @@
 #include "compilecommandsindex.h"
 #include "document.h"
 
+#ifdef __APPLE__
+#include "macos_utils.h"
+#endif
+
 #include <QAction>
 #include <QCloseEvent>
 #include <QDockWidget>
@@ -93,6 +97,10 @@ void MainWindow::initializeWidgets() {
 
   d->widgets.compile_cmds_index_dock = createDockWidget(d->widgets.compile_cmds_index);
   addDockWidget(Qt::LeftDockWidgetArea, d->widgets.compile_cmds_index_dock);
+
+#ifdef __APPLE__
+  setTitleBarColor(winId(), palette().color(QPalette::Window), false);
+#endif
 }
 
 void MainWindow::initializeMenus() {

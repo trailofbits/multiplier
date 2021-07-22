@@ -33,6 +33,7 @@ Document::Document(const QString &source_file_path, QWidget *parent)
   d->model = std::make_shared<TextModel>(source_file_path);
 
   auto layout = new QVBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
   setLayout(layout);
 
   auto splitter = new QSplitter();

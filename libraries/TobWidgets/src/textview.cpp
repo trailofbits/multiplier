@@ -17,9 +17,9 @@ namespace tob::widgets {
 namespace {
 
 QColor invertColor(const QColor &color) {
-  auto red = 1.0 - color.redF();
-  auto green = 1.0 - color.greenF();
-  auto blue = 1.0 - color.blueF();
+  auto red = 1.0f - color.redF();
+  auto green = 1.0f - color.greenF();
+  auto blue = 1.0f - color.blueF();
 
   return QColor::fromRgbF(red, green, blue);
 }
@@ -204,9 +204,7 @@ void TextView::drawViewport(Context &context, const ITextModel &model) {
   }
 
   context.viewport_surface.fill(Qt::transparent);
-
   QPainter painter(&context.viewport_surface);
-  painter.setRenderHint(QPainter::Antialiasing);
 
   QPointF translation(-context.viewport.x(), -context.viewport.y());
   auto font_width = context.font_metrics->horizontalAdvance(".");
@@ -248,7 +246,7 @@ void TextView::drawViewport(Context &context, const ITextModel &model) {
         }
 
         const auto &glyph = context.glyph_cache->get(c);
-        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.setCompositionMode(QPainter::CompositionMode_Source);
         painter.drawPixmap(pos, glyph);
 
         auto foreground = context.theme.foreground;
@@ -268,7 +266,7 @@ void TextView::drawViewport(Context &context, const ITextModel &model) {
         if (highlight) {
           auto background = invertColor(context.theme.background);
 
-          painter.setCompositionMode(QPainter::CompositionMode_DestinationAtop);
+          painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
           painter.fillRect(QRect((int)pos.x(), (int)pos.y(), glyph.width(), glyph.height()),
                            QBrush(background));
         }

@@ -39,7 +39,7 @@ QPalette getPalette() {
 }
 
 void initializeTheme() {
-#ifndef __linux__
+#ifdef __APPLE__
   qApp->setStyle("Fusion");
 #endif
 
@@ -49,9 +49,8 @@ void initializeTheme() {
 } // namespace
 
 int main(int argc, char *argv[]) {
-  initializeTheme();
-
   QApplication application(argc, argv);
+  initializeTheme();
 
   auto main_window = multiplier::MainWindow::create();
   main_window->show();

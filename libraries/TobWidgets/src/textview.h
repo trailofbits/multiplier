@@ -8,15 +8,16 @@
 
 #pragma once
 
+#include "glyphcache.h"
+
 #include <tob/itextmodel.h>
 #include <tob/itextview.h>
 
 #include <memory>
 
 #include <QFontMetricsF>
+#include <QPixmap>
 #include <QRectF>
-
-#include "glyphcache.h"
 
 namespace tob::widgets {
 
