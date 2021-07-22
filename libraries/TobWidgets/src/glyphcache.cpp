@@ -82,7 +82,6 @@ void GlyphCache::generateGlyph(QPixmap &pixmap, QChar c) {
   QPainter painter(&pixmap);
   painter.setFont(d->font);
   painter.setPen(QPen(QColor::fromRgba(0xFFFFFFFF)));
-  painter.setCompositionMode(QPainter::CompositionMode_Source);
   painter.setRenderHint(QPainter::Antialiasing);
   painter.drawText(d->glyph_rect, Qt::AlignCenter | Qt::TextSingleLine, c);
 }

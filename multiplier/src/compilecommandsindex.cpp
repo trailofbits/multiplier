@@ -26,6 +26,7 @@ CompileCommandsIndex::CompileCommandsIndex(QWidget *parent) : QFrame(parent), d(
   setWindowTitle(tr("Compile Commands"));
 
   auto layout = new QVBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
   setLayout(layout);
 
   d->source_file_tree = new QTreeWidget();

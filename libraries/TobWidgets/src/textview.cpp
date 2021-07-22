@@ -32,7 +32,12 @@ struct TextView::PrivateData final {
 };
 
 TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
+#ifdef __linux__
   setFont(QFont("Hack"));
+#else
+  setFont(QFont("Monaco"));
+#endif
+
   setFocusPolicy(Qt::StrongFocus);
 
   d->context.font_metrics = std::make_unique<QFontMetricsF>(font(), this);
