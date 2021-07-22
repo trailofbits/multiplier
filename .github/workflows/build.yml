@@ -10,6 +10,26 @@ on:
       - '*'
 
 jobs:
+  build:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    needs: [build_linux, build_macos]
+    steps:
+    - name: Check Linux build status
+      if: ${{ needs.build_linux.result != 'success' }}
+      run: |
+        echo "The Linux build has failed"
+        exit 1
+
+    - name: Check macOS build status
+      if: ${{ needs.build_macos.result != 'success' }}
+      run: |
+        echo "The macOS build has failed"
+        exit 1
+
+
+
+
   build_linux:
     runs-on: ${{ matrix.os }}
 
@@ -112,7 +132,8 @@ jobs:
 
     - name: Configure the project
       run: |
-       
+        export CCACHE_DIR="$(realpath cache/ccache)"
+
         cmake -DCMAKE_VERBOSE_MAKEFILE=true \
               -DCMAKE_C_COMPILER=clang \
               -DCMAKE_CXX_COMPILER=clang++ \
@@ -124,10 +145,12 @@ jobs:
 
     - name: Build the project
       run: |
+        export CCACHE_DIR="$(realpath cache/ccache)"
         cmake --build build
 
     - name: Build the DEB package
       run: |
+        export CCACHE_DIR="$(realpath cache/ccache)"
         cmake -DCPACK_GENERATOR=DEB \
           -S . \
           -B build
@@ -136,6 +159,7 @@ jobs:
 
     - name: Build the RPM package
       run: |
+        export CCACHE_DIR="$(realpath cache/ccache)"
         cmake -DCPACK_GENERATOR=RPM \
           -S . \
           -B build
@@ -144,6 +168,7 @@ jobs:
 
     - name: Build the ZIP package
       run: |
+        export CCACHE_DIR="$(realpath cache/ccache)"
         cmake -DCPACK_GENERATOR=ZIP \
           -S . \
           -B build
@@ -276,7 +301,7 @@ jobs:
 
     - name: Configure the project
       run: |
-       
+        export CCACHE_DIR="$(realpath cache/ccache)"
         cmake -DCMAKE_VERBOSE_MAKEFILE=true \
               -DCMAKE_C_COMPILER=clang \
               -DCMAKE_CXX_COMPILER=clang++ \
@@ -289,10 +314,12 @@ jobs:
 
     - name: Build the project
       run: |
+        export CCACHE_DIR="$(realpath cache/ccache)"
         cmake --build build
 
     - name: Build the ZIP package
       run: |
+        export CCACHE_DIR="$(realpath cache/ccache)"
         cmake -DCPACK_GENERATOR=ZIP \
           -S . \
           -B build
