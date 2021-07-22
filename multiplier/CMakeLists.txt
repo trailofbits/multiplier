@@ -11,6 +11,12 @@ add_executable(multiplier
 
   src/mainwindow.h
   src/mainwindow.cpp
+
+  src/textmodel.h
+  src/textmodel.cpp
+
+  src/compilecommandsindex.h
+  src/compilecommandsindex.cpp
 )
 
 target_link_libraries(multiplier PRIVATE

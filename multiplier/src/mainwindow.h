@@ -26,11 +26,34 @@ public:
   MainWindow(const MainWindow &) = delete;
   MainWindow &operator=(const MainWindow &) = delete;
 
+protected:
+  virtual void closeEvent(QCloseEvent *event) override;
+
 private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
   MainWindow();
+  QDockWidget *createDockWidget(QWidget *widget);
+
+  void initializeWidgets();
+  void initializeMenus();
+  void initializeUI();
+
+  void updateMenus();
+  void updateWidgets();
+  void updateUI();
+
+private slots:
+  void onFileOpenAction();
+  void onFileCloseAction();
+  void onFileExitAction();
+
+  void onHelpAboutAction();
+
+  void onCompileCommandsIndexItemActivated(const QString &working_directory,
+                                           const QString &source_file_path,
+                                           const QString &compile_command);
 };
 
 } // namespace multiplier

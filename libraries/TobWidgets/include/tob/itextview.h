@@ -30,7 +30,7 @@ public:
   static ITextView *create(const QWidget *parent = nullptr);
 
   ITextView(QWidget *parent) : QFrame(parent) {}
-  virtual ~ITextView();
+  virtual ~ITextView() = default;
 
   virtual void setTheme(const TextViewTheme &theme) = 0;
   virtual std::optional<QString> getSelection() = 0;
