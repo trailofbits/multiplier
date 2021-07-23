@@ -23,9 +23,6 @@ add_library(TobWidgets
 
   src/textview.h
   src/textview.cpp
-
-  src/glyphcache.h
-  src/glyphcache.cpp
 )
 
 target_include_directories(TobWidgets PRIVATE include)
