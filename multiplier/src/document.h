@@ -22,7 +22,8 @@ class Document : public QFrame {
   Q_OBJECT
 
 public:
-  Document(const QString &source_file_path, QWidget *parent = nullptr);
+  Document(const QString &source_file_path, const QString &working_directory,
+           const QString &compile_command, QWidget *parent = nullptr);
   virtual ~Document();
 
   Document(const Document &) = delete;
@@ -33,8 +34,11 @@ private:
   std::unique_ptr<PrivateData> d;
 
 private slots:
-  void onTokenClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
-                      TokenID token_id);
+  void onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+                               TokenID token_id);
+
+  void onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+                        TokenID token_id);
 
   void onCopyAction();
 };

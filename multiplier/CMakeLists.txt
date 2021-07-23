@@ -12,14 +12,20 @@ add_executable(multiplier
   src/mainwindow.h
   src/mainwindow.cpp
 
-  src/textmodel.h
-  src/textmodel.cpp
+  src/sourcecodemodel.h
+  src/sourcecodemodel.cpp
+
+  src/astmodel.h
+  src/astmodel.cpp
 
   src/compilecommandsindex.h
   src/compilecommandsindex.cpp
 
   src/document.h
   src/document.cpp
+
+  src/astgenerator.h
+  src/astgenerator.cpp
 )
 
 target_link_libraries(multiplier PRIVATE

@@ -7,30 +7,34 @@
 */
 
 #include "document.h"
-#include "textmodel.h"
+#include "astmodel.h"
+#include "sourcecodemodel.h"
 
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
 #include <QMenu>
-#include <QPlainTextEdit>
 #include <QSplitter>
 #include <QVBoxLayout>
 
 namespace multiplier {
 
 struct Document::PrivateData final {
-  tob::widgets::ITextModel::Ptr model;
+  tob::widgets::ITextModel::Ptr code_model;
   tob::widgets::ITextView *text_view{nullptr};
-  QPlainTextEdit *ast_view{nullptr};
+
+  tob::widgets::ITextModel::Ptr ast_model;
+  tob::widgets::ITextView *ast_view{nullptr};
 
   QMenu *context_menu{nullptr};
   QAction *copy_action{nullptr};
 };
 
-Document::Document(const QString &source_file_path, QWidget *parent)
+Document::Document(const QString &source_file_path, const QString &working_directory,
+                   const QString &compile_command, QWidget *parent)
     : QFrame(parent), d(new PrivateData) {
-  d->model = std::make_shared<TextModel>(source_file_path);
+  d->ast_model = std::make_shared<ASTModel>(working_directory, compile_command);
+  d->code_model = std::make_shared<SourceCodeModel>(source_file_path);
 
   auto layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
@@ -52,16 +56,18 @@ Document::Document(const QString &source_file_path, QWidget *parent)
 
   d->text_view = ITextView::create();
   d->text_view->setTheme(theme);
-  d->text_view->setModel(d->model);
+  d->text_view->setModel(d->code_model);
   connect(d->text_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
-          this, SLOT(onTokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
+          this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
   splitter->addWidget(d->text_view);
 
-  d->ast_view = new QPlainTextEdit();
-  d->ast_view->setPlainText(tr("TODO"));
-  d->ast_view->setReadOnly(true);
+  d->ast_view = ITextView::create();
+  d->ast_view->setTheme(theme);
+  d->ast_view->setModel(d->ast_model);
   splitter->addWidget(d->ast_view);
+  connect(d->ast_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)), this,
+          SLOT(onASTItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
   d->context_menu = new QMenu(tr("Context menu"));
 
@@ -73,8 +79,8 @@ Document::Document(const QString &source_file_path, QWidget *parent)
 
 Document::~Document() {}
 
-void Document::onTokenClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
-                              TokenID token_id) {
+void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+                                       TokenID token_id) {
   d->copy_action->setEnabled(d->text_view->hasSelection());
 
   // Custom menu example
@@ -83,7 +89,29 @@ void Document::onTokenClicked(const QPoint &mouse_position, const Qt::MouseButto
     additional_menu = new QMenu(tr("Test menu"));
     d->context_menu->addMenu(additional_menu);
 
-    auto token_data = d->model->tokenData(token_id);
+    auto token_data = d->code_model->tokenData(token_id);
+    auto test_action = new QAction(tr("Test action for ") + token_data);
+    additional_menu->addAction(test_action);
+  }
+
+  d->context_menu->exec(mouse_position);
+
+  if (additional_menu != nullptr) {
+    d->context_menu->removeAction(additional_menu->menuAction());
+  }
+}
+
+void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+                                TokenID token_id) {
+  d->copy_action->setEnabled(d->text_view->hasSelection());
+
+  // Custom menu example
+  QMenu *additional_menu{nullptr};
+  if (token_id != kInvalidTokenID) {
+    additional_menu = new QMenu(tr("Test menu"));
+    d->context_menu->addMenu(additional_menu);
+
+    auto token_data = d->ast_model->tokenData(token_id);
     auto test_action = new QAction(tr("Test action for ") + token_data);
     additional_menu->addAction(test_action);
   }
