@@ -220,7 +220,9 @@ void TextView::paintEvent(QPaintEvent *event) {
 }
 
 void TextView::mousePressEvent(QMouseEvent *event) {
-  QPointF mouse_position(static_cast<qreal>(event->x()), static_cast<qreal>(event->y()));
+  QPointF mouse_position(static_cast<qreal>(event->x() + d->context.viewport.x()),
+                         static_cast<qreal>(event->y() + d->context.viewport.y()));
+
   auto opt_cursor = createCursor(d->context, mouse_position);
   if (!opt_cursor.has_value()) {
     return;
@@ -264,7 +266,8 @@ void TextView::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  QPointF mouse_position(static_cast<qreal>(event->x()), static_cast<qreal>(event->y()));
+  QPointF mouse_position(static_cast<qreal>(event->x() + d->context.viewport.x()),
+                         static_cast<qreal>(event->y() + d->context.viewport.y()));
 
   auto opt_cursor = createCursor(d->context, mouse_position);
   if (opt_cursor.has_value()) {
