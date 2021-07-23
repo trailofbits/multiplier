@@ -34,6 +34,7 @@ public:
 
   virtual void setModel(ITextModel::Ptr model) = 0;
   virtual void setTheme(const TextViewTheme &theme) = 0;
+  virtual void setWordWrapping(bool enabled) = 0;
 
   virtual bool hasSelection() const = 0;
   virtual std::optional<QString> getSelection() = 0;

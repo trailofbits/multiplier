@@ -28,6 +28,7 @@ public:
 
   virtual void setModel(ITextModel::Ptr model) override;
   virtual void setTheme(const TextViewTheme &theme) override;
+  virtual void setWordWrapping(bool enabled) override;
 
   virtual bool hasSelection() const override;
   virtual std::optional<QString> getSelection() override;
@@ -39,13 +40,17 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *event) override;
   virtual void mouseMoveEvent(QMouseEvent *event) override;
   virtual void focusOutEvent(QFocusEvent *event) override;
+  virtual void wheelEvent(QWheelEvent *event) override;
 
 private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
+  void updateScrollbars();
+
 private slots:
   void onModelReset();
+  void onScrollBarValueChange(int);
 
 public:
   struct TokenEntity final {
@@ -77,6 +82,7 @@ public:
   using OptionalSelection = std::optional<Selection>;
 
   struct Scene final {
+    QRectF bounding_box;
     SceneRowList row_list;
   };
 
@@ -94,6 +100,7 @@ public:
     bool word_wrap{true};
   };
 
+  static void scrollViewportTo(Context &context, const QPointF &point);
   static void resizeViewport(Context &context, const QSizeF &size);
   static void moveViewport(Context &context, const QPointF &point);
   static void createTokenIndex(Context &context, ITextModel &model);

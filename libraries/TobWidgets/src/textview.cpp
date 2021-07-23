@@ -9,8 +9,12 @@
 #include "textview.h"
 
 #include <QApplication>
+#include <QHBoxLayout>
 #include <QPainter>
 #include <QResizeEvent>
+#include <QScrollBar>
+#include <QSpacerItem>
+#include <QVBoxLayout>
 
 namespace tob::widgets {
 
@@ -29,6 +33,9 @@ QColor invertColor(const QColor &color) {
 struct TextView::PrivateData final {
   ITextModel::Ptr model;
   Context context;
+
+  QScrollBar *horizontal_scrollbar{nullptr};
+  QScrollBar *vertical_scrollbar{nullptr};
 };
 
 TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
@@ -44,6 +51,31 @@ TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
 
   d->context.theme.background = palette().color(QPalette::Base);
   d->context.theme.foreground = palette().color(QPalette::Text);
+
+  d->vertical_scrollbar = new QScrollBar(Qt::Vertical);
+  d->vertical_scrollbar->setSingleStep(1);
+  connect(d->vertical_scrollbar, &QScrollBar::valueChanged, this,
+          &TextView::onScrollBarValueChange);
+
+  d->horizontal_scrollbar = new QScrollBar(Qt::Horizontal);
+  d->horizontal_scrollbar->setSingleStep(1);
+  connect(d->horizontal_scrollbar, &QScrollBar::valueChanged, this,
+          &TextView::onScrollBarValueChange);
+
+  auto vertical_layout = new QVBoxLayout();
+  vertical_layout->setContentsMargins(0, 0, 0, 0);
+  vertical_layout->setSpacing(0);
+  vertical_layout->addSpacerItem(
+      new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+  vertical_layout->addWidget(d->horizontal_scrollbar);
+
+  auto horizontal_layout = new QHBoxLayout();
+  horizontal_layout->setContentsMargins(0, 0, 0, 0);
+  horizontal_layout->setSpacing(0);
+  horizontal_layout->addLayout(vertical_layout);
+  horizontal_layout->addWidget(d->vertical_scrollbar);
+  setLayout(horizontal_layout);
 }
 
 TextView::~TextView() {}
@@ -55,6 +87,8 @@ void TextView::setModel(ITextModel::Ptr model) {
 }
 
 void TextView::setTheme(const TextViewTheme &theme) { d->context.theme = theme; }
+
+void TextView::setWordWrapping(bool enabled) { d->context.word_wrap = enabled; }
 
 bool TextView::hasSelection() const { return d->context.opt_selection.has_value(); }
 
@@ -100,6 +134,7 @@ void TextView::resizeEvent(QResizeEvent *event) {
   auto height = static_cast<qreal>(event->size().height());
 
   resizeViewport(d->context, QSizeF(width, height));
+  updateScrollbars();
   resetScene(d->context);
 }
 
@@ -111,7 +146,7 @@ void TextView::paintEvent(QPaintEvent *event) {
   }
 
   QPainter painter(this);
-  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::HighQualityAntialiasing);
   painter.fillRect(painter.viewport(), QBrush(context.theme.background));
 
   QPointF translation(-context.viewport.x(), -context.viewport.y());
@@ -182,6 +217,8 @@ void TextView::paintEvent(QPaintEvent *event) {
       }
     }
   }
+
+  painter.drawRect(scene.bounding_box);
 }
 
 void TextView::mousePressEvent(QMouseEvent *event) {
@@ -249,10 +286,135 @@ void TextView::focusOutEvent(QFocusEvent *event) {
   }
 }
 
+void TextView::wheelEvent(QWheelEvent *event) {
+  // On macOS, the most precise way to implement scrolling is to use pixelDelta;
+  // it is however not available on other platforms, so if that value is empty
+  // we should fallback to angleDelta instead
+  //
+  // NOTE: This also handles touchpad scrolling!
+
+  int vertical_pixel_delta{};
+  int horizontal_pixel_delta{};
+
+  if (auto pixel_delta_point = event->pixelDelta(); !pixel_delta_point.isNull()) {
+    vertical_pixel_delta = pixel_delta_point.y();
+    horizontal_pixel_delta = pixel_delta_point.x();
+
+  } else {
+    // High resolution gaming mice are capable of returning fractions of what is
+    // usually considered a single mouse wheel turn
+    auto vertical_angle_delta = event->angleDelta().y();
+    auto horizontal_angle_delta = event->angleDelta().x();
+
+    auto line_height = QFontMetrics(font(), this).height();
+
+    vertical_pixel_delta = line_height * static_cast<int>(vertical_angle_delta * 1.0 / 120.0);
+
+    horizontal_pixel_delta = line_height * static_cast<int>(horizontal_angle_delta * 1.0 / 120.0);
+  }
+
+  vertical_pixel_delta *= -1;
+  horizontal_pixel_delta *= -1;
+
+  // Get the next vertical scrollbar value
+  auto next_vertical_scrollbar_value = d->vertical_scrollbar->value() + vertical_pixel_delta;
+
+  if (next_vertical_scrollbar_value < d->vertical_scrollbar->minimum()) {
+    next_vertical_scrollbar_value = d->vertical_scrollbar->minimum();
+
+  } else if (next_vertical_scrollbar_value > d->vertical_scrollbar->maximum()) {
+    next_vertical_scrollbar_value = d->vertical_scrollbar->maximum();
+  }
+
+  d->vertical_scrollbar->setValue(next_vertical_scrollbar_value);
+
+  // Get the next horizontal scrollbar value
+  auto next_horizontal_scrollbar_value = d->horizontal_scrollbar->value() + horizontal_pixel_delta;
+
+  if (next_horizontal_scrollbar_value < d->horizontal_scrollbar->minimum()) {
+    next_horizontal_scrollbar_value = d->horizontal_scrollbar->minimum();
+
+  } else if (next_horizontal_scrollbar_value > d->horizontal_scrollbar->maximum()) {
+    next_horizontal_scrollbar_value = d->horizontal_scrollbar->maximum();
+  }
+
+  d->horizontal_scrollbar->setValue(next_horizontal_scrollbar_value);
+
+  onScrollBarValueChange(0);
+}
+
+void TextView::updateScrollbars() {
+  if (!d->context.opt_scene.has_value()) {
+    return;
+  }
+
+  const auto &scene = d->context.opt_scene.value();
+  auto scene_width = scene.bounding_box.width();
+  auto scene_height = scene.bounding_box.height();
+
+  if (d->context.viewport.width() < scene_width) {
+    d->horizontal_scrollbar->show();
+    d->horizontal_scrollbar->setMaximum(
+        static_cast<int>(scene_width - d->context.viewport.width()));
+
+  } else {
+    d->horizontal_scrollbar->hide();
+    d->horizontal_scrollbar->setMaximum(0);
+  }
+
+  if (d->context.viewport.height() < scene_height) {
+    d->vertical_scrollbar->show();
+    d->vertical_scrollbar->setMaximum(
+        static_cast<int>(scene_height - d->context.viewport.height()));
+
+  } else {
+    d->vertical_scrollbar->hide();
+    d->vertical_scrollbar->setMaximum(0);
+  }
+}
+
 void TextView::onModelReset() {
   moveViewport(d->context, QPointF(0.0, 0.0));
   createTokenIndex(d->context, *d->model.get());
+  updateScrollbars();
   resetScene(d->context);
+}
+
+void TextView::onScrollBarValueChange(int) {
+  auto vertical_scroll_value = static_cast<qreal>(d->vertical_scrollbar->value());
+
+  auto horizontal_scroll_value = static_cast<qreal>(d->horizontal_scrollbar->value());
+
+  scrollViewportTo(d->context, QPointF(horizontal_scroll_value, vertical_scroll_value));
+
+  update();
+}
+
+void TextView::scrollViewportTo(Context &context, const QPointF &point) {
+  if (!context.opt_scene.has_value()) {
+    return;
+  }
+
+  context.viewport.moveTo(point);
+
+  const auto &scene = context.opt_scene.value();
+  auto max_x = scene.bounding_box.x() + scene.bounding_box.width();
+  if (context.viewport.x() > max_x) {
+    context.viewport.setX(max_x);
+  }
+
+  auto max_y = scene.bounding_box.y() + scene.bounding_box.height();
+  if (context.viewport.y() > max_y) {
+    context.viewport.setY(max_y);
+  }
+
+  if (context.viewport.x() < 0) {
+    context.viewport.moveTo(0.0, context.viewport.y());
+  }
+
+  if (context.viewport.y() < 0) {
+    context.viewport.moveTo(context.viewport.x(), 0.0);
+  }
 }
 
 void TextView::resizeViewport(Context &context, const QSizeF &size) {
@@ -295,6 +457,9 @@ void TextView::generateScene(Context &context) {
   auto font_height = context.font_metrics->height();
 
   QPointF current_pos(font_height, font_height);
+  scene.bounding_box.setWidth(font_height);
+  scene.bounding_box.setHeight(font_height);
+
   auto right_margin = context.viewport.x() + context.viewport.width();
 
   for (const auto &token_entity_row : context.token_index) {
@@ -317,12 +482,15 @@ void TextView::generateScene(Context &context) {
       row.entity_list.push_back(std::move(token_entity));
     }
 
+    scene.bounding_box = scene.bounding_box.united(row.bounding_box);
     scene.row_list.push_back(std::move(row));
     row = {};
 
     current_pos.setX(font_height);
     current_pos.setY(current_pos.y() + font_height);
   }
+
+  scene.bounding_box.adjust(0.0, 0.0, font_height, font_height);
 
   context.opt_scene = std::move(scene);
 }
