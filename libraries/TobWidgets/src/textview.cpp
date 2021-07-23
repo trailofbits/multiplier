@@ -146,7 +146,7 @@ void TextView::paintEvent(QPaintEvent *event) {
   }
 
   QPainter painter(this);
-  painter.setRenderHint(QPainter::HighQualityAntialiasing);
+  painter.setRenderHint(QPainter::Antialiasing);
   painter.fillRect(painter.viewport(), QBrush(context.theme.background));
 
   QPointF translation(-context.viewport.x(), -context.viewport.y());
@@ -217,8 +217,6 @@ void TextView::paintEvent(QPaintEvent *event) {
       }
     }
   }
-
-  painter.drawRect(scene.bounding_box);
 }
 
 void TextView::mousePressEvent(QMouseEvent *event) {
