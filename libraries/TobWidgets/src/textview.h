@@ -8,15 +8,12 @@
 
 #pragma once
 
-#include "glyphcache.h"
-
 #include <tob/itextmodel.h>
 #include <tob/itextview.h>
 
 #include <memory>
 
 #include <QFontMetricsF>
-#include <QPixmap>
 #include <QRectF>
 
 namespace tob::widgets {
@@ -87,8 +84,6 @@ public:
 
   struct Context final {
     QRectF viewport;
-    QPixmap viewport_surface;
-    GlyphCache::Ptr glyph_cache;
     TextViewTheme theme;
 
     std::unique_ptr<QFontMetricsF> font_metrics;
@@ -99,10 +94,8 @@ public:
     bool word_wrap{true};
   };
 
-  static void resizeViewport(Context &context, qreal pixel_ratio, const QSizeF &size);
+  static void resizeViewport(Context &context, const QSizeF &size);
   static void moveViewport(Context &context, const QPointF &point);
-  static void drawViewport(Context &context, const ITextModel &model);
-
   static void createTokenIndex(Context &context, ITextModel &model);
   static void resetScene(Context &context);
   static void generateScene(Context &context);

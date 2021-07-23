@@ -41,7 +41,6 @@ TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
   setFocusPolicy(Qt::StrongFocus);
 
   d->context.font_metrics = std::make_unique<QFontMetricsF>(font(), this);
-  d->context.glyph_cache = GlyphCache::create(devicePixelRatio(), font(), 2048);
 
   d->context.theme.background = palette().color(QPalette::Base);
   d->context.theme.foreground = palette().color(QPalette::Text);
@@ -50,6 +49,7 @@ TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
 TextView::~TextView() {}
 
 void TextView::setModel(ITextModel::Ptr model) {
+  // TODO: connect the modelReset signal
   d->model = model;
   onModelReset();
 }
@@ -99,17 +99,89 @@ void TextView::resizeEvent(QResizeEvent *event) {
   auto width = static_cast<qreal>(event->size().width());
   auto height = static_cast<qreal>(event->size().height());
 
-  resizeViewport(d->context, devicePixelRatio(), QSizeF(width, height));
+  resizeViewport(d->context, QSizeF(width, height));
   resetScene(d->context);
 }
 
 void TextView::paintEvent(QPaintEvent *event) {
-  drawViewport(d->context, *d->model.get());
+  auto &context = d->context;
+
+  if (!context.opt_scene) {
+    generateScene(context);
+  }
 
   QPainter painter(this);
-  painter.fillRect(event->rect(), QBrush(d->context.theme.background));
-  painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-  painter.drawPixmap(QPointF(0.0, 0.0), d->context.viewport_surface);
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.fillRect(painter.viewport(), QBrush(context.theme.background));
+
+  QPointF translation(-context.viewport.x(), -context.viewport.y());
+
+  auto font_width = context.font_metrics->horizontalAdvance(".");
+  auto font_height = context.font_metrics->height();
+
+  QRectF glyph_rect(0.0, 0.0, font_width, font_height);
+
+  const auto &scene = context.opt_scene.value();
+  for (const auto &row : scene.row_list) {
+    if (!row.bounding_box.intersects(context.viewport)) {
+      continue;
+    }
+
+    for (const auto &entity : row.entity_list) {
+      QPointF pos(entity.bounding_box.x(), entity.bounding_box.y());
+      pos += translation;
+
+      const auto &token = d->model->tokenData(entity.token_id);
+      std::size_t character_index = 0;
+
+      for (const auto &c : token) {
+        bool highlight{false};
+        if (context.opt_selection.has_value()) {
+          auto selection = context.opt_selection.value();
+          sanitizeSelection(selection);
+
+          if (selection.first_cursor.token_id == entity.token_id &&
+              selection.last_cursor.token_id == entity.token_id) {
+            highlight = character_index >= selection.first_cursor.offset &&
+                        character_index <= selection.last_cursor.offset;
+
+          } else if (selection.first_cursor.token_id == entity.token_id) {
+            highlight = character_index >= selection.first_cursor.offset;
+
+          } else if (selection.last_cursor.token_id == entity.token_id) {
+            highlight = character_index <= selection.last_cursor.offset;
+
+          } else {
+            highlight = (entity.token_id > selection.first_cursor.token_id &&
+                         entity.token_id < selection.last_cursor.token_id);
+          }
+        }
+
+        auto background = context.theme.background;
+        auto foreground = context.theme.foreground;
+
+        if (auto color_id = d->model->tokenColor(entity.token_id);
+            color_id != kInvalidTokenColorID && context.theme.color_map.count(color_id) > 0) {
+          foreground = context.theme.color_map.at(color_id);
+        }
+
+        if (highlight) {
+          background = invertColor(background);
+          foreground = invertColor(foreground);
+        }
+
+        glyph_rect.moveTo(pos);
+        painter.fillRect(glyph_rect.adjusted(-1.0, -1.0, 0.0, 0.0), QBrush(background));
+
+        painter.setPen(QPen(foreground));
+        painter.drawText(glyph_rect, Qt::AlignCenter | Qt::TextSingleLine, c);
+
+        pos.setX(pos.x() + font_width);
+
+        ++character_index;
+      }
+    }
+  }
 }
 
 void TextView::mousePressEvent(QMouseEvent *event) {
@@ -183,100 +255,13 @@ void TextView::onModelReset() {
   resetScene(d->context);
 }
 
-void TextView::resizeViewport(Context &context, qreal pixel_ratio, const QSizeF &size) {
+void TextView::resizeViewport(Context &context, const QSizeF &size) {
   context.viewport.setWidth(size.width());
   context.viewport.setHeight(size.height());
-
-  auto device_width = static_cast<int>(size.width() * pixel_ratio);
-  auto device_height = static_cast<int>(size.height() * pixel_ratio);
-
-  context.viewport_surface = QPixmap(device_width, device_height);
-  context.viewport_surface.setDevicePixelRatio(pixel_ratio);
 }
 
 void TextView::moveViewport(Context &context, const QPointF &point) {
   context.viewport.moveTo(point);
-}
-
-void TextView::drawViewport(Context &context, const ITextModel &model) {
-  if (!context.opt_scene) {
-    generateScene(context);
-  }
-
-  context.viewport_surface.fill(Qt::transparent);
-  QPainter painter(&context.viewport_surface);
-
-  QPointF translation(-context.viewport.x(), -context.viewport.y());
-  auto font_width = context.font_metrics->horizontalAdvance(".");
-
-  const auto &scene = context.opt_scene.value();
-  for (const auto &row : scene.row_list) {
-    if (!row.bounding_box.intersects(context.viewport)) {
-      continue;
-    }
-
-    for (const auto &entity : row.entity_list) {
-      QPointF pos(entity.bounding_box.x(), entity.bounding_box.y());
-      pos += translation;
-
-      const auto &token = model.tokenData(entity.token_id);
-      std::size_t character_index = 0;
-
-      for (const auto &c : token) {
-        bool highlight{false};
-        if (context.opt_selection.has_value()) {
-          auto selection = context.opt_selection.value();
-          sanitizeSelection(selection);
-
-          if (selection.first_cursor.token_id == entity.token_id &&
-              selection.last_cursor.token_id == entity.token_id) {
-            highlight = character_index >= selection.first_cursor.offset &&
-                        character_index <= selection.last_cursor.offset;
-
-          } else if (selection.first_cursor.token_id == entity.token_id) {
-            highlight = character_index >= selection.first_cursor.offset;
-
-          } else if (selection.last_cursor.token_id == entity.token_id) {
-            highlight = character_index <= selection.last_cursor.offset;
-
-          } else {
-            highlight = (entity.token_id > selection.first_cursor.token_id &&
-                         entity.token_id < selection.last_cursor.token_id);
-          }
-        }
-
-        const auto &glyph = context.glyph_cache->get(c);
-        painter.setCompositionMode(QPainter::CompositionMode_Source);
-        painter.drawPixmap(pos, glyph);
-
-        auto foreground = context.theme.foreground;
-        if (auto color_id = model.tokenColor(entity.token_id);
-            color_id != kInvalidTokenColorID && context.theme.color_map.count(color_id) > 0) {
-          foreground = context.theme.color_map.at(color_id);
-        }
-
-        if (highlight) {
-          foreground = invertColor(foreground);
-        }
-
-        painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
-        painter.fillRect(QRect((int)pos.x(), (int)pos.y(), glyph.width(), glyph.height()),
-                         QBrush(foreground));
-
-        if (highlight) {
-          auto background = invertColor(context.theme.background);
-
-          painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
-          painter.fillRect(QRect((int)pos.x(), (int)pos.y(), glyph.width(), glyph.height()),
-                           QBrush(background));
-        }
-
-        pos.setX(pos.x() + font_width);
-
-        ++character_index;
-      }
-    }
-  }
 }
 
 void TextView::createTokenIndex(Context &context, ITextModel &model) {

@@ -47,7 +47,7 @@ void TextModel::generateTestData(const QString &path) {
 
   auto L_addToken = [&](const QString &str) {
     ++token_id_generator;
-    color_id_generator = (color_id_generator + 1) % 10;
+    color_id_generator = (color_id_generator + 1) % 7;
 
     d->token_list.push_back(token_id_generator);
 
@@ -78,9 +78,9 @@ void TextModel::generateTestData(const QString &path) {
 
 TextModel::~TextModel() {}
 
-TokenID TextModel::firstTokenID() const { return 1; }
+TokenID TextModel::firstTokenID() const { return d->token_list.at(0); }
 
-TokenID TextModel::lastTokenID() const { return d->token_list.size(); };
+TokenID TextModel::lastTokenID() const { return d->token_list.at(d->token_list.size() - 1); };
 
 TokenGroupID TextModel::tokenGroupID(TokenID token_id) const {
   auto token_map_it = d->token_map.find(token_id);

@@ -39,7 +39,19 @@ Document::Document(const QString &source_file_path, QWidget *parent)
   auto splitter = new QSplitter();
   layout->addWidget(splitter);
 
+  TextViewTheme theme;
+  theme.background = QColor::fromRgba(0xFF000000);
+  theme.foreground = QColor::fromRgba(0xFFC7C7C7);
+  theme.color_map.insert({0, QColor::fromRgba(0xFFFF8272)});
+  theme.color_map.insert({1, QColor::fromRgba(0xFFB4FA72)});
+  theme.color_map.insert({2, QColor::fromRgba(0xFFFEFDC2)});
+  theme.color_map.insert({3, QColor::fromRgba(0xFFA5D5FE)});
+  theme.color_map.insert({4, QColor::fromRgba(0xFFFF8FFD)});
+  theme.color_map.insert({5, QColor::fromRgba(0xFFD0D1FE)});
+  theme.color_map.insert({6, QColor::fromRgba(0xFFF1F1F1)});
+
   d->text_view = ITextView::create();
+  d->text_view->setTheme(theme);
   d->text_view->setModel(d->model);
   connect(d->text_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
           this, SLOT(onTokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
