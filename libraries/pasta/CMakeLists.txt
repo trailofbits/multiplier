@@ -15,4 +15,13 @@ target_link_libraries(thirdparty_pasta INTERFACE
   pasta_util
 )
 
+# TODO: This should be exported by the pasta targets
+target_include_directories(thirdparty_pasta SYSTEM INTERFACE
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/include"
+)
+
+target_link_libraries(thirdparty_pasta INTERFACE
+  pasta_thirdparty_llvm
+)
+
 add_library(pasta::pasta ALIAS thirdparty_pasta)

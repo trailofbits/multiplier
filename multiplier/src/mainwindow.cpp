@@ -231,7 +231,7 @@ void MainWindow::onCompileCommandsIndexItemActivated(const QString &working_dire
   static_cast<void>(compile_command);
 
   auto window_title = source_file_path.split("/").takeLast();
-  auto document = new Document(source_file_path);
+  auto document = new Document(source_file_path, working_directory, compile_command);
 
   auto container = new QMdiSubWindow();
   container->setWidget(document);

@@ -16,12 +16,12 @@ using namespace tob::widgets;
 
 namespace multiplier {
 
-class TextModel final : public ITextModel {
+class SourceCodeModel final : public ITextModel {
   Q_OBJECT
 
 public:
-  TextModel(const QString &path, QObject *parent = nullptr);
-  virtual ~TextModel();
+  SourceCodeModel(const QString &path, QObject *parent = nullptr);
+  virtual ~SourceCodeModel();
 
   void generateTestData(const QString &path);
 
@@ -34,8 +34,8 @@ public:
   virtual QVariant tokenProperty(TokenID token_id, int property_id) const override;
   virtual TokenAttribute tokenAttributes(TokenID token_id) const override;
 
-  TextModel(const TextModel &) = delete;
-  TextModel &operator=(const TextModel &) = delete;
+  SourceCodeModel(const SourceCodeModel &) = delete;
+  SourceCodeModel &operator=(const SourceCodeModel &) = delete;
 
 private:
   struct PrivateData;

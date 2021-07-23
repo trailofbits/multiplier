@@ -6,7 +6,8 @@
   the LICENSE file found in the root directory of this source tree.
 */
 
-#include "textmodel.h"
+#include "astmodel.h"
+#include "astgenerator.h"
 
 #include <QDebug>
 #include <QMap>
@@ -15,6 +16,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
 
@@ -29,21 +31,21 @@ struct Token final {
   TokenAttribute attributes;
 };
 
-struct TextModel::PrivateData final {
+struct ASTModel::PrivateData final {
   std::vector<TokenID> token_list;
   std::unordered_map<TokenID, Token> token_map;
 };
 
-TextModel::TextModel(const QString &path, QObject *parent)
+ASTModel::ASTModel(const QString &working_directory, const QString &compile_command,
+                   QObject *parent)
     : ITextModel(parent), d(new PrivateData) {
-  generateTestData(path);
+  generateTestData(working_directory, compile_command);
 }
 
-void TextModel::generateTestData(const QString &path) {
+void ASTModel::generateTestData(const QString &working_directory, const QString &compile_command) {
+
   static TokenID token_id_generator{kInvalidTokenID};
   static TokenColorID color_id_generator{kInvalidTokenColorID};
-
-  qDebug() << "Opening:" << path;
 
   auto L_addToken = [&](const QString &str) {
     ++token_id_generator;
@@ -59,14 +61,13 @@ void TextModel::generateTestData(const QString &path) {
     d->token_map.insert({token_id_generator, std::move(token)});
   };
 
-  std::ifstream input_file;
-  input_file.open(path.toStdString().c_str(), std::ios::in);
-  if (!input_file) {
-    throw std::runtime_error("Failed to open the input file");
+  std::stringstream ast;
+  if (!generateAST(ast, working_directory, compile_command)) {
+    throw std::runtime_error("Failed to generate the AST");
   }
 
   std::string line;
-  while (std::getline(input_file, line)) {
+  while (std::getline(ast, line)) {
     auto token_list = QString(line.c_str()).split(QRegularExpression("\\b"));
     for (const auto &token : token_list) {
       L_addToken(token);
@@ -76,13 +77,25 @@ void TextModel::generateTestData(const QString &path) {
   }
 }
 
-TextModel::~TextModel() {}
+ASTModel::~ASTModel() {}
 
-TokenID TextModel::firstTokenID() const { return d->token_list.at(0); }
+TokenID ASTModel::firstTokenID() const {
+  if (d->token_list.empty()) {
+    return kInvalidTokenID;
+  }
 
-TokenID TextModel::lastTokenID() const { return d->token_list.at(d->token_list.size() - 1); };
+  return d->token_list.at(0);
+}
 
-TokenGroupID TextModel::tokenGroupID(TokenID token_id) const {
+TokenID ASTModel::lastTokenID() const {
+  if (d->token_list.empty()) {
+    return kInvalidTokenID;
+  }
+
+  return d->token_list.at(d->token_list.size() - 1);
+};
+
+TokenGroupID ASTModel::tokenGroupID(TokenID token_id) const {
   auto token_map_it = d->token_map.find(token_id);
   if (token_map_it == d->token_map.end()) {
     return kInvalidTokenGroupID;
@@ -92,7 +105,7 @@ TokenGroupID TextModel::tokenGroupID(TokenID token_id) const {
   return token.group_id;
 }
 
-QString TextModel::tokenData(TokenID token_id) const {
+QString ASTModel::tokenData(TokenID token_id) const {
   auto token_map_it = d->token_map.find(token_id);
   if (token_map_it == d->token_map.end()) {
     return QString();
@@ -102,7 +115,7 @@ QString TextModel::tokenData(TokenID token_id) const {
   return token.data;
 }
 
-TokenColorID TextModel::tokenColor(TokenID token_id) const {
+TokenColorID ASTModel::tokenColor(TokenID token_id) const {
   auto token_map_it = d->token_map.find(token_id);
   if (token_map_it == d->token_map.end()) {
     return kInvalidTokenGroupID;
@@ -112,7 +125,7 @@ TokenColorID TextModel::tokenColor(TokenID token_id) const {
   return token.color_id;
 }
 
-QVariant TextModel::tokenProperty(TokenID token_id, int property_id) const {
+QVariant ASTModel::tokenProperty(TokenID token_id, int property_id) const {
   auto token_map_it = d->token_map.find(token_id);
   if (token_map_it == d->token_map.end()) {
     return QVariant();
@@ -128,7 +141,7 @@ QVariant TextModel::tokenProperty(TokenID token_id, int property_id) const {
   return *property_bag_it;
 }
 
-TokenAttribute TextModel::tokenAttributes(TokenID token_id) const {
+TokenAttribute ASTModel::tokenAttributes(TokenID token_id) const {
   auto token_map_it = d->token_map.find(token_id);
   if (token_map_it == d->token_map.end()) {
     return static_cast<TokenAttribute>(0);
