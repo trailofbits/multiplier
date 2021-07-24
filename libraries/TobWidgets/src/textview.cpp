@@ -261,16 +261,11 @@ void TextView::mousePressEvent(QMouseEvent *event) {
   auto cursor = std::move(opt_cursor.value());
 
   if (event->button() == Qt::LeftButton) {
-    if ((QApplication::keyboardModifiers() & Qt::ControlModifier) != 0) {
-      emit tokenClicked(event->globalPos(), event->button(), cursor.token_id);
+    Selection selection;
+    selection.tracking = true;
+    selection.last_cursor = selection.first_cursor = std::move(cursor);
 
-    } else {
-      Selection selection;
-      selection.tracking = true;
-      selection.first_cursor = std::move(cursor);
-
-      d->context.opt_selection = selection;
-    }
+    d->context.opt_selection = selection;
 
   } else {
     emit tokenClicked(event->globalPos(), event->button(), cursor.token_id);
@@ -283,6 +278,11 @@ void TextView::mouseReleaseEvent(QMouseEvent *event) {
     auto &selection = d->context.opt_selection.value();
     selection.tracking = false;
     sanitizeSelection(selection);
+
+    if (selection.first_cursor.token_id == selection.last_cursor.token_id &&
+        selection.first_cursor.offset == selection.last_cursor.offset) {
+      emit tokenClicked(event->globalPos(), event->button(), selection.first_cursor.token_id);
+    }
   }
 }
 
@@ -372,6 +372,13 @@ void TextView::wheelEvent(QWheelEvent *event) {
   d->horizontal_scrollbar->setValue(next_horizontal_scrollbar_value);
 
   onScrollBarValueChange(0);
+}
+
+void TextView::keyPressEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_Escape && d->context.opt_selection.has_value()) {
+    d->context.opt_selection = std::nullopt;
+    update();
+  }
 }
 
 void TextView::updateScrollbars() {

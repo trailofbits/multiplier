@@ -46,10 +46,17 @@ void SourceCodeModel::generateTestData(const QString &path) {
 
   qDebug() << "Opening:" << path;
 
+  auto group_id_step = 0;
+
   auto L_addToken = [&](const QString &str) {
     ++token_id_generator;
     color_id_generator = (color_id_generator + 1) % 7;
-    token_group_id_generator = (token_group_id_generator + 1) % 5;
+
+    ++group_id_step;
+    if (group_id_step == 30) {
+      token_group_id_generator = (token_group_id_generator + 1) % 5;
+      group_id_step = 0;
+    }
 
     d->token_list.push_back(token_id_generator);
 

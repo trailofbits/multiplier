@@ -13,7 +13,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
-#include <QDebug>
 #include <QMenu>
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -22,7 +21,7 @@ namespace multiplier {
 
 struct Document::PrivateData final {
   tob::widgets::ITextModel::Ptr code_model;
-  tob::widgets::ITextView *text_view{nullptr};
+  tob::widgets::ITextView *code_view{nullptr};
 
   tob::widgets::ITextModel::Ptr ast_model;
   tob::widgets::ITextView *ast_view{nullptr};
@@ -55,13 +54,13 @@ Document::Document(const QString &source_file_path, const QString &working_direc
   theme.color_map.insert({5, QColor::fromRgba(0xFFD0D1FE)});
   theme.color_map.insert({6, QColor::fromRgba(0xFFF1F1F1)});
 
-  d->text_view = ITextView::create();
-  d->text_view->setTheme(theme);
-  d->text_view->setModel(d->code_model);
-  connect(d->text_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
+  d->code_view = ITextView::create();
+  d->code_view->setTheme(theme);
+  d->code_view->setModel(d->code_model);
+  connect(d->code_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
           this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
-  splitter->addWidget(d->text_view);
+  splitter->addWidget(d->code_view);
 
   d->ast_view = ITextView::create();
   d->ast_view->setTheme(theme);
@@ -84,7 +83,7 @@ void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::M
                                        TokenID token_id) {
 
   if (button == Qt::RightButton) {
-    d->copy_action->setEnabled(d->text_view->hasSelection());
+    d->copy_action->setEnabled(d->code_view->hasSelection());
 
     // Custom menu example
     QMenu *additional_menu{nullptr};
@@ -109,9 +108,7 @@ void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::M
     auto token_group = d->code_model->tokenGroupID(token_id);
     if (token_group != kInvalidTokenGroupID) {
       d->ast_view->highlightTokenGroup(token_group);
-      d->text_view->highlightTokenGroup(token_group);
-
-      qDebug() << "Highlighting token group" << token_group;
+      d->code_view->highlightTokenGroup(token_group);
     }
   }
 }
@@ -119,7 +116,7 @@ void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::M
 void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
                                 TokenID token_id) {
   if (button == Qt::RightButton) {
-    d->copy_action->setEnabled(d->text_view->hasSelection());
+    d->copy_action->setEnabled(d->code_view->hasSelection());
 
     // Custom menu example
     QMenu *additional_menu{nullptr};
@@ -143,16 +140,14 @@ void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseBut
     // handle left clicks
     auto token_group = d->ast_model->tokenGroupID(token_id);
     if (token_group != kInvalidTokenGroupID) {
-      d->text_view->highlightTokenGroup(token_group);
+      d->code_view->highlightTokenGroup(token_group);
       d->ast_view->highlightTokenGroup(token_group);
-
-      qDebug() << "Highlighting token group" << token_group;
     }
   }
 }
 
 void Document::onCopyAction() {
-  auto opt_selection = d->text_view->getSelection();
+  auto opt_selection = d->code_view->getSelection();
   if (!opt_selection.has_value()) {
     return;
   }
