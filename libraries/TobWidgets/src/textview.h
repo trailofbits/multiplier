@@ -44,6 +44,7 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent *event) override;
   virtual void focusOutEvent(QFocusEvent *event) override;
   virtual void wheelEvent(QWheelEvent *event) override;
+  virtual void keyPressEvent(QKeyEvent *event) override;
 
 private:
   struct PrivateData;
