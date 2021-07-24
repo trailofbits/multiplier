@@ -42,12 +42,14 @@ SourceCodeModel::SourceCodeModel(const QString &path, QObject *parent)
 void SourceCodeModel::generateTestData(const QString &path) {
   static TokenID token_id_generator{kInvalidTokenID};
   static TokenColorID color_id_generator{kInvalidTokenColorID};
+  static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
 
   qDebug() << "Opening:" << path;
 
   auto L_addToken = [&](const QString &str) {
     ++token_id_generator;
     color_id_generator = (color_id_generator + 1) % 7;
+    token_group_id_generator = (token_group_id_generator + 1) % 5;
 
     d->token_list.push_back(token_id_generator);
 
@@ -55,6 +57,7 @@ void SourceCodeModel::generateTestData(const QString &path) {
     token.id = token_id_generator;
     token.data = str;
     token.color_id = color_id_generator;
+    token.group_id = token_group_id_generator + 1;
 
     d->token_map.insert({token_id_generator, std::move(token)});
   };

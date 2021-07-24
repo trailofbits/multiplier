@@ -13,6 +13,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 #include <QMenu>
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -44,7 +45,7 @@ Document::Document(const QString &source_file_path, const QString &working_direc
   layout->addWidget(splitter);
 
   TextViewTheme theme;
-  theme.background = QColor::fromRgba(0xFF000000);
+  theme.background = QColor::fromRgba(0xFF101010);
   theme.foreground = QColor::fromRgba(0xFFC7C7C7);
   theme.color_map.insert({0, QColor::fromRgba(0xFFFF8272)});
   theme.color_map.insert({1, QColor::fromRgba(0xFFB4FA72)});
@@ -81,45 +82,72 @@ Document::~Document() {}
 
 void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
                                        TokenID token_id) {
-  d->copy_action->setEnabled(d->text_view->hasSelection());
 
-  // Custom menu example
-  QMenu *additional_menu{nullptr};
-  if (token_id != kInvalidTokenID) {
-    additional_menu = new QMenu(tr("Test menu"));
-    d->context_menu->addMenu(additional_menu);
+  if (button == Qt::RightButton) {
+    d->copy_action->setEnabled(d->text_view->hasSelection());
 
-    auto token_data = d->code_model->tokenData(token_id);
-    auto test_action = new QAction(tr("Test action for ") + token_data);
-    additional_menu->addAction(test_action);
-  }
+    // Custom menu example
+    QMenu *additional_menu{nullptr};
+    if (token_id != kInvalidTokenID) {
+      additional_menu = new QMenu(tr("Test menu"));
+      d->context_menu->addMenu(additional_menu);
 
-  d->context_menu->exec(mouse_position);
+      auto token_data = d->code_model->tokenData(token_id);
+      auto test_action = new QAction(tr("Test action for ") + token_data);
+      additional_menu->addAction(test_action);
+    }
 
-  if (additional_menu != nullptr) {
-    d->context_menu->removeAction(additional_menu->menuAction());
+    d->context_menu->exec(mouse_position);
+
+    if (additional_menu != nullptr) {
+      d->context_menu->removeAction(additional_menu->menuAction());
+    }
+
+  } else if (button == Qt::LeftButton) {
+    // Token group highlight example; you can also check `button` to only
+    // handle left clicks
+    auto token_group = d->code_model->tokenGroupID(token_id);
+    if (token_group != kInvalidTokenGroupID) {
+      d->ast_view->highlightTokenGroup(token_group);
+      d->text_view->highlightTokenGroup(token_group);
+
+      qDebug() << "Highlighting token group" << token_group;
+    }
   }
 }
 
 void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
                                 TokenID token_id) {
-  d->copy_action->setEnabled(d->text_view->hasSelection());
+  if (button == Qt::RightButton) {
+    d->copy_action->setEnabled(d->text_view->hasSelection());
 
-  // Custom menu example
-  QMenu *additional_menu{nullptr};
-  if (token_id != kInvalidTokenID) {
-    additional_menu = new QMenu(tr("Test menu"));
-    d->context_menu->addMenu(additional_menu);
+    // Custom menu example
+    QMenu *additional_menu{nullptr};
+    if (token_id != kInvalidTokenID) {
+      additional_menu = new QMenu(tr("Test menu"));
+      d->context_menu->addMenu(additional_menu);
 
-    auto token_data = d->ast_model->tokenData(token_id);
-    auto test_action = new QAction(tr("Test action for ") + token_data);
-    additional_menu->addAction(test_action);
-  }
+      auto token_data = d->ast_model->tokenData(token_id);
+      auto test_action = new QAction(tr("Test action for ") + token_data);
+      additional_menu->addAction(test_action);
+    }
 
-  d->context_menu->exec(mouse_position);
+    d->context_menu->exec(mouse_position);
 
-  if (additional_menu != nullptr) {
-    d->context_menu->removeAction(additional_menu->menuAction());
+    if (additional_menu != nullptr) {
+      d->context_menu->removeAction(additional_menu->menuAction());
+    }
+
+  } else if (button == Qt::LeftButton) {
+    // Token group highlight example; you can also check `button` to only
+    // handle left clicks
+    auto token_group = d->ast_model->tokenGroupID(token_id);
+    if (token_group != kInvalidTokenGroupID) {
+      d->text_view->highlightTokenGroup(token_group);
+      d->ast_view->highlightTokenGroup(token_group);
+
+      qDebug() << "Highlighting token group" << token_group;
+    }
   }
 }
 
