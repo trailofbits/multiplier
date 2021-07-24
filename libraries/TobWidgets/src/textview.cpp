@@ -92,7 +92,7 @@ void TextView::setWordWrapping(bool enabled) { d->context.word_wrap = enabled; }
 
 bool TextView::hasSelection() const { return d->context.opt_selection.has_value(); }
 
-std::optional<QString> TextView::getSelection() {
+std::optional<QString> TextView::getSelection() const {
   if (!d->context.opt_selection.has_value()) {
     return std::nullopt;
   }
@@ -129,6 +129,16 @@ std::optional<QString> TextView::getSelection() {
   return output;
 }
 
+void TextView::highlightTokenGroup(TokenGroupID group_id) {
+  d->context.highlighted_token_group = group_id;
+  update();
+}
+
+void TextView::disableTokenGroupHighlight() {
+  d->context.highlighted_token_group = kInvalidTokenGroupID;
+  update();
+}
+
 void TextView::resizeEvent(QResizeEvent *event) {
   auto width = static_cast<qreal>(event->size().width());
   auto height = static_cast<qreal>(event->size().height());
@@ -155,6 +165,11 @@ void TextView::paintEvent(QPaintEvent *event) {
   auto font_height = context.font_metrics->height();
 
   QRectF glyph_rect(0.0, 0.0, font_width, font_height);
+
+  auto standard_font = font();
+
+  auto group_highlight_font = font();
+  group_highlight_font.setBold(true);
 
   const auto &scene = context.opt_scene.value();
   for (const auto &row : scene.row_list) {
@@ -192,7 +207,16 @@ void TextView::paintEvent(QPaintEvent *event) {
           }
         }
 
+        auto token_group = d->model->tokenGroupID(entity.token_id);
+        bool highlighted_group = (d->context.highlighted_token_group != kInvalidTokenGroupID) &&
+                                 (token_group == d->context.highlighted_token_group);
+
         auto background = context.theme.background;
+        if (highlighted_group) {
+          // TODO: Implement a better color selection
+          background = background.lighter(300);
+        }
+
         auto foreground = context.theme.foreground;
 
         if (auto color_id = d->model->tokenColor(entity.token_id);
@@ -207,8 +231,14 @@ void TextView::paintEvent(QPaintEvent *event) {
 
         glyph_rect.moveTo(pos);
         painter.fillRect(glyph_rect.adjusted(-1.0, -1.0, 0.0, 0.0), QBrush(background));
-
         painter.setPen(QPen(foreground));
+
+        if (highlighted_group) {
+          painter.setFont(group_highlight_font);
+        } else {
+          painter.setFont(standard_font);
+        }
+
         painter.drawText(glyph_rect, Qt::AlignCenter | Qt::TextSingleLine, c);
 
         pos.setX(pos.x() + font_width);

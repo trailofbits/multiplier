@@ -46,10 +46,12 @@ void ASTModel::generateTestData(const QString &working_directory, const QString 
 
   static TokenID token_id_generator{kInvalidTokenID};
   static TokenColorID color_id_generator{kInvalidTokenColorID};
+  static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
 
   auto L_addToken = [&](const QString &str) {
     ++token_id_generator;
     color_id_generator = (color_id_generator + 1) % 7;
+    token_group_id_generator = (token_group_id_generator + 1) % 5;
 
     d->token_list.push_back(token_id_generator);
 
@@ -57,6 +59,7 @@ void ASTModel::generateTestData(const QString &working_directory, const QString 
     token.id = token_id_generator;
     token.data = str;
     token.color_id = color_id_generator;
+    token.group_id = token_group_id_generator + 1;
 
     d->token_map.insert({token_id_generator, std::move(token)});
   };

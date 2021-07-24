@@ -37,7 +37,10 @@ public:
   virtual void setWordWrapping(bool enabled) = 0;
 
   virtual bool hasSelection() const = 0;
-  virtual std::optional<QString> getSelection() = 0;
+  virtual std::optional<QString> getSelection() const = 0;
+
+  virtual void highlightTokenGroup(TokenGroupID group_id) = 0;
+  virtual void disableTokenGroupHighlight() = 0;
 
   ITextView(const ITextView &) = delete;
   ITextView &operator=(const ITextView &) = delete;

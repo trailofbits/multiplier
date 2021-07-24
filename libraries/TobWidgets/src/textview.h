@@ -31,7 +31,10 @@ public:
   virtual void setWordWrapping(bool enabled) override;
 
   virtual bool hasSelection() const override;
-  virtual std::optional<QString> getSelection() override;
+  virtual std::optional<QString> getSelection() const override;
+
+  virtual void highlightTokenGroup(TokenGroupID group_id) override;
+  virtual void disableTokenGroupHighlight() override;
 
 protected:
   virtual void resizeEvent(QResizeEvent *event) override;
@@ -98,6 +101,7 @@ public:
     OptionalScene opt_scene;
     OptionalSelection opt_selection;
     bool word_wrap{true};
+    TokenGroupID highlighted_token_group{kInvalidTokenGroupID};
   };
 
   static void scrollViewportTo(Context &context, const QPointF &point);
