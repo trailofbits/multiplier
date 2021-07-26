@@ -111,7 +111,7 @@ public:
   static void createTokenIndex(Context &context, ITextModel &model);
   static void resetScene(Context &context);
   static void generateScene(Context &context);
-  static std::optional<Cursor> createCursor(Context &context, const QPointF &pos);
+  static std::optional<Cursor> createCursor(Context &context, QPointF pos);
   static void sanitizeSelection(Selection &selection);
 
 signals:
