@@ -185,6 +185,10 @@ void TextView::paintEvent(QPaintEvent *event) {
       std::size_t character_index = 0;
 
       for (const auto &c : token) {
+        if (c == "\n" || c == "\r") {
+          break;
+        }
+
         bool highlight{false};
         if (context.opt_selection.has_value()) {
           auto selection = context.opt_selection.value();
@@ -475,13 +479,18 @@ void TextView::moveViewport(Context &context, const QPointF &point) {
 
 void TextView::createTokenIndex(Context &context, ITextModel &model) {
   auto token_height = context.font_metrics->height();
+  auto font_width = context.font_metrics->horizontalAdvance(".");
 
   TokenEntityRowList token_index;
   TokenEntityList token_entity_row;
 
   for (auto token_id = model.firstTokenID(); token_id <= model.lastTokenID(); ++token_id) {
     const auto &token_data = model.tokenData(token_id);
+
     auto token_width = context.font_metrics->horizontalAdvance(token_data);
+    if (token_width == 0.0) {
+      token_width = font_width;
+    }
 
     TokenEntity token_entity;
     token_entity.token_id = token_id;
@@ -542,27 +551,52 @@ void TextView::generateScene(Context &context) {
   context.opt_scene = std::move(scene);
 }
 
-std::optional<TextView::Cursor> TextView::createCursor(Context &context, const QPointF &pos) {
+std::optional<TextView::Cursor> TextView::createCursor(Context &context, QPointF pos) {
   if (!context.opt_scene.has_value()) {
     return std::nullopt;
   }
 
   auto font_width = context.font_metrics->horizontalAdvance(".");
+  auto font_height = context.font_metrics->height();
+
   const auto &scene = context.opt_scene.value();
 
-  for (const auto &row : scene.row_list) {
-    if (!row.bounding_box.contains(pos)) {
-      continue;
-    }
+  if (pos.x() < font_height) {
+    pos.setX(font_height);
+  }
 
-    for (const auto &entity : row.entity_list) {
-      if (!entity.bounding_box.contains(pos)) {
+  if (pos.y() < font_height) {
+    pos.setY(font_height);
+  }
+
+  if (pos.y() >= scene.bounding_box.y() + scene.bounding_box.height()) {
+    pos.setX(scene.bounding_box.x() + scene.bounding_box.width() - font_height - 1.0);
+    pos.setY(scene.bounding_box.y() + scene.bounding_box.height() - font_height - 1.0);
+  }
+
+  for (const auto &row : scene.row_list) {
+    for (auto entity_it = row.entity_list.begin(); entity_it != row.entity_list.end();
+         ++entity_it) {
+
+      const auto &entity = *entity_it;
+
+      auto adjusted_pos = pos;
+      if (std::next(entity_it, 1) == row.entity_list.end()) {
+        auto max_x_pos = entity.bounding_box.x() + entity.bounding_box.width() - 1.0;
+
+        if (adjusted_pos.x() >= max_x_pos) {
+          adjusted_pos.setX(max_x_pos);
+        }
+      }
+
+      if (!entity.bounding_box.contains(adjusted_pos)) {
         continue;
       }
 
       Cursor cursor;
       cursor.token_id = entity.token_id;
-      cursor.offset = static_cast<std::size_t>((pos.x() - entity.bounding_box.x()) / font_width);
+      cursor.offset =
+          static_cast<std::size_t>((adjusted_pos.x() - entity.bounding_box.x()) / font_width);
 
       return cursor;
     }
