@@ -9,6 +9,7 @@
 #pragma once
 
 #include <QFrame>
+#include <QTreeWidgetItem>
 
 #include <memory>
 
@@ -41,6 +42,9 @@ private slots:
                         TokenID token_id);
 
   void onCopyAction();
+  void onApplyCommandLineChanges();
+  void onResetCommandLine();
+  void onTranslationUnitTreeItemClicked(QTreeWidgetItem *item, int);
 };
 
 } // namespace multiplier

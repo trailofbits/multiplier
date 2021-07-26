@@ -76,6 +76,8 @@ TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
   horizontal_layout->addLayout(vertical_layout);
   horizontal_layout->addWidget(d->vertical_scrollbar);
   setLayout(horizontal_layout);
+
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 TextView::~TextView() {}
@@ -154,6 +156,7 @@ void TextView::paintEvent(QPaintEvent *event) {
 
   if (!context.opt_scene) {
     generateScene(context);
+    updateScrollbars();
   }
 
   QPainter painter(this);
