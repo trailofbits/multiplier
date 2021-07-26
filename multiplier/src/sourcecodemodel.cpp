@@ -6,6 +6,10 @@
   the LICENSE file found in the root directory of this source tree.
 */
 
+//
+// SAMPLE CODE
+//
+
 #include "sourcecodemodel.h"
 
 #include <QDebug>

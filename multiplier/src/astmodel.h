@@ -18,14 +18,13 @@ namespace multiplier {
 
 class ASTModel final : public ITextModel {
   Q_OBJECT
+  Q_INTERFACES(tob::widgets::ITextModel)
 
 public:
   ASTModel(const QString &working_directory, const QString &compile_command,
            QObject *parent = nullptr);
 
   virtual ~ASTModel();
-
-  void generateTestData(const QString &working_directory, const QString &compile_command);
 
   virtual TokenID firstTokenID() const override;
   virtual TokenID lastTokenID() const override;
@@ -42,6 +41,9 @@ public:
 private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
+
+private slots:
+  void generateTestData();
 
 signals:
   void modelReset();

@@ -18,6 +18,7 @@ namespace multiplier {
 
 class SourceCodeModel final : public ITextModel {
   Q_OBJECT
+  Q_INTERFACES(tob::widgets::ITextModel)
 
 public:
   SourceCodeModel(const QString &path, QObject *parent = nullptr);

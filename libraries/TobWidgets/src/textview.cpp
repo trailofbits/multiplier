@@ -81,8 +81,9 @@ TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
 TextView::~TextView() {}
 
 void TextView::setModel(ITextModel::Ptr model) {
-  // TODO: connect the modelReset signal
   d->model = model;
+
+  connect(d->model.get(), SIGNAL(modelReset()), this, SLOT(onModelReset()));
   onModelReset();
 }
 
@@ -437,6 +438,7 @@ void TextView::onModelReset() {
   createTokenIndex(d->context, *d->model.get());
   updateScrollbars();
   resetScene(d->context);
+  update();
 }
 
 void TextView::onScrollBarValueChange(int) {
