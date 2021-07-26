@@ -184,11 +184,7 @@ void TextView::paintEvent(QPaintEvent *event) {
       const auto &token = d->model->tokenData(entity.token_id);
       std::size_t character_index = 0;
 
-      for (const auto &c : token) {
-        if (c == "\n" || c == "\r") {
-          break;
-        }
-
+      for (auto c : token) {
         bool highlight{false};
         if (context.opt_selection.has_value()) {
           auto selection = context.opt_selection.value();
@@ -231,6 +227,16 @@ void TextView::paintEvent(QPaintEvent *event) {
         if (highlight) {
           background = invertColor(background);
           foreground = invertColor(foreground);
+        }
+
+        if (c == "\n" || c == "\r") {
+          if (highlight) {
+            foreground = invertColor(context.theme.foreground);
+            c = L'\u23CE';
+
+          } else {
+            continue;
+          }
         }
 
         glyph_rect.moveTo(pos);
