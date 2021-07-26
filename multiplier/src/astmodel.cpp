@@ -6,6 +6,10 @@
   the LICENSE file found in the root directory of this source tree.
 */
 
+//
+// SAMPLE CODE
+//
+
 #include "astmodel.h"
 #include "astgenerator.h"
 
@@ -13,8 +17,10 @@
 #include <QMap>
 #include <QRegularExpression>
 #include <QString>
+#include <QTimer>
 
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
@@ -34,57 +40,24 @@ struct Token final {
 struct ASTModel::PrivateData final {
   std::vector<TokenID> token_list;
   std::unordered_map<TokenID, Token> token_map;
+
+  QString working_directory;
+  QString compile_command;
+
+  std::stringstream ast_stream;
+  std::future<bool> future_ast_result;
 };
 
 ASTModel::ASTModel(const QString &working_directory, const QString &compile_command,
                    QObject *parent)
     : ITextModel(parent), d(new PrivateData) {
-  generateTestData(working_directory, compile_command);
-}
+  d->working_directory = working_directory;
+  d->compile_command = compile_command;
 
-void ASTModel::generateTestData(const QString &working_directory, const QString &compile_command) {
+  d->future_ast_result = std::async(generateAST, std::ref(d->ast_stream),
+                                    std::ref(d->working_directory), std::ref(d->compile_command));
 
-  static TokenID token_id_generator{kInvalidTokenID};
-  static TokenColorID color_id_generator{kInvalidTokenColorID};
-  static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
-
-  auto group_id_step = 0;
-
-  auto L_addToken = [&](const QString &str) {
-    ++token_id_generator;
-    color_id_generator = (color_id_generator + 1) % 7;
-
-    ++group_id_step;
-    if (group_id_step == 30) {
-      token_group_id_generator = (token_group_id_generator + 1) % 5;
-      group_id_step = 0;
-    }
-
-    d->token_list.push_back(token_id_generator);
-
-    Token token;
-    token.id = token_id_generator;
-    token.data = str;
-    token.color_id = color_id_generator;
-    token.group_id = token_group_id_generator + 1;
-
-    d->token_map.insert({token_id_generator, std::move(token)});
-  };
-
-  std::stringstream ast;
-  if (!generateAST(ast, working_directory, compile_command)) {
-    throw std::runtime_error("Failed to generate the AST");
-  }
-
-  std::string line;
-  while (std::getline(ast, line)) {
-    auto token_list = QString(line.c_str()).split(QRegularExpression("\\b"));
-    for (const auto &token : token_list) {
-      L_addToken(token);
-    }
-
-    L_addToken("\n");
-  }
+  QTimer::singleShot(1000, this, &ASTModel::generateTestData);
 }
 
 ASTModel::~ASTModel() {}
@@ -159,6 +132,52 @@ TokenAttribute ASTModel::tokenAttributes(TokenID token_id) const {
 
   const auto &token = token_map_it->second;
   return token.attributes;
+}
+
+void ASTModel::generateTestData() {
+  if (d->future_ast_result.wait_for(std::chrono::milliseconds(5)) == std::future_status::timeout) {
+    QTimer::singleShot(1000, this, &ASTModel::generateTestData);
+    return;
+  }
+
+  static TokenID token_id_generator{kInvalidTokenID};
+  static TokenColorID color_id_generator{kInvalidTokenColorID};
+  static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
+
+  auto group_id_step = 0;
+
+  auto L_addToken = [&](const QString &str) {
+    ++token_id_generator;
+    color_id_generator = (color_id_generator + 1) % 7;
+
+    ++group_id_step;
+    if (group_id_step == 30) {
+      token_group_id_generator = (token_group_id_generator + 1) % 5;
+      group_id_step = 0;
+    }
+
+    d->token_list.push_back(token_id_generator);
+
+    Token token;
+    token.id = token_id_generator;
+    token.data = str;
+    token.color_id = color_id_generator;
+    token.group_id = token_group_id_generator + 1;
+
+    d->token_map.insert({token_id_generator, std::move(token)});
+  };
+
+  std::string line;
+  while (std::getline(d->ast_stream, line)) {
+    auto token_list = QString(line.c_str()).split(QRegularExpression("\\b"));
+    for (const auto &token : token_list) {
+      L_addToken(token);
+    }
+
+    L_addToken("\n");
+  }
+
+  emit modelReset();
 }
 
 } // namespace multiplier
