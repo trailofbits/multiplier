@@ -261,15 +261,26 @@ void TextView::mousePressEvent(QMouseEvent *event) {
   auto cursor = std::move(opt_cursor.value());
 
   if (event->button() == Qt::LeftButton) {
-    Selection selection;
-    selection.tracking = true;
-    selection.last_cursor = selection.first_cursor = std::move(cursor);
+    if ((QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0 &&
+        d->context.opt_selection.has_value()) {
 
-    d->context.opt_selection = selection;
+      auto &selection = d->context.opt_selection.value();
+      selection.tracking = false;
+      selection.last_cursor = std::move(cursor);
+
+    } else {
+      Selection selection;
+      selection.tracking = true;
+      selection.last_cursor = selection.first_cursor = std::move(cursor);
+
+      d->context.opt_selection = selection;
+    }
 
   } else {
     emit tokenClicked(event->globalPos(), event->button(), cursor.token_id);
   }
+
+  update();
 }
 
 void TextView::mouseReleaseEvent(QMouseEvent *event) {
@@ -420,11 +431,9 @@ void TextView::onModelReset() {
 
 void TextView::onScrollBarValueChange(int) {
   auto vertical_scroll_value = static_cast<qreal>(d->vertical_scrollbar->value());
-
   auto horizontal_scroll_value = static_cast<qreal>(d->horizontal_scrollbar->value());
 
   scrollViewportTo(d->context, QPointF(horizontal_scroll_value, vertical_scroll_value));
-
   update();
 }
 
