@@ -26,6 +26,9 @@ add_executable(multiplier
 
   src/document.h
   src/document.cpp
+
+  src/parsedfilesindex.h
+  src/parsedfilesindex.cpp
 )
 
 target_link_libraries(multiplier PRIVATE
