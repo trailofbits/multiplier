@@ -14,6 +14,8 @@
 
 #include <memory>
 
+#include <pasta/Compile/Job.h>
+
 namespace multiplier {
 
 class CompileCommandsIndex final : public QFrame {
@@ -37,8 +39,7 @@ private slots:
   void onTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
 signals:
-  void sourceFileDoubleClicked(const QString &working_directory, const QString &source_file_path,
-                               const QString &compile_command);
+  void sourceFileDoubleClicked(pasta::CompileJob job);
 };
 
 } // namespace multiplier

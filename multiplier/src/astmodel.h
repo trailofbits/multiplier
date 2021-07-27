@@ -9,6 +9,7 @@
 #pragma once
 
 #include <tob/itextmodel.h>
+#include <pasta/AST/AST.h>
 
 #include <memory>
 
@@ -20,9 +21,8 @@ class ASTModel final : public ITextModel {
   Q_OBJECT
   Q_INTERFACES(tob::widgets::ITextModel)
 
-public:
-  ASTModel(const QString &working_directory, const QString &compile_command,
-           QObject *parent = nullptr);
+ public:
+  ASTModel(QObject *parent = nullptr);
 
   virtual ~ASTModel();
 
@@ -38,14 +38,14 @@ public:
   ASTModel(const ASTModel &) = delete;
   ASTModel &operator=(const ASTModel &) = delete;
 
-private:
+ private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
-private slots:
-  void generateTestData();
+ public slots:
+  void gotAST(std::shared_ptr<pasta::AST> ast);
 
-signals:
+ signals:
   void modelReset();
 };
 

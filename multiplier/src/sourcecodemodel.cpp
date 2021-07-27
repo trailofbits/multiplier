@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -34,27 +35,20 @@ struct Token final {
 };
 
 struct SourceCodeModel::PrivateData final {
-  std::vector<TokenID> token_list;
+  std::optional<TokenID> min_token_id;
+  std::optional<TokenID> max_token_id;
   std::unordered_map<TokenID, Token> token_map;
 };
 
-SourceCodeModel::SourceCodeModel(const QString &path, QObject *parent)
-    : ITextModel(parent), d(new PrivateData) {
-  generateTestData(path);
-}
+SourceCodeModel::SourceCodeModel(QObject *parent)
+    : ITextModel(parent), d(new PrivateData) {}
 
-void SourceCodeModel::generateTestData(const QString &path) {
-  static TokenID token_id_generator{kInvalidTokenID};
-  static TokenColorID color_id_generator{kInvalidTokenColorID};
+void SourceCodeModel::gotAST(std::shared_ptr<pasta::AST> ast) {
   static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
-
-  qDebug() << "Opening:" << path;
 
   auto group_id_step = 0;
 
-  auto L_addToken = [&](const QString &str) {
-    ++token_id_generator;
-    color_id_generator = (color_id_generator + 1) % 7;
+  auto L_addToken = [&](const pasta::FileToken &tok) {
 
     ++group_id_step;
     if (group_id_step == 30) {
@@ -62,50 +56,46 @@ void SourceCodeModel::generateTestData(const QString &path) {
       group_id_step = 0;
     }
 
-    d->token_list.push_back(token_id_generator);
+    auto tok_data = tok.Data();
 
     Token token;
-    token.id = token_id_generator;
-    token.data = str;
-    token.color_id = color_id_generator;
+    token.id = tok.Index();
+    token.data = QString::fromLocal8Bit(
+        tok_data.data(), static_cast<int>(tok_data.size()));
+    token.color_id = tok.Kind() % 7u;
     token.group_id = token_group_id_generator + 1;
 
-    d->token_map.insert({token_id_generator, std::move(token)});
-  };
-
-  std::ifstream input_file;
-  input_file.open(path.toStdString().c_str(), std::ios::in);
-  if (!input_file) {
-    throw std::runtime_error("Failed to open the input file");
-  }
-
-  std::string line;
-  while (std::getline(input_file, line)) {
-    auto token_list = QString(line.c_str()).split(QRegularExpression("\\b"));
-    for (const auto &token : token_list) {
-      L_addToken(token);
+    if (!d->min_token_id) {
+      d->min_token_id = tok.Index();
     }
 
-    L_addToken("\n");
+    d->max_token_id = tok.Index();
+    d->token_map.try_emplace(tok.Index(), std::move(token));
+  };
+
+  for (auto token : ast->MainFile().Tokens()) {
+    L_addToken(token);
   }
+
+  emit modelReset();
 }
 
 SourceCodeModel::~SourceCodeModel() {}
 
 TokenID SourceCodeModel::firstTokenID() const {
-  if (d->token_list.empty()) {
+  if (d->min_token_id.has_value()) {
+    return d->min_token_id.value();
+  } else {
     return kInvalidTokenID;
   }
-
-  return d->token_list.at(0);
 }
 
 TokenID SourceCodeModel::lastTokenID() const {
-  if (d->token_list.empty()) {
+  if (d->max_token_id.has_value()) {
+    return d->max_token_id.value();
+  } else {
     return kInvalidTokenID;
   }
-
-  return d->token_list.at(d->token_list.size() - 1);
 };
 
 TokenGroupID SourceCodeModel::tokenGroupID(TokenID token_id) const {

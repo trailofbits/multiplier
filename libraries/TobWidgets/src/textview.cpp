@@ -185,10 +185,10 @@ void TextView::paintEvent(QPaintEvent *event) {
       QPointF pos(entity.bounding_box.x(), entity.bounding_box.y());
       pos += translation;
 
-      const auto &token = d->model->tokenData(entity.token_id);
+      const QString &token = entity.text;
       std::size_t character_index = 0;
 
-      for (auto c : token) {
+      for (QChar c : token) {
         bool highlight{false};
         if (context.opt_selection.has_value()) {
           auto selection = context.opt_selection.value();
@@ -495,23 +495,42 @@ void TextView::createTokenIndex(Context &context, ITextModel &model) {
   TokenEntityRowList token_index;
   TokenEntityList token_entity_row;
 
-  for (auto token_id = model.firstTokenID(); token_id <= model.lastTokenID(); ++token_id) {
-    const auto &token_data = model.tokenData(token_id);
+  QString chunk_data;
+  auto L_add_token = [&] (TokenID token_id) {
+    if (chunk_data.size()) {
+      auto token_width = context.font_metrics->horizontalAdvance(chunk_data);
+      if (token_width == 0.0) {
+        token_width = font_width;
+      }
 
-    auto token_width = context.font_metrics->horizontalAdvance(token_data);
-    if (token_width == 0.0) {
-      token_width = font_width;
+      TokenEntity token_entity;
+      token_entity.token_id = token_id;
+      token_entity.text = std::move(chunk_data);
+      token_entity.bounding_box = QRectF(0.0, 0.0, token_width, token_height);
+      token_entity_row.push_back(std::move(token_entity));
+    }
+  };
+
+  for (auto token_id = model.firstTokenID();
+       token_id <= model.lastTokenID(); ++token_id) {
+    const QString &token_data = model.tokenData(token_id);
+
+    chunk_data.clear();
+    chunk_data.reserve(token_data.size());
+
+    for (auto ch : token_data) {
+      if (ch == '\n') {
+        L_add_token(token_id);
+        token_index.push_back(std::move(token_entity_row));
+        token_entity_row = {};
+      } else if (ch == '\r') {
+        continue;
+      } else {
+        chunk_data += ch;
+      }
     }
 
-    TokenEntity token_entity;
-    token_entity.token_id = token_id;
-    token_entity.bounding_box = QRectF(0.0, 0.0, token_width, token_height);
-    token_entity_row.push_back(std::move(token_entity));
-
-    if (token_data.endsWith("\n")) {
-      token_index.push_back(std::move(token_entity_row));
-      token_entity_row = {};
-    }
+    L_add_token(token_id);
   }
 
   context.token_index = std::move(token_index);

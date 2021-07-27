@@ -6,12 +6,7 @@
   the LICENSE file found in the root directory of this source tree.
 */
 
-//
-// SAMPLE CODE
-//
-
 #include "astmodel.h"
-#include "astgenerator.h"
 
 #include <QDebug>
 #include <QMap>
@@ -26,7 +21,80 @@
 #include <unordered_map>
 #include <vector>
 
+#include <pasta/Compile/Job.h>
+#include <pasta/Util/ArgumentVector.h>
+
+#include "astbuilder.h"
+
 namespace multiplier {
+namespace {
+
+class ASTDumper final : public pasta::DeclVisitor {
+public:
+  virtual ~ASTDumper(void) = default;
+
+  explicit ASTDumper(const pasta::AST &ast_, std::stringstream &output_)
+      : ast(ast_), output(output_) {}
+
+  pasta::AST ast;
+  std::string indent;
+  std::stringstream &output;
+
+  void PushIndent(void) { indent += "  "; }
+
+  void PopIndent(void) { indent.resize(indent.size() - 2); }
+
+  void VisitDeclContext(const pasta::DeclContext &dc) {
+    output << " {\n";
+    PushIndent();
+    for (const auto &decl : dc.AlreadyLoadedDecls()) {
+      Accept(decl);
+    }
+    PopIndent();
+    output << indent << "}\n";
+  }
+
+  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
+    output << indent << decl.KindName();
+    VisitDeclContext(decl);
+  }
+
+  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
+    output << indent << decl.KindName();
+    VisitDeclContext(decl);
+  }
+
+  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
+    output << indent << decl.KindName();
+    VisitDeclContext(decl);
+  }
+
+  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
+    output << indent << decl.KindName();
+    VisitDeclContext(decl);
+  }
+
+  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    output << indent << decl.KindName();
+    VisitDeclContext(decl);
+  }
+
+  void VisitTagDecl(const pasta::TagDecl &decl) final {
+    output << indent << decl.KindName();
+    VisitDeclContext(decl);
+  }
+
+  void VisitDecl(const pasta::Decl &decl) final {
+    output << indent << decl.KindName() << "\n";
+  }
+};
+
+void DumpAST(std::stringstream &output, pasta::AST ast) {
+  ASTDumper dumper(ast, output);
+  dumper.Accept(ast.TranslationUnit());
+}
+
+} // namespace
 
 struct Token final {
   TokenID id{kInvalidTokenID};
@@ -40,25 +108,10 @@ struct Token final {
 struct ASTModel::PrivateData final {
   std::vector<TokenID> token_list;
   std::unordered_map<TokenID, Token> token_map;
-
-  QString working_directory;
-  QString compile_command;
-
-  std::stringstream ast_stream;
-  std::future<bool> future_ast_result;
 };
 
-ASTModel::ASTModel(const QString &working_directory, const QString &compile_command,
-                   QObject *parent)
-    : ITextModel(parent), d(new PrivateData) {
-  d->working_directory = working_directory;
-  d->compile_command = compile_command;
-
-  d->future_ast_result = std::async(generateAST, std::ref(d->ast_stream),
-                                    std::ref(d->working_directory), std::ref(d->compile_command));
-
-  QTimer::singleShot(1000, this, &ASTModel::generateTestData);
-}
+ASTModel::ASTModel(QObject *parent)
+    : ITextModel(parent), d(new PrivateData) {}
 
 ASTModel::~ASTModel() {}
 
@@ -134,11 +187,7 @@ TokenAttribute ASTModel::tokenAttributes(TokenID token_id) const {
   return token.attributes;
 }
 
-void ASTModel::generateTestData() {
-  if (d->future_ast_result.wait_for(std::chrono::milliseconds(5)) == std::future_status::timeout) {
-    QTimer::singleShot(1000, this, &ASTModel::generateTestData);
-    return;
-  }
+void ASTModel::gotAST(std::shared_ptr<pasta::AST> ast) {
 
   static TokenID token_id_generator{kInvalidTokenID};
   static TokenColorID color_id_generator{kInvalidTokenColorID};
@@ -156,19 +205,21 @@ void ASTModel::generateTestData() {
       group_id_step = 0;
     }
 
-    d->token_list.push_back(token_id_generator);
-
     Token token;
     token.id = token_id_generator;
     token.data = str;
     token.color_id = color_id_generator;
     token.group_id = token_group_id_generator + 1;
 
-    d->token_map.insert({token_id_generator, std::move(token)});
+    d->token_list.push_back(token_id_generator);
+    d->token_map.try_emplace(token_id_generator, std::move(token));
   };
 
+  std::stringstream ast_stream;
+  DumpAST(ast_stream, *ast);
+
   std::string line;
-  while (std::getline(d->ast_stream, line)) {
+  while (std::getline(ast_stream, line)) {
     auto token_list = QString(line.c_str()).split(QRegularExpression("\\b"));
     for (const auto &token : token_list) {
       L_addToken(token);

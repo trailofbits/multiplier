@@ -17,14 +17,16 @@
 
 using namespace tob::widgets;
 
+namespace pasta {
+class CompileJob;
+}  // namespace pasta
 namespace multiplier {
 
 class Document : public QFrame {
   Q_OBJECT
 
 public:
-  Document(const QString &source_file_path, const QString &working_directory,
-           const QString &compile_command, QWidget *parent = nullptr);
+  Document(const pasta::CompileJob &job, QWidget *parent = nullptr);
   virtual ~Document();
 
   Document(const Document &) = delete;
@@ -42,8 +44,6 @@ private slots:
                         TokenID token_id);
 
   void onCopyAction();
-  void onApplyCommandLineChanges();
-  void onResetCommandLine();
   void onTranslationUnitTreeItemClicked(QTreeWidgetItem *item, int);
 };
 

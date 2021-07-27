@@ -9,6 +9,10 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QMetaType>
+
+#include <pasta/AST/AST.h>
+#include <pasta/Util/Init.h>
 
 namespace {
 
@@ -49,8 +53,12 @@ void initializeTheme() {
 } // namespace
 
 int main(int argc, char *argv[]) {
+  pasta::InitPasta initializer;
+
   QApplication application(argc, argv);
   initializeTheme();
+
+  qRegisterMetaType<std::shared_ptr<pasta::AST>>("std::shared_ptr<pasta::AST>");
 
   auto main_window = multiplier::MainWindow::create();
   main_window->show();

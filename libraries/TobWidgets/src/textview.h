@@ -60,6 +60,7 @@ public:
   struct TokenEntity final {
     QRectF bounding_box;
     TokenID token_id;
+    QString text;
   };
 
   using TokenEntityList = std::vector<TokenEntity>;
