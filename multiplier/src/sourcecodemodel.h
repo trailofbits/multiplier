@@ -10,6 +10,7 @@
 
 #include <tob/itextmodel.h>
 #include <pasta/AST/AST.h>
+#include <pasta/Util/File.h>
 
 #include <memory>
 
@@ -23,6 +24,7 @@ class SourceCodeModel final : public ITextModel {
 
  public:
   SourceCodeModel(QObject *parent = nullptr);
+  SourceCodeModel(pasta::File file, QObject *parent = nullptr);
   virtual ~SourceCodeModel();
 
   virtual TokenID firstTokenID() const override;
@@ -41,6 +43,8 @@ class SourceCodeModel final : public ITextModel {
  private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
+
+  void renderFile(pasta::File file);
 
  public slots:
   void gotAST(std::shared_ptr<pasta::AST> ast);

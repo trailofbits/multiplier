@@ -42,7 +42,7 @@ class ParsedFilesIndex final : public QFrame {
   void onTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
  signals:
-  void sourceFileDoubleClicked(pasta::File file);
+  void parsedFileDoubleClicked(pasta::File file);
 };
 
 } // namespace multiplier

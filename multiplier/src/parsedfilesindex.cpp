@@ -9,8 +9,8 @@
 #include "parsedfilesindex.h"
 
 #include <QDebug>
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QMap>
+#include <QString>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -24,6 +24,7 @@ namespace multiplier {
 
 struct ParsedFilesIndex::PrivateData final {
   QTreeWidget *source_file_tree{nullptr};
+  QMap<QString, pasta::File> files;
 };
 
 ParsedFilesIndex::ParsedFilesIndex(QWidget *parent)
@@ -76,7 +77,9 @@ void ParsedFilesIndex::gotAST(std::shared_ptr<pasta::AST> ast) {
       parent = item;
     }
 
-    parent->setText(1, QString::fromStdString(path.generic_string()));
+    QString full_path = QString::fromStdString(path.generic_string());
+    d->files.insert(full_path, file);
+    parent->setText(1, full_path);
   }
 
   d->source_file_tree->addTopLevelItem(root_item);
@@ -88,53 +91,15 @@ void ParsedFilesIndex::reset() { d->source_file_tree->reset(); }
 
 void ParsedFilesIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {
 
-  if (item->childCount() != 0 || item->columnCount() != 4) {
+  if (item->childCount() != 0 || item->columnCount() != 2) {
     return;
   }
 
   auto source_file_path = item->text(1);
-  std::cerr << "Clicked " << source_file_path.toStdString() << std::endl;
-#if 0
-  auto cwd = d->file_system->CurrentWorkingDirectory();
-  if (cwd.Failed()) {
-    std::cerr << cwd.TakeError().message() << std::endl;
-    return;  // TODO(pag): Log error.
+  auto file_it = d->files.find(source_file_path);
+  if (file_it != d->files.end()) {
+    emit parsedFileDoubleClicked(*file_it);
   }
-
-  auto working_directory_path = d->file_system->ParsePath(
-      working_directory.toStdString(), cwd.TakeValue(),
-      d->file_system->PathKind());
-
-  pasta::ArgumentVector argv(compile_command.toStdString());
-  auto cmd = pasta::CompileCommand::CreateFromArguments(
-      argv, working_directory_path);
-
-  if (cmd.Failed()) {
-    std::cerr << cmd.TakeError() << std::endl;
-    return;  // TODO(pag): Log error.
-  }
-
-  auto compiler = d->c_compiler;
-
-  if (source_file_path.endsWith(".cc", Qt::CaseInsensitive) ||
-      source_file_path.endsWith(".cp", Qt::CaseInsensitive) ||
-      source_file_path.endsWith(".cpp", Qt::CaseInsensitive) ||
-      source_file_path.endsWith(".cxx", Qt::CaseInsensitive) ||
-      source_file_path.endsWith(".c++", Qt::CaseInsensitive) ||
-      source_file_path.endsWith(".C", Qt::CaseSensitive)) {
-    compiler = d->cxx_compiler;
-  }
-
-  auto jobs = compiler.CreateJobsForCommand(cmd.TakeValue());
-  if (jobs.Failed()) {
-    std::cerr << jobs.TakeError() << std::endl;
-    return;  // TODO(pag): Log error.
-  }
-
-  for (auto job : jobs.TakeValue()) {
-    emit sourceFileDoubleClicked(job);
-  }
-#endif
 }
 
 } // namespace multiplier

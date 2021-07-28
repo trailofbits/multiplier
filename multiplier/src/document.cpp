@@ -117,64 +117,66 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   connect(d->code_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
           this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
-//  // Create the compile command editor
-//  auto src_and_cwd_layout = new QFormLayout();
-//  auto source_file_path = QString::fromStdString(job.SourceFile().Path().generic_string());
-//  auto working_directory = QString::fromStdString(job.WorkingDirectory().generic_string());
-//
-//  d->source_file_path = new QLineEdit(source_file_path);
-//  d->source_file_path->setReadOnly(true);
-//  src_and_cwd_layout->addRow(tr("Source file"), d->source_file_path);
-//
-//  d->working_directory = new QLineEdit(working_directory);
-//  d->working_directory->setReadOnly(true);
-//  src_and_cwd_layout->addRow(tr("Working directory"), d->working_directory);
-//
-//  d->compile_command = new QPlainTextEdit();
-//  d->compile_command->setPlainText(d->original_compile_command);
-//  d->compile_command->setReadOnly(true);
-//
-//  auto tu_settings_layout = new QVBoxLayout();
-//  tu_settings_layout->addLayout(src_and_cwd_layout);
-//  tu_settings_layout->addWidget(new QLabel(tr("Compile command")));
-//  tu_settings_layout->addWidget(d->compile_command);
+  connect(d->tu_tree, &ParsedFilesIndex::parsedFileDoubleClicked,
+          this, &Document::displayParsedFile);
 
-//  connect(d->tu_tree, &QTreeWidget::itemActivated, this,
-//          &Document::onTranslationUnitTreeItemClicked);
+  // Create the compile command editor
+  auto src_and_cwd_layout = new QFormLayout();
+  auto source_file_path = QString::fromStdString(job.SourceFile().Path().generic_string());
+  auto working_directory = QString::fromStdString(job.WorkingDirectory().generic_string());
 
-//  auto compile_command_layout = new QHBoxLayout();
-//  compile_command_layout->addLayout(tu_settings_layout);
-//  compile_command_layout->addWidget(d->tu_tree);
+  d->source_file_path = new QLineEdit(source_file_path);
+  d->source_file_path->setReadOnly(true);
+  src_and_cwd_layout->addRow(tr("Source file"), d->source_file_path);
+
+  d->working_directory = new QLineEdit(working_directory);
+  d->working_directory->setReadOnly(true);
+  src_and_cwd_layout->addRow(tr("Working directory"), d->working_directory);
+
+  d->compile_command = new QPlainTextEdit();
+  d->compile_command->setPlainText(d->original_compile_command);
+  d->compile_command->setReadOnly(true);
+
+  auto tu_settings_layout = new QVBoxLayout();
+  tu_settings_layout->addLayout(src_and_cwd_layout);
+  tu_settings_layout->addWidget(new QLabel(tr("Compile command")));
+  tu_settings_layout->addWidget(d->compile_command);
+
+  auto compile_command_layout = new QHBoxLayout();
+  compile_command_layout->addLayout(tu_settings_layout);
+  compile_command_layout->addWidget(d->tu_tree);
 
   // Setup the layout
   auto main_layout = new QVBoxLayout();
   main_layout->setContentsMargins(0, 0, 0, 0);
   setLayout(main_layout);
 
-  auto main_splitter = new QSplitter(Qt::Horizontal);
+  auto compile_command_editor = new QWidget();
+  compile_command_editor->setLayout(compile_command_layout);
+
+  auto tu_cmd_splitter = new QSplitter();
+  tu_cmd_splitter->addWidget(compile_command_editor);
+  tu_cmd_splitter->addWidget(d->tu_tree);
+
+  auto code_ast_splitter = new QSplitter();
+  code_ast_splitter->addWidget(d->ast_view);
+  code_ast_splitter->addWidget(d->code_view);
+
+  QList<int> code_ast_sizes;
+  code_ast_sizes.push_back(code_ast_splitter->width() / 5);
+  code_ast_sizes.push_back(code_ast_splitter->width() - code_ast_sizes.back());
+  code_ast_splitter->setSizes(code_ast_sizes);
+
+  auto main_splitter = new QSplitter(Qt::Vertical);
+  main_splitter->addWidget(tu_cmd_splitter);
+  main_splitter->addWidget(code_ast_splitter);
   main_layout->addWidget(main_splitter);
 
-//  auto tu_cmd_splitter = new QSplitter();
-//  main_splitter->addWidget(tu_cmd_splitter);
-
-//  auto compile_command_editor = new QWidget();
-//  compile_command_editor->setLayout(compile_command_layout);
-//
-//  tu_cmd_splitter->addWidget(compile_command_editor);
-//  tu_cmd_splitter->addWidget(d->tu_tree);
-
-//  auto code_ast_splitter = new QSplitter();
-//  main_splitter->addWidget(code_ast_splitter);
-
-  main_splitter->addWidget(d->tu_tree);
-  main_splitter->addWidget(d->ast_view);
-  main_splitter->addWidget(d->code_view);
-
-  QList<int> size_list;
-  size_list.push_back(main_splitter->width() / 4);
-  size_list.push_back(main_splitter->width() / 4);
-  size_list.push_back(main_splitter->width() - (main_splitter->width() / 2));
-  main_splitter->setSizes(size_list);
+  QList<int> top_bottom_size_list;
+  top_bottom_size_list.push_back(main_splitter->height() / 5);
+  top_bottom_size_list.push_back(main_splitter->height() -
+                                 top_bottom_size_list.back());
+  main_splitter->setSizes(top_bottom_size_list);
 
   // Initialize the context menu
   d->context_menu = new QMenu(tr("Context menu"));
@@ -265,20 +267,9 @@ void Document::onCopyAction() {
   QApplication::clipboard()->setText(selection);
 }
 
-void Document::onTranslationUnitTreeItemClicked(QTreeWidgetItem *item, int) {
-  auto file_name = item->text(0);
-  static_cast<void>(file_name);
-
-  auto file_path = item->text(1);
-  static_cast<void>(file_path);
-
-  // Force opening the same file for now
-  file_path = d->source_file_path->text();
-
-  std::cerr << "TODO: clicked, open " << file_path.toStdString() << "\n";
-
-//  d->code_model = std::make_shared<SourceCodeModel>(file_path);
-//  d->code_view->setModel(d->code_model);
+void Document::displayParsedFile(pasta::File file) {
+  d->code_model = std::make_shared<SourceCodeModel>(file);
+  d->code_view->setModel(d->code_model);
 }
 
 } // namespace multiplier

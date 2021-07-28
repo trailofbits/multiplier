@@ -43,7 +43,16 @@ struct SourceCodeModel::PrivateData final {
 SourceCodeModel::SourceCodeModel(QObject *parent)
     : ITextModel(parent), d(new PrivateData) {}
 
+SourceCodeModel::SourceCodeModel(pasta::File file, QObject *parent)
+    : SourceCodeModel(parent) {
+  renderFile(file);
+}
+
 void SourceCodeModel::gotAST(std::shared_ptr<pasta::AST> ast) {
+  renderFile(ast->MainFile());
+}
+
+void SourceCodeModel::renderFile(pasta::File file) {
   static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
 
   auto group_id_step = 0;
@@ -73,7 +82,7 @@ void SourceCodeModel::gotAST(std::shared_ptr<pasta::AST> ast) {
     d->token_map.try_emplace(tok.Index(), std::move(token));
   };
 
-  for (auto token : ast->MainFile().Tokens()) {
+  for (auto token : file.Tokens()) {
     L_addToken(token);
   }
 

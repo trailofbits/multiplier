@@ -14,6 +14,7 @@
 #include <memory>
 
 #include <tob/itextview.h>
+#include <pasta/Util/File.h>
 
 using namespace tob::widgets;
 
@@ -25,26 +26,28 @@ namespace multiplier {
 class Document : public QFrame {
   Q_OBJECT
 
-public:
+ public:
   Document(const pasta::CompileJob &job, QWidget *parent = nullptr);
   virtual ~Document();
 
   Document(const Document &) = delete;
   Document &operator=(const Document &) = delete;
 
-private:
+ private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
-private slots:
-  void onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
-                               TokenID token_id);
+ private slots:
+  void onSourceCodeItemClicked(
+      const QPoint &mouse_position, const Qt::MouseButton &button,
+      TokenID token_id);
 
-  void onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
-                        TokenID token_id);
+  void onASTItemClicked(
+      const QPoint &mouse_position, const Qt::MouseButton &button,
+      TokenID token_id);
 
   void onCopyAction();
-  void onTranslationUnitTreeItemClicked(QTreeWidgetItem *item, int);
+  void displayParsedFile(pasta::File file);
 };
 
 } // namespace multiplier
