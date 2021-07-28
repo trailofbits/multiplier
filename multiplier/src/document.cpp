@@ -263,6 +263,41 @@ void Document::onCopyAction() {
 
 void Document::highlightDecl(pasta::Decl decl) {
 
+  std::optional<pasta::FileToken> opt_begin_loc;
+  std::optional<pasta::FileToken> opt_end_loc;
+
+  auto loc_range = decl.TokenRange();
+  if (auto num_toks = loc_range.Size()) {
+    opt_begin_loc = loc_range[0].FileLocation();
+    opt_end_loc = loc_range[num_toks - 1u].FileLocation();
+  } else {
+    opt_begin_loc = decl.Token().FileLocation();
+    opt_end_loc = opt_begin_loc;
+  }
+
+  if (!opt_begin_loc || !opt_end_loc) {
+    return;
+  }
+
+  auto begin_loc = std::move(*opt_begin_loc);
+  auto end_loc = std::move(*opt_end_loc);
+
+  if (!(begin_loc <= end_loc)) {
+    return;
+  }
+
+  // Make sure we're showing the right code.
+  auto file = pasta::File::Containing(begin_loc);
+  displayParsedFile(std::move(file));
+
+  // Now go and highlight the correct tokens.
+  std::unordered_set<TokenGroupID> token_groups;
+  for (auto begin_id = begin_loc.Index(), end_id = end_loc.Index();
+       begin_id <= end_id; ++begin_id) {
+    token_groups.insert(begin_id);
+  }
+
+  d->code_view->highlightTokenGroups(std::move(token_groups));
 }
 
 void Document::displayParsedFile(pasta::File file) {

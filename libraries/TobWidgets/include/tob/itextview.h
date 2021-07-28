@@ -14,6 +14,7 @@
 
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace tob::widgets {
 
@@ -39,6 +40,7 @@ public:
   virtual bool hasSelection() const = 0;
   virtual std::optional<QString> getSelection() const = 0;
 
+  virtual void highlightTokenGroups(std::unordered_set<TokenGroupID> new_groups) = 0;
   virtual void highlightTokenGroup(TokenGroupID group_id) = 0;
   virtual void disableTokenGroupHighlight() = 0;
 

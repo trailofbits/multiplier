@@ -132,14 +132,23 @@ std::optional<QString> TextView::getSelection() const {
   return output;
 }
 
-void TextView::highlightTokenGroup(TokenGroupID group_id) {
-  d->context.highlighted_token_group = group_id;
+void TextView::highlightTokenGroups(std::unordered_set<TokenGroupID> new_groups) {
+  d->context.highlighted_token_groups = std::move(new_groups);
   update();
 }
 
+void TextView::highlightTokenGroup(TokenGroupID group_id) {
+  if (auto [it, added] = d->context.highlighted_token_groups.emplace(group_id);
+      added) {
+    update();
+  }
+}
+
 void TextView::disableTokenGroupHighlight() {
-  d->context.highlighted_token_group = kInvalidTokenGroupID;
-  update();
+  if (!d->context.highlighted_token_groups.empty()) {
+    d->context.highlighted_token_groups.clear();
+    update();
+  }
 }
 
 void TextView::resizeEvent(QResizeEvent *event) {
@@ -212,8 +221,9 @@ void TextView::paintEvent(QPaintEvent *event) {
         }
 
         auto token_group = d->model->tokenGroupID(entity.token_id);
-        bool highlighted_group = (d->context.highlighted_token_group != kInvalidTokenGroupID) &&
-                                 (token_group == d->context.highlighted_token_group);
+
+        bool highlighted_group =
+            !!d->context.highlighted_token_groups.count(token_group);
 
         auto background = context.theme.background;
         if (highlighted_group) {

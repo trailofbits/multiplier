@@ -27,7 +27,6 @@ namespace multiplier {
 
 struct Token final {
   TokenID id{kInvalidTokenID};
-  TokenGroupID group_id{kInvalidTokenGroupID};
   QString data;
   TokenColorID color_id{kInvalidTokenColorID};
   QMap<int, QVariant> property_bag;
@@ -72,7 +71,6 @@ void SourceCodeModel::renderFile(pasta::File file) {
     token.data = QString::fromLocal8Bit(
         tok_data.data(), static_cast<int>(tok_data.size()));
     token.color_id = tok.Kind() % 7u;
-    token.group_id = token_group_id_generator + 1;
 
     if (!d->min_token_id) {
       d->min_token_id = tok.Index();
@@ -107,14 +105,9 @@ TokenID SourceCodeModel::lastTokenID() const {
   }
 };
 
+// NOTE(pag): For now, a token's ID is its group id.
 TokenGroupID SourceCodeModel::tokenGroupID(TokenID token_id) const {
-  auto token_map_it = d->token_map.find(token_id);
-  if (token_map_it == d->token_map.end()) {
-    return kInvalidTokenGroupID;
-  }
-
-  const auto &token = token_map_it->second;
-  return token.group_id;
+  return static_cast<TokenGroupID>(token_id);
 }
 
 QString SourceCodeModel::tokenData(TokenID token_id) const {
