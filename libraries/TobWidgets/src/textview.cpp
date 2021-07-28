@@ -138,10 +138,11 @@ void TextView::highlightTokenGroups(std::unordered_set<TokenGroupID> new_groups)
 }
 
 void TextView::highlightTokenGroup(TokenGroupID group_id) {
-  if (auto [it, added] = d->context.highlighted_token_groups.emplace(group_id);
-      added) {
-    update();
+  d->context.highlighted_token_groups.clear();
+  if (group_id != kInvalidTokenGroupID) {
+    d->context.highlighted_token_groups.insert(group_id);
   }
+  update();
 }
 
 void TextView::disableTokenGroupHighlight() {
@@ -521,8 +522,8 @@ void TextView::createTokenIndex(Context &context, ITextModel &model) {
     }
   };
 
-  for (auto token_id = model.firstTokenID();
-       token_id <= model.lastTokenID(); ++token_id) {
+  for (auto token_id = model.firstTokenID(), last_token_id = model.lastTokenID();
+       token_id != kInvalidTokenID && token_id <= last_token_id; ++token_id) {
     const QString &token_data = model.tokenData(token_id);
 
     chunk_data.clear();
