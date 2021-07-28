@@ -14,21 +14,20 @@
 #include <memory>
 
 #include <pasta/AST/AST.h>
-#include <pasta/Util/File.h>
 
 namespace multiplier {
 
-class ParsedFilesIndex final : public QFrame {
+class ASTIndex final : public QFrame {
   Q_OBJECT
 
  public:
-  ParsedFilesIndex(QWidget *parent = nullptr);
-  virtual ~ParsedFilesIndex() override;
+  ASTIndex(QWidget *parent = nullptr);
+  virtual ~ASTIndex() override;
 
   void reset();
 
-  ParsedFilesIndex(const ParsedFilesIndex &) = delete;
-  ParsedFilesIndex &operator=(const ParsedFilesIndex &) = delete;
+  ASTIndex(const ASTIndex &) = delete;
+  ASTIndex &operator=(const ASTIndex &) = delete;
 
  public slots:
   void gotAST(std::shared_ptr<pasta::AST> ast);
@@ -41,7 +40,7 @@ class ParsedFilesIndex final : public QFrame {
   void onTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
  signals:
-  void parsedFileDoubleClicked(pasta::File file);
+  void clickedDecl(pasta::Decl decl);
 };
 
 } // namespace multiplier

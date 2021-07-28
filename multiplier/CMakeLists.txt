@@ -18,8 +18,8 @@ add_executable(multiplier
   src/astbuilder.h
   src/astbuilder.cpp
 
-  src/astmodel.h
-  src/astmodel.cpp
+  src/astindex.h
+  src/astindex.cpp
 
   src/compilecommandsindex.h
   src/compilecommandsindex.cpp

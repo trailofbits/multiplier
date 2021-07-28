@@ -179,7 +179,9 @@ bool CompileCommandsIndex::setCompileCommands(const QJsonDocument &json_document
   return true;
 }
 
-void CompileCommandsIndex::reset() { d->source_file_tree->reset(); }
+void CompileCommandsIndex::reset() {
+  d->source_file_tree->reset();
+}
 
 void CompileCommandsIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {
 

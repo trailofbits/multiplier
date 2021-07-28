@@ -87,7 +87,10 @@ void ParsedFilesIndex::gotAST(std::shared_ptr<pasta::AST> ast) {
   d->source_file_tree->sortItems(0, Qt::AscendingOrder);
 }
 
-void ParsedFilesIndex::reset() { d->source_file_tree->reset(); }
+void ParsedFilesIndex::reset() {
+  d->files.clear();
+  d->source_file_tree->reset();
+}
 
 void ParsedFilesIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {
 

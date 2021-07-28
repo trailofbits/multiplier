@@ -8,7 +8,7 @@
 
 #include "document.h"
 #include "astbuilder.h"
-#include "astmodel.h"
+#include "astindex.h"
 #include "parsedfilesindex.h"
 #include "sourcecodemodel.h"
 
@@ -51,11 +51,11 @@ struct Document::PrivateData final {
   QPlainTextEdit *compile_command{nullptr};
   ParsedFilesIndex *tu_tree{nullptr};
 
+  std::string current_open_path;
   tob::widgets::ITextModel::Ptr code_model;
   tob::widgets::ITextView *code_view{nullptr};
 
-  tob::widgets::ITextModel::Ptr ast_model;
-  tob::widgets::ITextView *ast_view{nullptr};
+  ASTIndex *ast_tree{nullptr};
 
   QMenu *context_menu{nullptr};
   QAction *copy_action{nullptr};
@@ -77,19 +77,15 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   theme.color_map.insert({5, QColor::fromRgba(0xFFD0D1FE)});
   theme.color_map.insert({6, QColor::fromRgba(0xFFF1F1F1)});
 
-  // Create the AST view
-  d->ast_model = std::make_shared<ASTModel>();
-  d->ast_view = ITextView::create();
-  d->ast_view->setTheme(theme);
-  d->ast_view->setModel(d->ast_model);
+  // Two custom tree views.
+  d->ast_tree = new ASTIndex;
+  d->tu_tree = new ParsedFilesIndex;
 
   // Create the code view
   d->code_model = std::make_shared<SourceCodeModel>();
   d->code_view = ITextView::create();
   d->code_view->setTheme(theme);
   d->code_view->setModel(d->code_model);
-
-  d->tu_tree = new ParsedFilesIndex();
 
   // Create an AST builder that will run the compile job in a background thread
   // and then emit signals when it has been built.
@@ -98,7 +94,7 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
 
   // Tell the models when we get an AST.
   connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)),
-          d->ast_model.get(), SLOT(gotAST(std::shared_ptr<pasta::AST>)));
+          d->ast_tree, SLOT(gotAST(std::shared_ptr<pasta::AST>)));
 
   connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)),
           d->code_model.get(), SLOT(gotAST(std::shared_ptr<pasta::AST>)));
@@ -110,15 +106,14 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   auto tp = QThreadPool::globalInstance();
   tp->start(make_ast);
 
-  connect(
-      d->ast_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
-      this, SLOT(onASTItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
-
-  connect(d->code_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
-          this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
+  connect(d->ast_tree, &ASTIndex::clickedDecl,
+          this, &Document::highlightDecl);
 
   connect(d->tu_tree, &ParsedFilesIndex::parsedFileDoubleClicked,
           this, &Document::displayParsedFile);
+
+  connect(d->code_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
+          this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
   // Create the compile command editor
   auto src_and_cwd_layout = new QFormLayout();
@@ -159,7 +154,7 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   tu_cmd_splitter->addWidget(d->tu_tree);
 
   auto code_ast_splitter = new QSplitter();
-  code_ast_splitter->addWidget(d->ast_view);
+  code_ast_splitter->addWidget(d->ast_tree);
   code_ast_splitter->addWidget(d->code_view);
 
   QList<int> code_ast_sizes;
@@ -218,44 +213,43 @@ void Document::onSourceCodeItemClicked(
     // handle left clicks
     auto token_group = d->code_model->tokenGroupID(token_id);
     if (token_group != kInvalidTokenGroupID) {
-      d->ast_view->highlightTokenGroup(token_group);
       d->code_view->highlightTokenGroup(token_group);
     }
   }
 }
 
-void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
-                                TokenID token_id) {
-  if (button == Qt::RightButton) {
-    d->copy_action->setEnabled(d->code_view->hasSelection());
-
-    // Custom menu example
-    QMenu *additional_menu{nullptr};
-    if (token_id != kInvalidTokenID) {
-      additional_menu = new QMenu(tr("Test menu"));
-      d->context_menu->addMenu(additional_menu);
-
-      auto token_data = d->ast_model->tokenData(token_id);
-      auto test_action = new QAction(tr("Test action for ") + token_data);
-      additional_menu->addAction(test_action);
-    }
-
-    d->context_menu->exec(mouse_position);
-
-    if (additional_menu != nullptr) {
-      d->context_menu->removeAction(additional_menu->menuAction());
-    }
-
-  } else if (button == Qt::LeftButton) {
-    // Token group highlight example; you can also check `button` to only
-    // handle left clicks
-    auto token_group = d->ast_model->tokenGroupID(token_id);
-    if (token_group != kInvalidTokenGroupID) {
-      d->code_view->highlightTokenGroup(token_group);
-      d->ast_view->highlightTokenGroup(token_group);
-    }
-  }
-}
+//void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+//                                TokenID token_id) {
+//  if (button == Qt::RightButton) {
+//    d->copy_action->setEnabled(d->code_view->hasSelection());
+//
+//    // Custom menu example
+//    QMenu *additional_menu{nullptr};
+//    if (token_id != kInvalidTokenID) {
+//      additional_menu = new QMenu(tr("Test menu"));
+//      d->context_menu->addMenu(additional_menu);
+//
+//      auto token_data = d->ast_model->tokenData(token_id);
+//      auto test_action = new QAction(tr("Test action for ") + token_data);
+//      additional_menu->addAction(test_action);
+//    }
+//
+//    d->context_menu->exec(mouse_position);
+//
+//    if (additional_menu != nullptr) {
+//      d->context_menu->removeAction(additional_menu->menuAction());
+//    }
+//
+//  } else if (button == Qt::LeftButton) {
+//    // Token group highlight example; you can also check `button` to only
+//    // handle left clicks
+//    auto token_group = d->ast_model->tokenGroupID(token_id);
+//    if (token_group != kInvalidTokenGroupID) {
+//      d->code_view->highlightTokenGroup(token_group);
+//      d->ast_tree->highlightTokenGroup(token_group);
+//    }
+//  }
+//}
 
 void Document::onCopyAction() {
   auto opt_selection = d->code_view->getSelection();
@@ -267,9 +261,17 @@ void Document::onCopyAction() {
   QApplication::clipboard()->setText(selection);
 }
 
+void Document::highlightDecl(pasta::Decl decl) {
+
+}
+
 void Document::displayParsedFile(pasta::File file) {
-  d->code_model = std::make_shared<SourceCodeModel>(file);
-  d->code_view->setModel(d->code_model);
+  auto path = file.Path().generic_string();
+  if (path != d->current_open_path) {
+    d->current_open_path = std::move(path);
+    d->code_model = std::make_shared<SourceCodeModel>(file);
+    d->code_view->setModel(d->code_model);
+  }
 }
 
 } // namespace multiplier

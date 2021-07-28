@@ -14,6 +14,8 @@
 #include <memory>
 
 #include <tob/itextview.h>
+
+#include <pasta/AST/Decl.h>
 #include <pasta/Util/File.h>
 
 using namespace tob::widgets;
@@ -42,11 +44,8 @@ class Document : public QFrame {
       const QPoint &mouse_position, const Qt::MouseButton &button,
       TokenID token_id);
 
-  void onASTItemClicked(
-      const QPoint &mouse_position, const Qt::MouseButton &button,
-      TokenID token_id);
-
   void onCopyAction();
+  void highlightDecl(pasta::Decl decl);
   void displayParsedFile(pasta::File file);
 };
 
