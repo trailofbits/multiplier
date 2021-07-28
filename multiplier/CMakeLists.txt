@@ -15,8 +15,11 @@ add_executable(multiplier
   src/sourcecodemodel.h
   src/sourcecodemodel.cpp
 
-  src/astmodel.h
-  src/astmodel.cpp
+  src/astbuilder.h
+  src/astbuilder.cpp
+
+  src/astindex.h
+  src/astindex.cpp
 
   src/compilecommandsindex.h
   src/compilecommandsindex.cpp
@@ -24,8 +27,8 @@ add_executable(multiplier
   src/document.h
   src/document.cpp
 
-  src/astgenerator.h
-  src/astgenerator.cpp
+  src/parsedfilesindex.h
+  src/parsedfilesindex.cpp
 )
 
 target_link_libraries(multiplier PRIVATE

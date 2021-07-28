@@ -12,14 +12,15 @@
 #include <QVariant>
 
 #include <memory>
+#include <limits>
 
 namespace tob::widgets {
 
 using TokenID = std::uint64_t;
-constexpr TokenID kInvalidTokenID{0};
+constexpr TokenID kInvalidTokenID{std::numeric_limits<uint64_t>::max()};
 
 using TokenGroupID = std::uint64_t;
-constexpr TokenGroupID kInvalidTokenGroupID{0};
+constexpr TokenGroupID kInvalidTokenGroupID{std::numeric_limits<uint64_t>::max()};
 
 using TokenColorID = std::uint64_t;
 constexpr TokenColorID kInvalidTokenColorID{0};

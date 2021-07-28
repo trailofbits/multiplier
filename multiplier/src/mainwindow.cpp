@@ -223,16 +223,11 @@ void MainWindow::onFileExitAction() { close(); }
 
 void MainWindow::onHelpAboutAction() {}
 
-void MainWindow::onCompileCommandsIndexItemActivated(const QString &working_directory,
-                                                     const QString &source_file_path,
-                                                     const QString &compile_command) {
+void MainWindow::onCompileCommandsIndexItemActivated(pasta::CompileJob job) {
+  auto window_title = QString::fromStdString(
+      job.SourceFile().Path().filename().generic_string());
 
-  static_cast<void>(working_directory);
-  static_cast<void>(compile_command);
-
-  auto window_title = source_file_path.split("/").takeLast();
-  auto document = new Document(source_file_path, working_directory, compile_command);
-
+  auto document = new Document(job);
   auto container = new QMdiSubWindow();
   container->setWidget(document);
   container->setWindowTitle(window_title);

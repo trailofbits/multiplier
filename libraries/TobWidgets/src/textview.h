@@ -12,6 +12,7 @@
 #include <tob/itextview.h>
 
 #include <memory>
+#include <unordered_set>
 
 #include <QFontMetricsF>
 #include <QRectF>
@@ -33,6 +34,7 @@ public:
   virtual bool hasSelection() const override;
   virtual std::optional<QString> getSelection() const override;
 
+  virtual void highlightTokenGroups(std::unordered_set<TokenGroupID> new_groups) override;
   virtual void highlightTokenGroup(TokenGroupID group_id) override;
   virtual void disableTokenGroupHighlight() override;
 
@@ -60,6 +62,7 @@ public:
   struct TokenEntity final {
     QRectF bounding_box;
     TokenID token_id;
+    QString text;
   };
 
   using TokenEntityList = std::vector<TokenEntity>;
@@ -102,7 +105,7 @@ public:
     OptionalScene opt_scene;
     OptionalSelection opt_selection;
     bool word_wrap{true};
-    TokenGroupID highlighted_token_group{kInvalidTokenGroupID};
+    std::unordered_set<TokenGroupID> highlighted_token_groups;
   };
 
   static void scrollViewportTo(Context &context, const QPointF &point);

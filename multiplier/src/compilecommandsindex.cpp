@@ -15,14 +15,44 @@
 #include <QVBoxLayout>
 
 #include <array>
+#include <iostream>
+
+#include <pasta/Compile/Compiler.h>
+#include <pasta/Compile/Command.h>
+#include <pasta/Util/ArgumentVector.h>
+#include <pasta/Util/FileManager.h>
 
 namespace multiplier {
+namespace {
+
+pasta::Compiler CreateHostCompiler(pasta::FileManager fm,
+                                   pasta::TargetLanguage lang) {
+  auto compiler = pasta::Compiler::CreateHostCompiler(fm, lang);
+  if (compiler.Failed()) {
+    abort();
+  } else {
+    return compiler.TakeValue();
+  }
+}
+
+}  // namespace
 
 struct CompileCommandsIndex::PrivateData final {
+  PrivateData(void)
+      : file_system(pasta::FileSystem::CreateNative()),
+        file_manager(file_system),
+        c_compiler(CreateHostCompiler(file_manager, pasta::TargetLanguage::kC)),
+        cxx_compiler(CreateHostCompiler(file_manager, pasta::TargetLanguage::kCXX)) {}
+
+  std::shared_ptr<pasta::FileSystem> file_system;
+  pasta::FileManager file_manager;
+  pasta::Compiler c_compiler;
+  pasta::Compiler cxx_compiler;
   QTreeWidget *source_file_tree{nullptr};
 };
 
-CompileCommandsIndex::CompileCommandsIndex(QWidget *parent) : QFrame(parent), d(new PrivateData) {
+CompileCommandsIndex::CompileCommandsIndex(QWidget *parent)
+    : QFrame(parent), d(new PrivateData) {
   setWindowTitle(tr("Compile Commands"));
 
   auto layout = new QVBoxLayout();
@@ -149,7 +179,9 @@ bool CompileCommandsIndex::setCompileCommands(const QJsonDocument &json_document
   return true;
 }
 
-void CompileCommandsIndex::reset() { d->source_file_tree->reset(); }
+void CompileCommandsIndex::reset() {
+  d->source_file_tree->reset();
+}
 
 void CompileCommandsIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {
 
@@ -161,7 +193,45 @@ void CompileCommandsIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int)
   auto source_file_path = item->text(2);
   auto compile_command = item->text(3);
 
-  emit sourceFileDoubleClicked(working_directory, source_file_path, compile_command);
+  auto cwd = d->file_system->CurrentWorkingDirectory();
+  if (cwd.Failed()) {
+    std::cerr << cwd.TakeError().message() << std::endl;
+    return;  // TODO(pag): Log error.
+  }
+
+  auto working_directory_path = d->file_system->ParsePath(
+      working_directory.toStdString(), cwd.TakeValue(),
+      d->file_system->PathKind());
+
+  pasta::ArgumentVector argv(compile_command.toStdString());
+  auto cmd = pasta::CompileCommand::CreateFromArguments(
+      argv, working_directory_path);
+
+  if (cmd.Failed()) {
+    std::cerr << cmd.TakeError() << std::endl;
+    return;  // TODO(pag): Log error.
+  }
+
+  auto compiler = d->c_compiler;
+
+  if (source_file_path.endsWith(".cc", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".cp", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".cpp", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".cxx", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".c++", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".C", Qt::CaseSensitive)) {
+    compiler = d->cxx_compiler;
+  }
+
+  auto jobs = compiler.CreateJobsForCommand(cmd.TakeValue());
+  if (jobs.Failed()) {
+    std::cerr << jobs.TakeError() << std::endl;
+    return;  // TODO(pag): Log error.
+  }
+
+  for (auto job : jobs.TakeValue()) {
+    emit sourceFileDoubleClicked(job);
+  }
 }
 
 } // namespace multiplier

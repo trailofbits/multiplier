@@ -9,37 +9,38 @@
 #pragma once
 
 #include <QFrame>
-#include <QJsonDocument>
 #include <QTreeWidgetItem>
 
 #include <memory>
 
-#include <pasta/Compile/Job.h>
+#include <pasta/AST/AST.h>
 
 namespace multiplier {
 
-class CompileCommandsIndex final : public QFrame {
+class ASTIndex final : public QFrame {
   Q_OBJECT
 
-public:
-  CompileCommandsIndex(QWidget *parent = nullptr);
-  virtual ~CompileCommandsIndex() override;
+ public:
+  ASTIndex(QWidget *parent = nullptr);
+  virtual ~ASTIndex() override;
 
-  bool setCompileCommands(const QJsonDocument &json_document);
   void reset();
 
-  CompileCommandsIndex(const CompileCommandsIndex &) = delete;
-  CompileCommandsIndex &operator=(const CompileCommandsIndex &) = delete;
+  ASTIndex(const ASTIndex &) = delete;
+  ASTIndex &operator=(const ASTIndex &) = delete;
 
-private:
+ public slots:
+  void gotAST(std::shared_ptr<pasta::AST> ast);
+
+ private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
-private slots:
+ private slots:
   void onTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
-signals:
-  void sourceFileDoubleClicked(pasta::CompileJob job);
+ signals:
+  void clickedDecl(pasta::Decl decl);
 };
 
 } // namespace multiplier

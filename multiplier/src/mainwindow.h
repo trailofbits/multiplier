@@ -11,6 +11,7 @@
 #include <QMainWindow>
 
 #include <memory>
+#include <pasta/Compile/Job.h>
 
 namespace multiplier {
 
@@ -51,9 +52,7 @@ private slots:
 
   void onHelpAboutAction();
 
-  void onCompileCommandsIndexItemActivated(const QString &working_directory,
-                                           const QString &source_file_path,
-                                           const QString &compile_command);
+  void onCompileCommandsIndexItemActivated(pasta::CompileJob job);
 };
 
 } // namespace multiplier
