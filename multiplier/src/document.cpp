@@ -39,9 +39,7 @@ namespace multiplier {
 
 struct Document::PrivateData final {
   inline PrivateData(const pasta::CompileJob &job_)
-      : job(job_),
-        original_compile_command(
-            QString::fromStdString(job.Arguments().Join())) {}
+      : job(job_), original_compile_command(QString::fromStdString(job.Arguments().Join())) {}
 
   const pasta::CompileJob job;
   QString original_compile_command;
@@ -62,8 +60,7 @@ struct Document::PrivateData final {
 };
 
 Document::Document(const pasta::CompileJob &job, QWidget *parent)
-    : QFrame(parent),
-      d(new PrivateData(job)) {
+    : QFrame(parent), d(new PrivateData(job)) {
 
   // Initialize the text view theme
   TextViewTheme theme;
@@ -93,30 +90,30 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   make_ast->setAutoDelete(true);
 
   // Tell the models when we get an AST.
-  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)),
-          d->ast_tree, SLOT(gotAST(std::shared_ptr<pasta::AST>)));
+  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)), d->ast_tree,
+          SLOT(gotAST(std::shared_ptr<pasta::AST>)));
 
-  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)),
-          d->code_model.get(), SLOT(gotAST(std::shared_ptr<pasta::AST>)));
+  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)), d->code_model.get(),
+          SLOT(gotAST(std::shared_ptr<pasta::AST>)));
 
-  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)),
-          d->tu_tree, SLOT(gotAST(std::shared_ptr<pasta::AST>)));
+  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)), d->tu_tree,
+          SLOT(gotAST(std::shared_ptr<pasta::AST>)));
 
   // Start up AST construction in a background thread.
   auto tp = QThreadPool::globalInstance();
   tp->start(make_ast);
 
-  connect(d->ast_tree, &ASTIndex::clickedDecl,
-          this, &Document::highlightDecl);
+  connect(d->ast_tree, &ASTIndex::clickedDecl, this, &Document::highlightDecl);
 
-  connect(d->tu_tree, &ParsedFilesIndex::parsedFileDoubleClicked,
-          this, &Document::displayParsedFile);
+  connect(d->tu_tree, &ParsedFilesIndex::parsedFileDoubleClicked, this,
+          &Document::displayParsedFile);
 
   connect(d->code_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
           this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
   // Create the compile command editor
   auto src_and_cwd_layout = new QFormLayout();
+  src_and_cwd_layout->setContentsMargins(0, 0, 0, 0);
   auto source_file_path = QString::fromStdString(job.SourceFile().Path().generic_string());
   auto working_directory = QString::fromStdString(job.WorkingDirectory().generic_string());
 
@@ -133,11 +130,13 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   d->compile_command->setReadOnly(true);
 
   auto tu_settings_layout = new QVBoxLayout();
+  tu_settings_layout->setContentsMargins(0, 0, 0, 0);
   tu_settings_layout->addLayout(src_and_cwd_layout);
   tu_settings_layout->addWidget(new QLabel(tr("Compile command")));
   tu_settings_layout->addWidget(d->compile_command);
 
   auto compile_command_layout = new QHBoxLayout();
+  compile_command_layout->setContentsMargins(0, 0, 0, 0);
   compile_command_layout->addLayout(tu_settings_layout);
   compile_command_layout->addWidget(d->tu_tree);
 
@@ -169,8 +168,7 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
 
   QList<int> top_bottom_size_list;
   top_bottom_size_list.push_back(main_splitter->height() / 5);
-  top_bottom_size_list.push_back(main_splitter->height() -
-                                 top_bottom_size_list.back());
+  top_bottom_size_list.push_back(main_splitter->height() - top_bottom_size_list.back());
   main_splitter->setSizes(top_bottom_size_list);
 
   // Initialize the context menu
@@ -184,9 +182,8 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
 
 Document::~Document() {}
 
-void Document::onSourceCodeItemClicked(
-    const QPoint &mouse_position, const Qt::MouseButton &button,
-    TokenID token_id) {
+void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+                                       TokenID token_id) {
 
   if (button == Qt::RightButton) {
     d->copy_action->setEnabled(d->code_view->hasSelection());
@@ -218,7 +215,7 @@ void Document::onSourceCodeItemClicked(
   }
 }
 
-//void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+// void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
 //                                TokenID token_id) {
 //  if (button == Qt::RightButton) {
 //    d->copy_action->setEnabled(d->code_view->hasSelection());
@@ -292,8 +289,8 @@ void Document::highlightDecl(pasta::Decl decl) {
 
   // Now go and highlight the correct tokens.
   std::unordered_set<TokenGroupID> token_groups;
-  for (auto begin_id = begin_loc.Index(), end_id = end_loc.Index();
-       begin_id <= end_id; ++begin_id) {
+  for (auto begin_id = begin_loc.Index(), end_id = end_loc.Index(); begin_id <= end_id;
+       ++begin_id) {
     token_groups.insert(begin_id);
   }
 
