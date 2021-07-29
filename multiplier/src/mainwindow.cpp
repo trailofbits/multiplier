@@ -96,7 +96,7 @@ void MainWindow::initializeWidgets() {
           &MainWindow::onCompileCommandsIndexItemActivated);
 
   d->widgets.compile_cmds_index_dock = createDockWidget(d->widgets.compile_cmds_index);
-  addDockWidget(Qt::LeftDockWidgetArea, d->widgets.compile_cmds_index_dock);
+  addDockWidget(Qt::RightDockWidgetArea, d->widgets.compile_cmds_index_dock);
 
 #ifdef __APPLE__
   setTitleBarColor(winId(), palette().color(QPalette::Window), false);
@@ -151,7 +151,7 @@ void MainWindow::updateMenus() {
 void MainWindow::updateWidgets() {
   const auto &is_open = d->is_open;
 
-  d->widgets.compile_cmds_index_dock->setEnabled(is_open);
+  d->widgets.compile_cmds_index_dock->widget()->setEnabled(is_open);
   d->widgets.compile_cmds_index_dock->setHidden(!is_open);
 
   if (!is_open) {
