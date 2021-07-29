@@ -19,11 +19,9 @@
 #include <QClipboard>
 #include <QFormLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMenu>
 #include <QMetaType>
 #include <QPlainTextEdit>
-#include <QPushButton>
 #include <QSplitter>
 #include <QString>
 #include <QThreadPool>
@@ -38,15 +36,9 @@ Q_DECLARE_METATYPE(std::shared_ptr<pasta::AST>)
 namespace multiplier {
 
 struct Document::PrivateData final {
-  inline PrivateData(const pasta::CompileJob &job_)
-      : job(job_), original_compile_command(QString::fromStdString(job.Arguments().Join())) {}
+  inline PrivateData(const pasta::CompileJob &job_) : job(job_) {}
 
   const pasta::CompileJob job;
-  QString original_compile_command;
-
-  QLineEdit *source_file_path{nullptr};
-  QLineEdit *working_directory{nullptr};
-  QPlainTextEdit *compile_command{nullptr};
   ParsedFilesIndex *tu_tree{nullptr};
 
   std::string current_open_path;
@@ -100,9 +92,6 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
           SLOT(gotAST(std::shared_ptr<pasta::AST>)));
 
   // Start up AST construction in a background thread.
-  auto tp = QThreadPool::globalInstance();
-  tp->start(make_ast);
-
   connect(d->ast_tree, &ASTIndex::clickedDecl, this, &Document::highlightDecl);
 
   connect(d->tu_tree, &ParsedFilesIndex::parsedFileDoubleClicked, this,
@@ -111,65 +100,27 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   connect(d->code_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
           this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
-  // Create the compile command editor
-  auto src_and_cwd_layout = new QFormLayout();
-  src_and_cwd_layout->setContentsMargins(0, 0, 0, 0);
-  auto source_file_path = QString::fromStdString(job.SourceFile().Path().generic_string());
-  auto working_directory = QString::fromStdString(job.WorkingDirectory().generic_string());
-
-  d->source_file_path = new QLineEdit(source_file_path);
-  d->source_file_path->setReadOnly(true);
-  src_and_cwd_layout->addRow(tr("Source file"), d->source_file_path);
-
-  d->working_directory = new QLineEdit(working_directory);
-  d->working_directory->setReadOnly(true);
-  src_and_cwd_layout->addRow(tr("Working directory"), d->working_directory);
-
-  d->compile_command = new QPlainTextEdit();
-  d->compile_command->setPlainText(d->original_compile_command);
-  d->compile_command->setReadOnly(true);
-
-  auto tu_settings_layout = new QVBoxLayout();
-  tu_settings_layout->setContentsMargins(0, 0, 0, 0);
-  tu_settings_layout->addLayout(src_and_cwd_layout);
-  tu_settings_layout->addWidget(new QLabel(tr("Compile command")));
-  tu_settings_layout->addWidget(d->compile_command);
-
-  auto compile_command_layout = new QHBoxLayout();
-  compile_command_layout->setContentsMargins(0, 0, 0, 0);
-  compile_command_layout->addLayout(tu_settings_layout);
-  compile_command_layout->addWidget(d->tu_tree);
+  auto tp = QThreadPool::globalInstance();
+  tp->start(make_ast);
 
   // Setup the layout
   auto main_layout = new QVBoxLayout();
   main_layout->setContentsMargins(0, 0, 0, 0);
   setLayout(main_layout);
 
-  auto compile_command_editor = new QWidget();
-  compile_command_editor->setLayout(compile_command_layout);
+  auto tu_ast_splitter = new QSplitter(Qt::Vertical);
+  tu_ast_splitter->addWidget(d->tu_tree);
+  tu_ast_splitter->addWidget(d->ast_tree);
 
-  auto tu_cmd_splitter = new QSplitter();
-  tu_cmd_splitter->addWidget(compile_command_editor);
-  tu_cmd_splitter->addWidget(d->tu_tree);
-
-  auto code_ast_splitter = new QSplitter();
-  code_ast_splitter->addWidget(d->ast_tree);
-  code_ast_splitter->addWidget(d->code_view);
-
-  QList<int> code_ast_sizes;
-  code_ast_sizes.push_back(code_ast_splitter->width() / 5);
-  code_ast_sizes.push_back(code_ast_splitter->width() - code_ast_sizes.back());
-  code_ast_splitter->setSizes(code_ast_sizes);
-
-  auto main_splitter = new QSplitter(Qt::Vertical);
-  main_splitter->addWidget(tu_cmd_splitter);
-  main_splitter->addWidget(code_ast_splitter);
+  auto main_splitter = new QSplitter(Qt::Horizontal);
+  main_splitter->addWidget(tu_ast_splitter);
+  main_splitter->addWidget(d->code_view);
   main_layout->addWidget(main_splitter);
 
-  QList<int> top_bottom_size_list;
-  top_bottom_size_list.push_back(main_splitter->height() / 5);
-  top_bottom_size_list.push_back(main_splitter->height() - top_bottom_size_list.back());
-  main_splitter->setSizes(top_bottom_size_list);
+  QList<int> main_splitter_size_list;
+  main_splitter_size_list.push_back(main_splitter->width() / 5);
+  main_splitter_size_list.push_back(main_splitter->width() - main_splitter_size_list.back());
+  main_splitter->setSizes(main_splitter_size_list);
 
   // Initialize the context menu
   d->context_menu = new QMenu(tr("Context menu"));
@@ -214,39 +165,6 @@ void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::M
     }
   }
 }
-
-// void Document::onASTItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
-//                                TokenID token_id) {
-//  if (button == Qt::RightButton) {
-//    d->copy_action->setEnabled(d->code_view->hasSelection());
-//
-//    // Custom menu example
-//    QMenu *additional_menu{nullptr};
-//    if (token_id != kInvalidTokenID) {
-//      additional_menu = new QMenu(tr("Test menu"));
-//      d->context_menu->addMenu(additional_menu);
-//
-//      auto token_data = d->ast_model->tokenData(token_id);
-//      auto test_action = new QAction(tr("Test action for ") + token_data);
-//      additional_menu->addAction(test_action);
-//    }
-//
-//    d->context_menu->exec(mouse_position);
-//
-//    if (additional_menu != nullptr) {
-//      d->context_menu->removeAction(additional_menu->menuAction());
-//    }
-//
-//  } else if (button == Qt::LeftButton) {
-//    // Token group highlight example; you can also check `button` to only
-//    // handle left clicks
-//    auto token_group = d->ast_model->tokenGroupID(token_id);
-//    if (token_group != kInvalidTokenGroupID) {
-//      d->code_view->highlightTokenGroup(token_group);
-//      d->ast_tree->highlightTokenGroup(token_group);
-//    }
-//  }
-//}
 
 void Document::onCopyAction() {
   auto opt_selection = d->code_view->getSelection();
