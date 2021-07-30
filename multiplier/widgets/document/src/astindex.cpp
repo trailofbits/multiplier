@@ -21,17 +21,15 @@ namespace multiplier {
 
 class IndexBuilder final : public pasta::DeclVisitor {
   QMap<QTreeWidgetItem *, pasta::Decl> &decls;
-  QTreeWidget * const widget;
+  QTreeWidget *const widget;
   QTreeWidgetItem *parent{nullptr};
   QTreeWidgetItem *node{nullptr};
 
- public:
+public:
   virtual ~IndexBuilder(void) = default;
 
-  explicit IndexBuilder(QMap<QTreeWidgetItem *, pasta::Decl> &decls_,
-                        QTreeWidget *widget_)
-      : decls(decls_),
-        widget(widget_) {}
+  explicit IndexBuilder(QMap<QTreeWidgetItem *, pasta::Decl> &decls_, QTreeWidget *widget_)
+      : decls(decls_), widget(widget_) {}
 
   void AddNode(const pasta::Decl &decl) {
     node = new QTreeWidgetItem();
@@ -39,9 +37,7 @@ class IndexBuilder final : public pasta::DeclVisitor {
       parent->addChild(node);
     }
     auto kind_name = decl.KindName();
-    node->setText(
-        0, QString::fromLocal8Bit(kind_name.data(),
-                                  static_cast<int>(kind_name.size())));
+    node->setText(0, QString::fromLocal8Bit(kind_name.data(), static_cast<int>(kind_name.size())));
 
     decls.insert(node, decl);
   }
@@ -86,9 +82,7 @@ class IndexBuilder final : public pasta::DeclVisitor {
     VisitDeclContext(decl);
   }
 
-  void VisitDecl(const pasta::Decl &decl) final {
-    AddNode(decl);
-  }
+  void VisitDecl(const pasta::Decl &decl) final { AddNode(decl); }
 };
 
 struct ASTIndex::PrivateData final {
@@ -96,8 +90,7 @@ struct ASTIndex::PrivateData final {
   QMap<QTreeWidgetItem *, pasta::Decl> decls;
 };
 
-ASTIndex::ASTIndex(QWidget *parent)
-    : QFrame(parent), d(new PrivateData) {
+ASTIndex::ASTIndex(QWidget *parent) : QFrame(parent), d(new PrivateData) {
   setWindowTitle(tr("Abstract Syntax Tree"));
 
   auto layout = new QVBoxLayout();
@@ -109,8 +102,7 @@ ASTIndex::ASTIndex(QWidget *parent)
   d->ast_tree->setExpandsOnDoubleClick(false);
   layout->addWidget(d->ast_tree);
 
-  connect(d->ast_tree, &QTreeWidget::itemActivated, this,
-          &ASTIndex::onTreeWidgetItemActivated);
+  connect(d->ast_tree, &QTreeWidget::itemActivated, this, &ASTIndex::onTreeWidgetItemActivated);
 }
 
 ASTIndex::~ASTIndex() {}

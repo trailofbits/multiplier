@@ -12,8 +12,7 @@
 
 namespace multiplier {
 
-ASTBuilder::ASTBuilder(pasta::CompileJob job_)
-    : job(std::move(job_)) {}
+ASTBuilder::ASTBuilder(pasta::CompileJob job_) : job(std::move(job_)) {}
 
 void ASTBuilder::run(void) {
   auto ast = job.Run();
@@ -24,4 +23,4 @@ void ASTBuilder::run(void) {
   }
 }
 
-}  // namespace multiplier
+} // namespace multiplier

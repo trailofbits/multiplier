@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <multiplier/widgets/idocument.h>
+
 #include <QFrame>
 #include <QTreeWidgetItem>
 
@@ -22,27 +24,24 @@ using namespace tob::widgets;
 
 namespace pasta {
 class CompileJob;
-}  // namespace pasta
+} // namespace pasta
 namespace multiplier {
 
-class Document : public QFrame {
+class Document final : public IDocument {
   Q_OBJECT
+  Q_INTERFACES(multiplier::IDocument)
 
- public:
-  Document(const pasta::CompileJob &job, QWidget *parent = nullptr);
-  virtual ~Document();
+public:
+  Document(const pasta::CompileJob &job, QWidget *parent);
+  virtual ~Document() override;
 
-  Document(const Document &) = delete;
-  Document &operator=(const Document &) = delete;
-
- private:
+private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
- private slots:
-  void onSourceCodeItemClicked(
-      const QPoint &mouse_position, const Qt::MouseButton &button,
-      TokenID token_id);
+private slots:
+  void onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
+                               TokenID token_id);
 
   void onCopyAction();
   void highlightDecl(pasta::Decl decl);

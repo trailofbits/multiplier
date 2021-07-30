@@ -20,7 +20,7 @@ namespace multiplier {
 class ASTIndex final : public QFrame {
   Q_OBJECT
 
- public:
+public:
   ASTIndex(QWidget *parent = nullptr);
   virtual ~ASTIndex() override;
 
@@ -29,17 +29,17 @@ class ASTIndex final : public QFrame {
   ASTIndex(const ASTIndex &) = delete;
   ASTIndex &operator=(const ASTIndex &) = delete;
 
- public slots:
+public slots:
   void gotAST(std::shared_ptr<pasta::AST> ast);
 
- private:
+private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
- private slots:
+private slots:
   void onTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
- signals:
+signals:
   void clickedDecl(pasta::Decl decl);
 };
 

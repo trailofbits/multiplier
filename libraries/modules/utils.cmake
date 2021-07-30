@@ -21,10 +21,15 @@ function(importSubmodule)
 
   if(NOT ${target_count} EQUAL 0)
     set("${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES" "${target_list}")
+    set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" true)
+
+  else()
+    set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" false)
   endif()
 
-  find_package_handle_standard_args("${CMAKE_FIND_PACKAGE_NAME}" DEFAULT_MSG
-    "${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES"
+  find_package_handle_standard_args("${CMAKE_FIND_PACKAGE_NAME}"
+    FOUND_VAR "${CMAKE_FIND_PACKAGE_NAME}_FOUND"
+    REQUIRED_VARS "${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES"
   )
 endfunction()
 
@@ -59,12 +64,18 @@ endfunction()
 
 function(importExternalLibrary package_name library_name_list header_name)
   importExternalLibraryHelper("${package_name}" "${library_name_list}" "${header_name}")
+  if(TARGET "${package_name}")
+    set(libraries_var_name "${package_name}_LIBRARIES")
+    set(includedir_var_name "${package_name}_INCLUDE_DIR")
 
-  set(libraries_var_name "${package_name}_LIBRARIES")
-  set(includedir_var_name "${package_name}_INCLUDE_DIR")
+    set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" true)
+  else()
 
-  find_package_handle_standard_args("${package_name}" DEFAULT_MSG
-    "${libraries_var_name}"
-    "${includedir_var_name}"
+    set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" false)
+  endif()
+
+  find_package_handle_standard_args("${package_name}"
+    FOUND_VAR "${CMAKE_FIND_PACKAGE_NAME}_FOUND"
+    REQUIRED_VARS "${libraries_var_name}" "${includedir_var_name}"
   )
 endfunction()
