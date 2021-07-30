@@ -30,6 +30,7 @@ public:
   virtual void setModel(ITextModel::Ptr model) override;
   virtual void setTheme(const TextViewTheme &theme) override;
   virtual void setWordWrapping(bool enabled) override;
+  virtual void setLineNumbers(bool enabled) override;
 
   virtual bool hasSelection() const override;
   virtual std::optional<QString> getSelection() const override;
