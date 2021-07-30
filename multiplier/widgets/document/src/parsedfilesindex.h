@@ -21,7 +21,7 @@ namespace multiplier {
 class ParsedFilesIndex final : public QFrame {
   Q_OBJECT
 
- public:
+public:
   ParsedFilesIndex(QWidget *parent = nullptr);
   virtual ~ParsedFilesIndex() override;
 
@@ -30,17 +30,17 @@ class ParsedFilesIndex final : public QFrame {
   ParsedFilesIndex(const ParsedFilesIndex &) = delete;
   ParsedFilesIndex &operator=(const ParsedFilesIndex &) = delete;
 
- public slots:
+public slots:
   void gotAST(std::shared_ptr<pasta::AST> ast);
 
- private:
+private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
- private slots:
+private slots:
   void onTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
- signals:
+signals:
   void parsedFileDoubleClicked(pasta::File file);
 };
 

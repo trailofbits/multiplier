@@ -24,13 +24,13 @@ class ASTBuilder final : public QObject, public QRunnable {
 
   const pasta::CompileJob job;
 
- public:
+public:
   explicit ASTBuilder(pasta::CompileJob job_);
 
   void run(void) final;
 
- signals:
+signals:
   void gotAST(std::shared_ptr<pasta::AST> ast);
 };
 
-}  // namespace multiplier
+} // namespace multiplier

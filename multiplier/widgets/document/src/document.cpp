@@ -62,7 +62,7 @@ struct Document::PrivateData final {
 };
 
 Document::Document(const pasta::CompileJob &job, QWidget *parent)
-    : QFrame(parent), d(new PrivateData(job)) {
+    : IDocument(parent), d(new PrivateData(job)) {
 
   // Initialize the text view theme
   TextViewTheme theme;
@@ -234,6 +234,10 @@ void Document::displayParsedFile(pasta::File file) {
     d->code_model = std::make_shared<SourceCodeModel>(file);
     d->code_view->setModel(d->code_model);
   }
+}
+
+IDocument *IDocument::create(const pasta::CompileJob &job, QWidget *parent) {
+  return new (std::nothrow) Document(job, parent);
 }
 
 } // namespace multiplier

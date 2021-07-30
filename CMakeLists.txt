@@ -33,4 +33,8 @@ find_package(Qt${MU_QT_VERSION} COMPONENTS Core Widgets REQUIRED)
 generateTargetSettings()
 
 add_subdirectory("libraries")
+
+find_package(pasta REQUIRED)
+find_package(TobWidgets REQUIRED)
+
 add_subdirectory("multiplier")

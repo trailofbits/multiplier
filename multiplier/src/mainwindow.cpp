@@ -8,11 +8,12 @@
 
 #include "mainwindow.h"
 #include "compilecommandsindex.h"
-#include "document.h"
 
 #ifdef __APPLE__
 #include "macos_utils.h"
 #endif
+
+#include <multiplier/widgets/idocument.h>
 
 #include <QAction>
 #include <QCloseEvent>
@@ -224,10 +225,9 @@ void MainWindow::onFileExitAction() { close(); }
 void MainWindow::onHelpAboutAction() {}
 
 void MainWindow::onCompileCommandsIndexItemActivated(pasta::CompileJob job) {
-  auto window_title = QString::fromStdString(
-      job.SourceFile().Path().filename().generic_string());
+  auto window_title = QString::fromStdString(job.SourceFile().Path().filename().generic_string());
 
-  auto document = new Document(job);
+  auto document = IDocument::create(job);
   auto container = new QMdiSubWindow();
   container->setWidget(document);
   container->setWindowTitle(window_title);

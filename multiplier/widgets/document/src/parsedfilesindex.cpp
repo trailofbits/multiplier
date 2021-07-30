@@ -27,8 +27,7 @@ struct ParsedFilesIndex::PrivateData final {
   QMap<QString, pasta::File> files;
 };
 
-ParsedFilesIndex::ParsedFilesIndex(QWidget *parent)
-    : QFrame(parent), d(new PrivateData) {
+ParsedFilesIndex::ParsedFilesIndex(QWidget *parent) : QFrame(parent), d(new PrivateData) {
   setWindowTitle(tr("Parsed Files"));
 
   auto layout = new QVBoxLayout();
@@ -69,8 +68,7 @@ void ParsedFilesIndex::gotAST(std::shared_ptr<pasta::AST> ast) {
         if (parent) {
           parent->addChild(item);
         } else {
-          root_item->setText(
-              0, QString::fromStdString(path.root_path().generic_string()));
+          root_item->setText(0, QString::fromStdString(path.root_path().generic_string()));
           root_item->addChild(item);
         }
       }
