@@ -92,7 +92,17 @@ void TextView::setTheme(const TextViewTheme &theme) {
   update();
 }
 
-void TextView::setWordWrapping(bool enabled) { d->context.word_wrap = enabled; }
+void TextView::setWordWrapping(bool enabled) {
+  d->context.word_wrap = enabled;
+  resetScene(d->context);
+  update();
+}
+
+void TextView::setLineNumbers(bool enabled) {
+  d->context.line_numbers = enabled;
+  resetScene(d->context);
+  update();
+}
 
 bool TextView::hasSelection() const { return d->context.opt_selection.has_value(); }
 
