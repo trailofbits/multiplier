@@ -19,8 +19,10 @@
 namespace tob::widgets {
 
 struct TextViewTheme final {
+  QFont monospaced_font;
   QColor background;
   QColor foreground;
+  QColor line_numbers;
   std::unordered_map<TokenColorID, QColor> color_map;
 };
 

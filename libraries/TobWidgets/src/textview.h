@@ -53,6 +53,7 @@ private:
   std::unique_ptr<PrivateData> d;
 
   void updateScrollbars();
+  TextViewTheme getDefaultTheme();
 
 private slots:
   void onModelReset();
@@ -88,8 +89,18 @@ public:
 
   using OptionalSelection = std::optional<Selection>;
 
+  struct LineNumber final {
+    QRectF bounding_box;
+    QString str;
+  };
+
+  using LineNumberList = std::vector<LineNumber>;
+
   struct Scene final {
     QRectF bounding_box;
+    LineNumberList line_number_list;
+
+    qreal gutter_margin{};
     SceneRowList row_list;
   };
 
@@ -105,6 +116,7 @@ public:
     OptionalScene opt_scene;
     OptionalSelection opt_selection;
     bool word_wrap{true};
+    bool line_numbers{true};
     std::unordered_set<TokenGroupID> highlighted_token_groups;
   };
 
@@ -113,7 +125,7 @@ public:
   static void moveViewport(Context &context, const QPointF &point);
   static void createTokenIndex(Context &context, ITextModel &model);
   static void resetScene(Context &context);
-  static void generateScene(Context &context);
+  static void generateScene(Context &context, ITextModel &model);
   static std::optional<Cursor> createCursor(Context &context, QPointF pos);
   static void sanitizeSelection(Selection &selection);
 
