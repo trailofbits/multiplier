@@ -11,8 +11,8 @@
 #include <QObject>
 #include <QVariant>
 
-#include <memory>
 #include <limits>
+#include <memory>
 
 namespace tob::widgets {
 
@@ -41,6 +41,7 @@ public:
   ITextModel(QObject *parent) : QObject(parent){};
   virtual ~ITextModel() = default;
 
+  virtual std::size_t firstLineNumber() const = 0;
   virtual TokenID firstTokenID() const = 0;
   virtual TokenID lastTokenID() const = 0;
 

@@ -35,6 +35,16 @@ Q_DECLARE_METATYPE(std::shared_ptr<pasta::AST>)
 
 namespace multiplier {
 
+namespace {
+
+#ifdef __linux__
+const QString kMonospacedFontName{"Hack"};
+#else
+const QString kMonospacedFontName{"Monaco"};
+#endif
+
+} // namespace
+
 struct Document::PrivateData final {
   inline PrivateData(const pasta::CompileJob &job_) : job(job_) {}
 
@@ -56,8 +66,10 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
 
   // Initialize the text view theme
   TextViewTheme theme;
+  theme.monospaced_font = QFont(kMonospacedFontName);
   theme.background = QColor::fromRgba(0xFF101010);
   theme.foreground = QColor::fromRgba(0xFFC7C7C7);
+  theme.line_numbers = QColor::fromRgba(0x7FC7C7C7);
   theme.color_map.insert({0, QColor::fromRgba(0xFFFF8272)});
   theme.color_map.insert({1, QColor::fromRgba(0xFFB4FA72)});
   theme.color_map.insert({2, QColor::fromRgba(0xFFFEFDC2)});

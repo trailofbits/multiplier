@@ -9,6 +9,7 @@
 #include "textview.h"
 
 #include <QApplication>
+#include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QPainter>
 #include <QResizeEvent>
@@ -19,6 +20,8 @@
 namespace tob::widgets {
 
 namespace {
+
+const auto kNewLineGlyph{L'\u23CE'};
 
 QColor invertColor(const QColor &color) {
   auto red = 1.0f - color.redF();
@@ -39,18 +42,10 @@ struct TextView::PrivateData final {
 };
 
 TextView::TextView(QWidget *parent) : ITextView(parent), d(new PrivateData) {
-#ifdef __linux__
-  setFont(QFont("Hack"));
-#else
-  setFont(QFont("Monaco"));
-#endif
-
   setFocusPolicy(Qt::StrongFocus);
 
-  d->context.font_metrics = std::make_unique<QFontMetricsF>(font(), this);
-
-  d->context.theme.background = palette().color(QPalette::Base);
-  d->context.theme.foreground = palette().color(QPalette::Text);
+  auto default_theme = getDefaultTheme();
+  setTheme(default_theme);
 
   d->vertical_scrollbar = new QScrollBar(Qt::Vertical);
   d->vertical_scrollbar->setSingleStep(1);
@@ -89,7 +84,13 @@ void TextView::setModel(ITextModel::Ptr model) {
   onModelReset();
 }
 
-void TextView::setTheme(const TextViewTheme &theme) { d->context.theme = theme; }
+void TextView::setTheme(const TextViewTheme &theme) {
+  d->context.theme = theme;
+  d->context.font_metrics = std::make_unique<QFontMetricsF>(d->context.theme.monospaced_font, this);
+
+  setFont(d->context.theme.monospaced_font);
+  update();
+}
 
 void TextView::setWordWrapping(bool enabled) { d->context.word_wrap = enabled; }
 
@@ -165,7 +166,7 @@ void TextView::paintEvent(QPaintEvent *event) {
   auto &context = d->context;
 
   if (!context.opt_scene) {
-    generateScene(context);
+    generateScene(context, *d->model.get());
     updateScrollbars();
   }
 
@@ -181,11 +182,11 @@ void TextView::paintEvent(QPaintEvent *event) {
   QRectF glyph_rect(0.0, 0.0, font_width, font_height);
 
   auto standard_font = font();
-
   auto group_highlight_font = font();
   group_highlight_font.setBold(true);
 
   const auto &scene = context.opt_scene.value();
+
   for (const auto &row : scene.row_list) {
     if (!row.bounding_box.intersects(context.viewport)) {
       continue;
@@ -222,18 +223,15 @@ void TextView::paintEvent(QPaintEvent *event) {
         }
 
         auto token_group = d->model->tokenGroupID(entity.token_id);
-
-        bool highlighted_group =
-            !!d->context.highlighted_token_groups.count(token_group);
+        bool highlighted_group = !!d->context.highlighted_token_groups.count(token_group);
 
         auto background = context.theme.background;
         if (highlighted_group) {
-          // TODO: Implement a better color selection
+          // TODO: Implement a better color selection logic
           background = background.lighter(300);
         }
 
         auto foreground = context.theme.foreground;
-
         if (auto color_id = d->model->tokenColor(entity.token_id);
             color_id != kInvalidTokenColorID && context.theme.color_map.count(color_id) > 0) {
           foreground = context.theme.color_map.at(color_id);
@@ -244,11 +242,10 @@ void TextView::paintEvent(QPaintEvent *event) {
           foreground = invertColor(foreground);
         }
 
-        if (c == "\n" || c == "\r") {
+        if (c == "\n") {
           if (highlight) {
             foreground = invertColor(context.theme.foreground);
-            c = L'\u23CE';
-
+            c = kNewLineGlyph;
           } else {
             continue;
           }
@@ -265,12 +262,32 @@ void TextView::paintEvent(QPaintEvent *event) {
         }
 
         painter.drawText(glyph_rect, Qt::AlignCenter | Qt::TextSingleLine, c);
-
         pos.setX(pos.x() + font_width);
-
         ++character_index;
       }
     }
+  }
+
+  painter.setPen(QPen(context.theme.line_numbers));
+
+  qreal lowest_line_number = std::numeric_limits<qreal>::max();
+  qreal highest_line_number = std::numeric_limits<qreal>::min();
+
+  for (const auto &line_number : scene.line_number_list) {
+    if (!line_number.bounding_box.intersects(context.viewport)) {
+      continue;
+    }
+
+    auto rect = line_number.bounding_box.translated(translation);
+    painter.drawText(rect, Qt::AlignRight | Qt::TextSingleLine, line_number.str);
+
+    lowest_line_number = std::min(lowest_line_number, rect.y());
+    highest_line_number = std::max(highest_line_number, rect.y() + glyph_rect.height());
+  }
+
+  if (!scene.line_number_list.empty() && context.line_numbers) {
+    painter.drawLine(QPointF(scene.gutter_margin, lowest_line_number),
+                     QPointF(scene.gutter_margin, highest_line_number));
   }
 }
 
@@ -447,6 +464,18 @@ void TextView::updateScrollbars() {
   }
 }
 
+TextViewTheme TextView::getDefaultTheme() {
+  auto system_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+
+  TextViewTheme output;
+  output.monospaced_font = system_font;
+  output.background = palette().color(QPalette::Base);
+  output.foreground = palette().color(QPalette::Text);
+  output.line_numbers = output.foreground;
+
+  return output;
+}
+
 void TextView::onModelReset() {
   moveViewport(d->context, QPointF(0.0, 0.0));
   createTokenIndex(d->context, *d->model.get());
@@ -507,7 +536,7 @@ void TextView::createTokenIndex(Context &context, ITextModel &model) {
   TokenEntityList token_entity_row;
 
   QString chunk_data;
-  auto L_add_token = [&] (TokenID token_id) {
+  auto L_add_token = [&](TokenID token_id) {
     if (chunk_data.size()) {
       auto token_width = context.font_metrics->horizontalAdvance(chunk_data);
       if (token_width == 0.0) {
@@ -534,8 +563,10 @@ void TextView::createTokenIndex(Context &context, ITextModel &model) {
         L_add_token(token_id);
         token_index.push_back(std::move(token_entity_row));
         token_entity_row = {};
+
       } else if (ch == '\r') {
         continue;
+
       } else {
         chunk_data += ch;
       }
@@ -549,25 +580,53 @@ void TextView::createTokenIndex(Context &context, ITextModel &model) {
 
 void TextView::resetScene(Context &context) { context.opt_scene = {}; }
 
-void TextView::generateScene(Context &context) {
+void TextView::generateScene(Context &context, ITextModel &model) {
   Scene scene;
-  auto font_height = context.font_metrics->height();
 
-  QPointF current_pos(font_height, font_height);
+  auto font_height = context.font_metrics->height();
   scene.bounding_box.setWidth(font_height);
   scene.bounding_box.setHeight(font_height);
 
   auto right_margin = context.viewport.x() + context.viewport.width();
+  auto left_margin = font_height;
+
+  QRectF line_number_rect;
+  auto line_number = model.firstLineNumber();
+
+  if (context.line_numbers) {
+    auto highest_line_number =
+        QString::number(context.token_index.size() + model.firstLineNumber());
+
+    auto line_number_length =
+        context.font_metrics->horizontalAdvance(highest_line_number) + font_height;
+
+    scene.gutter_margin = left_margin += line_number_length + font_height;
+    left_margin = scene.gutter_margin + font_height;
+
+    line_number_rect = QRectF(0.0, 0.0, line_number_length, font_height);
+  }
+
+  QPointF current_pos(left_margin, font_height);
 
   for (const auto &token_entity_row : context.token_index) {
     SceneRow row;
     row.bounding_box.moveTo(current_pos);
     row.bounding_box.setHeight(font_height);
 
+    if (context.line_numbers) {
+      LineNumber ln;
+      ln.bounding_box = line_number_rect;
+      ln.bounding_box.moveTo(QPointF(font_height, current_pos.y()));
+      ln.str = QString::number(line_number);
+
+      scene.line_number_list.push_back(std::move(ln));
+      ++line_number;
+    }
+
     for (auto token_entity : token_entity_row) {
       if (context.word_wrap) {
         if (current_pos.x() + token_entity.bounding_box.width() > right_margin) {
-          current_pos.setX(font_height * 2);
+          current_pos.setX(left_margin + (font_height * 2));
           current_pos.setY(current_pos.y() + font_height);
         }
       }
@@ -583,7 +642,7 @@ void TextView::generateScene(Context &context) {
     scene.row_list.push_back(std::move(row));
     row = {};
 
-    current_pos.setX(font_height);
+    current_pos.setX(left_margin);
     current_pos.setY(current_pos.y() + font_height);
   }
 

@@ -39,17 +39,13 @@ struct SourceCodeModel::PrivateData final {
   std::unordered_map<TokenID, Token> token_map;
 };
 
-SourceCodeModel::SourceCodeModel(QObject *parent)
-    : ITextModel(parent), d(new PrivateData) {}
+SourceCodeModel::SourceCodeModel(QObject *parent) : ITextModel(parent), d(new PrivateData) {}
 
-SourceCodeModel::SourceCodeModel(pasta::File file, QObject *parent)
-    : SourceCodeModel(parent) {
+SourceCodeModel::SourceCodeModel(pasta::File file, QObject *parent) : SourceCodeModel(parent) {
   renderFile(file);
 }
 
-void SourceCodeModel::gotAST(std::shared_ptr<pasta::AST> ast) {
-  renderFile(ast->MainFile());
-}
+void SourceCodeModel::gotAST(std::shared_ptr<pasta::AST> ast) { renderFile(ast->MainFile()); }
 
 void SourceCodeModel::renderFile(pasta::File file) {
   static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
@@ -57,7 +53,6 @@ void SourceCodeModel::renderFile(pasta::File file) {
   auto group_id_step = 0;
 
   auto L_addToken = [&](const pasta::FileToken &tok) {
-
     ++group_id_step;
     if (group_id_step == 30) {
       token_group_id_generator = (token_group_id_generator + 1) % 5;
@@ -68,8 +63,7 @@ void SourceCodeModel::renderFile(pasta::File file) {
 
     Token token;
     token.id = tok.Index();
-    token.data = QString::fromLocal8Bit(
-        tok_data.data(), static_cast<int>(tok_data.size()));
+    token.data = QString::fromLocal8Bit(tok_data.data(), static_cast<int>(tok_data.size()));
     token.color_id = tok.Kind() % 7u;
 
     if (!d->min_token_id) {
@@ -88,6 +82,8 @@ void SourceCodeModel::renderFile(pasta::File file) {
 }
 
 SourceCodeModel::~SourceCodeModel() {}
+
+std::size_t SourceCodeModel::firstLineNumber() const { return 1; }
 
 TokenID SourceCodeModel::firstTokenID() const {
   if (d->min_token_id.has_value()) {
