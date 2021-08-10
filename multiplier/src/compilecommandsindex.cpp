@@ -9,6 +9,7 @@
 #include "compilecommandsindex.h"
 
 #include <QDebug>
+#include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QTreeWidget>
@@ -17,16 +18,15 @@
 #include <array>
 #include <iostream>
 
-#include <pasta/Compile/Compiler.h>
 #include <pasta/Compile/Command.h>
+#include <pasta/Compile/Compiler.h>
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/FileManager.h>
 
 namespace multiplier {
 namespace {
 
-pasta::Compiler CreateHostCompiler(pasta::FileManager fm,
-                                   pasta::TargetLanguage lang) {
+pasta::Compiler CreateHostCompiler(pasta::FileManager fm, pasta::TargetLanguage lang) {
   auto compiler = pasta::Compiler::CreateHostCompiler(fm, lang);
   if (compiler.Failed()) {
     abort();
@@ -35,12 +35,11 @@ pasta::Compiler CreateHostCompiler(pasta::FileManager fm,
   }
 }
 
-}  // namespace
+} // namespace
 
 struct CompileCommandsIndex::PrivateData final {
   PrivateData(void)
-      : file_system(pasta::FileSystem::CreateNative()),
-        file_manager(file_system),
+      : file_system(pasta::FileSystem::CreateNative()), file_manager(file_system),
         c_compiler(CreateHostCompiler(file_manager, pasta::TargetLanguage::kC)),
         cxx_compiler(CreateHostCompiler(file_manager, pasta::TargetLanguage::kCXX)) {}
 
@@ -51,8 +50,7 @@ struct CompileCommandsIndex::PrivateData final {
   QTreeWidget *source_file_tree{nullptr};
 };
 
-CompileCommandsIndex::CompileCommandsIndex(QWidget *parent)
-    : QFrame(parent), d(new PrivateData) {
+CompileCommandsIndex::CompileCommandsIndex(QWidget *parent) : QFrame(parent), d(new PrivateData) {
   setWindowTitle(tr("Compile Commands"));
 
   auto layout = new QVBoxLayout();
@@ -61,6 +59,10 @@ CompileCommandsIndex::CompileCommandsIndex(QWidget *parent)
 
   d->source_file_tree = new QTreeWidget();
   d->source_file_tree->setHeaderHidden(true);
+  d->source_file_tree->setColumnCount(1);
+  d->source_file_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+  d->source_file_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  d->source_file_tree->header()->setStretchLastSection(false);
   layout->addWidget(d->source_file_tree);
 
   connect(d->source_file_tree, &QTreeWidget::itemActivated, this,
@@ -179,9 +181,7 @@ bool CompileCommandsIndex::setCompileCommands(const QJsonDocument &json_document
   return true;
 }
 
-void CompileCommandsIndex::reset() {
-  d->source_file_tree->reset();
-}
+void CompileCommandsIndex::reset() { d->source_file_tree->reset(); }
 
 void CompileCommandsIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {
 
@@ -196,20 +196,18 @@ void CompileCommandsIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int)
   auto cwd = d->file_system->CurrentWorkingDirectory();
   if (cwd.Failed()) {
     std::cerr << cwd.TakeError().message() << std::endl;
-    return;  // TODO(pag): Log error.
+    return; // TODO(pag): Log error.
   }
 
   auto working_directory_path = d->file_system->ParsePath(
-      working_directory.toStdString(), cwd.TakeValue(),
-      d->file_system->PathKind());
+      working_directory.toStdString(), cwd.TakeValue(), d->file_system->PathKind());
 
   pasta::ArgumentVector argv(compile_command.toStdString());
-  auto cmd = pasta::CompileCommand::CreateFromArguments(
-      argv, working_directory_path);
+  auto cmd = pasta::CompileCommand::CreateFromArguments(argv, working_directory_path);
 
   if (cmd.Failed()) {
     std::cerr << cmd.TakeError() << std::endl;
-    return;  // TODO(pag): Log error.
+    return; // TODO(pag): Log error.
   }
 
   auto compiler = d->c_compiler;
@@ -226,7 +224,7 @@ void CompileCommandsIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int)
   auto jobs = compiler.CreateJobsForCommand(cmd.TakeValue());
   if (jobs.Failed()) {
     std::cerr << jobs.TakeError() << std::endl;
-    return;  // TODO(pag): Log error.
+    return; // TODO(pag): Log error.
   }
 
   for (auto job : jobs.TakeValue()) {
