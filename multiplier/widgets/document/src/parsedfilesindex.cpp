@@ -9,6 +9,7 @@
 #include "parsedfilesindex.h"
 
 #include <QDebug>
+#include <QHeaderView>
 #include <QMap>
 #include <QString>
 #include <QTreeWidget>
@@ -37,6 +38,10 @@ ParsedFilesIndex::ParsedFilesIndex(QWidget *parent) : QFrame(parent), d(new Priv
   d->source_file_tree = new QTreeWidget();
   d->source_file_tree->setHeaderHidden(true);
   d->source_file_tree->setExpandsOnDoubleClick(false);
+  d->source_file_tree->setColumnCount(1);
+  d->source_file_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+  d->source_file_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  d->source_file_tree->header()->setStretchLastSection(false);
   layout->addWidget(d->source_file_tree);
 
   connect(d->source_file_tree, &QTreeWidget::itemActivated, this,

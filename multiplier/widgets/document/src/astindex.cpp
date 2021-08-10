@@ -9,6 +9,7 @@
 #include "astindex.h"
 
 #include <QDebug>
+#include <QHeaderView>
 #include <QMap>
 #include <QString>
 #include <QTreeWidget>
@@ -100,6 +101,10 @@ ASTIndex::ASTIndex(QWidget *parent) : QFrame(parent), d(new PrivateData) {
   d->ast_tree = new QTreeWidget();
   d->ast_tree->setHeaderHidden(true);
   d->ast_tree->setExpandsOnDoubleClick(false);
+  d->ast_tree->setColumnCount(1);
+  d->ast_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+  d->ast_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  d->ast_tree->header()->setStretchLastSection(false);
   layout->addWidget(d->ast_tree);
 
   connect(d->ast_tree, &QTreeWidget::itemActivated, this, &ASTIndex::onTreeWidgetItemActivated);
