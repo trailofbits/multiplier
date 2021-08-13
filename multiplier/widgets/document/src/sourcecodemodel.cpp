@@ -45,8 +45,6 @@ SourceCodeModel::SourceCodeModel(pasta::File file, QObject *parent) : SourceCode
   renderFile(file);
 }
 
-void SourceCodeModel::gotAST(std::shared_ptr<pasta::AST> ast) { renderFile(ast->MainFile()); }
-
 void SourceCodeModel::renderFile(pasta::File file) {
   static TokenGroupID token_group_id_generator{kInvalidTokenGroupID};
 
@@ -151,5 +149,7 @@ TokenAttribute SourceCodeModel::tokenAttributes(TokenID token_id) const {
   const auto &token = token_map_it->second;
   return token.attributes;
 }
+
+void SourceCodeModel::setAST(std::shared_ptr<pasta::AST> ast) { renderFile(ast->MainFile()); }
 
 } // namespace multiplier

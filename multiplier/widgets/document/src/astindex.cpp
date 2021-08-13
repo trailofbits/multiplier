@@ -112,15 +112,15 @@ ASTIndex::ASTIndex(QWidget *parent) : QFrame(parent), d(new PrivateData) {
 
 ASTIndex::~ASTIndex() {}
 
-void ASTIndex::gotAST(std::shared_ptr<pasta::AST> ast) {
-  IndexBuilder builder(d->decls, d->ast_tree);
-  builder.Accept(ast->TranslationUnit());
-  d->ast_tree->expandAll();
-}
-
 void ASTIndex::reset() {
   d->decls.clear();
   d->ast_tree->reset();
+}
+
+void ASTIndex::setAST(std::shared_ptr<pasta::AST> ast) {
+  IndexBuilder builder(d->decls, d->ast_tree);
+  builder.Accept(ast->TranslationUnit());
+  d->ast_tree->expandAll();
 }
 
 void ASTIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {

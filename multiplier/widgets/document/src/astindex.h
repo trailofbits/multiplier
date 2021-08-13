@@ -25,12 +25,10 @@ public:
   virtual ~ASTIndex() override;
 
   void reset();
+  void setAST(std::shared_ptr<pasta::AST> ast);
 
   ASTIndex(const ASTIndex &) = delete;
   ASTIndex &operator=(const ASTIndex &) = delete;
-
-public slots:
-  void gotAST(std::shared_ptr<pasta::AST> ast);
 
 private:
   struct PrivateData;

@@ -26,12 +26,10 @@ public:
   virtual ~ParsedFilesIndex() override;
 
   void reset();
+  void setAST(std::shared_ptr<pasta::AST> ast);
 
   ParsedFilesIndex(const ParsedFilesIndex &) = delete;
   ParsedFilesIndex &operator=(const ParsedFilesIndex &) = delete;
-
-public slots:
-  void gotAST(std::shared_ptr<pasta::AST> ast);
 
 private:
   struct PrivateData;

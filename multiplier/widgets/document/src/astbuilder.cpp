@@ -12,7 +12,7 @@
 
 namespace multiplier {
 
-ASTBuilder::ASTBuilder(pasta::CompileJob job_) : job(std::move(job_)) {}
+ASTBuilder::ASTBuilder(pasta::CompileJob job_) : job(std::move(job_)) { setAutoDelete(true); }
 
 void ASTBuilder::run(void) {
   auto ast = job.Run();

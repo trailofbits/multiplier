@@ -50,7 +50,12 @@ ParsedFilesIndex::ParsedFilesIndex(QWidget *parent) : QFrame(parent), d(new Priv
 
 ParsedFilesIndex::~ParsedFilesIndex() {}
 
-void ParsedFilesIndex::gotAST(std::shared_ptr<pasta::AST> ast) {
+void ParsedFilesIndex::reset() {
+  d->files.clear();
+  d->source_file_tree->reset();
+}
+
+void ParsedFilesIndex::setAST(std::shared_ptr<pasta::AST> ast) {
   QMap<QString, QTreeWidgetItem *> root_item_map;
 
   QTreeWidgetItem *root_item = new QTreeWidgetItem();
@@ -88,11 +93,6 @@ void ParsedFilesIndex::gotAST(std::shared_ptr<pasta::AST> ast) {
   d->source_file_tree->addTopLevelItem(root_item);
   d->source_file_tree->expandAll();
   d->source_file_tree->sortItems(0, Qt::AscendingOrder);
-}
-
-void ParsedFilesIndex::reset() {
-  d->files.clear();
-  d->source_file_tree->reset();
 }
 
 void ParsedFilesIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {

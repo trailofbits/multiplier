@@ -35,15 +35,25 @@ public:
   Document(const pasta::CompileJob &job, QWidget *parent);
   virtual ~Document() override;
 
+protected:
+  virtual void paintEvent(QPaintEvent *event) override;
+
 private:
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
+  void initializeWidgets();
+  void initializeMenus();
+  void setLoadingState(bool ready);
+  void beginLoading(const pasta::CompileJob &job);
+
 private slots:
+  void onLoadingEnd(std::shared_ptr<pasta::AST> ast);
   void onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
                                TokenID token_id);
 
   void onCopyAction();
+
   void highlightDecl(pasta::Decl decl);
   void displayParsedFile(pasta::File file);
 };
