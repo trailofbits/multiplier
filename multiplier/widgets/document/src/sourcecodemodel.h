@@ -37,6 +37,8 @@ public:
   virtual QVariant tokenProperty(TokenID token_id, int property_id) const override;
   virtual TokenAttribute tokenAttributes(TokenID token_id) const override;
 
+  void setAST(std::shared_ptr<pasta::AST> ast);
+
   SourceCodeModel(const SourceCodeModel &) = delete;
   SourceCodeModel &operator=(const SourceCodeModel &) = delete;
 
@@ -45,9 +47,6 @@ private:
   std::unique_ptr<PrivateData> d;
 
   void renderFile(pasta::File file);
-
-public slots:
-  void gotAST(std::shared_ptr<pasta::AST> ast);
 
 signals:
   void modelReset();

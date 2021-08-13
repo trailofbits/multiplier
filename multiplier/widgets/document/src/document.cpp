@@ -17,15 +17,13 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
-#include <QFormLayout>
 #include <QLabel>
 #include <QMenu>
-#include <QMetaType>
-#include <QPlainTextEdit>
+#include <QPaintEvent>
+#include <QPainter>
 #include <QSplitter>
 #include <QString>
 #include <QThreadPool>
-#include <QTreeWidget>
 #include <QVBoxLayout>
 
 #include <pasta/Compile/Job.h>
@@ -46,25 +44,62 @@ const QString kMonospacedFontName{"Monaco"};
 } // namespace
 
 struct Document::PrivateData final {
-  inline PrivateData(const pasta::CompileJob &job_) : job(job_) {}
+  bool loading{false};
 
-  const pasta::CompileJob job;
-  ParsedFilesIndex *tu_tree{nullptr};
+  ParsedFilesIndex *parsed_files_index{nullptr};
 
   std::string current_open_path;
-  tob::widgets::ITextModel::Ptr code_model;
+  tob::widgets::ITextModel::Ptr source_code_model;
   tob::widgets::ITextView *code_view{nullptr};
 
-  ASTIndex *ast_tree{nullptr};
+  ASTIndex *ast_index{nullptr};
 
   QMenu *context_menu{nullptr};
   QAction *copy_action{nullptr};
 };
 
 Document::Document(const pasta::CompileJob &job, QWidget *parent)
-    : IDocument(parent), d(new PrivateData(job)) {
+    : IDocument(parent), d(new PrivateData) {
 
-  // Initialize the text view theme
+  initializeWidgets();
+  initializeMenus();
+  beginLoading(job);
+}
+
+Document::~Document() {}
+
+void Document::paintEvent(QPaintEvent *event) {
+  static const auto kLoadingMessage = tr("Loading...");
+  static const auto kTextFlags = Qt::AlignCenter | Qt::TextSingleLine;
+
+  if (!d->loading) {
+    IDocument::paintEvent(event);
+    return;
+  }
+
+  auto message_font = font();
+  message_font.setPointSizeF(message_font.pointSizeF() * 2.0);
+  message_font.setBold(true);
+
+  QFontMetrics font_metrics(message_font);
+  auto message_rect =
+      font_metrics.boundingRect(QRect(0, 0, 0xFFFF, 0xFFFF), kTextFlags, kLoadingMessage);
+
+  auto message_x_pos = (event->rect().width() / 2) - (message_rect.width() / 2);
+  auto message_y_pos = (event->rect().height() / 2) - (message_rect.height() / 2);
+
+  message_rect.moveTo(message_x_pos, message_y_pos);
+
+  QPainter painter(this);
+  painter.fillRect(event->rect(), palette().color(QPalette::Window));
+
+  painter.setFont(message_font);
+  painter.setPen(QPen(palette().color(QPalette::WindowText)));
+  painter.drawText(message_rect, kTextFlags, kLoadingMessage);
+}
+
+void Document::initializeWidgets() {
+  // Create the code viewer
   TextViewTheme theme;
   theme.monospaced_font = QFont(kMonospacedFontName);
   theme.background = QColor::fromRgba(0xFF101010);
@@ -78,42 +113,22 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   theme.color_map.insert({5, QColor::fromRgba(0xFFD0D1FE)});
   theme.color_map.insert({6, QColor::fromRgba(0xFFF1F1F1)});
 
-  // Two custom tree views.
-  d->ast_tree = new ASTIndex;
-  d->tu_tree = new ParsedFilesIndex;
-
-  // Create the code view
-  d->code_model = std::make_shared<SourceCodeModel>();
+  d->source_code_model = std::make_shared<SourceCodeModel>();
   d->code_view = ITextView::create();
   d->code_view->setTheme(theme);
-  d->code_view->setModel(d->code_model);
-
-  // Create an AST builder that will run the compile job in a background thread
-  // and then emit signals when it has been built.
-  ASTBuilder *make_ast = new ASTBuilder(job);
-  make_ast->setAutoDelete(true);
-
-  // Tell the models when we get an AST.
-  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)), d->ast_tree,
-          SLOT(gotAST(std::shared_ptr<pasta::AST>)));
-
-  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)), d->code_model.get(),
-          SLOT(gotAST(std::shared_ptr<pasta::AST>)));
-
-  connect(make_ast, SIGNAL(gotAST(std::shared_ptr<pasta::AST>)), d->tu_tree,
-          SLOT(gotAST(std::shared_ptr<pasta::AST>)));
-
-  // Start up AST construction in a background thread.
-  connect(d->ast_tree, &ASTIndex::clickedDecl, this, &Document::highlightDecl);
-
-  connect(d->tu_tree, &ParsedFilesIndex::parsedFileDoubleClicked, this,
-          &Document::displayParsedFile);
+  d->code_view->setModel(d->source_code_model);
 
   connect(d->code_view, SIGNAL(tokenClicked(const QPoint &, const Qt::MouseButton &, TokenID)),
           this, SLOT(onSourceCodeItemClicked(const QPoint &, const Qt::MouseButton &, TokenID)));
 
-  auto tp = QThreadPool::globalInstance();
-  tp->start(make_ast);
+  // Create the AST index
+  d->ast_index = new ASTIndex;
+  connect(d->ast_index, &ASTIndex::clickedDecl, this, &Document::highlightDecl);
+
+  // Create the TU file index
+  d->parsed_files_index = new ParsedFilesIndex;
+  connect(d->parsed_files_index, &ParsedFilesIndex::parsedFileDoubleClicked, this,
+          &Document::displayParsedFile);
 
   // Setup the layout
   auto main_layout = new QVBoxLayout();
@@ -121,19 +136,23 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   setLayout(main_layout);
 
   auto tu_ast_splitter = new QSplitter(Qt::Vertical);
-  tu_ast_splitter->addWidget(d->tu_tree);
-  tu_ast_splitter->addWidget(d->ast_tree);
+  tu_ast_splitter->addWidget(d->parsed_files_index);
+  tu_ast_splitter->addWidget(d->ast_index);
 
   auto main_splitter = new QSplitter(Qt::Horizontal);
   main_splitter->addWidget(tu_ast_splitter);
   main_splitter->addWidget(d->code_view);
   main_layout->addWidget(main_splitter);
 
+  // Resize the splitters
   QList<int> main_splitter_size_list;
+
   main_splitter_size_list.push_back(main_splitter->width() / 5);
   main_splitter_size_list.push_back(main_splitter->width() - main_splitter_size_list.back());
   main_splitter->setSizes(main_splitter_size_list);
+}
 
+void Document::initializeMenus() {
   // Initialize the context menu
   d->context_menu = new QMenu(tr("Context menu"));
 
@@ -143,7 +162,39 @@ Document::Document(const pasta::CompileJob &job, QWidget *parent)
   d->context_menu->addAction(d->copy_action);
 }
 
-Document::~Document() {}
+void Document::setLoadingState(bool loading) {
+  d->loading = loading;
+
+  d->code_view->setVisible(!loading);
+  d->ast_index->setVisible(!loading);
+  d->parsed_files_index->setVisible(!loading);
+}
+
+void Document::beginLoading(const pasta::CompileJob &job) {
+  setLoadingState(true);
+
+  // Create an AST builder that will run the compile job in a background thread
+  // and then emit signals when it has been built.
+  ASTBuilder *make_ast = new ASTBuilder(job);
+  connect(make_ast, &ASTBuilder::gotAST, this, &Document::onLoadingEnd);
+
+  auto tp = QThreadPool::globalInstance();
+  tp->start(make_ast);
+
+  update();
+}
+
+void Document::onLoadingEnd(std::shared_ptr<pasta::AST> ast) {
+  d->ast_index->setAST(ast);
+  d->parsed_files_index->setAST(ast);
+
+  auto &source_code_model = *static_cast<SourceCodeModel *>(d->source_code_model.get());
+  source_code_model.setAST(ast);
+
+  setLoadingState(false);
+
+  update();
+}
 
 void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::MouseButton &button,
                                        TokenID token_id) {
@@ -157,7 +208,7 @@ void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::M
       additional_menu = new QMenu(tr("Test menu"));
       d->context_menu->addMenu(additional_menu);
 
-      auto token_data = d->code_model->tokenData(token_id);
+      auto token_data = d->source_code_model->tokenData(token_id);
       auto test_action = new QAction(tr("Test action for ") + token_data);
       additional_menu->addAction(test_action);
     }
@@ -171,7 +222,7 @@ void Document::onSourceCodeItemClicked(const QPoint &mouse_position, const Qt::M
   } else if (button == Qt::LeftButton) {
     // Token group highlight example; you can also check `button` to only
     // handle left clicks
-    auto token_group = d->code_model->tokenGroupID(token_id);
+    auto token_group = d->source_code_model->tokenGroupID(token_id);
     if (token_group != kInvalidTokenGroupID) {
       d->code_view->highlightTokenGroup(token_group);
     }
@@ -231,8 +282,8 @@ void Document::displayParsedFile(pasta::File file) {
   auto path = file.Path().generic_string();
   if (path != d->current_open_path) {
     d->current_open_path = std::move(path);
-    d->code_model = std::make_shared<SourceCodeModel>(file);
-    d->code_view->setModel(d->code_model);
+    d->source_code_model = std::make_shared<SourceCodeModel>(file);
+    d->code_view->setModel(d->source_code_model);
   }
 }
 
