@@ -7,13 +7,13 @@
 */
 
 #include "mainwindow.h"
-#include "compilecommandsindex.h"
 
 #ifdef __APPLE__
 #include "macos_utils.h"
 #endif
 
 #include <multiplier/widgets/idocument.h>
+#include <multiplier/widgets/itranslationunitindex.h>
 
 #include <QAction>
 #include <QCloseEvent>
@@ -41,8 +41,8 @@ struct MainMindowMenus final {
 struct MainMenuWidgets final {
   QMdiArea *mdi_area{nullptr};
 
-  CompileCommandsIndex *compile_cmds_index{nullptr};
-  QDockWidget *compile_cmds_index_dock{nullptr};
+  ITranslationUnitIndex *tu_index{nullptr};
+  QDockWidget *tu_index_dock{nullptr};
 };
 
 struct MainWindow::PrivateData final {
@@ -92,12 +92,12 @@ void MainWindow::initializeWidgets() {
 
   setCentralWidget(d->widgets.mdi_area);
 
-  d->widgets.compile_cmds_index = new CompileCommandsIndex();
-  connect(d->widgets.compile_cmds_index, &CompileCommandsIndex::sourceFileDoubleClicked, this,
-          &MainWindow::onCompileCommandsIndexItemActivated);
+  d->widgets.tu_index = ITranslationUnitIndex::create();
+  connect(d->widgets.tu_index, SIGNAL(sourceFileDoubleClicked(pasta::CompileJob)), this,
+          SLOT(onCompileCommandsIndexItemActivated(pasta::CompileJob)));
 
-  d->widgets.compile_cmds_index_dock = createDockWidget(d->widgets.compile_cmds_index);
-  addDockWidget(Qt::RightDockWidgetArea, d->widgets.compile_cmds_index_dock);
+  d->widgets.tu_index_dock = createDockWidget(d->widgets.tu_index);
+  addDockWidget(Qt::RightDockWidgetArea, d->widgets.tu_index_dock);
 
 #ifdef __APPLE__
   setTitleBarColor(winId(), palette().color(QPalette::Window), false);
@@ -129,7 +129,7 @@ void MainWindow::initializeMenus() {
   //
 
   d->menus.view_menu = menuBar()->addMenu(tr("View"));
-  d->menus.view_menu->addAction(d->widgets.compile_cmds_index_dock->toggleViewAction());
+  d->menus.view_menu->addAction(d->widgets.tu_index_dock->toggleViewAction());
 
   //
   // Help menu
@@ -152,8 +152,8 @@ void MainWindow::updateMenus() {
 void MainWindow::updateWidgets() {
   const auto &is_open = d->is_open;
 
-  d->widgets.compile_cmds_index_dock->widget()->setEnabled(is_open);
-  d->widgets.compile_cmds_index_dock->setHidden(!is_open);
+  d->widgets.tu_index_dock->widget()->setEnabled(is_open);
+  d->widgets.tu_index_dock->setHidden(!is_open);
 
   if (!is_open) {
     d->widgets.mdi_area->closeAllSubWindows();
@@ -204,7 +204,7 @@ void MainWindow::onFileOpenAction() {
     }
   }
 
-  if (!d->widgets.compile_cmds_index->setCompileCommands(compile_commands)) {
+  if (!d->widgets.tu_index->setCompileCommands(compile_commands)) {
     QMessageBox::critical(this, tr("Error"), tr("Invalid JSON structure"));
     return;
   }
@@ -214,7 +214,7 @@ void MainWindow::onFileOpenAction() {
 }
 
 void MainWindow::onFileCloseAction() {
-  d->widgets.compile_cmds_index->reset();
+  d->widgets.tu_index->reset();
   d->is_open = false;
 
   updateUI();

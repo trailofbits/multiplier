@@ -13,9 +13,6 @@ add_executable(multiplier
 
   src/mainwindow.h
   src/mainwindow.cpp
-
-  src/compilecommandsindex.h
-  src/compilecommandsindex.cpp
 )
 
 target_link_libraries(multiplier PRIVATE

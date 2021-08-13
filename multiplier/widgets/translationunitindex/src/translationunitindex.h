@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <multiplier/widgets/itranslationunitindex.h>
+
 #include <QFrame>
 #include <QJsonDocument>
 #include <QTreeWidgetItem>
@@ -18,18 +20,16 @@
 
 namespace multiplier {
 
-class CompileCommandsIndex final : public QFrame {
+class TranslationUnitIndex final : public ITranslationUnitIndex {
   Q_OBJECT
+  Q_INTERFACES(multiplier::ITranslationUnitIndex)
 
 public:
-  CompileCommandsIndex(QWidget *parent = nullptr);
-  virtual ~CompileCommandsIndex() override;
+  TranslationUnitIndex(QWidget *parent);
+  virtual ~TranslationUnitIndex() override;
 
-  bool setCompileCommands(const QJsonDocument &json_document);
-  void reset();
-
-  CompileCommandsIndex(const CompileCommandsIndex &) = delete;
-  CompileCommandsIndex &operator=(const CompileCommandsIndex &) = delete;
+  virtual bool setCompileCommands(const QJsonDocument &json_document) override;
+  virtual void reset() override;
 
 private:
   struct PrivateData;
