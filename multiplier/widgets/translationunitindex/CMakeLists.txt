@@ -20,7 +20,6 @@ target_include_directories(multiplier_tuindex_widget SYSTEM INTERFACE include)
 target_link_libraries(multiplier_tuindex_widget PRIVATE
   mu_cxx_settings
 
-  pasta::pasta
   TobWidgets
 
   Qt${MU_QT_VERSION}::Core

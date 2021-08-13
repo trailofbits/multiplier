@@ -10,13 +10,9 @@
 
 #include <multiplier/widgets/itranslationunitindex.h>
 
-#include <QFrame>
-#include <QJsonDocument>
 #include <QTreeWidgetItem>
 
 #include <memory>
-
-#include <pasta/Compile/Job.h>
 
 namespace multiplier {
 
@@ -39,7 +35,8 @@ private slots:
   void onTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
 signals:
-  void sourceFileDoubleClicked(pasta::CompileJob job);
+  void sourceFileDoubleClicked(const QString &working_directory, const QString &source_file_path,
+                               const QString &compile_command);
 };
 
 } // namespace multiplier

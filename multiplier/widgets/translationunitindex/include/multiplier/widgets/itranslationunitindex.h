@@ -10,11 +10,6 @@
 
 #include <QFrame>
 #include <QJsonDocument>
-#include <QTreeWidgetItem>
-
-#include <memory>
-
-#include <pasta/Compile/Job.h>
 
 namespace multiplier {
 
@@ -34,7 +29,8 @@ public:
   ITranslationUnitIndex &operator=(const ITranslationUnitIndex &) = delete;
 
 signals:
-  void sourceFileDoubleClicked(pasta::CompileJob job);
+  void sourceFileDoubleClicked(const QString &working_directory, const QString &source_file_path,
+                               const QString &compile_command);
 };
 
 } // namespace multiplier

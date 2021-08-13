@@ -15,6 +15,12 @@
 #include <multiplier/widgets/idocument.h>
 #include <multiplier/widgets/itranslationunitindex.h>
 
+#include <pasta/Compile/Command.h>
+#include <pasta/Compile/Compiler.h>
+#include <pasta/Compile/Job.h>
+#include <pasta/Util/ArgumentVector.h>
+#include <pasta/Util/FileManager.h>
+
 #include <QAction>
 #include <QCloseEvent>
 #include <QDockWidget>
@@ -45,11 +51,45 @@ struct MainMenuWidgets final {
   QDockWidget *tu_index_dock{nullptr};
 };
 
+struct PastaState final {
+  std::shared_ptr<pasta::FileSystem> file_system;
+  pasta::FileManager file_manager;
+  pasta::Compiler c_compiler;
+  pasta::Compiler cxx_compiler;
+};
+
 struct MainWindow::PrivateData final {
   MainMindowMenus menus;
   MainMenuWidgets widgets;
   bool is_open{false};
+  std::optional<PastaState> opt_pasta;
 };
+
+bool MainWindow::initializePasta() {
+  auto file_system = pasta::FileSystem::CreateNative();
+  auto file_manager = pasta::FileManager(file_system);
+
+  auto c_compiler_res =
+      pasta::Compiler::CreateHostCompiler(file_manager, pasta::TargetLanguage::kC);
+  if (c_compiler_res.Failed()) {
+    return false;
+  }
+
+  auto cxx_compiler_res =
+      pasta::Compiler::CreateHostCompiler(file_manager, pasta::TargetLanguage::kCXX);
+  if (cxx_compiler_res.Failed()) {
+    return false;
+  }
+
+  d->opt_pasta = PastaState{
+      file_system,
+      std::move(file_manager),
+      c_compiler_res.TakeValue(),
+      cxx_compiler_res.TakeValue(),
+  };
+
+  return true;
+}
 
 MainWindow::Ptr MainWindow::create() { return Ptr(new MainWindow()); }
 
@@ -74,6 +114,11 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 MainWindow::MainWindow() : QMainWindow(nullptr), d(new PrivateData) {
   initializeUI();
   updateUI();
+
+  if (!initializePasta()) {
+    QMessageBox::critical(this, tr("Error"), tr("Failed to initialise libpasta"));
+    abort();
+  }
 }
 
 QDockWidget *MainWindow::createDockWidget(QWidget *widget) {
@@ -93,8 +138,10 @@ void MainWindow::initializeWidgets() {
   setCentralWidget(d->widgets.mdi_area);
 
   d->widgets.tu_index = ITranslationUnitIndex::create();
-  connect(d->widgets.tu_index, SIGNAL(sourceFileDoubleClicked(pasta::CompileJob)), this,
-          SLOT(onCompileCommandsIndexItemActivated(pasta::CompileJob)));
+  connect(
+      d->widgets.tu_index,
+      SIGNAL(sourceFileDoubleClicked(const QString &, const QString &, const QString &)), this,
+      SLOT(onCompileCommandsIndexItemActivated(const QString &, const QString &, const QString &)));
 
   d->widgets.tu_index_dock = createDockWidget(d->widgets.tu_index);
   addDockWidget(Qt::RightDockWidgetArea, d->widgets.tu_index_dock);
@@ -226,17 +273,58 @@ void MainWindow::onFileExitAction() { close(); }
 
 void MainWindow::onHelpAboutAction() {}
 
-void MainWindow::onCompileCommandsIndexItemActivated(pasta::CompileJob job) {
-  auto window_title = QString::fromStdString(job.SourceFile().Path().filename().generic_string());
+void MainWindow::onCompileCommandsIndexItemActivated(const QString &working_directory,
+                                                     const QString &source_file_path,
+                                                     const QString &compile_command) {
 
-  auto document = IDocument::create(job);
-  auto container = new QMdiSubWindow();
-  container->setWidget(document);
-  container->setWindowTitle(window_title);
-  container->setAttribute(Qt::WA_DeleteOnClose);
+  auto &pasta = d->opt_pasta.value();
 
-  d->widgets.mdi_area->addSubWindow(container);
-  container->show();
+  auto cwd_res = pasta.file_system->CurrentWorkingDirectory();
+  if (cwd_res.Failed()) {
+    QMessageBox::critical(this, tr("Error"), QString::fromStdString(cwd_res.TakeError().message()));
+    return;
+  }
+
+  auto working_directory_path = pasta.file_system->ParsePath(
+      working_directory.toStdString(), cwd_res.TakeValue(), pasta.file_system->PathKind());
+
+  pasta::ArgumentVector argv(compile_command.toStdString());
+  auto cmd_res = pasta::CompileCommand::CreateFromArguments(argv, working_directory_path);
+
+  if (cmd_res.Failed()) {
+    std::string error_message(cmd_res.Error());
+    QMessageBox::critical(this, tr("Error"), QString::fromStdString(error_message));
+    return;
+  }
+
+  auto compiler = pasta.c_compiler;
+  if (source_file_path.endsWith(".cc", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".cp", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".cpp", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".cxx", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".c++", Qt::CaseInsensitive) ||
+      source_file_path.endsWith(".C", Qt::CaseSensitive)) {
+    compiler = pasta.cxx_compiler;
+  }
+
+  auto jobs_res = compiler.CreateJobsForCommand(cmd_res.TakeValue());
+  if (jobs_res.Failed()) {
+    std::string error_message(jobs_res.Error());
+    QMessageBox::critical(this, tr("Error"), QString::fromStdString(error_message));
+    return;
+  }
+
+  for (auto job : jobs_res.TakeValue()) {
+    auto document_container = new QMdiSubWindow();
+    document_container->setWidget(IDocument::create(job));
+    document_container->setAttribute(Qt::WA_DeleteOnClose);
+
+    auto window_title = QString::fromStdString(job.SourceFile().Path().filename().generic_string());
+    document_container->setWindowTitle(window_title);
+
+    d->widgets.mdi_area->addSubWindow(document_container);
+    document_container->show();
+  }
 }
 
 } // namespace multiplier
