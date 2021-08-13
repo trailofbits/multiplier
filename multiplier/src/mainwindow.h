@@ -11,7 +11,6 @@
 #include <QMainWindow>
 
 #include <memory>
-#include <pasta/Compile/Job.h>
 
 namespace multiplier {
 
@@ -40,6 +39,7 @@ private:
   void initializeWidgets();
   void initializeMenus();
   void initializeUI();
+  bool initializePasta();
 
   void updateMenus();
   void updateWidgets();
@@ -52,7 +52,9 @@ private slots:
 
   void onHelpAboutAction();
 
-  void onCompileCommandsIndexItemActivated(pasta::CompileJob job);
+  void onCompileCommandsIndexItemActivated(const QString &working_directory,
+                                           const QString &source_file_path,
+                                           const QString &compile_command);
 };
 
 } // namespace multiplier
