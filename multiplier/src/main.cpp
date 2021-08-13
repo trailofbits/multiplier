@@ -8,6 +8,8 @@
 
 #include "mainwindow.h"
 
+#include <cstdlib>
+
 #include <QApplication>
 #include <QMetaType>
 
@@ -56,7 +58,10 @@ int main(int argc, char *argv[]) {
   pasta::InitPasta initializer;
 
   QApplication application(argc, argv);
-  initializeTheme();
+
+  if (getenv("MULTIPLIER_NO_CUSTOM_THEME") == nullptr) {
+    initializeTheme();
+  }
 
   qRegisterMetaType<std::shared_ptr<pasta::AST>>("std::shared_ptr<pasta::AST>");
 

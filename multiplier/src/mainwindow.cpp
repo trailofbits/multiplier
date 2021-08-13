@@ -100,7 +100,9 @@ void MainWindow::initializeWidgets() {
   addDockWidget(Qt::RightDockWidgetArea, d->widgets.tu_index_dock);
 
 #ifdef __APPLE__
-  setTitleBarColor(winId(), palette().color(QPalette::Window), false);
+  if (getenv("MULTIPLIER_NO_CUSTOM_THEME") == nullptr) {
+    setTitleBarColor(winId(), palette().color(QPalette::Window), false);
+  }
 #endif
 }
 
