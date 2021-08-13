@@ -7,4 +7,6 @@
 #
 
 add_library(multiplier_widgets INTERFACE)
+
 add_subdirectory("document")
+add_subdirectory("translationunitindex")

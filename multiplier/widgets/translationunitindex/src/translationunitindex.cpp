@@ -6,7 +6,7 @@
   the LICENSE file found in the root directory of this source tree.
 */
 
-#include "compilecommandsindex.h"
+#include "translationunitindex.h"
 
 #include <QDebug>
 #include <QHeaderView>
@@ -37,7 +37,7 @@ pasta::Compiler CreateHostCompiler(pasta::FileManager fm, pasta::TargetLanguage 
 
 } // namespace
 
-struct CompileCommandsIndex::PrivateData final {
+struct TranslationUnitIndex::PrivateData final {
   PrivateData(void)
       : file_system(pasta::FileSystem::CreateNative()), file_manager(file_system),
         c_compiler(CreateHostCompiler(file_manager, pasta::TargetLanguage::kC)),
@@ -50,8 +50,9 @@ struct CompileCommandsIndex::PrivateData final {
   QTreeWidget *source_file_tree{nullptr};
 };
 
-CompileCommandsIndex::CompileCommandsIndex(QWidget *parent) : QFrame(parent), d(new PrivateData) {
-  setWindowTitle(tr("Compile Commands"));
+TranslationUnitIndex::TranslationUnitIndex(QWidget *parent)
+    : ITranslationUnitIndex(parent), d(new PrivateData) {
+  setWindowTitle(tr("Translation Units"));
 
   auto layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
@@ -66,12 +67,12 @@ CompileCommandsIndex::CompileCommandsIndex(QWidget *parent) : QFrame(parent), d(
   layout->addWidget(d->source_file_tree);
 
   connect(d->source_file_tree, &QTreeWidget::itemActivated, this,
-          &CompileCommandsIndex::onTreeWidgetItemActivated);
+          &TranslationUnitIndex::onTreeWidgetItemActivated);
 }
 
-CompileCommandsIndex::~CompileCommandsIndex() {}
+TranslationUnitIndex::~TranslationUnitIndex() {}
 
-bool CompileCommandsIndex::setCompileCommands(const QJsonDocument &json_document) {
+bool TranslationUnitIndex::setCompileCommands(const QJsonDocument &json_document) {
   static const std::array<const char *, 3> kExpectedFileObjectEntries = {
       "directory",
       "command",
@@ -181,9 +182,9 @@ bool CompileCommandsIndex::setCompileCommands(const QJsonDocument &json_document
   return true;
 }
 
-void CompileCommandsIndex::reset() { d->source_file_tree->reset(); }
+void TranslationUnitIndex::reset() { d->source_file_tree->reset(); }
 
-void CompileCommandsIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {
+void TranslationUnitIndex::onTreeWidgetItemActivated(QTreeWidgetItem *item, int) {
 
   if (item->childCount() != 0 || item->columnCount() != 4) {
     return;
