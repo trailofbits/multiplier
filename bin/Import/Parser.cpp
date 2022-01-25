@@ -115,23 +115,6 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
         std::string_view commands_view(maybe_data->data(), maybe_data->size());
         ret = ParseBinaryJSONCommands(file_name_str, commands_view) && ret;
       }
-    } else if (name.contains_lower("trailofbits_ci")) {
-
-      LOG(INFO)
-          << "Found compiler info section in " << file_name;
-
-      auto maybe_data = sec.getContents();
-      if (!maybe_data) {
-        LOG(ERROR)
-            << "Unable to import the compile commands in object file "
-            << file_name << ": " << maybe_data.takeError();
-        ret = false;
-        continue;
-
-      } else {
-        std::string_view compilers_view(maybe_data->data(), maybe_data->size());
-        ret = ParseBinaryJSONCompilers(file_name_str, compilers_view) && ret;
-      }
     }
   }
 
@@ -177,17 +160,6 @@ bool Parser::ParseModule(const llvm::Module &module) {
       auto data = init->getAsString();
       std::string_view commands_view(data.data(), data.size());
       ret = ParseBinaryJSONCommands(file_name.str(), commands_view) && ret;
-
-    } else if (section_name.contains_lower("trailofbits_ci")) {
-
-      LOG(INFO)
-          << "Found compiler info variable '" << var.getName()
-          << "' in bitcode module " << module.getName();
-
-      auto file_name = module.getName();
-      auto data = init->getAsString();
-      std::string_view contents_view(data.data(), data.size());
-      ret = ParseBinaryJSONCompilers(file_name.str(), contents_view) && ret;
     }
   }
   return ret;
@@ -284,38 +256,10 @@ bool Parser::ParseBinaryJSONCommands(std::string_view file_name,
   return ret;
 }
 
-// Parse a compiler info as embedded in a binary.
-bool Parser::ParseBinaryJSONCompilers(std::string_view file_name,
-                                            std::string_view data) {
-  bool ret = true;
-  for (auto compiler_ : SplitCompileCommands(data)) {
-    auto compiler = SanitizeJsonString(compiler_, "{", "}");
-    auto maybe_json = llvm::json::parse(compiler);
-    if (maybe_json) {
-      ret = ParseBinaryJSONCompiler(*maybe_json) && ret;
-    } else {
-      LOG(ERROR)
-           << "Unable to parse compiler info in object file "
-           << file_name << ": " << maybe_json.takeError();
-      ret = false;
-    }
-  }
-  return ret;
-}
-
 // Parse a compile command as embedded in a binary.
 bool Parser::ParseBinaryJSONCommand(llvm::json::Value &json) {
   if (auto obj = json.getAsObject()) {
     return importer.ImportBlightCompileCommand(*obj);
-  } else {
-    return false;
-  }
-}
-
-// Parse a compiler info as embedded in a binary.
-bool Parser::ParseBinaryJSONCompiler(llvm::json::Value &json) {
-  if (auto obj = json.getAsObject()) {
-    return importer.ImportBlightCompileInfo(*obj);
   } else {
     return false;
   }

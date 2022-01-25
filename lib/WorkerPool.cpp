@@ -206,7 +206,9 @@ void WorkerThreadPoolBase::Impl::SignalWaiters(void) {
 
 void WorkerThreadPoolBase::Impl::EnqueueDummyWorkItems(void) {
   for (auto i = 0U; i < num_workers; i++) {
-    (void) queue->enqueue(nullptr);
+    if (queue) {
+      (void) queue->enqueue(nullptr);
+    }
   }
 }
 
@@ -305,6 +307,10 @@ bool WorkerThreadPoolBase::AddWorkInternal(void *ptr_) {
   //            that its destructor will invoke `DrainInternal` as a
   //            consequence.
   (void) d->queue_size.fetch_add(1);
+  if (!d->queue) {
+    d->queue.reset(new BlockingConcurrentQueue);
+  }
+
   if (d->queue->enqueue(std::move(ptr))) {
     return true;
   }

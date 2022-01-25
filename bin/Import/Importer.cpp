@@ -7,9 +7,11 @@
 #include "Importer.h"
 
 #include <cstring>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <system_error>
 #include <unordered_map>
 #include <vector>
 
@@ -32,6 +34,7 @@
 #include <pasta/Compile/Job.h>
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/FileManager.h>
+#include <pasta/Util/FileSystem.h>
 
 DECLARE_string(system_compiler);
 DECLARE_string(sysroot_dir);
@@ -42,12 +45,11 @@ namespace {
 
 using BuilderList = std::vector<std::unique_ptr<mx::DatalogMessageBuilder>>;
 
-using CompilerInfo = std::pair<std::string, std::string>;
-
 struct Command {
  public:
   std::string compiler_hash;
   std::string working_dir;
+  std::unordered_map<std::string, std::string> env;
   pasta::ArgumentVector vec;
   pasta::CompilerName name{pasta::CompilerName::kUnknown};
   pasta::TargetLanguage lang{pasta::TargetLanguage::kC};
@@ -63,12 +65,11 @@ class BuildCommandAction final : public mx::Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
-  CompilerInfo info;
   const BuilderList &builders;
 
   // If we are using something like CMake commands, then pull in the relevant
   // information by trying to execute the compiler directly.
-  void InitCompilerFromCommand(void);
+  std::pair<std::string, std::string> InitCompilerFromCommand(void);
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
                        mx::DatalogMessageBuilder &builder);
@@ -77,10 +78,9 @@ class BuildCommandAction final : public mx::Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, Command &command_,
-                            CompilerInfo &info_, const BuilderList &builders_)
+                            const BuilderList &builders_)
       : fm(fm_),
         command(command_),
-        info(info_),
         builders(builders_) {}
 
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;
@@ -88,7 +88,8 @@ class BuildCommandAction final : public mx::Action {
 
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
-void BuildCommandAction::InitCompilerFromCommand(void) {
+std::pair<std::string, std::string>
+BuildCommandAction::InitCompilerFromCommand(void) {
   std::vector<std::string> new_args;
   for (auto arg : command.vec) {
     new_args.emplace_back(arg);
@@ -105,13 +106,12 @@ void BuildCommandAction::InitCompilerFromCommand(void) {
   std::stringstream output_sysroot;
   std::stringstream output_no_sysroot;
   (void) mx::Subprocess::Execute(
-      cmd_sysroot, nullptr, nullptr, &output_sysroot);
+      cmd_sysroot, &(command.env), nullptr, nullptr, &output_sysroot);
 
   (void) mx::Subprocess::Execute(
-      cmd_no_sysroot, nullptr, nullptr, &output_no_sysroot);
+      cmd_no_sysroot, &(command.env), nullptr, nullptr, &output_no_sysroot);
 
-  info.first = output_sysroot.str();
-  info.second = output_no_sysroot.str();
+  return {output_sysroot.str(), output_no_sysroot.str()};
 }
 
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
@@ -215,14 +215,12 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     return;
   }
 
-  if (info.first.empty() && info.second.empty()) {
-    InitCompilerFromCommand();
-  }
+  auto [cc_version_sysroot, cc_version_no_sysroot] = InitCompilerFromCommand();
 
   pasta::Result<pasta::Compiler, std::string> maybe_cc =
       pasta::Compiler::Create(fm, command.vec[0], command.working_dir,
-                              command.name, command.lang, info.first,
-                              info.second);
+                              command.name, command.lang, cc_version_sysroot,
+                              cc_version_no_sysroot);
 
   mx::DatalogMessageBuilder &builder =
       *(builders[static_cast<unsigned>(worker_id)]);
@@ -255,8 +253,8 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
 struct Importer::PrivateData {
  public:
-  std::vector<Command> commands;
-  std::unordered_map<std::string, CompilerInfo> compilers;
+  // Commands, grouped by working directory.
+  std::unordered_map<std::string, std::vector<Command>> commands;
 };
 
 Importer::~Importer(void) {}
@@ -265,15 +263,16 @@ Importer::Importer(void)
     : d(std::make_unique<Importer::PrivateData>()) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
-  // TODO(pag,kumarak): Integrate `env`.
 
   auto wrapped_tool = o.getString("wrapped_tool");
   auto cwd = o.getString("cwd");
   auto args = o.getArray("args");
   auto hash = o.getString("hash");
   auto lang = o.getString("lang");  // `C`, `Cxx`, `Unknown`.
+  auto env = o.getObject("env");
 
-  if (!wrapped_tool || !cwd || !args || args->empty() || !hash || !lang) {
+  if (!wrapped_tool || !cwd || !args || args->empty() || !hash || !lang ||
+      !env) {
     return false;
   }
 
@@ -288,55 +287,27 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
     }
   }
 
-  auto &command = d->commands.emplace_back(args_vec);
+  std::unordered_map<std::string, std::string> envp;
+  for (const auto &it : *env) {
+    const llvm::json::ObjectKey &key = it.first;
+    const llvm::json::Value &val = it.second;
+    if (auto val_str = val.getAsString()) {
+      envp.emplace(key.str(), val_str->str());
+    } else {
+      return false;
+    }
+  }
+
+  auto &command = d->commands[cwd->str()].emplace_back(args_vec);
   command.working_dir = cwd->str();
   command.compiler_hash = hash->str();
+  command.env = std::move(envp);
   if (lang->equals_lower("c++") || lang->equals_lower("cxx")) {
     command.lang = pasta::TargetLanguage::kCXX;
   }
   return true;
 }
 
-bool Importer::ImportBlightCompileInfo(llvm::json::Object &o) {
-  auto hash = o.getString("hash");
-  auto sysroot = o.getArray("sysroot");
-  auto no_sysroot = o.getArray("no_sysroot");
-  if (!hash || !sysroot || !no_sysroot) {
-    return false;
-  }
-
-  auto &a_b = d->compilers[hash->str()];
-  if (!a_b.first.empty() || !a_b.second.empty()) {
-    return true;
-  }
-
-  std::stringstream version_sysroot;
-  auto sep = "";
-  for (auto line : *sysroot) {
-    if (auto line_str = line.getAsString()) {
-      version_sysroot << sep << line_str->str();
-      sep = "\n";
-    } else {
-      return false;
-    }
-  }
-
-  std::stringstream version_no_sysroot;
-  sep = "";
-  for (auto line : *no_sysroot) {
-    if (auto line_str = line.getAsString()) {
-      version_no_sysroot << sep << line_str->str();
-      sep = "\n";
-    } else {
-      return false;
-    }
-  }
-
-  a_b.first = version_sysroot.str();
-  a_b.second = version_no_sysroot.str();
-
-  return true;
-}
 
 bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   auto args = o.getString("command");
@@ -346,8 +317,9 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
     return false;
   }
 
+  auto &commands = d->commands[cwd->str()];
   auto args_str = args->str();
-  auto &command = d->commands.emplace_back(args_str);
+  auto &command = commands.emplace_back(args_str);
   if (command.vec.Size()) {
     command.compiler_hash = std::move(args_str);
     command.working_dir = cwd->str();
@@ -362,29 +334,55 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
     return true;
 
   } else {
-    d->commands.pop_back();
+    commands.pop_back();
     return false;
   }
 }
 
-void Importer::Build(pasta::FileManager &fm, mx::DatalogClient &client) {
+void Importer::Build(mx::DatalogClient &client) {
   mx::Executor exe;
+
+  // Make one builder per worker thread. This is a sort of thread-locat storage.
   BuilderList builders;
   for (auto i = 0u, max_i = exe.NumWorkers(); i < max_i; ++i) {
     builders.emplace_back(new mx::DatalogMessageBuilder);
   }
 
-  for (Command &command : d->commands) {
-    CompilerInfo &info = d->compilers[command.compiler_hash];
-    exe.EmplaceAction<BuildCommandAction>(fm, command, info, builders);
-  }
-  exe.Start();
-  exe.Wait();
-  for (const auto &builder : builders) {
-    if (builder->HasAnyMessages()) {
-      if (!client.Publish(*builder)) {
-        LOG(ERROR)
-            << "Unable to publish compile jobs to mx-server";
+  for (auto &[cwd, commands] : d->commands) {
+
+    // Change the current working directory to match that of the commands.
+    // This is a process-wide operation.
+    std::error_code ec;
+    std::filesystem::current_path(cwd, ec);
+    if (ec) {
+      LOG(ERROR)
+          << "Could not change current working directory to " << cwd
+          << ": " << ec.message();
+      continue;
+    }
+
+    // Now re-build a host file sytem, and let it observe the changed working
+    // directory.
+    auto host_fs = pasta::FileSystem::CreateNative();
+    pasta::FileManager fm(host_fs);
+
+    // Run all commands relevant to just this working directory.
+    for (Command &command : commands) {
+      exe.EmplaceAction<BuildCommandAction>(fm, command, builders);
+    }
+    exe.Start();
+    exe.Wait();
+
+    // If we've got any messages, then send them out. The granularity is likely
+    // to be small because we don't expect many files to operate in the same
+    // working directory, though if they do, then at least we still have the
+    // benefit of the N-way split from the executor.
+    for (const auto &builder : builders) {
+      if (builder->HasAnyMessages()) {
+        if (!client.Publish(*builder)) {
+          LOG(ERROR)
+              << "Unable to publish compile jobs to mx-server";
+        }
       }
     }
   }

@@ -67,15 +67,8 @@ class Parser {
   bool ParseBinaryJSONCommands(std::string_view file_name,
                                std::string_view data);
 
-  // Parse a compiler info as embedded in a binary.
-  bool ParseBinaryJSONCompilers(std::string_view file_name,
-                                std::string_view data);
-
   // Parse a compile command as embedded in a binary.
   bool ParseBinaryJSONCommand(llvm::json::Value &json);
-
-  // Parse a compiler info as embedded in a binary.
-  bool ParseBinaryJSONCompiler(llvm::json::Value &json);
 
   // Parse a `compile_commands.json`-type file.
   bool ParseCompileCommandsJSON(std::string_view file_name,

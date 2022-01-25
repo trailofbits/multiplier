@@ -14,9 +14,6 @@ class Object;
 namespace mx {
 class DatalogClient;
 }  // namespace mx
-namespace pasta {
-class FileManager;
-}  // namespace pasta
 namespace importer {
 
 class Importer {
@@ -30,10 +27,9 @@ class Importer {
   Importer(void);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
-  bool ImportBlightCompileInfo(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o);
 
-  void Build(pasta::FileManager &fm, mx::DatalogClient &builder);
+  void Build(mx::DatalogClient &builder);
 };
 
 }  // namespace importer

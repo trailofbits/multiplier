@@ -29,7 +29,6 @@
 #include <multiplier/Types.h>
 
 #include <pasta/Compile/Compiler.h>
-#include <pasta/Util/FileSystem.h>
 
 #include "Importer.h"
 #include "Log.h"
@@ -76,11 +75,6 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  auto host_fs = pasta::FileSystem::CreateNative();
-  pasta::FileManager host_fm(host_fs);
-  auto host_cc = pasta::Compiler::CreateHostCompiler(
-      host_fm, pasta::TargetLanguage::kC);
-
   auto maybe_buff = llvm::MemoryBuffer::getFileOrSTDIN(FLAGS_path, -1, false);
   if (!maybe_buff) {
     std::cerr
@@ -117,7 +111,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::DatalogClient client(channel, channel, channel);
 
-  importer.Build(host_fm, client);
+  importer.Build(client);
 
   return EXIT_SUCCESS;
 }

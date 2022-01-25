@@ -59,6 +59,10 @@ set_target_properties("util"
       CXX
     PUBLIC_HEADER
       "${util_headers}"
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
 )
 
 target_compile_features("util"

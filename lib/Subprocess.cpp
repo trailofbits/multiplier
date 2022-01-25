@@ -13,6 +13,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include <cassert>
 #include <cctype>
 #include <cerrno>
 #include <csignal>
@@ -38,8 +39,10 @@ class NullBuffer : public std::streambuf {
 // Execute the command specified in `args` with the ability to feed the
 // command input and capture output. Passing `nullptr` to any of `input`,
 // `output`, or `error` is acceptable.
-int Subprocess::Execute(const pasta::ArgumentVector &cmd, std::istream *input,
-                        std::ostream *output, std::ostream *error) {
+int Subprocess::Execute(const pasta::ArgumentVector &cmd,
+                        const std::unordered_map<std::string, std::string> *env,
+                        std::istream *input, std::ostream *output,
+                        std::ostream *error) {
   enum {
     kRead = 0,
     kWrite = 1
@@ -48,6 +51,38 @@ int Subprocess::Execute(const pasta::ArgumentVector &cmd, std::istream *input,
   int input_pipe[2] = {-1, -1};
   int output_pipe[2] = {-1, -1};
   int error_pipe[2] = {-1, -1};
+
+  // Build up the environment array.
+  std::string env_data;
+  std::vector<char *> env_array;
+  if (env && !env->empty()) {
+    size_t num_chars_needed = 0u;
+    for (const auto &[key, val] : *env) {
+      if (auto key_len = strlen(key.data())) {
+        num_chars_needed += key_len;
+        num_chars_needed += strlen(val.data());
+        num_chars_needed += 2u;  // `=` and `\0`.
+      }
+    }
+    env_data.resize(num_chars_needed);
+    auto j = 0u;
+    for (const auto &[key, val] : *env) {
+      if (auto key_len = strlen(key.data())) {
+        env_array.push_back(&(env_data[j]));
+        for (size_t i = 0u; i < key_len;) {
+          env_data[j++] = key[i++];
+        }
+        env_data[j++] = '=';
+        auto val_len = strlen(key.data());
+        for (size_t i = 0u; i < val_len;) {
+          env_data[j++] = val[i++];
+        }
+        env_data[j++] = '\0';
+      }
+    }
+    CHECK_EQ(j, num_chars_needed);
+  }
+  env_array.push_back(nullptr);
 
   LOG(INFO) << "Executing command: " << cmd.Join();
 
@@ -119,7 +154,8 @@ int Subprocess::Execute(const pasta::ArgumentVector &cmd, std::istream *input,
     close(error_pipe[kRead]);
     close(error_pipe[kWrite]);
 
-    execvp(cmd[0], const_cast<char * const *>(cmd.Argv()));
+    execve(cmd[0], const_cast<char * const *>(cmd.Argv()),
+           env_array.data());
     exit(EXIT_FAILURE);
   }
 
