@@ -149,7 +149,6 @@ fabric.properties
 .project
 .cproject
 .metadata
-bin/
 tmp/
 *.tmp
 *.bak
@@ -229,7 +228,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/

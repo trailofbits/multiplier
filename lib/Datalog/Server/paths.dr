@@ -1,0 +1,40 @@
+;
+; Copyright (c) 2022-present, Trail of Bits, Inc.
+; All rights reserved.
+;
+; This source code is licensed in accordance with the terms specified in
+; the LICENSE file found in the root directory of this source tree.
+;
+
+#import "types.dr".
+
+; ------------------------------------------------------------------------------
+; This file defines relations that focus on file and directory paths.
+; ------------------------------------------------------------------------------
+
+
+#functor source_path(bound CompileCommand CC,
+                     free Path SourcePath) @range(.) @inline.
+
+
+#functor parent_path(bound Path P, free Path D) @range(.) @inline.
+
+
+; Received when a new compile command is added. 
+#message compile_command(CompileCommand CC).
+
+
+; The set of compiled source paths are derived from compile commands.
+#query source_paths(free Path SourcePath)
+    : compile_command(CC)
+    , source_path(CC, SourcePath).
+
+
+; The directory heirarchy is inferred from source paths.
+#query directory_paths(free Path D)
+    : source_paths(P)
+    , parent_path(P, D)
+
+    : directory_paths(C)
+    , parent_path(C, D)
+    , C != D.

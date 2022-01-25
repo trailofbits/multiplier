@@ -1,0 +1,77 @@
+;
+; Copyright (c) 2022-present, Trail of Bits, Inc.
+; All rights reserved.
+;
+; This source code is licensed in accordance with the terms specified in
+; the LICENSE file found in the root directory of this source tree.
+;
+
+; ------------------------------------------------------------------------------
+; This file defines types used by the rest of the Datalog.
+; ------------------------------------------------------------------------------
+
+#database mx.
+
+#import "foreign_types.dr".
+
+#enum TargetLanguage u8.
+#constant TargetLanguage TL_C 0.
+#constant TargetLanguage TL_Cxx 1.
+
+#enum CompilerName u8.
+#constant CompilerName CN_Unknown 0.
+#constant CompilerName CN_Clang 1.
+#constant CompilerName CN_AppleClang 2.
+#constant CompilerName CN_ClangCL 3.
+#constant CompilerName CN_CL 4.
+#constant CompilerName CN_GNU 5.
+
+#enum IncludePathLocation u8.
+#constant IncludePathLocation IPL_Absolute 0.
+#constant IncludePathLocation IPL_SystemRootRelative 1.
+
+#epilogue ```flat
+
+table IncludePath {
+  Directory:string (required);
+  Location:IncludePathLocation;
+}
+
+// The source file contents are compressed by token kinds. That is, if the
+// default spelling of the token matches the file spelling of the token, then
+// we elide the contents for the token.
+//
+// The `Contents` is a vector of bytes, where data or individual tokens is
+// `NUL`-terminated. If a token's data can be elided, then so is its `NUL`-
+// terminator. 
+table SourceFile {
+  Contents:[ubyte];
+  TokenKinds:[ushort];
+}
+
+table DataFile {
+  Contents:[ubyte];
+}
+
+union File {
+  SourceFile,
+  DataFile
+}
+
+table CompileCommand {
+  SourcePath:string (required);
+  CompilerPath:string (required);
+  WorkingDirectory:string (required);
+  SystemRootDirectory:string;
+  ResourceDirectory:string;
+  InstallationDirectory:string;
+  SystemIncludePaths:[IncludePath];
+  UserIncludePaths:[IncludePath];
+  FrameworkPaths:[IncludePath];
+  Arguments:[string] (required);
+  Language:TargetLanguage;
+  Compiler:CompilerName;
+}
+
+```.
+
