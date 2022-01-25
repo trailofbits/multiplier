@@ -22,10 +22,8 @@ class IndexCompileJobAction final : public mx::Action {
  public:
   virtual ~IndexCompileJobAction(void);
 
-  inline IndexCompileJobAction(std::shared_ptr<Context> context_,
-                               pasta::CompileJob job_)
-      : context(std::move(context_)),
-        job(std::move(job_)) {}
+  IndexCompileJobAction(std::shared_ptr<Context> context_,
+                        pasta::CompileJob job_);
 
   // Build and index the AST.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

@@ -14,6 +14,7 @@ set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 set(util_headers
   "${source_include_dir}/Action.h"
   "${source_include_dir}/Executor.h"
+  "${source_include_dir}/ProgressBar.h"
   "${source_include_dir}/Result.h"
   "${source_include_dir}/Signal.h"
   "${source_include_dir}/Subprocess.h"
@@ -27,6 +28,7 @@ add_library("util"
 
     "Action.cpp"
     "Executor.cpp"
+    "ProgressBar.cpp"
     "Signal.cpp"
     "Subprocess.cpp"
     "Types.cpp"

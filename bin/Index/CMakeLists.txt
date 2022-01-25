@@ -19,12 +19,12 @@ add_library("${lib_name}"
     "IndexCompileJob.cpp"
     "Tool.cpp"
 )
- 
+
 target_link_libraries("${lib_name}"
   PRIVATE
     "tool"
 )
- 
+
 add_library("${PROJECT_NAME}::${lib_name}" ALIAS "${lib_name}")
 set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE CXX)
 

@@ -27,10 +27,8 @@ class IndexCompileCommandAction final : public mx::Action {
  public:
   virtual ~IndexCompileCommandAction(void);
 
-  inline IndexCompileCommandAction(std::shared_ptr<Context> context_,
-                                   CompileCommandPtr command_)
-      : context(std::move(context_)),
-        command(std::move(command_)) {}
+  IndexCompileCommandAction(std::shared_ptr<Context> context_,
+                            CompileCommandPtr command_);
 
   // Run the compile command, which should create a single compile job.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

@@ -4,6 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <multiplier/Executor.h>
 #include <multiplier/Tool.h>
@@ -11,6 +12,8 @@
 
 #include "Context.h"
 #include "IndexCompileCommand.h"
+
+DEFINE_bool(show_progress, false, "Show progress bars");
 
 namespace indexer {
 
@@ -27,6 +30,9 @@ class IndexCompileCommandTool final : public mx::Tool {
 
   void Update(mx::DatalogClientMessagePtr message) final {
     auto context = std::make_shared<Context>(client);
+    context->command_progress.SetNumWorkers(executor.NumWorkers());
+    context->ast_progress.SetNumWorkers(executor.NumWorkers());
+
     if (auto added = message->added()) {
       if (auto commands = added->new_compile_command_1()) {
         for (auto raw_command : *commands) {

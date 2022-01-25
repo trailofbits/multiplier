@@ -37,9 +37,18 @@ static pasta::ArgumentVector GetArguments(const CompileCommandPtr &command) {
 
 IndexCompileCommandAction::~IndexCompileCommandAction(void) {}
 
+IndexCompileCommandAction::IndexCompileCommandAction(
+    std::shared_ptr<Context> context_, CompileCommandPtr command_)
+    : context(std::move(context_)),
+      command(std::move(command_)) {
+  context->command_progress.AddWork(1);
+}
+
 // Run the compile command, which should create a single compile job.
 void IndexCompileCommandAction::Run(
     mx::Executor exe, mx::WorkerId worker_id) {
+
+  mx::ProgressBarStep step(context->command_progress);
 
   auto maybe_host_cc = pasta::Compiler::CreateHostCompiler(
       context->file_manager, mx::ToPasta(command->Language()));
