@@ -19,9 +19,8 @@ IndexCompileJobAction::~IndexCompileJobAction(void) {}
 IndexCompileJobAction::IndexCompileJobAction(std::shared_ptr<Context> context_,
                                              pasta::CompileJob job_)
     : context(std::move(context_)),
-      job(std::move(job_)) {
-  context->ast_progress.AddWork(1);
-}
+      progress(context->ast_progress),
+      job(std::move(job_)) {}
 
 // Build and index the AST.
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {

@@ -13,6 +13,7 @@ set(exe_name "mx-${lib_name}")
 add_library("${lib_name}"
   STATIC
     "Context.h"
+    "Context.cpp"
     "IndexCompileCommand.h"
     "IndexCompileCommand.cpp"
     "IndexCompileJob.h"

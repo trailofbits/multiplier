@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 #include "Executor.h"
 
@@ -32,6 +33,48 @@ class Action {
   Action(Action &&) noexcept = delete;
   Action &operator=(const Action &) = delete;
   Action &operator=(Action &&) noexcept = delete;
+};
+
+// Represents a deferred action, i.e. when a `DeferredAction::Ptr` expires,
+// the contained action will be emplaced onto the executor and run.
+class DeferredAction : public std::enable_shared_from_this<DeferredAction> {
+ private:
+  Executor exe;
+  std::unique_ptr<Action> action;
+
+  inline DeferredAction(const Executor &exe_, Action *action_)
+      : exe(exe_),
+        action(action_) {}
+
+ public:
+  using Ptr = std::shared_ptr<DeferredAction>;
+
+  ~DeferredAction(void) {
+    exe.AddAction(std::move(action));
+  }
+
+  Ptr Create(const Executor &exe_, std::unique_ptr<Action> action_) {
+    auto act = new DeferredAction(exe, action_.release());
+    return act->shared_from_this();
+  }
+
+  template<typename T, typename ... Args>
+  Ptr Emplace(const Executor &exe_, Args &&... args) {
+    static_assert(std::is_base_of_v<T, Action>);
+    auto act = new DeferredAction(exe, new T(std::forward<Args>(args)...));
+    return act->shared_from_this();
+  }
+
+  template <typename T>
+  std::shared_ptr<T> Lock(
+      std::enable_if_t<std::is_base_of_v<T, Action>, int> = 0) {
+    if (auto casted = dynamic_cast<T *>(action.get())) {
+      std::shared_ptr<T> ret(this->shared_from_this(), casted);
+      return ret;
+    } else {
+      return {};
+    }
+  }
 };
 
 }  // namespace mx

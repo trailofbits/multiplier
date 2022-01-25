@@ -37,6 +37,9 @@ class ProgressBarStep {
   inline explicit ProgressBarStep(const ProgressBar &bar_)
       : ProgressBarStep(&bar_) {}
 
+  inline explicit ProgressBarStep(const std::unique_ptr<ProgressBar> &bar_)
+      : ProgressBarStep(bar_.get()) {}
+
   inline explicit ProgressBarStep(const ProgressBar *bar_)
       : bar(bar_),
         start_time(std::chrono::system_clock::now()) {}
@@ -53,8 +56,24 @@ class ProgressBarStep {
   ProgressBarStep(const ProgressBarStep &) = delete;
   ProgressBarStep &operator=(const ProgressBarStep &) = delete;
 
+ protected:
   const ProgressBar * const bar;
   std::chrono::system_clock::time_point start_time;
+};
+
+// Like a `ProgressBarStep`, but also adds work to the bar.
+class ProgressBarWork : public ProgressBarStep {
+ private:
+  using ProgressBarStep::ProgressBarStep;
+
+ public:
+  template <typename T>
+  inline explicit ProgressBarWork(const T &bar_)
+      : ProgressBarStep(bar_) {
+    if (bar) {
+      bar->AddWork(1);
+    }
+  }
 };
 
 }  // namespace mx

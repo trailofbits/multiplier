@@ -6,14 +6,13 @@
 
 #pragma once
 
-#include <chrono>
 #include <memory>
-#include <multiplier/ProgressBar.h>
 #include <pasta/Util/FileManager.h>
-#include <pasta/Util/FileSystem.h>
 
 namespace mx {
 class DatalogClient;  // Auto-generated from Datalog.
+class Executor;
+class ProgressBar;
 }  // namespace mx
 namespace indexer {
 
@@ -24,14 +23,11 @@ class Context {
  public:
   const mx::DatalogClient &client;
   const pasta::FileManager file_manager;
-  mx::ProgressBar command_progress;
-  mx::ProgressBar ast_progress;
+  std::unique_ptr<mx::ProgressBar> command_progress;
+  std::unique_ptr<mx::ProgressBar> ast_progress;
 
-  inline Context(const mx::DatalogClient &client_)
-      : client(client_),
-        file_manager(pasta::FileSystem::CreateNative()),
-        command_progress("Command parsing", std::chrono::seconds(1)),
-        ast_progress("AST building", std::chrono::seconds(1)) {}
+  ~Context(void);
+  Context(const mx::Executor &exe_, const mx::DatalogClient &client_);
 };
 
 }  // namespace indexer

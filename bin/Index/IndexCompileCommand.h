@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <multiplier/Action.h>
+#include <multiplier/ProgressBar.h>
 #include <pasta/Compile/Command.h>
 
 namespace mx {
@@ -22,6 +23,7 @@ using CompileCommandPtr = std::shared_ptr<const mx::CompileCommand>;
 class IndexCompileCommandAction final : public mx::Action {
  private:
   const std::shared_ptr<Context> context;
+  const mx::ProgressBarWork progress;
   const CompileCommandPtr command;
 
  public:

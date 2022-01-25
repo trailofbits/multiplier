@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <multiplier/Action.h>
+#include <multiplier/ProgressBar.h>
 #include <pasta/Compile/Job.h>
 
 namespace indexer {
@@ -17,6 +18,7 @@ class Context;
 class IndexCompileJobAction final : public mx::Action {
  private:
   const std::shared_ptr<Context> context;
+  const mx::ProgressBarWork progress;
   const pasta::CompileJob job;
 
  public:
