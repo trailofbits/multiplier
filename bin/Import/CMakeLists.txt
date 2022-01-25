@@ -1,0 +1,42 @@
+#
+# Copyright (c) 2021-present, Trail of Bits, Inc.
+# All rights reserved.
+#
+# This source code is licensed in accordance with the terms specified in
+# the LICENSE file found in the root directory of this source tree.
+#
+
+
+string(TOLOWER "${PROJECT_NAME}" lower_project_name)
+set(exe_name "mx-import")
+
+add_executable("${exe_name}"
+  "Log.h"
+  
+  "Parser.h"
+  "Parser.cpp"
+  
+  "Importer.h"
+  "Importer.cpp"
+  
+  "Main.cpp"
+)
+
+set_target_properties("${exe_name}"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX)
+
+target_link_libraries("${exe_name}"
+  PRIVATE
+    "tool"
+)
+
+if(IRENE_ENABLE_INSTALL)
+  install(
+    TARGETS
+      "${exe_name}"
+    EXPORT
+      "${PROJECT_NAME}Targets"
+  )
+endif()
