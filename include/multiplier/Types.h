@@ -10,10 +10,16 @@
 #include <limits>
 #include <string>
 
+namespace clang {
+namespace tok {
+enum TokenKind : unsigned short;
+}  // namespace tok
+}  // namespace clang
 namespace mx {
 enum class CompilerName : uint8_t;
 enum class IncludePathLocation : uint8_t;
 enum class TargetLanguage : uint8_t;
+enum class TokenKind : uint16_t;
 }  // namespace mx
 namespace pasta {
 enum class CompilerName : unsigned;
@@ -25,7 +31,7 @@ enum class TargetLanguage : unsigned;
 // or it may be publicly available through a target copied location, or in its
 // installed location.
 #ifndef __has_include
-#  error "Missing __has_includex"
+#  error "Missing __has_include"
 #elif __has_include(<multiplier/mx_generated.h>)
 #  include <multiplier/mx_generated.h>
 #elif __has_include("mx_generated.h")
@@ -48,6 +54,10 @@ inline static TargetLanguage FromPasta(pasta::TargetLanguage tl) {
   return static_cast<TargetLanguage>(tl);
 }
 
+inline static TokenKind FromClang(clang::tok::TokenKind tk) {
+  return static_cast<TokenKind>(tk);
+}
+
 inline static pasta::CompilerName ToPasta(CompilerName cn) {
   return static_cast<pasta::CompilerName>(cn);
 }
@@ -58,6 +68,26 @@ inline static pasta::IncludePathLocation ToPasta(IncludePathLocation ipl) {
 
 inline static pasta::TargetLanguage ToPasta(TargetLanguage tl) {
   return static_cast<pasta::TargetLanguage>(tl);
+}
+
+inline static clang::tok::TokenKind ToClang(TokenKind tk) {
+  return static_cast<clang::tok::TokenKind>(tk);
+}
+
+inline static const char *NameOf(CompilerName val) {
+  return &(EnumNameCompilerName(val)[3]);  // Chop off `CN_`.
+}
+
+inline static const char *NameOf(IncludePathLocation val) {
+  return &(EnumNameIncludePathLocation(val)[4]);  // Chop off `IPL_`.
+}
+
+inline static const char *NameOf(TargetLanguage val) {
+  return &(EnumNameTargetLanguage(val)[3]);  // Chop off `TL_`.
+}
+
+inline static const char *NameOf(TokenKind val) {
+  return &(EnumNameTokenKind(val)[3]);  // Chop off `TK_`.
 }
 
 }  // namespace mx
