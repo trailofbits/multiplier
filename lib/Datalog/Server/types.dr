@@ -30,6 +30,10 @@
 #constant IncludePathLocation IPL_Absolute 0.
 #constant IncludePathLocation IPL_SystemRootRelative 1.
 
+; This is defined in an auto-generated file, based off of the Clang token
+; kinds.
+#enum TokenKind u16.
+
 #epilogue ```flat
 
 table IncludePath {
@@ -46,7 +50,7 @@ table IncludePath {
 // terminator. 
 table SourceFile {
   Contents:[ubyte];
-  TokenKinds:[ushort];
+  TokenKinds:[TokenKind];
 }
 
 table DataFile {

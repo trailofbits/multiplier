@@ -21,6 +21,27 @@ set(copied_headers
   "${binary_include_dir}/mx_generated.h"
 )
 
+add_executable("generate_tokens"
+  "GenerateTokens.cpp"
+)
+
+target_link_libraries("generate_tokens"
+  PRIVATE
+    pasta::pasta
+)
+
+set(generated_tokens_dr "${datalog_bin_dir}/Server/tokens.dr")
+add_custom_command(TARGET "generate_tokens"
+  PRE_BUILD
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${datalog_bin_dir}/Server"
+)
+add_custom_command(TARGET "generate_tokens"
+  POST_BUILD
+  COMMAND "generate_tokens" "${generated_tokens_dr}"
+  COMMENT "Generating ${generated_tokens_dr}"
+  BYPRODUCTS "${generated_tokens_dr}"
+)
+
 # Compile the server Datalog code. The Datalog code itself executes in
 # mx-server. It has a client interface, which all code uses via
 # `mx::DatalogClient`.
@@ -45,6 +66,7 @@ compile_datalog(
     "${datalog_source_dir}/Server/commands.dr"
     "${datalog_source_dir}/Server/paths.dr"
     "${datalog_source_dir}/Server/types.dr"
+    "${generated_tokens_dr}"
   WORKING_DIRECTORY
     "${datalog_source_dir}"
   INCLUDE_DIRECTORIES
@@ -52,6 +74,7 @@ compile_datalog(
     "${datalog_source_dir}"
   DEPENDS
     "${datalog_source_dir}/Functors.h"
+    "generate_tokens"
   LIBRARIES
     $<BUILD_INTERFACE:util>
 )
