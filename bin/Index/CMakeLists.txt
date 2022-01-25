@@ -8,7 +8,7 @@
 
 string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 set(lib_name "index")
-set(exe_name "mx-${lib_name}-server")
+set(exe_name "mx-${lib_name}")
 
 add_library("${lib_name}"
   STATIC
@@ -39,11 +39,9 @@ target_link_libraries("${exe_name}"
 
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 
-
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
-      "${lib_name}"
       "${exe_name}"
     EXPORT
       "${PROJECT_NAME}Targets"

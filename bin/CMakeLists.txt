@@ -8,7 +8,7 @@
 
 
 add_subdirectory("Import")
-add_subdirectory("Multitool")
+add_subdirectory("Index")
 
 if(MX_ENABLE_GUI)
   add_subdirectory("GUI")
