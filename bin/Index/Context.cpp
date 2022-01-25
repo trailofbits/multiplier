@@ -16,6 +16,7 @@ DEFINE_bool(show_progress, false, "Show progress bars");
 
 namespace indexer {
 
+
 Context::~Context(void) {}
 
 Context::Context(const mx::Executor &exe_, const mx::DatalogClient &client_)

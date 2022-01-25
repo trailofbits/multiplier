@@ -13,6 +13,7 @@ set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 
 set(util_headers
   "${source_include_dir}/Action.h"
+  "${source_include_dir}/BloomFilter.h"
   "${source_include_dir}/Executor.h"
   "${source_include_dir}/ProgressBar.h"
   "${source_include_dir}/Result.h"
@@ -27,6 +28,7 @@ add_library("util"
     ${util_headers}
 
     "Action.cpp"
+    "BloomFilter.cpp"
     "Executor.cpp"
     "ProgressBar.cpp"
     "Signal.cpp"
