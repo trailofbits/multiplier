@@ -6,6 +6,7 @@
 
 #include "TokenizeFile.h"
 
+#include <algorithm>
 #include <glog/logging.h>
 #include <multiplier/Datalog.h>
 #include <multiplier/Token.h>
@@ -15,6 +16,49 @@
 #include <fstream>
 
 namespace indexer {
+#if DCHECK_IS_ON()
+namespace {
+
+// Do some sanity checking on the token list compression to make sure we
+// don't introduce issues right away.
+static bool CheckTokenLists(
+    const std::string &file_path, mx::TokenList file_tokens,
+    const mx::CompressedTokenList *compressed_tokens) {
+  auto maybe_uncompressed = mx::TokenList::Create(compressed_tokens);
+  if (maybe_uncompressed.Succeeded()) {
+    auto uncompressed_file_tokens = maybe_uncompressed.TakeValue();
+    auto orig_num_toks = file_tokens.Size();
+    auto new_num_toks = uncompressed_file_tokens.Size();
+    if (orig_num_toks != new_num_toks) {
+      LOG(ERROR)
+          << "Uncompressed token list for file " << file_path << " has "
+          << orig_num_toks << " tokens, but compressed token list only has "
+          << new_num_toks << " tokens";
+      return false;
+    }
+
+    if (!std::equal(file_tokens.begin(), file_tokens.end(),
+                      uncompressed_file_tokens.begin(),
+                      uncompressed_file_tokens.end())) {
+
+      LOG(ERROR)
+          << "One or more of the tokens in the file " << file_path
+          << " does not match corresponding tokens from the uncompressed "
+             "token list";
+      return false;
+    }
+
+    return true;
+  } else {
+    LOG(ERROR)
+        << "Unable to uncompress just-created compressed file token list: "
+        << maybe_uncompressed.TakeError();
+    return false;
+  }
+}
+
+}  // namespace
+#endif  // DCHECK_IS_ON()
 
 TokenizeFileAction::~TokenizeFileAction(void) {}
 
@@ -35,48 +79,34 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     return;
   }
 
-  auto file_tokens = mx::TokenList::Create(file.Tokens());
+  auto pasta_file_tokens = file.Tokens();
+  auto file_tokens = mx::TokenList::Create(pasta_file_tokens);
+  CHECK_EQ(file_tokens.Size(), pasta_file_tokens.Size());
 
   flatbuffers::FlatBufferBuilder fbb;
   auto maybe_offset = file_tokens.Compress(fbb);
   if (maybe_offset.Succeeded()) {
     fbb.Finish(maybe_offset.TakeValue());
-    LOG(INFO)
+
+    // Warn if our compression doesn't actually compress things.
+    LOG_IF(WARNING, file_tokens.Data().size() <= fbb.GetSize())
         << "Raw data needs " << file_tokens.Data().size()
         << " bytes, compressed flatbuffer needs "
         << fbb.GetSize() << " bytes";
 
-    auto compressed = flatbuffers::GetRoot<mx::CompressedTokenList>(
+#if DCHECK_IS_ON()
+    auto compressed_tokens = flatbuffers::GetRoot<mx::CompressedTokenList>(
         fbb.GetBufferPointer());
-
-    auto maybe_uncompressed = mx::TokenList::Create(compressed);
-    if (maybe_uncompressed.Succeeded()) {
-      auto tl = maybe_uncompressed.TakeValue();
-//      LOG(INFO)
-//          << "Uncompressed raw data needs " << tl.Data().size()
-//          << " bytes and original needs " << file_tokens.Data().size();
-
-      static std::atomic<int> x;
-      if (tl.Data() != file_tokens.Data()) {
-//        LOG(ERROR)
-//            << "Error! Uncompressed data is different!";
-        auto i = std::to_string(x.fetch_add(1));
-        std::ofstream fs("/tmp/diff/" + i + ".orig");
-        fs << file_tokens.Data();
-
-        std::ofstream fs2("/tmp/diff/" + i + ".decom");
-        fs2 << tl.Data();
-      }
-
-    } else {
-      LOG(FATAL)
-          << maybe_uncompressed.TakeError();
+    if (!CheckTokenLists(path, file_tokens, compressed_tokens)) {
+      return;
     }
+#endif
 
   } else {
-    LOG(FATAL)
+    LOG(ERROR)
         << "Error serializing token list for file " << path << ": "
         << maybe_offset.TakeError();
+    return;
   }
 }
 

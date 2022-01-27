@@ -25,6 +25,10 @@ class TokenListImpl {
   std::string data;
   std::vector<TokenKind> token_kinds;
   std::vector<unsigned> data_offsets;
+
+  void AddToken(std::string_view data, TokenKind kind,
+                std::vector<uint16_t> &dummy_states,
+                std::string &dummy_output);
 };
 
 namespace {
@@ -226,7 +230,7 @@ static bool IsDigit(int ch) {
   return '0' <= ch && ch <= '9';
 }
 
-static uint16_t HexToDigit(char ch, uint16_t *is_uppercase) {
+static uint16_t HexToDigit(char ch, uint16_t *is_uppercase, bool *failed) {
   switch (ch) {
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
@@ -237,6 +241,18 @@ static uint16_t HexToDigit(char ch, uint16_t *is_uppercase) {
       *is_uppercase = static_cast<uint16_t>(1);
       return static_cast<uint16_t>(ch - 'A');
     default:
+      *failed = true;
+      return static_cast<uint16_t>(0);
+  }
+}
+
+static uint16_t OctalToDigit(char ch, bool *failed) {
+  switch (ch) {
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7':
+      return static_cast<uint16_t>(ch - '0');
+    default:
+      *failed = true;
       return static_cast<uint16_t>(0);
   }
 }
@@ -444,6 +460,8 @@ static bool CompressInteger(std::string_view tok_data,
   assert(data[0] == '0');
   assert(2 <= tok_len);
 
+  bool failed = false;
+
   // Hex.
   if (data[1] == 'x' && data[1] == 'X' && 3 <= tok_len && data[2] != '0') {
     uint16_t uppercase = 0;
@@ -453,20 +471,20 @@ static bool CompressInteger(std::string_view tok_data,
       ct.hex_3.state = static_cast<uint16_t>(
           CompressedTokenStateImpl::kInlineNumbers);
       ct.hex_3.number_kind = static_cast<uint16_t>(NumberKind::kHex);
-      ct.hex_3.hex_0 = HexToDigit(data[2], &uppercase);
-      ct.hex_3.hex_1 = HexToDigit(data[3], &uppercase);
-      ct.hex_3.hex_2 = HexToDigit(data[4], &uppercase);
+      ct.hex_3.hex_0 = HexToDigit(data[2], &uppercase, &failed);
+      ct.hex_3.hex_1 = HexToDigit(data[3], &uppercase, &failed);
+      ct.hex_3.hex_2 = HexToDigit(data[4], &uppercase, &failed);
       ct.hex_3.is_upper = uppercase;
-      assert(ct.hex_3.hex_0 != 0);
+      assert(failed || ct.hex_3.hex_0 != 0);
 
     // kHex2
     } else if (tok_len == 4) {
       ct.hex_3.state = static_cast<uint16_t>(
           CompressedTokenStateImpl::kInlineNumbers);
       ct.hex_3.number_kind = static_cast<uint16_t>(NumberKind::kHex);
-      ct.hex_3.hex_1 = HexToDigit(data[2], &uppercase);
-      ct.hex_3.hex_2 = HexToDigit(data[3], &uppercase);
-      assert(ct.hex_3.hex_1 != 0);
+      ct.hex_3.hex_1 = HexToDigit(data[2], &uppercase, &failed);
+      ct.hex_3.hex_2 = HexToDigit(data[3], &uppercase, &failed);
+      assert(failed || ct.hex_3.hex_1 != 0);
       ct.hex_3.is_upper = uppercase;
 
     // kHex1
@@ -474,8 +492,8 @@ static bool CompressInteger(std::string_view tok_data,
       ct.hex_3.state = static_cast<uint16_t>(
           CompressedTokenStateImpl::kInlineNumbers);
       ct.hex_3.number_kind = static_cast<uint16_t>(NumberKind::kHex);
-      ct.hex_3.hex_2 = HexToDigit(data[2], &uppercase);
-      assert(ct.hex_3.hex_2 != 0);
+      ct.hex_3.hex_2 = HexToDigit(data[2], &uppercase, &failed);
+      assert(failed || ct.hex_3.hex_2 != 0);
       ct.hex_3.is_upper = uppercase;
 
     } else {
@@ -491,11 +509,11 @@ static bool CompressInteger(std::string_view tok_data,
           CompressedTokenStateImpl::kInlineNumbers);
       ct.octal_4.number_kind = static_cast<uint16_t>(
           NumberKind::kOctal);
-      ct.octal_4.octal_0 = static_cast<uint16_t>(data[1] - '0');
-      ct.octal_4.octal_1 = static_cast<uint16_t>(data[2] - '0');
-      ct.octal_4.octal_2 = static_cast<uint16_t>(data[3] - '0');
-      ct.octal_4.octal_3 = static_cast<uint16_t>(data[4] - '0');
-      assert(ct.octal_4.octal_0 != 0);
+      ct.octal_4.octal_0 = OctalToDigit(data[1], &failed);
+      ct.octal_4.octal_1 = OctalToDigit(data[2], &failed);
+      ct.octal_4.octal_2 = OctalToDigit(data[3], &failed);
+      ct.octal_4.octal_3 = OctalToDigit(data[4], &failed);
+      assert(failed || ct.octal_4.octal_0 != 0);
 
     // kOctal3
     } else if (tok_len == 4) {
@@ -503,10 +521,10 @@ static bool CompressInteger(std::string_view tok_data,
           CompressedTokenStateImpl::kInlineNumbers);
       ct.octal_4.number_kind = static_cast<uint16_t>(
           NumberKind::kOctal);
-      ct.octal_4.octal_1 = static_cast<uint16_t>(data[1] - '0');
-      ct.octal_4.octal_2 = static_cast<uint16_t>(data[2] - '0');
-      ct.octal_4.octal_3 = static_cast<uint16_t>(data[3] - '0');
-      assert(ct.octal_4.octal_1 != 0);
+      ct.octal_4.octal_1 = OctalToDigit(data[1], &failed);
+      ct.octal_4.octal_2 = OctalToDigit(data[2], &failed);
+      ct.octal_4.octal_3 = OctalToDigit(data[3], &failed);
+      assert(failed || ct.octal_4.octal_1 != 0);
 
     // kOctal2
     } else if (tok_len == 3) {
@@ -514,9 +532,9 @@ static bool CompressInteger(std::string_view tok_data,
           CompressedTokenStateImpl::kInlineNumbers);
       ct.octal_4.number_kind = static_cast<uint16_t>(
           NumberKind::kOctal);
-      ct.octal_4.octal_2 = static_cast<uint16_t>(data[1] - '0');
-      ct.octal_4.octal_3 = static_cast<uint16_t>(data[2] - '0');
-      assert(ct.octal_4.octal_2 != 0);
+      ct.octal_4.octal_2 = OctalToDigit(data[1], &failed);
+      ct.octal_4.octal_3 = OctalToDigit(data[2], &failed);
+      assert(failed || ct.octal_4.octal_2 != 0);
 
     // kOctal1
     } else if (tok_len == 2) {
@@ -524,12 +542,20 @@ static bool CompressInteger(std::string_view tok_data,
           CompressedTokenStateImpl::kInlineNumbers);
       ct.octal_4.number_kind = static_cast<uint16_t>(
           NumberKind::kOctal);
-      ct.octal_4.octal_3 = static_cast<uint16_t>(data[1] - '0');
-      assert(ct.octal_4.octal_3 != 0);
+      ct.octal_4.octal_3 = OctalToDigit(data[1], &failed);
+      assert(failed || ct.octal_4.octal_3 != 0);
 
     } else {
       return false;
     }
+
+  } else {
+    return false;
+  }
+
+  // E.g. `0x0L` or `0L`.
+  if (failed) {
+    return false;
   }
 
   *ct_out = ct;
@@ -745,9 +771,6 @@ std::pair<DecompressionStatus, TokenKind> CompressedTokenKind::Uncompress(
     std::string &ws_spelling, std::string &tok_spelling,
     const char *&data) const noexcept {
 
-  ws_spelling.clear();
-  tok_spelling.clear();
-
   auto add_data = [] (std::string &buff, const char *data) {
     while (auto ch = *data++) {
       buff.push_back(ch);
@@ -807,21 +830,21 @@ std::pair<DecompressionStatus, TokenKind> CompressedTokenKind::Uncompress(
     }
 
     case CompressedTokenState::kTokenWithImpliedSpelling: {
-      tok_spelling = kTokenSpelling[token.kind];
+      tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenOnly,
               static_cast<TokenKind>(token.kind)};
     }
 
     case CompressedTokenState::kTokenWithImpliedSpellingAndLeadingSpaces: {
       add_repeats(ws_spelling, token.leading_spaces, ' ');
-      tok_spelling = kTokenSpelling[token.kind];
+      tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenAndWhitespace,
               static_cast<TokenKind>(token.kind)};
     }
 
     case CompressedTokenState::kTokenWithImpliedSpellingAndLeadingNewLine: {
       ws_spelling.push_back('\n');
-      tok_spelling = kTokenSpelling[token.kind];
+      tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenAndWhitespace,
               static_cast<TokenKind>(token.kind)};
     }
@@ -829,7 +852,7 @@ std::pair<DecompressionStatus, TokenKind> CompressedTokenKind::Uncompress(
     case CompressedTokenState::kTokenWithImpliedSpellingAndLeadingNewLineAndSpaces: {
       ws_spelling.push_back('\n');
       add_repeats(ws_spelling, token.leading_spaces, ' ');
-      tok_spelling = kTokenSpelling[token.kind];
+      tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenAndWhitespace,
               static_cast<TokenKind>(token.kind)};
     }
@@ -1015,7 +1038,73 @@ bool CompressSingle(TokenKind tok_kind, std::string_view tok_data,
   }
 }
 
+#ifndef NDEBUG
+static std::string_view StripWhitespace(std::string_view data) {
+  while (auto size = data.size()) {
+    switch (data.back()) {
+      case '\r':
+      case '\n':
+      case '\t':
+      case ' ':
+      case '\\':
+        data = data.substr(0, size - 1u);
+        break;
+      default:
+        goto done_trailing;
+    }
+  }
+done_trailing:
+  while (auto size = data.size()) {
+    switch (data.front()) {
+      case '\r':
+      case '\n':
+      case '\t':
+      case ' ':
+      case '\\':
+        data = data.substr(1, size - 1u);
+        break;
+      default:
+        return data;
+    }
+  }
+
+  return data;
+}
+#endif
+
 }  // namespace
+
+Token::~Token(void) {}
+
+// Is this a valid token?
+bool Token::IsValid(void) const noexcept {
+  if (impl) {
+    return index < impl->token_kinds.size();
+  } else {
+    return false;
+  }
+}
+
+// Return the kind of this token.
+TokenKind Token::Kind(void) const noexcept {
+  if (impl && index < impl->token_kinds.size()) {
+    return impl->token_kinds[index];
+  } else {
+    return TokenKind::TK_unknown;
+  }
+}
+
+// Return the data of this token.
+std::string_view Token::Data(void) const noexcept {
+  auto next_index = index + 1u;
+  if (impl && next_index < impl->data_offsets.size()) {
+    auto start_offset = impl->data_offsets[index];
+    auto len = impl->data_offsets[next_index] - start_offset;
+    return std::string_view(impl->data).substr(start_offset, len);
+  } else {
+    return {};
+  }
+}
 
 TokenList::TokenList(void)
     : impl(std::make_shared<TokenListImpl>()) {
@@ -1030,14 +1119,59 @@ std::string_view TokenList::Data(void) const noexcept {
   return std::string_view(impl->data).substr(0, impl->data.size() - 1u);
 }
 
+// Return the number of tokens in this token list.
+unsigned TokenList::Size(void) const noexcept {
+  return static_cast<unsigned>(impl->token_kinds.size());
+}
+
+void TokenListImpl::AddToken(std::string_view tok_data, TokenKind tok_kind,
+                             std::vector<uint16_t> &dummy_states,
+                             std::string &dummy_output) {
+  dummy_states.clear();
+  dummy_output.clear();
+  if (!CompressSingle(tok_kind, tok_data, dummy_states, dummy_output)) {
+    assert(false);
+    return;
+  }
+
+  if (!dummy_output.empty()) {
+    assert(dummy_output.back() == '\0');
+  } else {
+    dummy_output.push_back('\0');
+  }
+
+  assert(dummy_states.size() == 1u);
+
+  CompressedTokenKind tk;
+  tk.flat = dummy_states[0];
+  const char *data_inout = dummy_output.data();
+  const auto data_offset = static_cast<unsigned>(data.size());
+  auto [status, new_tok_kind] = tk.Uncompress(data, data, data_inout);
+  assert(data_offset <= data.size());
+  assert(status == DecompressionStatus::kTokenOnly ||
+         status == DecompressionStatus::kWhitespaceOnly);
+
+  data_offsets.push_back(data_offset);
+  token_kinds.push_back(new_tok_kind);
+
+#ifndef NDEBUG
+  std::string_view new_tok_data(data);
+  new_tok_data = new_tok_data.substr(
+      data_offset, static_cast<unsigned>(data.size()) - data_offset);
+  assert(StripWhitespace(new_tok_data) == StripWhitespace(tok_data));
+#endif
+}
+
+// Create a token list from a file token range.
 TokenList TokenList::Create(const pasta::FileTokenRange &toks) {
   auto ls = std::make_shared<TokenListImpl>();
+
+  std::vector<uint16_t> dummy_states;
+  std::string dummy_output;
+
   for (pasta::FileToken tok : toks) {
     if (auto kind = FromClang(tok.Kind()); TokenKind::TK_eof != kind) {
-      auto tok_data = tok.Data();
-      ls->data_offsets.push_back(static_cast<unsigned>(ls->data.size()));
-      ls->data.insert(ls->data.end(), tok_data.begin(), tok_data.end());
-      ls->token_kinds.push_back(kind);
+      ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
     }
@@ -1047,14 +1181,14 @@ TokenList TokenList::Create(const pasta::FileTokenRange &toks) {
   return TokenList(std::move(ls));
 }
 
+// Create a token list from a printed token range.
 TokenList TokenList::Create(const pasta::PrintedTokenRange &toks) {
   auto ls = std::make_shared<TokenListImpl>();
+  std::vector<uint16_t> dummy_states;
+  std::string dummy_output;
   for (pasta::PrintedToken tok : toks) {
     if (auto kind = FromClang(tok.Kind()); TokenKind::TK_eof != kind) {
-      auto tok_data = tok.Data();
-      ls->data_offsets.push_back(static_cast<unsigned>(ls->data.size()));
-      ls->data.insert(ls->data.end(), tok_data.begin(), tok_data.end());
-      ls->token_kinds.push_back(kind);
+      ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
     }
@@ -1064,14 +1198,14 @@ TokenList TokenList::Create(const pasta::PrintedTokenRange &toks) {
   return TokenList(std::move(ls));
 }
 
+// Create a token list from a parsed token range.
 TokenList TokenList::Create(const pasta::TokenRange &toks) {
   auto ls = std::make_shared<TokenListImpl>();
+  std::vector<uint16_t> dummy_states;
+  std::string dummy_output;
   for (pasta::Token tok : toks) {
     if (auto kind = FromClang(tok.Kind()); TokenKind::TK_eof != kind) {
-      auto tok_data = tok.Data();
-      ls->data_offsets.push_back(static_cast<unsigned>(ls->data.size()));
-      ls->data.insert(ls->data.end(), tok_data.begin(), tok_data.end());
-      ls->token_kinds.push_back(kind);
+      ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
     }
@@ -1081,6 +1215,7 @@ TokenList TokenList::Create(const pasta::TokenRange &toks) {
   return TokenList(std::move(ls));
 }
 
+// Uncompress a token list from its Flatbuffers-serialized form.
 Result<TokenList, std::string> TokenList::Create(
     const CompressedTokenList &toks) {
 
@@ -1152,6 +1287,10 @@ Result<TokenList, std::string> TokenList::Create(
   auto ls = std::make_shared<TokenListImpl>();
 
   for (auto tk = tk_begin; tk < tk_end; ++tk) {
+
+    ws.clear();
+    token.clear();
+
     auto [status, kind] = tk->Uncompress(ws, token, data);
     ls->data_offsets.push_back(static_cast<unsigned>(ls->data.size()));
     switch (status) {
@@ -1193,6 +1332,8 @@ Result<TokenList, std::string> TokenList::Create(
   return TokenList(std::move(ls));
 }
 
+// Serialize this token list into a "compressed token list," as represented
+// by a Flatbuffers message.
 Result<flatbuffers::Offset<CompressedTokenList>, std::string>
 TokenList::Compress(flatbuffers::FlatBufferBuilder &fbb) {
   std::string output;
