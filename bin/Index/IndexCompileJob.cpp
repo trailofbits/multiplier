@@ -11,6 +11,7 @@
 #include <pasta/Util/ArgumentVector.h>
 
 #include "Context.h"
+#include "TokenizeFile.h"
 
 namespace indexer {
 
@@ -22,18 +23,37 @@ IndexCompileJobAction::IndexCompileJobAction(std::shared_ptr<Context> context_,
       progress(context->ast_progress),
       job(std::move(job_)) {}
 
+void IndexCompileJobAction::MaybeTokenizeFile(
+    const mx::Executor &exe, pasta::File file) {
+  if (!file.WasParsed()) {
+    return;
+  }
+
+  auto file_path = file.Path().generic_string();
+  {
+    std::unique_lock<std::mutex> locker(context->tokenized_files_lock);
+    auto [it, added] = context->tokenized_files.emplace(std::move(file_path));
+    if (!added) {
+      return;  // Another worker is dealing with this file.
+    }
+  }
+
+  exe.EmplaceAction<TokenizeFileAction>(context, std::move(file));
+}
+
 // Build and index the AST.
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
-  mx::ProgressBarStep step(context->ast_progress);
-
   auto maybe_ast = job.Run();
   if (!maybe_ast.Succeeded()) {
     LOG(ERROR)
         << "Error building AST for command " << job.Arguments().Join()
         << "; error was: " << maybe_ast.TakeError();
     return;
-  } else {
-    LOG(INFO) << "Got AST for file " << job.SourceFile().Path().generic_string();
+  }
+
+  auto ast = maybe_ast.TakeValue();
+  for (pasta::File file : ast.ParsedFiles()) {
+    MaybeTokenizeFile(exe, std::move(file));
   }
 }
 

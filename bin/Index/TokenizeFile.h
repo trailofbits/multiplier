@@ -9,27 +9,24 @@
 #include <memory>
 #include <multiplier/Action.h>
 #include <multiplier/ProgressBar.h>
-#include <pasta/Compile/Job.h>
+#include <pasta/Util/File.h>
 
 namespace indexer {
 
 class Context;
 
-class IndexCompileJobAction final : public mx::Action {
+class TokenizeFileAction final : public mx::Action {
  private:
   const std::shared_ptr<Context> context;
   const mx::ProgressBarWork progress;
-  const pasta::CompileJob job;
-
-  void MaybeTokenizeFile(const mx::Executor &exe, pasta::File file);
+  const pasta::File file;
 
  public:
-  virtual ~IndexCompileJobAction(void);
+  virtual ~TokenizeFileAction(void);
 
-  IndexCompileJobAction(std::shared_ptr<Context> context_,
-                        pasta::CompileJob job_);
+  TokenizeFileAction(std::shared_ptr<Context> context_, pasta::File file_);
 
-  // Build and index the AST.
+  // Tokenize the file.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;
 };
 

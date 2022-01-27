@@ -128,6 +128,6 @@ if(MX_ENABLE_INSTALL)
       "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
-        "bin"
+        "${CMAKE_INSTALL_BINDIR}"
   )
 endif(MX_ENABLE_INSTALL)

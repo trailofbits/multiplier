@@ -85,6 +85,7 @@ add_dependencies("util"
 set(public_headers
   ${copied_headers}
   "${source_include_dir}/Datalog.h"
+  "${source_include_dir}/Token.h"
   "${source_include_dir}/Tool.h"
 )
 
@@ -94,6 +95,7 @@ add_library("tool"
     
     "Database.h"
     "Database.cpp"
+    "Token.cpp"
     "Tool.cpp"
 )
 
@@ -161,13 +163,13 @@ if(MX_ENABLE_INSTALL)
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
-        "bin"
+        "${CMAKE_INSTALL_BINDIR}"
     LIBRARY
       DESTINATION
-        "lib"
+        "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE
       DESTINATION
-        "lib"
+        "${CMAKE_INSTALL_LIBDIR}"
     PUBLIC_HEADER
       DESTINATION
         "include/${lower_project_name}"

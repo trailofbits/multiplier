@@ -27,14 +27,19 @@ int main(int argc, char *argv[]) {
       << "; Auto-generated file, do not modify!\n\n"
       << "#enum TokenKind u16.\n";
 
-  for (auto i = 0u; i < num_tokens; ++i) {
-    auto tok = static_cast<clang::tok::TokenKind>(i);
-    fs << "#constant TokenKind TK_";
-    if (auto kw = clang::tok::getKeywordSpelling(tok)) {
-      fs << "kw_";
-    }
-    fs << clang::tok::getTokenName(tok) << ' ' << i << " @unique.\n";
-  }
+  auto i = 0u;
+
+#define TOK(X) \
+    fs << "#constant TokenKind TK_" #X << ' ' << (i++) << " @unique.\n";
+#include "clang/Basic/TokenKinds.def"
+
+#define PPKEYWORD(X) \
+    fs << "#constant TokenKind TK_pp_" #X << ' ' << (i++) << " @unique.\n";
+#include "clang/Basic/TokenKinds.def"
+
+#define OBJC_AT_KEYWORD(X) \
+    fs << "#constant TokenKind TK_objc_" #X << ' ' << (i++) << " @unique.\n";
+#include "clang/Basic/TokenKinds.def"
 
   fs << '\n';
 

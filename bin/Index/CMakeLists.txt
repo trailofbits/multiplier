@@ -12,12 +12,14 @@ set(exe_name "mx-${lib_name}")
 
 add_library("${lib_name}"
   STATIC
-    "Context.h"
     "Context.cpp"
-    "IndexCompileCommand.h"
+    "Context.h"
     "IndexCompileCommand.cpp"
-    "IndexCompileJob.h"
+    "IndexCompileCommand.h"
     "IndexCompileJob.cpp"
+    "IndexCompileJob.h"
+    "TokenizeFile.cpp"
+    "TokenizeFile.h"
     "Tool.cpp"
 )
 
@@ -46,5 +48,8 @@ if(MX_ENABLE_INSTALL)
       "${exe_name}"
     EXPORT
       "${PROJECT_NAME}Targets"
+    RUNTIME
+      DESTINATION
+        "${CMAKE_INSTALL_BINDIR}"
   )
 endif()

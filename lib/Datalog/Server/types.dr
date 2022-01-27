@@ -48,18 +48,16 @@ table IncludePath {
 // The `Contents` is a vector of bytes, where data or individual tokens is
 // `NUL`-terminated. If a token's data can be elided, then so is its `NUL`-
 // terminator. 
-table SourceFile {
+//
+// We employ various forms of compression on the `ushort` values. If the values
+// have a high bit set, then it represents a packed data structure of
+// whitespace. If the value is in range of `TokenKind` then it's a plain old
+// `TokenKind`. If it is out of range of a `TokenKind`, and if the high bit is
+// `0`, then we use the next `6` high bits to encode: 1 bit for whether or not
+// there is a leading newline, and `5` bits for leading spaces.
+table CompressedTokenList {
   Contents:[ubyte];
-  TokenKinds:[TokenKind];
-}
-
-table DataFile {
-  Contents:[ubyte];
-}
-
-union File {
-  SourceFile,
-  DataFile
+  TokenKinds:[ushort];
 }
 
 table CompileCommand {

@@ -16,7 +16,6 @@ DEFINE_bool(show_progress, false, "Show progress bars");
 
 namespace indexer {
 
-
 Context::~Context(void) {}
 
 Context::Context(const mx::Executor &exe_, const mx::DatalogClient &client_)
@@ -27,9 +26,12 @@ Context::Context(const mx::Executor &exe_, const mx::DatalogClient &client_)
                                                std::chrono::seconds(1)));
     ast_progress.reset(new mx::ProgressBar("AST building",
                                            std::chrono::seconds(1)));
+    tokenizer_progress.reset(new mx::ProgressBar("Tokenizer",
+                                                 std::chrono::seconds(1)));
     auto num_workers = exe_.NumWorkers();
     command_progress->SetNumWorkers(num_workers);
     ast_progress->SetNumWorkers(num_workers);
+    tokenizer_progress->SetNumWorkers(num_workers);
   }
 }
 

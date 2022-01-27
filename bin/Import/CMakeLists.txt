@@ -38,5 +38,8 @@ if(IRENE_ENABLE_INSTALL)
       "${exe_name}"
     EXPORT
       "${PROJECT_NAME}Targets"
+    RUNTIME
+      DESTINATION
+        "${CMAKE_INSTALL_BINDIR}"
   )
 endif()

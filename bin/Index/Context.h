@@ -8,9 +8,10 @@
 
 #include <cstdint>
 #include <memory>
-#include <multiplier/BloomFilter.h>
 #include <mutex>
 #include <pasta/Util/FileManager.h>
+#include <string>
+#include <unordered_set>
 
 namespace mx {
 class DatalogClient;  // Auto-generated from Datalog.
@@ -28,10 +29,10 @@ class Context {
   const pasta::FileManager file_manager;
   std::unique_ptr<mx::ProgressBar> command_progress;
   std::unique_ptr<mx::ProgressBar> ast_progress;
+  std::unique_ptr<mx::ProgressBar> tokenizer_progress;
 
-  // Used to guesstimate what files have already been indexed, what entities
-  // have been indexes, etc.
-  mx::BloomFilter bloom_filter;
+  std::mutex tokenized_files_lock;
+  std::unordered_set<std::string> tokenized_files;
 
   ~Context(void);
   Context(const mx::Executor &exe_, const mx::DatalogClient &client_);

@@ -34,4 +34,4 @@ bool BloomFilter::TestAndSet(uint64_t hash) {
   return new0 & new1 & new2;
 }
 
-}  // namespace indexer
+}  // namespace mx
