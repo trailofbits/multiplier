@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cctype>
 #include <clang/Basic/TokenKinds.h>
+#include <multiplier/Compress.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
@@ -16,8 +17,6 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
-
-#include <glog/logging.h>
 
 namespace mx {
 
@@ -1104,6 +1103,46 @@ Result<TokenList, std::string> TokenList::Create(
     data_in = std::string_view(data_begin, contents->size());
   }
 
+  auto data_in_size = data_in.size();
+  std::string uncompressed;
+
+  // Not GZIP compressed.
+  if (data_in.back() == '\0') {
+    data_in = data_in.substr(0, data_in_size - 1u);
+
+  // GZIP-compresses.
+  } else if (data_in.back() == static_cast<char>(1)) {
+    if (data_in.size() < 4u) {
+      ss << "Corrupted token list contents; compressed contents "
+            "should contain an uncompressed size";
+      return ss.str();
+    }
+
+    size_t uncompressed_size = 0;
+    uncompressed_size |= static_cast<uint8_t>(data_in[data_in_size - 2u]);
+    uncompressed_size <<= 8u;
+    uncompressed_size |= static_cast<uint8_t>(data_in[data_in_size - 3u]);
+    uncompressed_size <<= 8u;
+    uncompressed_size |= static_cast<uint8_t>(data_in[data_in_size - 4u]);
+
+    data_in = data_in.substr(0, data_in_size - 4u);
+    auto maybe_uncompressed = TryUncompress(data_in, uncompressed_size);
+    if (maybe_uncompressed.Succeeded()) {
+      uncompressed = maybe_uncompressed.TakeValue();
+      data_in = uncompressed;
+
+    } else {
+      ss << "Error uncompressing compressed token contents: "
+         << maybe_uncompressed.TakeError().message();
+      return ss.str();
+    }
+
+  // Corrupted.
+  } else {
+    ss << "Corrupted token list contents; last byte should be 0 or 1";
+    return ss.str();
+  }
+
   std::string ws;
   std::string token;
 
@@ -1190,7 +1229,6 @@ TokenList::Compress(flatbuffers::FlatBufferBuilder &fbb) {
 
     // We found some leading whitespace before `it`.
     if (tok_kind == TokenKind::TK_unknown) {
-      LOG(INFO) << "!!! <<<" << tok_data << ">>> <<<" << next_tok_data << ">>>";
       if (CompressLeadingWhitespace(tok_data, next_tok_kind, next_tok_data,
                                     states, output)) {
         ++it;  // Skip over the token following the whitespace.
@@ -1203,7 +1241,6 @@ TokenList::Compress(flatbuffers::FlatBufferBuilder &fbb) {
         return ss.str();
       }
     } else {
-      LOG(INFO) << "!!! <<<" << tok_data << ">>>";
       if (!CompressSingle(tok_kind, tok_data, states, output)) {
         std::stringstream ss;
         ss << "Unable to compress single token " << NameOf(tok_kind)
@@ -1212,6 +1249,22 @@ TokenList::Compress(flatbuffers::FlatBufferBuilder &fbb) {
       }
     }
   }
+
+  const auto old_size = output.size();
+  char is_compressed = '\0';
+  if (old_size && old_size == (old_size & 0xFFFFFFu)) {
+    auto maybe_compressed = TryCompress(output);
+    if (maybe_compressed.Succeeded()) {
+      if ((maybe_compressed->size() + 4u) < old_size) {
+        output = maybe_compressed.TakeValue();
+        output.push_back(static_cast<char>(old_size >> 0));
+        output.push_back(static_cast<char>(old_size >> 8));
+        output.push_back(static_cast<char>(old_size >> 16));
+        is_compressed = static_cast<char>(1);
+      }
+    }
+  }
+  output.push_back(is_compressed);
 
   auto contents = fbb.CreateVector(
       reinterpret_cast<const uint8_t *>(output.data()), output.size());

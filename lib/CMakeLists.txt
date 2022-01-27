@@ -14,6 +14,7 @@ set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 set(util_headers
   "${source_include_dir}/Action.h"
   "${source_include_dir}/BloomFilter.h"
+  "${source_include_dir}/Compress.h"
   "${source_include_dir}/Executor.h"
   "${source_include_dir}/ProgressBar.h"
   "${source_include_dir}/Result.h"
@@ -29,6 +30,7 @@ add_library("util"
 
     "Action.cpp"
     "BloomFilter.cpp"
+    "Compress.cpp"
     "Executor.cpp"
     "ProgressBar.cpp"
     "Signal.cpp"
@@ -49,6 +51,7 @@ target_include_directories("util"
 target_link_libraries("util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
+    ZLIB::ZLIB
   PUBLIC
     glog::glog
     gflags::gflags

@@ -41,10 +41,10 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   auto maybe_offset = file_tokens.Compress(fbb);
   if (maybe_offset.Succeeded()) {
     fbb.Finish(maybe_offset.TakeValue());
-//    LOG(INFO)
-//        << "Raw data needs " << file_tokens.Data().size()
-//        << " bytes, compressed flatbuffer needs "
-//        << fbb.GetSize() << " bytes";
+    LOG(INFO)
+        << "Raw data needs " << file_tokens.Data().size()
+        << " bytes, compressed flatbuffer needs "
+        << fbb.GetSize() << " bytes";
 
     auto compressed = flatbuffers::GetRoot<mx::CompressedTokenList>(
         fbb.GetBufferPointer());

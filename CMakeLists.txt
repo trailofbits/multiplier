@@ -28,6 +28,7 @@ endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
 
+find_package(ZLIB REQUIRED)
 find_package(gflags CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
 find_package(Z3 4.8 CONFIG REQUIRED)
