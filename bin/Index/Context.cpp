@@ -8,6 +8,7 @@
 
 #include <chrono>
 #include <gflags/gflags.h>
+#include <glog/logging.h>
 #include <multiplier/Executor.h>
 #include <multiplier/ProgressBar.h>
 #include <pasta/Util/FileSystem.h>
@@ -18,6 +19,8 @@ namespace indexer {
 
 GlobalContext::GlobalContext(const mx::Executor &exe_) {
   if (FLAGS_show_progress) {
+    publish_progress.reset(new mx::ProgressBar("Publishing",
+                                               std::chrono::seconds(1)));
     command_progress.reset(new mx::ProgressBar("Command parsing",
                                                std::chrono::seconds(1)));
     ast_progress.reset(new mx::ProgressBar("AST building",
@@ -37,13 +40,21 @@ bool GlobalContext::AddFileToSet(std::string path) {
   return added;
 }
 
-UpdateContext::~UpdateContext(void) {}
+UpdateContext::~UpdateContext(void) {
+  if (builder.HasAnyMessages()) {
+    if (!client.Publish(builder)) {
+      LOG(ERROR)
+          << "Error sending messages to mx-server";
+    }
+  }
+}
 
 UpdateContext::UpdateContext(const mx::DatalogClient &client_,
                              std::shared_ptr<GlobalContext> global_context_)
   : client(client_),
     file_manager(pasta::FileSystem::CreateNative()),
     global_context(std::move(global_context_)),
+    publish_progress(global_context->publish_progress.get()),
     command_progress(global_context->command_progress.get()),
     ast_progress(global_context->ast_progress.get()),
     tokenizer_progress(global_context->tokenizer_progress.get()) {}

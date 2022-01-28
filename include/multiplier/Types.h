@@ -54,9 +54,7 @@ inline static TargetLanguage FromPasta(pasta::TargetLanguage tl) {
   return static_cast<TargetLanguage>(tl);
 }
 
-inline static TokenKind FromClang(clang::tok::TokenKind tk) {
-  return static_cast<TokenKind>(tk);
-}
+TokenKind FromClang(clang::tok::TokenKind tk);
 
 inline static pasta::CompilerName ToPasta(CompilerName cn) {
   return static_cast<pasta::CompilerName>(cn);
@@ -70,9 +68,7 @@ inline static pasta::TargetLanguage ToPasta(TargetLanguage tl) {
   return static_cast<pasta::TargetLanguage>(tl);
 }
 
-inline static clang::tok::TokenKind ToClang(TokenKind tk) {
-  return static_cast<clang::tok::TokenKind>(tk);
-}
+clang::tok::TokenKind ToClang(TokenKind tk);
 
 inline static const char *NameOf(CompilerName val) {
   return &(EnumNameCompilerName(val)[3]);  // Chop off `CN_`.

@@ -6,6 +6,32 @@
 
 #include <multiplier/Types.h>
 
+#include <clang/Basic/TokenKinds.h>
+
 namespace mx {
+
+TokenKind FromClang(clang::tok::TokenKind tk) {
+  if (clang::tok::raw_identifier == tk) {
+    return TokenKind::TK_identifier;
+  } else {
+    return static_cast<TokenKind>(tk);
+  }
+}
+
+clang::tok::TokenKind ToClang(TokenKind tk) {
+  switch (tk) {
+    case TokenKind::TK_whitespace: return clang::tok::unknown;
+#define PPKEYWORD(X) \
+    case TokenKind::TK_pp_ ## X: return clang::tok::identifier;
+#include "clang/Basic/TokenKinds.def"
+
+#define OBJC_AT_KEYWORD(X) \
+    case TokenKind::TK_objc_ ## X: return clang::tok::identifier;
+#include "clang/Basic/TokenKinds.def"
+
+    default:
+      return static_cast<clang::tok::TokenKind>(tk);
+  }
+}
 
 }  // namespace mx

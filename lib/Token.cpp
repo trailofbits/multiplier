@@ -161,7 +161,7 @@ union CompressedTokenKind {
     uint16_t state:2;
     uint16_t use_leading_line_continuations:1;
     uint16_t leading_new_lines:4;
-    uint16_t zero:9;
+    uint16_t whitespace_kind:9;
   } __attribute__((packed)) new_lines;
 
   // The difference between `excess_kind` and the maximum `TokenKind` is the
@@ -221,6 +221,8 @@ static constexpr CompressedTokenKind kAllOnesToken = {
 static const auto kMaxEmbeddedLeadingSpaces =
     kAllOnesToken.token.leading_spaces;
 static constexpr auto kMaxTokenKind = static_cast<uint16_t>(TokenKind::MAX);
+static constexpr auto kWhitespaceKind =
+    static_cast<uint16_t>(TokenKind::TK_whitespace);
 
 static bool IsIdentifierBegin(int ch) {
   return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || '_' == ch;
@@ -271,7 +273,7 @@ static constexpr auto kMaxSpelling = sizeof(kTokenSpelling) /
 
 // kCompressedToken
 static CompressedTokenState State0(CompressedTokenKind t) {
-  if (t.token.kind) {
+  if (t.token.kind != kWhitespaceKind) {
     if (t.token.kind > kMaxTokenKind) {
       if (t.whitespace.use_leading_line_continuations) {
         return CompressedTokenState::kNewLinesWithContinuationsAndSpaces;
@@ -315,7 +317,7 @@ static CompressedTokenState State0(CompressedTokenKind t) {
 
 // kToken
 static CompressedTokenState State1(CompressedTokenKind t) {
-  if (t.token.kind) {
+  if (t.token.kind != kWhitespaceKind) {
     if (t.token.kind > kMaxTokenKind) {
       assert(false);
       return CompressedTokenState::kInvalid;
@@ -334,7 +336,6 @@ static CompressedTokenState State1(CompressedTokenKind t) {
         }
       }
     }
-
   } else {
     return CompressedTokenState::kUncompressedWhitespace;
   }
@@ -612,6 +613,7 @@ static bool CompressWhitespace(std::string_view tok_data, Whitespace ws,
 
   // Zero leading spaces.
   if (!ws.num_leading_spaces) {
+    ct.new_lines.whitespace_kind = kWhitespaceKind;
     ct.new_lines.leading_new_lines =
         static_cast<uint16_t>(ws.num_leading_new_lines);
 
@@ -671,15 +673,20 @@ static bool CompressSingleImpl(TokenKind tok_kind, std::string_view tok_data,
 
   auto ws = SummarizeWhitespace(tok_data);
 
-  // It's a whitespace token.
-  if (TokenKind::TK_unknown == tok_kind) {
-    static_assert(!static_cast<uint16_t>(TokenKind::TK_unknown));
+  // Normalize whitespace.
+  if (TokenKind::TK_unknown == tok_kind && ws.has_whitespace &&
+      !ws.has_non_whitespace && !ws.has_unexpected_stuff) {
+    tok_kind = TokenKind::TK_whitespace;
+  }
 
+  // It's a whitespace token.
+  if (TokenKind::TK_whitespace == tok_kind) {
     if (CompressWhitespace(tok_data, ws, ct_out)) {
       return true;
 
     // kUncompressedWhitespace.
     } else {
+      ct_out->token.kind = kWhitespaceKind;
       ct_out->token.state = static_cast<uint16_t>(
           CompressedTokenStateImpl::kToken);
       output.insert(output.end(), tok_data.begin(), tok_data.end());
@@ -691,9 +698,9 @@ static bool CompressSingleImpl(TokenKind tok_kind, std::string_view tok_data,
     return false;
   }
 
-  // Normalize identifiers.
-  if (TokenKind::TK_raw_identifier == tok_kind) {
-    tok_kind = TokenKind::TK_identifier;
+  // Normalize keywords.
+  if (auto kws = clang::tok::getKeywordSpelling(ToClang(tok_kind))) {
+    tok_data = kws;
   }
 
   // Normalize by spelling.
@@ -859,28 +866,28 @@ std::pair<DecompressionStatus, TokenKind> CompressedTokenKind::Uncompress(
 
     case CompressedTokenState::kUncompressedWhitespace:
       data = add_data(ws_spelling, data);
-      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_unknown};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_whitespace};
 
     case CompressedTokenState::kNewLines:
       add_repeats(ws_spelling, new_lines.leading_new_lines, '\n');
-      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_unknown};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_whitespace};
 
     case CompressedTokenState::kNewLinesWithContinuations:
       add_continations(ws_spelling, new_lines.leading_new_lines, 0);
-      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_unknown};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_whitespace};
 
     case CompressedTokenState::kNewLinesAndSpaces: {
       unsigned num_spaces = whitespace.excess_kind - kMaxTokenKind;
       add_repeats(ws_spelling, whitespace.leading_new_lines, '\n');
       add_repeats(ws_spelling, num_spaces, ' ');
-      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_unknown};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_whitespace};
     }
 
     case CompressedTokenState::kNewLinesWithContinuationsAndSpaces: {
       unsigned num_spaces = whitespace.excess_kind - kMaxTokenKind;
       add_continations(ws_spelling, new_lines.leading_new_lines, num_spaces);
       add_repeats(ws_spelling, num_spaces, ' ');
-      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_unknown};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::TK_whitespace};
     }
 
     case CompressedTokenState::kIdentifier1:
@@ -981,7 +988,7 @@ static bool CompressLeadingWhitespace(std::string_view whitespace_data,
 
   // Whitespace before an EOF.
   if (TokenKind::TK_eof == tok_kind) {
-    return CompressSingle(TokenKind::TK_unknown, whitespace_data,
+    return CompressSingle(TokenKind::TK_whitespace, whitespace_data,
                           states, output);
   }
 
@@ -995,7 +1002,7 @@ static bool CompressLeadingWhitespace(std::string_view whitespace_data,
       ws_ws.num_leading_new_lines > 1 ||
       ws_ws.num_leading_spaces > kMaxEmbeddedLeadingSpaces ||
       ws_ws.num_line_continuations != 0) {
-    return CompressSingle(TokenKind::TK_unknown, whitespace_data,
+    return CompressSingle(TokenKind::TK_whitespace, whitespace_data,
                           states, output) &&
            CompressSingle(tok_kind, tok_data, states, output);
   }
@@ -1021,7 +1028,7 @@ static bool CompressLeadingWhitespace(std::string_view whitespace_data,
 
   // Token was in the wrong state; materialize both.
   output.resize(old_output_size);
-  return CompressSingle(TokenKind::TK_unknown, whitespace_data,
+  return CompressSingle(TokenKind::TK_whitespace, whitespace_data,
                         states, output) &&
          CompressSingle(tok_kind, tok_data, states, output);
 }
@@ -1296,7 +1303,7 @@ Result<TokenList, std::string> TokenList::Create(
     switch (status) {
       case DecompressionStatus::kTokenAndWhitespace:
         ls->data.insert(ls->data.end(), ws.begin(), ws.end());
-        ls->token_kinds.push_back(TokenKind::TK_unknown);
+        ls->token_kinds.push_back(TokenKind::TK_whitespace);
 
         ls->data_offsets.push_back(static_cast<unsigned>(ls->data.size()));
         ls->data.insert(ls->data.end(), token.begin(), token.end());
@@ -1310,7 +1317,7 @@ Result<TokenList, std::string> TokenList::Create(
 
       case DecompressionStatus::kWhitespaceOnly:
         ls->data.insert(ls->data.end(), ws.begin(), ws.end());
-        ls->token_kinds.push_back(TokenKind::TK_unknown);
+        ls->token_kinds.push_back(TokenKind::TK_whitespace);
         continue;
 
       case DecompressionStatus::kFailedInvalidKind:
@@ -1369,7 +1376,7 @@ TokenList::Compress(flatbuffers::FlatBufferBuilder &fbb) {
         end_offset, next_end_offset - end_offset);
 
     // We found some leading whitespace before `it`.
-    if (tok_kind == TokenKind::TK_unknown) {
+    if (tok_kind == TokenKind::TK_whitespace) {
       if (CompressLeadingWhitespace(tok_data, next_tok_kind, next_tok_data,
                                     states, output)) {
         ++it;  // Skip over the token following the whitespace.

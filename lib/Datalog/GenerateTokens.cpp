@@ -6,6 +6,7 @@
 
 #include <clang/Basic/TokenKinds.h>
 
+#include <cstring>
 #include <fstream>
 
 int main(int argc, char *argv[]) {
@@ -30,7 +31,11 @@ int main(int argc, char *argv[]) {
   auto i = 0u;
 
 #define TOK(X) \
-    fs << "#constant TokenKind TK_" #X << ' ' << (i++) << " @unique.\n";
+    if (clang::tok::X == clang::tok::raw_identifier) { \
+      fs << "#constant TokenKind TK_whitespace " << (i++) << " @unique.\n"; \
+    } else { \
+      fs << "#constant TokenKind TK_" #X << ' ' << (i++) << " @unique.\n"; \
+    }
 #include "clang/Basic/TokenKinds.def"
 
 #define PPKEYWORD(X) \

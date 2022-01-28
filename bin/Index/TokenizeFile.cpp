@@ -86,42 +86,31 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   flatbuffers::FlatBufferBuilder fbb;
 
   auto maybe_offset = file_tokens.Compress(fbb);
-  if (maybe_offset.Succeeded()) {
-    fbb.Finish(maybe_offset.TakeValue());
+  if (!maybe_offset.Succeeded()) {
 
-    // Warn if our compression doesn't actually compress things.
-    LOG_IF(WARNING, file_tokens.Data().size() <= fbb.GetSize())
-        << "Raw data needs " << file_tokens.Data().size()
-        << " bytes, compressed flatbuffer needs "
-        << fbb.GetSize() << " bytes";
+  }
+  fbb.Finish(maybe_offset.TakeValue());
 
-    const auto bytes_ptr = fbb.GetBufferPointer();
+  // Warn if our compression doesn't actually compress things.
+  LOG_IF(WARNING, file_tokens.Data().size() <= fbb.GetSize())
+      << "Raw data needs " << file_tokens.Data().size()
+      << " bytes, compressed flatbuffer needs "
+      << fbb.GetSize() << " bytes";
+
+  const auto bytes_ptr = fbb.GetBufferPointer();
 
 #if DCHECK_IS_ON()
-    auto compressed_tokens = flatbuffers::GetRoot<mx::CompressedTokenList>(
-        bytes_ptr);
-    if (!CheckTokenLists(path, file_tokens, compressed_tokens)) {
-      return;
-    }
-#endif
-
-    // Publish the tokenized file to the database.
-    mx::DatalogMessageBuilder builder;
-    hyde::rt::Bytes token_bytes(bytes_ptr, &(bytes_ptr[fbb.GetSize()]));
-    builder.source_file_2(path, std::move(token_bytes));
-    if (context->client.Publish(builder)) {
-      LOG(INFO)
-          << "Sent tokenized file " << path << " to mx-server";
-    } else {
-      LOG(ERROR)
-          << "Error sending tokenized file " << path << " to mx-server";
-    }
-  } else {
-    LOG(ERROR)
-        << "Error serializing token list for file " << path << ": "
-        << maybe_offset.TakeError();
+  auto compressed_tokens = flatbuffers::GetRoot<mx::CompressedTokenList>(
+      bytes_ptr);
+  if (!CheckTokenLists(path, file_tokens, compressed_tokens)) {
     return;
   }
+#endif
+
+  hyde::rt::Bytes token_bytes(bytes_ptr, &(bytes_ptr[fbb.GetSize()]));
+
+  std::unique_lock locker(context->builder_lock);
+  context->builder.source_file_2(path, std::move(token_bytes));
 }
 
 }  // namespace indexer
