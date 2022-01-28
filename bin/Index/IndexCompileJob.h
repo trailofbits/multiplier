@@ -13,11 +13,11 @@
 
 namespace indexer {
 
-class Context;
+class UpdateContext;
 
 class IndexCompileJobAction final : public mx::Action {
  private:
-  const std::shared_ptr<Context> context;
+  const std::shared_ptr<UpdateContext> context;
   const mx::ProgressBarWork progress;
   const pasta::CompileJob job;
 
@@ -26,7 +26,7 @@ class IndexCompileJobAction final : public mx::Action {
  public:
   virtual ~IndexCompileJobAction(void);
 
-  IndexCompileJobAction(std::shared_ptr<Context> context_,
+  IndexCompileJobAction(std::shared_ptr<UpdateContext> context_,
                         pasta::CompileJob job_);
 
   // Build and index the AST.

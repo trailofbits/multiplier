@@ -1,0 +1,51 @@
+;
+; Copyright (c) 2022-present, Trail of Bits, Inc.
+; All rights reserved.
+;
+; This source code is licensed in accordance with the terms specified in
+; the LICENSE file found in the root directory of this source tree.
+;
+
+#import "types.dr".
+
+; ------------------------------------------------------------------------------
+; This file defines relations that focus on parsed files.
+; ------------------------------------------------------------------------------
+
+; Intern a file into persistent storage, producing a unique file id.
+#functor get_or_create_file_id(
+    bound Path FilePath,
+    bound CompressedTokenList Tokens,
+    free FileId FID) @range(?).
+
+
+; Read all file IDs from the backing persistent storage. This is called on
+; startup so it "revives" the prior in-memory state based off of the persisted
+; state.
+#functor revive_file_ids(
+    bound u32 X,
+    free Path FilePath,
+    free FileId FID) @range(*).
+
+
+; Received when the indexer builds a translation unit and thinks a particular
+; file is new.
+#message source_file(Path FilePath, CompressedTokenList Tokens).
+
+
+; Returns the set of all unique file IDs.
+#query source_files(free Path P, free FileId F)
+
+    ; When the indexer sends us a new file, then try to add it to the database.
+    : source_file(P, T)
+    , get_or_create_file_id(P, T, F)
+    
+    ; When we start up, then try to open the database and figure out the set
+    ; of all saved files.
+    : revive_file_ids(0, P, F).
+
+
+; Published for each new source file added to the database.
+#message new_source_file(Path P, FileId F)
+    : source_files(P, F).
+

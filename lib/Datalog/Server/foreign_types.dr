@@ -11,24 +11,20 @@
 ; also be shared with client code.
 ; ------------------------------------------------------------------------------
 
-#foreign FileId ```c++ std::string```.
-#foreign FileId ```flat string```.
-#foreign FileId ```python str```.
-
-#foreign Token ```flat [ubyte] (nested_flatbuffer: "mx.Token", force_align: 8)```.
-#foreign Token ```c++ ::hyde::rt::Bytes```.
-
-#foreign SourceFile ```flat [ubyte] (nested_flatbuffer: "mx.SourceFile", force_align: 8)```.
-#foreign SourceFile ```c++ ::hyde::rt::Bytes```.
-
-#foreign DataFile ```flat [ubyte] (nested_flatbuffer: "mx.DataFile", force_align: 8)```.
-#foreign DataFile ```c++ ::hyde::rt::Bytes```.
-
-#foreign File ```flat [ubyte] (nested_flatbuffer: "mx.File", force_align: 8)```.
-#foreign File ```c++ ::hyde::rt::Bytes```.
+#foreign FileId ```c++ uint64_t``` @transparent.
+#foreign FileId ```flat uint64``` @transparent.
 
 #foreign Path ```flat string```.
 #foreign Path ```c++ std::string```.
+
+; NOTE(pag): We need to mark the compressed token lists as being referentially
+;            transparent so that they are *NOT* interned and deduplicated,
+;            otherwise they would occupy a lot of memory for large projects.
+;
+;            Instead, we use the stateful functor pattern to persist the token
+;            lists.
+#foreign CompressedTokenList ```flat [ubyte] (nested_flatbuffer: "mx.CompressedTokenList", force_align: 8)```.
+#foreign CompressedTokenList ```c++ ::hyde::rt::Bytes``` @transparent.
 
 #foreign IncludePath ```flat [ubyte] (nested_flatbuffer: "mx.IncludePath", force_align: 8)```.
 #foreign IncludePath ```c++ ::hyde::rt::Bytes```.

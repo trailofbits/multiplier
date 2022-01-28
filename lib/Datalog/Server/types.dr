@@ -34,7 +34,7 @@
 ; kinds.
 #enum TokenKind u16.
 
-#epilogue ```flat
+#inline(flat:interface:enums:epilogue) ```flat
 
 table IncludePath {
   Directory:string (required);

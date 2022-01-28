@@ -13,7 +13,6 @@
 ; ------------------------------------------------------------------------------
 
 
-
 ; Received when a new compile command is added. 
 #message compile_command(CompileCommand CC).
 

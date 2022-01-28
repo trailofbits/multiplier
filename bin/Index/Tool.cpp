@@ -18,7 +18,14 @@ class IndexCompileCommandTool final : public mx::Tool {
  public:
   using mx::Tool::Tool;
 
+  std::shared_ptr<GlobalContext> global_context;
+
   virtual ~IndexCompileCommandTool(void) = default;
+
+  IndexCompileCommandTool(const mx::Executor &executor_,
+                          const mx::DatalogClient &client_)
+      : mx::Tool(executor_, client_),
+        global_context(std::make_shared<GlobalContext>(executor_)) {}
 
   // Return tool name.
   const char *Name(void) const final {
@@ -26,7 +33,7 @@ class IndexCompileCommandTool final : public mx::Tool {
   }
 
   void Update(mx::DatalogClientMessagePtr message) final {
-    auto context = std::make_shared<Context>(executor, client);
+    auto context = std::make_shared<UpdateContext>(client, global_context);
     if (auto added = message->added()) {
       if (auto commands = added->new_compile_command_1()) {
         for (auto raw_command : *commands) {

@@ -16,20 +16,20 @@ struct CompileCommand;  // Auto-generated from Datalog.
 }  // namespace mx
 namespace indexer {
 
-class Context;
+class UpdateContext;
 
 using CompileCommandPtr = std::shared_ptr<const mx::CompileCommand>;
 
 class IndexCompileCommandAction final : public mx::Action {
  private:
-  const std::shared_ptr<Context> context;
+  const std::shared_ptr<UpdateContext> context;
   const mx::ProgressBarWork progress;
   const CompileCommandPtr command;
 
  public:
   virtual ~IndexCompileCommandAction(void);
 
-  IndexCompileCommandAction(std::shared_ptr<Context> context_,
+  IndexCompileCommandAction(std::shared_ptr<UpdateContext> context_,
                             CompileCommandPtr command_);
 
   // Run the compile command, which should create a single compile job.

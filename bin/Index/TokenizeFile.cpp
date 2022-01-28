@@ -11,9 +11,9 @@
 #include <multiplier/Datalog.h>
 #include <multiplier/Token.h>
 
-#include "Context.h"
-
 #include <fstream>
+
+#include "Context.h"
 
 namespace indexer {
 #if DCHECK_IS_ON()
@@ -62,7 +62,7 @@ static bool CheckTokenLists(
 
 TokenizeFileAction::~TokenizeFileAction(void) {}
 
-TokenizeFileAction::TokenizeFileAction(std::shared_ptr<Context> context_,
+TokenizeFileAction::TokenizeFileAction(std::shared_ptr<UpdateContext> context_,
                                        pasta::File file_)
     : context(std::move(context_)),
       progress(context->tokenizer_progress),
@@ -84,6 +84,7 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   CHECK_EQ(file_tokens.Size(), pasta_file_tokens.Size());
 
   flatbuffers::FlatBufferBuilder fbb;
+
   auto maybe_offset = file_tokens.Compress(fbb);
   if (maybe_offset.Succeeded()) {
     fbb.Finish(maybe_offset.TakeValue());
@@ -94,14 +95,27 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
         << " bytes, compressed flatbuffer needs "
         << fbb.GetSize() << " bytes";
 
+    const auto bytes_ptr = fbb.GetBufferPointer();
+
 #if DCHECK_IS_ON()
     auto compressed_tokens = flatbuffers::GetRoot<mx::CompressedTokenList>(
-        fbb.GetBufferPointer());
+        bytes_ptr);
     if (!CheckTokenLists(path, file_tokens, compressed_tokens)) {
       return;
     }
 #endif
 
+    // Publish the tokenized file to the database.
+    mx::DatalogMessageBuilder builder;
+    hyde::rt::Bytes token_bytes(bytes_ptr, &(bytes_ptr[fbb.GetSize()]));
+    builder.source_file_2(path, std::move(token_bytes));
+    if (context->client.Publish(builder)) {
+      LOG(INFO)
+          << "Sent tokenized file " << path << " to mx-server";
+    } else {
+      LOG(ERROR)
+          << "Error sending tokenized file " << path << " to mx-server";
+    }
   } else {
     LOG(ERROR)
         << "Error serializing token list for file " << path << ": "

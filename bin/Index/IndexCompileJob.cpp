@@ -17,28 +17,17 @@ namespace indexer {
 
 IndexCompileJobAction::~IndexCompileJobAction(void) {}
 
-IndexCompileJobAction::IndexCompileJobAction(std::shared_ptr<Context> context_,
-                                             pasta::CompileJob job_)
+IndexCompileJobAction::IndexCompileJobAction(
+    std::shared_ptr<UpdateContext> context_, pasta::CompileJob job_)
     : context(std::move(context_)),
       progress(context->ast_progress),
       job(std::move(job_)) {}
 
 void IndexCompileJobAction::MaybeTokenizeFile(
     const mx::Executor &exe, pasta::File file) {
-  if (!file.WasParsed()) {
-    return;
+  if (file.WasParsed() && context->AddFileToSet(file.Path().generic_string())) {
+    exe.EmplaceAction<TokenizeFileAction>(context, std::move(file));
   }
-
-  auto file_path = file.Path().generic_string();
-  {
-    std::unique_lock<std::mutex> locker(context->tokenized_files_lock);
-    auto [it, added] = context->tokenized_files.emplace(std::move(file_path));
-    if (!added) {
-      return;  // Another worker is dealing with this file.
-    }
-  }
-
-  exe.EmplaceAction<TokenizeFileAction>(context, std::move(file));
 }
 
 // Build and index the AST.

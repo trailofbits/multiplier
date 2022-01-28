@@ -18,3 +18,4 @@ set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" PARENT_SCOPE)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" PARENT_SCOPE)
 
 add_subdirectory(concurrentqueue)
+add_subdirectory(sqlite)

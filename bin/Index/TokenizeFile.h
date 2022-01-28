@@ -13,18 +13,18 @@
 
 namespace indexer {
 
-class Context;
+class UpdateContext;
 
 class TokenizeFileAction final : public mx::Action {
  private:
-  const std::shared_ptr<Context> context;
+  const std::shared_ptr<UpdateContext> context;
   const mx::ProgressBarWork progress;
   const pasta::File file;
 
  public:
   virtual ~TokenizeFileAction(void);
 
-  TokenizeFileAction(std::shared_ptr<Context> context_, pasta::File file_);
+  TokenizeFileAction(std::shared_ptr<UpdateContext> context_, pasta::File file_);
 
   // Tokenize the file.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

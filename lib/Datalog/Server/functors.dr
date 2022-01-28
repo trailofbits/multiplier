@@ -6,6 +6,10 @@
 ; the LICENSE file found in the root directory of this source tree.
 ;
 
-#prologue ```c++
+; We want to inject this include after the functors/logs templates have been
+; defined, and also outside of any C++ namespaces. This will let us do a
+; partial specialization on the DatabaseFunctors class template, and implement
+; the stateful functor pattern.
+#inline(c++:database:enums:epilogue) ```c++
 #include "Functors.h"
 ```.

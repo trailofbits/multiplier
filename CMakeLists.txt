@@ -28,6 +28,7 @@ endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
 
+find_package(SQLite REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(gflags CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
@@ -40,6 +41,15 @@ find_package(Flatbuffers CONFIG REQUIRED)
 find_package(DrLojekyll CONFIG REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
+add_library(mx_sqlite INTERFACE)
+target_link_libraries(mx_sqlite INTERFACE
+  ${SQLite_LIBRARIES}
+)
+
+target_include_directories(mx_sqlite INTERFACE
+  ${SQLite_INCLUDE_DIRS}
+)
 
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")

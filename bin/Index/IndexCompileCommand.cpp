@@ -38,7 +38,7 @@ static pasta::ArgumentVector GetArguments(const CompileCommandPtr &command) {
 IndexCompileCommandAction::~IndexCompileCommandAction(void) {}
 
 IndexCompileCommandAction::IndexCompileCommandAction(
-    std::shared_ptr<Context> context_, CompileCommandPtr command_)
+    std::shared_ptr<UpdateContext> context_, CompileCommandPtr command_)
     : context(std::move(context_)),
       progress(context->command_progress),
       command(std::move(command_)) {}

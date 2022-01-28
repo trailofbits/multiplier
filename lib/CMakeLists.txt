@@ -19,6 +19,7 @@ set(util_headers
   "${source_include_dir}/ProgressBar.h"
   "${source_include_dir}/Result.h"
   "${source_include_dir}/Signal.h"
+  "${source_include_dir}/SQLite.h"
   "${source_include_dir}/Subprocess.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/WorkerPool.h"
@@ -34,6 +35,7 @@ add_library("util"
     "Executor.cpp"
     "ProgressBar.cpp"
     "Signal.cpp"
+    "SQLite.cpp"
     "Subprocess.cpp"
     "Types.cpp"
     "WorkerPool.cpp"
@@ -56,6 +58,7 @@ target_link_libraries("util"
     glog::glog
     gflags::gflags
     pasta::pasta
+    $<BUILD_INTERFACE:mx_sqlite>
 )
 
 set_target_properties("util"
