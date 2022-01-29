@@ -42,6 +42,21 @@ add_custom_command(TARGET "generate_tokens"
   BYPRODUCTS "${generated_tokens_dr}"
 )
 
+add_library("server_storage" STATIC
+  "Storage.h"
+  "Storage.cpp"
+)
+
+target_link_libraries("server_storage"
+  PUBLIC
+    $<BUILD_INTERFACE:util>
+    $<BUILD_INTERFACE:concurrentqueue>
+)
+
+add_dependencies("server_storage"
+  "generate_tokens"
+)
+
 # Compile the server Datalog code. The Datalog code itself executes in
 # mx-server. It has a client interface, which all code uses via
 # `mx::DatalogClient`.
@@ -75,10 +90,8 @@ compile_datalog(
     "${datalog_source_dir}"
   DEPENDS
     "${datalog_source_dir}/Functors.h"
-    "generate_tokens"
   LIBRARIES
-    $<BUILD_INTERFACE:util>
-    $<BUILD_INTERFACE:concurrentqueue>
+    $<BUILD_INTERFACE:server_storage>
 )
 
 # Client interface to the server Datalog code.

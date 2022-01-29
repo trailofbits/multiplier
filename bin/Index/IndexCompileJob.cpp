@@ -8,7 +8,9 @@
 
 #include <glog/logging.h>
 #include <pasta/AST/AST.h>
+#include <pasta/AST/Token.h>
 #include <pasta/Util/ArgumentVector.h>
+#include <pasta/Util/File.h>
 
 #include "Context.h"
 #include "TokenizeFile.h"
@@ -26,11 +28,12 @@ IndexCompileJobAction::IndexCompileJobAction(
 void IndexCompileJobAction::MaybeTokenizeFile(
     const mx::Executor &exe, pasta::File file) {
   if (file.WasParsed()) {
-    if (auto [file_id, is_new_file_id] =
-            context->AddFileToSet(file.Path().generic_string());
-        is_new_file_id) {
+    auto [file_id, is_new_file_id] = context->AddFileToSet(
+        file.Path().generic_string());
+    if (is_new_file_id) {
       exe.EmplaceAction<TokenizeFileAction>(context, file_id, std::move(file));
     }
+    file_ids.emplace(file, file_id);
   }
 }
 

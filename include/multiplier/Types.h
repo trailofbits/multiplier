@@ -29,6 +29,7 @@ enum class CompilerName : unsigned;
 enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
 }  // namespace pasta
+
 // This included file is auto-generated. Depending on when we're compiling this,
 // we may be in the build dir where this auto-generated file is placed, or in
 // or it may be publicly available through a target copied location, or in its
@@ -39,8 +40,6 @@ enum class TargetLanguage : unsigned;
 #  include <multiplier/mx_generated.h>
 #elif __has_include("mx_generated.h")
 #  include "mx_generated.h"
-#else
-#  error "Cannot locate mx_generated.h"
 #endif
 
 namespace mx {

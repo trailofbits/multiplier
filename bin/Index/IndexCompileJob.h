@@ -9,8 +9,13 @@
 #include <memory>
 #include <multiplier/Action.h>
 #include <multiplier/ProgressBar.h>
+#include <multiplier/Types.h>
 #include <pasta/Compile/Job.h>
+#include <unordered_map>
 
+namespace pasta {
+class File;
+}  // namespace pasta
 namespace indexer {
 
 class UpdateContext;
@@ -20,6 +25,8 @@ class IndexCompileJobAction final : public mx::Action {
   const std::shared_ptr<UpdateContext> context;
   const mx::ProgressBarWork progress;
   const pasta::CompileJob job;
+
+  std::unordered_map<pasta::File, mx::FileId> file_ids;
 
   void MaybeTokenizeFile(const mx::Executor &exe, pasta::File file);
 

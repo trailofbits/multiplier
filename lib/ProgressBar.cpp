@@ -192,16 +192,23 @@ void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
   }
 
   const auto percentage = std::min<double>(1.0, steps_done / steps_total);
-  const auto lpad = percentage * kNumProgressBars;
-  const auto rpad = kNumProgressBars - lpad;
+  const auto lpad = static_cast<int>(
+      std::min(kNumProgressBars, (percentage * kNumProgressBars)));
+  const auto rpad = static_cast<int>(std::max(0.0, kNumProgressBars - lpad));
+  assert((lpad + rpad) == static_cast<int>(kNumProgressBars));
   const auto num_digits = NumDigits(max);
+  const auto label_len = strlen(label);
+  const auto label_rpad = label_len < 25ull ? 25ull - label_len : 0;
+  const auto div_rpad = num_digits < 8 ? 16 - (num_digits * 2) : 0;
 
   // Write into `next_line`, which is "local" to the owning thread.
   auto len = snprintf(next_line.data(), next_line.size() - 2u,
-          "%s (%*" PRIu32 " / %" PRIu32 ") %3d%% [%.*s%*s]  "
+          "%s%*s (%*" PRIu32 " / %" PRIu32 ")%*s %3d%% [%.*s%*s]  "
           "%.2f minutes remaining\n",
-          label, num_digits, curr, max, static_cast<int>(percentage * 100.0),
-          static_cast<int>(lpad), kProgressBars, static_cast<int>(rpad), "",
+          label, static_cast<int>(label_rpad), "",
+          num_digits, curr, max, static_cast<int>(div_rpad), "",
+          static_cast<int>(percentage * 100.0),
+          lpad, kProgressBars, rpad, "",
           estimated_remaining_time_seconds / 60);
   if (0 < len) {
     next_line[static_cast<unsigned>(len)] = '\0';
