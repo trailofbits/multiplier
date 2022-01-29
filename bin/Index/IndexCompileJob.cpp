@@ -25,8 +25,12 @@ IndexCompileJobAction::IndexCompileJobAction(
 
 void IndexCompileJobAction::MaybeTokenizeFile(
     const mx::Executor &exe, pasta::File file) {
-  if (file.WasParsed() && context->AddFileToSet(file.Path().generic_string())) {
-    exe.EmplaceAction<TokenizeFileAction>(context, std::move(file));
+  if (file.WasParsed()) {
+    if (auto [file_id, is_new_file_id] =
+            context->AddFileToSet(file.Path().generic_string());
+        is_new_file_id) {
+      exe.EmplaceAction<TokenizeFileAction>(context, file_id, std::move(file));
+    }
   }
 }
 

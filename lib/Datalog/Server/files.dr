@@ -12,40 +12,59 @@
 ; This file defines relations that focus on parsed files.
 ; ------------------------------------------------------------------------------
 
+
+; Call into SQLite and ask it to "allocate" `ReservationSize` file IDs.
+#functor allocate_file_ids(
+    bound FileId LastFileId,
+    bound u32 ReservationSize,
+    free FileId NextFileId) @range(?).
+
+; A dummy message that is internally sent by invoking `reserve_file_ids`.
+#message reserve_file_ids(FileId LastFileId, u32 ReservationSize).
+
+
+; Ask for a reservation of file IDs. Return of this query logically reserves
+; the range `[NextFileId, NextFileId + ReservationSize)` for use by the caller.
+#query reserve_file_ids(bound FileId LastFileId, bound u32 ReservationSize,
+                        free FileId NextFileId) @first
+    : @first reserve_file_ids(LastFileId, ReservationSize)
+    , allocate_file_ids(LastFileId, ReservationSize, NextFileId).
+
+
 ; Intern a file into persistent storage, producing a unique file id.
-#functor get_or_create_file_id(
+#functor persist_file(
+    bound FileId Id,
     bound Path FilePath,
-    bound CompressedTokenList Tokens,
-    free FileId FID) @range(?).
+    bound CompressedTokenList Tokens).
 
 
 ; Read all file IDs from the backing persistent storage. This is called on
 ; startup so it "revives" the prior in-memory state based off of the persisted
 ; state.
 #functor revive_file_ids(
-    bound u32 X,
+    free FileId Id,
     free Path FilePath,
-    free FileId FID) @range(*).
+    bound u32 Force) @range(*).
 
 
 ; Received when the indexer builds a translation unit and thinks a particular
 ; file is new.
-#message source_file(Path FilePath, CompressedTokenList Tokens).
+#message source_file(FileId Id, Path FilePath, CompressedTokenList Tokens).
 
 
 ; Returns the set of all unique file IDs.
-#query source_files(free Path P, free FileId F)
+#query source_files(free FileId Id, free Path FilePath)
 
     ; When the indexer sends us a new file, then try to add it to the database.
-    : source_file(P, T)
-    , get_or_create_file_id(P, T, F)
+    : source_file(Id, FilePath, Tokens)
+    , persist_file(Id, FilePath, Tokens)
     
     ; When we start up, then try to open the database and figure out the set
     ; of all saved files.
-    : revive_file_ids(0, P, F).
+    : revive_file_ids(Id, FilePath, 0).
 
 
 ; Published for each new source file added to the database.
-#message new_source_file(Path P, FileId F)
-    : source_files(P, F).
+#message new_source_file(FileId Id, Path FilePath)
+    : source_files(Id, FilePath).
 

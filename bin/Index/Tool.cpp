@@ -25,7 +25,7 @@ class IndexCompileCommandTool final : public mx::Tool {
   IndexCompileCommandTool(const mx::Executor &executor_,
                           const mx::DatalogClient &client_)
       : mx::Tool(executor_, client_),
-        global_context(std::make_shared<GlobalContext>(executor_)) {}
+        global_context(std::make_shared<GlobalContext>(executor_, client_)) {}
 
   // Return tool name.
   const char *Name(void) const final {

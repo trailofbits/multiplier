@@ -63,9 +63,10 @@ static bool CheckTokenLists(
 TokenizeFileAction::~TokenizeFileAction(void) {}
 
 TokenizeFileAction::TokenizeFileAction(std::shared_ptr<UpdateContext> context_,
-                                       pasta::File file_)
+                                       mx::FileId file_id_, pasta::File file_)
     : context(std::move(context_)),
       progress(context->tokenizer_progress),
+      file_id(file_id_),
       file(std::move(file_)) {}
 
 // Build and index the AST.
@@ -110,7 +111,7 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   hyde::rt::Bytes token_bytes(bytes_ptr, &(bytes_ptr[fbb.GetSize()]));
 
   std::unique_lock locker(context->builder_lock);
-  context->builder.source_file_2(path, std::move(token_bytes));
+  context->builder.source_file_3(file_id, path, std::move(token_bytes));
 }
 
 }  // namespace indexer

@@ -20,6 +20,9 @@ enum class CompilerName : uint8_t;
 enum class IncludePathLocation : uint8_t;
 enum class TargetLanguage : uint8_t;
 enum class TokenKind : uint16_t;
+
+using FileId = uint64_t;
+
 }  // namespace mx
 namespace pasta {
 enum class CompilerName : unsigned;

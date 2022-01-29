@@ -21,6 +21,9 @@ namespace mx::sqlite {
 
 namespace detail {
 
+template <typename T>
+inline bool dependent_false = false;
+
 // Given a concrete function type T:
 //   get_fn_info<T>::ret_type is the return type
 //   get_fn_info<T>::num_args is the number of arguments to the function
@@ -28,7 +31,7 @@ namespace detail {
 
 template <typename T>
 struct get_fn_info {
-  static_assert(!std::is_same_v<T,T>);
+  static_assert(dependent_false<T>);
 };
 
 template <typename R, typename... As>
@@ -134,7 +137,7 @@ inline std::vector<std::function<void(sqlite3 *)>> function_creation_hooks;
 
 template <typename T>
 struct decay_tuple_args {
-  static_assert(!std::is_same_v<T, T>);
+  static_assert(dependent_false<T>);
 };
 
 template <typename... Ts>
@@ -191,7 +194,7 @@ inline void createFunction(T fn) {
         arg = fn_ptr(std::move(from_arg));
         return;
       } else {
-        static_assert(!std::is_same_v<arg_t, arg_t>);
+        static_assert(detail::dependent_false<arg_t>);
       }
       idx++;
     };
@@ -234,7 +237,7 @@ inline void createFunction(T fn) {
       } else if constexpr (user_serialize_fn<res_t> != nullptr) {
         self(user_serialize_fn<res_t>(std::forward<decltype(res)>(res)), self);
       } else {
-        static_assert(!std::is_same_v<res_t, res_t>);
+        static_assert(detail::dependent_false<res_t>);
       }
     };
     result_dispatcher(std::apply(saved_fn, std::move(arg_tuple)),
@@ -420,7 +423,12 @@ class Database {
 
         using arg_t = std::decay_t<decltype(arg)>;
         if constexpr (std::is_integral_v<arg_t>) {
-          sqlite3_bind_int64(stmt, idx, arg);
+          if constexpr (std::is_signed_v<arg_t>) {
+            sqlite3_bind_int64(stmt, idx, static_cast<int64_t>(arg));
+          } else {
+            sqlite3_bind_int64(
+                stmt, idx, static_cast<int64_t>(static_cast<uint64_t>(arg)));
+          }
         } else if constexpr (std::is_same_v<const char *, arg_t> ||
                              std::is_same_v<char *, arg_t>) {
           sqlite3_bind_text64(stmt, idx, arg, strlen(arg), SQLITE_STATIC,
@@ -441,7 +449,7 @@ class Database {
             sqlite3_bind_null(stmt, idx);
           }
         } else {
-          static_assert(!std::is_same_v<arg_t, arg_t>);
+          static_assert(detail::dependent_false<arg_t>);
         }
         idx++;
 
@@ -506,17 +514,20 @@ class Database {
 
         using arg_t = std::decay_t<decltype(arg)>;
         if constexpr (std::is_integral_v<arg_t>) {
-          arg = sqlite3_column_int64(stmt, idx);
+          arg = static_cast<arg_t>(sqlite3_column_int64(stmt, idx));
+
         } else if constexpr (std::is_same_v<std::string, arg_t> ||
                              std::is_same_v<std::string_view, arg_t>) {
           auto ptr = (const char *)sqlite3_column_text(stmt, idx);
           auto len = sqlite3_column_bytes(stmt, idx);
           arg = arg_t(ptr, len);
+
         } else if constexpr (std::is_same_v<sqlite::blob, arg_t> ||
                              std::is_same_v<sqlite::blob_view, arg_t>) {
           auto ptr = (const char *)sqlite3_column_blob(stmt, idx);
           auto len = sqlite3_column_bytes(stmt, idx);
           arg = arg_t(ptr, len);
+
         } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
           ;
         } else if constexpr (detail::is_std_optional_type<arg_t>) {
@@ -537,7 +548,7 @@ class Database {
           arg = fn_ptr(std::move(from_arg));
           return;
         } else {
-          static_assert(!std::is_same_v<arg_t, arg_t>);
+          static_assert(detail::dependent_false<arg_t>);
         }
         idx++;
 
@@ -567,6 +578,55 @@ class Database {
     friend class Database<db_name>;
   };
 
+  // A TransactionGuard object starts a SQLite transaction when constructed,
+  // and when destructed either commits or rolls back the transaction,
+  // depending on whether the object is being destroyed as a result of stack
+  // unwinding caused by an uncaught exception.
+  class TransactionGuard {
+   public:
+    TransactionGuard() {
+      beginTransaction();
+      transaction_active = true;
+    }
+
+    ~TransactionGuard() {
+      if (!transaction_active)
+        return;
+      if (std::uncaught_exceptions() == uncaught_exception_count) {
+        commit();
+      } else {
+        rollback();
+      }
+    }
+
+    void rollback() {
+      if (!transaction_active) {
+        throw error{SQLITE_ERROR};
+      }
+      rollbackTransaction();
+      transaction_active = false;
+    }
+
+    void commit() {
+      if (!transaction_active) {
+        throw error{SQLITE_ERROR};
+      }
+      commitTransaction();
+      transaction_active = false;
+    }
+
+    TransactionGuard(const TransactionGuard &) = delete;
+    TransactionGuard &operator=(const TransactionGuard &) = delete;
+
+   private:
+    const int uncaught_exception_count = std::uncaught_exceptions();
+    bool transaction_active;
+  };
+
+  static auto transactionGuard(void) {
+    return TransactionGuard();
+  }
+
   // Begin a SQLite transaction.
   static void beginTransaction(void) {
     static const char begin_transaction_query[] = "begin transaction";
@@ -574,9 +634,15 @@ class Database {
   }
 
   // Commit the active SQLite transaction.
-  static void commit(void) {
+  static void commitTransaction(void) {
     static const char commit_transaction_query[] = "commit transaction";
     query<commit_transaction_query>();
+  }
+
+  // Roll back the active SQLite transaction.
+  static void rollbackTransaction(void) {
+    static const char rollback_transaction_query[] = "rollback transaction";
+    query<rollback_transaction_query>();
   }
 };
 

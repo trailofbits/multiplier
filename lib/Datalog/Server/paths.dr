@@ -13,18 +13,3 @@
 ; ------------------------------------------------------------------------------
 
 
-#functor source_path(bound CompileCommand CC,
-                     free Path SourcePath) @range(.).
-
-
-#functor parent_path(bound Path P, free Path D) @range(.).
-
-
-; The directory heirarchy is inferred from source paths.
-#query directory_paths(free Path D)
-    : source_files(P, _FileId)
-    , parent_path(P, D)
-
-    : directory_paths(C)
-    , parent_path(C, D)
-    , C != D.

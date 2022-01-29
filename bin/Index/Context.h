@@ -6,14 +6,16 @@
 
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <multiplier/Datalog.h>
 #include <multiplier/ProgressBar.h>
+#include <multiplier/Types.h>
 #include <mutex>
 #include <pasta/Util/FileManager.h>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 
 namespace mx {
 class Executor;
@@ -24,7 +26,7 @@ namespace indexer {
 class GlobalContext {
  private:
   std::mutex tokenized_files_lock;
-  std::unordered_set<std::string> tokenized_files;
+  std::unordered_map<std::string, mx::FileId> tokenized_files;
 
  public:
 
@@ -33,8 +35,12 @@ class GlobalContext {
   std::unique_ptr<mx::ProgressBar> ast_progress;
   std::unique_ptr<mx::ProgressBar> tokenizer_progress;
 
-  explicit GlobalContext(const mx::Executor &exe_);
-  bool AddFileToSet(std::string path);
+  std::atomic<mx::FileId> next_file_id;
+
+  explicit GlobalContext(const mx::Executor &exe_,
+                         const mx::DatalogClient &client_);
+
+  std::pair<mx::FileId, bool> AddFileToSet(std::string path);
 };
 
 class UpdateContext {
@@ -58,7 +64,7 @@ class UpdateContext {
   UpdateContext(const mx::DatalogClient &client_,
                 std::shared_ptr<GlobalContext> indexed_files_);
 
-  inline bool AddFileToSet(std::string path) {
+  inline std::pair<mx::FileId, bool> AddFileToSet(std::string path) {
     return global_context->AddFileToSet(std::move(path));
   }
 };

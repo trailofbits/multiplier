@@ -61,6 +61,7 @@ compile_datalog(
   FB_OUTPUT_FILE
     "${datalog_bin_dir}/mx.fbs"
   SOURCES
+    "${datalog_source_dir}/Server/files.dr"
     "${datalog_source_dir}/Server/foreign_types.dr"
     "${datalog_source_dir}/Server/functors.dr"
     "${datalog_source_dir}/Server/commands.dr"
@@ -77,6 +78,7 @@ compile_datalog(
     "generate_tokens"
   LIBRARIES
     $<BUILD_INTERFACE:util>
+    $<BUILD_INTERFACE:concurrentqueue>
 )
 
 # Client interface to the server Datalog code.

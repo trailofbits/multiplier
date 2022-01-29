@@ -178,10 +178,10 @@ void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
     // 95th-percentile upper bound on the expected elapsed time of a job, using
     // the elapsed times of the jobs that have already finished as our sample.
     const auto average_elapsed_time_ms =
-        sum_of_elapsed_time_ms.load() / steps_done;
+        static_cast<double>(sum_of_elapsed_time_ms.load()) / steps_done;
     const auto elapsed_time_ms_variance =
-        sum_of_elapsed_time_ms_squared.load() / steps_done -
-        pow(average_elapsed_time_ms, 2);
+        (static_cast<double>(sum_of_elapsed_time_ms_squared.load()) /
+         steps_done) - pow(average_elapsed_time_ms, 2);
     const auto z_score = 1.96;
     const auto average_elapsed_time_ms_upper_bound =
         average_elapsed_time_ms +

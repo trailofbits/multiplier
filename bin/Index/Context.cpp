@@ -17,7 +17,8 @@ DEFINE_bool(show_progress, false, "Show progress bars");
 
 namespace indexer {
 
-GlobalContext::GlobalContext(const mx::Executor &exe_) {
+GlobalContext::GlobalContext(const mx::Executor &exe_,
+                             const mx::DatalogClient &client) {
   if (FLAGS_show_progress) {
     publish_progress.reset(new mx::ProgressBar("Publishing",
                                                std::chrono::seconds(1)));
@@ -32,12 +33,24 @@ GlobalContext::GlobalContext(const mx::Executor &exe_) {
     ast_progress->SetNumWorkers(num_workers);
     tokenizer_progress->SetNumWorkers(num_workers);
   }
+
+  auto reserved_file_ids = client.reserve_file_ids_bbf(0, 1 << 20ul);
+  CHECK(reserved_file_ids);
+
+  next_file_id.store(reserved_file_ids->NextFileId());
 }
 
-bool GlobalContext::AddFileToSet(std::string path) {
+std::pair<mx::FileId, bool> GlobalContext::AddFileToSet(std::string path) {
   std::unique_lock<std::mutex> locker(tokenized_files_lock);
-  auto [it, added] = tokenized_files.emplace(std::move(path));
-  return added;
+  auto [it, added] = tokenized_files.try_emplace(std::move(path), 0);
+  if (added) {
+    auto next_id = next_file_id.fetch_add(1u);
+    it->second = next_id;
+    return {next_id, true};
+  } else {
+    DCHECK_NE(it->second, 0u);
+    return {it->second, false};
+  }
 }
 
 UpdateContext::~UpdateContext(void) {
