@@ -15,20 +15,20 @@
 
 ; Call into SQLite and ask it to "allocate" `ReservationSize` file IDs.
 #functor allocate_file_ids(
-    bound FileId LastFileId,
+    bound Time T,
     bound u32 ReservationSize,
     free FileId NextFileId) @range(?).
 
 ; A dummy message that is internally sent by invoking `reserve_file_ids`.
-#message reserve_file_ids(FileId LastFileId, u32 ReservationSize).
+#message reserve_file_ids(Time T, u32 ReservationSize).
 
 
 ; Ask for a reservation of file IDs. Return of this query logically reserves
 ; the range `[NextFileId, NextFileId + ReservationSize)` for use by the caller.
-#query reserve_file_ids(bound FileId LastFileId, bound u32 ReservationSize,
+#query reserve_file_ids(bound Time T, bound u32 ReservationSize,
                         free FileId NextFileId) @first
-    : @first reserve_file_ids(LastFileId, ReservationSize)
-    , allocate_file_ids(LastFileId, ReservationSize, NextFileId).
+    : @first reserve_file_ids(T, ReservationSize)
+    , allocate_file_ids(T, ReservationSize, NextFileId).
 
 
 ; Intern a file into persistent storage, producing a unique file id.
@@ -41,10 +41,10 @@
 ; Read all file IDs from the backing persistent storage. This is called on
 ; startup so it "revives" the prior in-memory state based off of the persisted
 ; state.
-#functor revive_file_ids(
+#functor list_file_ids(
+    bound Time T,
     free FileId Id,
-    free Path FilePath,
-    bound u32 Force) @range(*).
+    free Path FilePath) @range(*).
 
 
 ; Received when the indexer builds a translation unit and thinks a particular
@@ -61,7 +61,7 @@
     
     ; When we start up, then try to open the database and figure out the set
     ; of all saved files.
-    : revive_file_ids(Id, FilePath, 0).
+    : list_file_ids(0, Id, FilePath).
 
 
 ; Published for each new source file added to the database.

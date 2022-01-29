@@ -17,6 +17,9 @@
 #foreign Path ```flat string```.
 #foreign Path ```c++ std::string```.
 
+#foreign Time ```c++ int64_t``` @transparent.
+#foreign Time ```flat int64``` @transparent.
+
 ; NOTE(pag): We need to mark the compressed token lists as being referentially
 ;            transparent so that they are *NOT* interned and deduplicated,
 ;            otherwise they would occupy a lot of memory for large projects.

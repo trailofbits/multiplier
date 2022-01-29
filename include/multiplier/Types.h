@@ -22,6 +22,7 @@ enum class TargetLanguage : uint8_t;
 enum class TokenKind : uint16_t;
 
 using FileId = uint64_t;
+using Time = int64_t;
 
 }  // namespace mx
 namespace pasta {
@@ -87,5 +88,8 @@ inline static const char *NameOf(TargetLanguage val) {
 inline static const char *NameOf(TokenKind val) {
   return &(EnumNameTokenKind(val)[3]);  // Chop off `TK_`.
 }
+
+// Return the current time.
+Time TimeNow(void) noexcept;
 
 }  // namespace mx

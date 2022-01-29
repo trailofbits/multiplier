@@ -37,8 +37,7 @@ class Storage final {
 
   // Reserve `num_ids_to_reserve` file ids, starting at or after
   // `prev_max_id`.
-  Result<FileId, std::string> ReserveFileIds(
-      FileId prev_max_id, uint32_t num_ids_to_reserve);
+  Result<FileId, std::string> ReserveFileIds(uint32_t num_ids_to_reserve);
 };
 
 }  // namespace mx

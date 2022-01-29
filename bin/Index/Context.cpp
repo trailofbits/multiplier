@@ -34,10 +34,15 @@ GlobalContext::GlobalContext(const mx::Executor &exe_,
     tokenizer_progress->SetNumWorkers(num_workers);
   }
 
-  auto reserved_file_ids = client.reserve_file_ids_bbf(0, 1 << 20ul);
+  auto reserved_file_ids = client.reserve_file_ids_bbf(
+      mx::TimeNow(), 1 << 20ul);
   CHECK(reserved_file_ids);
 
-  next_file_id.store(reserved_file_ids->NextFileId());
+  const mx::FileId fid = reserved_file_ids->NextFileId();
+  next_file_id.store(fid);
+
+  LOG(INFO)
+      << "Next file ID will be " << fid;
 }
 
 std::pair<mx::FileId, bool> GlobalContext::AddFileToSet(std::string path) {

@@ -29,9 +29,8 @@ class DatabaseFunctors<hyde::rt::StdStorage> {
 
   // Allocate `reserve_size` file IDs, where we expect the last allocated
   // reservation to end at `last_id`.
-  std::optional<FileId> allocate_file_ids_bbf(
-      FileId last_id, uint32_t reserve_size) {
-    auto ret = storage.ReserveFileIds(last_id, reserve_size);
+  std::optional<FileId> allocate_file_ids_bbf(int64_t, uint32_t reserve_size) {
+    auto ret = storage.ReserveFileIds(reserve_size);
     if (ret.Succeeded()) {
       return ret.TakeValue();
     } else {
@@ -50,8 +49,7 @@ class DatabaseFunctors<hyde::rt::StdStorage> {
     return true;
   }
 
-  std::vector<std::tuple<FileId, std::string>> revive_file_ids_ffb(
-      uint32_t X) {
+  std::vector<std::tuple<FileId, std::string>> list_file_ids_bff(int64_t) {
     return {};
   }
 

@@ -201,26 +201,18 @@ void Storage::StoreFile(File file) {
   impl->EmplaceRow(std::move(file));
 }
 
-// Reserve `num_ids_to_reserve` file ids, starting at or after
-// `prev_max_id`.
+// Reserve `num_ids_to_reserve` file ids.
 Result<FileId, std::string> Storage::ReserveFileIds(
-    FileId prev_max_id, uint32_t num_ids_to_reserve) {
-
-  // We don't want to allow the first ID returned to ever be `0`.
-  if (!prev_max_id) {
-    prev_max_id = 1u;
-  }
+    uint32_t num_ids_to_reserve) {
 
   // Make sure we always reserve at least one.
   if (!num_ids_to_reserve) {
     num_ids_to_reserve = 1u;
   }
 
-  CHECK_LE(prev_max_id, prev_max_id + num_ids_to_reserve);
-
   static const char increment_id_query[]
       = "update ids "
-        "set next_file_id=max(?1, next_file_id + ?2) "
+        "set next_file_id=next_file_id + ?1 "
         "where initialized = 1";
 
   static const char select_incremented_id_query[]
@@ -231,13 +223,10 @@ Result<FileId, std::string> Storage::ReserveFileIds(
 
   try {
     StorageImpl::TransactionGuard transaction;
-    impl->query<increment_id_query>(
-        prev_max_id + num_ids_to_reserve,  // Fudge it.
-        num_ids_to_reserve);
+    impl->query<increment_id_query>(num_ids_to_reserve);
 
     auto fetch_row = impl->query<select_incremented_id_query>();
     if (fetch_row(next_file_id)) {
-      CHECK_LT(prev_max_id, next_file_id);
       CHECK_LT(num_ids_to_reserve, next_file_id);
       auto ret_val = next_file_id - num_ids_to_reserve;
       CHECK_LT(ret_val, next_file_id);
@@ -245,14 +234,12 @@ Result<FileId, std::string> Storage::ReserveFileIds(
     }
   } catch (const sqlite::error &error) {
     err
-        << "Unable to reserve " << num_ids_to_reserve
-        << " file ids starting at or after " << prev_max_id << ": "
+        << "Unable to reserve " << num_ids_to_reserve << " file ids: "
         << sqlite3_errstr(error.err_code);
     return err.str();
   }
 
-  err << "Unable to reserve " << num_ids_to_reserve
-      << " file ids starting at or after " << prev_max_id;
+  err << "Unable to reserve " << num_ids_to_reserve << " file ids";
   return err.str();
 }
 

@@ -6,6 +6,7 @@
 
 #include <multiplier/Types.h>
 
+#include <chrono>
 #include <clang/Basic/TokenKinds.h>
 
 namespace mx {
@@ -32,6 +33,11 @@ clang::tok::TokenKind ToClang(TokenKind tk) {
     default:
       return static_cast<clang::tok::TokenKind>(tk);
   }
+}
+
+// Return the current time.
+Time TimeNow(void) noexcept {
+  return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
 
 }  // namespace mx
