@@ -73,7 +73,7 @@ int Subprocess::Execute(const pasta::ArgumentVector &cmd,
           env_data[j++] = key[i++];
         }
         env_data[j++] = '=';
-        auto val_len = strlen(key.data());
+        auto val_len = strlen(val.data());
         for (size_t i = 0u; i < val_len;) {
           env_data[j++] = val[i++];
         }
