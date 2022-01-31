@@ -46,6 +46,16 @@ int main(int argc, char *argv[]) {
     fs << "#constant TokenKind TK_objc_" #X << ' ' << (i++) << " @unique.\n";
 #include "clang/Basic/TokenKinds.def"
 
+  fs << "#constant TokenKind TK_begin_macro_expansion "
+     << (i++) << " @unique.\n";
+
+  fs << "#constant TokenKind TK_end_macro_expansion "
+     << (i++) << " @unique.\n";
+
+  fs << "#constant TokenKind TK_begin_file " << (i++) << " @unique.\n";
+  fs << "#constant TokenKind TK_end_file " << (i++) << " @unique.\n";
+  fs << "#constant TokenKind TK_begin_directive " << (i++) << " @unique.\n";
+  fs << "#constant TokenKind TK_end_directive " << (i++) << " @unique.\n";
   fs << '\n';
 
   return 0;

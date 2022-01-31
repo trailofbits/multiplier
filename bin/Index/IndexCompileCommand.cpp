@@ -55,9 +55,12 @@ void IndexCompileCommandAction::Run(
     return;
   }
 
+  auto cwd = command->WorkingDirectory();
+  CHECK_NOTNULL(cwd);
+  CHECK_LT(0u, cwd->size());
+
   auto argv = GetArguments(command);
-  auto maybe_cmd = pasta::CompileCommand::CreateFromArguments(
-      argv, command->WorkingDirectory()->str());
+  auto maybe_cmd = pasta::CompileCommand::CreateFromArguments(argv, cwd->str());
   if (!maybe_cmd.Succeeded()) {
     LOG(ERROR)
         << "Could not create a compile command for arguments "

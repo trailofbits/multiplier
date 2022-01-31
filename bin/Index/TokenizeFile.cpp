@@ -82,7 +82,9 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   auto pasta_file_tokens = file.Tokens();
   auto file_tokens = mx::TokenList::Create(pasta_file_tokens);
-  CHECK_EQ(file_tokens.Size(), pasta_file_tokens.Size());
+
+  // PASTA file token lists have an `eof` token at the end; we strip it.
+  CHECK_EQ(file_tokens.Size() + 1u, pasta_file_tokens.Size());
 
   flatbuffers::FlatBufferBuilder fbb;
 

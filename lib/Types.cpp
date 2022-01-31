@@ -14,6 +14,7 @@ namespace mx {
 TokenKind FromClang(clang::tok::TokenKind tk) {
   if (clang::tok::raw_identifier == tk) {
     return TokenKind::TK_identifier;
+
   } else {
     return static_cast<TokenKind>(tk);
   }
@@ -21,7 +22,19 @@ TokenKind FromClang(clang::tok::TokenKind tk) {
 
 clang::tok::TokenKind ToClang(TokenKind tk) {
   switch (tk) {
-    case TokenKind::TK_whitespace: return clang::tok::unknown;
+    case TokenKind::TK_whitespace:
+      return clang::tok::unknown;
+
+    // These are derived from PASTA token roles, so they don't actually exist
+    // in Clang's token kinds.
+    case TokenKind::TK_begin_macro_expansion:
+    case TokenKind::TK_end_macro_expansion:
+    case TokenKind::TK_begin_file:
+    case TokenKind::TK_end_file:
+    case TokenKind::TK_begin_directive:
+    case TokenKind::TK_end_directive:
+      return clang::tok::unknown;
+
 #define PPKEYWORD(X) \
     case TokenKind::TK_pp_ ## X: return clang::tok::identifier;
 #include "clang/Basic/TokenKinds.def"

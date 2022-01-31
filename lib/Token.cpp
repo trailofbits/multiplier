@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/Token.h>
+#include "Token.h"
 
 #include <cassert>
 #include <cctype>
@@ -19,18 +19,6 @@
 #include <vector>
 
 namespace mx {
-
-class TokenListImpl {
- public:
-  std::string data;
-  std::vector<TokenKind> token_kinds;
-  std::vector<unsigned> data_offsets;
-
-  void AddToken(std::string_view data, TokenKind kind,
-                std::vector<uint16_t> &dummy_states,
-                std::string &dummy_output);
-};
-
 namespace {
 
 static constexpr auto kTabSize = 4u;

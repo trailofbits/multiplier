@@ -92,6 +92,7 @@ set(public_headers
   ${copied_headers}
   "${source_include_dir}/Datalog.h"
   "${source_include_dir}/Token.h"
+  "${source_include_dir}/TokenTree.h"
   "${source_include_dir}/Tool.h"
 )
 
@@ -102,6 +103,8 @@ add_library("tool"
     "Database.h"
     "Database.cpp"
     "Token.cpp"
+    "Token.h"
+    "TokenTree.cpp"
     "Tool.cpp"
 )
 
