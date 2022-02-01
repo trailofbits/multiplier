@@ -156,7 +156,8 @@ void StorageImpl::CreateTables(void) {
       = "create table if not exists entities "
         " (id integer,"
         "  tld_id integer,"
-        "  entity blob) without rowid";
+        "  entity blob,"
+        "  primary key(id, tld_id)) without rowid";
   query<entities_table_query>();
 
   // Initialize the IDs.
