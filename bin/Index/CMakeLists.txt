@@ -37,7 +37,9 @@ add_executable("${exe_name}"
 
 target_link_libraries("${exe_name}"
   PRIVATE
+    ${MX_BEGIN_FORCE_LOAD_GROUP}
     ${MX_BEGIN_FORCE_LOAD_TOOL} "${lib_name}" ${MX_END_FORCE_LOAD_TOOL}
+    ${MX_END_FORCE_LOAD_GROUP}
 )
 
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
