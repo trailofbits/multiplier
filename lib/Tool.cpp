@@ -55,6 +55,12 @@ Tool *Tool::StartAll(const Executor &exe, const DatalogClient &client) {
     }
   }
 
+  // If no tools are registered `gFirstTool` will be null.
+  if (!internal::RegisteredToolBase::gFirstTool) {
+    LOG(INFO) << "No tool registered!";
+    return nullptr;
+  }
+
   return internal::RegisteredToolBase::gFirstTool->tool;
 }
 
