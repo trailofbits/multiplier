@@ -485,14 +485,14 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
               << " is repeated in top-level decl list for job on file "
               << " on main job file " << main_file_path;
         } else {
-          DLOG(INFO)
-              << "Declaration of " << decl.KindName()
-              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
-              << " encloses over subsequent "
-              << next_decl.KindName() << PrefixedName(next_decl) << " declaration"
-              << PrefixedName(next_decl)
-              << PrefixedLocation(next_decl, " at or near ")
-              << " on main job file " << main_file_path;
+//          DLOG(INFO)
+//              << "Declaration of " << decl.KindName()
+//              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
+//              << " encloses over subsequent "
+//              << next_decl.KindName() << PrefixedName(next_decl) << " declaration"
+//              << PrefixedName(next_decl)
+//              << PrefixedLocation(next_decl, " at or near ")
+//              << " on main job file " << main_file_path;
 
           // Keep track of enclosed decls.
           tlds_for_tree.push_back(std::move(next_decl));
