@@ -1,0 +1,83 @@
+ARG UBUNTU_VERSION
+
+# Use Ubuntu version passed from the arguments as base image
+FROM ubuntu:${UBUNTU_VERSION} as base
+
+# GCC version to use for the build
+ARG GCC_VERSION
+
+# Clang Version to use for the build
+ARG CLANG_VERSION
+
+RUN apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -yq \
+        build-essential \
+        sudo \
+        cmake \
+        curl \
+        wget \
+        unzip \
+        flex \
+        bison \
+        libncurses5-dev \
+        make \
+        libssl-dev \
+        libelf-dev \
+        git \
+        fakeroot \
+        bc \
+        python3 \
+        python3-pip \
+        python3-venv \
+        python-dev && \
+    if [ "$GCC_VERSION" ]; then \
+      apt-get install -yq \
+          gcc-${GCC_VERSION} \
+          g++-${GCC_VERSION} \
+          gcc g++ \
+          gcc-${GCC_VERSION}-aarch64-linux-gnu \
+          g++-${GCC_VERSION}-aarch64-linux-gnu \
+          gcc-aarch64-linux-gnu \
+          g++-aarch64-linux-gnu \
+          gcc-${GCC_VERSION}-arm-linux-gnueabi \
+          g++-${GCC_VERSION}-arm-linux-gnueabi \
+          gcc-arm-linux-gnueabi \
+          g++-arm-linux-gnueabi && \
+      if [ "$GCC_VERSION" != "4.9" ]; then \
+        apt-get install -yq \
+            gcc-${GCC_VERSION}-plugin-dev-aarch64-linux-gnu \
+            gcc-${GCC_VERSION}-plugin-dev-arm-linux-gnueabi; \
+      fi \
+    fi; \
+    if [ "$CLANG_VERSION" ]; then \
+      apt-get install -yq \
+          clang-${CLANG_VERSION} \
+          lld-${CLANG_VERSION} \
+          clang-tools-${CLANG_VERSION} \
+          clang lld; \
+    fi
+
+
+RUN adduser --disabled-password --gecos '' vspell
+RUN adduser vspell sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER vspell
+
+RUN if [ "$GCC_VERSION" ]; then \
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 && \
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} 100 && \
+      sudo update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-${GCC_VERSION} 100 && \
+      sudo update-alternatives --install /usr/bin/aarch64-linux-gnu-g++ aarch64-linux-gnu-g++ /usr/bin/aarch64-linux-gnu-g++-${GCC_VERSION} 100 && \
+      sudo update-alternatives --install /usr/bin/arm-linux-gnueabi-gcc arm-linux-gnueabi-gcc /usr/bin/arm-linux-gnueabi-gcc-${GCC_VERSION} 100 && \
+      sudo update-alternatives --install /usr/bin/arm-linux-gnueabi-g++ arm-linux-gnueabi-g++ /usr/bin/arm-linux-gnueabi-g++-${GCC_VERSION} 100; \
+    fi; \
+    if [ "$CLANG_VERSION" ]; then \
+      sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 100 && \
+      sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} 100; \
+    fi
+
+WORKDIR /home/vspell/src
+
+EXPOSE 8000
