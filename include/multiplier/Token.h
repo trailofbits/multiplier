@@ -25,6 +25,7 @@ namespace mx {
 enum class TokenKind : uint16_t;  // Auto-generated from Datalog.
 struct CompressedTokenList;  // Auto-generated from Datalog.
 
+class TokenTreeImpl;
 class TokenList;
 class TokenListImpl;
 class TokenListIterator;

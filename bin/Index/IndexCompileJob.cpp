@@ -6,74 +6,23 @@
 
 #include "IndexCompileJob.h"
 
+#include <algorithm>
 #include <glog/logging.h>
-#include <map>
+#include <multiplier/TokenTree.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
+#include <tuple>
+#include <vector>
 
 #include "Context.h"
 #include "TokenizeFile.h"
 
-#include <iostream>
 
 namespace indexer {
 namespace {
-
-// Identify the indices in the token range that would tell us, via a
-// `std::lower_bound`-type query, which file our given token is from.
-// We need this so that we can figure out what file a top-level declaration
-// belongs to.
-static std::map<uint64_t, pasta::File> FindFileBounds(
-    pasta::TokenRange token_range) {
-  std::vector<pasta::File> file_stack;
-  std::map<uint64_t, pasta::File> file_containing_lb;
-  auto token_it = token_range.begin();
-  auto token_end = token_range.end();
-  for (; token_it != token_end; ++token_it) {
-    pasta::Token token = *token_it;
-
-    switch (token.Role()) {
-      case pasta::TokenRole::kBeginOfFileMarker: {
-        auto file_tok = token.FileLocation();
-        CHECK(file_tok.has_value())
-            << "Begin of file marker not associated with a file location";
-
-        // If we're entering another file, then record this entry point as
-        // an upper bound of the previous file.
-        if (!file_stack.empty()) {
-          file_containing_lb.emplace(token.Index(), file_stack.back());
-        }
-
-        file_stack.emplace_back(pasta::File::Containing(*file_tok));
-        continue;
-      }
-
-      case pasta::TokenRole::kEndOfFileMarker: {
-        auto file_tok = token.FileLocation();
-        CHECK(file_tok.has_value())
-            << "End of file marker not associated with a file location";
-        CHECK(!file_stack.empty())
-            << "Improper file stack nesting";
-        CHECK(file_stack.back() == pasta::File::Containing(*file_tok))
-            << "Improper file stack nesting";
-
-        // If we're leaving a file, then record this entry point as
-        // an upper bound of the previous file.
-        file_containing_lb.emplace(token.Index(), file_stack.back());
-        file_stack.pop_back();
-        continue;
-      }
-
-      default:
-        continue;
-    }
-  }
-
-  return file_containing_lb;
-}
 
 // Find all top-level declarations.
 class TLDFinder final : public pasta::DeclVisitor {
@@ -136,6 +85,7 @@ static bool TokenIsInContextOfDecl(const pasta::Token &tok,
   return false;
 }
 
+// Print a declaration; useful for error reporting.
 static std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
   auto sep = "";
@@ -146,19 +96,125 @@ static std::string DeclToString(const pasta::Decl &decl) {
   return ss.str();
 }
 
-// Find the range of tokens of this decl.
-static std::pair<uint64_t, uint64_t> FindDeclRange(
-    const pasta::TokenRange &range, pasta::Decl decl, pasta::Token tok,
-    const std::map<uint64_t, pasta::File> &file_containing_lb) {
+// Return the name of a declaration with a leading `prefix`, or nothing.
+static std::string PrefixedName(const pasta::Decl &decl,
+                                const char *prefix=" ") {
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    auto name = nd->Name();
+    if (!name.empty()) {
+      return prefix + name;
+    }
+  }
+  return "";
+}
 
+// Return the location of a declaration with a leading `prefix`, or nothing.
+static std::string PrefixedLocation(const pasta::Decl &decl,
+                                    const char *prefix=" ") {
+  auto ft = decl.Token().FileLocation();
+  if (!ft) {
+    for (auto tok : decl.TokenRange()) {
+      ft = decl.Token().FileLocation();
+      if (ft) {
+        break;
+      }
+    }
+  }
+  if (ft) {
+    auto file = pasta::File::Containing(*ft);
+    std::stringstream ss;
+    ss << prefix << file.Path().generic_string()
+       << ':' << ft->Line() << ':' << ft->Column();
+    return ss.str();
+  }
+  return "";
+}
+
+static bool IsWhitespace(std::string_view data) {
+  auto is_whitespace = false;
+  for (auto ch : data) {
+    switch (ch) {
+      case ' ': case '\t': case '\r': case '\n': case '\\':
+        is_whitespace = true;
+        continue;
+      default:
+        return false;
+    }
+  }
+  return is_whitespace;
+}
+
+// Can we elide this token from the beginning or end of a top-level
+// declaration's range of tokens?
+static bool CanElidTokenFromTLD(pasta::Token tok) {
+  switch (tok.Role()) {
+    case pasta::TokenRole::kBeginOfFileMarker:
+    case pasta::TokenRole::kEndOfFileMarker:
+      return true;
+
+    case pasta::TokenRole::kFileToken:
+      switch (mx::FromClang(tok.Kind())) {
+        case mx::TokenKind::TK_comment:
+        case mx::TokenKind::TK_eof:
+        case mx::TokenKind::TK_eod:
+        case mx::TokenKind::TK_code_completion:
+          return true;
+        case mx::TokenKind::TK_whitespace:
+        case mx::TokenKind::TK_unknown: {
+          return IsWhitespace(tok.Data());
+        }
+        default:
+          return false;
+      }
+    default:
+      return false;
+  }
+}
+
+// Do some minor stuff to find begin/ending tokens.
+static std::pair<uint64_t, uint64_t> BaselineDeclRange(
+    const pasta::Decl &decl, pasta::Token tok) {
   auto decl_range = decl.TokenRange();
   auto begin_tok_index = tok.Index();
   auto end_tok_index = begin_tok_index;
-  const auto max_tok_index = range.Size();
+
   if (decl_range.Size()) {
-    begin_tok_index = decl_range.begin()->Index();
-    end_tok_index = (--decl_range.end())->Index();
+    begin_tok_index = std::min(begin_tok_index, decl_range.begin()->Index());
+    end_tok_index = std::max(end_tok_index, (--decl_range.end())->Index());
   }
+
+  if (auto td = pasta::TagDecl::From(decl)) {
+    if (auto tt = td->OuterTokenStart()) {
+      begin_tok_index = std::min(begin_tok_index, tt.Index());
+      end_tok_index = std::max(end_tok_index, tt.Index());
+    }
+    if (auto tt = td->InnerTokenStart()) {
+      begin_tok_index = std::min(begin_tok_index, tt.Index());
+      end_tok_index = std::max(end_tok_index, tt.Index());
+    }
+  }
+
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    if (auto tt = nd->BeginToken()) {
+      begin_tok_index = std::min(begin_tok_index, tt.Index());
+      end_tok_index = std::max(end_tok_index, tt.Index());
+    }
+    if (auto tt = nd->EndToken()) {
+      begin_tok_index = std::min(begin_tok_index, tt.Index());
+      end_tok_index = std::max(end_tok_index, tt.Index());
+    }
+  }
+
+  return {begin_tok_index, end_tok_index};
+}
+
+// Find the range of tokens of this decl.
+static std::pair<uint64_t, uint64_t> FindDeclRange(
+    const pasta::TokenRange &range, pasta::Decl decl, pasta::Token tok) {
+
+  auto [begin_tok_index, end_tok_index] = BaselineDeclRange(decl, tok);
+
+  const auto max_tok_index = range.Size();
 
   // Scan backwards to find more tokens in the context of this declaration.
   // We want to find the beginning of this declarations.
@@ -185,8 +241,8 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 
   // Scan forwards to find more tokens in the context of this declaration. We
   // want to find the ending of this declarations.
-  for (; end_tok_index < max_tok_index; ++end_tok_index) {
-    tok = range[end_tok_index];
+  for (; (end_tok_index + 1u) < max_tok_index;) {
+    tok = range[++end_tok_index];
     switch (tok.Role()) {
       case pasta::TokenRole::kMacroExpansionToken:
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
@@ -209,104 +265,52 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the ranges returns
   tok = range[begin_tok_index];
-  if (auto mr = tok.MacroExpandedTokens()) {
-    begin_tok_index = mr.begin()->Index() - 1u;
+  while (tok.Role() == pasta::TokenRole::kMacroExpansionToken) {
+    tok = range[--begin_tok_index];
   }
 
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the ranges returns
   tok = range[end_tok_index];
-  if (auto mr = tok.MacroExpandedTokens()) {
-    end_tok_index = mr.end()->Index();
+  while (tok.Role() == pasta::TokenRole::kMacroExpansionToken) {
+    tok = range[++end_tok_index];
   }
 
-  if (begin_tok_index == end_tok_index) {
-    // There should always be at least two tokens in any top-level decl.
-    LOG(ERROR)
-        << "Only found one token " << tok.Data() << " for: "
-        << DeclToString(decl);
-    return {begin_tok_index, end_tok_index};
+  // Strip leading whitespace and comments.
+  while (begin_tok_index < end_tok_index &&
+         CanElidTokenFromTLD(range[begin_tok_index])) {
+    ++begin_tok_index;
   }
 
-//    std::cerr
-//        << "Looking for range of " << decl.KindName() << " token role "
-//        << int(tok.Role()) << " data " << tok.Data() << '\n';
-//
-//    if (auto ft = tok.FileLocation()) {
-//      auto f = pasta::File::Containing(*ft);
-//      std::cerr
-//          << '\t' << f.Path().generic_string() << ':' << ft->Line()
-//          << ':' << ft->Column() << ": " << ft->Data() << '\n';
-//    }
-//
-//    auto fi = file_containing_lb.lower_bound(begin_tok_index);
-//    if (fi != file_containing_lb.end()) {
-//      std::cerr
-//          << '\t' << fi->second.Path().generic_string() << '\n';
-//    }
-//
-//    for (auto rt : decl_range) {
-//      std::cerr << "\trange tok: " << rt.Data() << '\n';
-//    }
-//
-//    auto b = begin_tok_index;
-//    auto e = begin_tok_index;
-//    for (auto j = 0; b && j < 20; --b, ++j) { }
-//    for (auto j = 0; e < max_tok_index && j < 20; ++e, ++j) { }
-//
-//    std::cerr << "\tFUDGE:\n";
-//    for (auto i = b; i <= e; ++i) {
-//      std::cerr << "\t\t" << range[i].Data() << " (" << TokenIsInContextOfDecl(range[i], decl) << ")\n";
-//    }
-//  }
+  // Strip trailing whitespace and comments.
+  while (end_tok_index > begin_tok_index &&
+         CanElidTokenFromTLD(range[end_tok_index])) {
+    --end_tok_index;
+  }
 
-  std::stringstream ss;
-  auto ws = "";
-
-  for (auto i = begin_tok_index; i <= end_tok_index; ++i) {
-    tok = range[i];
-
-    switch (tok.Role()) {
-      case pasta::TokenRole::kInvalid:
-      case pasta::TokenRole::kPrintedToken:
-        LOG(FATAL)
-            << "Invalid or unexpected tokens in range";
-        break;
-
-      case pasta::TokenRole::kBeginOfFileMarker:
-      case pasta::TokenRole::kEndOfFileMarker:
-      case pasta::TokenRole::kEndOfMacroExpansionMarker:
-        continue;
-
-      case pasta::TokenRole::kBeginOfMacroExpansionMarker: {
-        auto macro_exp_toks = tok.MacroExpandedTokens();
-        i = macro_exp_toks.end()->Index();
-        for (auto ft : tok.MacroUseTokens()) {
-          ss << ws << ft.Data();
-          ws = " ";
-        }
-        continue;
-      }
-
-      case pasta::TokenRole::kFileToken: {
-        ss << ws << tok.Data();
-        ws = " ";
-        break;
-      }
-
-      case pasta::TokenRole::kMacroExpansionToken:
-        LOG(ERROR)
-            << "Macro token " << tok.KindName() << ": " << tok.Data()
-            << " not properly nested";
-        break;
+  // Add in trailing semicolons.
+  if ((end_tok_index + 1u) < max_tok_index) {
+    auto tok_after_end = range[end_tok_index + 1u];
+    if(tok_after_end.Role() == pasta::TokenRole::kFileToken &&
+       (mx::FromClang(tok_after_end.Kind()) == mx::TokenKind::TK_semi)) {
+      ++end_tok_index;
     }
   }
 
-//  std::cerr
-//      << "!!!------------------------------------------------------\n"
-//      << ss.str() << "\n\n\n";
-
   return {begin_tok_index, end_tok_index};
+}
+
+// Returns `true` if `decl` is probably a compiler-built-in declaration. It's
+// not possible to get location information for these, unless we first printed
+// out the compiler builtins to a file and then introduced those as a special
+// preamble.
+static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    if (nd->Name().starts_with("__")) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace
@@ -319,6 +323,8 @@ IndexCompileJobAction::IndexCompileJobAction(
       progress(context->ast_progress),
       job(std::move(job_)) {}
 
+// Look through all files referenced by the AST get their unique IDs. If this
+// is the first time seeing a file, then tokenize the file.
 void IndexCompileJobAction::MaybeTokenizeFile(
     const mx::Executor &exe, pasta::File file) {
   if (file.WasParsed()) {
@@ -331,12 +337,63 @@ void IndexCompileJobAction::MaybeTokenizeFile(
   }
 }
 
+//// Identify the indices in the token range that would tell us, via a
+//// `std::lower_bound`-type query, which file our given token is from.
+//// We need this so that we can figure out what file a top-level declaration
+//// belongs to.
+//void IndexCompileJobAction::FindFileBounds(pasta::TokenRange token_range) {
+//  std::vector<pasta::File> file_stack;
+//  auto token_it = token_range.begin();
+//  auto token_end = token_range.end();
+//  for (; token_it != token_end; ++token_it) {
+//    pasta::Token token = *token_it;
+//
+//    switch (token.Role()) {
+//      case pasta::TokenRole::kBeginOfFileMarker: {
+//        auto file_tok = token.FileLocation();
+//        CHECK(file_tok.has_value())
+//            << "Begin of file marker not associated with a file location";
+//
+//        // If we're entering another file, then record this entry point as
+//        // an upper bound of the previous file.
+//        if (!file_stack.empty()) {
+//          file_containing_lb.emplace(token.Index(), file_stack.back());
+//        }
+//
+//        file_stack.emplace_back(pasta::File::Containing(*file_tok));
+//        continue;
+//      }
+//
+//      case pasta::TokenRole::kEndOfFileMarker: {
+//        auto file_tok = token.FileLocation();
+//        CHECK(file_tok.has_value())
+//            << "End of file marker not associated with a file location";
+//        CHECK(!file_stack.empty())
+//            << "Improper file stack nesting";
+//        CHECK(file_stack.back() == pasta::File::Containing(*file_tok))
+//            << "Improper file stack nesting";
+//
+//        // If we're leaving a file, then record this entry point as
+//        // an upper bound of the previous file.
+//        file_containing_lb.emplace(token.Index(), file_stack.back());
+//        file_stack.pop_back();
+//        continue;
+//      }
+//
+//      default:
+//        continue;
+//    }
+//  }
+//}
+
 // Build and index the AST.
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
+  auto main_file_path = job.SourceFile().Path().generic_string();
   auto maybe_ast = job.Run();
   if (!maybe_ast.Succeeded()) {
     LOG(ERROR)
         << "Error building AST for command " << job.Arguments().Join()
+        << " on main file " << main_file_path
         << "; error was: " << maybe_ast.TakeError();
     return;
   }
@@ -346,25 +403,123 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     MaybeTokenizeFile(exe, std::move(file));
   }
 
+//  FindFileBounds(tok_range);
+
+  using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
+  std::vector<DeclRange> decl_ranges;
+
   // TODO(pag): Handle top-level statements, e.g. asm.
-  auto tok_range = ast.Tokens();
-  auto file_containing_lb = FindFileBounds(tok_range);
+  pasta::TokenRange tok_range = ast.Tokens();
   auto tlds = FindTLDs(ast.TranslationUnit());
   for (pasta::Decl decl : tlds) {
+    if (decl.Kind() == pasta::DeclKind::kEmpty) {
+      continue;
+    }
+
     auto tok = decl.Token();
 
     // These are probably part of the preamble of compiler-provided builtin
     // declarations.
     if (!tok) {
-      LOG(WARNING)
-          << "Could not find location of: " << DeclToString(decl);
+      LOG_IF(WARNING, !IsProbablyABuiltinDecl(decl))
+          << "Could not find location of " << decl.KindName()
+          << " declaration: " << DeclToString(decl)
+          << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
 
     } else if (!TokenIsInContextOfDecl(tok, decl)) {
-      LOG(ERROR)
-          << "Could not find location of: " << DeclToString(decl);
+      LOG_IF(ERROR, !IsProbablyABuiltinDecl(decl))
+          << "Could not find location of " << decl.KindName()
+          << " declaration: " << DeclToString(decl)
+          << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
 
     } else {
-      FindDeclRange(tok_range, decl, tok, file_containing_lb);
+      auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok);
+
+      // There should always be at least two tokens in any top-level decl.
+      LOG_IF(ERROR, begin_index == end_index)
+          << "Only found one token " << tok.Data() << " for: "
+          << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
+
+      decl_ranges.emplace_back(decl, begin_index, end_index);
+    }
+  }
+
+  // It's possible that we have two-or-more things that appear to be top-level
+  // decls, but really we're only dealing with one top-level decl. This happens
+  // with things like `typedef`s in Clang when the referenced type of a typedef
+  // is defined within the typedef (e.g. a union/struct/enum type). In these
+  // cases, Clang places the definition of the referenced type before the
+  // typedef inside of the `DeclContext`, and so the referenced type appears
+  // as its own top-level declaration, despite it being logically nested inside
+  // of another top-level declaration.
+
+  std::stable_sort(decl_ranges.begin(), decl_ranges.end(),
+                   [] (const DeclRange &a, const DeclRange &b) {
+                     auto a_begin = std::get<1>(a);
+                     auto b_begin = std::get<1>(b);
+                     if (a_begin < b_begin) {
+                       return true;
+                     } else if (a_begin > b_begin) {
+                       return false;
+                     } else {
+                       return std::get<2>(a) < std::get<2>(b);
+                     }
+                   });
+
+  std::vector<pasta::Decl> tlds_for_tree;
+  for (size_t i = 0u, max_i = decl_ranges.size(); i < max_i; ) {
+    auto [decl, begin_index, end_index] = std::move(decl_ranges[i++]);
+    tlds_for_tree.clear();
+    tlds_for_tree.push_back(decl);
+    while (i < max_i) {
+      if (std::get<1>(decl_ranges[i]) <= end_index) {
+        auto next_decl = std::get<0>(decl_ranges[i]);
+
+        if (next_decl == decl) {
+          DLOG(WARNING)
+              << "Declaration of " << decl.KindName()
+              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
+              << " is repeated in top-level decl list for job on file "
+              << " on main job file " << main_file_path;
+        } else {
+//          DLOG(INFO)
+//              << "Declaration of " << decl.KindName()
+//              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
+//              << " encloses over subsequent "
+//              << next_decl.KindName() << PrefixedName(next_decl) << " declaration"
+//              << PrefixedName(next_decl)
+//              << PrefixedLocation(next_decl, " at or near ")
+//              << " on main job file " << main_file_path;
+
+          // Keep track of enclosed decls.
+          tlds_for_tree.push_back(std::move(next_decl));
+        }
+
+        // Make sure we definitely enclose over the next decl.
+        end_index = std::max(end_index, std::get<2>(decl_ranges[i]));
+
+        // Consume the next decl.
+        ++i;
+        continue;
+
+      // Doesn't close over.
+      } else {
+        break;
+      }
+    }
+
+    mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(
+        tok_range, begin_index, end_index);
+    if (maybe_tt.Succeeded()) {
+
+    } else {
+      LOG(ERROR)
+          << maybe_tt.TakeError() << " for top-level declaration "
+          << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
     }
   }
 }
