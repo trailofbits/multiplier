@@ -224,14 +224,19 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
       case pasta::TokenRole::kMacroExpansionToken:
         continue;
+      case pasta::TokenRole::kBeginOfFileMarker:
+        goto exclude_begin_tok;
       default:
         break;
     }
 
-    if (!TokenIsInContextOfDecl(tok, decl)) {
-      ++begin_tok_index;
-      break;
+    if (TokenIsInContextOfDecl(tok, decl)) {
+      continue;
     }
+
+  exclude_begin_tok:
+    ++begin_tok_index;
+    break;
   }
 
   // Watch out for unsigned integer overflow on subtraction. This shouldn't
@@ -247,16 +252,20 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
       case pasta::TokenRole::kMacroExpansionToken:
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
         continue;
+      case pasta::TokenRole::kEndOfFileMarker:
+        goto exclude_end_tok;
       default:
         break;
     }
 
-    if (mx::FromClang(tok.Kind()) == mx::TokenKind::TK_semi) {
+    if (mx::FromClang(tok.Kind()) == mx::TokenKind::TK_semi ||
+        TokenIsInContextOfDecl(tok, decl)) {
       continue;
-    } else if (!TokenIsInContextOfDecl(tok, decl)) {
-      --end_tok_index;
-      break;
     }
+
+  exclude_end_tok:
+    --end_tok_index;
+    break;
   }
 
   // We should always at least hit the end of file marker token first.
