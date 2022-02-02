@@ -96,6 +96,40 @@ static std::string DeclToString(const pasta::Decl &decl) {
   return ss.str();
 }
 
+// Return the name of a declaration with a leading `prefix`, or nothing.
+static std::string PrefixedName(const pasta::Decl &decl,
+                                const char *prefix=" ") {
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    auto name = nd->Name();
+    if (!name.empty()) {
+      return prefix + name;
+    }
+  }
+  return "";
+}
+
+// Return the location of a declaration with a leading `prefix`, or nothing.
+static std::string PrefixedLocation(const pasta::Decl &decl,
+                                    const char *prefix=" ") {
+  auto ft = decl.Token().FileLocation();
+  if (!ft) {
+    for (auto tok : decl.TokenRange()) {
+      ft = decl.Token().FileLocation();
+      if (ft) {
+        break;
+      }
+    }
+  }
+  if (ft) {
+    auto file = pasta::File::Containing(*ft);
+    std::stringstream ss;
+    ss << prefix << file.Path().generic_string()
+       << ':' << ft->Line() << ':' << ft->Column();
+    return ss.str();
+  }
+  return "";
+}
+
 static bool IsWhitespace(std::string_view data) {
   auto is_whitespace = false;
   for (auto ch : data) {
@@ -207,8 +241,8 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 
   // Scan forwards to find more tokens in the context of this declaration. We
   // want to find the ending of this declarations.
-  for (; end_tok_index < max_tok_index; ++end_tok_index) {
-    tok = range[end_tok_index];
+  for (; (end_tok_index + 1u) < max_tok_index;) {
+    tok = range[++end_tok_index];
     switch (tok.Role()) {
       case pasta::TokenRole::kMacroExpansionToken:
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
@@ -354,10 +388,12 @@ void IndexCompileJobAction::MaybeTokenizeFile(
 
 // Build and index the AST.
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
+  auto main_file_path = job.SourceFile().Path().generic_string();
   auto maybe_ast = job.Run();
   if (!maybe_ast.Succeeded()) {
     LOG(ERROR)
         << "Error building AST for command " << job.Arguments().Join()
+        << " on main file " << main_file_path
         << "; error was: " << maybe_ast.TakeError();
     return;
   }
@@ -387,12 +423,16 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     if (!tok) {
       LOG_IF(WARNING, !IsProbablyABuiltinDecl(decl))
           << "Could not find location of " << decl.KindName()
-          << " declaration: " << DeclToString(decl);
+          << " declaration: " << DeclToString(decl)
+          << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
 
     } else if (!TokenIsInContextOfDecl(tok, decl)) {
       LOG_IF(ERROR, !IsProbablyABuiltinDecl(decl))
           << "Could not find location of " << decl.KindName()
-          << " declaration: " << DeclToString(decl);
+          << " declaration: " << DeclToString(decl)
+          << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
 
     } else {
       auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok);
@@ -400,8 +440,8 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       // There should always be at least two tokens in any top-level decl.
       LOG_IF(ERROR, begin_index == end_index)
           << "Only found one token " << tok.Data() << " for: "
-          << DeclToString(decl);
-
+          << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
 
       decl_ranges.emplace_back(decl, begin_index, end_index);
     }
@@ -429,14 +469,34 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
                      }
                    });
 
+  std::vector<pasta::Decl> tlds_for_tree;
   for (size_t i = 0u, max_i = decl_ranges.size(); i < max_i; ) {
     auto [decl, begin_index, end_index] = std::move(decl_ranges[i++]);
+    tlds_for_tree.clear();
+    tlds_for_tree.push_back(decl);
     while (i < max_i) {
       if (std::get<1>(decl_ranges[i]) <= end_index) {
-        DLOG(INFO)
-            << "Declaration of " << decl.KindName()
-            << " encloses over subsequent "
-            << std::get<0>(decl_ranges[i]).KindName() << " declaration";
+        auto next_decl = std::get<0>(decl_ranges[i]);
+
+        if (next_decl == decl) {
+          DLOG(WARNING)
+              << "Declaration of " << decl.KindName()
+              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
+              << " is repeated in top-level decl list for job on file "
+              << " on main job file " << main_file_path;
+        } else {
+          DLOG(INFO)
+              << "Declaration of " << decl.KindName()
+              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
+              << " encloses over subsequent "
+              << next_decl.KindName() << PrefixedName(next_decl) << " declaration"
+              << PrefixedName(next_decl)
+              << PrefixedLocation(next_decl, " at or near ")
+              << " on main job file " << main_file_path;
+
+          // Keep track of enclosed decls.
+          tlds_for_tree.push_back(std::move(next_decl));
+        }
 
         // Make sure we definitely enclose over the next decl.
         end_index = std::max(end_index, std::get<2>(decl_ranges[i]));
@@ -458,7 +518,8 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     } else {
       LOG(ERROR)
           << maybe_tt.TakeError() << " for top-level declaration "
-          << DeclToString(decl);
+          << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
     }
   }
 }

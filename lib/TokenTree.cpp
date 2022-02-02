@@ -142,7 +142,8 @@ static bool IsWhitespace(std::string_view data) {
 }
 
 // Fill in the missing tokens from the token tree.
-static TokenInfo *FillMissingFileTokens(std::deque<TokenInfo> &info_alloc) {
+static TokenInfo *FillMissingFileTokens(std::deque<TokenInfo> &info_alloc,
+                                        std::stringstream &err) {
 
   TokenInfo * const first = &(info_alloc.front());
   CHECK(first->parsed_tok.has_value());
@@ -308,10 +309,20 @@ static TokenInfo *FillMissingFileTokens(std::deque<TokenInfo> &info_alloc) {
     // We're about to exit a file, make sure to back-fill any trailing tokens
     // from within the end of that file.
     } else if (pasta::TokenRole::kEndOfFileMarker == curr_tok_role) {
-      CHECK(!last_tok_from_file.empty());
       pasta::File exited_file = last_tok_from_file.back().first;
       pasta::FileToken exited_tok = last_tok_from_file.back().second;
+
       last_tok_from_file.pop_back();
+      if (last_tok_from_file.empty()) {
+        err
+            << "Token tree range straddles two files "
+            << prev_file.Path().generic_string() << ':'
+            << prev_file_tok.Line() << ':' << prev_file_tok.Column()
+            << " and "
+            << curr_file.Path().generic_string() << ':'
+            << curr_file_tok.Line() << ':' << curr_file_tok.Column();
+        return nullptr;
+      }
 
       pasta::FileTokenRange exited_toks = exited_file.Tokens();
 
@@ -326,7 +337,6 @@ static TokenInfo *FillMissingFileTokens(std::deque<TokenInfo> &info_alloc) {
       // The included/imported file appeared non-empty to the parser; see if
       // we need to back fill.
       } else {
-        CHECK(exited_file == prev_file);
         for (uint64_t i = exited_tok.Index() + 1u, max_i = exited_toks.Size();
              i < max_i; ++i) {
           prev = FillMissingToken(info_alloc, exited_toks[i], prev);
@@ -360,12 +370,13 @@ static TokenInfo *FillMissingFileTokens(std::deque<TokenInfo> &info_alloc) {
       }
 
     } else {
-      LOG(FATAL)
+      err
           << "Out-of-order file tokens in file "
           << prev_file.Path().generic_string()
           << " " << prev_file_tok.Line() << ':' << prev_file_tok.Column()
           << " before " << curr_file_tok.Line() << ':'
           << curr_file_tok.Column();
+      return nullptr;
     }
 
     // Keep track of the last token from the current file.
@@ -444,7 +455,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
-  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
 
   std::deque<TokenInfo> info_alloc;
   BuildInitialTokenList(std::move(range), begin_index, end_index, info_alloc);
@@ -453,24 +464,41 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return err.str();
   }
 
-  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
-  auto info = FillMissingFileTokens(info_alloc);
-  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
-  for (; info; info = info->next) {
-    switch (info->category) {
-      case TokenInfo::kFileToken:
-        std::cerr << info->file_tok->Data();
-        continue;
-      case TokenInfo::kMacroUseToken:
-      case TokenInfo::kMissingFileToken:
-        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
-        continue;
-      case TokenInfo::kMarkerToken:
-      default:
-        continue;
-    }
+//  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
+//  for (auto info = &(info_alloc.front()); info; info = info->next) {
+//    switch (info->category) {
+//      case TokenInfo::kFileToken:
+//        std::cerr << info->file_tok->Data();
+//        continue;
+//      case TokenInfo::kMacroUseToken:
+//      case TokenInfo::kMissingFileToken:
+//        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
+//        continue;
+//      case TokenInfo::kMarkerToken:
+//      default:
+//        continue;
+//    }
+//  }
+  auto info = FillMissingFileTokens(info_alloc, err);
+  if (!info) {
+    return err.str();
   }
-  std::cerr << "\n\n\n";
+//  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
+//  for (; info; info = info->next) {
+//    switch (info->category) {
+//      case TokenInfo::kFileToken:
+//        std::cerr << info->file_tok->Data();
+//        continue;
+//      case TokenInfo::kMacroUseToken:
+//      case TokenInfo::kMissingFileToken:
+//        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
+//        continue;
+//      case TokenInfo::kMarkerToken:
+//      default:
+//        continue;
+//    }
+//  }
+//  std::cerr << "\n\n\n";
   return TokenTree(std::move(impl));
 }
 
