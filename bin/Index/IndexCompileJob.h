@@ -6,6 +6,7 @@
 
 #pragma once
 
+//#include <map>
 #include <memory>
 #include <multiplier/Action.h>
 #include <multiplier/ProgressBar.h>
@@ -15,6 +16,7 @@
 
 namespace pasta {
 class File;
+class TokenRange;
 }  // namespace pasta
 namespace indexer {
 
@@ -27,8 +29,17 @@ class IndexCompileJobAction final : public mx::Action {
   const pasta::CompileJob job;
 
   std::unordered_map<pasta::File, mx::FileId> file_ids;
+//  std::map<uint64_t, pasta::File> file_containing_lb;
 
+  // Look through all files referenced by the AST get their unique IDs. If this
+  // is the first time seeing a file, then tokenize the file.
   void MaybeTokenizeFile(const mx::Executor &exe, pasta::File file);
+
+//  // Identify the indices in the token range that would tell us, via a
+//  // `std::lower_bound`-type query, which file our given token is from.
+//  // We need this so that we can figure out what file a top-level declaration
+//  // belongs to.
+//  void FindFileBounds(pasta::TokenRange token_range);
 
  public:
   virtual ~IndexCompileJobAction(void);

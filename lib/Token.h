@@ -7,6 +7,7 @@
 #pragma once
 
 #include <multiplier/Token.h>
+#include <multiplier/TokenTree.h>
 
 #include <string>
 #include <vector>
@@ -22,6 +23,11 @@ class TokenListImpl {
   void AddToken(std::string_view data, TokenKind kind,
                 std::vector<uint16_t> &dummy_states,
                 std::string &dummy_output);
+};
+
+class TokenTreeImpl : public TokenListImpl {
+ public:
+
 };
 
 }  // namespace mx
