@@ -130,18 +130,17 @@ static std::string PrefixedLocation(const pasta::Decl &decl,
   return "";
 }
 
-static bool IsWhitespace(std::string_view data) {
-  auto is_whitespace = false;
+// Returns `true` if `data` contains only whitespace or is empty.
+static bool IsWhitespaceOrEmpty(std::string_view data) {
   for (auto ch : data) {
     switch (ch) {
       case ' ': case '\t': case '\r': case '\n': case '\\':
-        is_whitespace = true;
         continue;
       default:
         return false;
     }
   }
-  return is_whitespace;
+  return true;
 }
 
 // Can we elide this token from the beginning or end of a top-level
@@ -160,9 +159,8 @@ static bool CanElidTokenFromTLD(pasta::Token tok) {
         case mx::TokenKind::TK_code_completion:
           return true;
         case mx::TokenKind::TK_whitespace:
-        case mx::TokenKind::TK_unknown: {
-          return IsWhitespace(tok.Data());
-        }
+        case mx::TokenKind::TK_unknown:
+          return IsWhitespaceOrEmpty(tok.Data());
         default:
           return false;
       }
