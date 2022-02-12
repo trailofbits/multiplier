@@ -7,6 +7,7 @@
 #include "IndexCompileJob.h"
 
 #include <algorithm>
+#include <fstream>
 #include <glog/logging.h>
 #include <multiplier/TokenTree.h>
 #include <pasta/AST/AST.h>
@@ -19,7 +20,7 @@
 
 #include "Context.h"
 #include "TokenizeFile.h"
-
+#include "PrintTokenGraph.h"
 
 namespace indexer {
 namespace {
@@ -74,10 +75,10 @@ static std::vector<pasta::Decl> FindTLDs(pasta::TranslationUnitDecl tu) {
 // Return `true` of `tok` is in the context of `decl`.
 static bool TokenIsInContextOfDecl(const pasta::Token &tok,
                                    const pasta::Decl &decl) {
+  auto cdecl = decl.CanonicalDeclaration();
   for (auto context = tok.Context(); context; context = context->Parent()) {
     if (auto maybe_decl = pasta::Decl::From(*context)) {
-      if (maybe_decl->CanonicalDeclaration() ==
-          decl.CanonicalDeclaration()) {
+      if (*maybe_decl == cdecl) {
         return true;
       }
     }
@@ -180,28 +181,28 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
     begin_tok_index = std::min(begin_tok_index, decl_range.begin()->Index());
     end_tok_index = std::max(end_tok_index, (--decl_range.end())->Index());
   }
-
-  if (auto td = pasta::TagDecl::From(decl)) {
-    if (auto tt = td->OuterTokenStart()) {
-      begin_tok_index = std::min(begin_tok_index, tt.Index());
-      end_tok_index = std::max(end_tok_index, tt.Index());
-    }
-    if (auto tt = td->InnerTokenStart()) {
-      begin_tok_index = std::min(begin_tok_index, tt.Index());
-      end_tok_index = std::max(end_tok_index, tt.Index());
-    }
-  }
-
-  if (auto nd = pasta::NamedDecl::From(decl)) {
-    if (auto tt = nd->BeginToken()) {
-      begin_tok_index = std::min(begin_tok_index, tt.Index());
-      end_tok_index = std::max(end_tok_index, tt.Index());
-    }
-    if (auto tt = nd->EndToken()) {
-      begin_tok_index = std::min(begin_tok_index, tt.Index());
-      end_tok_index = std::max(end_tok_index, tt.Index());
-    }
-  }
+//
+//  if (auto td = pasta::TagDecl::From(decl)) {
+//    if (auto tt = td->OuterTokenStart()) {
+//      begin_tok_index = std::min(begin_tok_index, tt.Index());
+//      end_tok_index = std::max(end_tok_index, tt.Index());
+//    }
+//    if (auto tt = td->InnerTokenStart()) {
+//      begin_tok_index = std::min(begin_tok_index, tt.Index());
+//      end_tok_index = std::max(end_tok_index, tt.Index());
+//    }
+//  }
+//
+//  if (auto nd = pasta::NamedDecl::From(decl)) {
+//    if (auto tt = nd->BeginToken()) {
+//      begin_tok_index = std::min(begin_tok_index, tt.Index());
+//      end_tok_index = std::max(end_tok_index, tt.Index());
+//    }
+//    if (auto tt = nd->EndToken()) {
+//      begin_tok_index = std::min(begin_tok_index, tt.Index());
+//      end_tok_index = std::max(end_tok_index, tt.Index());
+//    }
+//  }
 
   return {begin_tok_index, end_tok_index};
 }
@@ -312,7 +313,9 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 // out the compiler builtins to a file and then introduced those as a special
 // preamble.
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
-  if (auto nd = pasta::NamedDecl::From(decl)) {
+  if (decl.IsImplicit()) {
+    return true;
+  } else if (auto nd = pasta::NamedDecl::From(decl)) {
     if (nd->Name().starts_with("__")) {
       return true;
     }
@@ -344,55 +347,6 @@ void IndexCompileJobAction::MaybeTokenizeFile(
   }
 }
 
-//// Identify the indices in the token range that would tell us, via a
-//// `std::lower_bound`-type query, which file our given token is from.
-//// We need this so that we can figure out what file a top-level declaration
-//// belongs to.
-//void IndexCompileJobAction::FindFileBounds(pasta::TokenRange token_range) {
-//  std::vector<pasta::File> file_stack;
-//  auto token_it = token_range.begin();
-//  auto token_end = token_range.end();
-//  for (; token_it != token_end; ++token_it) {
-//    pasta::Token token = *token_it;
-//
-//    switch (token.Role()) {
-//      case pasta::TokenRole::kBeginOfFileMarker: {
-//        auto file_tok = token.FileLocation();
-//        CHECK(file_tok.has_value())
-//            << "Begin of file marker not associated with a file location";
-//
-//        // If we're entering another file, then record this entry point as
-//        // an upper bound of the previous file.
-//        if (!file_stack.empty()) {
-//          file_containing_lb.emplace(token.Index(), file_stack.back());
-//        }
-//
-//        file_stack.emplace_back(pasta::File::Containing(*file_tok));
-//        continue;
-//      }
-//
-//      case pasta::TokenRole::kEndOfFileMarker: {
-//        auto file_tok = token.FileLocation();
-//        CHECK(file_tok.has_value())
-//            << "End of file marker not associated with a file location";
-//        CHECK(!file_stack.empty())
-//            << "Improper file stack nesting";
-//        CHECK(file_stack.back() == pasta::File::Containing(*file_tok))
-//            << "Improper file stack nesting";
-//
-//        // If we're leaving a file, then record this entry point as
-//        // an upper bound of the previous file.
-//        file_containing_lb.emplace(token.Index(), file_stack.back());
-//        file_stack.pop_back();
-//        continue;
-//      }
-//
-//      default:
-//        continue;
-//    }
-//  }
-//}
-
 // Build and index the AST.
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   auto main_file_path = job.SourceFile().Path().generic_string();
@@ -409,8 +363,6 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   for (pasta::File file : ast.ParsedFiles()) {
     MaybeTokenizeFile(exe, std::move(file));
   }
-
-//  FindFileBounds(tok_range);
 
   using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
   std::vector<DeclRange> decl_ranges;
@@ -434,14 +386,21 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
           << PrefixedLocation(decl, " at or near ")
           << " on main job file " << main_file_path;
 
-    } else if (!TokenIsInContextOfDecl(tok, decl)) {
-      LOG_IF(ERROR, !IsProbablyABuiltinDecl(decl))
+    } else {
+
+      // This suggests an error in PASTA, usually related to token alignment
+      // against printed tokens. That process tries to "align" pretty-printed
+      // decl tokens, which are full of contextual information, with parsed
+      // tokens, which have no contextual information. We do this so that we
+      // can get the contextual information from parsed tokens, which is often
+      // more useful.
+      LOG_IF(ERROR, !TokenIsInContextOfDecl(tok, decl) &&
+                    !IsProbablyABuiltinDecl(decl))
           << "Could not find location of " << decl.KindName()
           << " declaration: " << DeclToString(decl)
           << PrefixedLocation(decl, " at or near ")
           << " on main job file " << main_file_path;
 
-    } else {
       auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok);
 
       // There should always be at least two tokens in any top-level decl.
@@ -515,6 +474,13 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       // Doesn't close over.
       } else {
         break;
+      }
+    }
+
+    if (auto nd = pasta::NamedDecl::From(decl)) {
+      if (nd->Name() == "FILE" || nd->Name() == "__sFILE") {
+        std::ofstream fs("/tmp/file.dot");
+        PrintTokenGraph(tok_range, begin_index, end_index, fs);
       }
     }
 

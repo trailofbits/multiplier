@@ -111,11 +111,18 @@ static void BuildInitialTokenList(pasta::TokenRange range,
   }
 }
 
+// Inject a missing token file token into the token stream after `prev`.
+// Return the new value for `prev`.
 static TokenInfo *FillMissingToken(std::deque<TokenInfo> &info_alloc,
                                    pasta::FileToken tok,
                                    TokenInfo *prev) {
-  if (mx::FromClang(tok.Kind()) == mx::TokenKind::TK_eof) {
-    return prev;
+  switch (mx::FromClang(tok.Kind())) {
+    case mx::TokenKind::TK_eof:
+    case mx::TokenKind::TK_eod:
+    case mx::TokenKind::TK_code_completion:
+      return prev;
+    default:
+      break;
   }
 
   TokenInfo &missing_info = info_alloc.emplace_back();
@@ -127,6 +134,8 @@ static TokenInfo *FillMissingToken(std::deque<TokenInfo> &info_alloc,
   return &missing_info;
 }
 
+// Return `true` if `data` contains one or more whitespace characters, and
+// nothing else.
 static bool IsWhitespace(std::string_view data) {
   auto is_whitespace = false;
   for (auto ch : data) {
@@ -163,9 +172,8 @@ static TokenInfo *FillMissingFileTokens(std::deque<TokenInfo> &info_alloc,
 
     switch (curr->category) {
       case TokenInfo::kMissingFileToken:
-        LOG(FATAL)
-            << "Not possible";
-        continue;
+        err << "Broken invariant; missing file token?";
+        return nullptr;
 
       // The macro use tokens are taken from a file, and so we know that they
       // are "fine." We can rely on the expansion begin/end markers to tell
@@ -464,7 +472,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return err.str();
   }
 
-//  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
+  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
 //  for (auto info = &(info_alloc.front()); info; info = info->next) {
 //    switch (info->category) {
 //      case TokenInfo::kFileToken:
@@ -483,22 +491,22 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
   if (!info) {
     return err.str();
   }
-//  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
-//  for (; info; info = info->next) {
-//    switch (info->category) {
-//      case TokenInfo::kFileToken:
-//        std::cerr << info->file_tok->Data();
-//        continue;
-//      case TokenInfo::kMacroUseToken:
-//      case TokenInfo::kMissingFileToken:
-//        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
-//        continue;
-//      case TokenInfo::kMarkerToken:
-//      default:
-//        continue;
-//    }
-//  }
-//  std::cerr << "\n\n\n";
+  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
+  for (; info; info = info->next) {
+    switch (info->category) {
+      case TokenInfo::kFileToken:
+        std::cerr << info->file_tok->Data();
+        continue;
+      case TokenInfo::kMacroUseToken:
+      case TokenInfo::kMissingFileToken:
+        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
+        continue;
+      case TokenInfo::kMarkerToken:
+      default:
+        continue;
+    }
+  }
+  std::cerr << "\n\n\n";
   return TokenTree(std::move(impl));
 }
 

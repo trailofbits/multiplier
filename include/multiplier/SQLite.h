@@ -280,8 +280,8 @@ class Database {
           detail::sqlite3_configured = true;
         }
       } while (0);
-      static const auto saved_db_name = detail::maybe_invoke(db_name);
-      auto ret = sqlite3_open(&saved_db_name[0], &db_handle);
+      static const std::string saved_db_name = detail::maybe_invoke(db_name);
+      auto ret = sqlite3_open(saved_db_name.c_str(), &db_handle);
       if (ret != SQLITE_OK) {
         throw error{ret};
       }

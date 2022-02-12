@@ -97,7 +97,15 @@ StorageImpl::StorageImpl(void) {
     EnableAsynchronousWrites();
   }
 
-  CreateTables();
+
+  try {
+    StorageImpl::TransactionGuard transaction;
+    CreateTables();
+
+  } catch (const sqlite::error &error) {
+    LOG(FATAL)
+        << "Unable to create tables: " << sqlite3_errstr(error.err_code);
+  }
 
   if (!FLAGS_disable_async_inserts) {
     CreateBulkInserter();
@@ -125,44 +133,46 @@ void StorageImpl::CreateTables(void) {
   // A table that keeps track of IDs.
   static const char ids_table_query[]
       = "create table if not exists ids "
-        " (initialized integer primary key,"
-        "  next_file_id integer,"
-        "  next_job_id integer,"
-        "  next_tld_id integer,"
+        " (initialized integer primary key not null,"
+        "  next_file_id integer not null,"
+        "  next_job_id integer not null,"
+        "  next_tld_id integer not null,"
         "  next_entity_id integer) without rowid";
   query<ids_table_query>();
 
   static const char files_table_query[]
       = "create table if not exists files "
-        " (id integer primary key,"
-        "  path text unique,"
-        "  tokens blob) without rowid";
+        " (id integer primary key not null,"
+        "  path text unique not null,"
+        "  tokens blob not null) without rowid";
   query<files_table_query>();
 
   static const char jobs_table_query[]
       = "create table if not exists jobs "
-        " (id integer primary key,"
-        "  job blob) without rowid";
+        " (id integer primary key not null,"
+        "  job blob not null) without rowid";
   query<jobs_table_query>();
 
   static const char tlds_table_query[]
       = "create table if not exists tlds "
-        " (id integer primary key,"
-        "  job_id integer,"
-        "  file_id integer) without rowid";
+        " (id integer primary key not null,"
+        "  job_id integer not null,"
+        "  file_id integer not null) without rowid";
   query<tlds_table_query>();
 
   static const char entities_table_query[]
       = "create table if not exists entities "
-        " (id integer,"
-        "  tld_id integer,"
-        "  entity blob,"
-        "  primary key(id, tld_id)) without rowid";
+        " (id integer not null,"
+        "  tld_id integer not null,"
+        "  entity blob not null,"
+        "  primary key (id, tld_id)) without rowid";
   query<entities_table_query>();
 
   // Initialize the IDs.
   static const char initialize_ids_table_query[]
-      = "insert or ignore into ids (initialized, next_file_id) values (1, 1)";
+      = "insert or ignore into ids "
+        "(initialized, next_file_id, next_job_id, next_tld_id, next_entity_id) "
+        "values (1, 1, 1, 1, 1)";
   query<initialize_ids_table_query>();
 }
 
