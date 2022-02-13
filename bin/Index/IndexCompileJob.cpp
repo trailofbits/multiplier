@@ -22,6 +22,8 @@
 #include "TokenizeFile.h"
 #include "PrintTokenGraph.h"
 
+#include <iostream>
+
 namespace indexer {
 namespace {
 
@@ -146,7 +148,7 @@ static bool IsWhitespaceOrEmpty(std::string_view data) {
 
 // Can we elide this token from the beginning or end of a top-level
 // declaration's range of tokens?
-static bool CanElidTokenFromTLD(pasta::Token tok) {
+static bool CanElideTokenFromTLD(pasta::Token tok) {
   switch (tok.Role()) {
     case pasta::TokenRole::kBeginOfFileMarker:
     case pasta::TokenRole::kEndOfFileMarker:
@@ -215,93 +217,39 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 
   const auto max_tok_index = range.Size();
 
-  // Scan backwards to find more tokens in the context of this declaration.
-  // We want to find the beginning of this declarations.
-  while (begin_tok_index--) {
-    tok = range[begin_tok_index];
-    switch (tok.Role()) {
-      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-      case pasta::TokenRole::kMacroExpansionToken:
-        continue;
-      case pasta::TokenRole::kBeginOfFileMarker:
-        goto exclude_begin_tok;
-      default:
-        break;
-    }
-
-    if (TokenIsInContextOfDecl(tok, decl)) {
-      continue;
-    }
-
-  exclude_begin_tok:
-    ++begin_tok_index;
-    break;
-  }
-
-  // Watch out for unsigned integer overflow on subtraction. This shouldn't
-  // happen as we should hit a file begin token first, or perhaps a token
-  // associated with a builtin type.
-  CHECK_LT(begin_tok_index, max_tok_index);
-
-  // Scan forwards to find more tokens in the context of this declaration. We
-  // want to find the ending of this declarations.
-  for (; (end_tok_index + 1u) < max_tok_index;) {
-    tok = range[++end_tok_index];
-    switch (tok.Role()) {
-      case pasta::TokenRole::kMacroExpansionToken:
-      case pasta::TokenRole::kEndOfMacroExpansionMarker:
-        continue;
-      case pasta::TokenRole::kEndOfFileMarker:
-        goto exclude_end_tok;
-      default:
-        break;
-    }
-
-    if (mx::FromClang(tok.Kind()) == mx::TokenKind::TK_semi ||
-        TokenIsInContextOfDecl(tok, decl)) {
-      continue;
-    }
-
-  exclude_end_tok:
-    --end_tok_index;
-    break;
-  }
-
   // We should always at least hit the end of file marker token first.
   CHECK_LT(end_tok_index, max_tok_index);
 
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the ranges returns
   tok = range[begin_tok_index];
+  bool in_macro = false;
   while (tok.Role() == pasta::TokenRole::kMacroExpansionToken) {
     tok = range[--begin_tok_index];
+    in_macro = true;
+  }
+  if (!in_macro) {
+    // Strip leading whitespace and comments.
+    while (begin_tok_index < end_tok_index &&
+           CanElideTokenFromTLD(range[begin_tok_index])) {
+      ++begin_tok_index;
+    }
   }
 
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the ranges returns
   tok = range[end_tok_index];
+  in_macro = false;
   while (tok.Role() == pasta::TokenRole::kMacroExpansionToken) {
     tok = range[++end_tok_index];
+    in_macro = true;
   }
 
-  // Strip leading whitespace and comments.
-  while (begin_tok_index < end_tok_index &&
-         CanElidTokenFromTLD(range[begin_tok_index])) {
-    ++begin_tok_index;
-  }
-
-  // Strip trailing whitespace and comments.
-  while (end_tok_index > begin_tok_index &&
-         CanElidTokenFromTLD(range[end_tok_index])) {
-    --end_tok_index;
-  }
-
-  // Add in trailing semicolons.
-  if ((end_tok_index + 1u) < max_tok_index) {
-    auto tok_after_end = range[end_tok_index + 1u];
-    if(tok_after_end.Role() == pasta::TokenRole::kFileToken &&
-       (mx::FromClang(tok_after_end.Kind()) == mx::TokenKind::TK_semi)) {
-      ++end_tok_index;
+  if (!in_macro) {
+    // Strip trailing whitespace and comments.
+    while (end_tok_index > begin_tok_index &&
+           CanElideTokenFromTLD(range[end_tok_index])) {
+      --end_tok_index;
     }
   }
 
@@ -440,9 +388,11 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     auto [decl, begin_index, end_index] = std::move(decl_ranges[i++]);
     tlds_for_tree.clear();
     tlds_for_tree.push_back(decl);
-    while (i < max_i) {
+
+    for (; i < max_i; ++i) {
       if (std::get<1>(decl_ranges[i]) <= end_index) {
         auto next_decl = std::get<0>(decl_ranges[i]);
+        auto next_end = std::get<2>(decl_ranges[i]);
 
         if (next_decl == decl) {
           DLOG(WARNING)
@@ -465,22 +415,11 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
         }
 
         // Make sure we definitely enclose over the next decl.
-        end_index = std::max(end_index, std::get<2>(decl_ranges[i]));
-
-        // Consume the next decl.
-        ++i;
-        continue;
+        end_index = std::max(end_index, next_end);
 
       // Doesn't close over.
       } else {
         break;
-      }
-    }
-
-    if (auto nd = pasta::NamedDecl::From(decl)) {
-      if (nd->Name() == "FILE" || nd->Name() == "__sFILE") {
-        std::ofstream fs("/tmp/file.dot");
-        PrintTokenGraph(tok_range, begin_index, end_index, fs);
       }
     }
 
