@@ -107,6 +107,9 @@ void PrintTokenGraph(const pasta::TokenRange &tokens, uint64_t begin_index,
         bgcolor = " bgcolor=\"deepskyblue3\"";
         kind_name = "Alias";
         break;
+      case pasta::TokenContextKind::kAST:
+        bgcolor = " bgcolor=\"white\"";
+        break;
     }
 
     os

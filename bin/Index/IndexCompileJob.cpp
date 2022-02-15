@@ -423,6 +423,19 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       }
     }
 
+    if (auto nd = pasta::NamedDecl::From(decl)) {
+      if (nd->Name() == "DFhook") {
+        std::ofstream fs("/tmp/hook.dot");
+        PrintTokenGraph(tok_range, begin_index, end_index, fs);
+
+      } else if (nd->Name() == "DFhook" ||
+          nd->Name() == "MALSTK" || nd->Name() == "MalStack" ||
+          nd->Name() == "MalStkPtr") {
+        std::ofstream fs("/tmp/stack.dot");
+        PrintTokenGraph(tok_range, begin_index, end_index, fs);
+      }
+    }
+
     mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(
         tok_range, begin_index, end_index);
     if (maybe_tt.Succeeded()) {

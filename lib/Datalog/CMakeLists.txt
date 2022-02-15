@@ -30,7 +30,20 @@ target_link_libraries("generate_tokens"
     pasta::pasta
 )
 
+
+add_executable("generate_decls"
+  "GenerateDecls.cpp"
+)
+
+target_link_libraries("generate_decls"
+  PRIVATE
+    pasta::pasta
+)
+
+
 set(generated_tokens_dr "${datalog_bin_dir}/Server/tokens.dr")
+set(generated_decls_dr "${datalog_bin_dir}/Server/decls.dr")
+
 add_custom_command(TARGET "generate_tokens"
   PRE_BUILD
   COMMAND "${CMAKE_COMMAND}" -E make_directory "${datalog_bin_dir}/Server"
@@ -40,6 +53,17 @@ add_custom_command(TARGET "generate_tokens"
   COMMAND "generate_tokens" "${generated_tokens_dr}"
   COMMENT "Generating ${generated_tokens_dr}"
   BYPRODUCTS "${generated_tokens_dr}"
+)
+
+add_custom_command(TARGET "generate_decls"
+  PRE_BUILD
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${datalog_bin_dir}/Server"
+)
+add_custom_command(TARGET "generate_decls"
+  POST_BUILD
+  COMMAND "generate_decls" "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" "${generated_decls_dr}"
+  COMMENT "Generating ${generated_decls_dr}"
+  BYPRODUCTS "${generated_decls_dr}"
 )
 
 add_library("server_storage" STATIC
