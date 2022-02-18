@@ -8,6 +8,7 @@
 
 #include <cstring>
 #include <fstream>
+#include <vector>
 
 int main(int argc, char *argv[]) {
   auto num_tokens = static_cast<unsigned>(clang::tok::TokenKind::NUM_TOKENS);

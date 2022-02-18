@@ -97,7 +97,7 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
 
     // If we've found a section with embedded compile commands, then
     // try to parse them and import them.
-    if (name.contains_lower("trailofbits_cc")) {
+    if (name.contains_insensitive("trailofbits_cc")) {
 
       LOG(INFO)
           << "Found compile commands section in " << file_name;
@@ -151,7 +151,7 @@ bool Parser::ParseModule(const llvm::Module &module) {
     }
 
     auto section_name = var.getSection();
-    if (section_name.contains_lower("trailofbits_cc")) {
+    if (section_name.contains_insensitive("trailofbits_cc")) {
       LOG(INFO)
           << "Found compile command variable '" << var.getName()
           << "' in bitcode module " << module.getName();

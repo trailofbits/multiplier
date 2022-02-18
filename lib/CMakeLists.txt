@@ -106,6 +106,7 @@ add_library("tool"
     "Token.h"
     "TokenTree.cpp"
     "Tool.cpp"
+    "KeyValueStore.cpp"
 )
 
 
@@ -118,6 +119,7 @@ target_link_libraries("tool"
     
   PUBLIC
     DrLojekyll::Runtime
+    RocksDB::rocksdb
     "util")
 
 set_target_properties("tool"
