@@ -463,7 +463,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
-//  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
 
   std::deque<TokenInfo> info_alloc;
   BuildInitialTokenList(std::move(range), begin_index, end_index, info_alloc);
@@ -472,7 +472,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return err.str();
   }
 
-//  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
+  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
 //  for (auto info = &(info_alloc.front()); info; info = info->next) {
 //    switch (info->category) {
 //      case TokenInfo::kFileToken:
@@ -491,22 +491,22 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
   if (!info) {
     return err.str();
   }
-//  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
-//  for (; info; info = info->next) {
-//    switch (info->category) {
-//      case TokenInfo::kFileToken:
-//        std::cerr << info->file_tok->Data();
-//        continue;
-//      case TokenInfo::kMacroUseToken:
-//      case TokenInfo::kMissingFileToken:
-//        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
-//        continue;
-//      case TokenInfo::kMarkerToken:
-//      default:
-//        continue;
-//    }
-//  }
-//  std::cerr << "\n\n\n";
+  std::cerr << "----------------------------------------------------- " << info_alloc.size() << " ---\n";
+  for (; info; info = info->next) {
+    switch (info->category) {
+      case TokenInfo::kFileToken:
+        std::cerr << info->file_tok->Data();
+        continue;
+      case TokenInfo::kMacroUseToken:
+      case TokenInfo::kMissingFileToken:
+        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
+        continue;
+      case TokenInfo::kMarkerToken:
+      default:
+        continue;
+    }
+  }
+  std::cerr << "\n\n\n";
   return TokenTree(std::move(impl));
 }
 
