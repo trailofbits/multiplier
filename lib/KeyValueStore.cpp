@@ -1,8 +1,10 @@
-/*
- * Copyright (c) 2019 Trail of Bits, Inc.
- */
+// Copyright (c) 2019-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
 
-#include "KeyValueStore.h"
+#include <multiplier/KeyValueStore.h>
 
 #include <glog/logging.h>
 
@@ -27,7 +29,6 @@
 #include <rocksdb/slice_transform.h>
 #include <rocksdb/table.h>
 #pragma clang diagnostic pop
-
 
 namespace mx {
 
@@ -78,22 +79,8 @@ static std::mutex gKeyShards[kNumKeyShards];
 //            fixed prefix extractor for the column family.
 static const char *IDToKeyPrefix(KeyValueStore::KeyValueStoreID id) {
   switch (id) {
-    case KeyValueStore::kPathInfoFileStatus:
-      return "pis:";
-    case KeyValueStore::kPathInfoFileList:
-      return "pil:";
-    case KeyValueStore::kSourceConcatPathToOffset:
-      return "p2o:";
-    case KeyValueStore::kSourceConcatHashToOffset:
-      return "h2o:";
-    case KeyValueStore::kFileOffsetToTokenListId:
-      return "f2i:";
-    case KeyValueStore::kTopLevelDeclKeyToOffset:
-      return "t2o:";
-    case KeyValueStore::kTranslationUnits:
-      return "tus:";
-    case KeyValueStore::kEntities:
-      return "ent:";
+    case KeyValueStore::kPathToFileId:
+      return "fid:";
   }
 }
 
@@ -106,14 +93,39 @@ GetEngine(KeyValueStore::KeyValueStoreID id, std::filesystem::path path) {
     return ret;
   }
 
+  std::error_code ec;
+
+  if (path.empty()) {
+    path = std::filesystem::current_path(ec);
+    CHECK(!ec)
+        << "Unable to determine the current working directory: "
+        << ec.message();
+  }
+
+  if (!std::filesystem::is_directory(path)) {
+    CHECK(std::filesystem::create_directory(path, ec))
+        << "Unable to create directory '" << path.generic_string()
+        << "' for key-value storage: " << ec.message();
+  }
+
+  std::filesystem::directory_iterator it(path, ec);
+  CHECK(!ec)
+      << "Specified directory '" << path.generic_string()
+      << "' for key-value storage is not iterable: " << ec.message();
+
+  // Make sure we can list the directory.
+  for (auto entry : it) {
+    CHECK(!ec)
+        << "Specified directory '" << path.generic_string()
+        << "' for key-value storage is not iterable: " << ec.message();
+    break;
+  }
+
   auto kv_dir = path / "kv";
-  if (std::filesystem::is_directory(kv_dir)) {
-    std::error_code ec;
-    if (std::filesystem::create_directory(kv_dir, ec)) {
-      LOG(ERROR)
-          << "Unable to create directory '" << kv_dir.string()
-          << "' for key-value storage: " << ec.message();
-    }
+  if (!std::filesystem::is_directory(kv_dir)) {
+    CHECK(std::filesystem::create_directory(kv_dir, ec))
+        << "Unable to create directory '" << kv_dir.string()
+        << "' for key-value storage: " << ec.message();
   }
 
   ret = std::make_shared<KeyValueStore::KeyValueEngine>(kv_dir);
@@ -155,7 +167,8 @@ KeyValueStore::KeyValueEngine::KeyValueEngine(std::filesystem::path kv_dir)
   rocksdb::DBOptions options;
   options.create_if_missing = true;
   options.create_missing_column_families = true;
-  options.IncreaseParallelism(std::thread::hardware_concurrency());
+  options.IncreaseParallelism(static_cast<int>(
+      std::thread::hardware_concurrency()));
 
   std::vector<rocksdb::ColumnFamilyDescriptor> cf_descs;
   rocksdb::ColumnFamilyOptions cf_options;
@@ -332,14 +345,6 @@ KeyValueStore::KeyValueStore(KeyValueStoreID id, std::filesystem::path path)
     : engine(GetEngine(id, path)),
       key_prefix(IDToKeyPrefix(id)) {}
 
-KeyValueStore::KeyValueStore(const KeyValueStore &that)
-    : engine(that.engine),
-      key_prefix(that.key_prefix) {}
-
-KeyValueStore::KeyValueStore(KeyValueStore &&that) noexcept
-    : engine(std::move(that.engine)),
-      key_prefix(std::move(that.key_prefix)) {}
-
 // Erase a key/value pair with the key `key`.
 void KeyValueStore::Erase(const std::string &key) {
   std::stringstream ss;
@@ -477,4 +482,4 @@ std::string KeyValueStore::UpdateOrSet(
   return ret;
 }
 
-}  // namespace mu
+}  // namespace mx

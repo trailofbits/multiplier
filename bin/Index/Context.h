@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <memory>
 #include <multiplier/Datalog.h>
+#include <multiplier/KeyValueStore.h>
 #include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
 #include <mutex>
@@ -26,7 +27,7 @@ namespace indexer {
 class GlobalContext {
  private:
   std::mutex tokenized_files_lock;
-  std::unordered_map<std::string, mx::FileId> tokenized_files;
+  mx::KeyValueStore tokenized_files;
 
  public:
 

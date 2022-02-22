@@ -7,18 +7,29 @@
 #include "Context.h"
 
 #include <chrono>
+#include <filesystem>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <multiplier/Executor.h>
 #include <multiplier/ProgressBar.h>
 #include <pasta/Util/FileSystem.h>
+#include <system_error>
 
 DEFINE_bool(show_progress, false, "Show progress bars");
 
+DEFINE_string(workspace_dir, "",
+              "Path to the workspace into which semi-permanent indexer data "
+              "should be stored. Defaults to the current working directory "
+              "of `mx-index`.");
+
 namespace indexer {
 
+
 GlobalContext::GlobalContext(const mx::Executor &exe_,
-                             const mx::DatalogClient &client) {
+                             const mx::DatalogClient &client)
+    : tokenized_files(mx::KeyValueStore::kPathToFileId,
+                      FLAGS_workspace_dir) {
+
   if (FLAGS_show_progress) {
     publish_progress.reset(new mx::ProgressBar("Publishing",
                                                std::chrono::seconds(1)));
@@ -35,7 +46,7 @@ GlobalContext::GlobalContext(const mx::Executor &exe_,
   }
 
   auto reserved_file_ids = client.reserve_file_ids_bbf(
-      mx::TimeNow(), 1 << 20ul);
+      mx::TimeNow(), 1 << 13ul);
   CHECK(reserved_file_ids);
 
   const mx::FileId fid = reserved_file_ids->NextFileId();
@@ -46,16 +57,14 @@ GlobalContext::GlobalContext(const mx::Executor &exe_,
 }
 
 std::pair<mx::FileId, bool> GlobalContext::AddFileToSet(std::string path) {
-  std::unique_lock<std::mutex> locker(tokenized_files_lock);
-  auto [it, added] = tokenized_files.try_emplace(std::move(path), 0);
-  if (added) {
-    auto next_id = next_file_id.fetch_add(1u);
-    it->second = next_id;
-    return {next_id, true};
-  } else {
-    DCHECK_NE(it->second, 0u);
-    return {it->second, false};
-  }
+  bool is_new = false;
+  auto file_id = tokenized_files.GetOrSet<mx::FileId>(
+      path,
+      [this, &is_new] (void) -> mx::FileId {
+        is_new = true;
+        return next_file_id.fetch_add(1u);
+      });
+  return {file_id, is_new};
 }
 
 UpdateContext::~UpdateContext(void) {

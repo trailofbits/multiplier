@@ -16,6 +16,7 @@ set(util_headers
   "${source_include_dir}/BloomFilter.h"
   "${source_include_dir}/Compress.h"
   "${source_include_dir}/Executor.h"
+  "${source_include_dir}/KeyValueStore.h"
   "${source_include_dir}/ProgressBar.h"
   "${source_include_dir}/Result.h"
   "${source_include_dir}/Signal.h"
@@ -33,6 +34,7 @@ add_library("util"
     "BloomFilter.cpp"
     "Compress.cpp"
     "Executor.cpp"
+    "KeyValueStore.cpp"
     "ProgressBar.cpp"
     "Signal.cpp"
     "SQLite.cpp"
@@ -106,7 +108,6 @@ add_library("tool"
     "Token.h"
     "TokenTree.cpp"
     "Tool.cpp"
-    "KeyValueStore.cpp"
 )
 
 

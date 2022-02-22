@@ -38,8 +38,8 @@ static bool CheckTokenLists(
     }
 
     if (!std::equal(file_tokens.begin(), file_tokens.end(),
-                      uncompressed_file_tokens.begin(),
-                      uncompressed_file_tokens.end())) {
+                    uncompressed_file_tokens.begin(),
+                    uncompressed_file_tokens.end())) {
 
       LOG(ERROR)
           << "One or more of the tokens in the file " << file_path
@@ -90,8 +90,12 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   auto maybe_offset = file_tokens.Compress(fbb);
   if (!maybe_offset.Succeeded()) {
-
+    LOG(ERROR)
+        << "Unable to compress tokens from file '"
+        << file.Path().generic_string() << "': " << maybe_offset.TakeError();
+    return;
   }
+
   fbb.Finish(maybe_offset.TakeValue());
 
   // Warn if our compression doesn't actually compress things.

@@ -1,19 +1,21 @@
-/*
- * Copyright (c) 2019 Trail of Bits, Inc.
- */
+// Copyright (c) 2019-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
 
 #pragma once
 
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <type_traits>
 
 #include <glog/logging.h>
 #include <google/protobuf/message.h>
-
-#include <pasta/Util/FileSystem.h>
 
 namespace mx {
 
@@ -21,21 +23,14 @@ namespace mx {
 class KeyValueStore {
  public:
   enum KeyValueStoreID {
-    kPathInfoFileStatus,
-    kPathInfoFileList,
-    kSourceConcatPathToOffset,
-    kSourceConcatHashToOffset,
-    kFileOffsetToTokenListId,
-    kTopLevelDeclKeyToOffset,
-    kTranslationUnits,
-    kEntities
+    kPathToFileId,
   };
 
   ~KeyValueStore(void);
 
+  // Initialize the key-value store. If an empty path is specified then
+  // the current working directory is used.
   explicit KeyValueStore(KeyValueStoreID id_, std::filesystem::path path);
-  KeyValueStore(const KeyValueStore &that);
-  KeyValueStore(KeyValueStore &&that) noexcept;
 
   // Erase a key/value pair with the key `key`.
   void Erase(const std::string &key);
@@ -215,7 +210,7 @@ class KeyValueStore {
   void SetImpl(const std::string &key, const std::string &val);
 
   std::shared_ptr<KeyValueEngine> engine;
-  const std::string key_prefix;
+  std::string key_prefix;
 };
 
 }  // namespace mu
