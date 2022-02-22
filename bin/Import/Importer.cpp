@@ -305,7 +305,7 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   command.working_dir = cwd->str();
   command.compiler_hash = hash->str();
   command.env = std::move(envp);
-  if (lang->equals_lower("c++") || lang->equals_lower("cxx")) {
+  if (lang->equals_insensitive("c++") || lang->equals_insensitive("cxx")) {
     command.lang = pasta::TargetLanguage::kCXX;
   }
   return true;
@@ -328,9 +328,9 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
     command.working_dir = cwd->str();
 
     // Guess at the language.
-    if (args->contains_lower("++") || args->contains_lower(".cc") ||
-        args->contains_lower(".cxx") || args->contains_lower(".cpp") ||
-        args->contains_lower(".hxx") || args->contains_lower(".hpp")) {
+    if (args->contains_insensitive("++") || args->contains_insensitive(".cc") ||
+        args->contains_insensitive(".cxx") || args->contains_insensitive(".cpp") ||
+        args->contains_insensitive(".hxx") || args->contains_insensitive(".hpp")) {
       command.lang = pasta::TargetLanguage::kCXX;
     }
 

@@ -37,6 +37,7 @@ find_llvm(llvm)
 find_package(Clang CONFIG REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 find_package(Flatbuffers CONFIG REQUIRED)
+find_package(RocksDB CONFIG REQUIRED)
 
 find_package(DrLojekyll CONFIG REQUIRED)
 find_package(pasta CONFIG REQUIRED)
