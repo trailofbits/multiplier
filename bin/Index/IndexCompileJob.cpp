@@ -10,6 +10,9 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <multiplier/TokenTree.h>
+
+#include <llvm/ADT/FoldingSet.h>
+
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
@@ -182,6 +185,7 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
   if (decl_range.Size()) {
     begin_tok_index = std::min(begin_tok_index, decl_range.begin()->Index());
     end_tok_index = std::max(end_tok_index, (--decl_range.end())->Index());
+    DCHECK_LT(end_tok_index, std::numeric_limits<uint32_t>::max());
   }
 //
 //  if (auto td = pasta::TagDecl::From(decl)) {
@@ -356,6 +360,17 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
           << "Only found one token " << tok.Data() << " for: "
           << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
           << " on main job file " << main_file_path;
+
+      // Compute the hash value of top level decl to check if it is new. If the
+      // decl is seen previously, don't add it to the decl_range
+      auto hash =
+          HashValue::computeHashValue(decl, tok_range, begin_index, end_index);
+      auto [decl_id, is_new] = context->AddDeclToSet(hash);
+
+      // If the decl id is not new continue and don't add to the decl_ranges
+      if (!is_new) {
+        continue;
+      }
 
       decl_ranges.emplace_back(decl, begin_index, end_index);
     }
