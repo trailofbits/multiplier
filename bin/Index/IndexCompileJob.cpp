@@ -364,8 +364,8 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       // Compute the hash value of top level decl to check if it is new. If the
       // decl is seen previously, don't add it to the decl_range
       auto hash =
-          HashValue::computeHashValue(decl, tok_range, begin_index, end_index);
-      auto [decl_id, is_new] = context->AddDeclToSet(hash);
+          HashValue::ComputeHashValue(decl, tok_range, begin_index, end_index);
+      auto [decl_id, is_new] = context->AddDeclToSet(std::move(hash));
 
       // If the decl id is not new continue and don't add to the decl_ranges
       if (!is_new) {

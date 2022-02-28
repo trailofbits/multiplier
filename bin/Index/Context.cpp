@@ -32,7 +32,7 @@ GlobalContext::GlobalContext(const mx::Executor &exe_,
                              const mx::DatalogClient &client)
     : tokenized_files(mx::KeyValueStore::kPathToFileId,
                       FLAGS_workspace_dir),
-      top_level_decl(mx::KeyValueStore::kPathToFileId,
+      top_level_decl(mx::KeyValueStore::kHashToTopLevelDeclId,
                      FLAGS_workspace_dir) {
 
   if (FLAGS_show_progress) {
@@ -113,7 +113,7 @@ static std::string GetTokenLoc(const pasta::Token &token) {
 }
 
 std::string
-HashValue::computeHash(const pasta::Decl &decl,
+HashValue::ComputeHash(const pasta::Decl &decl,
                        const pasta::TokenRange &toks,
                        uint64_t begin_index, uint64_t end_index) {
   llvm::FoldingSetNodeID ID;
@@ -123,14 +123,32 @@ HashValue::computeHash(const pasta::Decl &decl,
 
   for (auto i = begin_index; i < end_index; i++) {
     auto token = toks[i];
-    if (token.Role() == pasta::TokenRole::kBeginOfFileMarker ||
-        token.Role() == pasta::TokenRole::kEndOfFileMarker ||
-        token.Role() == pasta::TokenRole::kBeginOfMacroExpansionMarker ||
-        token.Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
-      continue;
-    }
+    switch(token.Role()) {
+      case pasta::TokenRole::kBeginOfFileMarker:
+      case pasta::TokenRole::kEndOfFileMarker:
+      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+      case pasta::TokenRole::kEndOfMacroExpansionMarker:
+        break;
+      default:
+        ID.AddInteger(token.Kind());
 
-    ID.AddString(llvm::StringRef(token.Data()));
+        auto tok_ctx = token.Context();
+        if (tok_ctx) {
+          ID.AddString(tok_ctx->KindName());
+        }
+
+        // Add decl kind to the foldingset node as well
+        ID.AddString(decl.KindName());
+        if (auto func = pasta::FunctionDecl::From(decl); func) {
+          ID.AddInteger(func->ODRHash());
+        }
+
+        if (auto cxxrecord = pasta::CXXRecordDecl::From(decl); cxxrecord) {
+          ID.AddInteger(cxxrecord->ODRHash());
+        }
+
+        ID.AddString(llvm::StringRef(token.Data()));
+    }
   }
 
   std::stringstream ss;

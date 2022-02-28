@@ -24,6 +24,7 @@ class KeyValueStore {
  public:
   enum KeyValueStoreID {
     kPathToFileId,
+    kHashToTopLevelDeclId
   };
 
   ~KeyValueStore(void);
