@@ -61,8 +61,49 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeclContext(decl);
   }
 
+  void VisitClassTemplatePartialSpecializationDecl(
+      const pasta::ClassTemplatePartialSpecializationDecl &decl) final {
+    // Do nothing.
+  }
+
+  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
+    for (auto spec : decl.Specializations()) {
+      if (spec.TemplateSpecializationKind() !=
+          pasta::TemplateSpecializationKind::kExplicitSpecialization) {
+        Accept(spec);
+      }
+    }
+  }
+
+  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) final {
+    for (auto spec : decl.Specializations()) {
+      if (spec.TemplateSpecializationKind() !=
+          pasta::TemplateSpecializationKind::kExplicitSpecialization) {
+        Accept(spec);
+      }
+    }
+  }
+
+  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
+    for (auto spec : decl.Specializations()) {
+      Accept(spec);
+    }
+  }
+
+  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    for (auto params : decl.TemplateParameterLists()) {
+      if (params.NumParameters() || params.HasUnexpandedParameterPack()) {
+        return;
+      }
+    }
+
+    VisitDecl(decl);
+  }
+
   void VisitDecl(const pasta::Decl &decl) final {
-    tlds.emplace_back(decl);
+    if (!decl.IsImplicit()) {
+      tlds.emplace_back(decl);
+    }
   }
 };
 
@@ -175,6 +216,8 @@ static bool CanElideTokenFromTLD(pasta::Token tok) {
 // Do some minor stuff to find begin/ending tokens.
 static std::pair<uint64_t, uint64_t> BaselineDeclRange(
     const pasta::Decl &decl, pasta::Token tok) {
+  DCHECK(tok);  // Make sure we're dealing with a valid token.
+
   auto decl_range = decl.TokenRange();
   auto begin_tok_index = tok.Index();
   auto end_tok_index = begin_tok_index;
@@ -183,7 +226,7 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
     begin_tok_index = std::min(begin_tok_index, decl_range.begin()->Index());
     end_tok_index = std::max(end_tok_index, (--decl_range.end())->Index());
   }
-//
+
 //  if (auto td = pasta::TagDecl::From(decl)) {
 //    if (auto tt = td->OuterTokenStart()) {
 //      begin_tok_index = std::min(begin_tok_index, tt.Index());
@@ -271,6 +314,24 @@ static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
   return false;
 }
 
+// Should we even expect to find this decl in the token contexts? There are
+// cases where we shouldn't, e.g. with template instantiations, because the
+// token contexts will just end up being associated with the templates
+// themselves.
+static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
+  if (auto csd = pasta::ClassTemplateSpecializationDecl::From(decl)) {
+    return csd->TemplateSpecializationKind() ==
+        pasta::TemplateSpecializationKind::kExplicitSpecialization;
+  }
+
+  if (auto vsd = pasta::VarTemplateSpecializationDecl::From(decl)) {
+    return vsd->TemplateSpecializationKind() ==
+        pasta::TemplateSpecializationKind::kExplicitSpecialization;
+  }
+
+  return true;
+}
+
 }  // namespace
 
 IndexCompileJobAction::~IndexCompileJobAction(void) {}
@@ -342,7 +403,8 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       // tokens, which have no contextual information. We do this so that we
       // can get the contextual information from parsed tokens, which is often
       // more useful.
-      LOG_IF(ERROR, !TokenIsInContextOfDecl(tok, decl) &&
+      LOG_IF(ERROR, ShouldFindDeclInTokenContexts(decl) &&
+                    !TokenIsInContextOfDecl(tok, decl) &&
                     !IsProbablyABuiltinDecl(decl))
           << "Could not find location of " << decl.KindName()
           << " declaration: " << DeclToString(decl)
@@ -423,18 +485,18 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       }
     }
 
-    if (auto nd = pasta::NamedDecl::From(decl)) {
-      if (nd->Name() == "DFhook") {
-        std::ofstream fs("/tmp/hook.dot");
-        PrintTokenGraph(tok_range, begin_index, end_index, fs);
-
-      } else if (nd->Name() == "DFhook" ||
-          nd->Name() == "MALSTK" || nd->Name() == "MalStack" ||
-          nd->Name() == "MalStkPtr") {
-        std::ofstream fs("/tmp/stack.dot");
-        PrintTokenGraph(tok_range, begin_index, end_index, fs);
-      }
-    }
+//    if (auto nd = pasta::NamedDecl::From(decl)) {
+//      if (nd->Name() == "DFhook") {
+//        std::ofstream fs("/tmp/hook.dot");
+//        PrintTokenGraph(tok_range, begin_index, end_index, fs);
+//
+//      } else if (nd->Name() == "DFhook" ||
+//          nd->Name() == "MALSTK" || nd->Name() == "MalStack" ||
+//          nd->Name() == "MalStkPtr") {
+//        std::ofstream fs("/tmp/stack.dot");
+//        PrintTokenGraph(tok_range, begin_index, end_index, fs);
+//      }
+//    }
 
     mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(
         tok_range, begin_index, end_index);

@@ -61,7 +61,11 @@ add_custom_command(TARGET "generate_decls"
 )
 add_custom_command(TARGET "generate_decls"
   POST_BUILD
-  COMMAND "generate_decls" "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" "${generated_decls_dr}"
+  COMMAND
+    "generate_decls"
+    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}"
+    "${VCPKG_ROOT_INSTALL_DIR}/${VCPKG_TARGET_TRIPLET}/${CMAKE_INSTALL_INCLUDEDIR}"
+    "${generated_decls_dr}"
   COMMENT "Generating ${generated_decls_dr}"
   BYPRODUCTS "${generated_decls_dr}"
 )
