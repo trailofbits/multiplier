@@ -17,6 +17,7 @@
 #include <pasta/Util/FileManager.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Stmt.h>
+#include <pasta/AST/Type.h>
 
 #include <mutex>
 #include <string>
@@ -87,10 +88,10 @@ class HashValue {
  public:
   using Ref = std::shared_ptr<HashValue>;
 
-  static std::string ComputeHashValue(const pasta::Decl &decl,
+  static std::string ComputeHashValue(const std::vector<pasta::Decl> &decl_range,
                                       const pasta::TokenRange &toks,
                                       uint64_t begin_index, uint64_t end_index) {
-    return Instance()->ComputeHash(decl, toks, begin_index, end_index);
+    return Instance()->ComputeHash(decl_range, toks, begin_index, end_index);
   }
 
  private:
@@ -100,7 +101,7 @@ class HashValue {
     return I;
   }
 
-  std::string ComputeHash(const pasta::Decl &decl,
+  std::string ComputeHash(const std::vector<pasta::Decl> &decl_range,
                           const pasta::TokenRange &toks,
                           uint64_t begin_index, uint64_t end_index);
 

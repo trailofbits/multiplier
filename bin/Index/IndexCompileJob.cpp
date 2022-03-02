@@ -361,17 +361,6 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
           << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
           << " on main job file " << main_file_path;
 
-      // Compute the hash value of top level decl to check if it is new. If the
-      // decl is seen previously, don't add it to the decl_range
-      auto hash =
-          HashValue::ComputeHashValue(decl, tok_range, begin_index, end_index);
-      auto [decl_id, is_new] = context->AddDeclToSet(std::move(hash));
-
-      // If the decl id is not new continue and don't add to the decl_ranges
-      if (!is_new) {
-        continue;
-      }
-
       decl_ranges.emplace_back(decl, begin_index, end_index);
     }
   }
@@ -449,6 +438,14 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
         std::ofstream fs("/tmp/stack.dot");
         PrintTokenGraph(tok_range, begin_index, end_index, fs);
       }
+    }
+
+    // Don't create token tree if the decl is already seen.
+    auto hash =
+        HashValue::ComputeHashValue(tlds_for_tree, tok_range, begin_index, end_index);
+    auto [decl_id, is_new] = context->AddDeclToSet(std::move(hash));
+    if (!is_new) {
+      continue;
     }
 
     mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(

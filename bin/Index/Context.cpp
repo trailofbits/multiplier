@@ -112,13 +112,78 @@ static std::string GetTokenLoc(const pasta::Token &token) {
   return ss.str();
 }
 
+class HashVisitor final : public pasta::DeclVisitor {
+ public:
+  virtual ~HashVisitor(void) = default;
+
+  explicit HashVisitor(llvm::FoldingSetNodeID &ID_):
+         ID(ID_) {}
+
+  void VisitDeclContext(const pasta::DeclContext &dc) {
+    for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
+      Accept(decl);
+    }
+  }
+
+  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    ID.AddInteger(decl.ODRHash());
+    VisitDeclContext(decl);
+  }
+
+  void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
+    if (decl.HasDefinition()) {
+      ID.AddInteger(decl.ODRHash());
+    }
+    VisitDeclContext(decl);
+  }
+
+  void VisitEnumDecl(const pasta::EnumDecl &decl) final {
+    ID.AddInteger(decl.ODRHash());
+    VisitDeclContext(decl);
+  }
+
+  void VisitTagDecl(const pasta::TagDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  // VisitDecl will add kind name of all decl to the folding set
+  // node.
+  void VisitDecl(const pasta::Decl &decl) final {
+    ID.AddString(decl.KindName());
+  }
+
+ private:
+  llvm::FoldingSetNodeID &ID;
+};
+
 std::string
-HashValue::ComputeHash(const pasta::Decl &decl,
+HashValue::ComputeHash(const std::vector<pasta::Decl> &tlds,
                        const pasta::TokenRange &toks,
                        uint64_t begin_index, uint64_t end_index) {
   llvm::FoldingSetNodeID ID;
   if (begin_index > end_index || end_index > toks.size()) {
     return std::string();
+  }
+
+  for (auto &decl : tlds) {
+    HashVisitor visitor(ID);
+    visitor.Accept(decl);
   }
 
   for (auto i = begin_index; i < end_index; i++) {
@@ -130,21 +195,22 @@ HashValue::ComputeHash(const pasta::Decl &decl,
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
         break;
       default:
-        ID.AddInteger(token.Kind());
-
-        auto tok_ctx = token.Context();
-        if (tok_ctx) {
-          ID.AddString(tok_ctx->KindName());
-        }
-
-        // Add decl kind to the foldingset node as well
-        ID.AddString(decl.KindName());
-        if (auto func = pasta::FunctionDecl::From(decl); func) {
-          ID.AddInteger(func->ODRHash());
-        }
-
-        if (auto cxxrecord = pasta::CXXRecordDecl::From(decl); cxxrecord) {
-          ID.AddInteger(cxxrecord->ODRHash());
+        ID.AddInteger(static_cast<uint16_t>(token.Kind()));
+        for (auto context = token.Context(); context; context = context->Parent()) {
+          switch (context->Kind()) {
+            case pasta::TokenContextKind::kDecl:
+              ID.AddInteger(static_cast<uint16_t>(pasta::Decl::From(*context)->Kind()));
+              break;
+            case pasta::TokenContextKind::kStmt:
+              ID.AddInteger(static_cast<uint16_t>(pasta::Stmt::From(*context)->Kind()));
+              break;
+            case pasta::TokenContextKind::kType:
+              ID.AddInteger(static_cast<uint16_t>(pasta::Type::From(*context)->Kind()));
+              break;
+            default:
+              ID.AddInteger(static_cast<uint16_t>(context->Kind()));
+              break;
+          }
         }
 
         ID.AddString(llvm::StringRef(token.Data()));
