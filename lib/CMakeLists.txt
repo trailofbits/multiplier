@@ -121,6 +121,7 @@ target_link_libraries("tool"
   PUBLIC
     DrLojekyll::Runtime
     RocksDB::rocksdb
+    ZLIB::ZLIB
     "util")
 
 set_target_properties("tool"

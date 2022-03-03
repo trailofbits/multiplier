@@ -81,6 +81,8 @@ static const char *IDToKeyPrefix(KeyValueStore::KeyValueStoreID id) {
   switch (id) {
     case KeyValueStore::kPathToFileId:
       return "fid:";
+    case KeyValueStore::kHashToTopLevelDeclId:
+      return "tld:";
   }
 }
 

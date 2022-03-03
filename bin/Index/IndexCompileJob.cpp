@@ -10,6 +10,9 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <multiplier/TokenTree.h>
+
+#include <llvm/ADT/FoldingSet.h>
+
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
@@ -182,6 +185,7 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
   if (decl_range.Size()) {
     begin_tok_index = std::min(begin_tok_index, decl_range.begin()->Index());
     end_tok_index = std::max(end_tok_index, (--decl_range.end())->Index());
+    DCHECK_LT(end_tok_index, std::numeric_limits<uint32_t>::max());
   }
 //
 //  if (auto td = pasta::TagDecl::From(decl)) {
@@ -434,6 +438,14 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
         std::ofstream fs("/tmp/stack.dot");
         PrintTokenGraph(tok_range, begin_index, end_index, fs);
       }
+    }
+
+    // Don't create token tree if the decl is already seen.
+    auto hash =
+        HashValue::ComputeHashValue(tlds_for_tree, tok_range, begin_index, end_index);
+    auto [decl_id, is_new] = context->AddDeclToSet(std::move(hash));
+    if (!is_new) {
+      continue;
     }
 
     mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(
