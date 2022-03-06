@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include "Token.h"
-
+#include <multiplier/Result.h>
+#include <multiplier/Token.h>
 #include <string>
-
-#include "Result.h"
 
 namespace mx {
 

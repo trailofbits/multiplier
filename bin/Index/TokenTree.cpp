@@ -4,11 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "Token.h"
+#include "TokenTree.h"
 
 #include <deque>
 #include <glog/logging.h>
 #include <optional>
+#include <pasta/AST/Forward.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 #include <sstream>
@@ -17,6 +18,15 @@
 #include <iostream>
 
 namespace mx {
+
+class TokenTreeImpl {
+ public:
+
+  std::string data;
+  std::vector<TokenKind> token_kinds;
+  std::vector<unsigned> data_offsets;
+};
+
 namespace {
 
 struct TokenInfo {
@@ -116,7 +126,7 @@ static void BuildInitialTokenList(pasta::TokenRange range,
 static TokenInfo *FillMissingToken(std::deque<TokenInfo> &info_alloc,
                                    pasta::FileToken tok,
                                    TokenInfo *prev) {
-  switch (mx::FromClang(tok.Kind())) {
+  switch (mx::FromPasta(tok.Kind())) {
     case mx::TokenKind::TK_eof:
     case mx::TokenKind::TK_eod:
     case mx::TokenKind::TK_code_completion:
@@ -148,6 +158,35 @@ static bool IsWhitespace(std::string_view data) {
     }
   }
   return is_whitespace;
+}
+
+struct Include {
+  TokenInfo *begin{nullptr};
+  TokenInfo *end{nullptr};
+};
+
+static std::optional<Include> FindInclude(
+    std::deque<TokenInfo> &info_alloc, pasta::File file, unsigned start_index,
+    TokenInfo **prev_ptr) {
+
+  auto prev_file_toks = file.Tokens();
+  for (size_t i = start_index, max_i = prev_file_toks.Size();
+       i < max_i; ++i) {
+    auto ft = prev_file_toks[i];
+    switch (ft.Kind()) {
+      case pasta::TokenKind::kHasH;
+    }
+    switch (ft.PreProcessorKeywordKind()) {
+      case pasta::PPKeywordKind::kInclude:
+      case pasta::PPKeywordKind::kIncludeNext:
+      case pasta::PPKeywordKind::kImport:
+        break;
+      default:
+        break;
+    }
+  }
+
+  return std::nullopt;
 }
 
 // Fill in the missing tokens from the token tree.
@@ -284,7 +323,17 @@ static TokenInfo *FillMissingFileTokens(std::deque<TokenInfo> &info_alloc,
         CHECK(next_info_in_prev_file->file_tok.has_value());
         const pasta::FileToken &next_tok_from_prev_file =
             next_info_in_prev_file->file_tok.value();
-        CHECK(pasta::File::Containing(next_tok_from_prev_file) == prev_file);
+
+        // Likely X-Macro case, where `prev->file_tok` is followed by something
+        // that is eventually followed by an `#include`.
+        if (pasta::File::Containing(next_tok_from_prev_file) != prev_file) {
+          if (auto inc = FindInclude(prev_file, prev_file_tok.Index() + 1u,
+                                     &(prev->next))) {
+
+          } else {
+
+          }
+        }
 
         pasta::FileTokenRange missing_toks = prev_file.Tokens();
         auto prev_was_whitespace = false;

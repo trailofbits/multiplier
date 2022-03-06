@@ -10,11 +10,6 @@
 #include <limits>
 #include <string>
 
-namespace clang {
-namespace tok {
-enum TokenKind : unsigned short;
-}  // namespace tok
-}  // namespace clang
 namespace mx {
 enum class CompilerName : uint8_t;
 enum class IncludePathLocation : uint8_t;
@@ -29,6 +24,7 @@ namespace pasta {
 enum class CompilerName : unsigned;
 enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
+enum class TokenKind : unsigned short;
 }  // namespace pasta
 
 // This included file is auto-generated. Depending on when we're compiling this,
@@ -57,7 +53,7 @@ inline static TargetLanguage FromPasta(pasta::TargetLanguage tl) {
   return static_cast<TargetLanguage>(tl);
 }
 
-TokenKind FromClang(clang::tok::TokenKind tk);
+TokenKind FromPasta(pasta::TokenKind tk);
 
 inline static pasta::CompilerName ToPasta(CompilerName cn) {
   return static_cast<pasta::CompilerName>(cn);
@@ -71,7 +67,7 @@ inline static pasta::TargetLanguage ToPasta(TargetLanguage tl) {
   return static_cast<pasta::TargetLanguage>(tl);
 }
 
-clang::tok::TokenKind ToClang(TokenKind tk);
+pasta::TokenKind ToPasta(TokenKind tk);
 
 inline static const char *NameOf(CompilerName val) {
   return &(EnumNameCompilerName(val)[3]);  // Chop off `CN_`.

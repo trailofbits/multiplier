@@ -22,6 +22,8 @@ add_library("${lib_name}"
     "PrintTokenGraph.h"
     "TokenizeFile.cpp"
     "TokenizeFile.h"
+    "TokenTree.cpp"
+    "TokenTree.h"
     "Tool.cpp"
 )
 

@@ -687,7 +687,7 @@ static bool CompressSingleImpl(TokenKind tok_kind, std::string_view tok_data,
   }
 
   // Normalize keywords.
-  if (auto kws = clang::tok::getKeywordSpelling(ToClang(tok_kind))) {
+  if (auto kws = pasta::KeywordSpellingOrNull(ToPasta(tok_kind))) {
     tok_data = kws;
   }
 
@@ -1165,7 +1165,7 @@ TokenList TokenList::Create(const pasta::FileTokenRange &toks) {
   std::string dummy_output;
 
   for (pasta::FileToken tok : toks) {
-    if (auto kind = FromClang(tok.Kind()); TokenKind::TK_eof != kind) {
+    if (auto kind = FromPasta(tok.Kind()); TokenKind::TK_eof != kind) {
       ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
@@ -1182,7 +1182,7 @@ TokenList TokenList::Create(const pasta::PrintedTokenRange &toks) {
   std::vector<uint16_t> dummy_states;
   std::string dummy_output;
   for (pasta::PrintedToken tok : toks) {
-    if (auto kind = FromClang(tok.Kind()); TokenKind::TK_eof != kind) {
+    if (auto kind = FromPasta(tok.Kind()); TokenKind::TK_eof != kind) {
       ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
@@ -1199,7 +1199,7 @@ TokenList TokenList::Create(const pasta::TokenRange &toks) {
   std::vector<uint16_t> dummy_states;
   std::string dummy_output;
   for (pasta::Token tok : toks) {
-    if (auto kind = FromClang(tok.Kind()); TokenKind::TK_eof != kind) {
+    if (auto kind = FromPasta(tok.Kind()); TokenKind::TK_eof != kind) {
       ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;

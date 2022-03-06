@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <fstream>
 #include <glog/logging.h>
-#include <multiplier/TokenTree.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
@@ -19,8 +18,9 @@
 #include <vector>
 
 #include "Context.h"
-#include "TokenizeFile.h"
 #include "PrintTokenGraph.h"
+#include "TokenizeFile.h"
+#include "TokenTree.h"
 
 #include <iostream>
 
@@ -221,7 +221,7 @@ static bool CanElideTokenFromTLD(pasta::Token tok) {
       return true;
 
     case pasta::TokenRole::kFileToken:
-      switch (mx::FromClang(tok.Kind())) {
+      switch (mx::FromPasta(tok.Kind())) {
         case mx::TokenKind::TK_comment:
         case mx::TokenKind::TK_eof:
         case mx::TokenKind::TK_eod:
