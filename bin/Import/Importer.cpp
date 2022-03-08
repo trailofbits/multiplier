@@ -136,7 +136,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
     // NOTE: Force the working directory to the source file path to avoid
     //       issues while creating jobs from the compiled args.
     auto cwd = fbb.CreateString(job.SourceFile().Path().parent_path().generic_string());
-    auto srd = fbb.CreateString(job.SystemRootDirectory().generic_string());
+    auto srd = fbb.CreateString(job.SystemRootIncludeDirectory().generic_string());
     auto rd = fbb.CreateString(job.ResourceDirectory().generic_string());
     auto id = fbb.CreateString(cc.InstallationDirectory().generic_string());
 

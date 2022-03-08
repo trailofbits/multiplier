@@ -9,10 +9,7 @@
 #include <algorithm>
 #include <fstream>
 #include <glog/logging.h>
-#include <multiplier/TokenTree.h>
-
 #include <llvm/ADT/FoldingSet.h>
-
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
@@ -22,8 +19,9 @@
 #include <vector>
 
 #include "Context.h"
-#include "TokenizeFile.h"
 #include "PrintTokenGraph.h"
+#include "TokenizeFile.h"
+#include "TokenTree.h"
 
 #include <iostream>
 
@@ -34,6 +32,10 @@ namespace {
 class TLDFinder final : public pasta::DeclVisitor {
  private:
   std::vector<pasta::Decl> &tlds;
+
+  // Tracks declarations for which we've seen the specializations. This is
+  // to prevent us from double-adding specializations.
+  std::unordered_set<pasta::Decl> seen_specs;
 
  public:
   virtual ~TLDFinder(void) = default;
@@ -64,8 +66,70 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeclContext(decl);
   }
 
+  void VisitClassTemplatePartialSpecializationDecl(
+      const pasta::ClassTemplatePartialSpecializationDecl &) final {
+    // Do nothing.
+  }
+
+  void VisitVarTemplatePartialSpecializationDecl(
+      const pasta::VarTemplatePartialSpecializationDecl &) final {
+    // Do nothing.
+  }
+
+  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
+    if (seen_specs.emplace(decl.CanonicalDeclaration()).second) {
+      for (auto spec : decl.Specializations()) {
+
+        // We should observe the explicit specializations and instantiations
+        // separately.
+        switch (spec.TemplateSpecializationKind()) {
+          case pasta::TemplateSpecializationKind::kExplicitSpecialization:
+          case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
+          case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
+            continue;
+          default:
+            Accept(spec);
+        }
+      }
+    }
+  }
+
+  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &var) final {
+    // Do nothing; we will see the specializations as top-level declarations.
+  }
+
+  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
+    if (seen_specs.emplace(decl.CanonicalDeclaration()).second) {
+      for (auto spec : decl.Specializations()) {
+
+        // We should observe the explicit specializations and instantiations
+        // separately.
+        switch (spec.TemplateSpecializationKind()) {
+          case pasta::TemplateSpecializationKind::kExplicitSpecialization:
+          case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
+          case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
+            continue;
+          default:
+            Accept(spec);
+        }
+      }
+    }
+  }
+
+  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    for (auto params : decl.TemplateParameterLists()) {
+      if (params.NumParameters() || params.HasUnexpandedParameterPack()) {
+        return;
+      }
+    }
+
+    VisitDecl(decl);
+  }
+
   void VisitDecl(const pasta::Decl &decl) final {
-    tlds.emplace_back(decl);
+    if (!decl.IsImplicit()) {
+      tlds.emplace_back(decl);
+    }
   }
 };
 
@@ -158,7 +222,7 @@ static bool CanElideTokenFromTLD(pasta::Token tok) {
       return true;
 
     case pasta::TokenRole::kFileToken:
-      switch (mx::FromClang(tok.Kind())) {
+      switch (mx::FromPasta(tok.Kind())) {
         case mx::TokenKind::TK_comment:
         case mx::TokenKind::TK_eof:
         case mx::TokenKind::TK_eod:
@@ -177,17 +241,30 @@ static bool CanElideTokenFromTLD(pasta::Token tok) {
 
 // Do some minor stuff to find begin/ending tokens.
 static std::pair<uint64_t, uint64_t> BaselineDeclRange(
-    const pasta::Decl &decl, pasta::Token tok) {
+    const pasta::Decl &decl, pasta::Token tok, std::string_view main_file_path) {
+  DCHECK(tok);  // Make sure we're dealing with a valid token.
+
   auto decl_range = decl.TokenRange();
-  auto begin_tok_index = tok.Index();
-  auto end_tok_index = begin_tok_index;
+  const auto tok_index = tok.Index();
+  auto begin_tok_index = tok_index;
+  auto end_tok_index = tok_index;
 
   if (decl_range.Size()) {
-    begin_tok_index = std::min(begin_tok_index, decl_range.begin()->Index());
-    end_tok_index = std::max(end_tok_index, (--decl_range.end())->Index());
-    DCHECK_LT(end_tok_index, std::numeric_limits<uint32_t>::max());
+    begin_tok_index = decl_range.begin()->Index();
+    end_tok_index = (--decl_range.end())->Index();
+
+    // NOTE(pag): This is more of an indication that we probably need to fix
+    //            something in PASTA.
+    if (!(begin_tok_index <= tok_index && tok_index <= end_tok_index)) {
+      DLOG(ERROR)
+          << "Location of " << decl.KindName()
+          << " declaration: " << DeclToString(decl)
+          << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path
+          << " is not within declaration bounds";
+    }
   }
-//
+
 //  if (auto td = pasta::TagDecl::From(decl)) {
 //    if (auto tt = td->OuterTokenStart()) {
 //      begin_tok_index = std::min(begin_tok_index, tt.Index());
@@ -215,9 +292,11 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
 
 // Find the range of tokens of this decl.
 static std::pair<uint64_t, uint64_t> FindDeclRange(
-    const pasta::TokenRange &range, pasta::Decl decl, pasta::Token tok) {
+    const pasta::TokenRange &range, pasta::Decl decl, pasta::Token tok,
+    std::string_view main_file_path) {
 
-  auto [begin_tok_index, end_tok_index] = BaselineDeclRange(decl, tok);
+  auto [begin_tok_index, end_tok_index] = BaselineDeclRange(decl, tok,
+                                                            main_file_path);
 
   const auto max_tok_index = range.Size();
 
@@ -275,6 +354,47 @@ static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
   return false;
 }
 
+// Should we even expect to find this declaration in the token contexts? There
+// are cases where we shouldn't, e.g. with template instantiations, because the
+// token contexts will just end up being associated with the templates
+// themselves.
+static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
+  auto tsk = pasta::TemplateSpecializationKind::kUndeclared;
+  bool has_partial_or_tpl = true;
+
+  if (auto csd = pasta::ClassTemplateSpecializationDecl::From(decl)) {
+    tsk = csd->TemplateSpecializationKind();
+    has_partial_or_tpl = !csd->SpecializedTemplateOrPartial().index();
+
+  } else if (auto vsd = pasta::VarTemplateSpecializationDecl::From(decl)) {
+    tsk = vsd->TemplateSpecializationKind();
+    has_partial_or_tpl = !vsd->SpecializedTemplateOrPartial().index();
+
+  } else if (auto fd = pasta::FunctionDecl::From(decl)) {
+    tsk = fd->TemplateSpecializationKind();
+
+  } else if (auto vd = pasta::VarDecl::From(decl)) {
+    tsk = vd->TemplateSpecializationKind();
+
+  } else if (auto ta = pasta::TypeAliasDecl::From(decl)) {
+    if (ta->DescribedAliasTemplate()) {
+      tsk = pasta::TemplateSpecializationKind::kImplicitInstantiation;  // Fake.
+    }
+  }
+
+  if (tsk == pasta::TemplateSpecializationKind::kExplicitSpecialization) {
+    return true;
+
+  // NOTE(pag): Have observed situations where `ClassTemplateSpecialization`
+  //            will report `kUndeclared`.
+  } else if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
+    return has_partial_or_tpl;
+
+  } else {
+    return false;
+  }
+}
+
 }  // namespace
 
 IndexCompileJobAction::~IndexCompileJobAction(void) {}
@@ -318,6 +438,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
   std::vector<DeclRange> decl_ranges;
+  decl_ranges.reserve(8192u);
 
   // TODO(pag): Handle top-level statements, e.g. asm.
   pasta::TokenRange tok_range = ast.Tokens();
@@ -346,14 +467,16 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       // tokens, which have no contextual information. We do this so that we
       // can get the contextual information from parsed tokens, which is often
       // more useful.
-      LOG_IF(ERROR, !TokenIsInContextOfDecl(tok, decl) &&
+      LOG_IF(FATAL, ShouldFindDeclInTokenContexts(decl) &&
+                    !TokenIsInContextOfDecl(tok, decl) &&
                     !IsProbablyABuiltinDecl(decl))
           << "Could not find location of " << decl.KindName()
           << " declaration: " << DeclToString(decl)
           << PrefixedLocation(decl, " at or near ")
           << " on main job file " << main_file_path;
 
-      auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok);
+      auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok,
+                                                    main_file_path);
 
       // There should always be at least two tokens in any top-level decl.
       LOG_IF(ERROR, begin_index == end_index)
@@ -393,13 +516,21 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     tlds_for_tree.clear();
     tlds_for_tree.push_back(decl);
 
+    // Try to accumulate the nearby top-level declarations whose token ranges
+    // overlap with `decl` into `tlds_for_tree`. For example, this process will
+    // accumulate three `VarDecl`s into `tlds_for_tree` in the following case:
+    //
+    //      int optind, opterr, optopt;
+    //
+    // This also happens when multiplier declarations are defined by macros,
+    // as well as for template specializations.
     for (; i < max_i; ++i) {
       if (std::get<1>(decl_ranges[i]) <= end_index) {
         auto next_decl = std::get<0>(decl_ranges[i]);
         auto next_end = std::get<2>(decl_ranges[i]);
 
         if (next_decl == decl) {
-          DLOG(WARNING)
+          DLOG(FATAL)
               << "Declaration of " << decl.KindName()
               << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
               << " is repeated in top-level decl list for job on file "
@@ -427,18 +558,18 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       }
     }
 
-    if (auto nd = pasta::NamedDecl::From(decl)) {
-      if (nd->Name() == "DFhook") {
-        std::ofstream fs("/tmp/hook.dot");
-        PrintTokenGraph(tok_range, begin_index, end_index, fs);
-
-      } else if (nd->Name() == "DFhook" ||
-          nd->Name() == "MALSTK" || nd->Name() == "MalStack" ||
-          nd->Name() == "MalStkPtr") {
-        std::ofstream fs("/tmp/stack.dot");
-        PrintTokenGraph(tok_range, begin_index, end_index, fs);
-      }
-    }
+//    if (auto nd = pasta::NamedDecl::From(decl)) {
+//      if (nd->Name() == "DFhook") {
+//        std::ofstream fs("/tmp/hook.dot");
+//        PrintTokenGraph(tok_range, begin_index, end_index, fs);
+//
+//      } else if (nd->Name() == "DFhook" ||
+//          nd->Name() == "MALSTK" || nd->Name() == "MalStack" ||
+//          nd->Name() == "MalStkPtr") {
+//        std::ofstream fs("/tmp/stack.dot");
+//        PrintTokenGraph(tok_range, begin_index, end_index, fs);
+//      }
+//    }
 
     // Don't create token tree if the decl is already seen.
     auto hash =

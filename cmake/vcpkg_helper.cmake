@@ -36,20 +36,38 @@ if (NOT DEFINED VCPKG_TARGET_TRIPLET)
   endif()
 
   if (APPLE)
-    set(_project_vcpkg_triplet "${_project_arch}-osx-rel")
+    set(_project_vcpkg_triplet "${_project_arch}-osx")
   elseif(UNIX)
-    set(_project_vcpkg_triplet "${_project_arch}-linux-rel")
+    set(_project_vcpkg_triplet "${_project_arch}-linux")
   elseif(WIN32)
-    set(_project_vcpkg_triplet "${_project_arch}-windows-static-md-rel")
+    set(_project_vcpkg_triplet "${_project_arch}-windows-static-md")
   else()
     message(FATAL_ERROR "Could not detect default release triplet")
   endif()
-
-  if (NOT EXISTS "${VCPKG_ROOT_INSTALL_DIR}/${_project_vcpkg_triplet}")
-    message(STATUS "Could not find installed project-default triplet '${_project_vcpkg_triplet}' using vcpkg-default for your system")
-  else()
+  
+  # Start with an unsuffixed triple, which is the normal cxx-common triple format
+  # when vcpkg creates both debug and release builds.
+  if (EXISTS "${VCPKG_ROOT_INSTALL_DIR}/${_project_vcpkg_triplet}")
     set(VCPKG_TARGET_TRIPLET "${_project_vcpkg_triplet}" CACHE STRING "")
     message(STATUS "Setting default vcpkg triplet to release-only libraries: ${VCPKG_TARGET_TRIPLET}")
+
+  # In a debug build, prefer the debug triple.
+  elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${VCPKG_ROOT_INSTALL_DIR}/${_project_vcpkg_triplet}-dbg")
+    set(VCPKG_TARGET_TRIPLET "${_project_vcpkg_triplet}-dbg" CACHE STRING "")
+    message(STATUS "Setting default vcpkg triplet to release-only libraries: ${VCPKG_TARGET_TRIPLET}-dbg")
+  
+  # Otherwise, prefer a release triple.
+  elseif(EXISTS "${VCPKG_ROOT_INSTALL_DIR}/${_project_vcpkg_triplet}-rel")
+    set(VCPKG_TARGET_TRIPLET "${_project_vcpkg_triplet}-dbg" CACHE STRING "")
+    message(STATUS "Setting default vcpkg triplet to release-only libraries: ${VCPKG_TARGET_TRIPLET}-rel")
+  
+  # Fall back on a debug triple.
+  elseif(EXISTS "${VCPKG_ROOT_INSTALL_DIR}/${_project_vcpkg_triplet}-dbg")
+    set(VCPKG_TARGET_TRIPLET "${_project_vcpkg_triplet}-dbg" CACHE STRING "")
+    message(STATUS "Setting default vcpkg triplet to release-only libraries: ${VCPKG_TARGET_TRIPLET}-dbg")
+  
+  else()
+    message(STATUS "Could not find installed project-default triplet '${_project_vcpkg_triplet}' using vcpkg-default for your system")    
   endif()
 endif()
 

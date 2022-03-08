@@ -7,12 +7,13 @@
 #include <multiplier/Types.h>
 
 #include <chrono>
-#include <clang/Basic/TokenKinds.h>
+
+#include <pasta/AST/Forward.h>
 
 namespace mx {
 
-TokenKind FromClang(clang::tok::TokenKind tk) {
-  if (clang::tok::raw_identifier == tk) {
+TokenKind FromPasta(pasta::TokenKind tk) {
+  if (pasta::TokenKind::kRawIdentifier == tk) {
     return TokenKind::TK_identifier;
 
   } else {
@@ -20,10 +21,10 @@ TokenKind FromClang(clang::tok::TokenKind tk) {
   }
 }
 
-clang::tok::TokenKind ToClang(TokenKind tk) {
+pasta::TokenKind ToPasta(TokenKind tk) {
   switch (tk) {
     case TokenKind::TK_whitespace:
-      return clang::tok::unknown;
+      return pasta::TokenKind::kUnknown;
 
     // These are derived from PASTA token roles, so they don't actually exist
     // in Clang's token kinds.
@@ -33,18 +34,18 @@ clang::tok::TokenKind ToClang(TokenKind tk) {
     case TokenKind::TK_end_file:
     case TokenKind::TK_begin_directive:
     case TokenKind::TK_end_directive:
-      return clang::tok::unknown;
+      return pasta::TokenKind::kUnknown;
 
 #define PPKEYWORD(X) \
-    case TokenKind::TK_pp_ ## X: return clang::tok::identifier;
+    case TokenKind::TK_pp_ ## X: return pasta::TokenKind::kIdentifier;
 #include "clang/Basic/TokenKinds.def"
 
 #define OBJC_AT_KEYWORD(X) \
-    case TokenKind::TK_objc_ ## X: return clang::tok::identifier;
+    case TokenKind::TK_objc_ ## X: return pasta::TokenKind::kIdentifier;
 #include "clang/Basic/TokenKinds.def"
 
     default:
-      return static_cast<clang::tok::TokenKind>(tk);
+      return static_cast<pasta::TokenKind>(tk);
   }
 }
 
