@@ -80,6 +80,7 @@ struct Substitution {
 
   Substitution(Kind kind_, pasta::File file_)
       : kind(kind_),
+        after(nullptr),
         file(file_) {}
 
   TokenInfo *RightCorner(void) {
@@ -162,15 +163,38 @@ struct Substitution {
     os << "s" << reinterpret_cast<void *>(this)
        << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"><TR>";
 
-    auto i = 0;
     auto has_any = false;
+    auto dump_ft = [&] (TokenInfo *info) {
+      if (auto tk = info->file_tok->Kind();
+          tk == pasta::TokenKind::kComment || tk == pasta::TokenKind::kUnknown) {
+        // Skip.
+      } else if (tk == pasta::TokenKind::kCharacterConstant ||
+                 tk == pasta::TokenKind::kUtf8CharacterConstant ||
+                 tk == pasta::TokenKind::kUtf16CharacterConstant ||
+                 tk == pasta::TokenKind::kUtf32CharacterConstant ||
+                 tk == pasta::TokenKind::kWideCharacterConstant ||
+                 tk == pasta::TokenKind::kStringLiteral ||
+                 tk == pasta::TokenKind::kUtf8StringLiteral ||
+                 tk == pasta::TokenKind::kUtf16StringLiteral ||
+                 tk == pasta::TokenKind::kUtf32StringLiteral ||
+                 tk == pasta::TokenKind::kWideStringLiteral) {
+
+        os << "<TD>&lt;str&gt;</TD>";
+        has_any = true;
+
+      } else {
+        os << "<TD>" << TokData(info->file_tok->Data()) << "</TD>";
+        has_any = true;
+      }
+    };
+
+    auto i = 0;
     for (auto ent : before) {
       if (std::holds_alternative<TokenInfo *>(ent)) {
         auto info = std::get<TokenInfo *>(ent);
         switch (info->category) {
           case TokenInfo::kFileToken:
-            os << "<TD>" << TokData(info->file_tok->Data()) << "</TD>";
-            has_any = true;
+            dump_ft(info);
             continue;
           case TokenInfo::kMacroExpansionToken:
             os << "<TD>" << TokData(info->parsed_tok->Data()) << "</TD>";
@@ -178,31 +202,10 @@ struct Substitution {
             continue;
           case TokenInfo::kMacroUseToken:
           case TokenInfo::kMissingFileToken:
-            os << "<TD><U>" << TokData(info->file_tok->Data()) << "</U></TD>";
-            has_any = true;
+            dump_ft(info);
             continue;
           case TokenInfo::kMarkerToken:
-            switch (info->parsed_tok->Role()) {
-              case pasta::TokenRole::kBeginOfFileMarker:
-                os << "<TD><FONT FACE=\"boldfontname\">bof</FONT></TD>";
-                has_any = true;
-                continue;
-              case pasta::TokenRole::kEndOfFileMarker:
-                os << "<TD><FONT FACE=\"boldfontname\">eof</FONT></TD>";
-                has_any = true;
-                continue;
-              case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-                os << "<TD><FONT FACE=\"boldfontname\">bom</FONT></TD>";
-                has_any = true;
-                continue;
-              case pasta::TokenRole::kEndOfMacroExpansionMarker:
-                os << "<TD><FONT FACE=\"boldfontname\">eom</FONT></TD>";
-                has_any = true;
-                continue;
-              default:
-                continue;
-            }
-            break;
+            continue;
           default:
             continue;
         }
@@ -550,6 +553,8 @@ TokenInfo *TokenTreeImpl::HandleMacroUseToken(
   return first;
 }
 
+// Handle the beginning of a macro expansion. This should immediately follow
+// the macro use tokens.
 TokenInfo *TokenTreeImpl::HandleMacroExpansionToken(
     TokenInfo *prev, TokenInfo *curr, std::stringstream &err) {
   CHECK_NOTNULL(prev);
@@ -654,16 +659,17 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFileMacroPath(
     }
   }
 
+  std::reverse(inclusion->before.begin(), inclusion->before.end());
+
+  // If we dont' find the thing, then we might have had a macro expansion before
+  // the inclusion but where the macro expansion is unrelated to the actual
+  // file path.
   if (!seen_hash || !seen_include) {
-    err << "Unable to find '#include' or include-like directive for "
-        << "x-macro inclusion with macro path in "
-        << parent->file.Path().generic_string();
-    DCHECK(false)
-        << err.str();
+    CHECK(parent->before.empty());
+    parent->before.swap(inclusion->before);
     return nullptr;
   }
 
-  std::reverse(inclusion->before.begin(), inclusion->before.end());
   parent->before.emplace_back(inclusion);
   inclusion->after = file;
   substitutions.push_back(file);
@@ -685,7 +691,9 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
   // in the same way as our normal handling, so we handle it specially.
   if (prev && prev->parsed_tok.has_value() &&
       prev->parsed_tok->Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
-    return HandleBeginningOfFileMacroPath(prev, curr, err);
+    if (HandleBeginningOfFileMacroPath(prev, curr, err)) {
+      return prev;
+    }
   }
 
   CHECK(curr->file_tok.has_value());
@@ -708,10 +716,28 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
 
   CHECK(!substitutions.empty());
 
+  Substitution *parent = substitutions.back();
+  TokenInfo *prev_file_token = nullptr;
+
+  // There's a macro expansion that happens just before the `#include`.
+  if (prev->parsed_tok->Role() ==
+      pasta::TokenRole::kEndOfMacroExpansionMarker) {
+    prev_file_token = prev;
+
+  // We have an include following an include.
+  } else if (prev->parsed_tok->Role() == pasta::TokenRole::kEndOfFileMarker) {
+    CHECK(std::holds_alternative<Substitution *>(parent->before.back()));
+    auto inc = std::get<Substitution *>(parent->before.back());
+    CHECK(inc->kind == Substitution::kInclusion);
+    prev_file_token = inc->RightCornerOfFile(inc->file);
+
   // NOTE(pag): This deliberately uses `.front()`, whereas most cases use
   //            `.back()`. Starting at the front descends to the deepest file
   //            doing the inclusion, not the included file.
-  auto prev_file_token = substitutions.front()->RightCorner();
+  } else {
+    prev_file_token = parent->RightCorner();
+  }
+
   if (!prev_file_token || !prev_file_token->file_tok.has_value()) {
     DCHECK(false);  // Should have at least found `prev`.
     prev_file_token = prev;
@@ -769,6 +795,7 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
   TokenInfo *seen_hash = nullptr;
   TokenInfo *seen_include = nullptr;
   TokenInfo *after_directive = nullptr;
+  std::cerr << "---\n";
   for (auto i = pft_index + 1u; i < max_i && !after_directive; ++i) {
     pasta::FileToken sft = pfts[i];
     const pasta::TokenKind tok_kind = sft.Kind();
@@ -783,6 +810,7 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
     //            where `#define S(s) #s`.
     if (tok_kind == pasta::TokenKind::kHash) {
       seen_hash = prev;
+      std::cerr << "!!! seen_hash (TokenInfo *) " << reinterpret_cast<void *>(seen_hash) << '\n';
       seen_include = nullptr;
 
     // Look for the `include` or similar keyword in the directive.
@@ -792,6 +820,7 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
         continue;
       } else if (IsIncludeKeyword(sft)) {
         seen_include = prev;
+        std::cerr << "!!! seen_include (TokenInfo *) " << reinterpret_cast<void *>(seen_include) << '\n';
       } else {
         seen_hash = nullptr;
         seen_include = nullptr;
@@ -857,7 +886,6 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
   CHECK_NOTNULL(seen_hash);
   CHECK_NOTNULL(seen_include);
 
-  Substitution *parent = substitutions.back();
   Substitution *file = CreateSubstitution(Substitution::kIdentity,
                                           std::move(curr_file));
   Substitution *inclusion = CreateSubstitution(Substitution::kInclusion,
@@ -1109,11 +1137,12 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return err.str();
   }
   std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-  std::cerr
-      << "digraph {\n"
-      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
-  sub->PrintDOT(std::cerr);
-  std::cerr << "\n}\n";
+  sub->Print(std::cerr);
+//  std::cerr
+//      << "\n\ndigraph {\n"
+//      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
+//  sub->PrintDOT(std::cerr);
+//  std::cerr << "\n}\n";
   std::cerr << "\n\n\n";
   return TokenTree(std::move(impl));
 }
