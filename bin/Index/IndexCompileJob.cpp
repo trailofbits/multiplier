@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <fstream>
 #include <glog/logging.h>
+#include <llvm/ADT/FoldingSet.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
@@ -569,6 +570,14 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 //        PrintTokenGraph(tok_range, begin_index, end_index, fs);
 //      }
 //    }
+
+    // Don't create token tree if the decl is already seen.
+    auto hash =
+        HashValue::ComputeHashValue(tlds_for_tree, tok_range, begin_index, end_index);
+    auto [decl_id, is_new] = context->AddDeclToSet(std::move(hash));
+    if (!is_new) {
+      continue;
+    }
 
     mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(
         tok_range, begin_index, end_index);

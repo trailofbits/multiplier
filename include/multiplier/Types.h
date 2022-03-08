@@ -18,6 +18,7 @@ enum class TokenKind : uint16_t;
 
 using FileId = uint64_t;
 using Time = int64_t;
+using DeclId = uint64_t;
 
 }  // namespace mx
 namespace pasta {
