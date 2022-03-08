@@ -56,7 +56,7 @@ struct TokenInfoRange {
 // due to an X-macro file inclusion (i.e. where an include is nested inside
 // of a declaration, and then the included file expands macros).
 struct Substitution {
-  enum Kind {
+  const enum Kind {
     // Default case, this is an identity substitution of `before` for itself,
     // i.e. this sustitution represents the tokens of `before`.
     kIdentity,
@@ -70,25 +70,17 @@ struct Substitution {
     // the inclusion manifests as a kind of macro expansion.
     kInclusion
 
-  } kind{kIdentity};
+  } kind;
 
   std::vector<std::variant<TokenInfo *, Substitution *>> before;
 
   Substitution *after;
 
-//  TokenInfo *LeftCorner(void) {
-//    for (auto ent : before) {
-//      if (std::holds_alternative<TokenInfo *>(ent)) {
-//        return std::get<TokenInfo *>(ent);
-//      } else {
-//        auto sub = std::get<Substitution *>(ent);
-//        if (auto lc = sub->LeftCorner()) {
-//          return lc;
-//        }
-//      }
-//    }
-//    return nullptr;
-//  }
+  const pasta::File file;
+
+  Substitution(Kind kind_, pasta::File file_)
+      : kind(kind_),
+        file(file_) {}
 
   TokenInfo *RightCorner(void) {
     if (kind == Substitution::kInclusion) {
@@ -104,6 +96,23 @@ struct Substitution {
         return std::get<Substitution *>(ent)->RightCorner();
       }
     }
+    return nullptr;
+  }
+
+  TokenInfo *RightCornerOfFile(pasta::File of_file) {
+    if (file == of_file) {
+      if (!before.empty()) {
+        auto ent = before.back();
+        if (std::holds_alternative<TokenInfo *>(ent)) {
+          return std::get<TokenInfo *>(ent);
+        } else {
+          return std::get<Substitution *>(ent)->RightCornerOfFile(of_file);
+        }
+      }
+    } else if (after) {
+      return after->RightCornerOfFile(std::move(of_file));
+    }
+
     return nullptr;
   }
 
@@ -173,6 +182,27 @@ struct Substitution {
             has_any = true;
             continue;
           case TokenInfo::kMarkerToken:
+            switch (info->parsed_tok->Role()) {
+              case pasta::TokenRole::kBeginOfFileMarker:
+                os << "<TD><FONT FACE=\"boldfontname\">bof</FONT></TD>";
+                has_any = true;
+                continue;
+              case pasta::TokenRole::kEndOfFileMarker:
+                os << "<TD><FONT FACE=\"boldfontname\">eof</FONT></TD>";
+                has_any = true;
+                continue;
+              case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+                os << "<TD><FONT FACE=\"boldfontname\">bom</FONT></TD>";
+                has_any = true;
+                continue;
+              case pasta::TokenRole::kEndOfMacroExpansionMarker:
+                os << "<TD><FONT FACE=\"boldfontname\">eom</FONT></TD>";
+                has_any = true;
+                continue;
+              default:
+                continue;
+            }
+            break;
           default:
             continue;
         }
@@ -244,7 +274,8 @@ class TokenTreeImpl {
   TokenInfo *BackFillFromEndOfFile(TokenInfo *prev, pasta::File file,
                                    uint64_t after_index);
 
-  TokenInfo *BackFillFromRightCorner(TokenInfo *prev, TokenInfo *curr);
+  TokenInfo *BackFillFromRightCorner(
+      TokenInfo *prev, TokenInfo *prev_file_token, TokenInfo *curr);
 
   // Back-fill tokens from between `a` and `b`, exclusive.
   TokenInfo *BackFillFromBetween(TokenInfo *prev, pasta::FileToken a,
@@ -257,20 +288,9 @@ class TokenTreeImpl {
   // Return the new value for `prev`.
   TokenInfo *FillMissingToken(pasta::FileToken tok, TokenInfo *prev);
 
-//  // Build an include substitution.
-//  Substitution *BuildInclude(
-//      TokenInfo *hash_loc, TokenInfo *include_loc, TokenInfo *less,
-//      TokenInfo *path, TokenInfo *greater, TokenInfo *eod);
-//
-//  // Try to isolate the tokens of an `#include`-like directive. Mostly this just
-//  // looks for the beginning of an apparent directive (i.e. a `#`) and the end
-//  // (a new line), as we're scanning the file tokens, and we might need to deal
-//  // with the actual file name being a macro subject to expansion.
-//  Substitution *FindInclude(pasta::File file, uint64_t start_index,
-//                            TokenInfo *prev);
-
   void AddTokenToSubstitution(TokenInfo *tok);
-  Substitution *CreateSubstitution(Substitution::Kind kind);
+  Substitution *CreateSubstitution(Substitution::Kind kind,
+                                   pasta::File file);
 
   TokenInfo *HandleFileToken(TokenInfo *prev, TokenInfo *curr);
   TokenInfo *HandleMacroUseToken(TokenInfo *prev, TokenInfo *curr);
@@ -328,19 +348,18 @@ TokenInfo *TokenTreeImpl::BackFillFromBetween(TokenInfo *prev,
       prev = FillMissingToken(file_toks[i], prev);
     }
   } else {
-    prev = BackFillFromEndOfFile(prev, fb, b.Index());
-    prev = BackFillFromBeginningOfFile(prev, fa, a.Index());
+    prev = BackFillFromEndOfFile(prev, fa, a.Index());
+    prev = BackFillFromBeginningOfFile(prev, fb, b.Index());
   }
   return prev;
 }
 
 TokenInfo *TokenTreeImpl::BackFillFromRightCorner(
-    TokenInfo *prev, TokenInfo *curr) {
+    TokenInfo *prev, TokenInfo *prev_file_token, TokenInfo *curr) {
   DCHECK(!substitutions.empty());
 
   if (curr->file_tok.has_value()) {
-    auto prev_file_token = substitutions.back()->RightCorner();
-    if (prev_file_token && prev_file_token->file_tok.has_value()) {
+    if (prev && prev->file_tok.has_value()) {
       return BackFillFromBetween(prev, prev_file_token->file_tok.value(),
                                  curr->file_tok.value());
     }
@@ -471,157 +490,19 @@ void TokenTreeImpl::AddTokenToSubstitution(TokenInfo *tok) {
   }
 }
 
-Substitution *TokenTreeImpl::CreateSubstitution(Substitution::Kind kind) {
-  auto &sub = substitutions_alloc.emplace_back();
-  sub.kind = kind;
-  return &sub;
+Substitution *TokenTreeImpl::CreateSubstitution(Substitution::Kind kind,
+                                                pasta::File file) {
+  return &(substitutions_alloc.emplace_back(kind, std::move(file)));
 }
-
-//// Return `true` if `data` contains one or more whitespace characters, and
-//// nothing else.
-//static bool IsWhitespace(std::string_view data) {
-//  auto is_whitespace = false;
-//  for (auto ch : data) {
-//    switch (ch) {
-//      case ' ': case '\t': case '\r': case '\n': case '\\':
-//        is_whitespace = true;
-//        continue;
-//      default:
-//        return false;
-//    }
-//  }
-//  return is_whitespace;
-//}
-
-//// Build an include substitution.
-//Substitution *TokenTreeImpl::BuildInclude(
-//    TokenInfo *hash_loc, TokenInfo *include_loc, TokenInfo *less,
-//    TokenInfo *path, TokenInfo *greater, TokenInfo *eod) {
-//
-//  CHECK_NOTNULL(hash_loc);
-//  CHECK_NOTNULL(include_loc);
-//  CHECK_NOTNULL(eod);
-//
-//  CHECK_LT(hash_loc->file_tok->Index(), include_loc->file_tok->Index());
-//  CHECK_LT(include_loc->file_tok->Index(), eod->file_tok->Index());
-//
-//  (void) less;
-//  (void) path;
-//  (void) greater;
-//
-//  Substitution * const sub = &(substitutions_alloc.emplace_back());
-//
-//  for (auto tok = hash_loc; tok < eod; tok = tok->next) {
-//    if (tok->file_tok) {
-//      sub->before.emplace_back(tok);
-//    }
-//  }
-//
-//  return sub;
-//}
-//
-//// Try to isolate the tokens of an `#include`-like directive. Mostly this just
-//// looks for the beginning of an apparent directive (i.e. a `#`) and the end
-//// (a new line), as we're scanning the file tokens, and we might need to deal
-//// with the actual file name being a macro subject to expansion.
-//Substitution *TokenTreeImpl::FindInclude(pasta::File file, uint64_t start_index,
-//                                         TokenInfo *prev) {
-//
-//  TokenInfo * const orig_prev = prev;
-//  TokenInfo * const orig_next = prev->next;
-//
-//  auto prev_file_toks = file.Tokens();
-//  TokenInfo *hash_loc = nullptr;
-//  TokenInfo *include_loc = nullptr;
-//  TokenInfo *less_loc = nullptr;
-//  TokenInfo *greater_loc = nullptr;
-//  TokenInfo *path_loc = nullptr;
-//  for (size_t i = start_index, max_i = prev_file_toks.Size();
-//       i < max_i; ++i) {
-//    auto ft = prev_file_toks[i];
-//    auto data = ft.Data();
-//    auto mute_new_line = false;
-//    auto tok = FillMissingToken(ft, prev);
-//    switch (ft.Kind()) {
-//      case pasta::TokenKind::kHash:
-//        hash_loc = tok;
-//        break;
-//      case pasta::TokenKind::kIdentifier:
-//      case pasta::TokenKind::kRawIdentifier:
-//        switch (ft.PreProcessorKeywordKind()) {
-//          case pasta::PPKeywordKind::kInclude:
-//          case pasta::PPKeywordKind::kIncludeNext:
-//          case pasta::PPKeywordKind::kImport:
-//            include_loc = tok;
-//            break;
-//          default:
-//            if (data == "include" || data == "include_next" ||
-//                data == "import") {
-//              include_loc = tok;
-//            }
-//            break;
-//        }
-//        break;
-//      case pasta::TokenKind::kLess:
-//        less_loc = tok;
-//        break;
-//      case pasta::TokenKind::kGreater:
-//        greater_loc = tok;
-//        break;
-//      case pasta::TokenKind::kStringLiteral:
-//      case pasta::TokenKind::kUtf8StringLiteral:
-//      case pasta::TokenKind::kUtf16StringLiteral:
-//      case pasta::TokenKind::kUtf32StringLiteral:
-//      case pasta::TokenKind::kWideStringLiteral:
-//        path_loc = tok;
-//        break;
-//
-//      case pasta::TokenKind::kEndOfDirective:
-//      case pasta::TokenKind::kUnknown:
-//        // Found some random stuff before the `#include`. For example,
-//        // might be some macro defines, comments, etc.
-//        if (!hash_loc || !include_loc) {
-//          break;
-//        }
-//
-//        for (auto ch : data) {
-//          if ('\n' == ch) {
-//            if (mute_new_line) {
-//              mute_new_line = false;
-//              continue;
-//
-//            // Found the end of the directive. try to build it.
-//            } else {
-//              return BuildInclude(hash_loc, include_loc, less_loc,
-//                                  path_loc, greater_loc, tok);
-//            }
-//
-//          // Line continuation.
-//          } else if ('\\') {
-//            mute_new_line = true;
-//            continue;
-//
-//          } else {
-//            continue;
-//          }
-//        }
-//        break;
-//
-//      default:
-//        continue;
-//    }
-//  }
-//
-//  // Elide all added tokens.
-//  orig_prev->next = orig_next;
-//  return nullptr;
-//}
 
 TokenInfo *TokenTreeImpl::HandleFileToken(TokenInfo *prev, TokenInfo *curr) {
   CHECK(!substitutions.empty());
   CHECK(curr->file_tok.has_value());
 
-  TokenInfo *first = BackFillFromRightCorner(prev, curr);
+  TokenInfo *last_from_file = substitutions.front()->RightCornerOfFile(
+      pasta::File::Containing(curr->file_tok.value()));
+  TokenInfo *first = BackFillFromRightCorner(
+      prev, last_from_file, curr);
   AddTokenToSubstitution(curr);
   return first;
 }
@@ -629,14 +510,18 @@ TokenInfo *TokenTreeImpl::HandleFileToken(TokenInfo *prev, TokenInfo *curr) {
 TokenInfo *TokenTreeImpl::HandleMacroUseToken(
     TokenInfo *prev, TokenInfo *curr) {
 
+  CHECK(curr->file_tok.has_value());
   CHECK(!substitutions.empty());
   Substitution *parent = substitutions.back();
 
   TokenInfo *first = curr;
 
+  auto curr_file = pasta::File::Containing(curr->file_tok.value());
+
   // Macro use is the first in the token list.
   if (!prev) {
-    Substitution *use = CreateSubstitution(Substitution::kMacroUse);
+    Substitution *use = CreateSubstitution(
+        Substitution::kMacroUse, std::move(curr_file));
     parent->before.emplace_back(use);
     substitutions.push_back(use);
 
@@ -650,8 +535,10 @@ TokenInfo *TokenTreeImpl::HandleMacroUseToken(
   } else {
     DCHECK(parent->kind == Substitution::kIdentity);
 
-    first = BackFillFromRightCorner(prev, curr);
-    Substitution *use = CreateSubstitution(Substitution::kMacroUse);
+    first = BackFillFromRightCorner(
+        prev, substitutions.back()->RightCorner(), curr);
+    Substitution *use = CreateSubstitution(
+        Substitution::kMacroUse, std::move(curr_file));
     parent->before.emplace_back(use);
     substitutions.push_back(use);
   }
@@ -696,8 +583,13 @@ TokenInfo *TokenTreeImpl::HandleMacroExpansionToken(
 TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
     TokenInfo *prev, TokenInfo *curr, std::stringstream &err) {
 
+  CHECK(curr->file_tok.has_value());
+  pasta::File curr_file = pasta::File::Containing(curr->file_tok.value());
+
   if (!prev) {
-    substitutions.push_back(CreateSubstitution(Substitution::kIdentity));
+    Substitution *file = CreateSubstitution(
+        Substitution::kIdentity, std::move(curr_file));
+    substitutions.push_back(file);
     AddTokenToSubstitution(curr);
     return curr;
   }
@@ -709,10 +601,12 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
     return nullptr;
   }
 
-  CHECK(curr->file_tok.has_value());
   CHECK(!substitutions.empty());
 
-  auto prev_file_token = substitutions.back()->RightCorner();
+  // NOTE(pag): This deliberately uses `.front()`, whereas most cases use
+  //            `.back()`. Starting at the front descends to the deepest file
+  //            doing the inclusion, not the included file.
+  auto prev_file_token = substitutions.front()->RightCorner();
   if (!prev_file_token || !prev_file_token->file_tok.has_value()) {
     DCHECK(false);  // Should have at least found `prev`.
     prev_file_token = prev;
@@ -774,7 +668,8 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
     pasta::FileToken sft = pfts[i];
     const pasta::TokenKind tok_kind = sft.Kind();
 
-    auto old_prev = prev;
+    TokenInfo * const old_prev = prev;
+    CHECK_EQ(old_prev->next, curr);
     prev = FillMissingToken(sft, prev);
 
     // Look for the beginning of the directive.
@@ -786,9 +681,12 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
       seen_include = nullptr;
 
     // Look for the `include` or similar keyword in the directive.
-    } else if ((tok_kind == pasta::TokenKind::kIdentifier ||
-                tok_kind == pasta::TokenKind::kRawIdentifier) &&
-               seen_hash) {
+    } else if (tok_kind == pasta::TokenKind::kIdentifier ||
+               tok_kind == pasta::TokenKind::kRawIdentifier) {
+      if (!seen_hash) {
+        continue;
+      }
+
       switch (sft.PreProcessorKeywordKind()) {
         case pasta::PPKeywordKind::kInclude:
         case pasta::PPKeywordKind::kIncludeNext:
@@ -809,8 +707,7 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
       }
 
     // Now look for a new line after the end of the directive.
-    } else if (seen_hash && seen_include &&
-               tok_kind == pasta::TokenKind::kUnknown) {
+    } else if (tok_kind == pasta::TokenKind::kUnknown) {
       auto data = sft.Data();
       auto mute_newline = false;
       for (auto ch : data) {
@@ -818,19 +715,41 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
           if (mute_newline) {
             mute_newline = false;
 
-          // Found the trailing new line; unlink it.
-          } else {
+          // Found the trailing new line; unlink it and remove it from the
+          // substitution as well.
+          } else if (seen_hash && seen_include) {
             CHECK_EQ(old_prev->next, prev);
             CHECK_EQ(prev->next, curr);
+            substitutions.back()->before.pop_back();
+
             after_directive = prev;
             old_prev->next = curr;
             prev = old_prev;
+            break;
+
+          // Not in an include.
+          } else {
+            seen_hash = nullptr;
+            seen_include = nullptr;
             break;
           }
         } else if ('\\' == ch) {
           mute_newline = true;
         }
       }
+
+    // The `#include` is the last thing in this file, with no trailing new line.
+    } else if (seen_hash && seen_include &&
+               (tok_kind == pasta::TokenKind::kEndOfDirective ||
+                tok_kind == pasta::TokenKind::kEndOfFile)) {
+      CHECK_EQ(old_prev->next, prev);
+      CHECK_EQ(prev->next, curr);
+      substitutions.back()->before.pop_back();
+
+      after_directive = prev;
+      old_prev->next = curr;
+      prev = old_prev;
+      break;
     }
   }
 
@@ -848,8 +767,10 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
   CHECK_NOTNULL(seen_include);
 
   Substitution *parent = substitutions.back();
-  Substitution *file = CreateSubstitution(Substitution::kIdentity);
-  Substitution *inclusion = CreateSubstitution(Substitution::kInclusion);
+  Substitution *file = CreateSubstitution(Substitution::kIdentity,
+                                          std::move(curr_file));
+  Substitution *inclusion = CreateSubstitution(Substitution::kInclusion,
+                                               std::move(pf));
 
   CHECK(parent->kind == Substitution::kIdentity);
   CHECK(!parent->after);
@@ -906,7 +827,8 @@ TokenInfo *TokenTreeImpl::HandleEndOfFile(TokenInfo *prev, TokenInfo *curr,
 
   // If we have a previous token from any file, then try to back-fill any
   // missing tokens.
-  first = BackFillFromRightCorner(prev, curr);
+  first = BackFillFromRightCorner(
+      prev, substitutions.back()->RightCorner(), curr);
 
   // The top substitution on the stack should be a file.
   CHECK_LE(2u, substitutions.size());
@@ -932,7 +854,8 @@ TokenInfo *TokenTreeImpl::HandleBeginOfMacroExpansion(
   Substitution *use = substitutions.back();
   substitutions.pop_back();
   CHECK(use->kind == Substitution::kMacroUse);
-  Substitution *exp = CreateSubstitution(Substitution::kMacroExpansion);
+  Substitution *exp = CreateSubstitution(Substitution::kMacroExpansion,
+                                         use->file  /* kind of a lie */);
   substitutions.push_back(exp);
   use->after = exp;
   AddTokenToSubstitution(curr);
@@ -993,12 +916,29 @@ TokenInfo *TokenTreeImpl::HandleMarkerToken(TokenInfo *prev, TokenInfo *curr,
 
 // Fill in the missing tokens from the token tree.
 Substitution *TokenTreeImpl::FillMissingFileTokens(std::stringstream &err) {
+  TokenInfo *first = &(tokens_alloc.front());
+  Substitution *toks = nullptr;
+  for (TokenInfo *curr = first; curr; curr = curr->next) {
+    if (curr->file_tok.has_value()) {
+      toks = CreateSubstitution(
+          Substitution::kIdentity,
+          pasta::File::Containing(curr->file_tok.value()));
+      break;
+    }
+  }
 
-  Substitution * const toks = CreateSubstitution(Substitution::kIdentity);
+  if (!toks) {
+    err
+        << "Could not find any file tokens associated with top-level "
+        << "declaration tokens";
+    return nullptr;
+  }
+
   substitutions.push_back(toks);
 
-  for (TokenInfo *curr = &(tokens_alloc.front()), *prev = nullptr; curr;
+  for (TokenInfo *curr = first, *prev = nullptr; curr;
        prev = curr, curr = curr->next) {
+
     switch (curr->category) {
       case TokenInfo::kFileToken:
         prev = HandleFileToken(prev, curr);
@@ -1024,473 +964,6 @@ Substitution *TokenTreeImpl::FillMissingFileTokens(std::stringstream &err) {
   CHECK(!substitutions.empty());
 
   return toks;
-
-#if 0
-  TokenInfo * const first = &(tokens_alloc.front());
-//  CHECK(first->parsed_tok.has_value());
-  CHECK(first->file_tok.has_value());
-
-  std::vector<std::pair<pasta::File, pasta::FileToken>> last_tok_from_file;
-
-  // Base case to track that we're always in something.
-  last_tok_from_file.emplace_back(
-      pasta::File::Containing(first->file_tok.value()),
-      first->file_tok.value());
-
-
-  auto create_substitution = [this] (Substitution::Kind kind) -> Substitution * {
-    auto sub = &(substitutions_alloc.emplace_back());
-    sub->kind = kind;
-    return sub;
-  };
-
-  auto yield_file_tok = [&substitutions] (TokenInfo *tok) {
-    CHECK(!substitutions.empty());
-    substitutions.back()->before.emplace_back(tok);
-  };
-
-  auto yield_substitution = [&substitutions] (Substitution *sub) {
-    CHECK(!substitutions.empty());
-    substitutions.back()->before.emplace_back(sub);
-  };
-
-  auto enter_substitution = [&substitutions] (Substitution *sub) {
-    substitutions.push_back(sub);
-  };
-
-  auto exit_substitution = [&substitutions] (void) {
-    substitutions.pop_back();
-  };
-
-//  auto push_substitution = [&substitutions] (Substitution *sub) {
-//    CHECK(!substitutions.empty());
-//    substitutions.back()->before.emplace_back(sub);
-//    substitutions.push_back(sub);
-//  };
-//
-//  auto pop_substitution = [&substitutions] (void) {
-//    CHECK_LE(substitutions.size(), 2u);
-//    auto last_sub = substitutions.back();
-//    substitutions.pop_back();
-////    substitutions.back()->after
-//  };
-
-  substitutions.push_back(create_substitution(Substitution::Kind::kIdentity));
-
-  TokenInfo *prev = nullptr;
-  for (auto curr = first; curr; prev = curr, curr = curr->next) {
-    DCHECK_NE(curr, prev);
-    CHECK(!last_tok_from_file.empty());
-
-    std::cerr
-        << "prev=" << reinterpret_cast<void *>(prev)
-        << " curr=" << reinterpret_cast<void *>(curr)
-        << " substitutions=" << substitutions.size()
-        << '\n';
-
-    switch (curr->category) {
-      case TokenInfo::kMissingFileToken:
-        err << "Broken invariant; missing file token?";
-        return nullptr;
-
-      // The macro use tokens are taken from a file, and so we know that they
-      // are "fine." We can rely on the expansion begin/end markers to tell
-      // us what to fill around.
-      case TokenInfo::kMacroUseToken:
-
-        // Entering a macro use.
-        if (!prev || prev->category != TokenInfo::kMacroUseToken) {
-
-          if (prev) {
-            CHECK(prev->file_tok.has_value());
-            CHECK(curr->file_tok.has_value());
-            auto old_prev = prev;
-
-            // Go collect stuff like whitespace prior to the use of a macro
-            // token.
-            prev = BackFillFromBetween(prev, prev->file_tok.value(),
-                                       curr->file_tok.value());
-            if (old_prev != prev) {
-              CHECK_EQ(prev->next, curr);
-              for (auto tok = old_prev->next; tok != curr; tok = tok->next) {
-                yield_file_tok(tok);  // Collect into substitution.
-              }
-            }
-          }
-
-          auto sub = create_substitution(Substitution::Kind::kMacroUse);
-          yield_substitution(sub);
-          enter_substitution(sub);
-
-        } else {
-          // Should be inside the top-level identity substitution, and at least
-          // one other substitution (i.e. for a macro expansion).
-          DCHECK_LE(2u, substitutions.size());
-          DCHECK(substitutions.back()->kind == Substitution::Kind::kMacroUse);
-        }
-
-        yield_file_tok(curr);
-        last_tok_from_file.back().second = std::move(curr->file_tok.value());
-        continue;
-
-      // With macro expansion tokens there's nothing to do really.
-      case TokenInfo::kMacroExpansionToken:
-
-        // Should at least be inside the top-level identity substitution,
-        // then the macro expansion substitution.
-        DCHECK_LE(2u, substitutions.size());
-
-        yield_file_tok(curr);
-        continue;
-
-      default:
-        if (!prev) {
-          CHECK(curr->file_tok.has_value());
-          yield_file_tok(curr);
-          continue;
-        } else {
-          break;
-        }
-    }
-
-    CHECK(curr->parsed_tok.has_value());
-    pasta::Token curr_tok = curr->parsed_tok.value();
-    const pasta::TokenRole curr_tok_role = curr_tok.Role();
-
-    pasta::TokenRole prev_tok_role = pasta::TokenRole::kInvalid;
-    if (prev) {
-      if (prev->parsed_tok) {
-        prev_tok_role = prev->parsed_tok->Role();
-      } else {
-        CHECK(prev->category == TokenInfo::kMacroUseToken);
-        prev_tok_role = pasta::TokenRole::kFileToken;
-      }
-    }
-
-    // At the beginning of a macro expansion.
-    if (pasta::TokenRole::kBeginOfMacroExpansionMarker == curr_tok_role) {
-      CHECK_NOTNULL(prev);
-      CHECK(prev->category == TokenInfo::kMacroUseToken);
-      CHECK_LE(2u, substitutions.size());
-      auto use_sub = substitutions.back();
-      CHECK(use_sub->kind == Substitution::Kind::kMacroUse);
-      auto exp_sub = create_substitution(Substitution::Kind::kMacroExpansion);
-      use_sub->after = exp_sub;
-      exit_substitution();
-      enter_substitution(exp_sub);
-      yield_file_tok(curr);
-      continue;
-
-    // At the end of a macro expansion.
-    } else if (pasta::TokenRole::kEndOfMacroExpansionMarker == curr_tok_role) {
-      CHECK_NOTNULL(prev);
-      CHECK(prev->category == TokenInfo::kMacroExpansionToken ||
-            prev_tok_role == pasta::TokenRole::kBeginOfMacroExpansionMarker);
-      CHECK_LE(2u, substitutions.size());
-      auto exp_sub = substitutions.back();
-      CHECK(exp_sub->kind == Substitution::Kind::kMacroExpansion);
-      yield_file_tok(curr);
-      exit_substitution();
-      continue;
-    }
-
-//    // We must be at the end of a macro expansion.
-//    if (prev->category == TokenInfo::kMacroExpansionToken) {
-//
-//      // Should at least be inside the top-level identity substitution,
-//      // then the macro use substitution, and then the macro expansion
-//      // substitution.
-//      DCHECK_LE(2u, substitutions.size());
-//
-//      CHECK(curr_tok.Role() == pasta::TokenRole::kEndOfMacroExpansionMarker);
-//
-//      yield_file_tok(curr);
-//      exit_substitution();  // Macro expansion.
-//
-////      last_tok_from_file.back().second = std::move(curr_file_tok);
-//      continue;
-//    }
-
-    CHECK(curr->file_tok.has_value());
-    CHECK(prev->file_tok.has_value());
-
-    pasta::FileToken prev_file_tok = prev->file_tok.value();
-    pasta::File prev_file = pasta::File::Containing(prev_file_tok);
-
-    pasta::FileToken curr_file_tok = curr->file_tok.value();
-    pasta::File curr_file = pasta::File::Containing(curr_file_tok);
-
-    auto prev_index = prev_file_tok.Index();
-    auto curr_index = curr_file_tok.Index();
-
-    // We need to track the last token seen from each file. For example
-    // we might have the X-macro pattern used as follows:
-    //
-    //      enum Blah {
-    //      #define MAKE_BLAH(x) x,
-    //      #include "BlahEnumerators.h"
-    //      };
-    //
-    // And so when we get to the end-of-file marker before the `};`, we need
-    // to make sure that any of the file tokens after the last parsed token
-    // from `BlahEnumerators.h`, e.g. whitespace, comments, `#undef`s, etc,
-    // end up being injected before our end-of-file marker.
-    if (pasta::TokenRole::kBeginOfFileMarker == curr_tok_role) {
-
-      // We may need to back-fill before this marker; handled below. To do
-      // that, we need to find the corresponding end-of-file marker, then find
-      // the next token, then back fill from what's before the next token.
-      //
-      // TODO(pag): This will probably back-fill whitespace to the wrong spot.
-      auto f = 1u;
-      std::optional<TokenInfo *> found_at;
-      for (auto n = curr->next; n; n = n->next) {
-        if (n->parsed_tok) {
-          switch (n->parsed_tok->Role()) {
-            case pasta::TokenRole::kBeginOfFileMarker:
-              ++f;
-              continue;
-            case pasta::TokenRole::kEndOfFileMarker:
-              --f;
-              if (!f) {
-                break;
-              }
-              [[clang::fallthrough]];
-            default:
-              continue;
-          }
-
-          // `n` points to the end of file marker matching `curr_tok`.
-          if (n->next) {
-
-            // It must have a file token, because either it's another marker,
-            // or the usage tokens from a macro expansion.
-            found_at = n->next;
-          }
-          break;
-        }
-      }
-
-      if (!found_at) {
-        LOG(ERROR)
-            << "Token tree range straddles two files "
-            << prev_file.Path().generic_string() << ':'
-            << prev_file_tok.Line() << ':' << prev_file_tok.Column()
-            << " and "
-            << curr_file.Path().generic_string() << ':'
-            << curr_file_tok.Line() << ':' << curr_file_tok.Column();
-
-      } else {
-        TokenInfo *next_info_in_prev_file = *found_at;
-        CHECK(next_info_in_prev_file->file_tok.has_value());
-        const pasta::FileToken &next_tok_from_prev_file =
-            next_info_in_prev_file->file_tok.value();
-
-        // Likely X-Macro case, where `prev->file_tok` is followed by something
-        // that is eventually followed by an `#include`.
-        if (auto expected_prev_file =
-                pasta::File::Containing(next_tok_from_prev_file);
-            expected_prev_file != prev_file) {
-          auto sub = FindInclude(prev_file, prev_file_tok.Index() + 1u, prev);
-          if (!sub) {
-            err
-                << "Unexpected change of file from "
-                << expected_prev_file.Path().generic_string() << ':'
-                << next_tok_from_prev_file.Line() << ':'
-                << next_tok_from_prev_file.Column() << " to "
-                << prev_file.Path().generic_string() << ':'
-                << prev_file_tok.Line() << ':' << prev_file_tok.Column()
-                << " in token stream could not be "
-                << "matched with an X-macro-like inclusion";
-
-            assert(false);
-            return nullptr;
-
-          } else {
-            CHECK(next_info_in_prev_file->parsed_tok.has_value());
-            CHECK(next_info_in_prev_file->parsed_tok->Role() ==
-                  pasta::TokenRole::kBeginOfFileMarker);
-
-            TokenInfo * const include_directive = sub->LeftCorner();
-            CHECK_NOTNULL(include_directive);
-
-            // Back fill the tokens found prior to the `#include` directive
-            // into the current substitution.
-            for (auto tok = prev->next; tok != include_directive;
-                tok = tok->next) {
-              yield_file_tok(tok);
-            }
-
-            // Add the include directive itself into the current substituion.
-            yield_substitution(sub);
-
-            // Enter the file as the substituted tokens for the inclusion
-            // directive.
-            sub->after = create_substitution(Substitution::Kind::kInclusion);
-            enter_substitution(sub->after);
-          }
-        }
-
-        pasta::FileTokenRange missing_toks = prev_file.Tokens();
-        auto prev_was_whitespace = false;
-
-        // We take a bit of extra care here to try to detect the case where
-        // we don't inject the whitespace that would probably follow a
-        // `#include`. This isn't quite good enough, as we could have whitespace
-        // and comments and such following, but oh well.
-        std::optional<pasta::FileToken> missing_tok;
-        for (auto i = prev_file_tok.Index() + 1u,
-                  max_i = next_tok_from_prev_file.Index();
-             i < max_i; ++i) {
-          if (missing_tok) {
-            last_tok_from_file.back().second = missing_tok.value();
-            prev = FillMissingToken(std::move(*missing_tok), prev);
-            prev_was_whitespace = IsWhitespace(prev->file_tok->Data());
-          } else {
-            missing_tok = missing_toks[i];
-          }
-        }
-        if (missing_tok && !prev_was_whitespace) {
-          last_tok_from_file.back().second = missing_tok.value();
-          prev = FillMissingToken(std::move(*missing_tok), prev);
-        }
-      }
-
-      last_tok_from_file.emplace_back(curr_file, curr_file_tok);
-      continue;
-
-    // We're about to exit a file, make sure to back-fill any trailing tokens
-    // from within the end of that file.
-    } else if (pasta::TokenRole::kEndOfFileMarker == curr_tok_role) {
-      CHECK_LE(2u, substitutions.size());
-
-      pasta::File exited_file = last_tok_from_file.back().first;
-      pasta::FileToken exited_tok = last_tok_from_file.back().second;
-
-      last_tok_from_file.pop_back();
-      if (last_tok_from_file.empty()) {
-        err
-            << "Token tree range straddles two files "
-            << prev_file.Path().generic_string() << ':'
-            << prev_file_tok.Line() << ':' << prev_file_tok.Column()
-            << " and "
-            << curr_file.Path().generic_string() << ':'
-            << curr_file_tok.Line() << ':' << curr_file_tok.Column();
-        return nullptr;
-      }
-
-      pasta::FileTokenRange exited_toks = exited_file.Tokens();
-
-      // The included/imported file appeared empty to the parser, e.g. it was
-      // actually empty, or just full of whitespace, or perhaps all the code was
-      // disabled by macros.
-      if (prev_tok_role == pasta::TokenRole::kBeginOfFileMarker) {
-        for (auto exited_tok : exited_toks) {
-          prev = FillMissingToken(std::move(exited_tok), prev);
-          yield_file_tok(prev);
-        }
-
-      // The included/imported file appeared non-empty to the parser; see if
-      // we need to back fill.
-      } else {
-        for (uint64_t i = exited_tok.Index() + 1u, max_i = exited_toks.Size();
-             i < max_i; ++i) {
-          prev = FillMissingToken(exited_toks[i], prev);
-          yield_file_tok(prev);
-        }
-      }
-
-      yield_file_tok(curr);
-      exit_substitution();  // Exit this substitution.
-
-      continue;
-    }
-
-    // We've just left a file, now we're resuming in another file. Make it
-    // look like we're continuing on where we left off.
-    if (prev_file != curr_file) {
-      CHECK(prev_tok_role == pasta::TokenRole::kEndOfFileMarker);
-      CHECK(last_tok_from_file.back().first == curr_file);
-      prev_file = curr_file;
-      prev_file_tok = last_tok_from_file.back().second;
-      prev_index = last_tok_from_file.back().second.Index();
-    }
-
-    // The previous token is at the same spot, and that should only happen
-    // with marker tokens (e.g. macro expansions, file begins).
-    if (prev_index == curr_index) {
-      CHECK(prev->category == TokenInfo::kMarkerToken ||
-            curr->category == TokenInfo::kMarkerToken);
-
-    // We are missing some tokens so we need to inject them.
-    } else if (prev_index < curr_index) {
-      pasta::FileTokenRange missing_toks = prev_file.Tokens();
-      for (auto i = prev_index + 1u; i < curr_index; ++i) {
-        prev = FillMissingToken(missing_toks[i], prev);
-        yield_file_tok(prev);
-      }
-
-    } else {
-      err
-          << "Out-of-order file tokens in file "
-          << prev_file.Path().generic_string()
-          << " " << prev_file_tok.Line() << ':' << prev_file_tok.Column()
-          << " before " << curr_file_tok.Line() << ':'
-          << curr_file_tok.Column();
-      return nullptr;
-    }
-
-    // Keep track of the last token from the current file.
-    last_tok_from_file.back().second = std::move(curr_file_tok);
-  }
-
-  // Do a final sweep through to inject any missing things. We sometimes have
-  // missing things due to macros.
-  prev = first;
-
-//  auto prev_file_tok = first->file_tok.value();
-//  auto prev_index = prev_file_tok.Index();
-//
-//  for (auto curr = first->next; curr; prev = curr, curr = curr->next) {
-//    if (TokenInfo::kMacroExpansionToken == curr->category) {
-//      continue;
-//    }
-//
-//    auto curr_index = curr->file_tok->Index();
-//    if (prev_index == curr_index || (prev_index + 1u) == curr_index) {
-//
-//      if ((TokenInfo::kMacroExpansionToken != curr->category &&
-//           TokenInfo::kMarkerToken != curr->category) ||
-//          (pasta::TokenRole::kEndOfMacroExpansionMarker !=
-//           curr->parsed_tok->Role())) {
-//        prev_file_tok = curr->file_tok.value();
-//        prev_index = curr_index;
-//      }
-//
-//      continue;
-//    }
-//
-//    auto prev_file = pasta::File::Containing(prev_file_tok);
-//    auto curr_file = pasta::File::Containing(*(curr->file_tok));
-//    if (prev_file != curr_file) {
-//      prev_file_tok = curr->file_tok.value();
-//      prev_index = curr_index;
-//      continue;
-//    }
-//
-//    pasta::FileTokenRange missing_toks = prev_file.Tokens();
-//    for (auto i = prev_index + 1u; i < curr_index; ++i) {
-//      prev = FillMissingToken(missing_toks[i], prev);
-//    }
-//
-//    prev_index = curr_index;
-//    prev_file_tok = curr->file_tok.value();
-//  }
-
-  CHECK_EQ(substitutions.size(), 1u);
-
-  return first;
-#endif
 }
 
 TokenTree::~TokenTree(void) {}
