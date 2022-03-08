@@ -299,6 +299,8 @@ class TokenTreeImpl {
   TokenInfo *HandleMarkerToken(TokenInfo *prev, TokenInfo *curr,
                                std::stringstream &err);
 
+  TokenInfo *HandleBeginningOfFileMacroPath(TokenInfo *prev, TokenInfo *curr,
+                                            std::stringstream &err);
   TokenInfo *HandleBeginningOfFile(TokenInfo *prev, TokenInfo *curr,
                                    std::stringstream &err);
   TokenInfo *HandleEndOfFile(TokenInfo *prev, TokenInfo *curr,
@@ -580,8 +582,111 @@ TokenInfo *TokenTreeImpl::HandleMacroExpansionToken(
   return first;
 }
 
+static bool IsIncludeKeyword(pasta::FileToken ft) {
+  switch (ft.PreProcessorKeywordKind()) {
+    case pasta::PPKeywordKind::kInclude:
+    case pasta::PPKeywordKind::kIncludeNext:
+    case pasta::PPKeywordKind::kImport:
+      return true;
+    case pasta::PPKeywordKind::kNotKeyword: {
+      auto data = ft.Data();
+      return (data == "include" || data == "include_next" || data == "import");
+    }
+    default:
+      return false;
+  }
+}
+
+// We're entering a file, but the file path itself is the result of macro
+// expansion.
+TokenInfo *TokenTreeImpl::HandleBeginningOfFileMacroPath(
+    TokenInfo *prev, TokenInfo *curr, std::stringstream &err) {
+  CHECK_NOTNULL(prev);
+  CHECK_LE(1u, substitutions.size());
+  CHECK(!substitutions.empty());
+
+  Substitution *parent = substitutions.back();
+  CHECK(!parent->before.empty());
+  CHECK(std::holds_alternative<Substitution *>(parent->before.back()));
+
+  pasta::File curr_file = pasta::File::Containing(curr->file_tok.value());
+  Substitution *file = CreateSubstitution(Substitution::kIdentity,
+                                          std::move(curr_file));
+  Substitution *inclusion = CreateSubstitution(Substitution::kInclusion,
+                                               parent->file);
+  TokenInfo *seen_hash = nullptr;
+  TokenInfo *seen_include = nullptr;
+
+  while (!parent->before.empty()) {
+    auto ent = parent->before.back();
+    parent->before.pop_back();
+    inclusion->before.push_back(ent);
+
+    if (!std::holds_alternative<TokenInfo *>(ent)) {
+      seen_hash = nullptr;
+      seen_include = nullptr;
+      continue;
+    }
+
+    TokenInfo *ti = std::get<TokenInfo *>(ent);
+    if (!ti->file_tok.has_value()) {
+      continue;
+    }
+
+    pasta::FileToken ft = ti->file_tok.value();
+    pasta::TokenKind tok_kind = ft.Kind();
+    if (tok_kind == pasta::TokenKind::kHash) {
+      if (seen_include) {
+        seen_hash = ti;
+        break;
+      } else {
+        continue;
+      }
+
+    } else if (tok_kind == pasta::TokenKind::kIdentifier ||
+               tok_kind == pasta::TokenKind::kRawIdentifier) {
+      if (IsIncludeKeyword(ft)) {
+        seen_include = ti;
+      } else {
+        seen_hash = nullptr;
+        seen_include = nullptr;
+      }
+    }
+  }
+
+  if (!seen_hash || !seen_include) {
+    err << "Unable to find '#include' or include-like directive for "
+        << "x-macro inclusion with macro path in "
+        << parent->file.Path().generic_string();
+    DCHECK(false)
+        << err.str();
+    return nullptr;
+  }
+
+  std::reverse(inclusion->before.begin(), inclusion->before.end());
+  parent->before.emplace_back(inclusion);
+  inclusion->after = file;
+  substitutions.push_back(file);
+  AddTokenToSubstitution(curr);
+
+  return prev;
+}
+
+// We're entering a file within a top-level declaration list. We need to go
+// and find and inject the tokens prior to the `#include` directive, and
+// we also want to treat the `#include` directive itself as a kind of macro
+// substitution.
 TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
     TokenInfo *prev, TokenInfo *curr, std::stringstream &err) {
+
+  // If the previous token is the end of a macro expansion then we're dealing
+  // with a macro expansion inside of an `#include` directive, e.g.
+  // `#include PATH` or `#include S(cstdio)` type of thing. This doesn't behave
+  // in the same way as our normal handling, so we handle it specially.
+  if (prev && prev->parsed_tok.has_value() &&
+      prev->parsed_tok->Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
+    return HandleBeginningOfFileMacroPath(prev, curr, err);
+  }
 
   CHECK(curr->file_tok.has_value());
   pasta::File curr_file = pasta::File::Containing(curr->file_tok.value());
@@ -685,25 +790,11 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
                tok_kind == pasta::TokenKind::kRawIdentifier) {
       if (!seen_hash) {
         continue;
-      }
-
-      switch (sft.PreProcessorKeywordKind()) {
-        case pasta::PPKeywordKind::kInclude:
-        case pasta::PPKeywordKind::kIncludeNext:
-        case pasta::PPKeywordKind::kImport:
-          seen_include = prev;
-          break;
-        case pasta::PPKeywordKind::kNotKeyword: {
-          auto data = sft.Data();
-          if (data == "include" || data == "include_next" || data == "import") {
-            seen_include = prev;
-          }
-          break;
-        }
-        default:
-          seen_hash = nullptr;
-          seen_include = nullptr;
-          break;
+      } else if (IsIncludeKeyword(sft)) {
+        seen_include = prev;
+      } else {
+        seen_hash = nullptr;
+        seen_include = nullptr;
       }
 
     // Now look for a new line after the end of the directive.
