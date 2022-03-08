@@ -364,7 +364,7 @@ TokenInfo *TokenTreeImpl::BackFillFromRightCorner(
   DCHECK(!substitutions.empty());
 
   if (curr->file_tok.has_value()) {
-    if (prev && prev->file_tok.has_value()) {
+    if (prev_file_token && prev_file_token->file_tok.has_value()) {
       return BackFillFromBetween(prev, prev_file_token->file_tok.value(),
                                  curr->file_tok.value());
     }
@@ -795,7 +795,7 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
   TokenInfo *seen_hash = nullptr;
   TokenInfo *seen_include = nullptr;
   TokenInfo *after_directive = nullptr;
-  std::cerr << "---\n";
+
   for (auto i = pft_index + 1u; i < max_i && !after_directive; ++i) {
     pasta::FileToken sft = pfts[i];
     const pasta::TokenKind tok_kind = sft.Kind();
@@ -810,7 +810,6 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
     //            where `#define S(s) #s`.
     if (tok_kind == pasta::TokenKind::kHash) {
       seen_hash = prev;
-      std::cerr << "!!! seen_hash (TokenInfo *) " << reinterpret_cast<void *>(seen_hash) << '\n';
       seen_include = nullptr;
 
     // Look for the `include` or similar keyword in the directive.
@@ -818,9 +817,10 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
                tok_kind == pasta::TokenKind::kRawIdentifier) {
       if (!seen_hash) {
         continue;
+
       } else if (IsIncludeKeyword(sft)) {
         seen_include = prev;
-        std::cerr << "!!! seen_include (TokenInfo *) " << reinterpret_cast<void *>(seen_include) << '\n';
+
       } else {
         seen_hash = nullptr;
         seen_include = nullptr;
@@ -1109,7 +1109,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
-  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
 
   impl->BuildInitialTokenList(std::move(range), begin_index, end_index);
   if (impl->tokens_alloc.empty()) {
@@ -1117,7 +1117,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return err.str();
   }
 
-  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
 //  for (auto info = &(tokens_alloc.front()); info; info = info->next) {
 //    switch (info->category) {
 //      case TokenInfo::kFileToken:
@@ -1136,14 +1136,14 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
   if (!sub) {
     return err.str();
   }
-  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-  sub->Print(std::cerr);
+//  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//  sub->Print(std::cerr);
 //  std::cerr
 //      << "\n\ndigraph {\n"
 //      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
 //  sub->PrintDOT(std::cerr);
 //  std::cerr << "\n}\n";
-  std::cerr << "\n\n\n";
+//  std::cerr << "\n\n\n";
   return TokenTree(std::move(impl));
 }
 

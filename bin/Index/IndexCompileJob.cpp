@@ -252,6 +252,8 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
     begin_tok_index = decl_range.begin()->Index();
     end_tok_index = (--decl_range.end())->Index();
 
+    // NOTE(pag): This is more of an indication that we probably need to fix
+    //            something in PASTA.
     if (!(begin_tok_index <= tok_index && tok_index <= end_tok_index)) {
       DLOG(ERROR)
           << "Location of " << decl.KindName()
