@@ -15,14 +15,10 @@
 #include <multiplier/Types.h>
 
 #include <pasta/Util/FileManager.h>
-#include <pasta/AST/Decl.h>
-#include <pasta/AST/Stmt.h>
-#include <pasta/AST/Type.h>
 
 #include <mutex>
 #include <string>
 #include <unordered_map>
-
 
 namespace mx {
 class Executor;
@@ -81,30 +77,6 @@ class UpdateContext {
   inline std::pair<mx::DeclId, bool> AddDeclToSet(std::string decl) {
     return global_context->AddDeclToSet(std::move(decl));
   }
-
-};
-
-class HashValue {
- public:
-  using Ref = std::shared_ptr<HashValue>;
-
-  static std::string ComputeHashValue(const std::vector<pasta::Decl> &decl_range,
-                                      const pasta::TokenRange &toks,
-                                      uint64_t begin_index, uint64_t end_index) {
-    return Instance()->ComputeHash(decl_range, toks, begin_index, end_index);
-  }
-
- private:
-  static Ref Instance(void) {
-    class HashValueImpl : public HashValue{};
-    static auto I = std::make_shared<HashValueImpl>();
-    return I;
-  }
-
-  std::string ComputeHash(const std::vector<pasta::Decl> &decl_range,
-                          const pasta::TokenRange &toks,
-                          uint64_t begin_index, uint64_t end_index);
-
 };
 
 }  // namespace indexer

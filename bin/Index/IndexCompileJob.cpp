@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "Context.h"
+#include "Hash.h"
 #include "PrintTokenGraph.h"
 #include "TokenizeFile.h"
 #include "TokenTree.h"
@@ -558,23 +559,10 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       }
     }
 
-//    if (auto nd = pasta::NamedDecl::From(decl)) {
-//      if (nd->Name() == "DFhook") {
-//        std::ofstream fs("/tmp/hook.dot");
-//        PrintTokenGraph(tok_range, begin_index, end_index, fs);
-//
-//      } else if (nd->Name() == "DFhook" ||
-//          nd->Name() == "MALSTK" || nd->Name() == "MalStack" ||
-//          nd->Name() == "MalStkPtr") {
-//        std::ofstream fs("/tmp/stack.dot");
-//        PrintTokenGraph(tok_range, begin_index, end_index, fs);
-//      }
-//    }
-
-    // Don't create token tree if the decl is already seen.
-    auto hash =
-        HashValue::ComputeHashValue(tlds_for_tree, tok_range, begin_index, end_index);
-    auto [decl_id, is_new] = context->AddDeclToSet(std::move(hash));
+    // Don't create token tree if the decl is already seen. This means it's
+    // alrady been indexed.
+    auto [decl_id, is_new] = context->AddDeclToSet(
+        ComputeHash(tlds_for_tree, tok_range, begin_index, end_index));
     if (!is_new) {
       continue;
     }

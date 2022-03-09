@@ -14,6 +14,8 @@ add_library("${lib_name}"
   STATIC
     "Context.cpp"
     "Context.h"
+    "Hash.cpp"
+    "Hash.h"
     "IndexCompileCommand.cpp"
     "IndexCompileCommand.h"
     "IndexCompileJob.cpp"
