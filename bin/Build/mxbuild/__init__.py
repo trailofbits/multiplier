@@ -5,12 +5,3 @@
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
 #
-
-
-add_subdirectory("Import")
-add_subdirectory("Index")
-add_subdirectory("Build")
-
-if(MX_ENABLE_GUI)
-  add_subdirectory("GUI")
-endif(MX_ENABLE_GUI)

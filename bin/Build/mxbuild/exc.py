@@ -7,10 +7,11 @@
 #
 
 
-add_subdirectory("Import")
-add_subdirectory("Index")
-add_subdirectory("Build")
+class MXBuildException(Exception):
+    pass
 
-if(MX_ENABLE_GUI)
-  add_subdirectory("GUI")
-endif(MX_ENABLE_GUI)
+
+class UnhandledKeysException(MXBuildException):
+    def __init__(self, msg, ty=None):
+        super(UnhandledKeysException, self).__init__(msg)
+        self.type = ty
