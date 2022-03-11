@@ -59,7 +59,10 @@ static void Report(Semaphore *sem_) {
     }
     gOutput.clear();
     llvm::raw_string_ostream os(gOutput);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
     os << "\r\e[1;1H\e[2J";
+#pragma GCC diagnostic pop
     {
       std::unique_lock<std::mutex> locker(gProgressLinesLock);
       for (const auto &line : gProgressLines) {

@@ -16,6 +16,7 @@ set(MX_INSTALL_BIN_DIR "${CMAKE_INSTALL_BINDIR}" CACHE PATH "Directory in which 
 set(MX_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/multiplier" CACHE PATH "Directory in which Multiplier headers will be installed")
 set(MX_INSTALL_SHARE_DIR "${CMAKE_INSTALL_DATADIR}" CACHE PATH "Directory in which Multiplier CMake files will be installed")
 
+option(MX_BOOTSTRAP "Bootstrap auto-generated Multiplier files" OFF)
 option(MX_ENABLE_SANITIZERS "Set to true to enable sanitizers on the build binary/libraries")
-option(MX_ENABLE_INSTALL "Set to true to enable the install target" true)
-option(MX_ENABLE_GUI "Should the GUI be built?")
+cmake_dependent_option(MX_ENABLE_INSTALL "Set to true to enable the install target" ON "NOT MX_BOOTSTRAP" OFF)
+cmake_dependent_option(MX_ENABLE_GUI "Should the GUI be built?" OFF "NOT MX_BOOTSTRAP" OFF)
