@@ -11,6 +11,53 @@ string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 set(source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}")
 set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 
+# Auto-generate C++ headers and sources from our Cap'n Proto schemas.
+capnp_generate_cpp(MX_RPC_SOURCES MX_RPC_HEADERS RPC.capnp)
+capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)
+
+# Generate the commands to copy the headers into the binary include directory.
+set(copied_headers "")
+set(copy_headers_commands "")
+foreach(capnp_header_path ${MX_RPC_HEADERS} ${MX_AST_HEADERS})
+  get_filename_component(header_name "${capnp_header_path}" NAME)
+  set(output_header_path "${binary_include_dir}/${header_name}")
+  list(APPEND copied_headers "${output_header_path}")
+  list(APPEND copy_headers_commands
+    COMMAND
+    "${CMAKE_COMMAND}"
+    -E
+    copy
+    "${capnp_header_path}"
+    "${output_header_path}"
+  )
+endforeach()
+
+# Copy the auto-generated headers into the binary include directory.
+add_custom_command(
+  OUTPUT
+    ${copied_headers}
+  
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${binary_include_dir}"
+  ${copy_headers_commands}
+
+  DEPENDS
+    ${MX_RPC_HEADERS}
+    ${MX_AST_HEADERS}
+
+  BYPRODUCTS
+    ${copied_headers}
+
+  COMMENT
+    "Exporting Cap'n Proto-generated headers"
+
+  VERBATIM
+)
+
+add_custom_target("copy_headers"
+  DEPENDS
+    ${copied_headers}
+)
+
 set(util_headers
   "${source_include_dir}/Action.h"
   "${source_include_dir}/BloomFilter.h"
@@ -22,8 +69,10 @@ set(util_headers
   "${source_include_dir}/Signal.h"
   "${source_include_dir}/SQLite.h"
   "${source_include_dir}/Subprocess.h"
+  "${source_include_dir}/Token.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/WorkerPool.h"
+  ${copied_headers}
 )
 
 add_library("util"
@@ -39,8 +88,17 @@ add_library("util"
     "Signal.cpp"
     "SQLite.cpp"
     "Subprocess.cpp"
+    "Token.cpp"
+    "Token.h"
     "Types.cpp"
     "WorkerPool.cpp"
+    
+    ${MX_RPC_SOURCES}
+    ${MX_AST_SOURCES}
+)
+
+add_dependencies("util"
+  "copy_headers"
 )
 
 target_include_directories("util"
@@ -50,16 +108,19 @@ target_include_directories("util"
     $<INSTALL_INTERFACE:include>
   PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
 target_link_libraries("util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
+    RocksDB::rocksdb
     ZLIB::ZLIB
   PUBLIC
     glog::glog
     gflags::gflags
     pasta::pasta
+    $<BUILD_INTERFACE:CapnProto::capnp-rpc>
     $<BUILD_INTERFACE:mx_sqlite>
 )
 
@@ -80,85 +141,19 @@ target_compile_features("util"
     cxx_std_20
 )
 
-add_subdirectory("Datalog")
 
-# util relies on auto-generated headers from the Datalog code, but the Datalog
-# server client code also relies on util. Thus we need to interpose util
-# compilation after the Dr. Lojekyll compiler generates files, but before any
-# of those files are actually compiled.
-add_dependencies("util"
-  "copy_datalog_server_headers"
-)
+add_library("${PROJECT_NAME}::util" ALIAS "util")
+set_target_properties("util" PROPERTIES LINKER_LANGUAGE CXX)
 
-set(public_headers
-  ${copied_headers}
-  "${source_include_dir}/Datalog.h"
-  "${source_include_dir}/Token.h"
-  "${source_include_dir}/Tool.h"
-)
-
-add_library("tool"
-  STATIC
-    ${public_headers}
-    
-    "Database.h"
-    "Database.cpp"
-    "Token.cpp"
-    "Token.h"
-    "Tool.cpp"
-)
-
-
-add_library("${PROJECT_NAME}::tool" ALIAS "tool")
-set_target_properties("tool" PROPERTIES LINKER_LANGUAGE CXX)
-
-target_link_libraries("tool"
-  PRIVATE
-    $<BUILD_INTERFACE:datalog_server_client>
-    
-  PUBLIC
-    DrLojekyll::Runtime
-    RocksDB::rocksdb
-    ZLIB::ZLIB
-    "util")
-
-set_target_properties("tool"
+set_target_properties("util"
   PROPERTIES
     PUBLIC_HEADER "${public_headers}")
 
-target_include_directories("tool"
+target_include_directories("util"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>
-    $<INSTALL_INTERFACE:include>
-  PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
-add_library("tool_main" OBJECT
-  ${public_headers}
-
-  "ToolMain.cpp")
-
-
-add_library("${PROJECT_NAME}::tool_main" ALIAS "tool_main")
-set_target_properties("tool_main" PROPERTIES LINKER_LANGUAGE CXX)
-
-target_link_libraries("tool_main"
-  PUBLIC
-    glog::glog
-    gflags::gflags
-    "tool")
-
-set_target_properties("tool_main"
-  PROPERTIES
-    PUBLIC_HEADER "${public_headers}")
-
-target_include_directories("tool_main"
-  PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>
   PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -169,8 +164,6 @@ if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "util"
-      "tool"
-      "tool_main"
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
@@ -183,6 +176,6 @@ if(MX_ENABLE_INSTALL)
         "${CMAKE_INSTALL_LIBDIR}"
     PUBLIC_HEADER
       DESTINATION
-        "include/${lower_project_name}"
+        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
   )
 endif(MX_ENABLE_INSTALL)

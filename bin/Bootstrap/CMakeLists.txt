@@ -6,13 +6,18 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(MX_BOOTSTRAP)
-  add_subdirectory("Bootstrap")
-else()
-  add_subdirectory("Import")
-  add_subdirectory("Index")
-  
-  if(MX_ENABLE_GUI)
-    add_subdirectory("GUI")
-  endif(MX_ENABLE_GUI)
-endif()
+set(exe_name "mx-bootstrap")
+
+add_executable("${exe_name}"
+  Main.cpp
+)
+
+set_target_properties("${exe_name}"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX)
+
+target_link_libraries("${exe_name}"
+  PRIVATE
+    pasta::pasta
+)

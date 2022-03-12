@@ -8,6 +8,9 @@
 
 cmake_minimum_required(VERSION 3.19)
 
+include(CMakeDependentOption)
+include(GNUInstallDirs)
+
 include("cmake/options.cmake")
 include("cmake/ccache.cmake")
 include("cmake/vcpkg_helper.cmake")
@@ -18,7 +21,6 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_VISIBILITY_PRESET hidden) 
 set(VISIBILITY_INLINES_HIDDEN YES)
 
-include(GNUInstallDirs)
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 
@@ -29,17 +31,15 @@ endif(MX_ENABLE_INSTALL)
 add_subdirectory("vendor")
 
 find_package(SQLite REQUIRED)
+find_package(CapnProto CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(gflags CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
 find_package(Z3 4.8 CONFIG REQUIRED)
 find_llvm(llvm)
 find_package(Clang CONFIG REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
-find_package(Flatbuffers CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
 
-find_package(DrLojekyll CONFIG REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
@@ -55,7 +55,7 @@ target_include_directories(mx_sqlite INTERFACE
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
   
-  set(cmake_install_dir "lib/cmake/${PROJECT_NAME}")
+  set(cmake_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
   
   include(CMakePackageConfigHelpers)
   configure_package_config_file("${PROJECT_NAME}Config.cmake.in"
@@ -85,13 +85,16 @@ endif(MX_ENABLE_INSTALL)
 #            tools are linked in, otherwise global constructors in tools
 #            won't be called, and then they won't get created in `ToolMain.cpp`.
 if(PLATFORM_MACOS)
-  set("MX_BEGIN_FORCE_LOAD_TOOL" "-Wl,-force_load")
-  set("MX_END_FORCE_LOAD_TOOL" "")
+  set("MX_BEGIN_FORCE_LOAD_LIB" "-Wl,-force_load")
+  set("MX_END_FORCE_LOAD_LIB" "")
 elseif(PLATFORM_LINUX)
   set("MX_BEGIN_FORCE_LOAD_GROUP" "-Wl,--whole-archive")
   set("MX_END_FORCE_LOAD_GROUP" "-Wl,--no-whole-archive")
 endif()
 
-add_subdirectory("lib")
+if(NOT MX_BOOTSTRAP)
+  add_subdirectory("lib")
+endif()
+
 add_subdirectory("bin")
 

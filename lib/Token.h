@@ -8,7 +8,9 @@
 
 #include <multiplier/Token.h>
 
+#include <cstdint>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace mx {
@@ -16,10 +18,10 @@ namespace mx {
 class TokenListImpl {
  public:
   std::string data;
-  std::vector<TokenKind> token_kinds;
+  std::vector<mx::ast::TokenKind> token_kinds;
   std::vector<unsigned> data_offsets;
 
-  void AddToken(std::string_view data, TokenKind kind,
+  void AddToken(std::string_view data, mx::ast::TokenKind kind,
                 std::vector<uint16_t> &dummy_states,
                 std::string &dummy_output);
 };

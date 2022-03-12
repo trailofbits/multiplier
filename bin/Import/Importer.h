@@ -6,14 +6,13 @@
 
 #include <memory>
 
+#include <multiplier/RPC.capnp.h>
+
 namespace llvm {
 namespace json {
 class Object;
 }  // namespace json
 }  // namespace llvm
-namespace mx {
-class DatalogClient;
-}  // namespace mx
 namespace importer {
 
 class Importer {
@@ -29,7 +28,7 @@ class Importer {
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o);
 
-  void Build(mx::DatalogClient &builder);
+  kj::Promise<void> Build(mx::rpc::Multiplier::Client &builder);
 };
 
 }  // namespace importer

@@ -7,7 +7,6 @@
 #
 
 
-string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 set(exe_name "mx-import")
 
 add_executable("${exe_name}"
@@ -29,7 +28,7 @@ set_target_properties("${exe_name}"
 
 target_link_libraries("${exe_name}"
   PRIVATE
-    "tool"
+    "util"
 )
 
 if(IRENE_ENABLE_INSTALL)

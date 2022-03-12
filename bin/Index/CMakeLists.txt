@@ -6,46 +6,30 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-string(TOLOWER "${PROJECT_NAME}" lower_project_name)
-set(lib_name "index")
-set(exe_name "mx-${lib_name}")
+set(exe_name "mx-index")
 
-add_library("${lib_name}"
-  STATIC
+add_executable("${exe_name}"
     "Context.cpp"
     "Context.h"
-    "IndexCompileCommand.cpp"
-    "IndexCompileCommand.h"
+    "Hash.cpp"
+    "Hash.h"
     "IndexCompileJob.cpp"
     "IndexCompileJob.h"
+    "Main.cpp"
     "PrintTokenGraph.cpp"
     "PrintTokenGraph.h"
     "TokenizeFile.cpp"
     "TokenizeFile.h"
     "TokenTree.cpp"
     "TokenTree.h"
-    "Tool.cpp"
-)
-
-target_link_libraries("${lib_name}"
-  PRIVATE
-    "tool"
-)
-
-add_library("${PROJECT_NAME}::${lib_name}" ALIAS "${lib_name}")
-set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable("${exe_name}"
-  $<TARGET_OBJECTS:tool_main>
 )
 
 target_link_libraries("${exe_name}"
   PRIVATE
-    ${MX_BEGIN_FORCE_LOAD_GROUP}
-    ${MX_BEGIN_FORCE_LOAD_TOOL} "${lib_name}" ${MX_END_FORCE_LOAD_TOOL}
-    ${MX_END_FORCE_LOAD_GROUP}
+    "util"
 )
 
+add_executable("${PROJECT_NAME}::${exe_name}" ALIAS "${exe_name}")
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 
 if(MX_ENABLE_INSTALL)

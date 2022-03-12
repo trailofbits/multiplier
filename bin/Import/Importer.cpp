@@ -15,19 +15,18 @@
 #include <unordered_map>
 #include <vector>
 
-#include <drlojekyll/Runtime/Bytes.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <kj/array.h>
+#include <kj/async.h>
 #include <llvm/Support/Format.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
 #include <multiplier/Action.h>
-#include <multiplier/Datalog.h>
 #include <multiplier/Executor.h>
 #include <multiplier/Result.h>
 #include <multiplier/Subprocess.h>
-#include <multiplier/Tool.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
@@ -43,7 +42,9 @@ DECLARE_string(resource_dir);
 namespace importer {
 namespace {
 
-using BuilderList = std::vector<std::unique_ptr<mx::DatalogMessageBuilder>>;
+static std::mutex gCompileJobListLock;
+
+using CompileJobList = std::vector<std::pair<pasta::Compiler, pasta::CompileJob>>;
 
 struct Command {
  public:
@@ -65,25 +66,25 @@ class BuildCommandAction final : public mx::Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
-  const BuilderList &builders;
+  CompileJobList &jobs;
 
   // If we are using something like CMake commands, then pull in the relevant
   // information by trying to execute the compiler directly.
   std::pair<std::string, std::string> InitCompilerFromCommand(void);
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
-                       mx::DatalogMessageBuilder &builder);
+                       CompileJobList &builder);
 
  public:
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, Command &command_,
-                            const BuilderList &builders_)
+                            CompileJobList &jobs_)
       : fm(fm_),
         command(command_),
-        builders(builders_) {}
+        jobs(jobs_) {}
 
-  void Run(mx::Executor exe, mx::WorkerId worker_id) final;
+  void Run(mx::Executor exe, mx::WorkerId) final;
 };
 
 // If we are using something like CMake commands, then pull in the relevant
@@ -116,7 +117,7 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
                                          pasta::Compiler cc,
-                                         mx::DatalogMessageBuilder &builder) {
+                                         CompileJobList &jobs) {
   auto maybe_jobs = cc.CreateJobsForCommand(cmd);
   if (!maybe_jobs.Succeeded()) {
     LOG(ERROR)
@@ -124,90 +125,14 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
     return;
   }
 
-  std::vector<flatbuffers::Offset<flatbuffers::String>> arg_list;
-  std::vector<flatbuffers::Offset<mx::IncludePath>> path_list;
-
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
-
-    flatbuffers::FlatBufferBuilder fbb;
-    auto sp = fbb.CreateString(job.SourceFile().Path().generic_string());
-    auto cp = fbb.CreateString(cc.ExecutablePath().generic_string());
-
-    // NOTE: Force the working directory to the source file path to avoid
-    //       issues while creating jobs from the compiled args.
-    auto cwd = fbb.CreateString(job.SourceFile().Path().parent_path().generic_string());
-    auto srd = fbb.CreateString(job.SystemRootIncludeDirectory().generic_string());
-    auto rd = fbb.CreateString(job.ResourceDirectory().generic_string());
-    auto id = fbb.CreateString(cc.InstallationDirectory().generic_string());
-
-    path_list.clear();
-    cc.ForEachSystemIncludeDirectory(
-        [&] (const std::filesystem::path &path,
-             pasta::IncludePathLocation ipl) {
-          auto p = fbb.CreateString(path.generic_string());
-          mx::IncludePathBuilder ipb(fbb);
-          ipb.add_Directory(std::move(p));
-          ipb.add_Location(mx::FromPasta(ipl));
-          path_list.emplace_back(ipb.Finish());
-        });
-
-    auto sips = fbb.CreateVector(path_list);
-
-    path_list.clear();
-    cc.ForEachUserIncludeDirectory(
-        [&] (const std::filesystem::path &path,
-             pasta::IncludePathLocation ipl) {
-          auto p = fbb.CreateString(path.generic_string());
-          mx::IncludePathBuilder ipb(fbb);
-          ipb.add_Directory(std::move(p));
-          ipb.add_Location(mx::FromPasta(ipl));
-          path_list.emplace_back(ipb.Finish());
-        });
-
-    auto uips = fbb.CreateVector(path_list);
-
-    path_list.clear();
-    cc.ForEachFrameworkDirectory(
-        [&] (const std::filesystem::path &path,
-             pasta::IncludePathLocation ipl) {
-          auto p = fbb.CreateString(path.generic_string());
-          mx::IncludePathBuilder ipb(fbb);
-          ipb.add_Directory(std::move(p));
-          ipb.add_Location(mx::FromPasta(ipl));
-          path_list.emplace_back(ipb.Finish());
-        });
-
-    auto fips = fbb.CreateVector(path_list);
-
-    arg_list.clear();
-    for (auto arg : job.Arguments()) {
-      arg_list.push_back(fbb.CreateSharedString(arg, strlen(arg)));
-    }
-
-    auto args = fbb.CreateVector(arg_list);
-
-    mx::CompileCommandBuilder ccb(fbb);
-    ccb.add_SourcePath(std::move(sp));
-    ccb.add_CompilerPath(std::move(cp));
-    ccb.add_WorkingDirectory(std::move(cwd));
-    ccb.add_SystemRootDirectory(std::move(srd));
-    ccb.add_ResourceDirectory(std::move(rd));
-    ccb.add_InstallationDirectory(std::move(id));
-    ccb.add_SystemIncludePaths(std::move(sips));
-    ccb.add_UserIncludePaths(std::move(uips));
-    ccb.add_FrameworkPaths(std::move(fips));
-    ccb.add_Arguments(std::move(args));
-    ccb.add_Compiler(mx::FromPasta(cc.Name()));
-    ccb.add_Language(mx::FromPasta(cc.TargetLanguage()));
-    fbb.Finish(ccb.Finish());
-    auto data_ptr = fbb.GetCurrentBufferPointer();
-    hyde::rt::Bytes data(data_ptr, &(data_ptr[fbb.GetSize()]));
-    builder.compile_command_1(data);
+    std::unique_lock<std::mutex> locker(gCompileJobListLock);
+    jobs.emplace_back(cc, job);
   }
 }
 
 // Build the compilers for the commands, then build the commands.
-void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
+void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
 
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
@@ -225,22 +150,19 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
                               command.name, command.lang, cc_version_sysroot,
                               cc_version_no_sysroot);
 
-  mx::DatalogMessageBuilder &builder =
-      *(builders[static_cast<unsigned>(worker_id)]);
-
   if (!maybe_cc.Succeeded()) {
     auto error = maybe_cc.TakeError();
     maybe_cc = pasta::Compiler::CreateHostCompiler(fm, command.lang);
     if (maybe_cc.Succeeded()) {
       RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue(),
-                      builder);
+                      jobs);
     } else {
       LOG(ERROR)
           << "Unable to create compiler: " << error;
     }
   } else {
     RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue(),
-                    builder);
+                    jobs);
   }
 }
 
@@ -342,14 +264,45 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   }
 }
 
-void Importer::Build(mx::DatalogClient &client) {
-  mx::Executor exe;
-
-  // Make one builder per worker thread. This is a sort of thread-locat storage.
-  BuilderList builders;
-  for (auto i = 0u, max_i = exe.NumWorkers(); i < max_i; ++i) {
-    builders.emplace_back(new mx::DatalogMessageBuilder);
+static mx::rpc::CompilerName FromPasta(pasta::CompilerName name) {
+  switch (name) {
+    case pasta::CompilerName::kUnknown:
+      return mx::rpc::CompilerName::UNKNOWN;
+    case pasta::CompilerName::kClang:
+      return mx::rpc::CompilerName::CLANG;
+    case pasta::CompilerName::kAppleClang:
+      return mx::rpc::CompilerName::APPLE_CLANG;
+    case pasta::CompilerName::kClangCL:
+      return mx::rpc::CompilerName::CLANG_CL;
+    case pasta::CompilerName::kCL:
+      return mx::rpc::CompilerName::CL;
+    case pasta::CompilerName::kGNU:
+      return mx::rpc::CompilerName::GNU;
   }
+}
+
+static mx::rpc::TargetLanguage FromPasta(pasta::TargetLanguage tl) {
+  switch (tl) {
+    case pasta::TargetLanguage::kC:
+      return mx::rpc::TargetLanguage::C;
+
+    case pasta::TargetLanguage::kCXX:
+      return mx::rpc::TargetLanguage::CXX;
+  }
+}
+
+static mx::rpc::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
+  switch (ipl) {
+    case pasta::IncludePathLocation::kAbsolute:
+      return mx::rpc::IncludePathLocation::ABSOLUTE;
+    case pasta::IncludePathLocation::kSysrootRelative:
+      return mx::rpc::IncludePathLocation::SYSTEM_ROOT_INCLUDE_RELATIVE;
+  }
+}
+
+kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
+  mx::Executor exe;
+  auto promises = kj::heapArrayBuilder<kj::Promise<void>>(d->commands.size());
 
   for (auto &[cwd, commands] : d->commands) {
 
@@ -368,27 +321,101 @@ void Importer::Build(mx::DatalogClient &client) {
     // directory.
     auto host_fs = pasta::FileSystem::CreateNative();
     pasta::FileManager fm(host_fs);
+    CompileJobList jobs;
 
     // Run all commands relevant to just this working directory.
     for (Command &command : commands) {
-      exe.EmplaceAction<BuildCommandAction>(fm, command, builders);
+      exe.EmplaceAction<BuildCommandAction>(fm, command, jobs);
     }
     exe.Start();
     exe.Wait();
+
+    if (jobs.empty()) {
+      continue;
+    }
+
+    auto request = client.indexCompileCommandsRequest();
+    auto commands_builder = request.initCommands(static_cast<unsigned>(jobs.size()));
 
     // If we've got any messages, then send them out. The granularity is likely
     // to be small because we don't expect many files to operate in the same
     // working directory, though if they do, then at least we still have the
     // benefit of the N-way split from the executor.
-    for (const auto &builder : builders) {
-      if (builder->HasAnyMessages()) {
-        if (!client.Publish(*builder)) {
-          LOG(ERROR)
-              << "Unable to publish compile jobs to mx-server";
-        }
+    auto i = 0u;
+    for (const auto &[cc_, job_] : jobs) {
+      const pasta::Compiler &cc = cc_;
+      const pasta::CompileJob &job = job_;
+
+      mx::rpc::CompileCommand::Builder cb = commands_builder[i++];
+      cb.setSourcePath(job.SourceFile().Path().generic_string());
+      cb.setCompilerPath(cc.ExecutablePath());
+      cb.setWorkingDirectory(job.WorkingDirectory().generic_string());
+      cb.setSystemRootDirectory(job.SystemRootDirectory().generic_string());
+      cb.setSystemRootIncludeDirectory(job.SystemRootIncludeDirectory().generic_string());
+      cb.setResourceDirectory(job.ResourceDirectory().generic_string());
+      cb.setInstallationDirectory(cc.InstallationDirectory().generic_string());
+
+      auto j = 0u;
+      cc.ForEachSystemIncludeDirectory(
+          [&] (const std::filesystem::path &,
+               pasta::IncludePathLocation ) { ++j; });
+      auto paths = cb.initSystemIncludePaths(j);
+
+      j = 0u;
+      cc.ForEachSystemIncludeDirectory(
+          [&] (const std::filesystem::path &path,
+               pasta::IncludePathLocation ipl) {
+            mx::rpc::IncludePath::Builder p = paths[j++];
+            p.setDirectory(path.generic_string());
+            p.setLocation(FromPasta(ipl));
+          });
+
+      j = 0u;
+      cc.ForEachUserIncludeDirectory(
+          [&] (const std::filesystem::path &,
+               pasta::IncludePathLocation ) { ++j; });
+      paths = cb.initUserIncludePaths(j);
+
+      j = 0u;
+      cc.ForEachUserIncludeDirectory(
+          [&] (const std::filesystem::path &path,
+               pasta::IncludePathLocation ipl) {
+            mx::rpc::IncludePath::Builder p = paths[j++];
+            p.setDirectory(path.generic_string());
+            p.setLocation(FromPasta(ipl));
+          });
+
+      j = 0u;
+      cc.ForEachFrameworkDirectory(
+          [&] (const std::filesystem::path &,
+               pasta::IncludePathLocation ) { ++j; });
+      paths = cb.initFrameworkPaths(j);
+
+      j = 0u;
+      cc.ForEachFrameworkDirectory(
+          [&] (const std::filesystem::path &path,
+               pasta::IncludePathLocation ipl) {
+            mx::rpc::IncludePath::Builder p = paths[j++];
+            p.setDirectory(path.generic_string());
+            p.setLocation(FromPasta(ipl));
+          });
+
+
+      auto &args = job.Arguments();
+      auto args_list = cb.initArguments(static_cast<unsigned>(args.Size()));
+      j = 0u;
+      for (auto arg : args) {
+        args_list.set(j++, arg);
       }
+
+      cb.setLanguage(FromPasta(cc.TargetLanguage()));
+      cb.setCompiler(FromPasta(cc.Name()));
     }
+
+    promises.add(request.send().ignoreResult());
   }
+
+  return kj::joinPromises(promises.finish());
 }
 
 }  // namespace importer

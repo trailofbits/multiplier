@@ -23,8 +23,9 @@ namespace mx {
 class KeyValueStore {
  public:
   enum KeyValueStoreID {
+    kHashToFileId,
     kPathToFileId,
-    kHashToTopLevelDeclId
+    kHashToCodeId
   };
 
   ~KeyValueStore(void);

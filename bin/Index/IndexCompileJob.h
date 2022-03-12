@@ -11,7 +11,10 @@
 #include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Job.h>
+#include <pasta/Util/FileManager.h>
 #include <unordered_map>
+
+#include "Context.h"
 
 namespace pasta {
 class File;
@@ -19,15 +22,17 @@ class TokenRange;
 }  // namespace pasta
 namespace indexer {
 
-class UpdateContext;
-
 class IndexCompileJobAction final : public mx::Action {
  private:
-  const std::shared_ptr<UpdateContext> context;
-  const mx::ProgressBarWork progress;
+  const std::shared_ptr<IndexingContext> context;
+  const pasta::FileManager file_manager;
   const pasta::CompileJob job;
 
+  // Maps pasta files to their unique IDs.
   std::unordered_map<pasta::File, mx::FileId> file_ids;
+
+  // Maps pasta files to their hashes, represented as SHA256 checksums.
+  std::unordered_map<pasta::File, std::string> file_hashes;
 
   // Look through all files referenced by the AST get their unique IDs. If this
   // is the first time seeing a file, then tokenize the file.
@@ -36,7 +41,8 @@ class IndexCompileJobAction final : public mx::Action {
  public:
   virtual ~IndexCompileJobAction(void);
 
-  IndexCompileJobAction(std::shared_ptr<UpdateContext> context_,
+  IndexCompileJobAction(std::shared_ptr<IndexingContext> context_,
+                        pasta::FileManager file_manager_,
                         pasta::CompileJob job_);
 
   // Build and index the AST.

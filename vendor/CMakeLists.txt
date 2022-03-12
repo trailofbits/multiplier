@@ -10,8 +10,12 @@ set(additional_module_paths_list
   "${CMAKE_CURRENT_SOURCE_DIR}/modules"
 )
 
-list(APPEND CMAKE_MODULE_PATH
+list(PREPEND CMAKE_MODULE_PATH
   ${additional_module_paths_list}
+)
+
+list(PREPEND CMAKE_PREFIX_PATH
+  "${CMAKE_CURRENT_BINARY_DIR}/capnproto/install"
 )
 
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" PARENT_SCOPE)
