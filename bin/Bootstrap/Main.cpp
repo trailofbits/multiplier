@@ -58,7 +58,7 @@ struct ClassHierarchy {
 
 static ClassHierarchy *BuildHierarchy(
     std::vector<std::unique_ptr<ClassHierarchy>> &alloc,
-    std::vector<pasta::CXXRecordDecl> classes) {
+    const std::vector<pasta::CXXRecordDecl> &classes) {
 
   std::unordered_map<pasta::CXXRecordDecl, ClassHierarchy *> hmap;
 
@@ -199,7 +199,38 @@ static std::string SnakeCaseToCamelCase(std::string_view name) {
   return ss.str();
 }
 
-static const char *IntType(const std::string &method_name, pasta::Type type) {
+static std::string SnakeCaseToEnumCase(std::string_view name) {
+  std::stringstream ss;
+  for (auto c : name) {
+    ss << static_cast<char>(std::toupper(c));
+  }
+  return ss.str();
+}
+
+static const char *CxxIntType(pasta::Type type) {
+  auto t = type;
+  if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
+    switch (bt->Kind()) {
+      case pasta::BuiltinTypeKind::kBoolean: return "bool";
+      case pasta::BuiltinTypeKind::kCharacterS: return "int8_t";  // `char`.
+      case pasta::BuiltinTypeKind::kCharacterU: return "uint8_t";  // `char`.
+      case pasta::BuiltinTypeKind::kSChar: return "int8_t";  // `signed char`.
+      case pasta::BuiltinTypeKind::kUChar: return "uint8_t";  // `unsigned char`.
+      case pasta::BuiltinTypeKind::kShort: return "int16_t";
+      case pasta::BuiltinTypeKind::kUShort: return "uint16_t";
+      case pasta::BuiltinTypeKind::kInt: return "int32_t";
+      case pasta::BuiltinTypeKind::kUInt: return "uint32_t";
+      case pasta::BuiltinTypeKind::kLong: return "int64_t";
+      case pasta::BuiltinTypeKind::kULong: return "uint64_t";
+      case pasta::BuiltinTypeKind::kLongLong: return "int64_t";
+      case pasta::BuiltinTypeKind::kULongLong: return "uint64_t";
+      default: break;
+    }
+  }
+  return nullptr;
+}
+
+static const char *SchemaIntType(pasta::Type type) {
   auto t = type;
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
     switch (bt->Kind()) {
@@ -250,6 +281,7 @@ class CodeGenerator {
 
   std::vector<pasta::NamespaceDecl> pastas;
 
+  std::vector<pasta::EnumDecl> enums;
   std::vector<pasta::CXXRecordDecl> decls;
   std::vector<pasta::CXXRecordDecl> stmts;
   std::vector<pasta::CXXRecordDecl> types;
@@ -281,6 +313,7 @@ bool CodeGenerator::DumpEnum(const std::string &method_name,
 
   auto enum_name = enum_decl.Name();
   schema_os << NameAndHash("enum " + enum_name) << " {\n";
+  include_h_os << "enum class " << enum_name << " : unsigned short {\n";
   auto i = 0u;
   for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
     auto val_name = val.Name();
@@ -298,9 +331,13 @@ bool CodeGenerator::DumpEnum(const std::string &method_name,
 
     auto snake_name = CapitalCaseToSnakeCase(val_name_view);
     auto camel_name = SnakeCaseToCamelCase(snake_name);
+    auto enum_case = SnakeCaseToEnumCase(snake_name);
     schema_os
         << "  " << camel_name << " @" << i << " $Cxx.name(\""
         << snake_name << "\");\n";
+
+    include_h_os
+        << "  " << enum_case << ",\n";
     ++i;
   }
 
@@ -309,6 +346,11 @@ bool CodeGenerator::DumpEnum(const std::string &method_name,
   schema_os
       << "  numEnumerators @" << i << " $Cxx.name(\"num_enumerators\");\n"
       << "}\n\n";
+
+  include_h_os
+      << "  NUM_ENUMERATORS\n"
+      << "};\n\n"
+      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
   return true;
 }
 
@@ -373,7 +415,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       }
 
     // Handle integral return types.
-    } else if (auto int_type = IntType(method_name, return_type)) {
+    } else if (auto int_type = SchemaIntType(return_type)) {
       schema_classes_ss << "  " << camel_name << " @" << i << " :" << int_type
          << ";\n";
       ++i;
@@ -438,6 +480,38 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "  endOffset @1 :UInt32 $Cxx.name(\"end_offset\");  # Inclusive.\n"
       << "}\n\n";
 
+  include_h_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#include <cstdint>\n\n"
+      << "namespace pasta {\n";
+
+  // Forward declarations.
+  for (const pasta::CXXRecordDecl &record : decls) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::CXXRecordDecl &record : stmts) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::CXXRecordDecl &record : types) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::CXXRecordDecl &record : tokens) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::EnumDecl &tag : enums) {
+    if (auto itype = CxxIntType(tag.IntegerType())) {
+      include_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
+    }
+  }
+  include_h_os
+      << "}  // namespace pasta\n"
+      << "namespace mx {\n";
+
   std::vector<std::string> class_names;
 
   while (!work_list.empty()) {
@@ -469,15 +543,17 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   }
   schema_os << "}\n";
 
+  include_h_os << "}  // namespace mx\n";
+
   return EXIT_SUCCESS;
 }
 
 int CodeGenerator::RunOnClasses(void) {
   std::vector<std::unique_ptr<ClassHierarchy>> alloc;
-  decl = BuildHierarchy(alloc, std::move(decls));
-  stmt = BuildHierarchy(alloc, std::move(stmts));
-  type = BuildHierarchy(alloc, std::move(types));
-  token = BuildHierarchy(alloc, std::move(tokens));
+  decl = BuildHierarchy(alloc, decls);
+  stmt = BuildHierarchy(alloc, stmts);
+  type = BuildHierarchy(alloc, types);
+  token = BuildHierarchy(alloc, tokens);
 
   if (!decl) {
     std::cerr << "Could not locate `pasta::Decl`.\n";
@@ -517,6 +593,9 @@ int CodeGenerator::RunOnNamespaces(void) {
         } else if (name == "Token") {
           tokens.emplace_back(std::move(*cls));
         }
+      } else if (auto e = pasta::EnumDecl::From(decl);
+                 e && e->IsThisDeclarationADefinition()) {
+        enums.emplace_back(std::move(*e));
       }
     }
   }
