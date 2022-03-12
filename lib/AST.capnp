@@ -10,1403 +10,1872 @@
 
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("mx::ast");
+
+enum TokenKind @0xedc5e766e7f89f15 {
+  unknown @0 $Cxx.name("unknown");
+  endUcOfUcFile @1 $Cxx.name("end_of_file");
+  endUcOfUcDirective @2 $Cxx.name("end_of_directive");
+  codeUcCompletion @3 $Cxx.name("code_completion");
+  comment @4 $Cxx.name("comment");
+  identifier @5 $Cxx.name("identifier");
+  whitespace @6 $Cxx.name("whitespace");
+  numericUcConstant @7 $Cxx.name("numeric_constant");
+  characterUcConstant @8 $Cxx.name("character_constant");
+  wideUcCharacterUcConstant @9 $Cxx.name("wide_character_constant");
+  utf8UcCharacterUcConstant @10 $Cxx.name("utf8_character_constant");
+  utf16UcCharacterUcConstant @11 $Cxx.name("utf16_character_constant");
+  utf32UcCharacterUcConstant @12 $Cxx.name("utf32_character_constant");
+  stringUcLiteral @13 $Cxx.name("string_literal");
+  wideUcStringUcLiteral @14 $Cxx.name("wide_string_literal");
+  headerUcName @15 $Cxx.name("header_name");
+  utf8UcStringUcLiteral @16 $Cxx.name("utf8_string_literal");
+  utf16UcStringUcLiteral @17 $Cxx.name("utf16_string_literal");
+  utf32UcStringUcLiteral @18 $Cxx.name("utf32_string_literal");
+  lUcSquare @19 $Cxx.name("l_square");
+  rUcSquare @20 $Cxx.name("r_square");
+  lUcParenthesis @21 $Cxx.name("l_parenthesis");
+  rUcParenthesis @22 $Cxx.name("r_parenthesis");
+  lUcBrace @23 $Cxx.name("l_brace");
+  rUcBrace @24 $Cxx.name("r_brace");
+  period @25 $Cxx.name("period");
+  ellipsis @26 $Cxx.name("ellipsis");
+  amp @27 $Cxx.name("amp");
+  ampUcAmp @28 $Cxx.name("amp_amp");
+  ampUcEqual @29 $Cxx.name("amp_equal");
+  star @30 $Cxx.name("star");
+  starUcEqual @31 $Cxx.name("star_equal");
+  plus @32 $Cxx.name("plus");
+  plusUcPlus @33 $Cxx.name("plus_plus");
+  plusUcEqual @34 $Cxx.name("plus_equal");
+  minus @35 $Cxx.name("minus");
+  arrow @36 $Cxx.name("arrow");
+  minusUcMinus @37 $Cxx.name("minus_minus");
+  minusUcEqual @38 $Cxx.name("minus_equal");
+  tilde @39 $Cxx.name("tilde");
+  exclaim @40 $Cxx.name("exclaim");
+  exclaimUcEqual @41 $Cxx.name("exclaim_equal");
+  slash @42 $Cxx.name("slash");
+  slashUcEqual @43 $Cxx.name("slash_equal");
+  percent @44 $Cxx.name("percent");
+  percentUcEqual @45 $Cxx.name("percent_equal");
+  less @46 $Cxx.name("less");
+  lessUcLess @47 $Cxx.name("less_less");
+  lessUcEqual @48 $Cxx.name("less_equal");
+  lessUcLessUcEqual @49 $Cxx.name("less_less_equal");
+  spaceship @50 $Cxx.name("spaceship");
+  greater @51 $Cxx.name("greater");
+  greaterUcGreater @52 $Cxx.name("greater_greater");
+  greaterUcEqual @53 $Cxx.name("greater_equal");
+  greaterUcGreaterUcEqual @54 $Cxx.name("greater_greater_equal");
+  caret @55 $Cxx.name("caret");
+  caretUcEqual @56 $Cxx.name("caret_equal");
+  pipe @57 $Cxx.name("pipe");
+  pipeUcPipe @58 $Cxx.name("pipe_pipe");
+  pipeUcEqual @59 $Cxx.name("pipe_equal");
+  question @60 $Cxx.name("question");
+  colon @61 $Cxx.name("colon");
+  semi @62 $Cxx.name("semi");
+  equal @63 $Cxx.name("equal");
+  equalUcEqual @64 $Cxx.name("equal_equal");
+  comma @65 $Cxx.name("comma");
+  hash @66 $Cxx.name("hash");
+  hashUcHash @67 $Cxx.name("hash_hash");
+  hashat @68 $Cxx.name("hashat");
+  periodUcStar @69 $Cxx.name("period_star");
+  arrowUcStar @70 $Cxx.name("arrow_star");
+  colonUcColon @71 $Cxx.name("colon_colon");
+  at @72 $Cxx.name("at");
+  lessUcLessUcLess @73 $Cxx.name("less_less_less");
+  greaterUcGreaterUcGreater @74 $Cxx.name("greater_greater_greater");
+  caretcaret @75 $Cxx.name("caretcaret");
+  keywordUcAuto @76 $Cxx.name("keyword_auto");
+  keywordUcBreak @77 $Cxx.name("keyword_break");
+  keywordUcCase @78 $Cxx.name("keyword_case");
+  keywordUcCharacter @79 $Cxx.name("keyword_character");
+  keywordUcConst @80 $Cxx.name("keyword_const");
+  keywordUcContinue @81 $Cxx.name("keyword_continue");
+  keywordUcDefault @82 $Cxx.name("keyword_default");
+  keywordUcDo @83 $Cxx.name("keyword_do");
+  keywordUcDouble @84 $Cxx.name("keyword_double");
+  keywordUcElse @85 $Cxx.name("keyword_else");
+  keywordUcEnum @86 $Cxx.name("keyword_enum");
+  keywordUcExtern @87 $Cxx.name("keyword_extern");
+  keywordUcFloat @88 $Cxx.name("keyword_float");
+  keywordUcFor @89 $Cxx.name("keyword_for");
+  keywordUcGoto @90 $Cxx.name("keyword_goto");
+  keywordUcIf @91 $Cxx.name("keyword_if");
+  keywordUcInline @92 $Cxx.name("keyword_inline");
+  keywordUcInt @93 $Cxx.name("keyword_int");
+  keywordUcUcExtUcInt @94 $Cxx.name("keyword__ext_int");
+  keywordUcLong @95 $Cxx.name("keyword_long");
+  keywordUcRegister @96 $Cxx.name("keyword_register");
+  keywordUcRestrict @97 $Cxx.name("keyword_restrict");
+  keywordUcReturn @98 $Cxx.name("keyword_return");
+  keywordUcShort @99 $Cxx.name("keyword_short");
+  keywordUcSigned @100 $Cxx.name("keyword_signed");
+  keywordUcSizeof @101 $Cxx.name("keyword_sizeof");
+  keywordUcStatic @102 $Cxx.name("keyword_static");
+  keywordUcStruct @103 $Cxx.name("keyword_struct");
+  keywordUcSwitch @104 $Cxx.name("keyword_switch");
+  keywordUcTypedef @105 $Cxx.name("keyword_typedef");
+  keywordUcUnion @106 $Cxx.name("keyword_union");
+  keywordUcUnsigned @107 $Cxx.name("keyword_unsigned");
+  keywordUcVoid @108 $Cxx.name("keyword_void");
+  keywordUcVolatile @109 $Cxx.name("keyword_volatile");
+  keywordUcWhile @110 $Cxx.name("keyword_while");
+  keywordUcUcAlignas @111 $Cxx.name("keyword__alignas");
+  keywordUcUcAlignof @112 $Cxx.name("keyword__alignof");
+  keywordUcUcAtomic @113 $Cxx.name("keyword__atomic");
+  keywordUcUcBoolean @114 $Cxx.name("keyword__boolean");
+  keywordUcUcComplex @115 $Cxx.name("keyword__complex");
+  keywordUcUcGeneric @116 $Cxx.name("keyword__generic");
+  keywordUcUcImaginary @117 $Cxx.name("keyword__imaginary");
+  keywordUcUcNoreturn @118 $Cxx.name("keyword__noreturn");
+  keywordUcUcStaticUcAssert @119 $Cxx.name("keyword__static_assert");
+  keywordUcUcThreadUcLocal @120 $Cxx.name("keyword__thread_local");
+  keywordUcUcUcFunc @121 $Cxx.name("keyword___func__");
+  keywordUcUcUcObjcUcYes @122 $Cxx.name("keyword___objc_yes");
+  keywordUcUcUcObjcUcNo @123 $Cxx.name("keyword___objc_no");
+  keywordUcAssembly @124 $Cxx.name("keyword_assembly");
+  keywordUcBoolean @125 $Cxx.name("keyword_boolean");
+  keywordUcCatch @126 $Cxx.name("keyword_catch");
+  keywordUcClass @127 $Cxx.name("keyword_class");
+  keywordUcConstUcCast @128 $Cxx.name("keyword_const_cast");
+  keywordUcDelete @129 $Cxx.name("keyword_delete");
+  keywordUcDynamicUcCast @130 $Cxx.name("keyword_dynamic_cast");
+  keywordUcExplicit @131 $Cxx.name("keyword_explicit");
+  keywordUcExport @132 $Cxx.name("keyword_export");
+  keywordUcFalse @133 $Cxx.name("keyword_false");
+  keywordUcFriend @134 $Cxx.name("keyword_friend");
+  keywordUcMutable @135 $Cxx.name("keyword_mutable");
+  keywordUcNamespace @136 $Cxx.name("keyword_namespace");
+  keywordUcNew @137 $Cxx.name("keyword_new");
+  keywordUcOperator @138 $Cxx.name("keyword_operator");
+  keywordUcPrivate @139 $Cxx.name("keyword_private");
+  keywordUcProtected @140 $Cxx.name("keyword_protected");
+  keywordUcPublic @141 $Cxx.name("keyword_public");
+  keywordUcReinterpretUcCast @142 $Cxx.name("keyword_reinterpret_cast");
+  keywordUcStaticUcCast @143 $Cxx.name("keyword_static_cast");
+  keywordUcTemplate @144 $Cxx.name("keyword_template");
+  keywordUcThis @145 $Cxx.name("keyword_this");
+  keywordUcThrow @146 $Cxx.name("keyword_throw");
+  keywordUcTrue @147 $Cxx.name("keyword_true");
+  keywordUcTry @148 $Cxx.name("keyword_try");
+  keywordUcTypename @149 $Cxx.name("keyword_typename");
+  keywordUcTypeid @150 $Cxx.name("keyword_typeid");
+  keywordUcUsing @151 $Cxx.name("keyword_using");
+  keywordUcVirtual @152 $Cxx.name("keyword_virtual");
+  keywordUcWcharUcT @153 $Cxx.name("keyword_wchar_t");
+  keywordUcAlignas @154 $Cxx.name("keyword_alignas");
+  keywordUcAlignof @155 $Cxx.name("keyword_alignof");
+  keywordUcChar16UcT @156 $Cxx.name("keyword_char16_t");
+  keywordUcChar32UcT @157 $Cxx.name("keyword_char32_t");
+  keywordUcConstexpr @158 $Cxx.name("keyword_constexpr");
+  keywordUcDecltype @159 $Cxx.name("keyword_decltype");
+  keywordUcNoexcept @160 $Cxx.name("keyword_noexcept");
+  keywordUcNullptr @161 $Cxx.name("keyword_nullptr");
+  keywordUcStaticUcAssert @162 $Cxx.name("keyword_static_assert");
+  keywordUcThreadUcLocal @163 $Cxx.name("keyword_thread_local");
+  keywordUcConcept @164 $Cxx.name("keyword_concept");
+  keywordUcRequires @165 $Cxx.name("keyword_requires");
+  keywordUcCoUcAwait @166 $Cxx.name("keyword_co_await");
+  keywordUcCoUcReturn @167 $Cxx.name("keyword_co_return");
+  keywordUcCoUcYield @168 $Cxx.name("keyword_co_yield");
+  keywordUcModule @169 $Cxx.name("keyword_module");
+  keywordUcImport @170 $Cxx.name("keyword_import");
+  keywordUcConsteval @171 $Cxx.name("keyword_consteval");
+  keywordUcConstinit @172 $Cxx.name("keyword_constinit");
+  keywordUcChar8UcT @173 $Cxx.name("keyword_char8_t");
+  keywordUcUcFloat16 @174 $Cxx.name("keyword__float16");
+  keywordUcUcAccum @175 $Cxx.name("keyword__accum");
+  keywordUcUcFract @176 $Cxx.name("keyword__fract");
+  keywordUcUcSat @177 $Cxx.name("keyword__sat");
+  keywordUcUcDecimal32 @178 $Cxx.name("keyword__decimal32");
+  keywordUcUcDecimal64 @179 $Cxx.name("keyword__decimal64");
+  keywordUcUcDecimal128 @180 $Cxx.name("keyword__decimal128");
+  keywordUcUcUcNull @181 $Cxx.name("keyword___null");
+  keywordUcUcUcAlignof @182 $Cxx.name("keyword___alignof");
+  keywordUcUcUcAttribute @183 $Cxx.name("keyword___attribute");
+  keywordUcUcUcBuiltinUcChooseUcExpression @184 $Cxx.name("keyword___builtin_choose_expression");
+  keywordUcUcUcBuiltinUcOffsetof @185 $Cxx.name("keyword___builtin_offsetof");
+  keywordUcUcUcBuiltinUcFile @186 $Cxx.name("keyword___builtin_file");
+  keywordUcUcUcBuiltinUcFunction @187 $Cxx.name("keyword___builtin_function");
+  keywordUcUcUcBuiltinUcLine @188 $Cxx.name("keyword___builtin_line");
+  keywordUcUcUcBuiltinUcColumn @189 $Cxx.name("keyword___builtin_column");
+  keywordUcUcUcBuiltinUcTypesUcCompatibleUcP @190 $Cxx.name("keyword___builtin_types_compatible_p");
+  keywordUcUcUcBuiltinUcVaUcArgument @191 $Cxx.name("keyword___builtin_va_argument");
+  keywordUcUcUcExtension @192 $Cxx.name("keyword___extension__");
+  keywordUcUcUcFloat128 @193 $Cxx.name("keyword___float128");
+  keywordUcUcUcImag @194 $Cxx.name("keyword___imag");
+  keywordUcUcUcInt128 @195 $Cxx.name("keyword___int128");
+  keywordUcUcUcLabel @196 $Cxx.name("keyword___label__");
+  keywordUcUcUcReal @197 $Cxx.name("keyword___real");
+  keywordUcUcUcThread @198 $Cxx.name("keyword___thread");
+  keywordUcUcUcFunction @199 $Cxx.name("keyword___function__");
+  keywordUcUcUcPrettyfunction @200 $Cxx.name("keyword___prettyfunction__");
+  keywordUcUcUcAutoUcType @201 $Cxx.name("keyword___auto_type");
+  keywordUcTypeof @202 $Cxx.name("keyword_typeof");
+  keywordUcUcUcFuncdname @203 $Cxx.name("keyword___funcdname__");
+  keywordUcUcUcFuncsig @204 $Cxx.name("keyword___funcsig__");
+  keywordUcLfunction @205 $Cxx.name("keyword_lfunction__");
+  keywordUcLfuncsig @206 $Cxx.name("keyword_lfuncsig__");
+  keywordUcUcUcIsUcInterfaceUcClass @207 $Cxx.name("keyword___is_interface_class");
+  keywordUcUcUcIsUcSealed @208 $Cxx.name("keyword___is_sealed");
+  keywordUcUcUcIsUcDestructible @209 $Cxx.name("keyword___is_destructible");
+  keywordUcUcUcIsUcTriviallyUcDestructible @210 $Cxx.name("keyword___is_trivially_destructible");
+  keywordUcUcUcIsUcNothrowUcDestructible @211 $Cxx.name("keyword___is_nothrow_destructible");
+  keywordUcUcUcIsUcNothrowUcAssignable @212 $Cxx.name("keyword___is_nothrow_assignable");
+  keywordUcUcUcIsUcConstructible @213 $Cxx.name("keyword___is_constructible");
+  keywordUcUcUcIsUcNothrowUcConstructible @214 $Cxx.name("keyword___is_nothrow_constructible");
+  keywordUcUcUcIsUcAssignable @215 $Cxx.name("keyword___is_assignable");
+  keywordUcUcUcHasUcNothrowUcMoveUcAssign @216 $Cxx.name("keyword___has_nothrow_move_assign");
+  keywordUcUcUcHasUcTrivialUcMoveUcAssign @217 $Cxx.name("keyword___has_trivial_move_assign");
+  keywordUcUcUcHasUcTrivialUcMoveUcConstructor @218 $Cxx.name("keyword___has_trivial_move_constructor");
+  keywordUcUcUcHasUcNothrowUcAssign @219 $Cxx.name("keyword___has_nothrow_assign");
+  keywordUcUcUcHasUcNothrowUcCopy @220 $Cxx.name("keyword___has_nothrow_copy");
+  keywordUcUcUcHasUcNothrowUcConstructor @221 $Cxx.name("keyword___has_nothrow_constructor");
+  keywordUcUcUcHasUcTrivialUcAssign @222 $Cxx.name("keyword___has_trivial_assign");
+  keywordUcUcUcHasUcTrivialUcCopy @223 $Cxx.name("keyword___has_trivial_copy");
+  keywordUcUcUcHasUcTrivialUcConstructor @224 $Cxx.name("keyword___has_trivial_constructor");
+  keywordUcUcUcHasUcTrivialUcDestructor @225 $Cxx.name("keyword___has_trivial_destructor");
+  keywordUcUcUcHasUcVirtualUcDestructor @226 $Cxx.name("keyword___has_virtual_destructor");
+  keywordUcUcUcIsUcAbstract @227 $Cxx.name("keyword___is_abstract");
+  keywordUcUcUcIsUcAggregate @228 $Cxx.name("keyword___is_aggregate");
+  keywordUcUcUcIsUcBaseUcOf @229 $Cxx.name("keyword___is_base_of");
+  keywordUcUcUcIsUcClass @230 $Cxx.name("keyword___is_class");
+  keywordUcUcUcIsUcConvertibleUcTo @231 $Cxx.name("keyword___is_convertible_to");
+  keywordUcUcUcIsUcEmpty @232 $Cxx.name("keyword___is_empty");
+  keywordUcUcUcIsUcEnum @233 $Cxx.name("keyword___is_enum");
+  keywordUcUcUcIsUcFinal @234 $Cxx.name("keyword___is_final");
+  keywordUcUcUcIsUcLiteral @235 $Cxx.name("keyword___is_literal");
+  keywordUcUcUcIsUcPod @236 $Cxx.name("keyword___is_pod");
+  keywordUcUcUcIsUcPolymorphic @237 $Cxx.name("keyword___is_polymorphic");
+  keywordUcUcUcIsUcStandardUcLayout @238 $Cxx.name("keyword___is_standard_layout");
+  keywordUcUcUcIsUcTrivial @239 $Cxx.name("keyword___is_trivial");
+  keywordUcUcUcIsUcTriviallyUcAssignable @240 $Cxx.name("keyword___is_trivially_assignable");
+  keywordUcUcUcIsUcTriviallyUcConstructible @241 $Cxx.name("keyword___is_trivially_constructible");
+  keywordUcUcUcIsUcTriviallyUcCopyable @242 $Cxx.name("keyword___is_trivially_copyable");
+  keywordUcUcUcIsUcUnion @243 $Cxx.name("keyword___is_union");
+  keywordUcUcUcHasUcUniqueUcObjectUcRepresentations @244 $Cxx.name("keyword___has_unique_object_representations");
+  keywordUcUcUcUnderlyingUcType @245 $Cxx.name("keyword___underlying_type");
+  keywordUcUcUcReferenceUcBindsUcToUcTemporary @246 $Cxx.name("keyword___reference_binds_to_temporary");
+  keywordUcUcUcIsUcLvalueUcExpression @247 $Cxx.name("keyword___is_lvalue_expression");
+  keywordUcUcUcIsUcRvalueUcExpression @248 $Cxx.name("keyword___is_rvalue_expression");
+  keywordUcUcUcIsUcArithmetic @249 $Cxx.name("keyword___is_arithmetic");
+  keywordUcUcUcIsUcFloatingUcPoint @250 $Cxx.name("keyword___is_floating_point");
+  keywordUcUcUcIsUcIntegral @251 $Cxx.name("keyword___is_integral");
+  keywordUcUcUcIsUcCompleteUcType @252 $Cxx.name("keyword___is_complete_type");
+  keywordUcUcUcIsUcVoid @253 $Cxx.name("keyword___is_void");
+  keywordUcUcUcIsUcArray @254 $Cxx.name("keyword___is_array");
+  keywordUcUcUcIsUcFunction @255 $Cxx.name("keyword___is_function");
+  keywordUcUcUcIsUcReference @256 $Cxx.name("keyword___is_reference");
+  keywordUcUcUcIsUcLvalueUcReference @257 $Cxx.name("keyword___is_lvalue_reference");
+  keywordUcUcUcIsUcRvalueUcReference @258 $Cxx.name("keyword___is_rvalue_reference");
+  keywordUcUcUcIsUcFundamental @259 $Cxx.name("keyword___is_fundamental");
+  keywordUcUcUcIsUcObject @260 $Cxx.name("keyword___is_object");
+  keywordUcUcUcIsUcScalar @261 $Cxx.name("keyword___is_scalar");
+  keywordUcUcUcIsUcCompound @262 $Cxx.name("keyword___is_compound");
+  keywordUcUcUcIsUcPointer @263 $Cxx.name("keyword___is_pointer");
+  keywordUcUcUcIsUcMemberUcObjectUcPointer @264 $Cxx.name("keyword___is_member_object_pointer");
+  keywordUcUcUcIsUcMemberUcFunctionUcPointer @265 $Cxx.name("keyword___is_member_function_pointer");
+  keywordUcUcUcIsUcMemberUcPointer @266 $Cxx.name("keyword___is_member_pointer");
+  keywordUcUcUcIsUcConst @267 $Cxx.name("keyword___is_const");
+  keywordUcUcUcIsUcVolatile @268 $Cxx.name("keyword___is_volatile");
+  keywordUcUcUcIsUcSigned @269 $Cxx.name("keyword___is_signed");
+  keywordUcUcUcIsUcUnsigned @270 $Cxx.name("keyword___is_unsigned");
+  keywordUcUcUcIsUcSame @271 $Cxx.name("keyword___is_same");
+  keywordUcUcUcIsUcConvertible @272 $Cxx.name("keyword___is_convertible");
+  keywordUcUcUcArrayUcRank @273 $Cxx.name("keyword___array_rank");
+  keywordUcUcUcArrayUcExtent @274 $Cxx.name("keyword___array_extent");
+  keywordUcUcUcPrivateUcExtern @275 $Cxx.name("keyword___private_extern__");
+  keywordUcUcUcModuleUcPrivate @276 $Cxx.name("keyword___module_private__");
+  keywordUcUcUcDeclspec @277 $Cxx.name("keyword___declspec");
+  keywordUcUcUcCdecl @278 $Cxx.name("keyword___cdecl");
+  keywordUcUcUcStdcall @279 $Cxx.name("keyword___stdcall");
+  keywordUcUcUcFastcall @280 $Cxx.name("keyword___fastcall");
+  keywordUcUcUcThiscall @281 $Cxx.name("keyword___thiscall");
+  keywordUcUcUcRegcall @282 $Cxx.name("keyword___regcall");
+  keywordUcUcUcVectorcall @283 $Cxx.name("keyword___vectorcall");
+  keywordUcUcUcForceinline @284 $Cxx.name("keyword___forceinline");
+  keywordUcUcUcUnaligned @285 $Cxx.name("keyword___unaligned");
+  keywordUcUcUcSuper @286 $Cxx.name("keyword___super");
+  keywordUcUcUcGlobal @287 $Cxx.name("keyword___global");
+  keywordUcUcUcLocal @288 $Cxx.name("keyword___local");
+  keywordUcUcUcConstant @289 $Cxx.name("keyword___constant");
+  keywordUcUcUcPrivate @290 $Cxx.name("keyword___private");
+  keywordUcUcUcGeneric @291 $Cxx.name("keyword___generic");
+  keywordUcUcUcKernel @292 $Cxx.name("keyword___kernel");
+  keywordUcUcUcReadUcOnly @293 $Cxx.name("keyword___read_only");
+  keywordUcUcUcWriteUcOnly @294 $Cxx.name("keyword___write_only");
+  keywordUcUcUcReadUcWrite @295 $Cxx.name("keyword___read_write");
+  keywordUcUcUcBuiltinUcAstype @296 $Cxx.name("keyword___builtin_astype");
+  keywordUcVecUcStep @297 $Cxx.name("keyword_vec_step");
+  keywordUcImage1dUcT @298 $Cxx.name("keyword_image1d_t");
+  keywordUcImage1dUcArrayUcT @299 $Cxx.name("keyword_image1d_array_t");
+  keywordUcImage1dUcBufferUcT @300 $Cxx.name("keyword_image1d_buffer_t");
+  keywordUcImage2dUcT @301 $Cxx.name("keyword_image2d_t");
+  keywordUcImage2dUcArrayUcT @302 $Cxx.name("keyword_image2d_array_t");
+  keywordUcImage2dUcDepthUcT @303 $Cxx.name("keyword_image2d_depth_t");
+  keywordUcImage2dUcArrayUcDepthUcT @304 $Cxx.name("keyword_image2d_array_depth_t");
+  keywordUcImage2dUcMsaaUcT @305 $Cxx.name("keyword_image2d_msaa_t");
+  keywordUcImage2dUcArrayUcMsaaUcT @306 $Cxx.name("keyword_image2d_array_msaa_t");
+  keywordUcImage2dUcMsaaUcDepthUcT @307 $Cxx.name("keyword_image2d_msaa_depth_t");
+  keywordUcImage2dUcArrayUcMsaaUcDepthUcT @308 $Cxx.name("keyword_image2d_array_msaa_depth_t");
+  keywordUcImage3dUcT @309 $Cxx.name("keyword_image3d_t");
+  keywordUcPipe @310 $Cxx.name("keyword_pipe");
+  keywordUcAddrspaceUcCast @311 $Cxx.name("keyword_addrspace_cast");
+  keywordUcUcUcBuiltinUcOmpUcRequiredUcSimdUcAlign @312 $Cxx.name("keyword___builtin_omp_required_simd_align");
+  keywordUcUcUcPascal @313 $Cxx.name("keyword___pascal");
+  keywordUcUcUcVector @314 $Cxx.name("keyword___vector");
+  keywordUcUcUcPixel @315 $Cxx.name("keyword___pixel");
+  keywordUcUcUcBoolean @316 $Cxx.name("keyword___boolean");
+  keywordUcUcUcBf16 @317 $Cxx.name("keyword___bf16");
+  keywordUcHalf @318 $Cxx.name("keyword_half");
+  keywordUcUcUcBridge @319 $Cxx.name("keyword___bridge");
+  keywordUcUcUcBridgeUcTransfer @320 $Cxx.name("keyword___bridge_transfer");
+  keywordUcUcUcBridgeUcRetained @321 $Cxx.name("keyword___bridge_retained");
+  keywordUcUcUcBridgeUcRetain @322 $Cxx.name("keyword___bridge_retain");
+  keywordUcUcUcCovariant @323 $Cxx.name("keyword___covariant");
+  keywordUcUcUcContravariant @324 $Cxx.name("keyword___contravariant");
+  keywordUcUcUcKindof @325 $Cxx.name("keyword___kindof");
+  keywordUcUcNonnull @326 $Cxx.name("keyword__nonnull");
+  keywordUcUcNullable @327 $Cxx.name("keyword__nullable");
+  keywordUcUcNullableUcResult @328 $Cxx.name("keyword__nullable_result");
+  keywordUcUcNullUcUnspecified @329 $Cxx.name("keyword__null_unspecified");
+  keywordUcUcUcPtr64 @330 $Cxx.name("keyword___ptr64");
+  keywordUcUcUcPtr32 @331 $Cxx.name("keyword___ptr32");
+  keywordUcUcUcSptr @332 $Cxx.name("keyword___sptr");
+  keywordUcUcUcUptr @333 $Cxx.name("keyword___uptr");
+  keywordUcUcUcW64 @334 $Cxx.name("keyword___w64");
+  keywordUcUcUcUuidof @335 $Cxx.name("keyword___uuidof");
+  keywordUcUcUcTry @336 $Cxx.name("keyword___try");
+  keywordUcUcUcFinally @337 $Cxx.name("keyword___finally");
+  keywordUcUcUcLeave @338 $Cxx.name("keyword___leave");
+  keywordUcUcUcInt64 @339 $Cxx.name("keyword___int64");
+  keywordUcUcUcIfUcExists @340 $Cxx.name("keyword___if_exists");
+  keywordUcUcUcIfUcNotUcExists @341 $Cxx.name("keyword___if_not_exists");
+  keywordUcUcUcSingleUcInheritance @342 $Cxx.name("keyword___single_inheritance");
+  keywordUcUcUcMultipleUcInheritance @343 $Cxx.name("keyword___multiple_inheritance");
+  keywordUcUcUcVirtualUcInheritance @344 $Cxx.name("keyword___virtual_inheritance");
+  keywordUcUcUcInterface @345 $Cxx.name("keyword___interface");
+  keywordUcUcUcBuiltinUcConvertvector @346 $Cxx.name("keyword___builtin_convertvector");
+  keywordUcUcUcBuiltinUcBitUcCast @347 $Cxx.name("keyword___builtin_bit_cast");
+  keywordUcUcUcBuiltinUcAvailable @348 $Cxx.name("keyword___builtin_available");
+  keywordUcUcUcBuiltinUcSyclUcUniqueUcStableUcName @349 $Cxx.name("keyword___builtin_sycl_unique_stable_name");
+  keywordUcUcUcUnknownUcAnytype @350 $Cxx.name("keyword___unknown_anytype");
+  annotUcCxxscope @351 $Cxx.name("annot_cxxscope");
+  annotUcTypename @352 $Cxx.name("annot_typename");
+  annotUcTemplateUcId @353 $Cxx.name("annot_template_id");
+  annotUcNonUcType @354 $Cxx.name("annot_non_type");
+  annotUcNonUcTypeUcUndeclared @355 $Cxx.name("annot_non_type_undeclared");
+  annotUcNonUcTypeUcDependent @356 $Cxx.name("annot_non_type_dependent");
+  annotUcOverload @357 $Cxx.name("annot_overload");
+  annotUcPrimaryUcExpression @358 $Cxx.name("annot_primary_expression");
+  annotUcDecltype @359 $Cxx.name("annot_decltype");
+  annotUcPragmaUcUnused @360 $Cxx.name("annot_pragma_unused");
+  annotUcPragmaUcVis @361 $Cxx.name("annot_pragma_vis");
+  annotUcPragmaUcPack @362 $Cxx.name("annot_pragma_pack");
+  annotUcPragmaUcParserUcCrash @363 $Cxx.name("annot_pragma_parser_crash");
+  annotUcPragmaUcCaptured @364 $Cxx.name("annot_pragma_captured");
+  annotUcPragmaUcDump @365 $Cxx.name("annot_pragma_dump");
+  annotUcPragmaUcMsstruct @366 $Cxx.name("annot_pragma_msstruct");
+  annotUcPragmaUcAlign @367 $Cxx.name("annot_pragma_align");
+  annotUcPragmaUcWeak @368 $Cxx.name("annot_pragma_weak");
+  annotUcPragmaUcWeakalias @369 $Cxx.name("annot_pragma_weakalias");
+  annotUcPragmaUcRedefineUcExtname @370 $Cxx.name("annot_pragma_redefine_extname");
+  annotUcPragmaUcFpUcContract @371 $Cxx.name("annot_pragma_fp_contract");
+  annotUcPragmaUcFenvUcAccess @372 $Cxx.name("annot_pragma_fenv_access");
+  annotUcPragmaUcFenvUcRound @373 $Cxx.name("annot_pragma_fenv_round");
+  annotUcPragmaUcFloatUcControl @374 $Cxx.name("annot_pragma_float_control");
+  annotUcPragmaUcMsUcPointersUcToUcMembers @375 $Cxx.name("annot_pragma_ms_pointers_to_members");
+  annotUcPragmaUcMsUcVtordisp @376 $Cxx.name("annot_pragma_ms_vtordisp");
+  annotUcPragmaUcMsUcPragma @377 $Cxx.name("annot_pragma_ms_pragma");
+  annotUcPragmaUcOpenclUcExtension @378 $Cxx.name("annot_pragma_opencl_extension");
+  annotUcAttributeUcOpenmp @379 $Cxx.name("annot_attribute_openmp");
+  annotUcPragmaUcOpenmp @380 $Cxx.name("annot_pragma_openmp");
+  annotUcPragmaUcOpenmpUcEnd @381 $Cxx.name("annot_pragma_openmp_end");
+  annotUcPragmaUcLoopUcHint @382 $Cxx.name("annot_pragma_loop_hint");
+  annotUcPragmaUcFp @383 $Cxx.name("annot_pragma_fp");
+  annotUcPragmaUcAttribute @384 $Cxx.name("annot_pragma_attribute");
+  annotUcModuleUcInclude @385 $Cxx.name("annot_module_include");
+  annotUcModuleUcBegin @386 $Cxx.name("annot_module_begin");
+  annotUcModuleUcEnd @387 $Cxx.name("annot_module_end");
+  annotUcHeaderUcUnit @388 $Cxx.name("annot_header_unit");
+  numEnumerators @389 $Cxx.name("num_enumerators");
+}
+
+enum TokenRole @0x9951b825ce993408 {
+  invalid @0 $Cxx.name("invalid");
+  beginUcOfUcFileUcMarker @1 $Cxx.name("begin_of_file_marker");
+  fileUcToken @2 $Cxx.name("file_token");
+  endUcOfUcFileUcMarker @3 $Cxx.name("end_of_file_marker");
+  beginUcOfUcMacroUcExpansionUcMarker @4 $Cxx.name("begin_of_macro_expansion_marker");
+  macroUcExpansionUcToken @5 $Cxx.name("macro_expansion_token");
+  endUcOfUcMacroUcExpansionUcMarker @6 $Cxx.name("end_of_macro_expansion_marker");
+  printedUcToken @7 $Cxx.name("printed_token");
+  numEnumerators @8 $Cxx.name("num_enumerators");
+}
+
 enum AccessSpecifier @0xea31fabcef869ac6 {
-  public @0;
-  protected @1;
-  private @2;
-  none @3;
+  public @0 $Cxx.name("public");
+  protected @1 $Cxx.name("protected");
+  private @2 $Cxx.name("private");
+  none @3 $Cxx.name("none");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum AvailabilityResult @0xe8c6cd388f86c217 {
-  available @0;
-  notUcYetUcIntroduced @1;
-  deprecated @2;
-  unavailable @3;
+  available @0 $Cxx.name("available");
+  notUcYetUcIntroduced @1 $Cxx.name("not_yet_introduced");
+  deprecated @2 $Cxx.name("deprecated");
+  unavailable @3 $Cxx.name("unavailable");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum FriendObjectKind @0xc74745b68a910aa9 {
-  none @0;
-  declared @1;
-  undeclared @2;
+  none @0 $Cxx.name("none");
+  declared @1 $Cxx.name("declared");
+  undeclared @2 $Cxx.name("undeclared");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ModuleOwnershipKind @0x94f1123366f439d2 {
-  unowned @0;
-  visible @1;
-  visibleUcWhenUcImported @2;
-  moduleUcPrivate @3;
+  unowned @0 $Cxx.name("unowned");
+  visible @1 $Cxx.name("visible");
+  visibleUcWhenUcImported @2 $Cxx.name("visible_when_imported");
+  moduleUcPrivate @3 $Cxx.name("module_private");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum DeclKind @0x96ac187aac5afe4d {
-  accessUcSpec @0;
-  baseUcUsing @1;
-  binding @2;
-  block @3;
-  builtinUcTemplate @4;
-  cxxConstructor @5;
-  cxxConversion @6;
-  cxxDeductionUcGuide @7;
-  cxxDestructor @8;
-  cxxMethod @9;
-  cxxRecord @10;
-  captured @11;
-  classUcScopeUcFunctionUcSpecialization @12;
-  classUcTemplate @13;
-  classUcTemplateUcPartialUcSpecialization @14;
-  classUcTemplateUcSpecialization @15;
-  concept @16;
-  constructorUcUsingUcShadow @17;
-  declarator @18;
-  decomposition @19;
-  empty @20;
-  enumUcConstant @21;
-  enum @22;
-  export @23;
-  externCContext @24;
-  field @25;
-  fileUcScopeUcAsm @26;
-  friend @27;
-  friendUcTemplate @28;
-  function @29;
-  functionUcTemplate @30;
-  implicitUcParam @31;
-  import @32;
-  indirectUcField @33;
-  label @34;
-  lifetimeUcExtendedUcTemporary @35;
-  linkageUcSpec @36;
-  msGuid @37;
-  msProperty @38;
-  named @39;
-  namespaceUcAlias @40;
-  namespace @41;
-  nonUcTypeUcTemplateUcParm @42;
-  ompAllocate @43;
-  ompCapturedUcExpr @44;
-  ompDeclareUcMapper @45;
-  ompDeclareUcReduction @46;
-  ompRequires @47;
-  ompThreadUcPrivate @48;
-  objCAtUcDefsUcField @49;
-  objCCategory @50;
-  objCCategoryUcImpl @51;
-  objCCompatibleUcAlias @52;
-  objCContainer @53;
-  objCImpl @54;
-  objCImplementation @55;
-  objCInterface @56;
-  objCIvar @57;
-  objCMethod @58;
-  objCProperty @59;
-  objCPropertyUcImpl @60;
-  objCProtocol @61;
-  objCTypeUcParam @62;
-  parmUcVar @63;
-  pragmaUcComment @64;
-  pragmaUcDetectUcMismatch @65;
-  record @66;
-  redeclarableUcTemplate @67;
-  requiresUcExprUcBody @68;
-  staticUcAssert @69;
-  tag @70;
-  template @71;
-  templateUcParamUcObject @72;
-  templateUcTemplateUcParm @73;
-  templateUcTypeUcParm @74;
-  translationUcUnit @75;
-  typeUcAlias @76;
-  typeUcAliasUcTemplate @77;
-  type @78;
-  typedef @79;
-  typedefUcName @80;
-  unresolvedUcUsingUcIfUcExists @81;
-  unresolvedUcUsingUcTypename @82;
-  unresolvedUcUsingUcValue @83;
-  using @84;
-  usingUcDirective @85;
-  usingUcEnum @86;
-  usingUcPack @87;
-  usingUcShadow @88;
-  value @89;
-  var @90;
-  varUcTemplate @91;
-  varUcTemplateUcPartialUcSpecialization @92;
-  varUcTemplateUcSpecialization @93;
+  accessUcSpec @0 $Cxx.name("access_spec");
+  baseUcUsing @1 $Cxx.name("base_using");
+  binding @2 $Cxx.name("binding");
+  block @3 $Cxx.name("block");
+  builtinUcTemplate @4 $Cxx.name("builtin_template");
+  cxxUcConstructor @5 $Cxx.name("cxx_constructor");
+  cxxUcConversion @6 $Cxx.name("cxx_conversion");
+  cxxUcDeductionUcGuide @7 $Cxx.name("cxx_deduction_guide");
+  cxxUcDestructor @8 $Cxx.name("cxx_destructor");
+  cxxUcMethod @9 $Cxx.name("cxx_method");
+  cxxUcRecord @10 $Cxx.name("cxx_record");
+  captured @11 $Cxx.name("captured");
+  classUcScopeUcFunctionUcSpecialization @12 $Cxx.name("class_scope_function_specialization");
+  classUcTemplate @13 $Cxx.name("class_template");
+  classUcTemplateUcPartialUcSpecialization @14 $Cxx.name("class_template_partial_specialization");
+  classUcTemplateUcSpecialization @15 $Cxx.name("class_template_specialization");
+  concept @16 $Cxx.name("concept");
+  constructorUcUsingUcShadow @17 $Cxx.name("constructor_using_shadow");
+  declarator @18 $Cxx.name("declarator");
+  decomposition @19 $Cxx.name("decomposition");
+  empty @20 $Cxx.name("empty");
+  enumUcConstant @21 $Cxx.name("enum_constant");
+  enum @22 $Cxx.name("enum");
+  export @23 $Cxx.name("export");
+  externUcCUcContext @24 $Cxx.name("extern_c_context");
+  field @25 $Cxx.name("field");
+  fileUcScopeUcAsm @26 $Cxx.name("file_scope_asm");
+  friend @27 $Cxx.name("friend");
+  friendUcTemplate @28 $Cxx.name("friend_template");
+  function @29 $Cxx.name("function");
+  functionUcTemplate @30 $Cxx.name("function_template");
+  implicitUcParam @31 $Cxx.name("implicit_param");
+  import @32 $Cxx.name("import");
+  indirectUcField @33 $Cxx.name("indirect_field");
+  label @34 $Cxx.name("label");
+  lifetimeUcExtendedUcTemporary @35 $Cxx.name("lifetime_extended_temporary");
+  linkageUcSpec @36 $Cxx.name("linkage_spec");
+  msUcGuid @37 $Cxx.name("ms_guid");
+  msUcProperty @38 $Cxx.name("ms_property");
+  named @39 $Cxx.name("named");
+  namespaceUcAlias @40 $Cxx.name("namespace_alias");
+  namespace @41 $Cxx.name("namespace");
+  nonUcTypeUcTemplateUcParm @42 $Cxx.name("non_type_template_parm");
+  ompUcAllocate @43 $Cxx.name("omp_allocate");
+  ompUcCapturedUcExpr @44 $Cxx.name("omp_captured_expr");
+  ompUcDeclareUcMapper @45 $Cxx.name("omp_declare_mapper");
+  ompUcDeclareUcReduction @46 $Cxx.name("omp_declare_reduction");
+  ompUcRequires @47 $Cxx.name("omp_requires");
+  ompUcThreadUcPrivate @48 $Cxx.name("omp_thread_private");
+  objUcCUcAtUcDefsUcField @49 $Cxx.name("obj_c_at_defs_field");
+  objUcCUcCategory @50 $Cxx.name("obj_c_category");
+  objUcCUcCategoryUcImpl @51 $Cxx.name("obj_c_category_impl");
+  objUcCUcCompatibleUcAlias @52 $Cxx.name("obj_c_compatible_alias");
+  objUcCUcContainer @53 $Cxx.name("obj_c_container");
+  objUcCUcImpl @54 $Cxx.name("obj_c_impl");
+  objUcCUcImplementation @55 $Cxx.name("obj_c_implementation");
+  objUcCUcInterface @56 $Cxx.name("obj_c_interface");
+  objUcCUcIvar @57 $Cxx.name("obj_c_ivar");
+  objUcCUcMethod @58 $Cxx.name("obj_c_method");
+  objUcCUcProperty @59 $Cxx.name("obj_c_property");
+  objUcCUcPropertyUcImpl @60 $Cxx.name("obj_c_property_impl");
+  objUcCUcProtocol @61 $Cxx.name("obj_c_protocol");
+  objUcCUcTypeUcParam @62 $Cxx.name("obj_c_type_param");
+  parmUcVar @63 $Cxx.name("parm_var");
+  pragmaUcComment @64 $Cxx.name("pragma_comment");
+  pragmaUcDetectUcMismatch @65 $Cxx.name("pragma_detect_mismatch");
+  record @66 $Cxx.name("record");
+  redeclarableUcTemplate @67 $Cxx.name("redeclarable_template");
+  requiresUcExprUcBody @68 $Cxx.name("requires_expr_body");
+  staticUcAssert @69 $Cxx.name("static_assert");
+  tag @70 $Cxx.name("tag");
+  template @71 $Cxx.name("template");
+  templateUcParamUcObject @72 $Cxx.name("template_param_object");
+  templateUcTemplateUcParm @73 $Cxx.name("template_template_parm");
+  templateUcTypeUcParm @74 $Cxx.name("template_type_parm");
+  translationUcUnit @75 $Cxx.name("translation_unit");
+  typeUcAlias @76 $Cxx.name("type_alias");
+  typeUcAliasUcTemplate @77 $Cxx.name("type_alias_template");
+  type @78 $Cxx.name("type");
+  typedef @79 $Cxx.name("typedef");
+  typedefUcName @80 $Cxx.name("typedef_name");
+  unresolvedUcUsingUcIfUcExists @81 $Cxx.name("unresolved_using_if_exists");
+  unresolvedUcUsingUcTypename @82 $Cxx.name("unresolved_using_typename");
+  unresolvedUcUsingUcValue @83 $Cxx.name("unresolved_using_value");
+  using @84 $Cxx.name("using");
+  usingUcDirective @85 $Cxx.name("using_directive");
+  usingUcEnum @86 $Cxx.name("using_enum");
+  usingUcPack @87 $Cxx.name("using_pack");
+  usingUcShadow @88 $Cxx.name("using_shadow");
+  value @89 $Cxx.name("value");
+  var @90 $Cxx.name("var");
+  varUcTemplate @91 $Cxx.name("var_template");
+  varUcTemplateUcPartialUcSpecialization @92 $Cxx.name("var_template_partial_specialization");
+  varUcTemplateUcSpecialization @93 $Cxx.name("var_template_specialization");
+  numEnumerators @94 $Cxx.name("num_enumerators");
 }
 
 enum PragmaMSCommentKind @0xe09b297844ff08bb {
-  unknown @0;
-  linker @1;
-  lib @2;
-  compiler @3;
-  exeUcString @4;
-  user @5;
+  unknown @0 $Cxx.name("unknown");
+  linker @1 $Cxx.name("linker");
+  lib @2 $Cxx.name("lib");
+  compiler @3 $Cxx.name("compiler");
+  exeUcString @4 $Cxx.name("exe_string");
+  user @5 $Cxx.name("user");
+  numEnumerators @6 $Cxx.name("num_enumerators");
 }
 
 enum Linkage @0xd7f90485cbd67b8c {
-  noUcLinkage @0;
-  internalUcLinkage @1;
-  uniqueUcExternalUcLinkage @2;
-  visibleUcNoUcLinkage @3;
-  moduleUcInternalUcLinkage @4;
-  moduleUcLinkage @5;
-  externalUcLinkage @6;
+  noUcLinkage @0 $Cxx.name("no_linkage");
+  internalUcLinkage @1 $Cxx.name("internal_linkage");
+  uniqueUcExternalUcLinkage @2 $Cxx.name("unique_external_linkage");
+  visibleUcNoUcLinkage @3 $Cxx.name("visible_no_linkage");
+  moduleUcInternalUcLinkage @4 $Cxx.name("module_internal_linkage");
+  moduleUcLinkage @5 $Cxx.name("module_linkage");
+  externalUcLinkage @6 $Cxx.name("external_linkage");
+  numEnumerators @7 $Cxx.name("num_enumerators");
 }
 
 enum ObjCStringFormatFamily @0xdde65f902899f0f0 {
-  none @0;
-  nsString @1;
-  cfString @2;
+  none @0 $Cxx.name("none");
+  nsUcString @1 $Cxx.name("ns_string");
+  cfUcString @2 $Cxx.name("cf_string");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum Visibility @0x9f55e79df4f9996e {
-  hiddenUcVisibility @0;
-  protectedUcVisibility @1;
-  defaultUcVisibility @2;
+  hiddenUcVisibility @0 $Cxx.name("hidden_visibility");
+  protectedUcVisibility @1 $Cxx.name("protected_visibility");
+  defaultUcVisibility @2 $Cxx.name("default_visibility");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum LanguageLinkage @0xa1e45a6941f17018 {
-  cLanguageUcLinkage @0;
-  cxxLanguageUcLinkage @1;
-  noUcLanguageUcLinkage @2;
+  cUcLanguageUcLinkage @0 $Cxx.name("c_language_linkage");
+  cxxUcLanguageUcLinkage @1 $Cxx.name("cxx_language_linkage");
+  noUcLanguageUcLinkage @2 $Cxx.name("no_language_linkage");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum StorageClass @0xda0542391be3aa63 {
-  none @0;
-  extern @1;
-  static @2;
-  privateUcExtern @3;
-  auto @4;
-  register @5;
+  none @0 $Cxx.name("none");
+  extern @1 $Cxx.name("extern");
+  static @2 $Cxx.name("static");
+  privateUcExtern @3 $Cxx.name("private_extern");
+  auto @4 $Cxx.name("auto");
+  register @5 $Cxx.name("register");
+  numEnumerators @6 $Cxx.name("num_enumerators");
 }
 
 enum StorageDuration @0xe1a5462cfd90bc60 {
-  fullUcExpression @0;
-  automatic @1;
-  thread @2;
-  static @3;
-  dynamic @4;
+  fullUcExpression @0 $Cxx.name("full_expression");
+  automatic @1 $Cxx.name("automatic");
+  thread @2 $Cxx.name("thread");
+  static @3 $Cxx.name("static");
+  dynamic @4 $Cxx.name("dynamic");
+  numEnumerators @5 $Cxx.name("num_enumerators");
 }
 
 enum ThreadStorageClassSpecifier @0xa5e43d0340490a97 {
-  unspecified @0;
-  ucThread @1;
-  threadUcLocal @2;
-  ucThreadUcLocal @3;
+  unspecified @0 $Cxx.name("unspecified");
+  ucUcThread @1 $Cxx.name("__thread");
+  threadUcLocal @2 $Cxx.name("thread_local");
+  ucThreadUcLocal @3 $Cxx.name("_thread_local");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum TemplateSpecializationKind @0xc45c2bfe2b2d2105 {
-  undeclared @0;
-  implicitUcInstantiation @1;
-  explicitUcSpecialization @2;
-  explicitUcInstantiationUcDeclaration @3;
-  explicitUcInstantiationUcDefinition @4;
+  undeclared @0 $Cxx.name("undeclared");
+  implicitUcInstantiation @1 $Cxx.name("implicit_instantiation");
+  explicitUcSpecialization @2 $Cxx.name("explicit_specialization");
+  explicitUcInstantiationUcDeclaration @3 $Cxx.name("explicit_instantiation_declaration");
+  explicitUcInstantiationUcDefinition @4 $Cxx.name("explicit_instantiation_definition");
+  numEnumerators @5 $Cxx.name("num_enumerators");
 }
 
 enum ImplicitParamKind @0xab95d72fdf3ce08d {
-  objCSelf @0;
-  objCCmd @1;
-  cxxThis @2;
-  cxxvtt @3;
-  capturedUcContext @4;
-  other @5;
+  objUcCUcSelf @0 $Cxx.name("obj_c_self");
+  objUcCUcCmd @1 $Cxx.name("obj_c_cmd");
+  cxxUcThis @2 $Cxx.name("cxx_this");
+  cxxvtt @3 $Cxx.name("cxxvtt");
+  capturedUcContext @4 $Cxx.name("captured_context");
+  other @5 $Cxx.name("other");
+  numEnumerators @6 $Cxx.name("num_enumerators");
 }
 
 enum ConstexprSpecKind @0x9b968674fb4c29be {
-  unspecified @0;
-  constexpr @1;
-  consteval @2;
-  constinit @3;
+  unspecified @0 $Cxx.name("unspecified");
+  constexpr @1 $Cxx.name("constexpr");
+  consteval @2 $Cxx.name("consteval");
+  constinit @3 $Cxx.name("constinit");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum ExceptionSpecificationType @0xd5391f397240ed4d {
-  none @0;
-  dynamicUcNone @1;
-  dynamic @2;
-  msAny @3;
-  noUcThrow @4;
-  basicUcNoexcept @5;
-  dependentUcNoexcept @6;
-  noexceptUcFalse @7;
-  noexceptUcTrue @8;
-  unevaluated @9;
-  uninstantiated @10;
-  unparsed @11;
+  none @0 $Cxx.name("none");
+  dynamicUcNone @1 $Cxx.name("dynamic_none");
+  dynamic @2 $Cxx.name("dynamic");
+  msUcAny @3 $Cxx.name("ms_any");
+  noUcThrow @4 $Cxx.name("no_throw");
+  basicUcNoexcept @5 $Cxx.name("basic_noexcept");
+  dependentUcNoexcept @6 $Cxx.name("dependent_noexcept");
+  noexceptUcFalse @7 $Cxx.name("noexcept_false");
+  noexceptUcTrue @8 $Cxx.name("noexcept_true");
+  unevaluated @9 $Cxx.name("unevaluated");
+  uninstantiated @10 $Cxx.name("uninstantiated");
+  unparsed @11 $Cxx.name("unparsed");
+  numEnumerators @12 $Cxx.name("num_enumerators");
 }
 
 enum MultiVersionKind @0xd6aa1ba55a8d79af {
-  none @0;
-  target @1;
-  cpuSpecific @2;
-  cpuDispatch @3;
+  none @0 $Cxx.name("none");
+  target @1 $Cxx.name("target");
+  cpuUcSpecific @2 $Cxx.name("cpu_specific");
+  cpuUcDispatch @3 $Cxx.name("cpu_dispatch");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum OverloadedOperatorKind @0x899b59d4c33ece1a {
-  none @0;
-  new @1;
-  delete @2;
-  arrayUcNew @3;
-  arrayUcDelete @4;
-  plus @5;
-  minus @6;
-  star @7;
-  slash @8;
-  percent @9;
-  caret @10;
-  amp @11;
-  pipe @12;
-  tilde @13;
-  exclaim @14;
-  equal @15;
-  less @16;
-  greater @17;
-  plusUcEqual @18;
-  minusUcEqual @19;
-  starUcEqual @20;
-  slashUcEqual @21;
-  percentUcEqual @22;
-  caretUcEqual @23;
-  ampUcEqual @24;
-  pipeUcEqual @25;
-  lessUcLess @26;
-  greaterUcGreater @27;
-  lessUcLessUcEqual @28;
-  greaterUcGreaterUcEqual @29;
-  equalUcEqual @30;
-  exclaimUcEqual @31;
-  lessUcEqual @32;
-  greaterUcEqual @33;
-  spaceship @34;
-  ampUcAmp @35;
-  pipeUcPipe @36;
-  plusUcPlus @37;
-  minusUcMinus @38;
-  comma @39;
-  arrowUcStar @40;
-  arrow @41;
-  call @42;
-  subscript @43;
-  conditional @44;
-  coawait @45;
-  numoverloadedoperators @46;
+  none @0 $Cxx.name("none");
+  new @1 $Cxx.name("new");
+  delete @2 $Cxx.name("delete");
+  arrayUcNew @3 $Cxx.name("array_new");
+  arrayUcDelete @4 $Cxx.name("array_delete");
+  plus @5 $Cxx.name("plus");
+  minus @6 $Cxx.name("minus");
+  star @7 $Cxx.name("star");
+  slash @8 $Cxx.name("slash");
+  percent @9 $Cxx.name("percent");
+  caret @10 $Cxx.name("caret");
+  amp @11 $Cxx.name("amp");
+  pipe @12 $Cxx.name("pipe");
+  tilde @13 $Cxx.name("tilde");
+  exclaim @14 $Cxx.name("exclaim");
+  equal @15 $Cxx.name("equal");
+  less @16 $Cxx.name("less");
+  greater @17 $Cxx.name("greater");
+  plusUcEqual @18 $Cxx.name("plus_equal");
+  minusUcEqual @19 $Cxx.name("minus_equal");
+  starUcEqual @20 $Cxx.name("star_equal");
+  slashUcEqual @21 $Cxx.name("slash_equal");
+  percentUcEqual @22 $Cxx.name("percent_equal");
+  caretUcEqual @23 $Cxx.name("caret_equal");
+  ampUcEqual @24 $Cxx.name("amp_equal");
+  pipeUcEqual @25 $Cxx.name("pipe_equal");
+  lessUcLess @26 $Cxx.name("less_less");
+  greaterUcGreater @27 $Cxx.name("greater_greater");
+  lessUcLessUcEqual @28 $Cxx.name("less_less_equal");
+  greaterUcGreaterUcEqual @29 $Cxx.name("greater_greater_equal");
+  equalUcEqual @30 $Cxx.name("equal_equal");
+  exclaimUcEqual @31 $Cxx.name("exclaim_equal");
+  lessUcEqual @32 $Cxx.name("less_equal");
+  greaterUcEqual @33 $Cxx.name("greater_equal");
+  spaceship @34 $Cxx.name("spaceship");
+  ampUcAmp @35 $Cxx.name("amp_amp");
+  pipeUcPipe @36 $Cxx.name("pipe_pipe");
+  plusUcPlus @37 $Cxx.name("plus_plus");
+  minusUcMinus @38 $Cxx.name("minus_minus");
+  comma @39 $Cxx.name("comma");
+  arrowUcStar @40 $Cxx.name("arrow_star");
+  arrow @41 $Cxx.name("arrow");
+  call @42 $Cxx.name("call");
+  subscript @43 $Cxx.name("subscript");
+  conditional @44 $Cxx.name("conditional");
+  coawait @45 $Cxx.name("coawait");
+  numEnumerators @46 $Cxx.name("num_enumerators");
 }
 
 enum RefQualifierKind @0xe49bd7951a6ae539 {
-  none @0;
-  lValue @1;
-  rValue @2;
+  none @0 $Cxx.name("none");
+  lUcValue @1 $Cxx.name("l_value");
+  rUcValue @2 $Cxx.name("r_value");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum InClassInitStyle @0xfd30164f4a13d25c {
-  noUcInitializer @0;
-  copyUcInitializer @1;
-  listUcInitializer @2;
+  noUcInitializer @0 $Cxx.name("no_initializer");
+  copyUcInitializer @1 $Cxx.name("copy_initializer");
+  listUcInitializer @2 $Cxx.name("list_initializer");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum TagTypeKind @0xbfa845fcdbd00864 {
-  struct @0;
-  interface @1;
-  union @2;
-  class @3;
-  enum @4;
+  struct @0 $Cxx.name("struct");
+  interface @1 $Cxx.name("interface");
+  union @2 $Cxx.name("union");
+  class @3 $Cxx.name("class");
+  enum @4 $Cxx.name("enum");
+  numEnumerators @5 $Cxx.name("num_enumerators");
 }
 
 enum ArgPassingKind @0xfc581c2eded85fa9 {
-  canUcPassUcInUcRegs @0;
-  cannotUcPassUcInUcRegs @1;
-  canUcNeverUcPassUcInUcRegs @2;
+  canUcPassUcInUcRegs @0 $Cxx.name("can_pass_in_regs");
+  cannotUcPassUcInUcRegs @1 $Cxx.name("cannot_pass_in_regs");
+  canUcNeverUcPassUcInUcRegs @2 $Cxx.name("can_never_pass_in_regs");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum MSInheritanceModel @0x9e63c392cec08405 {
-  single @0;
-  multiple @1;
-  virtual @2;
-  unspecified @3;
+  single @0 $Cxx.name("single");
+  multiple @1 $Cxx.name("multiple");
+  virtual @2 $Cxx.name("virtual");
+  unspecified @3 $Cxx.name("unspecified");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum LambdaCaptureDefault @0xc5ffb9f76dbfab4d {
-  none @0;
-  byUcCopy @1;
-  byUcReference @2;
+  none @0 $Cxx.name("none");
+  byUcCopy @1 $Cxx.name("by_copy");
+  byUcReference @2 $Cxx.name("by_reference");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum MSVtorDispMode @0xd30e950dab28014f {
-  never @0;
-  forUcVirtualUcBaseUcOverride @1;
-  forVfTable @2;
+  never @0 $Cxx.name("never");
+  forUcVirtualUcBaseUcOverride @1 $Cxx.name("for_virtual_base_override");
+  forUcVfUcTable @2 $Cxx.name("for_vf_table");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ObjCTypeParamVariance @0x922a77f8ad69d2ca {
-  invariant @0;
-  covariant @1;
-  contravariant @2;
+  invariant @0 $Cxx.name("invariant");
+  covariant @1 $Cxx.name("covariant");
+  contravariant @2 $Cxx.name("contravariant");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum PropertyControl @0x80dbe303a4591128 {
-  none @0;
-  required @1;
-  optional @2;
+  none @0 $Cxx.name("none");
+  required @1 $Cxx.name("required");
+  optional @2 $Cxx.name("optional");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ObjCPropertyQueryKind @0xa276e57d28cfccfe {
-  queryUcUnknown @0;
-  queryUcInstance @1;
-  queryUcClass @2;
+  queryUcUnknown @0 $Cxx.name("query_unknown");
+  queryUcInstance @1 $Cxx.name("query_instance");
+  queryUcClass @2 $Cxx.name("query_class");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum SetterKind @0x9b24373b205d21f4 {
-  assign @0;
-  retain @1;
-  copy @2;
-  weak @3;
+  assign @0 $Cxx.name("assign");
+  retain @1 $Cxx.name("retain");
+  copy @2 $Cxx.name("copy");
+  weak @3 $Cxx.name("weak");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum ImplementationControl @0x8d100537007bc5a0 {
-  none @0;
-  required @1;
-  optional @2;
+  none @0 $Cxx.name("none");
+  required @1 $Cxx.name("required");
+  optional @2 $Cxx.name("optional");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ObjCMethodFamily @0xce49434a6017454c {
-  none @0;
-  alloc @1;
-  copy @2;
-  initializer @3;
-  mutableUcCopy @4;
-  new @5;
-  autorelease @6;
-  dealloc @7;
-  finalize @8;
-  release @9;
-  retain @10;
-  retainUcCount @11;
-  self @12;
-  initialize @13;
-  performUcSelector @14;
+  none @0 $Cxx.name("none");
+  alloc @1 $Cxx.name("alloc");
+  copy @2 $Cxx.name("copy");
+  initializer @3 $Cxx.name("initializer");
+  mutableUcCopy @4 $Cxx.name("mutable_copy");
+  new @5 $Cxx.name("new");
+  autorelease @6 $Cxx.name("autorelease");
+  dealloc @7 $Cxx.name("dealloc");
+  finalize @8 $Cxx.name("finalize");
+  release @9 $Cxx.name("release");
+  retain @10 $Cxx.name("retain");
+  retainUcCount @11 $Cxx.name("retain_count");
+  self @12 $Cxx.name("self");
+  initialize @13 $Cxx.name("initialize");
+  performUcSelector @14 $Cxx.name("perform_selector");
+  numEnumerators @15 $Cxx.name("num_enumerators");
 }
 
 enum LanguageIDs @0xe48de286671b0833 {
-  c @0;
-  cxx @1;
+  c @0 $Cxx.name("c");
+  cxx @1 $Cxx.name("cxx");
+  numEnumerators @2 $Cxx.name("num_enumerators");
 }
 
 enum StmtKind @0xc9755b9a053563b9 {
-  gccAsmUcStmt @0;
-  msAsmUcStmt @1;
-  breakUcStmt @2;
-  cxxCatchUcStmt @3;
-  cxxForUcRangeUcStmt @4;
-  cxxTryUcStmt @5;
-  capturedUcStmt @6;
-  compoundUcStmt @7;
-  continueUcStmt @8;
-  coreturnUcStmt @9;
-  coroutineUcBodyUcStmt @10;
-  declUcStmt @11;
-  doUcStmt @12;
-  forUcStmt @13;
-  gotoUcStmt @14;
-  ifUcStmt @15;
-  indirectUcGotoUcStmt @16;
-  msDependentUcExistsUcStmt @17;
-  nullUcStmt @18;
-  ompCanonicalUcLoop @19;
-  ompAtomicUcDirective @20;
-  ompBarrierUcDirective @21;
-  ompCancelUcDirective @22;
-  ompCancellationUcPointUcDirective @23;
-  ompCriticalUcDirective @24;
-  ompDepobjUcDirective @25;
-  ompDispatchUcDirective @26;
-  ompFlushUcDirective @27;
-  ompInteropUcDirective @28;
-  ompDistributeUcDirective @29;
-  ompDistributeUcParallelUcForUcDirective @30;
-  ompDistributeUcParallelUcForUcSimdUcDirective @31;
-  ompDistributeUcSimdUcDirective @32;
-  ompForUcDirective @33;
-  ompForUcSimdUcDirective @34;
-  ompMasterUcTaskUcLoopUcDirective @35;
-  ompMasterUcTaskUcLoopUcSimdUcDirective @36;
-  ompParallelUcForUcDirective @37;
-  ompParallelUcForUcSimdUcDirective @38;
-  ompParallelUcMasterUcTaskUcLoopUcDirective @39;
-  ompParallelUcMasterUcTaskUcLoopUcSimdUcDirective @40;
-  ompSimdUcDirective @41;
-  ompTargetUcParallelUcForUcSimdUcDirective @42;
-  ompTargetUcSimdUcDirective @43;
-  ompTargetUcTeamsUcDistributeUcDirective @44;
-  ompTargetUcTeamsUcDistributeUcParallelUcForUcDirective @45;
-  ompTargetUcTeamsUcDistributeUcParallelUcForUcSimdUcDirective @46;
-  ompTargetUcTeamsUcDistributeUcSimdUcDirective @47;
-  ompTaskUcLoopUcDirective @48;
-  ompTaskUcLoopUcSimdUcDirective @49;
-  ompTeamsUcDistributeUcDirective @50;
-  ompTeamsUcDistributeUcParallelUcForUcDirective @51;
-  ompTeamsUcDistributeUcParallelUcForUcSimdUcDirective @52;
-  ompTeamsUcDistributeUcSimdUcDirective @53;
-  ompTileUcDirective @54;
-  ompUnrollUcDirective @55;
-  ompMaskedUcDirective @56;
-  ompMasterUcDirective @57;
-  ompOrderedUcDirective @58;
-  ompParallelUcDirective @59;
-  ompParallelUcMasterUcDirective @60;
-  ompParallelUcSectionsUcDirective @61;
-  ompScanUcDirective @62;
-  ompSectionUcDirective @63;
-  ompSectionsUcDirective @64;
-  ompSingleUcDirective @65;
-  ompTargetUcDataUcDirective @66;
-  ompTargetUcDirective @67;
-  ompTargetUcEnterUcDataUcDirective @68;
-  ompTargetUcExitUcDataUcDirective @69;
-  ompTargetUcParallelUcDirective @70;
-  ompTargetUcParallelUcForUcDirective @71;
-  ompTargetUcTeamsUcDirective @72;
-  ompTargetUcUpdateUcDirective @73;
-  ompTaskUcDirective @74;
-  ompTaskgroupUcDirective @75;
-  ompTaskwaitUcDirective @76;
-  ompTaskyieldUcDirective @77;
-  ompTeamsUcDirective @78;
-  objCAtUcCatchUcStmt @79;
-  objCAtUcFinallyUcStmt @80;
-  objCAtUcSynchronizedUcStmt @81;
-  objCAtUcThrowUcStmt @82;
-  objCAtUcTryUcStmt @83;
-  objCAutoreleaseUcPoolUcStmt @84;
-  objCForUcCollectionUcStmt @85;
-  returnUcStmt @86;
-  sehExceptUcStmt @87;
-  sehFinallyUcStmt @88;
-  sehLeaveUcStmt @89;
-  sehTryUcStmt @90;
-  caseUcStmt @91;
-  defaultUcStmt @92;
-  switchUcStmt @93;
-  attributedUcStmt @94;
-  binaryUcConditionalUcOperator @95;
-  conditionalUcOperator @96;
-  addrUcLabelUcExpr @97;
-  arrayUcInitUcIndexUcExpr @98;
-  arrayUcInitUcLoopUcExpr @99;
-  arrayUcSubscriptUcExpr @100;
-  arrayUcTypeUcTraitUcExpr @101;
-  asUcTypeUcExpr @102;
-  atomicUcExpr @103;
-  binaryUcOperator @104;
-  compoundUcAssignUcOperator @105;
-  blockUcExpr @106;
-  cxxBindUcTemporaryUcExpr @107;
-  cxxBoolUcLiteralUcExpr @108;
-  cxxConstructUcExpr @109;
-  cxxTemporaryUcObjectUcExpr @110;
-  cxxDefaultUcArgUcExpr @111;
-  cxxDefaultUcInitUcExpr @112;
-  cxxDeleteUcExpr @113;
-  cxxDependentUcScopeUcMemberUcExpr @114;
-  cxxFoldUcExpr @115;
-  cxxInheritedUcCtorUcInitUcExpr @116;
-  cxxNewUcExpr @117;
-  cxxNoexceptUcExpr @118;
-  cxxNullUcPtrUcLiteralUcExpr @119;
-  cxxPseudoUcDestructorUcExpr @120;
-  cxxRewrittenUcBinaryUcOperator @121;
-  cxxScalarUcValueUcInitUcExpr @122;
-  cxxStdUcInitializerUcListUcExpr @123;
-  cxxThisUcExpr @124;
-  cxxThrowUcExpr @125;
-  cxxTypeidUcExpr @126;
-  cxxUnresolvedUcConstructUcExpr @127;
-  cxxUuidofUcExpr @128;
-  callUcExpr @129;
-  cudaKernelUcCallUcExpr @130;
-  cxxMemberUcCallUcExpr @131;
-  cxxOperatorUcCallUcExpr @132;
-  userUcDefinedUcLiteral @133;
-  builtinUcBitUcCastUcExpr @134;
-  cStyleUcCastUcExpr @135;
-  cxxFunctionalUcCastUcExpr @136;
-  cxxAddrspaceUcCastUcExpr @137;
-  cxxConstUcCastUcExpr @138;
-  cxxDynamicUcCastUcExpr @139;
-  cxxReinterpretUcCastUcExpr @140;
-  cxxStaticUcCastUcExpr @141;
-  objCBridgedUcCastUcExpr @142;
-  implicitUcCastUcExpr @143;
-  characterUcLiteral @144;
-  chooseUcExpr @145;
-  compoundUcLiteralUcExpr @146;
-  conceptUcSpecializationUcExpr @147;
-  convertUcVectorUcExpr @148;
-  coawaitUcExpr @149;
-  coyieldUcExpr @150;
-  declUcRefUcExpr @151;
-  dependentUcCoawaitUcExpr @152;
-  dependentUcScopeUcDeclUcRefUcExpr @153;
-  designatedUcInitUcExpr @154;
-  designatedUcInitUcUpdateUcExpr @155;
-  expressionUcTraitUcExpr @156;
-  extUcVectorUcElementUcExpr @157;
-  fixedUcPointUcLiteral @158;
-  floatingUcLiteral @159;
-  constantUcExpr @160;
-  exprUcWithUcCleanups @161;
-  functionUcParmUcPackUcExpr @162;
-  gnuNullUcExpr @163;
-  genericUcSelectionUcExpr @164;
-  imaginaryUcLiteral @165;
-  implicitUcValueUcInitUcExpr @166;
-  initUcListUcExpr @167;
-  integerUcLiteral @168;
-  lambdaUcExpr @169;
-  msPropertyUcRefUcExpr @170;
-  msPropertyUcSubscriptUcExpr @171;
-  materializeUcTemporaryUcExpr @172;
-  matrixUcSubscriptUcExpr @173;
-  memberUcExpr @174;
-  noUcInitUcExpr @175;
-  ompArrayUcSectionUcExpr @176;
-  ompArrayUcShapingUcExpr @177;
-  ompIteratorUcExpr @178;
-  objCArrayUcLiteral @179;
-  objCAvailabilityUcCheckUcExpr @180;
-  objCBoolUcLiteralUcExpr @181;
-  objCBoxedUcExpr @182;
-  objCDictionaryUcLiteral @183;
-  objCEncodeUcExpr @184;
-  objCIndirectUcCopyUcRestoreUcExpr @185;
-  objCIsaUcExpr @186;
-  objCIvarUcRefUcExpr @187;
-  objCMessageUcExpr @188;
-  objCPropertyUcRefUcExpr @189;
-  objCProtocolUcExpr @190;
-  objCSelectorUcExpr @191;
-  objCStringUcLiteral @192;
-  objCSubscriptUcRefUcExpr @193;
-  offsetUcOfUcExpr @194;
-  opaqueUcValueUcExpr @195;
-  unresolvedUcLookupUcExpr @196;
-  unresolvedUcMemberUcExpr @197;
-  packUcExpansionUcExpr @198;
-  parenUcExpr @199;
-  parenUcListUcExpr @200;
-  predefinedUcExpr @201;
-  pseudoUcObjectUcExpr @202;
-  recoveryUcExpr @203;
-  requiresUcExpr @204;
-  syclUniqueUcStableUcNameUcExpr @205;
-  shuffleUcVectorUcExpr @206;
-  sizeUcOfUcPackUcExpr @207;
-  sourceUcLocUcExpr @208;
-  stmtUcExpr @209;
-  stringUcLiteral @210;
-  substUcNonUcTypeUcTemplateUcParmUcExpr @211;
-  substUcNonUcTypeUcTemplateUcParmUcPackUcExpr @212;
-  typeUcTraitUcExpr @213;
-  typoUcExpr @214;
-  unaryUcExprUcOrUcTypeUcTraitUcExpr @215;
-  unaryUcOperator @216;
-  vaArgUcExpr @217;
-  labelUcStmt @218;
-  whileUcStmt @219;
+  gccUcAsmUcStmt @0 $Cxx.name("gcc_asm_stmt");
+  msUcAsmUcStmt @1 $Cxx.name("ms_asm_stmt");
+  breakUcStmt @2 $Cxx.name("break_stmt");
+  cxxUcCatchUcStmt @3 $Cxx.name("cxx_catch_stmt");
+  cxxUcForUcRangeUcStmt @4 $Cxx.name("cxx_for_range_stmt");
+  cxxUcTryUcStmt @5 $Cxx.name("cxx_try_stmt");
+  capturedUcStmt @6 $Cxx.name("captured_stmt");
+  compoundUcStmt @7 $Cxx.name("compound_stmt");
+  continueUcStmt @8 $Cxx.name("continue_stmt");
+  coreturnUcStmt @9 $Cxx.name("coreturn_stmt");
+  coroutineUcBodyUcStmt @10 $Cxx.name("coroutine_body_stmt");
+  declUcStmt @11 $Cxx.name("decl_stmt");
+  doUcStmt @12 $Cxx.name("do_stmt");
+  forUcStmt @13 $Cxx.name("for_stmt");
+  gotoUcStmt @14 $Cxx.name("goto_stmt");
+  ifUcStmt @15 $Cxx.name("if_stmt");
+  indirectUcGotoUcStmt @16 $Cxx.name("indirect_goto_stmt");
+  msUcDependentUcExistsUcStmt @17 $Cxx.name("ms_dependent_exists_stmt");
+  nullUcStmt @18 $Cxx.name("null_stmt");
+  ompUcCanonicalUcLoop @19 $Cxx.name("omp_canonical_loop");
+  ompUcAtomicUcDirective @20 $Cxx.name("omp_atomic_directive");
+  ompUcBarrierUcDirective @21 $Cxx.name("omp_barrier_directive");
+  ompUcCancelUcDirective @22 $Cxx.name("omp_cancel_directive");
+  ompUcCancellationUcPointUcDirective @23 $Cxx.name("omp_cancellation_point_directive");
+  ompUcCriticalUcDirective @24 $Cxx.name("omp_critical_directive");
+  ompUcDepobjUcDirective @25 $Cxx.name("omp_depobj_directive");
+  ompUcDispatchUcDirective @26 $Cxx.name("omp_dispatch_directive");
+  ompUcFlushUcDirective @27 $Cxx.name("omp_flush_directive");
+  ompUcInteropUcDirective @28 $Cxx.name("omp_interop_directive");
+  ompUcDistributeUcDirective @29 $Cxx.name("omp_distribute_directive");
+  ompUcDistributeUcParallelUcForUcDirective @30 $Cxx.name("omp_distribute_parallel_for_directive");
+  ompUcDistributeUcParallelUcForUcSimdUcDirective @31 $Cxx.name("omp_distribute_parallel_for_simd_directive");
+  ompUcDistributeUcSimdUcDirective @32 $Cxx.name("omp_distribute_simd_directive");
+  ompUcForUcDirective @33 $Cxx.name("omp_for_directive");
+  ompUcForUcSimdUcDirective @34 $Cxx.name("omp_for_simd_directive");
+  ompUcMasterUcTaskUcLoopUcDirective @35 $Cxx.name("omp_master_task_loop_directive");
+  ompUcMasterUcTaskUcLoopUcSimdUcDirective @36 $Cxx.name("omp_master_task_loop_simd_directive");
+  ompUcParallelUcForUcDirective @37 $Cxx.name("omp_parallel_for_directive");
+  ompUcParallelUcForUcSimdUcDirective @38 $Cxx.name("omp_parallel_for_simd_directive");
+  ompUcParallelUcMasterUcTaskUcLoopUcDirective @39 $Cxx.name("omp_parallel_master_task_loop_directive");
+  ompUcParallelUcMasterUcTaskUcLoopUcSimdUcDirective @40 $Cxx.name("omp_parallel_master_task_loop_simd_directive");
+  ompUcSimdUcDirective @41 $Cxx.name("omp_simd_directive");
+  ompUcTargetUcParallelUcForUcSimdUcDirective @42 $Cxx.name("omp_target_parallel_for_simd_directive");
+  ompUcTargetUcSimdUcDirective @43 $Cxx.name("omp_target_simd_directive");
+  ompUcTargetUcTeamsUcDistributeUcDirective @44 $Cxx.name("omp_target_teams_distribute_directive");
+  ompUcTargetUcTeamsUcDistributeUcParallelUcForUcDirective @45 $Cxx.name("omp_target_teams_distribute_parallel_for_directive");
+  ompUcTargetUcTeamsUcDistributeUcParallelUcForUcSimdUcDirective @46 $Cxx.name("omp_target_teams_distribute_parallel_for_simd_directive");
+  ompUcTargetUcTeamsUcDistributeUcSimdUcDirective @47 $Cxx.name("omp_target_teams_distribute_simd_directive");
+  ompUcTaskUcLoopUcDirective @48 $Cxx.name("omp_task_loop_directive");
+  ompUcTaskUcLoopUcSimdUcDirective @49 $Cxx.name("omp_task_loop_simd_directive");
+  ompUcTeamsUcDistributeUcDirective @50 $Cxx.name("omp_teams_distribute_directive");
+  ompUcTeamsUcDistributeUcParallelUcForUcDirective @51 $Cxx.name("omp_teams_distribute_parallel_for_directive");
+  ompUcTeamsUcDistributeUcParallelUcForUcSimdUcDirective @52 $Cxx.name("omp_teams_distribute_parallel_for_simd_directive");
+  ompUcTeamsUcDistributeUcSimdUcDirective @53 $Cxx.name("omp_teams_distribute_simd_directive");
+  ompUcTileUcDirective @54 $Cxx.name("omp_tile_directive");
+  ompUcUnrollUcDirective @55 $Cxx.name("omp_unroll_directive");
+  ompUcMaskedUcDirective @56 $Cxx.name("omp_masked_directive");
+  ompUcMasterUcDirective @57 $Cxx.name("omp_master_directive");
+  ompUcOrderedUcDirective @58 $Cxx.name("omp_ordered_directive");
+  ompUcParallelUcDirective @59 $Cxx.name("omp_parallel_directive");
+  ompUcParallelUcMasterUcDirective @60 $Cxx.name("omp_parallel_master_directive");
+  ompUcParallelUcSectionsUcDirective @61 $Cxx.name("omp_parallel_sections_directive");
+  ompUcScanUcDirective @62 $Cxx.name("omp_scan_directive");
+  ompUcSectionUcDirective @63 $Cxx.name("omp_section_directive");
+  ompUcSectionsUcDirective @64 $Cxx.name("omp_sections_directive");
+  ompUcSingleUcDirective @65 $Cxx.name("omp_single_directive");
+  ompUcTargetUcDataUcDirective @66 $Cxx.name("omp_target_data_directive");
+  ompUcTargetUcDirective @67 $Cxx.name("omp_target_directive");
+  ompUcTargetUcEnterUcDataUcDirective @68 $Cxx.name("omp_target_enter_data_directive");
+  ompUcTargetUcExitUcDataUcDirective @69 $Cxx.name("omp_target_exit_data_directive");
+  ompUcTargetUcParallelUcDirective @70 $Cxx.name("omp_target_parallel_directive");
+  ompUcTargetUcParallelUcForUcDirective @71 $Cxx.name("omp_target_parallel_for_directive");
+  ompUcTargetUcTeamsUcDirective @72 $Cxx.name("omp_target_teams_directive");
+  ompUcTargetUcUpdateUcDirective @73 $Cxx.name("omp_target_update_directive");
+  ompUcTaskUcDirective @74 $Cxx.name("omp_task_directive");
+  ompUcTaskgroupUcDirective @75 $Cxx.name("omp_taskgroup_directive");
+  ompUcTaskwaitUcDirective @76 $Cxx.name("omp_taskwait_directive");
+  ompUcTaskyieldUcDirective @77 $Cxx.name("omp_taskyield_directive");
+  ompUcTeamsUcDirective @78 $Cxx.name("omp_teams_directive");
+  objUcCUcAtUcCatchUcStmt @79 $Cxx.name("obj_c_at_catch_stmt");
+  objUcCUcAtUcFinallyUcStmt @80 $Cxx.name("obj_c_at_finally_stmt");
+  objUcCUcAtUcSynchronizedUcStmt @81 $Cxx.name("obj_c_at_synchronized_stmt");
+  objUcCUcAtUcThrowUcStmt @82 $Cxx.name("obj_c_at_throw_stmt");
+  objUcCUcAtUcTryUcStmt @83 $Cxx.name("obj_c_at_try_stmt");
+  objUcCUcAutoreleaseUcPoolUcStmt @84 $Cxx.name("obj_c_autorelease_pool_stmt");
+  objUcCUcForUcCollectionUcStmt @85 $Cxx.name("obj_c_for_collection_stmt");
+  returnUcStmt @86 $Cxx.name("return_stmt");
+  sehUcExceptUcStmt @87 $Cxx.name("seh_except_stmt");
+  sehUcFinallyUcStmt @88 $Cxx.name("seh_finally_stmt");
+  sehUcLeaveUcStmt @89 $Cxx.name("seh_leave_stmt");
+  sehUcTryUcStmt @90 $Cxx.name("seh_try_stmt");
+  caseUcStmt @91 $Cxx.name("case_stmt");
+  defaultUcStmt @92 $Cxx.name("default_stmt");
+  switchUcStmt @93 $Cxx.name("switch_stmt");
+  attributedUcStmt @94 $Cxx.name("attributed_stmt");
+  binaryUcConditionalUcOperator @95 $Cxx.name("binary_conditional_operator");
+  conditionalUcOperator @96 $Cxx.name("conditional_operator");
+  addrUcLabelUcExpr @97 $Cxx.name("addr_label_expr");
+  arrayUcInitUcIndexUcExpr @98 $Cxx.name("array_init_index_expr");
+  arrayUcInitUcLoopUcExpr @99 $Cxx.name("array_init_loop_expr");
+  arrayUcSubscriptUcExpr @100 $Cxx.name("array_subscript_expr");
+  arrayUcTypeUcTraitUcExpr @101 $Cxx.name("array_type_trait_expr");
+  asUcTypeUcExpr @102 $Cxx.name("as_type_expr");
+  atomicUcExpr @103 $Cxx.name("atomic_expr");
+  binaryUcOperator @104 $Cxx.name("binary_operator");
+  compoundUcAssignUcOperator @105 $Cxx.name("compound_assign_operator");
+  blockUcExpr @106 $Cxx.name("block_expr");
+  cxxUcBindUcTemporaryUcExpr @107 $Cxx.name("cxx_bind_temporary_expr");
+  cxxUcBoolUcLiteralUcExpr @108 $Cxx.name("cxx_bool_literal_expr");
+  cxxUcConstructUcExpr @109 $Cxx.name("cxx_construct_expr");
+  cxxUcTemporaryUcObjectUcExpr @110 $Cxx.name("cxx_temporary_object_expr");
+  cxxUcDefaultUcArgUcExpr @111 $Cxx.name("cxx_default_arg_expr");
+  cxxUcDefaultUcInitUcExpr @112 $Cxx.name("cxx_default_init_expr");
+  cxxUcDeleteUcExpr @113 $Cxx.name("cxx_delete_expr");
+  cxxUcDependentUcScopeUcMemberUcExpr @114 $Cxx.name("cxx_dependent_scope_member_expr");
+  cxxUcFoldUcExpr @115 $Cxx.name("cxx_fold_expr");
+  cxxUcInheritedUcCtorUcInitUcExpr @116 $Cxx.name("cxx_inherited_ctor_init_expr");
+  cxxUcNewUcExpr @117 $Cxx.name("cxx_new_expr");
+  cxxUcNoexceptUcExpr @118 $Cxx.name("cxx_noexcept_expr");
+  cxxUcNullUcPtrUcLiteralUcExpr @119 $Cxx.name("cxx_null_ptr_literal_expr");
+  cxxUcPseudoUcDestructorUcExpr @120 $Cxx.name("cxx_pseudo_destructor_expr");
+  cxxUcRewrittenUcBinaryUcOperator @121 $Cxx.name("cxx_rewritten_binary_operator");
+  cxxUcScalarUcValueUcInitUcExpr @122 $Cxx.name("cxx_scalar_value_init_expr");
+  cxxUcStdUcInitializerUcListUcExpr @123 $Cxx.name("cxx_std_initializer_list_expr");
+  cxxUcThisUcExpr @124 $Cxx.name("cxx_this_expr");
+  cxxUcThrowUcExpr @125 $Cxx.name("cxx_throw_expr");
+  cxxUcTypeidUcExpr @126 $Cxx.name("cxx_typeid_expr");
+  cxxUcUnresolvedUcConstructUcExpr @127 $Cxx.name("cxx_unresolved_construct_expr");
+  cxxUcUuidofUcExpr @128 $Cxx.name("cxx_uuidof_expr");
+  callUcExpr @129 $Cxx.name("call_expr");
+  cudaUcKernelUcCallUcExpr @130 $Cxx.name("cuda_kernel_call_expr");
+  cxxUcMemberUcCallUcExpr @131 $Cxx.name("cxx_member_call_expr");
+  cxxUcOperatorUcCallUcExpr @132 $Cxx.name("cxx_operator_call_expr");
+  userUcDefinedUcLiteral @133 $Cxx.name("user_defined_literal");
+  builtinUcBitUcCastUcExpr @134 $Cxx.name("builtin_bit_cast_expr");
+  cUcStyleUcCastUcExpr @135 $Cxx.name("c_style_cast_expr");
+  cxxUcFunctionalUcCastUcExpr @136 $Cxx.name("cxx_functional_cast_expr");
+  cxxUcAddrspaceUcCastUcExpr @137 $Cxx.name("cxx_addrspace_cast_expr");
+  cxxUcConstUcCastUcExpr @138 $Cxx.name("cxx_const_cast_expr");
+  cxxUcDynamicUcCastUcExpr @139 $Cxx.name("cxx_dynamic_cast_expr");
+  cxxUcReinterpretUcCastUcExpr @140 $Cxx.name("cxx_reinterpret_cast_expr");
+  cxxUcStaticUcCastUcExpr @141 $Cxx.name("cxx_static_cast_expr");
+  objUcCUcBridgedUcCastUcExpr @142 $Cxx.name("obj_c_bridged_cast_expr");
+  implicitUcCastUcExpr @143 $Cxx.name("implicit_cast_expr");
+  characterUcLiteral @144 $Cxx.name("character_literal");
+  chooseUcExpr @145 $Cxx.name("choose_expr");
+  compoundUcLiteralUcExpr @146 $Cxx.name("compound_literal_expr");
+  conceptUcSpecializationUcExpr @147 $Cxx.name("concept_specialization_expr");
+  convertUcVectorUcExpr @148 $Cxx.name("convert_vector_expr");
+  coawaitUcExpr @149 $Cxx.name("coawait_expr");
+  coyieldUcExpr @150 $Cxx.name("coyield_expr");
+  declUcRefUcExpr @151 $Cxx.name("decl_ref_expr");
+  dependentUcCoawaitUcExpr @152 $Cxx.name("dependent_coawait_expr");
+  dependentUcScopeUcDeclUcRefUcExpr @153 $Cxx.name("dependent_scope_decl_ref_expr");
+  designatedUcInitUcExpr @154 $Cxx.name("designated_init_expr");
+  designatedUcInitUcUpdateUcExpr @155 $Cxx.name("designated_init_update_expr");
+  expressionUcTraitUcExpr @156 $Cxx.name("expression_trait_expr");
+  extUcVectorUcElementUcExpr @157 $Cxx.name("ext_vector_element_expr");
+  fixedUcPointUcLiteral @158 $Cxx.name("fixed_point_literal");
+  floatingUcLiteral @159 $Cxx.name("floating_literal");
+  constantUcExpr @160 $Cxx.name("constant_expr");
+  exprUcWithUcCleanups @161 $Cxx.name("expr_with_cleanups");
+  functionUcParmUcPackUcExpr @162 $Cxx.name("function_parm_pack_expr");
+  gnuUcNullUcExpr @163 $Cxx.name("gnu_null_expr");
+  genericUcSelectionUcExpr @164 $Cxx.name("generic_selection_expr");
+  imaginaryUcLiteral @165 $Cxx.name("imaginary_literal");
+  implicitUcValueUcInitUcExpr @166 $Cxx.name("implicit_value_init_expr");
+  initUcListUcExpr @167 $Cxx.name("init_list_expr");
+  integerUcLiteral @168 $Cxx.name("integer_literal");
+  lambdaUcExpr @169 $Cxx.name("lambda_expr");
+  msUcPropertyUcRefUcExpr @170 $Cxx.name("ms_property_ref_expr");
+  msUcPropertyUcSubscriptUcExpr @171 $Cxx.name("ms_property_subscript_expr");
+  materializeUcTemporaryUcExpr @172 $Cxx.name("materialize_temporary_expr");
+  matrixUcSubscriptUcExpr @173 $Cxx.name("matrix_subscript_expr");
+  memberUcExpr @174 $Cxx.name("member_expr");
+  noUcInitUcExpr @175 $Cxx.name("no_init_expr");
+  ompUcArrayUcSectionUcExpr @176 $Cxx.name("omp_array_section_expr");
+  ompUcArrayUcShapingUcExpr @177 $Cxx.name("omp_array_shaping_expr");
+  ompUcIteratorUcExpr @178 $Cxx.name("omp_iterator_expr");
+  objUcCUcArrayUcLiteral @179 $Cxx.name("obj_c_array_literal");
+  objUcCUcAvailabilityUcCheckUcExpr @180 $Cxx.name("obj_c_availability_check_expr");
+  objUcCUcBoolUcLiteralUcExpr @181 $Cxx.name("obj_c_bool_literal_expr");
+  objUcCUcBoxedUcExpr @182 $Cxx.name("obj_c_boxed_expr");
+  objUcCUcDictionaryUcLiteral @183 $Cxx.name("obj_c_dictionary_literal");
+  objUcCUcEncodeUcExpr @184 $Cxx.name("obj_c_encode_expr");
+  objUcCUcIndirectUcCopyUcRestoreUcExpr @185 $Cxx.name("obj_c_indirect_copy_restore_expr");
+  objUcCUcIsaUcExpr @186 $Cxx.name("obj_c_isa_expr");
+  objUcCUcIvarUcRefUcExpr @187 $Cxx.name("obj_c_ivar_ref_expr");
+  objUcCUcMessageUcExpr @188 $Cxx.name("obj_c_message_expr");
+  objUcCUcPropertyUcRefUcExpr @189 $Cxx.name("obj_c_property_ref_expr");
+  objUcCUcProtocolUcExpr @190 $Cxx.name("obj_c_protocol_expr");
+  objUcCUcSelectorUcExpr @191 $Cxx.name("obj_c_selector_expr");
+  objUcCUcStringUcLiteral @192 $Cxx.name("obj_c_string_literal");
+  objUcCUcSubscriptUcRefUcExpr @193 $Cxx.name("obj_c_subscript_ref_expr");
+  offsetUcOfUcExpr @194 $Cxx.name("offset_of_expr");
+  opaqueUcValueUcExpr @195 $Cxx.name("opaque_value_expr");
+  unresolvedUcLookupUcExpr @196 $Cxx.name("unresolved_lookup_expr");
+  unresolvedUcMemberUcExpr @197 $Cxx.name("unresolved_member_expr");
+  packUcExpansionUcExpr @198 $Cxx.name("pack_expansion_expr");
+  parenUcExpr @199 $Cxx.name("paren_expr");
+  parenUcListUcExpr @200 $Cxx.name("paren_list_expr");
+  predefinedUcExpr @201 $Cxx.name("predefined_expr");
+  pseudoUcObjectUcExpr @202 $Cxx.name("pseudo_object_expr");
+  recoveryUcExpr @203 $Cxx.name("recovery_expr");
+  requiresUcExpr @204 $Cxx.name("requires_expr");
+  syclUcUniqueUcStableUcNameUcExpr @205 $Cxx.name("sycl_unique_stable_name_expr");
+  shuffleUcVectorUcExpr @206 $Cxx.name("shuffle_vector_expr");
+  sizeUcOfUcPackUcExpr @207 $Cxx.name("size_of_pack_expr");
+  sourceUcLocUcExpr @208 $Cxx.name("source_loc_expr");
+  stmtUcExpr @209 $Cxx.name("stmt_expr");
+  stringUcLiteral @210 $Cxx.name("string_literal");
+  substUcNonUcTypeUcTemplateUcParmUcExpr @211 $Cxx.name("subst_non_type_template_parm_expr");
+  substUcNonUcTypeUcTemplateUcParmUcPackUcExpr @212 $Cxx.name("subst_non_type_template_parm_pack_expr");
+  typeUcTraitUcExpr @213 $Cxx.name("type_trait_expr");
+  typoUcExpr @214 $Cxx.name("typo_expr");
+  unaryUcExprUcOrUcTypeUcTraitUcExpr @215 $Cxx.name("unary_expr_or_type_trait_expr");
+  unaryUcOperator @216 $Cxx.name("unary_operator");
+  vaUcArgUcExpr @217 $Cxx.name("va_arg_expr");
+  labelUcStmt @218 $Cxx.name("label_stmt");
+  whileUcStmt @219 $Cxx.name("while_stmt");
+  numEnumerators @220 $Cxx.name("num_enumerators");
 }
 
 enum CapturedRegionKind @0x9c1102e218ed4271 {
-  default @0;
-  objCAtUcFinally @1;
-  openMp @2;
+  default @0 $Cxx.name("default");
+  objUcCUcAtUcFinally @1 $Cxx.name("obj_c_at_finally");
+  openUcMp @2 $Cxx.name("open_mp");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ExprObjectKind @0xf9211f9356023995 {
-  ordinary @0;
-  bitUcField @1;
-  vectorUcComponent @2;
-  objCProperty @3;
-  objCSubscript @4;
-  matrixUcComponent @5;
+  ordinary @0 $Cxx.name("ordinary");
+  bitUcField @1 $Cxx.name("bit_field");
+  vectorUcComponent @2 $Cxx.name("vector_component");
+  objUcCUcProperty @3 $Cxx.name("obj_c_property");
+  objUcCUcSubscript @4 $Cxx.name("obj_c_subscript");
+  matrixUcComponent @5 $Cxx.name("matrix_component");
+  numEnumerators @6 $Cxx.name("num_enumerators");
 }
 
 enum ExprValueKind @0xb10e40f0a807354a {
-  prValue @0;
-  lValue @1;
-  xValue @2;
+  prUcValue @0 $Cxx.name("pr_value");
+  lUcValue @1 $Cxx.name("l_value");
+  xUcValue @2 $Cxx.name("x_value");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum NonOdrUseReason @0xbc90b6da0c76be85 {
-  none @0;
-  unevaluated @1;
-  constant @2;
-  discarded @3;
+  none @0 $Cxx.name("none");
+  unevaluated @1 $Cxx.name("unevaluated");
+  constant @2 $Cxx.name("constant");
+  discarded @3 $Cxx.name("discarded");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum CastKind @0xc1c8bbecc0c79f1b {
-  dependent @0;
-  bitUcCast @1;
-  lValueUcBitUcCast @2;
-  lValueUcToRValueUcBitUcCast @3;
-  lValueUcToRValue @4;
-  noUcOperation @5;
-  baseUcToUcDerived @6;
-  derivedUcToUcBase @7;
-  uncheckedUcDerivedUcToUcBase @8;
-  dynamic @9;
-  toUcUnion @10;
-  arrayUcToUcPointerUcDecay @11;
-  functionUcToUcPointerUcDecay @12;
-  nullUcToUcPointer @13;
-  nullUcToUcMemberUcPointer @14;
-  baseUcToUcDerivedUcMemberUcPointer @15;
-  derivedUcToUcBaseUcMemberUcPointer @16;
-  memberUcPointerUcToUcBoolean @17;
-  reinterpretUcMemberUcPointer @18;
-  userUcDefinedUcConversion @19;
-  constructorUcConversion @20;
-  integralUcToUcPointer @21;
-  pointerUcToUcIntegral @22;
-  pointerUcToUcBoolean @23;
-  toUcVoid @24;
-  matrixUcCast @25;
-  vectorUcSplat @26;
-  integralUcCast @27;
-  integralUcToUcBoolean @28;
-  integralUcToUcFloating @29;
-  floatingUcToUcFixedUcPoint @30;
-  fixedUcPointUcToUcFloating @31;
-  fixedUcPointUcCast @32;
-  fixedUcPointUcToUcIntegral @33;
-  integralUcToUcFixedUcPoint @34;
-  fixedUcPointUcToUcBoolean @35;
-  floatingUcToUcIntegral @36;
-  floatingUcToUcBoolean @37;
-  booleanUcToUcSignedUcIntegral @38;
-  floatingUcCast @39;
-  cPointerUcToUcObjCPointerUcCast @40;
-  blockUcPointerUcToUcObjCPointerUcCast @41;
-  anyUcPointerUcToUcBlockUcPointerUcCast @42;
-  objCObjectLValueUcCast @43;
-  floatingUcRealUcToUcComplex @44;
-  floatingUcComplexUcToUcReal @45;
-  floatingUcComplexUcToUcBoolean @46;
-  floatingUcComplexUcCast @47;
-  floatingUcComplexUcToUcIntegralUcComplex @48;
-  integralUcRealUcToUcComplex @49;
-  integralUcComplexUcToUcReal @50;
-  integralUcComplexUcToUcBoolean @51;
-  integralUcComplexUcCast @52;
-  integralUcComplexUcToUcFloatingUcComplex @53;
-  arcProduceUcObject @54;
-  arcConsumeUcObject @55;
-  arcReclaimUcReturnedUcObject @56;
-  arcExtendUcBlockUcObject @57;
-  atomicUcToUcNonUcAtomic @58;
-  nonUcAtomicUcToUcAtomic @59;
-  copyUcAndUcAutoreleaseUcBlockUcObject @60;
-  builtinUcFnUcToUcFnUcPointer @61;
-  zeroUcToOclOpaqueUcType @62;
-  addressUcSpaceUcConversion @63;
-  intUcToOclSampler @64;
+  dependent @0 $Cxx.name("dependent");
+  bitUcCast @1 $Cxx.name("bit_cast");
+  lUcValueUcBitUcCast @2 $Cxx.name("l_value_bit_cast");
+  lUcValueUcToUcRUcValueUcBitUcCast @3 $Cxx.name("l_value_to_r_value_bit_cast");
+  lUcValueUcToUcRUcValue @4 $Cxx.name("l_value_to_r_value");
+  noUcOperation @5 $Cxx.name("no_operation");
+  baseUcToUcDerived @6 $Cxx.name("base_to_derived");
+  derivedUcToUcBase @7 $Cxx.name("derived_to_base");
+  uncheckedUcDerivedUcToUcBase @8 $Cxx.name("unchecked_derived_to_base");
+  dynamic @9 $Cxx.name("dynamic");
+  toUcUnion @10 $Cxx.name("to_union");
+  arrayUcToUcPointerUcDecay @11 $Cxx.name("array_to_pointer_decay");
+  functionUcToUcPointerUcDecay @12 $Cxx.name("function_to_pointer_decay");
+  nullUcToUcPointer @13 $Cxx.name("null_to_pointer");
+  nullUcToUcMemberUcPointer @14 $Cxx.name("null_to_member_pointer");
+  baseUcToUcDerivedUcMemberUcPointer @15 $Cxx.name("base_to_derived_member_pointer");
+  derivedUcToUcBaseUcMemberUcPointer @16 $Cxx.name("derived_to_base_member_pointer");
+  memberUcPointerUcToUcBoolean @17 $Cxx.name("member_pointer_to_boolean");
+  reinterpretUcMemberUcPointer @18 $Cxx.name("reinterpret_member_pointer");
+  userUcDefinedUcConversion @19 $Cxx.name("user_defined_conversion");
+  constructorUcConversion @20 $Cxx.name("constructor_conversion");
+  integralUcToUcPointer @21 $Cxx.name("integral_to_pointer");
+  pointerUcToUcIntegral @22 $Cxx.name("pointer_to_integral");
+  pointerUcToUcBoolean @23 $Cxx.name("pointer_to_boolean");
+  toUcVoid @24 $Cxx.name("to_void");
+  matrixUcCast @25 $Cxx.name("matrix_cast");
+  vectorUcSplat @26 $Cxx.name("vector_splat");
+  integralUcCast @27 $Cxx.name("integral_cast");
+  integralUcToUcBoolean @28 $Cxx.name("integral_to_boolean");
+  integralUcToUcFloating @29 $Cxx.name("integral_to_floating");
+  floatingUcToUcFixedUcPoint @30 $Cxx.name("floating_to_fixed_point");
+  fixedUcPointUcToUcFloating @31 $Cxx.name("fixed_point_to_floating");
+  fixedUcPointUcCast @32 $Cxx.name("fixed_point_cast");
+  fixedUcPointUcToUcIntegral @33 $Cxx.name("fixed_point_to_integral");
+  integralUcToUcFixedUcPoint @34 $Cxx.name("integral_to_fixed_point");
+  fixedUcPointUcToUcBoolean @35 $Cxx.name("fixed_point_to_boolean");
+  floatingUcToUcIntegral @36 $Cxx.name("floating_to_integral");
+  floatingUcToUcBoolean @37 $Cxx.name("floating_to_boolean");
+  booleanUcToUcSignedUcIntegral @38 $Cxx.name("boolean_to_signed_integral");
+  floatingUcCast @39 $Cxx.name("floating_cast");
+  cUcPointerUcToUcObjUcCUcPointerUcCast @40 $Cxx.name("c_pointer_to_obj_c_pointer_cast");
+  blockUcPointerUcToUcObjUcCUcPointerUcCast @41 $Cxx.name("block_pointer_to_obj_c_pointer_cast");
+  anyUcPointerUcToUcBlockUcPointerUcCast @42 $Cxx.name("any_pointer_to_block_pointer_cast");
+  objUcCUcObjectUcLUcValueUcCast @43 $Cxx.name("obj_c_object_l_value_cast");
+  floatingUcRealUcToUcComplex @44 $Cxx.name("floating_real_to_complex");
+  floatingUcComplexUcToUcReal @45 $Cxx.name("floating_complex_to_real");
+  floatingUcComplexUcToUcBoolean @46 $Cxx.name("floating_complex_to_boolean");
+  floatingUcComplexUcCast @47 $Cxx.name("floating_complex_cast");
+  floatingUcComplexUcToUcIntegralUcComplex @48 $Cxx.name("floating_complex_to_integral_complex");
+  integralUcRealUcToUcComplex @49 $Cxx.name("integral_real_to_complex");
+  integralUcComplexUcToUcReal @50 $Cxx.name("integral_complex_to_real");
+  integralUcComplexUcToUcBoolean @51 $Cxx.name("integral_complex_to_boolean");
+  integralUcComplexUcCast @52 $Cxx.name("integral_complex_cast");
+  integralUcComplexUcToUcFloatingUcComplex @53 $Cxx.name("integral_complex_to_floating_complex");
+  arcUcProduceUcObject @54 $Cxx.name("arc_produce_object");
+  arcUcConsumeUcObject @55 $Cxx.name("arc_consume_object");
+  arcUcReclaimUcReturnedUcObject @56 $Cxx.name("arc_reclaim_returned_object");
+  arcUcExtendUcBlockUcObject @57 $Cxx.name("arc_extend_block_object");
+  atomicUcToUcNonUcAtomic @58 $Cxx.name("atomic_to_non_atomic");
+  nonUcAtomicUcToUcAtomic @59 $Cxx.name("non_atomic_to_atomic");
+  copyUcAndUcAutoreleaseUcBlockUcObject @60 $Cxx.name("copy_and_autorelease_block_object");
+  builtinUcFnUcToUcFnUcPointer @61 $Cxx.name("builtin_fn_to_fn_pointer");
+  zeroUcToUcOclUcOpaqueUcType @62 $Cxx.name("zero_to_ocl_opaque_type");
+  addressUcSpaceUcConversion @63 $Cxx.name("address_space_conversion");
+  intUcToUcOclUcSampler @64 $Cxx.name("int_to_ocl_sampler");
+  numEnumerators @65 $Cxx.name("num_enumerators");
 }
 
 enum ObjCBridgeCastKind @0xfe79ee651274349f {
-  bridge @0;
-  bridgeUcTransfer @1;
-  bridgeUcRetained @2;
+  bridge @0 $Cxx.name("bridge");
+  bridgeUcTransfer @1 $Cxx.name("bridge_transfer");
+  bridgeUcRetained @2 $Cxx.name("bridge_retained");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ADLCallKind @0xc8253fdf892ab117 {
-  notAdl @0;
-  usesAdl @1;
+  notUcAdl @0 $Cxx.name("not_adl");
+  usesUcAdl @1 $Cxx.name("uses_adl");
+  numEnumerators @2 $Cxx.name("num_enumerators");
 }
 
 enum BinaryOperatorKind @0xbb08cc41f7a56597 {
-  pointerUcMemoryD @0;
-  pointerUcMemoryI @1;
-  mul @2;
-  div @3;
-  rem @4;
-  add @5;
-  sub @6;
-  shl @7;
-  shr @8;
-  cmp @9;
-  lt @10;
-  gt @11;
-  le @12;
-  ge @13;
-  eq @14;
-  ne @15;
-  and @16;
-  xor @17;
-  or @18;
-  lAnd @19;
-  lOr @20;
-  assign @21;
-  mulUcAssign @22;
-  divUcAssign @23;
-  remUcAssign @24;
-  addUcAssign @25;
-  subUcAssign @26;
-  shlUcAssign @27;
-  shrUcAssign @28;
-  andUcAssign @29;
-  xorUcAssign @30;
-  orUcAssign @31;
-  comma @32;
+  pointerUcMemoryUcD @0 $Cxx.name("pointer_memory_d");
+  pointerUcMemoryUcI @1 $Cxx.name("pointer_memory_i");
+  mul @2 $Cxx.name("mul");
+  div @3 $Cxx.name("div");
+  rem @4 $Cxx.name("rem");
+  add @5 $Cxx.name("add");
+  sub @6 $Cxx.name("sub");
+  shl @7 $Cxx.name("shl");
+  shr @8 $Cxx.name("shr");
+  cmp @9 $Cxx.name("cmp");
+  lt @10 $Cxx.name("lt");
+  gt @11 $Cxx.name("gt");
+  le @12 $Cxx.name("le");
+  ge @13 $Cxx.name("ge");
+  eq @14 $Cxx.name("eq");
+  ne @15 $Cxx.name("ne");
+  and @16 $Cxx.name("and");
+  xor @17 $Cxx.name("xor");
+  or @18 $Cxx.name("or");
+  lUcAnd @19 $Cxx.name("l_and");
+  lUcOr @20 $Cxx.name("l_or");
+  assign @21 $Cxx.name("assign");
+  mulUcAssign @22 $Cxx.name("mul_assign");
+  divUcAssign @23 $Cxx.name("div_assign");
+  remUcAssign @24 $Cxx.name("rem_assign");
+  addUcAssign @25 $Cxx.name("add_assign");
+  subUcAssign @26 $Cxx.name("sub_assign");
+  shlUcAssign @27 $Cxx.name("shl_assign");
+  shrUcAssign @28 $Cxx.name("shr_assign");
+  andUcAssign @29 $Cxx.name("and_assign");
+  xorUcAssign @30 $Cxx.name("xor_assign");
+  orUcAssign @31 $Cxx.name("or_assign");
+  comma @32 $Cxx.name("comma");
+  numEnumerators @33 $Cxx.name("num_enumerators");
 }
 
 enum InitializationStyle @0x8ec30c1abc0c19a6 {
-  cInit @0;
-  callUcInitializer @1;
-  listUcInitializer @2;
+  cUcInit @0 $Cxx.name("c_init");
+  callUcInitializer @1 $Cxx.name("call_initializer");
+  listUcInitializer @2 $Cxx.name("list_initializer");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ConstructionKind @0xda989eff233a33e2 {
-  complete @0;
-  nonUcVirtualUcBase @1;
-  virtualUcBase @2;
-  delegating @3;
+  complete @0 $Cxx.name("complete");
+  nonUcVirtualUcBase @1 $Cxx.name("non_virtual_base");
+  virtualUcBase @2 $Cxx.name("virtual_base");
+  delegating @3 $Cxx.name("delegating");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum ArrayTypeTrait @0xd6960ffdc6f9f29f {
-  arrayUcRank @0;
-  arrayUcExtent @1;
+  arrayUcRank @0 $Cxx.name("array_rank");
+  arrayUcExtent @1 $Cxx.name("array_extent");
+  numEnumerators @2 $Cxx.name("num_enumerators");
 }
 
 enum UnaryOperatorKind @0xd9e4cf844656d8e6 {
-  postUcIncrement @0;
-  postUcDec @1;
-  preUcIncrement @2;
-  preUcDec @3;
-  addrUcOf @4;
-  deref @5;
-  plus @6;
-  minus @7;
-  not @8;
-  lNot @9;
-  real @10;
-  imag @11;
-  extension @12;
-  coawait @13;
+  postUcIncrement @0 $Cxx.name("post_increment");
+  postUcDec @1 $Cxx.name("post_dec");
+  preUcIncrement @2 $Cxx.name("pre_increment");
+  preUcDec @3 $Cxx.name("pre_dec");
+  addrUcOf @4 $Cxx.name("addr_of");
+  deref @5 $Cxx.name("deref");
+  plus @6 $Cxx.name("plus");
+  minus @7 $Cxx.name("minus");
+  not @8 $Cxx.name("not");
+  lUcNot @9 $Cxx.name("l_not");
+  real @10 $Cxx.name("real");
+  imag @11 $Cxx.name("imag");
+  extension @12 $Cxx.name("extension");
+  coawait @13 $Cxx.name("coawait");
+  numEnumerators @14 $Cxx.name("num_enumerators");
 }
 
 enum TypeTrait @0xf7e0a1b4b1fe1e7a {
-  isUcInterfaceUcClass @0;
-  isUcSealed @1;
-  isUcDestructible @2;
-  isUcTriviallyUcDestructible @3;
-  isUcNothrowUcDestructible @4;
-  hasUcNothrowUcMoveUcAssign @5;
-  hasUcTrivialUcMoveUcAssign @6;
-  hasUcTrivialUcMoveUcConstructor @7;
-  hasUcNothrowUcAssign @8;
-  hasUcNothrowUcCopy @9;
-  hasUcNothrowUcConstructor @10;
-  hasUcTrivialUcAssign @11;
-  hasUcTrivialUcCopy @12;
-  hasUcTrivialUcDefaultUcConstructor @13;
-  hasUcTrivialUcDestructor @14;
-  hasUcVirtualUcDestructor @15;
-  isUcAbstract @16;
-  isUcAggregate @17;
-  isUcClass @18;
-  isUcEmpty @19;
-  isUcEnum @20;
-  isUcFinal @21;
-  isUcLiteral @22;
-  isPod @23;
-  isUcPolymorphic @24;
-  isUcStandardUcLayout @25;
-  isUcTrivial @26;
-  isUcTriviallyUcCopyable @27;
-  isUcUnion @28;
-  hasUcUniqueUcObjectUcRepresentations @29;
-  isUcArithmetic @30;
-  isUcFloatingUcPoint @31;
-  isUcIntegral @32;
-  isUcCompleteUcType @33;
-  isUcVoid @34;
-  isUcArray @35;
-  isUcFunction @36;
-  isUcReference @37;
-  isUcLvalueUcReference @38;
-  isUcRvalueUcReference @39;
-  isUcFundamental @40;
-  isUcObject @41;
-  isUcScalar @42;
-  isUcCompound @43;
-  isUcPointer @44;
-  isUcMemberUcObjectUcPointer @45;
-  isUcMemberUcFunctionUcPointer @46;
-  isUcMemberUcPointer @47;
-  isUcConst @48;
-  isUcVolatile @49;
-  isUcSigned @50;
-  isUcUnsigned @51;
-  typeUcCompatible @52;
-  isUcNothrowUcAssignable @53;
-  isUcAssignable @54;
-  isUcBaseUcOf @55;
-  isUcConvertibleUcTo @56;
-  isUcTriviallyUcAssignable @57;
-  referenceUcBindsUcToUcTemporary @58;
-  isUcSame @59;
-  isUcConvertible @60;
-  isUcConstructible @61;
-  isUcNothrowUcConstructible @62;
-  isUcTriviallyUcConstructible @63;
+  isUcInterfaceUcClass @0 $Cxx.name("is_interface_class");
+  isUcSealed @1 $Cxx.name("is_sealed");
+  isUcDestructible @2 $Cxx.name("is_destructible");
+  isUcTriviallyUcDestructible @3 $Cxx.name("is_trivially_destructible");
+  isUcNothrowUcDestructible @4 $Cxx.name("is_nothrow_destructible");
+  hasUcNothrowUcMoveUcAssign @5 $Cxx.name("has_nothrow_move_assign");
+  hasUcTrivialUcMoveUcAssign @6 $Cxx.name("has_trivial_move_assign");
+  hasUcTrivialUcMoveUcConstructor @7 $Cxx.name("has_trivial_move_constructor");
+  hasUcNothrowUcAssign @8 $Cxx.name("has_nothrow_assign");
+  hasUcNothrowUcCopy @9 $Cxx.name("has_nothrow_copy");
+  hasUcNothrowUcConstructor @10 $Cxx.name("has_nothrow_constructor");
+  hasUcTrivialUcAssign @11 $Cxx.name("has_trivial_assign");
+  hasUcTrivialUcCopy @12 $Cxx.name("has_trivial_copy");
+  hasUcTrivialUcDefaultUcConstructor @13 $Cxx.name("has_trivial_default_constructor");
+  hasUcTrivialUcDestructor @14 $Cxx.name("has_trivial_destructor");
+  hasUcVirtualUcDestructor @15 $Cxx.name("has_virtual_destructor");
+  isUcAbstract @16 $Cxx.name("is_abstract");
+  isUcAggregate @17 $Cxx.name("is_aggregate");
+  isUcClass @18 $Cxx.name("is_class");
+  isUcEmpty @19 $Cxx.name("is_empty");
+  isUcEnum @20 $Cxx.name("is_enum");
+  isUcFinal @21 $Cxx.name("is_final");
+  isUcLiteral @22 $Cxx.name("is_literal");
+  isUcPod @23 $Cxx.name("is_pod");
+  isUcPolymorphic @24 $Cxx.name("is_polymorphic");
+  isUcStandardUcLayout @25 $Cxx.name("is_standard_layout");
+  isUcTrivial @26 $Cxx.name("is_trivial");
+  isUcTriviallyUcCopyable @27 $Cxx.name("is_trivially_copyable");
+  isUcUnion @28 $Cxx.name("is_union");
+  hasUcUniqueUcObjectUcRepresentations @29 $Cxx.name("has_unique_object_representations");
+  isUcArithmetic @30 $Cxx.name("is_arithmetic");
+  isUcFloatingUcPoint @31 $Cxx.name("is_floating_point");
+  isUcIntegral @32 $Cxx.name("is_integral");
+  isUcCompleteUcType @33 $Cxx.name("is_complete_type");
+  isUcVoid @34 $Cxx.name("is_void");
+  isUcArray @35 $Cxx.name("is_array");
+  isUcFunction @36 $Cxx.name("is_function");
+  isUcReference @37 $Cxx.name("is_reference");
+  isUcLvalueUcReference @38 $Cxx.name("is_lvalue_reference");
+  isUcRvalueUcReference @39 $Cxx.name("is_rvalue_reference");
+  isUcFundamental @40 $Cxx.name("is_fundamental");
+  isUcObject @41 $Cxx.name("is_object");
+  isUcScalar @42 $Cxx.name("is_scalar");
+  isUcCompound @43 $Cxx.name("is_compound");
+  isUcPointer @44 $Cxx.name("is_pointer");
+  isUcMemberUcObjectUcPointer @45 $Cxx.name("is_member_object_pointer");
+  isUcMemberUcFunctionUcPointer @46 $Cxx.name("is_member_function_pointer");
+  isUcMemberUcPointer @47 $Cxx.name("is_member_pointer");
+  isUcConst @48 $Cxx.name("is_const");
+  isUcVolatile @49 $Cxx.name("is_volatile");
+  isUcSigned @50 $Cxx.name("is_signed");
+  isUcUnsigned @51 $Cxx.name("is_unsigned");
+  typeUcCompatible @52 $Cxx.name("type_compatible");
+  isUcNothrowUcAssignable @53 $Cxx.name("is_nothrow_assignable");
+  isUcAssignable @54 $Cxx.name("is_assignable");
+  isUcBaseUcOf @55 $Cxx.name("is_base_of");
+  isUcConvertibleUcTo @56 $Cxx.name("is_convertible_to");
+  isUcTriviallyUcAssignable @57 $Cxx.name("is_trivially_assignable");
+  referenceUcBindsUcToUcTemporary @58 $Cxx.name("reference_binds_to_temporary");
+  isUcSame @59 $Cxx.name("is_same");
+  isUcConvertible @60 $Cxx.name("is_convertible");
+  isUcConstructible @61 $Cxx.name("is_constructible");
+  isUcNothrowUcConstructible @62 $Cxx.name("is_nothrow_constructible");
+  isUcTriviallyUcConstructible @63 $Cxx.name("is_trivially_constructible");
+  numEnumerators @64 $Cxx.name("num_enumerators");
 }
 
 enum APValueKind @0xcb98d416d4611f2f {
-  none @0;
-  indeterminate @1;
-  int @2;
-  float @3;
-  fixedUcPoint @4;
-  complexUcInt @5;
-  complexUcFloat @6;
-  lValue @7;
-  vector @8;
-  array @9;
-  struct @10;
-  union @11;
-  memberUcPointer @12;
-  addrUcLabelUcDiff @13;
+  none @0 $Cxx.name("none");
+  indeterminate @1 $Cxx.name("indeterminate");
+  int @2 $Cxx.name("int");
+  float @3 $Cxx.name("float");
+  fixedUcPoint @4 $Cxx.name("fixed_point");
+  complexUcInt @5 $Cxx.name("complex_int");
+  complexUcFloat @6 $Cxx.name("complex_float");
+  lUcValue @7 $Cxx.name("l_value");
+  vector @8 $Cxx.name("vector");
+  array @9 $Cxx.name("array");
+  struct @10 $Cxx.name("struct");
+  union @11 $Cxx.name("union");
+  memberUcPointer @12 $Cxx.name("member_pointer");
+  addrUcLabelUcDiff @13 $Cxx.name("addr_label_diff");
+  numEnumerators @14 $Cxx.name("num_enumerators");
 }
 
 enum ResultStorageKind @0xbb78b2b258534591 {
-  none @0;
-  int64 @1;
-  apValue @2;
+  none @0 $Cxx.name("none");
+  int64 @1 $Cxx.name("int64");
+  apUcValue @2 $Cxx.name("ap_value");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum ExpressionTrait @0xc0206beabf974c92 {
-  isLValueUcExpression @0;
-  isRValueUcExpression @1;
+  isUcLUcValueUcExpression @0 $Cxx.name("is_l_value_expression");
+  isUcRUcValueUcExpression @1 $Cxx.name("is_r_value_expression");
+  numEnumerators @2 $Cxx.name("num_enumerators");
 }
 
 enum TypeDependence @0xcba0ba47ac5b69e3 {
-  unexpandedUcPack @0;
-  instantiation @1;
-  dependent @2;
-  variablyUcModified @3;
-  error @4;
-  none @5;
-  all @6;
-  dependentUcInstantiation @7;
+  unexpandedUcPack @0 $Cxx.name("unexpanded_pack");
+  instantiation @1 $Cxx.name("instantiation");
+  dependent @2 $Cxx.name("dependent");
+  variablyUcModified @3 $Cxx.name("variably_modified");
+  error @4 $Cxx.name("error");
+  none @5 $Cxx.name("none");
+  all @6 $Cxx.name("all");
+  dependentUcInstantiation @7 $Cxx.name("dependent_instantiation");
+  numEnumerators @8 $Cxx.name("num_enumerators");
 }
 
 enum ObjCLifetime @0xa408eab661edd8cd {
-  none @0;
-  explicitUcNone @1;
-  strong @2;
-  weak @3;
-  autoreleasing @4;
+  none @0 $Cxx.name("none");
+  explicitUcNone @1 $Cxx.name("explicit_none");
+  strong @2 $Cxx.name("strong");
+  weak @3 $Cxx.name("weak");
+  autoreleasing @4 $Cxx.name("autoreleasing");
+  numEnumerators @5 $Cxx.name("num_enumerators");
 }
 
 enum ScalarTypeKind @0xdacaafd6791835aa {
-  cPointer @0;
-  blockUcPointer @1;
-  objCObjectUcPointer @2;
-  memberUcPointer @3;
-  boolean @4;
-  integral @5;
-  floating @6;
-  integralUcComplex @7;
-  floatingUcComplex @8;
-  fixedUcPoint @9;
+  cUcPointer @0 $Cxx.name("c_pointer");
+  blockUcPointer @1 $Cxx.name("block_pointer");
+  objUcCUcObjectUcPointer @2 $Cxx.name("obj_c_object_pointer");
+  memberUcPointer @3 $Cxx.name("member_pointer");
+  boolean @4 $Cxx.name("boolean");
+  integral @5 $Cxx.name("integral");
+  floating @6 $Cxx.name("floating");
+  integralUcComplex @7 $Cxx.name("integral_complex");
+  floatingUcComplex @8 $Cxx.name("floating_complex");
+  fixedUcPoint @9 $Cxx.name("fixed_point");
+  numEnumerators @10 $Cxx.name("num_enumerators");
 }
 
 enum TypeKind @0x8eb229be4c525aa3 {
-  adjusted @0;
-  decayed @1;
-  constantUcArray @2;
-  dependentUcSizedUcArray @3;
-  incompleteUcArray @4;
-  variableUcArray @5;
-  atomic @6;
-  attributed @7;
-  blockUcPointer @8;
-  builtin @9;
-  complex @10;
-  decltype @11;
-  auto @12;
-  deducedUcTemplateUcSpecialization @13;
-  dependentUcAddressUcSpace @14;
-  dependentUcExtUcInt @15;
-  dependentUcName @16;
-  dependentUcSizedUcExtUcVector @17;
-  dependentUcTemplateUcSpecialization @18;
-  dependentUcVector @19;
-  elaborated @20;
-  extUcInt @21;
-  functionUcNoUcProto @22;
-  functionUcProto @23;
-  injectedUcClassUcName @24;
-  macroUcQualified @25;
-  constantUcMatrix @26;
-  dependentUcSizedUcMatrix @27;
-  memberUcPointer @28;
-  objCObjectUcPointer @29;
-  objCObject @30;
-  objCInterface @31;
-  objCTypeUcParam @32;
-  packUcExpansion @33;
-  paren @34;
-  pipe @35;
-  pointer @36;
-  lValueUcReference @37;
-  rValueUcReference @38;
-  substUcTemplateUcTypeUcParmUcPack @39;
-  substUcTemplateUcTypeUcParm @40;
-  enum @41;
-  record @42;
-  templateUcSpecialization @43;
-  templateUcTypeUcParm @44;
-  typeUcOfUcExpr @45;
-  typeUcOf @46;
-  typedef @47;
-  unaryUcTransform @48;
-  unresolvedUcUsing @49;
-  vector @50;
-  extUcVector @51;
+  adjusted @0 $Cxx.name("adjusted");
+  decayed @1 $Cxx.name("decayed");
+  constantUcArray @2 $Cxx.name("constant_array");
+  dependentUcSizedUcArray @3 $Cxx.name("dependent_sized_array");
+  incompleteUcArray @4 $Cxx.name("incomplete_array");
+  variableUcArray @5 $Cxx.name("variable_array");
+  atomic @6 $Cxx.name("atomic");
+  attributed @7 $Cxx.name("attributed");
+  blockUcPointer @8 $Cxx.name("block_pointer");
+  builtin @9 $Cxx.name("builtin");
+  complex @10 $Cxx.name("complex");
+  decltype @11 $Cxx.name("decltype");
+  auto @12 $Cxx.name("auto");
+  deducedUcTemplateUcSpecialization @13 $Cxx.name("deduced_template_specialization");
+  dependentUcAddressUcSpace @14 $Cxx.name("dependent_address_space");
+  dependentUcExtUcInt @15 $Cxx.name("dependent_ext_int");
+  dependentUcName @16 $Cxx.name("dependent_name");
+  dependentUcSizedUcExtUcVector @17 $Cxx.name("dependent_sized_ext_vector");
+  dependentUcTemplateUcSpecialization @18 $Cxx.name("dependent_template_specialization");
+  dependentUcVector @19 $Cxx.name("dependent_vector");
+  elaborated @20 $Cxx.name("elaborated");
+  extUcInt @21 $Cxx.name("ext_int");
+  functionUcNoUcProto @22 $Cxx.name("function_no_proto");
+  functionUcProto @23 $Cxx.name("function_proto");
+  injectedUcClassUcName @24 $Cxx.name("injected_class_name");
+  macroUcQualified @25 $Cxx.name("macro_qualified");
+  constantUcMatrix @26 $Cxx.name("constant_matrix");
+  dependentUcSizedUcMatrix @27 $Cxx.name("dependent_sized_matrix");
+  memberUcPointer @28 $Cxx.name("member_pointer");
+  objUcCUcObjectUcPointer @29 $Cxx.name("obj_c_object_pointer");
+  objUcCUcObject @30 $Cxx.name("obj_c_object");
+  objUcCUcInterface @31 $Cxx.name("obj_c_interface");
+  objUcCUcTypeUcParam @32 $Cxx.name("obj_c_type_param");
+  packUcExpansion @33 $Cxx.name("pack_expansion");
+  paren @34 $Cxx.name("paren");
+  pipe @35 $Cxx.name("pipe");
+  pointer @36 $Cxx.name("pointer");
+  lUcValueUcReference @37 $Cxx.name("l_value_reference");
+  rUcValueUcReference @38 $Cxx.name("r_value_reference");
+  substUcTemplateUcTypeUcParmUcPack @39 $Cxx.name("subst_template_type_parm_pack");
+  substUcTemplateUcTypeUcParm @40 $Cxx.name("subst_template_type_parm");
+  enum @41 $Cxx.name("enum");
+  record @42 $Cxx.name("record");
+  templateUcSpecialization @43 $Cxx.name("template_specialization");
+  templateUcTypeUcParm @44 $Cxx.name("template_type_parm");
+  typeUcOfUcExpr @45 $Cxx.name("type_of_expr");
+  typeUcOf @46 $Cxx.name("type_of");
+  typedef @47 $Cxx.name("typedef");
+  unaryUcTransform @48 $Cxx.name("unary_transform");
+  unresolvedUcUsing @49 $Cxx.name("unresolved_using");
+  vector @50 $Cxx.name("vector");
+  extUcVector @51 $Cxx.name("ext_vector");
+  numEnumerators @52 $Cxx.name("num_enumerators");
 }
 
 enum LangAS @0xbe9184d23b40adbf {
-  default @0;
-  openclUcGlobal @1;
-  openclUcLocal @2;
-  openclUcConstant @3;
-  openclUcPrivate @4;
-  openclUcGeneric @5;
-  openclUcGlobalUcDevice @6;
-  openclUcGlobalUcHost @7;
-  cudaUcDevice @8;
-  cudaUcConstant @9;
-  cudaUcShared @10;
-  syclUcGlobal @11;
-  syclUcGlobalUcDevice @12;
-  syclUcGlobalUcHost @13;
-  syclUcLocal @14;
-  syclUcPrivate @15;
-  ptr32UcSptr @16;
-  ptr32UcUptr @17;
-  ptr64 @18;
+  default @0 $Cxx.name("default");
+  openclUcGlobal @1 $Cxx.name("opencl_global");
+  openclUcLocal @2 $Cxx.name("opencl_local");
+  openclUcConstant @3 $Cxx.name("opencl_constant");
+  openclUcPrivate @4 $Cxx.name("opencl_private");
+  openclUcGeneric @5 $Cxx.name("opencl_generic");
+  openclUcGlobalUcDevice @6 $Cxx.name("opencl_global_device");
+  openclUcGlobalUcHost @7 $Cxx.name("opencl_global_host");
+  cudaUcDevice @8 $Cxx.name("cuda_device");
+  cudaUcConstant @9 $Cxx.name("cuda_constant");
+  cudaUcShared @10 $Cxx.name("cuda_shared");
+  syclUcGlobal @11 $Cxx.name("sycl_global");
+  syclUcGlobalUcDevice @12 $Cxx.name("sycl_global_device");
+  syclUcGlobalUcHost @13 $Cxx.name("sycl_global_host");
+  syclUcLocal @14 $Cxx.name("sycl_local");
+  syclUcPrivate @15 $Cxx.name("sycl_private");
+  ptr32UcSptr @16 $Cxx.name("ptr32_sptr");
+  ptr32UcUptr @17 $Cxx.name("ptr32_uptr");
+  ptr64 @18 $Cxx.name("ptr64");
+  numEnumerators @19 $Cxx.name("num_enumerators");
 }
 
 enum PrimitiveCopyKind @0xd987c4779543007c {
-  trivial @0;
-  volatileUcTrivial @1;
-  arcStrong @2;
-  arcWeak @3;
-  struct @4;
+  trivial @0 $Cxx.name("trivial");
+  volatileUcTrivial @1 $Cxx.name("volatile_trivial");
+  arcUcStrong @2 $Cxx.name("arc_strong");
+  arcUcWeak @3 $Cxx.name("arc_weak");
+  struct @4 $Cxx.name("struct");
+  numEnumerators @5 $Cxx.name("num_enumerators");
 }
 
 enum PrimitiveDefaultInitializeKind @0x8939975a5b04dbb3 {
-  trivial @0;
-  arcStrong @1;
-  arcWeak @2;
-  struct @3;
+  trivial @0 $Cxx.name("trivial");
+  arcUcStrong @1 $Cxx.name("arc_strong");
+  arcUcWeak @2 $Cxx.name("arc_weak");
+  struct @3 $Cxx.name("struct");
+  numEnumerators @4 $Cxx.name("num_enumerators");
 }
 
 enum CallingConv @0xfc49dab6441b4ebd {
-  c @0;
-  x86UcStdUcCall @1;
-  x86UcFastUcCall @2;
-  x86UcThisUcCall @3;
-  x86UcVectorUcCall @4;
-  x86UcPascal @5;
-  win64 @6;
-  x8664UcSysV @7;
-  x86UcRegUcCall @8;
-  aapcs @9;
-  aapcsvfp @10;
-  intelUcOclUcBicc @11;
-  spirUcFunction @12;
-  openClKernel @13;
-  swift @14;
-  swiftUcAsync @15;
-  preserveUcMost @16;
-  preserveUcAll @17;
-  aArch64UcVectorUcCall @18;
+  c @0 $Cxx.name("c");
+  x86UcStdUcCall @1 $Cxx.name("x86_std_call");
+  x86UcFastUcCall @2 $Cxx.name("x86_fast_call");
+  x86UcThisUcCall @3 $Cxx.name("x86_this_call");
+  x86UcVectorUcCall @4 $Cxx.name("x86_vector_call");
+  x86UcPascal @5 $Cxx.name("x86_pascal");
+  win64 @6 $Cxx.name("win64");
+  x8664UcSysUcV @7 $Cxx.name("x8664_sys_v");
+  x86UcRegUcCall @8 $Cxx.name("x86_reg_call");
+  aapcs @9 $Cxx.name("aapcs");
+  aapcsvfp @10 $Cxx.name("aapcsvfp");
+  intelUcOclUcBicc @11 $Cxx.name("intel_ocl_bicc");
+  spirUcFunction @12 $Cxx.name("spir_function");
+  openUcClUcKernel @13 $Cxx.name("open_cl_kernel");
+  swift @14 $Cxx.name("swift");
+  swiftUcAsync @15 $Cxx.name("swift_async");
+  preserveUcMost @16 $Cxx.name("preserve_most");
+  preserveUcAll @17 $Cxx.name("preserve_all");
+  aUcArch64UcVectorUcCall @18 $Cxx.name("a_arch64_vector_call");
+  numEnumerators @19 $Cxx.name("num_enumerators");
 }
 
 enum CanThrowResult @0xade719c14c0fa1a7 {
-  cannot @0;
-  dependent @1;
-  can @2;
+  cannot @0 $Cxx.name("cannot");
+  dependent @1 $Cxx.name("dependent");
+  can @2 $Cxx.name("can");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum VectorKind @0xa2946b86ad43cc82 {
-  genericUcVector @0;
-  altiUcVecUcVector @1;
-  altiUcVecUcPixel @2;
-  altiUcVecUcBoolean @3;
-  neonUcVector @4;
-  neonUcPolyUcVector @5;
-  sveUcFixedUcLengthUcDataUcVector @6;
-  sveUcFixedUcLengthUcPredicateUcVector @7;
+  genericUcVector @0 $Cxx.name("generic_vector");
+  altiUcVecUcVector @1 $Cxx.name("alti_vec_vector");
+  altiUcVecUcPixel @2 $Cxx.name("alti_vec_pixel");
+  altiUcVecUcBoolean @3 $Cxx.name("alti_vec_boolean");
+  neonUcVector @4 $Cxx.name("neon_vector");
+  neonUcPolyUcVector @5 $Cxx.name("neon_poly_vector");
+  sveUcFixedUcLengthUcDataUcVector @6 $Cxx.name("sve_fixed_length_data_vector");
+  sveUcFixedUcLengthUcPredicateUcVector @7 $Cxx.name("sve_fixed_length_predicate_vector");
+  numEnumerators @8 $Cxx.name("num_enumerators");
 }
 
 enum AutoTypeKeyword @0x8f3df89531320c02 {
-  auto @0;
-  decltypeUcAuto @1;
-  gnuAutoUcType @2;
+  auto @0 $Cxx.name("auto");
+  decltypeUcAuto @1 $Cxx.name("decltype_auto");
+  gnuUcAutoUcType @2 $Cxx.name("gnu_auto_type");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum AttributeKind @0xea12979c4469acdf {
-  addressUcSpace @0;
-  armUcMveUcStrictUcPolymorphism @1;
-  cmseNsCall @2;
-  noUcDeref @3;
-  objCgc @4;
-  objCInertUcUnsafeUcUnretained @5;
-  objCKindUcOf @6;
-  openClConstantUcAddressUcSpace @7;
-  openClGenericUcAddressUcSpace @8;
-  openClGlobalUcAddressUcSpace @9;
-  openClGlobalUcDeviceUcAddressUcSpace @10;
-  openClGlobalUcHostUcAddressUcSpace @11;
-  openClLocalUcAddressUcSpace @12;
-  openClPrivateUcAddressUcSpace @13;
-  ptr32 @14;
-  ptr64 @15;
-  sPtr @16;
-  typeUcNonUcNull @17;
-  typeUcNullUcUnspecified @18;
-  typeUcNullable @19;
-  typeUcNullableUcResult @20;
-  uPtr @21;
-  fallUcThrough @22;
-  likely @23;
-  mustUcTail @24;
-  openClUnrollUcHint @25;
-  suppress @26;
-  unlikely @27;
-  noUcMerge @28;
-  aArch64UcVectorUcPcs @29;
-  acquireUcHandle @30;
-  anyX86UcNoUcCfUcCheck @31;
-  cDecl @32;
-  fastUcCall @33;
-  intelUcOclUcBicc @34;
-  lifetimeUcBound @35;
-  msabi @36;
-  nsReturnsUcRetained @37;
-  objCOwnership @38;
-  pascal @39;
-  pcs @40;
-  preserveUcAll @41;
-  preserveUcMost @42;
-  regUcCall @43;
-  stdUcCall @44;
-  swiftUcAsyncUcCall @45;
-  swiftUcCall @46;
-  sysVabi @47;
-  thisUcCall @48;
-  vectorUcCall @49;
-  swiftUcAsyncUcContext @50;
-  swiftUcContext @51;
-  swiftUcErrorUcResult @52;
-  swiftUcIndirectUcResult @53;
-  annotate @54;
-  cfConsumed @55;
-  carriesUcDependency @56;
-  nsConsumed @57;
-  nonUcNull @58;
-  osConsumed @59;
-  passUcObjectUcSize @60;
-  releaseUcHandle @61;
-  useUcHandle @62;
-  amdgpuFlatUcWorkUcGroupUcSize @63;
-  amdgpuNumSgpr @64;
-  amdgpuNumVgpr @65;
-  amdgpuWavesUcPerEu @66;
-  armInterrupt @67;
-  avrInterrupt @68;
-  avrSignal @69;
-  acquireUcCapability @70;
-  acquiredUcAfter @71;
-  acquiredUcBefore @72;
-  alignUcMac68k @73;
-  alignUcNatural @74;
-  aligned @75;
-  allocUcAlign @76;
-  allocUcSize @77;
-  alwaysUcDestroy @78;
-  alwaysUcInline @79;
-  analyzerUcNoUcReturn @80;
-  anyX86UcInterrupt @81;
-  anyX86UcNoUcCallerUcSavedUcRegisters @82;
-  arcUcWeakrefUcUnavailable @83;
-  argumentUcWithUcTypeUcTag @84;
-  armUcBuiltinUcAlias @85;
-  artificial @86;
-  assemblyUcLabel @87;
-  assertUcCapability @88;
-  assertUcExclusiveUcLock @89;
-  assertUcSharedUcLock @90;
-  assumeUcAligned @91;
-  assumption @92;
-  availability @93;
-  bpfPreserveUcAccessUcIndex @94;
-  blocks @95;
-  builtin @96;
-  c11UcNoUcReturn @97;
-  cfAuditedUcTransfer @98;
-  cfGuard @99;
-  cfiCanonicalUcJumpUcTable @100;
-  cfReturnsUcNotUcRetained @101;
-  cfReturnsUcRetained @102;
-  cfUnknownUcTransfer @103;
-  cpuDispatch @104;
-  cpuSpecific @105;
-  cudaConstant @106;
-  cudaDevice @107;
-  cudaDeviceUcBuiltinUcSurfaceUcType @108;
-  cudaDeviceUcBuiltinUcTextureUcType @109;
-  cudaGlobal @110;
-  cudaHost @111;
-  cudaInvalidUcTarget @112;
-  cudaLaunchUcBounds @113;
-  cudaShared @114;
-  cxx11UcNoUcReturn @115;
-  callableUcWhen @116;
-  callback @117;
-  capability @118;
-  capturedUcRecord @119;
-  cleanup @120;
-  cmseNsEntry @121;
-  codeUcSeg @122;
-  cold @123;
-  common @124;
-  const @125;
-  constUcInitializer @126;
-  constructor @127;
-  consumable @128;
-  consumableUcAutoUcCast @129;
-  consumableUcSetUcOnUcRead @130;
-  convergent @131;
-  dllExport @132;
-  dllExportUcStaticUcLocal @133;
-  dllImport @134;
-  dllImportUcStaticUcLocal @135;
-  deprecated @136;
-  destructor @137;
-  diagnoseUcIf @138;
-  disableUcTailUcCalls @139;
-  emptyUcBases @140;
-  enableUcIf @141;
-  enforceTcb @142;
-  enforceTcbLeaf @143;
-  enumUcExtensibility @144;
-  excludeUcFromUcExplicitUcInstantiation @145;
-  exclusiveUcTrylockUcFunction @146;
-  externalUcSourceUcSymbol @147;
-  final @148;
-  flagUcEnum @149;
-  flatten @150;
-  format @151;
-  formatUcArgument @152;
-  gnuInline @153;
-  guardedUcBy @154;
-  guardedUcVariable @155;
-  hipManaged @156;
-  hot @157;
-  ibAction @158;
-  ibOutlet @159;
-  ibOutletUcCollection @160;
-  initializerUcPriority @161;
-  internalUcLinkage @162;
-  ltoVisibilityUcPublic @163;
-  layoutUcVersion @164;
-  leaf @165;
-  lockUcReturned @166;
-  locksUcExcluded @167;
-  m68kUcInterrupt @168;
-  migServerUcRoutine @169;
-  msAllocator @170;
-  msInheritance @171;
-  msNoVTable @172;
-  msp430UcInterrupt @173;
-  msStruct @174;
-  msVtorUcDisp @175;
-  maxUcFieldUcAlignment @176;
-  mayUcAlias @177;
-  microUcMips @178;
-  minUcSize @179;
-  minUcVectorUcWidth @180;
-  mips16 @181;
-  mipsUcInterrupt @182;
-  mipsUcLongUcCall @183;
-  mipsUcShortUcCall @184;
-  nsConsumesUcSelf @185;
-  nsErrorUcDomain @186;
-  nsReturnsUcAutoreleased @187;
-  nsReturnsUcNotUcRetained @188;
-  naked @189;
-  noUcAlias @190;
-  noUcCommon @191;
-  noUcDebug @192;
-  noUcDestroy @193;
-  noUcDuplicate @194;
-  noUcInline @195;
-  noUcInstrumentUcFunction @196;
-  noUcMicroUcMips @197;
-  noUcMips16 @198;
-  noUcProfileUcFunction @199;
-  noUcReturn @200;
-  noUcSanitize @201;
-  noUcSpeculativeUcLoadUcHardening @202;
-  noUcSplitUcStack @203;
-  noUcStackUcProtector @204;
-  noUcThreadUcSafetyUcAnalysis @205;
-  noUcThrow @206;
-  noUcUniqueUcAddress @207;
-  notUcTailUcCalled @208;
-  ompAllocateUcDeclaration @209;
-  ompCaptureUcNoUcInitializer @210;
-  ompDeclareUcTargetUcDeclaration @211;
-  ompDeclareUcVariant @212;
-  ompThreadUcPrivateUcDeclaration @213;
-  osConsumesUcThis @214;
-  osReturnsUcNotUcRetained @215;
-  osReturnsUcRetained @216;
-  osReturnsUcRetainedUcOnUcNonUcZero @217;
-  osReturnsUcRetainedUcOnUcZero @218;
-  objCBridge @219;
-  objCBridgeUcMutable @220;
-  objCBridgeUcRelated @221;
-  objCException @222;
-  objCExplicitUcProtocolUcImplementation @223;
-  objCExternallyUcRetained @224;
-  objCIndependentUcClass @225;
-  objCMethodUcFamily @226;
-  objCnsObject @227;
-  objCPreciseUcLifetime @228;
-  objCRequiresUcPropertyUcDefinitions @229;
-  objCRequiresUcSuper @230;
-  objCReturnsUcInnerUcPointer @231;
-  objCRootUcClass @232;
-  objCSubclassingUcRestricted @233;
-  openClIntelUcReqdUcSubUcGroupUcSize @234;
-  openClKernel @235;
-  optimizeUcNone @236;
-  override @237;
-  owner @238;
-  ownership @239;
-  packed @240;
-  paramUcTypestate @241;
-  patchableUcFunctionUcEntry @242;
-  pointer @243;
-  pragmaUcClangBssSection @244;
-  pragmaUcClangUcDataUcSection @245;
-  pragmaUcClangUcRelroUcSection @246;
-  pragmaUcClangUcRodataUcSection @247;
-  pragmaUcClangUcTextUcSection @248;
-  preferredUcName @249;
-  ptUcGuardedUcBy @250;
-  ptUcGuardedUcVariable @251;
-  pure @252;
-  riscvInterrupt @253;
-  reinitializes @254;
-  releaseUcCapability @255;
-  reqdUcWorkUcGroupUcSize @256;
-  requiresUcCapability @257;
-  restrict @258;
-  retain @259;
-  returnUcTypestate @260;
-  returnsUcNonUcNull @261;
-  returnsUcTwice @262;
-  syclKernel @263;
-  scopedUcLockable @264;
-  section @265;
-  selectUcAny @266;
-  sentinel @267;
-  setUcTypestate @268;
-  sharedUcTrylockUcFunction @269;
-  speculativeUcLoadUcHardening @270;
-  standaloneUcDebug @271;
-  strictFp @272;
-  swiftUcAsync @273;
-  swiftUcAsyncUcError @274;
-  swiftUcAsyncUcName @275;
-  swiftUcAttribute @276;
-  swiftUcBridge @277;
-  swiftUcBridgedUcTypedef @278;
-  swiftUcError @279;
-  swiftUcName @280;
-  swiftUcNewUcType @281;
-  swiftUcPrivate @282;
-  tlsModel @283;
-  target @284;
-  testUcTypestate @285;
-  transparentUcUnion @286;
-  trivialAbi @287;
-  tryUcAcquireUcCapability @288;
-  typeUcTagUcForUcDatatype @289;
-  typeUcVisibility @290;
-  unavailable @291;
-  uninitialized @292;
-  unused @293;
-  used @294;
-  usingUcIfUcExists @295;
-  uuid @296;
-  vecUcReturn @297;
-  vecUcTypeUcHint @298;
-  visibility @299;
-  warnUcUnused @300;
-  warnUcUnusedUcResult @301;
-  weak @302;
-  weakUcImport @303;
-  weakUcReference @304;
-  webUcAssemblyUcExportUcName @305;
-  webUcAssemblyUcImportUcModule @306;
-  webUcAssemblyUcImportUcName @307;
-  workUcGroupUcSizeUcHint @308;
-  x86UcForceUcAlignUcArgumentUcPointer @309;
-  xRayUcInstrument @310;
-  xRayUcLogUcArguments @311;
-  abiUcTag @312;
-  alias @313;
-  alignUcValue @314;
-  builtinUcAlias @315;
-  calledUcOnce @316;
-  iFunc @317;
-  initializerUcSeg @318;
-  loaderUcUninitialized @319;
-  loopUcHint @320;
-  mode @321;
-  noUcBuiltin @322;
-  noUcEscape @323;
-  ompCaptureUcKind @324;
-  ompDeclareUcSimdUcDeclaration @325;
-  ompReferencedUcVariable @326;
-  objCBoxable @327;
-  objCClassUcStub @328;
-  objCDesignatedUcInitializer @329;
-  objCDirect @330;
-  objCDirectUcMembers @331;
-  objCNonUcLazyUcClass @332;
-  objCNonUcRuntimeUcProtocol @333;
-  objCRuntimeUcName @334;
-  objCRuntimeUcVisible @335;
-  openClAccess @336;
-  overloadable @337;
-  renderUcScriptUcKernel @338;
-  swiftUcObjCMembers @339;
-  thread @340;
+  addressUcSpace @0 $Cxx.name("address_space");
+  armUcMveUcStrictUcPolymorphism @1 $Cxx.name("arm_mve_strict_polymorphism");
+  cmseUcNsUcCall @2 $Cxx.name("cmse_ns_call");
+  noUcDeref @3 $Cxx.name("no_deref");
+  objUcCgc @4 $Cxx.name("obj_cgc");
+  objUcCUcInertUcUnsafeUcUnretained @5 $Cxx.name("obj_c_inert_unsafe_unretained");
+  objUcCUcKindUcOf @6 $Cxx.name("obj_c_kind_of");
+  openUcClUcConstantUcAddressUcSpace @7 $Cxx.name("open_cl_constant_address_space");
+  openUcClUcGenericUcAddressUcSpace @8 $Cxx.name("open_cl_generic_address_space");
+  openUcClUcGlobalUcAddressUcSpace @9 $Cxx.name("open_cl_global_address_space");
+  openUcClUcGlobalUcDeviceUcAddressUcSpace @10 $Cxx.name("open_cl_global_device_address_space");
+  openUcClUcGlobalUcHostUcAddressUcSpace @11 $Cxx.name("open_cl_global_host_address_space");
+  openUcClUcLocalUcAddressUcSpace @12 $Cxx.name("open_cl_local_address_space");
+  openUcClUcPrivateUcAddressUcSpace @13 $Cxx.name("open_cl_private_address_space");
+  ptr32 @14 $Cxx.name("ptr32");
+  ptr64 @15 $Cxx.name("ptr64");
+  sUcPtr @16 $Cxx.name("s_ptr");
+  typeUcNonUcNull @17 $Cxx.name("type_non_null");
+  typeUcNullUcUnspecified @18 $Cxx.name("type_null_unspecified");
+  typeUcNullable @19 $Cxx.name("type_nullable");
+  typeUcNullableUcResult @20 $Cxx.name("type_nullable_result");
+  uUcPtr @21 $Cxx.name("u_ptr");
+  fallUcThrough @22 $Cxx.name("fall_through");
+  likely @23 $Cxx.name("likely");
+  mustUcTail @24 $Cxx.name("must_tail");
+  openUcClUcUnrollUcHint @25 $Cxx.name("open_cl_unroll_hint");
+  suppress @26 $Cxx.name("suppress");
+  unlikely @27 $Cxx.name("unlikely");
+  noUcMerge @28 $Cxx.name("no_merge");
+  aUcArch64UcVectorUcPcs @29 $Cxx.name("a_arch64_vector_pcs");
+  acquireUcHandle @30 $Cxx.name("acquire_handle");
+  anyUcX86UcNoUcCfUcCheck @31 $Cxx.name("any_x86_no_cf_check");
+  cUcDecl @32 $Cxx.name("c_decl");
+  fastUcCall @33 $Cxx.name("fast_call");
+  intelUcOclUcBicc @34 $Cxx.name("intel_ocl_bicc");
+  lifetimeUcBound @35 $Cxx.name("lifetime_bound");
+  msabi @36 $Cxx.name("msabi");
+  nsUcReturnsUcRetained @37 $Cxx.name("ns_returns_retained");
+  objUcCUcOwnership @38 $Cxx.name("obj_c_ownership");
+  pascal @39 $Cxx.name("pascal");
+  pcs @40 $Cxx.name("pcs");
+  preserveUcAll @41 $Cxx.name("preserve_all");
+  preserveUcMost @42 $Cxx.name("preserve_most");
+  regUcCall @43 $Cxx.name("reg_call");
+  stdUcCall @44 $Cxx.name("std_call");
+  swiftUcAsyncUcCall @45 $Cxx.name("swift_async_call");
+  swiftUcCall @46 $Cxx.name("swift_call");
+  sysUcVabi @47 $Cxx.name("sys_vabi");
+  thisUcCall @48 $Cxx.name("this_call");
+  vectorUcCall @49 $Cxx.name("vector_call");
+  swiftUcAsyncUcContext @50 $Cxx.name("swift_async_context");
+  swiftUcContext @51 $Cxx.name("swift_context");
+  swiftUcErrorUcResult @52 $Cxx.name("swift_error_result");
+  swiftUcIndirectUcResult @53 $Cxx.name("swift_indirect_result");
+  annotate @54 $Cxx.name("annotate");
+  cfUcConsumed @55 $Cxx.name("cf_consumed");
+  carriesUcDependency @56 $Cxx.name("carries_dependency");
+  nsUcConsumed @57 $Cxx.name("ns_consumed");
+  nonUcNull @58 $Cxx.name("non_null");
+  osUcConsumed @59 $Cxx.name("os_consumed");
+  passUcObjectUcSize @60 $Cxx.name("pass_object_size");
+  releaseUcHandle @61 $Cxx.name("release_handle");
+  useUcHandle @62 $Cxx.name("use_handle");
+  amdgpuUcFlatUcWorkUcGroupUcSize @63 $Cxx.name("amdgpu_flat_work_group_size");
+  amdgpuUcNumUcSgpr @64 $Cxx.name("amdgpu_num_sgpr");
+  amdgpuUcNumUcVgpr @65 $Cxx.name("amdgpu_num_vgpr");
+  amdgpuUcWavesUcPerUcEu @66 $Cxx.name("amdgpu_waves_per_eu");
+  armUcInterrupt @67 $Cxx.name("arm_interrupt");
+  avrUcInterrupt @68 $Cxx.name("avr_interrupt");
+  avrUcSignal @69 $Cxx.name("avr_signal");
+  acquireUcCapability @70 $Cxx.name("acquire_capability");
+  acquiredUcAfter @71 $Cxx.name("acquired_after");
+  acquiredUcBefore @72 $Cxx.name("acquired_before");
+  alignUcMac68k @73 $Cxx.name("align_mac68k");
+  alignUcNatural @74 $Cxx.name("align_natural");
+  aligned @75 $Cxx.name("aligned");
+  allocUcAlign @76 $Cxx.name("alloc_align");
+  allocUcSize @77 $Cxx.name("alloc_size");
+  alwaysUcDestroy @78 $Cxx.name("always_destroy");
+  alwaysUcInline @79 $Cxx.name("always_inline");
+  analyzerUcNoUcReturn @80 $Cxx.name("analyzer_no_return");
+  anyUcX86UcInterrupt @81 $Cxx.name("any_x86_interrupt");
+  anyUcX86UcNoUcCallerUcSavedUcRegisters @82 $Cxx.name("any_x86_no_caller_saved_registers");
+  arcUcWeakrefUcUnavailable @83 $Cxx.name("arc_weakref_unavailable");
+  argumentUcWithUcTypeUcTag @84 $Cxx.name("argument_with_type_tag");
+  armUcBuiltinUcAlias @85 $Cxx.name("arm_builtin_alias");
+  artificial @86 $Cxx.name("artificial");
+  assemblyUcLabel @87 $Cxx.name("assembly_label");
+  assertUcCapability @88 $Cxx.name("assert_capability");
+  assertUcExclusiveUcLock @89 $Cxx.name("assert_exclusive_lock");
+  assertUcSharedUcLock @90 $Cxx.name("assert_shared_lock");
+  assumeUcAligned @91 $Cxx.name("assume_aligned");
+  assumption @92 $Cxx.name("assumption");
+  availability @93 $Cxx.name("availability");
+  bpfUcPreserveUcAccessUcIndex @94 $Cxx.name("bpf_preserve_access_index");
+  blocks @95 $Cxx.name("blocks");
+  builtin @96 $Cxx.name("builtin");
+  c11UcNoUcReturn @97 $Cxx.name("c11_no_return");
+  cfUcAuditedUcTransfer @98 $Cxx.name("cf_audited_transfer");
+  cfUcGuard @99 $Cxx.name("cf_guard");
+  cfiUcCanonicalUcJumpUcTable @100 $Cxx.name("cfi_canonical_jump_table");
+  cfUcReturnsUcNotUcRetained @101 $Cxx.name("cf_returns_not_retained");
+  cfUcReturnsUcRetained @102 $Cxx.name("cf_returns_retained");
+  cfUcUnknownUcTransfer @103 $Cxx.name("cf_unknown_transfer");
+  cpuUcDispatch @104 $Cxx.name("cpu_dispatch");
+  cpuUcSpecific @105 $Cxx.name("cpu_specific");
+  cudaUcConstant @106 $Cxx.name("cuda_constant");
+  cudaUcDevice @107 $Cxx.name("cuda_device");
+  cudaUcDeviceUcBuiltinUcSurfaceUcType @108 $Cxx.name("cuda_device_builtin_surface_type");
+  cudaUcDeviceUcBuiltinUcTextureUcType @109 $Cxx.name("cuda_device_builtin_texture_type");
+  cudaUcGlobal @110 $Cxx.name("cuda_global");
+  cudaUcHost @111 $Cxx.name("cuda_host");
+  cudaUcInvalidUcTarget @112 $Cxx.name("cuda_invalid_target");
+  cudaUcLaunchUcBounds @113 $Cxx.name("cuda_launch_bounds");
+  cudaUcShared @114 $Cxx.name("cuda_shared");
+  cxx11UcNoUcReturn @115 $Cxx.name("cxx11_no_return");
+  callableUcWhen @116 $Cxx.name("callable_when");
+  callback @117 $Cxx.name("callback");
+  capability @118 $Cxx.name("capability");
+  capturedUcRecord @119 $Cxx.name("captured_record");
+  cleanup @120 $Cxx.name("cleanup");
+  cmseUcNsUcEntry @121 $Cxx.name("cmse_ns_entry");
+  codeUcSeg @122 $Cxx.name("code_seg");
+  cold @123 $Cxx.name("cold");
+  common @124 $Cxx.name("common");
+  const @125 $Cxx.name("const");
+  constUcInitializer @126 $Cxx.name("const_initializer");
+  constructor @127 $Cxx.name("constructor");
+  consumable @128 $Cxx.name("consumable");
+  consumableUcAutoUcCast @129 $Cxx.name("consumable_auto_cast");
+  consumableUcSetUcOnUcRead @130 $Cxx.name("consumable_set_on_read");
+  convergent @131 $Cxx.name("convergent");
+  dllUcExport @132 $Cxx.name("dll_export");
+  dllUcExportUcStaticUcLocal @133 $Cxx.name("dll_export_static_local");
+  dllUcImport @134 $Cxx.name("dll_import");
+  dllUcImportUcStaticUcLocal @135 $Cxx.name("dll_import_static_local");
+  deprecated @136 $Cxx.name("deprecated");
+  destructor @137 $Cxx.name("destructor");
+  diagnoseUcIf @138 $Cxx.name("diagnose_if");
+  disableUcTailUcCalls @139 $Cxx.name("disable_tail_calls");
+  emptyUcBases @140 $Cxx.name("empty_bases");
+  enableUcIf @141 $Cxx.name("enable_if");
+  enforceUcTcb @142 $Cxx.name("enforce_tcb");
+  enforceUcTcbUcLeaf @143 $Cxx.name("enforce_tcb_leaf");
+  enumUcExtensibility @144 $Cxx.name("enum_extensibility");
+  excludeUcFromUcExplicitUcInstantiation @145 $Cxx.name("exclude_from_explicit_instantiation");
+  exclusiveUcTrylockUcFunction @146 $Cxx.name("exclusive_trylock_function");
+  externalUcSourceUcSymbol @147 $Cxx.name("external_source_symbol");
+  final @148 $Cxx.name("final");
+  flagUcEnum @149 $Cxx.name("flag_enum");
+  flatten @150 $Cxx.name("flatten");
+  format @151 $Cxx.name("format");
+  formatUcArgument @152 $Cxx.name("format_argument");
+  gnuUcInline @153 $Cxx.name("gnu_inline");
+  guardedUcBy @154 $Cxx.name("guarded_by");
+  guardedUcVariable @155 $Cxx.name("guarded_variable");
+  hipUcManaged @156 $Cxx.name("hip_managed");
+  hot @157 $Cxx.name("hot");
+  ibUcAction @158 $Cxx.name("ib_action");
+  ibUcOutlet @159 $Cxx.name("ib_outlet");
+  ibUcOutletUcCollection @160 $Cxx.name("ib_outlet_collection");
+  initializerUcPriority @161 $Cxx.name("initializer_priority");
+  internalUcLinkage @162 $Cxx.name("internal_linkage");
+  ltoUcVisibilityUcPublic @163 $Cxx.name("lto_visibility_public");
+  layoutUcVersion @164 $Cxx.name("layout_version");
+  leaf @165 $Cxx.name("leaf");
+  lockUcReturned @166 $Cxx.name("lock_returned");
+  locksUcExcluded @167 $Cxx.name("locks_excluded");
+  m68kUcInterrupt @168 $Cxx.name("m68k_interrupt");
+  migUcServerUcRoutine @169 $Cxx.name("mig_server_routine");
+  msUcAllocator @170 $Cxx.name("ms_allocator");
+  msUcInheritance @171 $Cxx.name("ms_inheritance");
+  msUcNoUcVUcTable @172 $Cxx.name("ms_no_v_table");
+  msp430UcInterrupt @173 $Cxx.name("msp430_interrupt");
+  msUcStruct @174 $Cxx.name("ms_struct");
+  msUcVtorUcDisp @175 $Cxx.name("ms_vtor_disp");
+  maxUcFieldUcAlignment @176 $Cxx.name("max_field_alignment");
+  mayUcAlias @177 $Cxx.name("may_alias");
+  microUcMips @178 $Cxx.name("micro_mips");
+  minUcSize @179 $Cxx.name("min_size");
+  minUcVectorUcWidth @180 $Cxx.name("min_vector_width");
+  mips16 @181 $Cxx.name("mips16");
+  mipsUcInterrupt @182 $Cxx.name("mips_interrupt");
+  mipsUcLongUcCall @183 $Cxx.name("mips_long_call");
+  mipsUcShortUcCall @184 $Cxx.name("mips_short_call");
+  nsUcConsumesUcSelf @185 $Cxx.name("ns_consumes_self");
+  nsUcErrorUcDomain @186 $Cxx.name("ns_error_domain");
+  nsUcReturnsUcAutoreleased @187 $Cxx.name("ns_returns_autoreleased");
+  nsUcReturnsUcNotUcRetained @188 $Cxx.name("ns_returns_not_retained");
+  naked @189 $Cxx.name("naked");
+  noUcAlias @190 $Cxx.name("no_alias");
+  noUcCommon @191 $Cxx.name("no_common");
+  noUcDebug @192 $Cxx.name("no_debug");
+  noUcDestroy @193 $Cxx.name("no_destroy");
+  noUcDuplicate @194 $Cxx.name("no_duplicate");
+  noUcInline @195 $Cxx.name("no_inline");
+  noUcInstrumentUcFunction @196 $Cxx.name("no_instrument_function");
+  noUcMicroUcMips @197 $Cxx.name("no_micro_mips");
+  noUcMips16 @198 $Cxx.name("no_mips16");
+  noUcProfileUcFunction @199 $Cxx.name("no_profile_function");
+  noUcReturn @200 $Cxx.name("no_return");
+  noUcSanitize @201 $Cxx.name("no_sanitize");
+  noUcSpeculativeUcLoadUcHardening @202 $Cxx.name("no_speculative_load_hardening");
+  noUcSplitUcStack @203 $Cxx.name("no_split_stack");
+  noUcStackUcProtector @204 $Cxx.name("no_stack_protector");
+  noUcThreadUcSafetyUcAnalysis @205 $Cxx.name("no_thread_safety_analysis");
+  noUcThrow @206 $Cxx.name("no_throw");
+  noUcUniqueUcAddress @207 $Cxx.name("no_unique_address");
+  notUcTailUcCalled @208 $Cxx.name("not_tail_called");
+  ompUcAllocateUcDeclaration @209 $Cxx.name("omp_allocate_declaration");
+  ompUcCaptureUcNoUcInitializer @210 $Cxx.name("omp_capture_no_initializer");
+  ompUcDeclareUcTargetUcDeclaration @211 $Cxx.name("omp_declare_target_declaration");
+  ompUcDeclareUcVariant @212 $Cxx.name("omp_declare_variant");
+  ompUcThreadUcPrivateUcDeclaration @213 $Cxx.name("omp_thread_private_declaration");
+  osUcConsumesUcThis @214 $Cxx.name("os_consumes_this");
+  osUcReturnsUcNotUcRetained @215 $Cxx.name("os_returns_not_retained");
+  osUcReturnsUcRetained @216 $Cxx.name("os_returns_retained");
+  osUcReturnsUcRetainedUcOnUcNonUcZero @217 $Cxx.name("os_returns_retained_on_non_zero");
+  osUcReturnsUcRetainedUcOnUcZero @218 $Cxx.name("os_returns_retained_on_zero");
+  objUcCUcBridge @219 $Cxx.name("obj_c_bridge");
+  objUcCUcBridgeUcMutable @220 $Cxx.name("obj_c_bridge_mutable");
+  objUcCUcBridgeUcRelated @221 $Cxx.name("obj_c_bridge_related");
+  objUcCUcException @222 $Cxx.name("obj_c_exception");
+  objUcCUcExplicitUcProtocolUcImplementation @223 $Cxx.name("obj_c_explicit_protocol_implementation");
+  objUcCUcExternallyUcRetained @224 $Cxx.name("obj_c_externally_retained");
+  objUcCUcIndependentUcClass @225 $Cxx.name("obj_c_independent_class");
+  objUcCUcMethodUcFamily @226 $Cxx.name("obj_c_method_family");
+  objUcCnsUcObject @227 $Cxx.name("obj_cns_object");
+  objUcCUcPreciseUcLifetime @228 $Cxx.name("obj_c_precise_lifetime");
+  objUcCUcRequiresUcPropertyUcDefinitions @229 $Cxx.name("obj_c_requires_property_definitions");
+  objUcCUcRequiresUcSuper @230 $Cxx.name("obj_c_requires_super");
+  objUcCUcReturnsUcInnerUcPointer @231 $Cxx.name("obj_c_returns_inner_pointer");
+  objUcCUcRootUcClass @232 $Cxx.name("obj_c_root_class");
+  objUcCUcSubclassingUcRestricted @233 $Cxx.name("obj_c_subclassing_restricted");
+  openUcClUcIntelUcReqdUcSubUcGroupUcSize @234 $Cxx.name("open_cl_intel_reqd_sub_group_size");
+  openUcClUcKernel @235 $Cxx.name("open_cl_kernel");
+  optimizeUcNone @236 $Cxx.name("optimize_none");
+  override @237 $Cxx.name("override");
+  owner @238 $Cxx.name("owner");
+  ownership @239 $Cxx.name("ownership");
+  packed @240 $Cxx.name("packed");
+  paramUcTypestate @241 $Cxx.name("param_typestate");
+  patchableUcFunctionUcEntry @242 $Cxx.name("patchable_function_entry");
+  pointer @243 $Cxx.name("pointer");
+  pragmaUcClangUcBssUcSection @244 $Cxx.name("pragma_clang_bss_section");
+  pragmaUcClangUcDataUcSection @245 $Cxx.name("pragma_clang_data_section");
+  pragmaUcClangUcRelroUcSection @246 $Cxx.name("pragma_clang_relro_section");
+  pragmaUcClangUcRodataUcSection @247 $Cxx.name("pragma_clang_rodata_section");
+  pragmaUcClangUcTextUcSection @248 $Cxx.name("pragma_clang_text_section");
+  preferredUcName @249 $Cxx.name("preferred_name");
+  ptUcGuardedUcBy @250 $Cxx.name("pt_guarded_by");
+  ptUcGuardedUcVariable @251 $Cxx.name("pt_guarded_variable");
+  pure @252 $Cxx.name("pure");
+  riscvUcInterrupt @253 $Cxx.name("riscv_interrupt");
+  reinitializes @254 $Cxx.name("reinitializes");
+  releaseUcCapability @255 $Cxx.name("release_capability");
+  reqdUcWorkUcGroupUcSize @256 $Cxx.name("reqd_work_group_size");
+  requiresUcCapability @257 $Cxx.name("requires_capability");
+  restrict @258 $Cxx.name("restrict");
+  retain @259 $Cxx.name("retain");
+  returnUcTypestate @260 $Cxx.name("return_typestate");
+  returnsUcNonUcNull @261 $Cxx.name("returns_non_null");
+  returnsUcTwice @262 $Cxx.name("returns_twice");
+  syclUcKernel @263 $Cxx.name("sycl_kernel");
+  scopedUcLockable @264 $Cxx.name("scoped_lockable");
+  section @265 $Cxx.name("section");
+  selectUcAny @266 $Cxx.name("select_any");
+  sentinel @267 $Cxx.name("sentinel");
+  setUcTypestate @268 $Cxx.name("set_typestate");
+  sharedUcTrylockUcFunction @269 $Cxx.name("shared_trylock_function");
+  speculativeUcLoadUcHardening @270 $Cxx.name("speculative_load_hardening");
+  standaloneUcDebug @271 $Cxx.name("standalone_debug");
+  strictUcFp @272 $Cxx.name("strict_fp");
+  swiftUcAsync @273 $Cxx.name("swift_async");
+  swiftUcAsyncUcError @274 $Cxx.name("swift_async_error");
+  swiftUcAsyncUcName @275 $Cxx.name("swift_async_name");
+  swiftUcAttribute @276 $Cxx.name("swift_attribute");
+  swiftUcBridge @277 $Cxx.name("swift_bridge");
+  swiftUcBridgedUcTypedef @278 $Cxx.name("swift_bridged_typedef");
+  swiftUcError @279 $Cxx.name("swift_error");
+  swiftUcName @280 $Cxx.name("swift_name");
+  swiftUcNewUcType @281 $Cxx.name("swift_new_type");
+  swiftUcPrivate @282 $Cxx.name("swift_private");
+  tlsUcModel @283 $Cxx.name("tls_model");
+  target @284 $Cxx.name("target");
+  testUcTypestate @285 $Cxx.name("test_typestate");
+  transparentUcUnion @286 $Cxx.name("transparent_union");
+  trivialUcAbi @287 $Cxx.name("trivial_abi");
+  tryUcAcquireUcCapability @288 $Cxx.name("try_acquire_capability");
+  typeUcTagUcForUcDatatype @289 $Cxx.name("type_tag_for_datatype");
+  typeUcVisibility @290 $Cxx.name("type_visibility");
+  unavailable @291 $Cxx.name("unavailable");
+  uninitialized @292 $Cxx.name("uninitialized");
+  unused @293 $Cxx.name("unused");
+  used @294 $Cxx.name("used");
+  usingUcIfUcExists @295 $Cxx.name("using_if_exists");
+  uuid @296 $Cxx.name("uuid");
+  vecUcReturn @297 $Cxx.name("vec_return");
+  vecUcTypeUcHint @298 $Cxx.name("vec_type_hint");
+  visibility @299 $Cxx.name("visibility");
+  warnUcUnused @300 $Cxx.name("warn_unused");
+  warnUcUnusedUcResult @301 $Cxx.name("warn_unused_result");
+  weak @302 $Cxx.name("weak");
+  weakUcImport @303 $Cxx.name("weak_import");
+  weakUcReference @304 $Cxx.name("weak_reference");
+  webUcAssemblyUcExportUcName @305 $Cxx.name("web_assembly_export_name");
+  webUcAssemblyUcImportUcModule @306 $Cxx.name("web_assembly_import_module");
+  webUcAssemblyUcImportUcName @307 $Cxx.name("web_assembly_import_name");
+  workUcGroupUcSizeUcHint @308 $Cxx.name("work_group_size_hint");
+  x86UcForceUcAlignUcArgumentUcPointer @309 $Cxx.name("x86_force_align_argument_pointer");
+  xUcRayUcInstrument @310 $Cxx.name("x_ray_instrument");
+  xUcRayUcLogUcArguments @311 $Cxx.name("x_ray_log_arguments");
+  abiUcTag @312 $Cxx.name("abi_tag");
+  alias @313 $Cxx.name("alias");
+  alignUcValue @314 $Cxx.name("align_value");
+  builtinUcAlias @315 $Cxx.name("builtin_alias");
+  calledUcOnce @316 $Cxx.name("called_once");
+  iUcFunc @317 $Cxx.name("i_func");
+  initializerUcSeg @318 $Cxx.name("initializer_seg");
+  loaderUcUninitialized @319 $Cxx.name("loader_uninitialized");
+  loopUcHint @320 $Cxx.name("loop_hint");
+  mode @321 $Cxx.name("mode");
+  noUcBuiltin @322 $Cxx.name("no_builtin");
+  noUcEscape @323 $Cxx.name("no_escape");
+  ompUcCaptureUcKind @324 $Cxx.name("omp_capture_kind");
+  ompUcDeclareUcSimdUcDeclaration @325 $Cxx.name("omp_declare_simd_declaration");
+  ompUcReferencedUcVariable @326 $Cxx.name("omp_referenced_variable");
+  objUcCUcBoxable @327 $Cxx.name("obj_c_boxable");
+  objUcCUcClassUcStub @328 $Cxx.name("obj_c_class_stub");
+  objUcCUcDesignatedUcInitializer @329 $Cxx.name("obj_c_designated_initializer");
+  objUcCUcDirect @330 $Cxx.name("obj_c_direct");
+  objUcCUcDirectUcMembers @331 $Cxx.name("obj_c_direct_members");
+  objUcCUcNonUcLazyUcClass @332 $Cxx.name("obj_c_non_lazy_class");
+  objUcCUcNonUcRuntimeUcProtocol @333 $Cxx.name("obj_c_non_runtime_protocol");
+  objUcCUcRuntimeUcName @334 $Cxx.name("obj_c_runtime_name");
+  objUcCUcRuntimeUcVisible @335 $Cxx.name("obj_c_runtime_visible");
+  openUcClUcAccess @336 $Cxx.name("open_cl_access");
+  overloadable @337 $Cxx.name("overloadable");
+  renderUcScriptUcKernel @338 $Cxx.name("render_script_kernel");
+  swiftUcObjUcCUcMembers @339 $Cxx.name("swift_obj_c_members");
+  thread @340 $Cxx.name("thread");
+  numEnumerators @341 $Cxx.name("num_enumerators");
 }
 
 enum ArraySizeModifier @0xf6f70035a2bc22f6 {
-  normal @0;
-  static @1;
-  star @2;
+  normal @0 $Cxx.name("normal");
+  static @1 $Cxx.name("static");
+  star @2 $Cxx.name("star");
+  numEnumerators @3 $Cxx.name("num_enumerators");
 }
 
 enum UTTKind @0xe3ac3858dbe51a16 {
-  enumUcUnderlyingUcType @0;
+  enumUcUnderlyingUcType @0 $Cxx.name("enum_underlying_type");
+  numEnumerators @1 $Cxx.name("num_enumerators");
 }
 
 struct TokenOffset @0x8a47d77b57b46cd5 {
@@ -1418,12 +1887,19 @@ struct TokenRange @0xfaaa666ba10b6696 {
   endOffset @1 :UInt32 $Cxx.name("end_offset");  # Inclusive.
 }
 
+struct Token @0xdf7bccc629d6dcf9 {
+  data @0 :Text;
+  kind @1 :TokenKind;
+  role @2 :TokenRole;
+  macroUcExpandedUcTokens @3 :TokenRange;
+}
+
 struct Decl @0xfb5879761ffaedb6 {
   access @0 :AccessSpecifier;
   accessUcUnsafe @1 :AccessSpecifier;
   availability @2 :AvailabilityResult;
   beginUcToken @3 :TokenOffset;
-  bodyRBrace @4 :TokenOffset;
+  bodyUcRUcBrace @4 :TokenOffset;
   endUcToken @5 :TokenOffset;
   friendUcObjectUcKind @6 :FriendObjectKind;
   moduleUcOwnershipUcKind @7 :ModuleOwnershipKind;
@@ -1436,7 +1912,7 @@ struct Decl @0xfb5879761ffaedb6 {
   isUcDefinedUcOutsideUcFunctionUcOrUcMethod @14 :Bool;
   isUcDeprecated @15 :Bool;
   isUcFirstUcDeclaration @16 :Bool;
-  isUcFromAstFile @17 :Bool;
+  isUcFromUcAstUcFile @17 :Bool;
   isUcFunctionUcOrUcFunctionUcTemplate @18 :Bool;
   isUcImplicit @19 :Bool;
   isUcInUcAnonymousUcNamespace @20 :Bool;
@@ -1452,7 +1928,7 @@ struct Decl @0xfb5879761ffaedb6 {
   isUcTemplateUcParameterUcPack @30 :Bool;
   isUcTemplated @31 :Bool;
   isUcThisUcDeclarationUcReferenced @32 :Bool;
-  isUcTopUcLevelUcDeclarationUcInUcObjCContainer @33 :Bool;
+  isUcTopUcLevelUcDeclarationUcInUcObjUcCUcContainer @33 :Bool;
   isUcUnavailable @34 :Bool;
   isUcUnconditionallyUcVisible @35 :Bool;
   isUcUsed @36 :Bool;
@@ -1476,7 +1952,7 @@ struct BlockDecl @0xd21c906a9e197a51 {
   decl @0:Decl;
   blockUcMissingUcReturnUcType @1 :Bool;
   canUcAvoidUcCopyUcToUcHeap @2 :Bool;
-  capturesCxxThis @3 :Bool;
+  capturesUcCxxUcThis @3 :Bool;
   doesUcNotUcEscape @4 :Bool;
   caretUcToken @5 :TokenOffset;
   hasUcCaptures @6 :Bool;
@@ -1496,7 +1972,7 @@ struct TranslationUnitDecl @0x84ba694d5be7caa3 {
 
 struct StaticAssertDecl @0xe3ab98945466226a {
   decl @0:Decl;
-  rParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @1 :TokenOffset;
   isUcFailed @2 :Bool;
 }
 
@@ -1527,14 +2003,14 @@ struct NamedDecl @0xee8ff2639c85feae {
   formalUcLinkage @1 :Linkage;
   linkageUcInternal @2 :Linkage;
   name @3 :Text;
-  objCfStringUcFormattingUcFamily @4 :ObjCStringFormatFamily;
+  objUcCfUcStringUcFormattingUcFamily @4 :ObjCStringFormatFamily;
   qualifiedUcNameUcAsUcString @5 :Text;
   visibility @6 :Visibility;
   hasUcExternalUcFormalUcLinkage @7 :Bool;
   hasUcLinkage @8 :Bool;
   hasUcLinkageUcBeenUcComputed @9 :Bool;
-  isCxxClassUcMember @10 :Bool;
-  isCxxInstanceUcMember @11 :Bool;
+  isUcCxxUcClassUcMember @10 :Bool;
+  isUcCxxUcInstanceUcMember @11 :Bool;
   isUcExternallyUcDeclarable @12 :Bool;
   isUcExternallyUcVisible @13 :Bool;
   isUcLinkageUcValid @14 :Bool;
@@ -1542,10 +2018,10 @@ struct NamedDecl @0xee8ff2639c85feae {
 
 struct LabelDecl @0x959116a0b50f04fe {
   namedUcDecl @0:NamedDecl;
-  msAssemblyUcLabel @1 :Text;
+  msUcAssemblyUcLabel @1 :Text;
   isUcGnuUcLocal @2 :Bool;
-  isMsAssemblyUcLabel @3 :Bool;
-  isUcResolvedMsAssemblyUcLabel @4 :Bool;
+  isUcMsUcAssemblyUcLabel @3 :Bool;
+  isUcResolvedUcMsUcAssemblyUcLabel @4 :Bool;
 }
 
 struct BaseUsingDecl @0xd779d676819e5d07 {
@@ -1612,41 +2088,41 @@ struct VarDecl @0xcf9adcbc59a4e339 {
   pointUcOfUcInstantiation @2 :TokenOffset;
   storageUcClass @3 :StorageClass;
   storageUcDuration @4 :StorageDuration;
-  tscSpec @5 :ThreadStorageClassSpecifier;
+  tscUcSpec @5 :ThreadStorageClassSpecifier;
   templateUcSpecializationUcKind @6 :TemplateSpecializationKind;
   templateUcSpecializationUcKindUcForUcInstantiation @7 :TemplateSpecializationKind;
   hasUcConstantUcInitialization @8 :Bool;
   hasUcDependentUcAlignment @9 :Bool;
   hasUcExternalUcStorage @10 :Bool;
   hasUcGlobalUcStorage @11 :Bool;
-  hasIceInitializer @12 :Bool;
+  hasUcIceUcInitializer @12 :Bool;
   hasUcInitializer @13 :Bool;
   hasUcLocalUcStorage @14 :Bool;
-  isArcPseudoUcStrong @15 :Bool;
-  isCxxForUcRangeUcDeclaration @16 :Bool;
+  isUcArcUcPseudoUcStrong @15 :Bool;
+  isUcCxxUcForUcRangeUcDeclaration @16 :Bool;
   isUcConstexpr @17 :Bool;
   isUcDirectUcInitializer @18 :Bool;
   isUcEscapingUcByref @19 :Bool;
   isUcExceptionUcVariable @20 :Bool;
-  isUcExternC @21 :Bool;
+  isUcExternUcC @21 :Bool;
   isUcFileUcVariableUcDeclaration @22 :Bool;
   isUcFunctionUcOrUcMethodUcVariableUcDeclaration @23 :Bool;
-  isUcInUcExternCContext @24 :Bool;
-  isUcInUcExternCxxContext @25 :Bool;
+  isUcInUcExternUcCUcContext @24 :Bool;
+  isUcInUcExternUcCxxUcContext @25 :Bool;
   isUcInitializerUcCapture @26 :Bool;
   isUcInline @27 :Bool;
   isUcInlineUcSpecified @28 :Bool;
   isUcKnownUcToUcBeUcDefined @29 :Bool;
   isUcLocalUcVariableUcDeclaration @30 :Bool;
   isUcLocalUcVariableUcDeclarationUcOrUcParm @31 :Bool;
-  isNrvoVariable @32 :Bool;
+  isUcNrvoUcVariable @32 :Bool;
   isUcNoUcDestroy @33 :Bool;
   isUcNonUcEscapingUcByref @34 :Bool;
-  isUcObjCForUcDeclaration @35 :Bool;
+  isUcObjUcCUcForUcDeclaration @35 :Bool;
   isUcPreviousUcDeclarationUcInUcSameUcBlockUcScope @36 :Bool;
   isUcStaticUcDataUcMember @37 :Bool;
   isUcStaticUcLocal @38 :Bool;
-  isUcThisUcDeclarationADemotedUcDefinition @39 :Bool;
+  isUcThisUcDeclarationUcAUcDemotedUcDefinition @39 :Bool;
   isUcUsableUcInUcConstantUcExpressions @40 :Bool;
   mightUcBeUcUsableUcInUcConstantUcExpressions @41 :Bool;
 }
@@ -1659,8 +2135,8 @@ struct ParmVarDecl @0xedf01c1d7684de38 {
   hasUcUninstantiatedUcDefaultUcArgument @4 :Bool;
   hasUcUnparsedUcDefaultUcArgument @5 :Bool;
   isUcDestroyedUcInUcCallee @6 :Bool;
-  isKnrPromoted @7 :Bool;
-  isUcObjCMethodUcParameter @8 :Bool;
+  isUcKnrUcPromoted @7 :Bool;
+  isUcObjUcCUcMethodUcParameter @8 :Bool;
 }
 
 struct OMPCapturedExprDecl @0x8dae8ad443b5cf77 {
@@ -1710,7 +2186,7 @@ struct MSPropertyDecl @0x9a46ca50a3ae900f {
 struct FunctionDecl @0x92bd4789888f8ccb {
   declaratorUcDecl @0:DeclaratorDecl;
   doesUcDeclarationUcForceUcExternallyUcVisibleUcDefinition @1 :Bool;
-  doesUcThisUcDeclarationUcHaveABody @2 :Bool;
+  doesUcThisUcDeclarationUcHaveUcAUcBody @2 :Bool;
   constexprUcKind @3 :ConstexprSpecKind;
   ellipsisUcToken @4 :TokenOffset;
   exceptionUcSpecUcSourceUcRange @5 :TokenRange;
@@ -1732,8 +2208,8 @@ struct FunctionDecl @0x92bd4789888f8ccb {
   hasUcTrivialUcBody @21 :Bool;
   hasUcWrittenUcPrototype @22 :Bool;
   instantiationUcIsUcPending @23 :Bool;
-  isCpuDispatchUcMultiUcVersion @24 :Bool;
-  isCpuSpecificUcMultiUcVersion @25 :Bool;
+  isUcCpuUcDispatchUcMultiUcVersion @24 :Bool;
+  isUcCpuUcSpecificUcMultiUcVersion @25 :Bool;
   isUcConsteval @26 :Bool;
   isUcConstexpr @27 :Bool;
   isUcConstexprUcSpecified @28 :Bool;
@@ -1742,19 +2218,19 @@ struct FunctionDecl @0x92bd4789888f8ccb {
   isUcDeletedUcAsUcWritten @31 :Bool;
   isUcDestroyingUcOperatorUcDelete @32 :Bool;
   isUcExplicitlyUcDefaulted @33 :Bool;
-  isUcExternC @34 :Bool;
+  isUcExternUcC @34 :Bool;
   isUcFunctionUcTemplateUcSpecialization @35 :Bool;
   isUcGlobal @36 :Bool;
   isUcImplicitlyUcInstantiable @37 :Bool;
-  isUcInUcExternCContext @38 :Bool;
-  isUcInUcExternCxxContext @39 :Bool;
+  isUcInUcExternUcCUcContext @38 :Bool;
+  isUcInUcExternUcCxxUcContext @39 :Bool;
   isUcInlineUcBuiltinUcDeclaration @40 :Bool;
   isUcInlineUcDefinitionUcExternallyUcVisible @41 :Bool;
   isUcInlineUcSpecified @42 :Bool;
   isUcInlined @43 :Bool;
   isUcLateUcTemplateUcParsed @44 :Bool;
-  isMsExternUcInline @45 :Bool;
-  isMsvcrtEntryUcPoint @46 :Bool;
+  isUcMsUcExternUcInline @45 :Bool;
+  isUcMsvcrtUcEntryUcPoint @46 :Bool;
   isUcMain @47 :Bool;
   isUcMultiUcVersion @48 :Bool;
   isUcNoUcReturn @49 :Bool;
@@ -1765,14 +2241,14 @@ struct FunctionDecl @0x92bd4789888f8ccb {
   isUcStatic @54 :Bool;
   isUcTargetUcMultiUcVersion @55 :Bool;
   isUcTemplateUcInstantiation @56 :Bool;
-  isUcThisUcDeclarationADefinition @57 :Bool;
-  isUcThisUcDeclarationUcInstantiatedUcFromAFriendUcDefinition @58 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @57 :Bool;
+  isUcThisUcDeclarationUcInstantiatedUcFromUcAUcFriendUcDefinition @58 :Bool;
   isUcTrivial @59 :Bool;
   isUcTrivialUcForUcCall @60 :Bool;
   isUcUserUcProvided @61 :Bool;
   isUcVariadic @62 :Bool;
   isUcVirtualUcAsUcWritten @63 :Bool;
-  usesSehTry @64 :Bool;
+  usesUcSehUcTry @64 :Bool;
   willUcHaveUcBody @65 :Bool;
 }
 
@@ -1790,17 +2266,17 @@ struct CXXMethodDecl @0xd83d5835cf6512db {
 }
 
 struct CXXDestructorDecl @0xee0fd0438430a21c {
-  cxxMethodUcDecl @0:CXXMethodDecl;
+  cxxUcMethodUcDecl @0:CXXMethodDecl;
 }
 
 struct CXXConversionDecl @0xac531836739115b2 {
-  cxxMethodUcDecl @0:CXXMethodDecl;
+  cxxUcMethodUcDecl @0:CXXMethodDecl;
   isUcExplicit @1 :Bool;
   isUcLambdaUcToUcBlockUcPointerUcConversion @2 :Bool;
 }
 
 struct CXXConstructorDecl @0xc6bfa2c4650464b8 {
-  cxxMethodUcDecl @0:CXXMethodDecl;
+  cxxUcMethodUcDecl @0:CXXMethodDecl;
   isUcConvertingUcConstructor @1 :Bool;
   isUcDefaultUcConstructor @2 :Bool;
   isUcDelegatingUcConstructor @3 :Bool;
@@ -1818,7 +2294,7 @@ struct CXXDeductionGuideDecl @0xca6c78b5c1634d9d {
 struct FieldDecl @0xec8d79b82b91a5eb {
   declaratorUcDecl @0:DeclaratorDecl;
   inUcClassUcInitializerUcStyle @1 :InClassInitStyle;
-  hasUcCapturedVlaType @2 :Bool;
+  hasUcCapturedUcVlaUcType @2 :Bool;
   hasUcInUcClassUcInitializer @3 :Bool;
   isUcAnonymousUcStructUcOrUcUnion @4 :Bool;
   isUcBitUcField @5 :Bool;
@@ -1897,7 +2373,7 @@ struct TagDecl @0x8e30dcc81a0377d1 {
   isUcFreeUcStanding @13 :Bool;
   isUcInterface @14 :Bool;
   isUcStruct @15 :Bool;
-  isUcThisUcDeclarationADefinition @16 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @16 :Bool;
   isUcUnion @17 :Bool;
   mayUcHaveUcOutUcOfUcDateUcDefinition @18 :Bool;
 }
@@ -1908,9 +2384,9 @@ struct RecordDecl @0xae6dc96296678f51 {
   argumentUcPassingUcRestrictions @2 :ArgPassingKind;
   hasUcFlexibleUcArrayUcMember @3 :Bool;
   hasUcLoadedUcFieldsUcFromUcExternalUcStorage @4 :Bool;
-  hasUcNonUcTrivialUcToUcPrimitiveUcCopyCUnion @5 :Bool;
-  hasUcNonUcTrivialUcToUcPrimitiveUcDefaultUcInitializeCUnion @6 :Bool;
-  hasUcNonUcTrivialUcToUcPrimitiveUcDestructCUnion @7 :Bool;
+  hasUcNonUcTrivialUcToUcPrimitiveUcCopyUcCUcUnion @5 :Bool;
+  hasUcNonUcTrivialUcToUcPrimitiveUcDefaultUcInitializeUcCUcUnion @6 :Bool;
+  hasUcNonUcTrivialUcToUcPrimitiveUcDestructUcCUcUnion @7 :Bool;
   hasUcObjectUcMember @8 :Bool;
   hasUcVolatileUcMember @9 :Bool;
   isUcAnonymousUcStructUcOrUcUnion @10 :Bool;
@@ -1936,8 +2412,8 @@ struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
   defaultedUcDestructorUcIsUcDeleted @6 :Bool;
   defaultedUcMoveUcConstructorUcIsUcDeleted @7 :Bool;
   lambdaUcCaptureUcDefault @8 :LambdaCaptureDefault;
-  msInheritanceUcModel @9 :MSInheritanceModel;
-  msVtorUcDispUcMode @10 :MSVtorDispMode;
+  msUcInheritanceUcModel @9 :MSInheritanceModel;
+  msUcVtorUcDispUcMode @10 :MSVtorDispMode;
   templateUcSpecializationUcKind @11 :TemplateSpecializationKind;
   hasUcAnyUcDependentUcBases @12 :Bool;
   hasUcConstexprUcDefaultUcConstructor @13 :Bool;
@@ -1998,8 +2474,8 @@ struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
   isUcAbstract @68 :Bool;
   isUcAggregate @69 :Bool;
   isUcAnyUcDestructorUcNoUcReturn @70 :Bool;
-  isCLike @71 :Bool;
-  isCxx11UcStandardUcLayout @72 :Bool;
+  isUcCUcLike @71 :Bool;
+  isUcCxx11UcStandardUcLayout @72 :Bool;
   isUcDependentUcLambda @73 :Bool;
   isUcDynamicUcClass @74 :Bool;
   isUcEffectivelyUcFinal @75 :Bool;
@@ -2007,7 +2483,7 @@ struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
   isUcGenericUcLambda @77 :Bool;
   isUcInterfaceUcLike @78 :Bool;
   isUcLiteral @79 :Bool;
-  isPod @80 :Bool;
+  isUcPod @80 :Bool;
   isUcParsingUcBaseUcSpecifiers @81 :Bool;
   isUcPolymorphic @82 :Bool;
   isUcStandardUcLayout @83 :Bool;
@@ -2033,7 +2509,7 @@ struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
 }
 
 struct ClassTemplateSpecializationDecl @0xa81be8b0845933da {
-  cxxRecordUcDecl @0:CXXRecordDecl;
+  cxxUcRecordUcDecl @0:CXXRecordDecl;
   externUcToken @1 :TokenOffset;
   pointUcOfUcInstantiation @2 :TokenOffset;
   specializationUcKind @3 :TemplateSpecializationKind;
@@ -2104,17 +2580,17 @@ struct RedeclarableTemplateDecl @0xeae96325d22b861f {
 struct FunctionTemplateDecl @0xc88144c3067080ac {
   redeclarableUcTemplateUcDecl @0:RedeclarableTemplateDecl;
   isUcAbbreviated @1 :Bool;
-  isUcThisUcDeclarationADefinition @2 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @2 :Bool;
 }
 
 struct ClassTemplateDecl @0xd77c8a2532fd776e {
   redeclarableUcTemplateUcDecl @0:RedeclarableTemplateDecl;
-  isUcThisUcDeclarationADefinition @1 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @1 :Bool;
 }
 
 struct VarTemplateDecl @0x983bd212ec53c1f3 {
   redeclarableUcTemplateUcDecl @0:RedeclarableTemplateDecl;
-  isUcThisUcDeclarationADefinition @1 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @1 :Bool;
 }
 
 struct TypeAliasTemplateDecl @0xcafc2a5c9d4a2d22 {
@@ -2143,7 +2619,7 @@ struct ObjCPropertyDecl @0x9eb7f76b62290548 {
   namedUcDecl @0:NamedDecl;
   atUcToken @1 :TokenOffset;
   getterUcNameUcToken @2 :TokenOffset;
-  lParenUcToken @3 :TokenOffset;
+  lUcParenUcToken @3 :TokenOffset;
   propertyUcImplementation @4 :PropertyControl;
   queryUcKind @5 :ObjCPropertyQueryKind;
   setterUcKind @6 :SetterKind;
@@ -2159,7 +2635,7 @@ struct ObjCPropertyDecl @0x9eb7f76b62290548 {
 
 struct ObjCMethodDecl @0xf8c8c7d3c113456e {
   namedUcDecl @0:NamedDecl;
-  definedUcInNsObject @1 :Bool;
+  definedUcInUcNsUcObject @1 :Bool;
   declaratorUcEndUcToken @2 :TokenOffset;
   implementationUcControl @3 :ImplementationControl;
   methodUcFamily @4 :ObjCMethodFamily;
@@ -2178,8 +2654,8 @@ struct ObjCMethodDecl @0xf8c8c7d3c113456e {
   isUcPropertyUcAccessor @17 :Bool;
   isUcRedeclaration @18 :Bool;
   isUcSynthesizedUcAccessorUcStub @19 :Bool;
-  isUcThisUcDeclarationADefinition @20 :Bool;
-  isUcThisUcDeclarationADesignatedUcInitializer @21 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @20 :Bool;
+  isUcThisUcDeclarationUcAUcDesignatedUcInitializer @21 :Bool;
   isUcVariadic @22 :Bool;
 }
 
@@ -2190,48 +2666,48 @@ struct ObjCContainerDecl @0xaf9db5ae0b65ce9e {
 }
 
 struct ObjCCategoryDecl @0xb673566cbe41a76d {
-  objCContainerUcDecl @0:ObjCContainerDecl;
+  objUcCUcContainerUcDecl @0:ObjCContainerDecl;
   isUcClassUcExtension @1 :Bool;
   categoryUcNameUcToken @2 :TokenOffset;
-  instanceUcVariableLBraceUcToken @3 :TokenOffset;
-  instanceUcVariableRBraceUcToken @4 :TokenOffset;
+  instanceUcVariableUcLUcBraceUcToken @3 :TokenOffset;
+  instanceUcVariableUcRUcBraceUcToken @4 :TokenOffset;
 }
 
 struct ObjCProtocolDecl @0xa8d0b0128e3a36e1 {
-  objCContainerUcDecl @0:ObjCContainerDecl;
-  objCRuntimeUcNameUcAsUcString @1 :Text;
+  objUcCUcContainerUcDecl @0:ObjCContainerDecl;
+  objUcCUcRuntimeUcNameUcAsUcString @1 :Text;
   hasUcDefinition @2 :Bool;
   isUcNonUcRuntimeUcProtocol @3 :Bool;
-  isUcThisUcDeclarationADefinition @4 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @4 :Bool;
 }
 
 struct ObjCInterfaceDecl @0x851a7195d7b1d15e {
-  objCContainerUcDecl @0:ObjCContainerDecl;
+  objUcCUcContainerUcDecl @0:ObjCContainerDecl;
   declaresUcOrUcInheritsUcDesignatedUcInitializers @1 :Bool;
   endUcOfUcDefinitionUcToken @2 :TokenOffset;
-  objCRuntimeUcNameUcAsUcString @3 :Text;
+  objUcCUcRuntimeUcNameUcAsUcString @3 :Text;
   superUcClassUcToken @4 :TokenOffset;
   hasUcDefinition @5 :Bool;
   hasUcDesignatedUcInitializers @6 :Bool;
   isUcArcUcWeakrefUcUnavailable @7 :Bool;
   isUcImplicitUcInterfaceUcDeclaration @8 :Bool;
-  isUcThisUcDeclarationADefinition @9 :Bool;
+  isUcThisUcDeclarationUcAUcDefinition @9 :Bool;
 }
 
 struct ObjCImplDecl @0xfbf2d2598582b4f4 {
-  objCContainerUcDecl @0:ObjCContainerDecl;
+  objUcCUcContainerUcDecl @0:ObjCContainerDecl;
 }
 
 struct ObjCCategoryImplDecl @0xb972fe178fc59d16 {
-  objCImplUcDecl @0:ObjCImplDecl;
+  objUcCUcImplUcDecl @0:ObjCImplDecl;
   categoryUcNameUcToken @1 :TokenOffset;
 }
 
 struct ObjCImplementationDecl @0xf2e56fe062561acd {
-  objCImplUcDecl @0:ObjCImplDecl;
-  instanceUcVariableLBraceUcToken @1 :TokenOffset;
-  instanceUcVariableRBraceUcToken @2 :TokenOffset;
-  objCRuntimeUcNameUcAsUcString @3 :Text;
+  objUcCUcImplUcDecl @0:ObjCImplDecl;
+  instanceUcVariableUcLUcBraceUcToken @1 :TokenOffset;
+  instanceUcVariableUcRUcBraceUcToken @2 :TokenOffset;
+  objUcCUcRuntimeUcNameUcAsUcString @3 :Text;
   superUcClassUcToken @4 :TokenOffset;
   hasUcDestructors @5 :Bool;
   hasUcNonUcZeroUcConstructors @6 :Bool;
@@ -2243,7 +2719,7 @@ struct ObjCCompatibleAliasDecl @0xc484be73cf6be95b {
 
 struct NamespaceDecl @0xd4713edcad196585 {
   namedUcDecl @0:NamedDecl;
-  rBraceUcToken @1 :TokenOffset;
+  rUcBraceUcToken @1 :TokenOffset;
   isUcAnonymousUcNamespace @2 :Bool;
   isUcInline @3 :Bool;
   isUcOriginalUcNamespace @4 :Bool;
@@ -2260,7 +2736,7 @@ struct LinkageSpecDecl @0xb0f84c4a56c95eec {
   decl @0:Decl;
   externUcToken @1 :TokenOffset;
   language @2 :LanguageIDs;
-  rBraceUcToken @3 :TokenOffset;
+  rUcBraceUcToken @3 :TokenOffset;
   hasUcBraces @4 :Bool;
 }
 
@@ -2287,7 +2763,7 @@ struct FriendDecl @0xe6545eb838d810d0 {
 struct FileScopeAsmDecl @0xa91b82b590024228 {
   decl @0:Decl;
   assemblyUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ExternCContextDecl @0xd79e4560c3f80cbd {
@@ -2297,7 +2773,7 @@ struct ExternCContextDecl @0xd79e4560c3f80cbd {
 struct ExportDecl @0xb9bc9642842c6d81 {
   decl @0:Decl;
   exportUcToken @1 :TokenOffset;
-  rBraceUcToken @2 :TokenOffset;
+  rUcBraceUcToken @2 :TokenOffset;
   hasUcBraces @3 :Bool;
 }
 
@@ -2314,7 +2790,7 @@ struct Stmt @0x91127d30fade9a32 {
 
 struct SEHTryStmt @0xf24201c85c654a91 {
   stmt @0:Stmt;
-  isCxxTry @1 :Bool;
+  isUcCxxUcTry @1 :Bool;
   tryUcToken @2 :TokenOffset;
 }
 
@@ -2341,7 +2817,7 @@ struct ReturnStmt @0xa64f08dfd7dbc80a {
 struct ObjCForCollectionStmt @0x9eba75a6b3c891a0 {
   stmt @0:Stmt;
   forUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ObjCAutoreleasePoolStmt @0x9762e1f9121378d2 {
@@ -2372,7 +2848,7 @@ struct ObjCAtFinallyStmt @0xb4641f5dbb7b9c51 {
 struct ObjCAtCatchStmt @0xea4d614d29e03f4e {
   stmt @0:Stmt;
   atUcCatchUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   hasUcEllipsis @3 :Bool;
 }
 
@@ -2383,265 +2859,265 @@ struct OMPExecutableDirective @0xd9ecc0e6e88a888e {
 }
 
 struct OMPDispatchDirective @0xf2ebe316be280493 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   targetUcCallUcToken @1 :TokenOffset;
 }
 
 struct OMPDepobjDirective @0xf7901aaea1e59da5 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPCriticalDirective @0xaae7b90454a167f2 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPCancellationPointDirective @0xbd3f65af25cb05ac {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPCancelDirective @0xe9fe3be8b3920583 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPBarrierDirective @0xa561ecfd48037b9f {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPAtomicDirective @0xccfc4e254a9ca2ef {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   isUcPostfixUcUpdate @1 :Bool;
-  isXlhsInRhsPart @2 :Bool;
+  isUcXlhsUcInUcRhsUcPart @2 :Bool;
 }
 
 struct OMPTeamsDirective @0xb09cbd39c14f104d {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTaskyieldDirective @0xeda0fa85f0053b41 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTaskwaitDirective @0xfab570caa675ad05 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTaskgroupDirective @0x997a52791bc1d2cb {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTaskDirective @0xad4854dc66276a11 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPTargetUpdateDirective @0xce201c1bda195171 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTargetTeamsDirective @0xcad5df87230fb5e1 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTargetParallelDirective @0xe053102edf992ab7 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPTargetExitDataDirective @0xd3f73d9d66855b7c {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTargetEnterDataDirective @0xfaddabf39d71573c {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTargetDirective @0xe61e25c74d351171 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPTargetDataDirective @0xffdf74d960adebc3 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPSingleDirective @0x9e31c9d771d11457 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPSectionsDirective @0xa007966bd69b3ef4 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPSectionDirective @0xabfbf1faadf3da79 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPScanDirective @0x8048cf331a56b6fb {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPParallelSectionsDirective @0xdab61036a2e612d3 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPParallelMasterDirective @0xa7869fbfbcb75e30 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPParallelDirective @0xb6332105b1f2102a {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPOrderedDirective @0xb97823fb2b0a2176 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPMasterDirective @0xb7b87dfe2df187cd {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPMaskedDirective @0xc1e20133fca4bab7 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPLoopBasedDirective @0xebd7e00926927a85 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPUnrollDirective @0xfde8548a895efed2 {
-  ompLoopUcBasedUcDirective @0:OMPLoopBasedDirective;
+  ompUcLoopUcBasedUcDirective @0:OMPLoopBasedDirective;
 }
 
 struct OMPTileDirective @0x955f68d0ea4dad7c {
-  ompLoopUcBasedUcDirective @0:OMPLoopBasedDirective;
+  ompUcLoopUcBasedUcDirective @0:OMPLoopBasedDirective;
 }
 
 struct OMPLoopDirective @0x996557610848d25e {
-  ompLoopUcBasedUcDirective @0:OMPLoopBasedDirective;
+  ompUcLoopUcBasedUcDirective @0:OMPLoopBasedDirective;
 }
 
 struct OMPForSimdDirective @0xb5d719f282f43408 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPForDirective @0xafaaf1c5631fa3da {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPDistributeSimdDirective @0xfe653c77e8d8d7f8 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPDistributeParallelForSimdDirective @0xed219e924604e032 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPDistributeParallelForDirective @0xd4f84c1343cddbc3 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPDistributeDirective @0xa3b58e2e947f68cb {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTeamsDistributeSimdDirective @0xdd9b68bf972afa51 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTeamsDistributeParallelForSimdDirective @0xb1d522d25bf5e8db {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTeamsDistributeParallelForDirective @0x8113915845154e06 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPTeamsDistributeDirective @0xd57fd7f310c3591a {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTaskLoopSimdDirective @0xf8f593871dfacede {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTaskLoopDirective @0xbeea33eaf08e61de {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPTargetTeamsDistributeSimdDirective @0xf160e61a5edc1ff2 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTargetTeamsDistributeParallelForSimdDirective @0x804e195502d62e5b {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTargetTeamsDistributeParallelForDirective @0xb9ef1d4c32f58988 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPTargetTeamsDistributeDirective @0xdb91542417a3e11b {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTargetSimdDirective @0x82400c65f487fb8a {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTargetParallelForSimdDirective @0x92be3b840fda6c34 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPTargetParallelForDirective @0xb14634030f2d8708 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPSimdDirective @0xb48cdcd37571e590 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPParallelMasterTaskLoopSimdDirective @0xbbcba5847ff5ba48 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPParallelMasterTaskLoopDirective @0xa53ad6a3233e8b9d {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPParallelForSimdDirective @0xecdb69f0bce900de {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPParallelForDirective @0x8e1e3b1821c0515a {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPMasterTaskLoopSimdDirective @0xea7bac26edd3f458 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
 }
 
 struct OMPMasterTaskLoopDirective @0x826300eb6228e8f0 {
-  ompLoopUcDirective @0:OMPLoopDirective;
+  ompUcLoopUcDirective @0:OMPLoopDirective;
   hasUcCancel @1 :Bool;
 }
 
 struct OMPInteropDirective @0x86d3370fbc5f7dd0 {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPFlushDirective @0xfa2df93386e63fbe {
-  ompExecutableUcDirective @0:OMPExecutableDirective;
+  ompUcExecutableUcDirective @0:OMPExecutableDirective;
 }
 
 struct OMPCanonicalLoop @0xf3cf896ddd7c46d1 {
@@ -2671,13 +3147,13 @@ struct IfStmt @0xfc829da66c4e6bb1 {
   stmt @0:Stmt;
   elseUcToken @1 :TokenOffset;
   ifUcToken @2 :TokenOffset;
-  lParenUcToken @3 :TokenOffset;
-  rParenUcToken @4 :TokenOffset;
+  lUcParenUcToken @3 :TokenOffset;
+  rUcParenUcToken @4 :TokenOffset;
   hasUcElseUcStorage @5 :Bool;
   hasUcInitializerUcStorage @6 :Bool;
   hasUcVariableUcStorage @7 :Bool;
   isUcConstexpr @8 :Bool;
-  isUcObjCAvailabilityUcCheck @9 :Bool;
+  isUcObjUcCUcAvailabilityUcCheck @9 :Bool;
 }
 
 struct GotoStmt @0xf542902873fc6c2b {
@@ -2689,14 +3165,14 @@ struct GotoStmt @0xf542902873fc6c2b {
 struct ForStmt @0xb6591c23541f6a1e {
   stmt @0:Stmt;
   forUcToken @1 :TokenOffset;
-  lParenUcToken @2 :TokenOffset;
-  rParenUcToken @3 :TokenOffset;
+  lUcParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @3 :TokenOffset;
 }
 
 struct DoStmt @0xf6407ae4f3214356 {
   stmt @0:Stmt;
   doUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   whileUcToken @3 :TokenOffset;
 }
 
@@ -2723,8 +3199,8 @@ struct ContinueStmt @0xb364bd3d9a19cd05 {
 
 struct CompoundStmt @0xd080c9192fa41c92 {
   stmt @0:Stmt;
-  lBracUcToken @1 :TokenOffset;
-  rBracUcToken @2 :TokenOffset;
+  lUcBracUcToken @1 :TokenOffset;
+  rUcBracUcToken @2 :TokenOffset;
 }
 
 struct CapturedStmt @0xa60fffc1366b48e6 {
@@ -2742,7 +3218,7 @@ struct CXXForRangeStmt @0xa23a75b3c0fa7d86 {
   coawaitUcToken @1 :TokenOffset;
   colonUcToken @2 :TokenOffset;
   forUcToken @3 :TokenOffset;
-  rParenUcToken @4 :TokenOffset;
+  rUcParenUcToken @4 :TokenOffset;
 }
 
 struct CXXCatchStmt @0xac4b9e8390fd3a85 {
@@ -2766,20 +3242,20 @@ struct AsmStmt @0xa47714ac2d00fb21 {
 struct MSAsmStmt @0xc504268dee34a98f {
   asmUcStmt @0:AsmStmt;
   assemblyUcString @1 :Text;
-  lBraceUcToken @2 :TokenOffset;
+  lUcBraceUcToken @2 :TokenOffset;
   hasUcBraces @3 :Bool;
 }
 
 struct GCCAsmStmt @0x9d046a0d94b425db {
   asmUcStmt @0:AsmStmt;
-  rParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @1 :TokenOffset;
   isUcAssemblyUcGoto @2 :Bool;
 }
 
 struct WhileStmt @0x8f0fb0e808ef8cd3 {
   stmt @0:Stmt;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   whileUcToken @3 :TokenOffset;
   hasUcVariableUcStorage @4 :Bool;
 }
@@ -2805,24 +3281,24 @@ struct Expr @0x9e4316b5a505b8d6 {
   valueUcKind @6 :ExprValueKind;
   hasUcNonUcTrivialUcCall @7 :Bool;
   isUcBoundUcMemberUcFunction @8 :Bool;
-  isCxx11UcConstantUcExpression @9 :Bool;
-  isCxx98UcIntegralUcConstantUcExpression @10 :Bool;
+  isUcCxx11UcConstantUcExpression @9 :Bool;
+  isUcCxx98UcIntegralUcConstantUcExpression @10 :Bool;
   isUcDefaultUcArgument @11 :Bool;
   isUcEvaluatable @12 :Bool;
-  isGlValue @13 :Bool;
-  isUcImplicitCxxThis @14 :Bool;
+  isUcGlUcValue @13 :Bool;
+  isUcImplicitUcCxxUcThis @14 :Bool;
   isUcInstantiationUcDependent @15 :Bool;
   isUcIntegerUcConstantUcExpression @16 :Bool;
   isUcKnownUcToUcHaveUcBooleanUcValue @17 :Bool;
-  isLValue @18 :Bool;
-  isObjcgcCandidate @19 :Bool;
-  isUcObjCSelfUcExpression @20 :Bool;
+  isUcLUcValue @18 :Bool;
+  isUcObjcgcUcCandidate @19 :Bool;
+  isUcObjUcCUcSelfUcExpression @20 :Bool;
   isUcOrdinaryUcOrUcBitUcFieldUcObject @21 :Bool;
-  isPrValue @22 :Bool;
-  isUcReadUcIfUcDiscardedUcInCPlusUcPlus11 @23 :Bool;
+  isUcPrUcValue @22 :Bool;
+  isUcReadUcIfUcDiscardedUcInUcCUcPlusUcPlus11 @23 :Bool;
   isUcTypeUcDependent @24 :Bool;
   isUcValueUcDependent @25 :Bool;
-  isXValue @26 :Bool;
+  isUcXUcValue @26 :Bool;
   refersUcToUcBitUcField @27 :Bool;
   refersUcToUcGlobalUcRegisterUcVariable @28 :Bool;
   refersUcToUcMatrixUcElement @29 :Bool;
@@ -2838,13 +3314,13 @@ struct DesignatedInitExpr @0xeff2c52d9c942ab2 {
   designatorsUcSourceUcRange @1 :TokenRange;
   equalUcOrUcColonUcToken @2 :TokenOffset;
   isUcDirectUcInitializer @3 :Bool;
-  usesGnuSyntax @4 :Bool;
+  usesUcGnuUcSyntax @4 :Bool;
 }
 
 struct DependentScopeDeclRefExpr @0x8fbb6ccb95a3509d {
   expr @0:Expr;
-  lAngleUcToken @1 :TokenOffset;
-  rAngleUcToken @2 :TokenOffset;
+  lUcAngleUcToken @1 :TokenOffset;
+  rUcAngleUcToken @2 :TokenOffset;
   templateUcKeywordUcToken @3 :TokenOffset;
   hasUcExplicitUcTemplateUcArguments @4 :Bool;
   hasUcTemplateUcKeyword @5 :Bool;
@@ -2857,13 +3333,13 @@ struct DependentCoawaitExpr @0x8fd8a27becb59315 {
 
 struct DeclRefExpr @0xec5119d27610b166 {
   expr @0:Expr;
-  lAngleUcToken @1 :TokenOffset;
-  rAngleUcToken @2 :TokenOffset;
+  lUcAngleUcToken @1 :TokenOffset;
+  rUcAngleUcToken @2 :TokenOffset;
   templateUcKeywordUcToken @3 :TokenOffset;
   hadUcMultipleUcCandidates @4 :Bool;
   hasUcExplicitUcTemplateUcArguments @5 :Bool;
   hasUcQualifier @6 :Bool;
-  hasUcTemplateKwAndUcArgumentsUcInfo @7 :Bool;
+  hasUcTemplateUcKwUcAndUcArgumentsUcInfo @7 :Bool;
   hasUcTemplateUcKeyword @8 :Bool;
   isUcNonUcOdrUcUse @9 :NonOdrUseReason;
   refersUcToUcEnclosingUcVariableUcOrUcCapture @10 :Bool;
@@ -2886,7 +3362,7 @@ struct CoyieldExpr @0xe587a5c6d1b766ed {
 struct ConvertVectorExpr @0x9d71128cb240a509 {
   expr @0:Expr;
   builtinUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ConceptSpecializationExpr @0xfed5bd9e47227653 {
@@ -2896,14 +3372,14 @@ struct ConceptSpecializationExpr @0xfed5bd9e47227653 {
 
 struct CompoundLiteralExpr @0x9865eabaf4e2ef8c {
   expr @0:Expr;
-  lParenUcToken @1 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
   isUcFileUcScope @2 :Bool;
 }
 
 struct ChooseExpr @0xd4a658caf5a1339e {
   expr @0:Expr;
   builtinUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   isUcConditionUcDependent @3 :Bool;
   isUcConditionUcTrue @4 :Bool;
 }
@@ -2917,7 +3393,7 @@ struct CastExpr @0x8cabd91ab4a4dcb3 {
   expr @0:Expr;
   castUcKind @1 :CastKind;
   castUcKindUcName @2 :Text;
-  hasUcStoredFpFeatures @3 :Bool;
+  hasUcStoredUcFpUcFeatures @3 :Bool;
 }
 
 struct ImplicitCastExpr @0xf4659a194c7adcda {
@@ -2934,41 +3410,41 @@ struct CXXNamedCastExpr @0x9edfd291691d4a7d {
   angleUcBrackets @1 :TokenRange;
   castUcName @2 :Text;
   operatorUcToken @3 :TokenOffset;
-  rParenUcToken @4 :TokenOffset;
+  rUcParenUcToken @4 :TokenOffset;
 }
 
 struct CXXDynamicCastExpr @0xb48d513e0fa1452b {
-  cxxNamedUcCastUcExpr @0:CXXNamedCastExpr;
+  cxxUcNamedUcCastUcExpr @0:CXXNamedCastExpr;
   isUcAlwaysUcNull @1 :Bool;
 }
 
 struct CXXConstCastExpr @0x8ee388e71866e008 {
-  cxxNamedUcCastUcExpr @0:CXXNamedCastExpr;
+  cxxUcNamedUcCastUcExpr @0:CXXNamedCastExpr;
 }
 
 struct CXXAddrspaceCastExpr @0x8065afafedfafb6a {
-  cxxNamedUcCastUcExpr @0:CXXNamedCastExpr;
+  cxxUcNamedUcCastUcExpr @0:CXXNamedCastExpr;
 }
 
 struct CXXStaticCastExpr @0xd307133180b20a1a {
-  cxxNamedUcCastUcExpr @0:CXXNamedCastExpr;
+  cxxUcNamedUcCastUcExpr @0:CXXNamedCastExpr;
 }
 
 struct CXXReinterpretCastExpr @0x9ff4423f70d9541a {
-  cxxNamedUcCastUcExpr @0:CXXNamedCastExpr;
+  cxxUcNamedUcCastUcExpr @0:CXXNamedCastExpr;
 }
 
 struct CXXFunctionalCastExpr @0xf2c246adc881d86c {
   explicitUcCastUcExpr @0:ExplicitCastExpr;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   isUcListUcInitialization @3 :Bool;
 }
 
 struct CStyleCastExpr @0xddb96d0ba671cd89 {
   explicitUcCastUcExpr @0:ExplicitCastExpr;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct BuiltinBitCastExpr @0xc4d665f00ba3fa8b {
@@ -2980,19 +3456,19 @@ struct ObjCBridgedCastExpr @0xad38ef321a1ce1e3 {
   bridgeUcKeywordUcToken @1 :TokenOffset;
   bridgeUcKind @2 :ObjCBridgeCastKind;
   bridgeUcKindUcName @3 :Text;
-  lParenUcToken @4 :TokenOffset;
+  lUcParenUcToken @4 :TokenOffset;
 }
 
 struct CallExpr @0x8cff24c7f68e334b {
   expr @0:Expr;
-  adlCallUcKind @1 :ADLCallKind;
-  rParenUcToken @2 :TokenOffset;
-  hasUcStoredFpFeatures @3 :Bool;
+  adlUcCallUcKind @1 :ADLCallKind;
+  rUcParenUcToken @2 :TokenOffset;
+  hasUcStoredUcFpUcFeatures @3 :Bool;
   hasUcUnusedUcResultUcAttribute @4 :Bool;
   isUcBuiltinUcAssumeUcFalse @5 :Bool;
   isUcCallUcToUcStdUcMove @6 :Bool;
   isUcUnevaluatedUcBuiltinUcCall @7 :Bool;
-  usesAdl @8 :Bool;
+  usesUcAdl @8 :Bool;
 }
 
 struct CXXOperatorCallExpr @0xb6a5653b33cdf0c5 {
@@ -3014,7 +3490,7 @@ struct CUDAKernelCallExpr @0xd0bc1c26ca1e132f {
 
 struct UserDefinedLiteral @0xa1af860a6baa1029 {
   callUcExpr @0:CallExpr;
-  udSuffixUcToken @1 :TokenOffset;
+  udUcSuffixUcToken @1 :TokenOffset;
 }
 
 struct CXXUuidofExpr @0xcdde7d28fc7931f6 {
@@ -3024,8 +3500,8 @@ struct CXXUuidofExpr @0xcdde7d28fc7931f6 {
 
 struct CXXUnresolvedConstructExpr @0x9fbb7e373f171f86 {
   expr @0:Expr;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   isUcListUcInitialization @3 :Bool;
 }
 
@@ -3054,7 +3530,7 @@ struct CXXStdInitializerListExpr @0xd199eb3b19c592fa {
 
 struct CXXScalarValueInitExpr @0x9fd4b7d4985831e7 {
   expr @0:Expr;
-  rParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @1 :TokenOffset;
 }
 
 struct CXXRewrittenBinaryOperator @0xd00648fa0bd5ccc4 {
@@ -3113,19 +3589,19 @@ struct CXXInheritedCtorInitExpr @0xd5db83de022b1ee3 {
 struct CXXFoldExpr @0x8a593922e3ea9d50 {
   expr @0:Expr;
   ellipsisUcToken @1 :TokenOffset;
-  lParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @2 :TokenOffset;
   operator @3 :BinaryOperatorKind;
-  rParenUcToken @4 :TokenOffset;
+  rUcParenUcToken @4 :TokenOffset;
   isUcLeftUcFold @5 :Bool;
   isUcRightUcFold @6 :Bool;
 }
 
 struct CXXDependentScopeMemberExpr @0xa1a21ac74e691c1f {
   expr @0:Expr;
-  lAngleUcToken @1 :TokenOffset;
+  lUcAngleUcToken @1 :TokenOffset;
   memberUcToken @2 :TokenOffset;
   operatorUcToken @3 :TokenOffset;
-  rAngleUcToken @4 :TokenOffset;
+  rUcAngleUcToken @4 :TokenOffset;
   templateUcKeywordUcToken @5 :TokenOffset;
   hasUcExplicitUcTemplateUcArguments @6 :Bool;
   hasUcTemplateUcKeyword @7 :Bool;
@@ -3164,7 +3640,7 @@ struct CXXConstructExpr @0xb3d036394c09ed48 {
 }
 
 struct CXXTemporaryObjectExpr @0xb4be9b66753a2671 {
-  cxxConstructUcExpr @0:CXXConstructExpr;
+  cxxUcConstructUcExpr @0:CXXConstructExpr;
 }
 
 struct CXXBoolLiteralExpr @0x862b8d87bd2905e0 {
@@ -3187,7 +3663,7 @@ struct BinaryOperator @0xd858b89bd116f05f {
   opcode @1 :BinaryOperatorKind;
   opcodeUcString @2 :Text;
   operatorUcToken @3 :TokenOffset;
-  hasUcStoredFpFeatures @4 :Bool;
+  hasUcStoredUcFpUcFeatures @4 :Bool;
   isUcAdditiveUcOperation @5 :Bool;
   isUcAssignmentUcOperation @6 :Bool;
   isUcBitwiseUcOperation @7 :Bool;
@@ -3210,16 +3686,16 @@ struct CompoundAssignOperator @0xe6e7bc711d327cb9 {
 struct AtomicExpr @0xc730b6c3f33ecb9f {
   expr @0:Expr;
   builtinUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
-  isUcCmpXChg @3 :Bool;
-  isUcOpenCl @4 :Bool;
+  rUcParenUcToken @2 :TokenOffset;
+  isUcCmpUcXUcChg @3 :Bool;
+  isUcOpenUcCl @4 :Bool;
   isUcVolatile @5 :Bool;
 }
 
 struct AsTypeExpr @0xf646590167dcf1ab {
   expr @0:Expr;
   builtinUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ArrayTypeTraitExpr @0xcbcb35a78956a3cc {
@@ -3229,7 +3705,7 @@ struct ArrayTypeTraitExpr @0xcbcb35a78956a3cc {
 
 struct ArraySubscriptExpr @0xb5bb680da7ccce33 {
   expr @0:Expr;
-  rBracketUcToken @1 :TokenOffset;
+  rUcBracketUcToken @1 :TokenOffset;
 }
 
 struct ArrayInitLoopExpr @0xbe95601783117ebe {
@@ -3263,8 +3739,8 @@ struct BinaryConditionalOperator @0xde5f047672b1ac84 {
 struct VAArgExpr @0x8fa746d782ee27c9 {
   expr @0:Expr;
   builtinUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
-  isUcMicrosoftAbi @3 :Bool;
+  rUcParenUcToken @2 :TokenOffset;
+  isUcMicrosoftUcAbi @3 :Bool;
 }
 
 struct UnaryOperator @0xaa78820aaa7f22b8 {
@@ -3272,7 +3748,7 @@ struct UnaryOperator @0xaa78820aaa7f22b8 {
   canUcOverflow @1 :Bool;
   opcode @2 :UnaryOperatorKind;
   operatorUcToken @3 :TokenOffset;
-  hasUcStoredFpFeatures @4 :Bool;
+  hasUcStoredUcFpUcFeatures @4 :Bool;
   isUcArithmeticUcOperation @5 :Bool;
   isUcDecrementUcOperation @6 :Bool;
   isUcIncrementUcDecrementUcOperation @7 :Bool;
@@ -3284,7 +3760,7 @@ struct UnaryOperator @0xaa78820aaa7f22b8 {
 struct UnaryExprOrTypeTraitExpr @0xbc37e32561d53a59 {
   expr @0:Expr;
   operatorUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   isUcArgumentUcType @3 :Bool;
 }
 
@@ -3317,16 +3793,16 @@ struct StringLiteral @0xd0cec44e02f59cf2 {
   string @4 :Text;
   isUcAscii @5 :Bool;
   isUcPascal @6 :Bool;
-  isUtf16 @7 :Bool;
-  isUtf32 @8 :Bool;
-  isUtf8 @9 :Bool;
+  isUcUtf16 @7 :Bool;
+  isUcUtf32 @8 :Bool;
+  isUcUtf8 @9 :Bool;
   isUcWide @10 :Bool;
 }
 
 struct StmtExpr @0xe3606abe04461b8a {
   expr @0:Expr;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct SourceLocExpr @0xd4bebb374e1e6d58 {
@@ -3341,28 +3817,28 @@ struct SizeOfPackExpr @0xa4f777d7b3ce890c {
   expr @0:Expr;
   operatorUcToken @1 :TokenOffset;
   packUcToken @2 :TokenOffset;
-  rParenUcToken @3 :TokenOffset;
+  rUcParenUcToken @3 :TokenOffset;
   isUcPartiallyUcSubstituted @4 :Bool;
 }
 
 struct ShuffleVectorExpr @0xdfa87964ccc4abd6 {
   expr @0:Expr;
   builtinUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct SYCLUniqueStableNameExpr @0xfa67d59d16f9a78a {
   expr @0:Expr;
   computeUcName @1 :Text;
-  lParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @2 :TokenOffset;
   token @3 :TokenOffset;
-  rParenUcToken @4 :TokenOffset;
+  rUcParenUcToken @4 :TokenOffset;
 }
 
 struct RequiresExpr @0xe4f5db5ba506ab26 {
   expr @0:Expr;
-  rBraceUcToken @1 :TokenOffset;
-  requiresKwToken @2 :TokenOffset;
+  rUcBraceUcToken @1 :TokenOffset;
+  requiresUcKwUcToken @2 :TokenOffset;
   isUcSatisfied @3 :Bool;
 }
 
@@ -3382,14 +3858,14 @@ struct PredefinedExpr @0xf512f62d75089164 {
 
 struct ParenListExpr @0xc7ba76bb20cf6201 {
   expr @0:Expr;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ParenExpr @0x821bf890921895cd {
   expr @0:Expr;
-  lParen @1 :TokenOffset;
-  rParen @2 :TokenOffset;
+  lUcParen @1 :TokenOffset;
+  rUcParen @2 :TokenOffset;
 }
 
 struct PackExpansionExpr @0xbf1eafc846bba2e0 {
@@ -3399,9 +3875,9 @@ struct PackExpansionExpr @0xbf1eafc846bba2e0 {
 
 struct OverloadExpr @0xe1320ca92341cff5 {
   expr @0:Expr;
-  lAngleUcToken @1 :TokenOffset;
+  lUcAngleUcToken @1 :TokenOffset;
   nameUcToken @2 :TokenOffset;
-  rAngleUcToken @3 :TokenOffset;
+  rUcAngleUcToken @3 :TokenOffset;
   templateUcKeywordUcToken @4 :TokenOffset;
   hasUcExplicitUcTemplateUcArguments @5 :Bool;
   hasUcTemplateUcKeyword @6 :Bool;
@@ -3419,7 +3895,7 @@ struct UnresolvedMemberExpr @0xbd4aeea6486879d1 {
 struct UnresolvedLookupExpr @0xd04212a95a4ab25d {
   overloadUcExpr @0:OverloadExpr;
   isUcOverloaded @1 :Bool;
-  requiresAdl @2 :Bool;
+  requiresUcAdl @2 :Bool;
 }
 
 struct OpaqueValueExpr @0xd0ebba3413f46f6d {
@@ -3431,12 +3907,12 @@ struct OpaqueValueExpr @0xd0ebba3413f46f6d {
 struct OffsetOfExpr @0xe74e51b681474f08 {
   expr @0:Expr;
   operatorUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ObjCSubscriptRefExpr @0x827d6564c3126c7a {
   expr @0:Expr;
-  rBracket @1 :TokenOffset;
+  rUcBracket @1 :TokenOffset;
   isUcArrayUcSubscriptUcReferenceUcExpression @2 :Bool;
 }
 
@@ -3448,14 +3924,14 @@ struct ObjCStringLiteral @0x84470e968f7365fb {
 struct ObjCSelectorExpr @0xa6687e4a6275988d {
   expr @0:Expr;
   atUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ObjCProtocolExpr @0xb07709e6d6281804 {
   expr @0:Expr;
   atUcToken @1 :TokenOffset;
   protocolUcIdUcToken @2 :TokenOffset;
-  rParenUcToken @3 :TokenOffset;
+  rUcParenUcToken @3 :TokenOffset;
 }
 
 struct ObjCPropertyRefExpr @0x9f75c18ee7f1c7a2 {
@@ -3509,7 +3985,7 @@ struct ObjCIndirectCopyRestoreExpr @0x9475cc6d12ba1afb {
 struct ObjCEncodeExpr @0x911855b6fa2d9812 {
   expr @0:Expr;
   atUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct ObjCDictionaryLiteral @0xaef4d291186415b7 {
@@ -3540,21 +4016,21 @@ struct ObjCArrayLiteral @0xa36b5cac081b468a {
 struct OMPIteratorExpr @0xd52a7668addb282d {
   expr @0:Expr;
   iteratorUcKwUcToken @1 :TokenOffset;
-  lParenUcToken @2 :TokenOffset;
-  rParenUcToken @3 :TokenOffset;
+  lUcParenUcToken @2 :TokenOffset;
+  rUcParenUcToken @3 :TokenOffset;
 }
 
 struct OMPArrayShapingExpr @0xcddd3cf38d603be1 {
   expr @0:Expr;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
 }
 
 struct OMPArraySectionExpr @0xca2808db37aea2e0 {
   expr @0:Expr;
   colonUcTokenUcFirst @1 :TokenOffset;
   colonUcTokenUcSecond @2 :TokenOffset;
-  rBracketUcToken @3 :TokenOffset;
+  rUcBracketUcToken @3 :TokenOffset;
 }
 
 struct NoInitExpr @0xadedf240a5b5d3d1 {
@@ -3563,10 +4039,10 @@ struct NoInitExpr @0xadedf240a5b5d3d1 {
 
 struct MemberExpr @0xd8c89de1fe446ed0 {
   expr @0:Expr;
-  lAngleUcToken @1 :TokenOffset;
+  lUcAngleUcToken @1 :TokenOffset;
   memberUcToken @2 :TokenOffset;
   operatorUcToken @3 :TokenOffset;
-  rAngleUcToken @4 :TokenOffset;
+  rUcAngleUcToken @4 :TokenOffset;
   templateUcKeywordUcToken @5 :TokenOffset;
   hadUcMultipleUcCandidates @6 :Bool;
   hasUcExplicitUcTemplateUcArguments @7 :Bool;
@@ -3579,7 +4055,7 @@ struct MemberExpr @0xd8c89de1fe446ed0 {
 
 struct MatrixSubscriptExpr @0xc6e8f0398e560e56 {
   expr @0:Expr;
-  rBracketUcToken @1 :TokenOffset;
+  rUcBracketUcToken @1 :TokenOffset;
   isUcIncomplete @2 :Bool;
 }
 
@@ -3592,7 +4068,7 @@ struct MaterializeTemporaryExpr @0x81f0ffa9f501c48d {
 
 struct MSPropertySubscriptExpr @0xdca78c710e8a0bc9 {
   expr @0:Expr;
-  rBracketUcToken @1 :TokenOffset;
+  rUcBracketUcToken @1 :TokenOffset;
 }
 
 struct MSPropertyRefExpr @0xb14da9f10b21425d {
@@ -3620,8 +4096,8 @@ struct IntegerLiteral @0x9555503bb691c665 {
 
 struct InitListExpr @0xee5bc39a46a85bfd {
   expr @0:Expr;
-  lBraceUcToken @1 :TokenOffset;
-  rBraceUcToken @2 :TokenOffset;
+  lUcBraceUcToken @1 :TokenOffset;
+  rUcBraceUcToken @2 :TokenOffset;
   hadUcArrayUcRangeUcDesignator @3 :Bool;
   hasUcArrayUcFiller @4 :Bool;
   isUcExplicit @5 :Bool;
@@ -3643,7 +4119,7 @@ struct GenericSelectionExpr @0xb9c714e9030a2703 {
   expr @0:Expr;
   defaultUcToken @1 :TokenOffset;
   genericUcToken @2 :TokenOffset;
-  rParenUcToken @3 :TokenOffset;
+  rUcParenUcToken @3 :TokenOffset;
   isUcResultUcDependent @4 :Bool;
 }
 
@@ -3668,9 +4144,9 @@ struct ExprWithCleanups @0x8caff3daad0879d0 {
 
 struct ConstantExpr @0xb118d0dca5dbdf6e {
   fullUcExpr @0:FullExpr;
-  resultApValueUcKind @1 :APValueKind;
+  resultUcApUcValueUcKind @1 :APValueKind;
   resultUcStorageUcKind @2 :ResultStorageKind;
-  hasApValueUcResult @3 :Bool;
+  hasUcApUcValueUcResult @3 :Bool;
   isUcImmediateUcInvocation @4 :Bool;
 }
 
@@ -3705,8 +4181,8 @@ struct AttributedStmt @0xc33cd79cc9238608 {
 
 struct SwitchStmt @0x8f2566a2d81612cd {
   stmt @0:Stmt;
-  lParenUcToken @1 :TokenOffset;
-  rParenUcToken @2 :TokenOffset;
+  lUcParenUcToken @1 :TokenOffset;
+  rUcParenUcToken @2 :TokenOffset;
   switchUcToken @3 :TokenOffset;
   hasUcInitializerUcStorage @4 :Bool;
   hasUcVariableUcStorage @5 :Bool;
@@ -3726,55 +4202,55 @@ struct DefaultStmt @0xf8ae119f01317845 {
 
 struct CaseStmt @0x829897c890006599 {
   switchUcCase @0:SwitchCase;
-  caseUcStatementUcIsGnuRange @1 :Bool;
+  caseUcStatementUcIsUcGnuUcRange @1 :Bool;
   caseUcToken @2 :TokenOffset;
   ellipsisUcToken @3 :TokenOffset;
 }
 
 struct Type @0xd739e808bc1b3fd7 {
-  acceptsUcObjCTypeUcParams @0 :Bool;
+  acceptsUcObjUcCUcTypeUcParams @0 :Bool;
   canUcDecayUcToUcPointerUcType @1 :Bool;
   canUcHaveUcNullability @2 :Bool;
   containsUcErrors @3 :Bool;
   containsUcUnexpandedUcParameterUcPack @4 :Bool;
   dependence @5 :TypeDependence;
   linkage @6 :Linkage;
-  objCarcImplicitUcLifetime @7 :ObjCLifetime;
+  objUcCarcUcImplicitUcLifetime @7 :ObjCLifetime;
   scalarUcTypeUcKind @8 :ScalarTypeKind;
   kind @9 :TypeKind;
   visibility @10 :Visibility;
   hasUcAutoUcForUcTrailingUcReturnUcType @11 :Bool;
   hasUcFloatingUcRepresentation @12 :Bool;
   hasUcIntegerUcRepresentation @13 :Bool;
-  hasUcObjCPointerUcRepresentation @14 :Bool;
+  hasUcObjUcCUcPointerUcRepresentation @14 :Bool;
   hasUcPointerUcRepresentation @15 :Bool;
   hasUcSignedUcIntegerUcRepresentation @16 :Bool;
-  hasUcSizedVlaType @17 :Bool;
+  hasUcSizedUcVlaUcType @17 :Bool;
   hasUcUnnamedUcOrUcLocalUcType @18 :Bool;
   hasUcUnsignedUcIntegerUcRepresentation @19 :Bool;
   isUcAggregateUcType @20 :Bool;
-  isUcAlignUcValT @21 :Bool;
+  isUcAlignUcValUcT @21 :Bool;
   isUcAnyUcCharacterUcType @22 :Bool;
   isUcAnyUcComplexUcType @23 :Bool;
   isUcAnyUcPointerUcType @24 :Bool;
   isUcArithmeticUcType @25 :Bool;
   isUcArrayUcType @26 :Bool;
   isUcAtomicUcType @27 :Bool;
-  isBFloat16UcType @28 :Bool;
-  isUcBlockUcCompatibleUcObjCPointerUcType @29 :Bool;
+  isUcBUcFloat16UcType @28 :Bool;
+  isUcBlockUcCompatibleUcObjUcCUcPointerUcType @29 :Bool;
   isUcBlockUcPointerUcType @30 :Bool;
   isUcBooleanUcType @31 :Bool;
   isUcBuiltinUcType @32 :Bool;
-  isCarcBridgableUcType @33 :Bool;
-  isCudaDeviceUcBuiltinUcSurfaceUcType @34 :Bool;
-  isCudaDeviceUcBuiltinUcTextureUcType @35 :Bool;
+  isUcCarcUcBridgableUcType @33 :Bool;
+  isUcCudaUcDeviceUcBuiltinUcSurfaceUcType @34 :Bool;
+  isUcCudaUcDeviceUcBuiltinUcTextureUcType @35 :Bool;
   isUcCanonicalUcUnqualified @36 :Bool;
   isUcChar16UcType @37 :Bool;
   isUcChar32UcType @38 :Bool;
   isUcChar8UcType @39 :Bool;
   isUcCharacterUcType @40 :Bool;
   isUcClassUcType @41 :Bool;
-  isUcClkUcEventT @42 :Bool;
+  isUcClkUcEventUcT @42 :Bool;
   isUcComplexUcIntegerUcType @43 :Bool;
   isUcComplexUcType @44 :Bool;
   isUcCompoundUcType @45 :Bool;
@@ -3787,7 +4263,7 @@ struct Type @0xd739e808bc1b3fd7 {
   isUcDependentUcType @52 :Bool;
   isUcElaboratedUcTypeUcSpecifier @53 :Bool;
   isUcEnumeralUcType @54 :Bool;
-  isUcEventT @55 :Bool;
+  isUcEventUcT @55 :Bool;
   isUcExtUcIntUcType @56 :Bool;
   isUcExtUcVectorUcType @57 :Bool;
   isUcFixedUcPointUcOrUcIntegerUcType @58 :Bool;
@@ -3795,7 +4271,7 @@ struct Type @0xd739e808bc1b3fd7 {
   isUcFloat128UcType @60 :Bool;
   isUcFloat16UcType @61 :Bool;
   isUcFloatingUcType @62 :Bool;
-  isUcFromAst @63 :Bool;
+  isUcFromUcAst @63 :Bool;
   isUcFunctionUcNoUcProtoUcType @64 :Bool;
   isUcFunctionUcPointerUcType @65 :Bool;
   isUcFunctionUcProtoUcType @66 :Bool;
@@ -3813,7 +4289,7 @@ struct Type @0xd739e808bc1b3fd7 {
   isUcIntegralUcOrUcUnscopedUcEnumerationUcType @78 :Bool;
   isUcIntegralUcType @79 :Bool;
   isUcInterfaceUcType @80 :Bool;
-  isLValueUcReferenceUcType @81 :Bool;
+  isUcLUcValueUcReferenceUcType @81 :Bool;
   isUcLinkageUcValid @82 :Bool;
   isUcLiteralUcType @83 :Bool;
   isUcMatrixUcType @84 :Bool;
@@ -3821,94 +4297,94 @@ struct Type @0xd739e808bc1b3fd7 {
   isUcMemberUcFunctionUcPointerUcType @86 :Bool;
   isUcMemberUcPointerUcType @87 :Bool;
   isUcNonUcOverloadUcPlaceholderUcType @88 :Bool;
-  isUcNothrowT @89 :Bool;
+  isUcNothrowUcT @89 :Bool;
   isUcNullUcPointerUcType @90 :Bool;
-  isOclExtUcOpaqueUcType @91 :Bool;
-  isOclImage1dUcArrayRoType @92 :Bool;
-  isOclImage1dUcArrayRwType @93 :Bool;
-  isOclImage1dUcArrayWoType @94 :Bool;
-  isOclImage1dUcBufferRoType @95 :Bool;
-  isOclImage1dUcBufferRwType @96 :Bool;
-  isOclImage1dUcBufferWoType @97 :Bool;
-  isOclImage1dRoType @98 :Bool;
-  isOclImage1dRwType @99 :Bool;
-  isOclImage1dWoType @100 :Bool;
-  isOclImage2dUcArrayUcDepthRoType @101 :Bool;
-  isOclImage2dUcArrayUcDepthRwType @102 :Bool;
-  isOclImage2dUcArrayUcDepthWoType @103 :Bool;
-  isOclImage2dUcArrayMsaaDepthRoType @104 :Bool;
-  isOclImage2dUcArrayMsaaDepthRwType @105 :Bool;
-  isOclImage2dUcArrayMsaaDepthWoType @106 :Bool;
-  isOclImage2dUcArrayMsaaroType @107 :Bool;
-  isOclImage2dUcArrayMsaarwType @108 :Bool;
-  isOclImage2dUcArrayMsaawoType @109 :Bool;
-  isOclImage2dUcArrayRoType @110 :Bool;
-  isOclImage2dUcArrayRwType @111 :Bool;
-  isOclImage2dUcArrayWoType @112 :Bool;
-  isOclImage2dUcDepthRoType @113 :Bool;
-  isOclImage2dUcDepthRwType @114 :Bool;
-  isOclImage2dUcDepthWoType @115 :Bool;
-  isOclImage2dMsaaDepthRoType @116 :Bool;
-  isOclImage2dMsaaDepthRwType @117 :Bool;
-  isOclImage2dMsaaDepthWoType @118 :Bool;
-  isOclImage2dMsaaroType @119 :Bool;
-  isOclImage2dMsaarwType @120 :Bool;
-  isOclImage2dMsaawoType @121 :Bool;
-  isOclImage2dRoType @122 :Bool;
-  isOclImage2dRwType @123 :Bool;
-  isOclImage2dWoType @124 :Bool;
-  isOclImage3dRoType @125 :Bool;
-  isOclImage3dRwType @126 :Bool;
-  isOclImage3dWoType @127 :Bool;
-  isOclIntelUcSubgroupAvcImeUcDualUcReferenceUcStreaminUcType @128 :Bool;
-  isOclIntelUcSubgroupAvcImeUcPayloadUcType @129 :Bool;
-  isOclIntelUcSubgroupAvcImeUcResultUcDualUcReferenceUcStreamoutUcType @130 :Bool;
-  isOclIntelUcSubgroupAvcImeUcResultUcSingleUcReferenceUcStreamoutUcType @131 :Bool;
-  isOclIntelUcSubgroupAvcImeUcResultUcType @132 :Bool;
-  isOclIntelUcSubgroupAvcImeUcSingleUcReferenceUcStreaminUcType @133 :Bool;
-  isOclIntelUcSubgroupAvcMceUcPayloadUcType @134 :Bool;
-  isOclIntelUcSubgroupAvcMceUcResultUcType @135 :Bool;
-  isOclIntelUcSubgroupAvcRefUcPayloadUcType @136 :Bool;
-  isOclIntelUcSubgroupAvcRefUcResultUcType @137 :Bool;
-  isOclIntelUcSubgroupAvcSicUcPayloadUcType @138 :Bool;
-  isOclIntelUcSubgroupAvcSicUcResultUcType @139 :Bool;
-  isOclIntelUcSubgroupAvcType @140 :Bool;
-  isUcObjCarcBridgableUcType @141 :Bool;
-  isUcObjCarcImplicitlyUcUnretainedUcType @142 :Bool;
-  isUcObjCBoxableUcRecordUcType @143 :Bool;
-  isUcObjCBuiltinUcType @144 :Bool;
-  isUcObjCClassUcOrUcClassUcKindUcOfUcType @145 :Bool;
-  isUcObjCClassUcType @146 :Bool;
-  isUcObjCIdUcType @147 :Bool;
-  isUcObjCIndependentUcClassUcType @148 :Bool;
-  isUcObjCIndirectUcLifetimeUcType @149 :Bool;
-  isUcObjCInertUcUnsafeUcUnretainedUcType @150 :Bool;
-  isUcObjCLifetimeUcType @151 :Bool;
-  isUcObjCnsObjectUcType @152 :Bool;
-  isUcObjCObjectUcOrUcInterfaceUcType @153 :Bool;
-  isUcObjCObjectUcPointerUcType @154 :Bool;
-  isUcObjCObjectUcType @155 :Bool;
-  isUcObjCQualifiedUcClassUcType @156 :Bool;
-  isUcObjCQualifiedUcIdUcType @157 :Bool;
-  isUcObjCQualifiedUcInterfaceUcType @158 :Bool;
-  isUcObjCRetainableUcType @159 :Bool;
-  isUcObjCSelUcType @160 :Bool;
+  isUcOclUcExtUcOpaqueUcType @91 :Bool;
+  isUcOclUcImage1dUcArrayUcRoUcType @92 :Bool;
+  isUcOclUcImage1dUcArrayUcRwUcType @93 :Bool;
+  isUcOclUcImage1dUcArrayUcWoUcType @94 :Bool;
+  isUcOclUcImage1dUcBufferUcRoUcType @95 :Bool;
+  isUcOclUcImage1dUcBufferUcRwUcType @96 :Bool;
+  isUcOclUcImage1dUcBufferUcWoUcType @97 :Bool;
+  isUcOclUcImage1dUcRoUcType @98 :Bool;
+  isUcOclUcImage1dUcRwUcType @99 :Bool;
+  isUcOclUcImage1dUcWoUcType @100 :Bool;
+  isUcOclUcImage2dUcArrayUcDepthUcRoUcType @101 :Bool;
+  isUcOclUcImage2dUcArrayUcDepthUcRwUcType @102 :Bool;
+  isUcOclUcImage2dUcArrayUcDepthUcWoUcType @103 :Bool;
+  isUcOclUcImage2dUcArrayUcMsaaUcDepthUcRoUcType @104 :Bool;
+  isUcOclUcImage2dUcArrayUcMsaaUcDepthUcRwUcType @105 :Bool;
+  isUcOclUcImage2dUcArrayUcMsaaUcDepthUcWoUcType @106 :Bool;
+  isUcOclUcImage2dUcArrayUcMsaaroUcType @107 :Bool;
+  isUcOclUcImage2dUcArrayUcMsaarwUcType @108 :Bool;
+  isUcOclUcImage2dUcArrayUcMsaawoUcType @109 :Bool;
+  isUcOclUcImage2dUcArrayUcRoUcType @110 :Bool;
+  isUcOclUcImage2dUcArrayUcRwUcType @111 :Bool;
+  isUcOclUcImage2dUcArrayUcWoUcType @112 :Bool;
+  isUcOclUcImage2dUcDepthUcRoUcType @113 :Bool;
+  isUcOclUcImage2dUcDepthUcRwUcType @114 :Bool;
+  isUcOclUcImage2dUcDepthUcWoUcType @115 :Bool;
+  isUcOclUcImage2dUcMsaaUcDepthUcRoUcType @116 :Bool;
+  isUcOclUcImage2dUcMsaaUcDepthUcRwUcType @117 :Bool;
+  isUcOclUcImage2dUcMsaaUcDepthUcWoUcType @118 :Bool;
+  isUcOclUcImage2dUcMsaaroUcType @119 :Bool;
+  isUcOclUcImage2dUcMsaarwUcType @120 :Bool;
+  isUcOclUcImage2dUcMsaawoUcType @121 :Bool;
+  isUcOclUcImage2dUcRoUcType @122 :Bool;
+  isUcOclUcImage2dUcRwUcType @123 :Bool;
+  isUcOclUcImage2dUcWoUcType @124 :Bool;
+  isUcOclUcImage3dUcRoUcType @125 :Bool;
+  isUcOclUcImage3dUcRwUcType @126 :Bool;
+  isUcOclUcImage3dUcWoUcType @127 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcImeUcDualUcReferenceUcStreaminUcType @128 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcImeUcPayloadUcType @129 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcImeUcResultUcDualUcReferenceUcStreamoutUcType @130 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcImeUcResultUcSingleUcReferenceUcStreamoutUcType @131 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcImeUcResultUcType @132 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcImeUcSingleUcReferenceUcStreaminUcType @133 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcMceUcPayloadUcType @134 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcMceUcResultUcType @135 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcRefUcPayloadUcType @136 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcRefUcResultUcType @137 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcSicUcPayloadUcType @138 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcSicUcResultUcType @139 :Bool;
+  isUcOclUcIntelUcSubgroupUcAvcUcType @140 :Bool;
+  isUcObjUcCarcUcBridgableUcType @141 :Bool;
+  isUcObjUcCarcUcImplicitlyUcUnretainedUcType @142 :Bool;
+  isUcObjUcCUcBoxableUcRecordUcType @143 :Bool;
+  isUcObjUcCUcBuiltinUcType @144 :Bool;
+  isUcObjUcCUcClassUcOrUcClassUcKindUcOfUcType @145 :Bool;
+  isUcObjUcCUcClassUcType @146 :Bool;
+  isUcObjUcCUcIdUcType @147 :Bool;
+  isUcObjUcCUcIndependentUcClassUcType @148 :Bool;
+  isUcObjUcCUcIndirectUcLifetimeUcType @149 :Bool;
+  isUcObjUcCUcInertUcUnsafeUcUnretainedUcType @150 :Bool;
+  isUcObjUcCUcLifetimeUcType @151 :Bool;
+  isUcObjUcCnsUcObjectUcType @152 :Bool;
+  isUcObjUcCUcObjectUcOrUcInterfaceUcType @153 :Bool;
+  isUcObjUcCUcObjectUcPointerUcType @154 :Bool;
+  isUcObjUcCUcObjectUcType @155 :Bool;
+  isUcObjUcCUcQualifiedUcClassUcType @156 :Bool;
+  isUcObjUcCUcQualifiedUcIdUcType @157 :Bool;
+  isUcObjUcCUcQualifiedUcInterfaceUcType @158 :Bool;
+  isUcObjUcCUcRetainableUcType @159 :Bool;
+  isUcObjUcCUcSelUcType @160 :Bool;
   isUcObjectUcPointerUcType @161 :Bool;
   isUcObjectUcType @162 :Bool;
-  isUcOpenClSpecificUcType @163 :Bool;
+  isUcOpenUcClUcSpecificUcType @163 :Bool;
   isUcOverloadableUcType @164 :Bool;
   isUcPipeUcType @165 :Bool;
   isUcPlaceholderUcType @166 :Bool;
   isUcPointerUcType @167 :Bool;
   isUcPromotableUcIntegerUcType @168 :Bool;
-  isUcQueueT @169 :Bool;
-  isRValueUcReferenceUcType @170 :Bool;
+  isUcQueueUcT @169 :Bool;
+  isUcRUcValueUcReferenceUcType @170 :Bool;
   isUcRealUcFloatingUcType @171 :Bool;
   isUcRealUcType @172 :Bool;
   isUcRecordUcType @173 :Bool;
   isUcReferenceUcType @174 :Bool;
-  isUcReserveIdt @175 :Bool;
-  isUcSamplerT @176 :Bool;
+  isUcReserveUcIdt @175 :Bool;
+  isUcSamplerUcT @176 :Bool;
   isUcSaturatedUcFixedUcPointUcType @177 :Bool;
   isUcScalarUcType @178 :Bool;
   isUcScopedUcEnumeralUcType @179 :Bool;
@@ -3933,7 +4409,7 @@ struct Type @0xd739e808bc1b3fd7 {
   isUcUnsignedUcFixedUcPointUcType @198 :Bool;
   isUcUnsignedUcIntegerUcOrUcEnumerationUcType @199 :Bool;
   isUcUnsignedUcIntegerUcType @200 :Bool;
-  isVlstBuiltinUcType @201 :Bool;
+  isUcVlstUcBuiltinUcType @201 :Bool;
   isUcVariableUcArrayUcType @202 :Bool;
   isUcVariablyUcModifiedUcType @203 :Bool;
   isUcVectorUcType @204 :Bool;
@@ -3943,19 +4419,19 @@ struct Type @0xd739e808bc1b3fd7 {
   isUcWideUcCharacterUcType @208 :Bool;
   isUcQualified @209 :Bool;
   addressUcSpace @210 :LangAS;
-  objCLifetime @211 :ObjCLifetime;
+  objUcCUcLifetime @211 :ObjCLifetime;
   hasUcAddressUcSpace @212 :Bool;
   hasUcLocalUcNonUcFastUcQualifiers @213 :Bool;
   hasUcLocalUcQualifiers @214 :Bool;
-  hasUcNonUcTrivialUcObjCLifetime @215 :Bool;
-  hasUcNonUcTrivialUcToUcPrimitiveUcCopyCUnion @216 :Bool;
-  hasUcNonUcTrivialUcToUcPrimitiveUcDefaultUcInitializeCUnion @217 :Bool;
-  hasUcNonUcTrivialUcToUcPrimitiveUcDestructCUnion @218 :Bool;
+  hasUcNonUcTrivialUcObjUcCUcLifetime @215 :Bool;
+  hasUcNonUcTrivialUcToUcPrimitiveUcCopyUcCUcUnion @216 :Bool;
+  hasUcNonUcTrivialUcToUcPrimitiveUcDefaultUcInitializeUcCUcUnion @217 :Bool;
+  hasUcNonUcTrivialUcToUcPrimitiveUcDestructUcCUcUnion @218 :Bool;
   hasUcQualifiers @219 :Bool;
-  hasUcStrongUcOrUcWeakUcObjCLifetime @220 :Bool;
-  isCForbiddenLValueUcType @221 :Bool;
-  isCxx11PodType @222 :Bool;
-  isCxx98PodType @223 :Bool;
+  hasUcStrongUcOrUcWeakUcObjUcCUcLifetime @220 :Bool;
+  isUcCUcForbiddenUcLUcValueUcType @221 :Bool;
+  isUcCxx11UcPodUcType @222 :Bool;
+  isUcCxx98UcPodUcType @223 :Bool;
   isUcCanonical @224 :Bool;
   isUcCanonicalUcAsUcParam @225 :Bool;
   isUcConstUcQualified @226 :Bool;
@@ -3966,11 +4442,11 @@ struct Type @0xd739e808bc1b3fd7 {
   isUcNonUcTrivialUcToUcPrimitiveUcCopy @231 :PrimitiveCopyKind;
   isUcNonUcTrivialUcToUcPrimitiveUcDefaultUcInitialize @232 :PrimitiveDefaultInitializeKind;
   isUcNonUcTrivialUcToUcPrimitiveUcDestructiveUcMove @233 :PrimitiveCopyKind;
-  isUcNonUcWeakUcInMrrWithUcObjCWeak @234 :Bool;
+  isUcNonUcWeakUcInUcMrrUcWithUcObjUcCUcWeak @234 :Bool;
   isUcNull @235 :Bool;
-  isUcObjCgcStrong @236 :Bool;
-  isUcObjCgcWeak @237 :Bool;
-  isPodType @238 :Bool;
+  isUcObjUcCgcUcStrong @236 :Bool;
+  isUcObjUcCgcUcWeak @237 :Bool;
+  isUcPodUcType @238 :Bool;
   isUcRestrictUcQualified @239 :Bool;
   isUcTrivialUcType @240 :Bool;
   isUcTriviallyUcCopyableUcType @241 :Bool;
@@ -4021,7 +4497,7 @@ struct SubstTemplateTypeParmPackType @0x8e845eb2b04a7eee {
 struct ReferenceType @0xf0b00042a60e0b80 {
   type @0:Type;
   isUcInnerUcReference @1 :Bool;
-  isUcSpelledUcAsLValue @2 :Bool;
+  isUcSpelledUcAsUcLUcValue @2 :Bool;
 }
 
 struct RValueReferenceType @0xbecf2238a530256c {
@@ -4064,13 +4540,13 @@ struct ObjCObjectType @0xdb7630160ba51f56 {
   type @0:Type;
   isUcKindUcOfUcType @1 :Bool;
   isUcKindUcOfUcTypeUcAsUcWritten @2 :Bool;
-  isUcObjCClass @3 :Bool;
-  isUcObjCId @4 :Bool;
-  isUcObjCQualifiedUcClass @5 :Bool;
-  isUcObjCQualifiedUcId @6 :Bool;
-  isUcObjCUnqualifiedUcClass @7 :Bool;
-  isUcObjCUnqualifiedUcId @8 :Bool;
-  isUcObjCUnqualifiedUcIdUcOrUcClass @9 :Bool;
+  isUcObjUcCUcClass @3 :Bool;
+  isUcObjUcCUcId @4 :Bool;
+  isUcObjUcCUcQualifiedUcClass @5 :Bool;
+  isUcObjUcCUcQualifiedUcId @6 :Bool;
+  isUcObjUcCUcUnqualifiedUcClass @7 :Bool;
+  isUcObjUcCUcUnqualifiedUcId @8 :Bool;
+  isUcObjUcCUcUnqualifiedUcIdUcOrUcClass @9 :Bool;
   isUcSpecialized @10 :Bool;
   isUcSpecializedUcAsUcWritten @11 :Bool;
   isUcSugared @12 :Bool;
@@ -4079,13 +4555,13 @@ struct ObjCObjectType @0xdb7630160ba51f56 {
 }
 
 struct ObjCInterfaceType @0xeaf73283b88684f2 {
-  objCObjectUcType @0:ObjCObjectType;
+  objUcCUcObjectUcType @0:ObjCObjectType;
 }
 
 struct ObjCObjectPointerType @0x83fd17147f556ba9 {
   type @0:Type;
   isUcKindUcOfUcType @1 :Bool;
-  isUcObjCIdUcOrUcClassUcType @2 :Bool;
+  isUcObjUcCUcIdUcOrUcClassUcType @2 :Bool;
   isUcSpecialized @3 :Bool;
   isUcSpecializedUcAsUcWritten @4 :Bool;
   isUcSugared @5 :Bool;
@@ -4127,7 +4603,7 @@ struct InjectedClassNameType @0xa6c2e5edfcbf618a {
 struct FunctionType @0x948975919b3cdebd {
   type @0:Type;
   callUcConv @1 :CallingConv;
-  cmseNsCallUcAttribute @2 :Bool;
+  cmseUcNsUcCallUcAttribute @2 :Bool;
   hasUcRegUcParm @3 :Bool;
   noUcReturnUcAttribute @4 :Bool;
   isUcConst @5 :Bool;
@@ -4237,7 +4713,7 @@ struct AttributedType @0xfae2a754903efb8f {
   type @0:Type;
   attributeUcKind @1 :AttributeKind;
   isUcCallingUcConv @2 :Bool;
-  isMsTypeUcSpec @3 :Bool;
+  isUcMsUcTypeUcSpec @3 :Bool;
   isUcQualifier @4 :Bool;
   isUcSugared @5 :Bool;
 }
@@ -4255,8 +4731,8 @@ struct ArrayType @0xf51c56dc11dd4d5a {
 struct VariableArrayType @0x82d4d76c013109f5 {
   arrayUcType @0:ArrayType;
   bracketsUcRange @1 :TokenRange;
-  lBracketUcToken @2 :TokenOffset;
-  rBracketUcToken @3 :TokenOffset;
+  lUcBracketUcToken @2 :TokenOffset;
+  rUcBracketUcToken @3 :TokenOffset;
   isUcSugared @4 :Bool;
 }
 
@@ -4268,8 +4744,8 @@ struct IncompleteArrayType @0xd4f7a93527ce975e {
 struct DependentSizedArrayType @0xeb3238fd4299c322 {
   arrayUcType @0:ArrayType;
   bracketsUcRange @1 :TokenRange;
-  lBracketUcToken @2 :TokenOffset;
-  rBracketUcToken @3 :TokenOffset;
+  lUcBracketUcToken @2 :TokenOffset;
+  rUcBracketUcToken @3 :TokenOffset;
   isUcSugared @4 :Bool;
 }
 
@@ -4304,7 +4780,7 @@ struct UnresolvedUsingType @0xb008cd48c50f310f {
 
 struct UnaryTransformType @0xf3f137ad71547e38 {
   type @0:Type;
-  uttKind @1 :UTTKind;
+  uttUcKind @1 :UTTKind;
   isUcSugared @2 :Bool;
 }
 
@@ -4324,386 +4800,387 @@ struct TypeOfExprType @0x9be487fb240a6fe1 {
 }
 
 struct EntityList @0xf26db0d046aab9c9 {
-  decl @0 :List(Decl);
-  classUcScopeUcFunctionUcSpecializationUcDecl @1 :List(ClassScopeFunctionSpecializationDecl);
-  capturedUcDecl @2 :List(CapturedDecl);
-  blockUcDecl @3 :List(BlockDecl);
-  accessUcSpecUcDecl @4 :List(AccessSpecDecl);
-  translationUcUnitUcDecl @5 :List(TranslationUnitDecl);
-  staticUcAssertUcDecl @6 :List(StaticAssertDecl);
-  requiresUcExprUcBodyUcDecl @7 :List(RequiresExprBodyDecl);
-  pragmaUcDetectUcMismatchUcDecl @8 :List(PragmaDetectMismatchDecl);
-  pragmaUcCommentUcDecl @9 :List(PragmaCommentDecl);
-  objCPropertyUcImplUcDecl @10 :List(ObjCPropertyImplDecl);
-  namedUcDecl @11 :List(NamedDecl);
-  labelUcDecl @12 :List(LabelDecl);
-  baseUcUsingUcDecl @13 :List(BaseUsingDecl);
-  usingUcEnumUcDecl @14 :List(UsingEnumDecl);
-  usingUcDecl @15 :List(UsingDecl);
-  valueUcDecl @16 :List(ValueDecl);
-  unresolvedUcUsingUcValueUcDecl @17 :List(UnresolvedUsingValueDecl);
-  templateUcParamUcObjectUcDecl @18 :List(TemplateParamObjectDecl);
-  ompDeclareUcReductionUcDecl @19 :List(OMPDeclareReductionDecl);
-  msGuidUcDecl @20 :List(MSGuidDecl);
-  indirectUcFieldUcDecl @21 :List(IndirectFieldDecl);
-  enumUcConstantUcDecl @22 :List(EnumConstantDecl);
-  declaratorUcDecl @23 :List(DeclaratorDecl);
-  varUcDecl @24 :List(VarDecl);
-  parmUcVarUcDecl @25 :List(ParmVarDecl);
-  ompCapturedUcExprUcDecl @26 :List(OMPCapturedExprDecl);
-  implicitUcParamUcDecl @27 :List(ImplicitParamDecl);
-  decompositionUcDecl @28 :List(DecompositionDecl);
-  varUcTemplateUcSpecializationUcDecl @29 :List(VarTemplateSpecializationDecl);
-  varUcTemplateUcPartialUcSpecializationUcDecl @30 :List(VarTemplatePartialSpecializationDecl);
-  nonUcTypeUcTemplateUcParmUcDecl @31 :List(NonTypeTemplateParmDecl);
-  msPropertyUcDecl @32 :List(MSPropertyDecl);
-  functionUcDecl @33 :List(FunctionDecl);
-  cxxMethodUcDecl @34 :List(CXXMethodDecl);
-  cxxDestructorUcDecl @35 :List(CXXDestructorDecl);
-  cxxConversionUcDecl @36 :List(CXXConversionDecl);
-  cxxConstructorUcDecl @37 :List(CXXConstructorDecl);
-  cxxDeductionUcGuideUcDecl @38 :List(CXXDeductionGuideDecl);
-  fieldUcDecl @39 :List(FieldDecl);
-  objCIvarUcDecl @40 :List(ObjCIvarDecl);
-  objCAtUcDefsUcFieldUcDecl @41 :List(ObjCAtDefsFieldDecl);
-  bindingUcDecl @42 :List(BindingDecl);
-  usingUcShadowUcDecl @43 :List(UsingShadowDecl);
-  constructorUcUsingUcShadowUcDecl @44 :List(ConstructorUsingShadowDecl);
-  usingUcPackUcDecl @45 :List(UsingPackDecl);
-  usingUcDirectiveUcDecl @46 :List(UsingDirectiveDecl);
-  unresolvedUcUsingUcIfUcExistsUcDecl @47 :List(UnresolvedUsingIfExistsDecl);
-  typeUcDecl @48 :List(TypeDecl);
-  templateUcTypeUcParmUcDecl @49 :List(TemplateTypeParmDecl);
-  tagUcDecl @50 :List(TagDecl);
-  recordUcDecl @51 :List(RecordDecl);
-  cxxRecordUcDecl @52 :List(CXXRecordDecl);
-  classUcTemplateUcSpecializationUcDecl @53 :List(ClassTemplateSpecializationDecl);
-  classUcTemplateUcPartialUcSpecializationUcDecl @54 :List(ClassTemplatePartialSpecializationDecl);
-  enumUcDecl @55 :List(EnumDecl);
-  unresolvedUcUsingUcTypenameUcDecl @56 :List(UnresolvedUsingTypenameDecl);
-  typedefUcNameUcDecl @57 :List(TypedefNameDecl);
-  typedefUcDecl @58 :List(TypedefDecl);
-  typeUcAliasUcDecl @59 :List(TypeAliasDecl);
-  objCTypeUcParamUcDecl @60 :List(ObjCTypeParamDecl);
-  templateUcDecl @61 :List(TemplateDecl);
-  redeclarableUcTemplateUcDecl @62 :List(RedeclarableTemplateDecl);
-  functionUcTemplateUcDecl @63 :List(FunctionTemplateDecl);
-  classUcTemplateUcDecl @64 :List(ClassTemplateDecl);
-  varUcTemplateUcDecl @65 :List(VarTemplateDecl);
-  typeUcAliasUcTemplateUcDecl @66 :List(TypeAliasTemplateDecl);
-  conceptUcDecl @67 :List(ConceptDecl);
-  builtinUcTemplateUcDecl @68 :List(BuiltinTemplateDecl);
-  templateUcTemplateUcParmUcDecl @69 :List(TemplateTemplateParmDecl);
-  objCPropertyUcDecl @70 :List(ObjCPropertyDecl);
-  objCMethodUcDecl @71 :List(ObjCMethodDecl);
-  objCContainerUcDecl @72 :List(ObjCContainerDecl);
-  objCCategoryUcDecl @73 :List(ObjCCategoryDecl);
-  objCProtocolUcDecl @74 :List(ObjCProtocolDecl);
-  objCInterfaceUcDecl @75 :List(ObjCInterfaceDecl);
-  objCImplUcDecl @76 :List(ObjCImplDecl);
-  objCCategoryUcImplUcDecl @77 :List(ObjCCategoryImplDecl);
-  objCImplementationUcDecl @78 :List(ObjCImplementationDecl);
-  objCCompatibleUcAliasUcDecl @79 :List(ObjCCompatibleAliasDecl);
-  namespaceUcDecl @80 :List(NamespaceDecl);
-  namespaceUcAliasUcDecl @81 :List(NamespaceAliasDecl);
-  linkageUcSpecUcDecl @82 :List(LinkageSpecDecl);
-  lifetimeUcExtendedUcTemporaryUcDecl @83 :List(LifetimeExtendedTemporaryDecl);
-  importUcDecl @84 :List(ImportDecl);
-  friendUcTemplateUcDecl @85 :List(FriendTemplateDecl);
-  friendUcDecl @86 :List(FriendDecl);
-  fileUcScopeUcAsmUcDecl @87 :List(FileScopeAsmDecl);
-  externCContextUcDecl @88 :List(ExternCContextDecl);
-  exportUcDecl @89 :List(ExportDecl);
-  emptyUcDecl @90 :List(EmptyDecl);
-  stmt @91 :List(Stmt);
-  sehTryUcStmt @92 :List(SEHTryStmt);
-  sehLeaveUcStmt @93 :List(SEHLeaveStmt);
-  sehFinallyUcStmt @94 :List(SEHFinallyStmt);
-  sehExceptUcStmt @95 :List(SEHExceptStmt);
-  returnUcStmt @96 :List(ReturnStmt);
-  objCForUcCollectionUcStmt @97 :List(ObjCForCollectionStmt);
-  objCAutoreleaseUcPoolUcStmt @98 :List(ObjCAutoreleasePoolStmt);
-  objCAtUcTryUcStmt @99 :List(ObjCAtTryStmt);
-  objCAtUcThrowUcStmt @100 :List(ObjCAtThrowStmt);
-  objCAtUcSynchronizedUcStmt @101 :List(ObjCAtSynchronizedStmt);
-  objCAtUcFinallyUcStmt @102 :List(ObjCAtFinallyStmt);
-  objCAtUcCatchUcStmt @103 :List(ObjCAtCatchStmt);
-  ompExecutableUcDirective @104 :List(OMPExecutableDirective);
-  ompDispatchUcDirective @105 :List(OMPDispatchDirective);
-  ompDepobjUcDirective @106 :List(OMPDepobjDirective);
-  ompCriticalUcDirective @107 :List(OMPCriticalDirective);
-  ompCancellationUcPointUcDirective @108 :List(OMPCancellationPointDirective);
-  ompCancelUcDirective @109 :List(OMPCancelDirective);
-  ompBarrierUcDirective @110 :List(OMPBarrierDirective);
-  ompAtomicUcDirective @111 :List(OMPAtomicDirective);
-  ompTeamsUcDirective @112 :List(OMPTeamsDirective);
-  ompTaskyieldUcDirective @113 :List(OMPTaskyieldDirective);
-  ompTaskwaitUcDirective @114 :List(OMPTaskwaitDirective);
-  ompTaskgroupUcDirective @115 :List(OMPTaskgroupDirective);
-  ompTaskUcDirective @116 :List(OMPTaskDirective);
-  ompTargetUcUpdateUcDirective @117 :List(OMPTargetUpdateDirective);
-  ompTargetUcTeamsUcDirective @118 :List(OMPTargetTeamsDirective);
-  ompTargetUcParallelUcDirective @119 :List(OMPTargetParallelDirective);
-  ompTargetUcExitUcDataUcDirective @120 :List(OMPTargetExitDataDirective);
-  ompTargetUcEnterUcDataUcDirective @121 :List(OMPTargetEnterDataDirective);
-  ompTargetUcDirective @122 :List(OMPTargetDirective);
-  ompTargetUcDataUcDirective @123 :List(OMPTargetDataDirective);
-  ompSingleUcDirective @124 :List(OMPSingleDirective);
-  ompSectionsUcDirective @125 :List(OMPSectionsDirective);
-  ompSectionUcDirective @126 :List(OMPSectionDirective);
-  ompScanUcDirective @127 :List(OMPScanDirective);
-  ompParallelUcSectionsUcDirective @128 :List(OMPParallelSectionsDirective);
-  ompParallelUcMasterUcDirective @129 :List(OMPParallelMasterDirective);
-  ompParallelUcDirective @130 :List(OMPParallelDirective);
-  ompOrderedUcDirective @131 :List(OMPOrderedDirective);
-  ompMasterUcDirective @132 :List(OMPMasterDirective);
-  ompMaskedUcDirective @133 :List(OMPMaskedDirective);
-  ompLoopUcBasedUcDirective @134 :List(OMPLoopBasedDirective);
-  ompUnrollUcDirective @135 :List(OMPUnrollDirective);
-  ompTileUcDirective @136 :List(OMPTileDirective);
-  ompLoopUcDirective @137 :List(OMPLoopDirective);
-  ompForUcSimdUcDirective @138 :List(OMPForSimdDirective);
-  ompForUcDirective @139 :List(OMPForDirective);
-  ompDistributeUcSimdUcDirective @140 :List(OMPDistributeSimdDirective);
-  ompDistributeUcParallelUcForUcSimdUcDirective @141 :List(OMPDistributeParallelForSimdDirective);
-  ompDistributeUcParallelUcForUcDirective @142 :List(OMPDistributeParallelForDirective);
-  ompDistributeUcDirective @143 :List(OMPDistributeDirective);
-  ompTeamsUcDistributeUcSimdUcDirective @144 :List(OMPTeamsDistributeSimdDirective);
-  ompTeamsUcDistributeUcParallelUcForUcSimdUcDirective @145 :List(OMPTeamsDistributeParallelForSimdDirective);
-  ompTeamsUcDistributeUcParallelUcForUcDirective @146 :List(OMPTeamsDistributeParallelForDirective);
-  ompTeamsUcDistributeUcDirective @147 :List(OMPTeamsDistributeDirective);
-  ompTaskUcLoopUcSimdUcDirective @148 :List(OMPTaskLoopSimdDirective);
-  ompTaskUcLoopUcDirective @149 :List(OMPTaskLoopDirective);
-  ompTargetUcTeamsUcDistributeUcSimdUcDirective @150 :List(OMPTargetTeamsDistributeSimdDirective);
-  ompTargetUcTeamsUcDistributeUcParallelUcForUcSimdUcDirective @151 :List(OMPTargetTeamsDistributeParallelForSimdDirective);
-  ompTargetUcTeamsUcDistributeUcParallelUcForUcDirective @152 :List(OMPTargetTeamsDistributeParallelForDirective);
-  ompTargetUcTeamsUcDistributeUcDirective @153 :List(OMPTargetTeamsDistributeDirective);
-  ompTargetUcSimdUcDirective @154 :List(OMPTargetSimdDirective);
-  ompTargetUcParallelUcForUcSimdUcDirective @155 :List(OMPTargetParallelForSimdDirective);
-  ompTargetUcParallelUcForUcDirective @156 :List(OMPTargetParallelForDirective);
-  ompSimdUcDirective @157 :List(OMPSimdDirective);
-  ompParallelUcMasterUcTaskUcLoopUcSimdUcDirective @158 :List(OMPParallelMasterTaskLoopSimdDirective);
-  ompParallelUcMasterUcTaskUcLoopUcDirective @159 :List(OMPParallelMasterTaskLoopDirective);
-  ompParallelUcForUcSimdUcDirective @160 :List(OMPParallelForSimdDirective);
-  ompParallelUcForUcDirective @161 :List(OMPParallelForDirective);
-  ompMasterUcTaskUcLoopUcSimdUcDirective @162 :List(OMPMasterTaskLoopSimdDirective);
-  ompMasterUcTaskUcLoopUcDirective @163 :List(OMPMasterTaskLoopDirective);
-  ompInteropUcDirective @164 :List(OMPInteropDirective);
-  ompFlushUcDirective @165 :List(OMPFlushDirective);
-  ompCanonicalUcLoop @166 :List(OMPCanonicalLoop);
-  nullUcStmt @167 :List(NullStmt);
-  msDependentUcExistsUcStmt @168 :List(MSDependentExistsStmt);
-  indirectUcGotoUcStmt @169 :List(IndirectGotoStmt);
-  ifUcStmt @170 :List(IfStmt);
-  gotoUcStmt @171 :List(GotoStmt);
-  forUcStmt @172 :List(ForStmt);
-  doUcStmt @173 :List(DoStmt);
-  declUcStmt @174 :List(DeclStmt);
-  coroutineUcBodyUcStmt @175 :List(CoroutineBodyStmt);
-  coreturnUcStmt @176 :List(CoreturnStmt);
-  continueUcStmt @177 :List(ContinueStmt);
-  compoundUcStmt @178 :List(CompoundStmt);
-  capturedUcStmt @179 :List(CapturedStmt);
-  cxxTryUcStmt @180 :List(CXXTryStmt);
-  cxxForUcRangeUcStmt @181 :List(CXXForRangeStmt);
-  cxxCatchUcStmt @182 :List(CXXCatchStmt);
-  breakUcStmt @183 :List(BreakStmt);
-  asmUcStmt @184 :List(AsmStmt);
-  msAsmUcStmt @185 :List(MSAsmStmt);
-  gccAsmUcStmt @186 :List(GCCAsmStmt);
-  whileUcStmt @187 :List(WhileStmt);
-  valueUcStmt @188 :List(ValueStmt);
-  labelUcStmt @189 :List(LabelStmt);
-  expr @190 :List(Expr);
-  designatedUcInitUcUpdateUcExpr @191 :List(DesignatedInitUpdateExpr);
-  designatedUcInitUcExpr @192 :List(DesignatedInitExpr);
-  dependentUcScopeUcDeclUcRefUcExpr @193 :List(DependentScopeDeclRefExpr);
-  dependentUcCoawaitUcExpr @194 :List(DependentCoawaitExpr);
-  declUcRefUcExpr @195 :List(DeclRefExpr);
-  coroutineUcSuspendUcExpr @196 :List(CoroutineSuspendExpr);
-  coawaitUcExpr @197 :List(CoawaitExpr);
-  coyieldUcExpr @198 :List(CoyieldExpr);
-  convertUcVectorUcExpr @199 :List(ConvertVectorExpr);
-  conceptUcSpecializationUcExpr @200 :List(ConceptSpecializationExpr);
-  compoundUcLiteralUcExpr @201 :List(CompoundLiteralExpr);
-  chooseUcExpr @202 :List(ChooseExpr);
-  characterUcLiteral @203 :List(CharacterLiteral);
-  castUcExpr @204 :List(CastExpr);
-  implicitUcCastUcExpr @205 :List(ImplicitCastExpr);
-  explicitUcCastUcExpr @206 :List(ExplicitCastExpr);
-  cxxNamedUcCastUcExpr @207 :List(CXXNamedCastExpr);
-  cxxDynamicUcCastUcExpr @208 :List(CXXDynamicCastExpr);
-  cxxConstUcCastUcExpr @209 :List(CXXConstCastExpr);
-  cxxAddrspaceUcCastUcExpr @210 :List(CXXAddrspaceCastExpr);
-  cxxStaticUcCastUcExpr @211 :List(CXXStaticCastExpr);
-  cxxReinterpretUcCastUcExpr @212 :List(CXXReinterpretCastExpr);
-  cxxFunctionalUcCastUcExpr @213 :List(CXXFunctionalCastExpr);
-  cStyleUcCastUcExpr @214 :List(CStyleCastExpr);
-  builtinUcBitUcCastUcExpr @215 :List(BuiltinBitCastExpr);
-  objCBridgedUcCastUcExpr @216 :List(ObjCBridgedCastExpr);
-  callUcExpr @217 :List(CallExpr);
-  cxxOperatorUcCallUcExpr @218 :List(CXXOperatorCallExpr);
-  cxxMemberUcCallUcExpr @219 :List(CXXMemberCallExpr);
-  cudaKernelUcCallUcExpr @220 :List(CUDAKernelCallExpr);
-  userUcDefinedUcLiteral @221 :List(UserDefinedLiteral);
-  cxxUuidofUcExpr @222 :List(CXXUuidofExpr);
-  cxxUnresolvedUcConstructUcExpr @223 :List(CXXUnresolvedConstructExpr);
-  cxxTypeidUcExpr @224 :List(CXXTypeidExpr);
-  cxxThrowUcExpr @225 :List(CXXThrowExpr);
-  cxxThisUcExpr @226 :List(CXXThisExpr);
-  cxxStdUcInitializerUcListUcExpr @227 :List(CXXStdInitializerListExpr);
-  cxxScalarUcValueUcInitUcExpr @228 :List(CXXScalarValueInitExpr);
-  cxxRewrittenUcBinaryUcOperator @229 :List(CXXRewrittenBinaryOperator);
-  cxxPseudoUcDestructorUcExpr @230 :List(CXXPseudoDestructorExpr);
-  cxxNullUcPtrUcLiteralUcExpr @231 :List(CXXNullPtrLiteralExpr);
-  cxxNoexceptUcExpr @232 :List(CXXNoexceptExpr);
-  cxxNewUcExpr @233 :List(CXXNewExpr);
-  cxxInheritedUcCtorUcInitUcExpr @234 :List(CXXInheritedCtorInitExpr);
-  cxxFoldUcExpr @235 :List(CXXFoldExpr);
-  cxxDependentUcScopeUcMemberUcExpr @236 :List(CXXDependentScopeMemberExpr);
-  cxxDeleteUcExpr @237 :List(CXXDeleteExpr);
-  cxxDefaultUcInitUcExpr @238 :List(CXXDefaultInitExpr);
-  cxxDefaultUcArgUcExpr @239 :List(CXXDefaultArgExpr);
-  cxxConstructUcExpr @240 :List(CXXConstructExpr);
-  cxxTemporaryUcObjectUcExpr @241 :List(CXXTemporaryObjectExpr);
-  cxxBoolUcLiteralUcExpr @242 :List(CXXBoolLiteralExpr);
-  cxxBindUcTemporaryUcExpr @243 :List(CXXBindTemporaryExpr);
-  blockUcExpr @244 :List(BlockExpr);
-  binaryUcOperator @245 :List(BinaryOperator);
-  compoundUcAssignUcOperator @246 :List(CompoundAssignOperator);
-  atomicUcExpr @247 :List(AtomicExpr);
-  asUcTypeUcExpr @248 :List(AsTypeExpr);
-  arrayUcTypeUcTraitUcExpr @249 :List(ArrayTypeTraitExpr);
-  arrayUcSubscriptUcExpr @250 :List(ArraySubscriptExpr);
-  arrayUcInitUcLoopUcExpr @251 :List(ArrayInitLoopExpr);
-  arrayUcInitUcIndexUcExpr @252 :List(ArrayInitIndexExpr);
-  addrUcLabelUcExpr @253 :List(AddrLabelExpr);
-  abstractUcConditionalUcOperator @254 :List(AbstractConditionalOperator);
-  conditionalUcOperator @255 :List(ConditionalOperator);
-  binaryUcConditionalUcOperator @256 :List(BinaryConditionalOperator);
-  vaArgUcExpr @257 :List(VAArgExpr);
-  unaryUcOperator @258 :List(UnaryOperator);
-  unaryUcExprUcOrUcTypeUcTraitUcExpr @259 :List(UnaryExprOrTypeTraitExpr);
-  typoUcExpr @260 :List(TypoExpr);
-  typeUcTraitUcExpr @261 :List(TypeTraitExpr);
-  substUcNonUcTypeUcTemplateUcParmUcPackUcExpr @262 :List(SubstNonTypeTemplateParmPackExpr);
-  substUcNonUcTypeUcTemplateUcParmUcExpr @263 :List(SubstNonTypeTemplateParmExpr);
-  stringUcLiteral @264 :List(StringLiteral);
-  stmtUcExpr @265 :List(StmtExpr);
-  sourceUcLocUcExpr @266 :List(SourceLocExpr);
-  sizeUcOfUcPackUcExpr @267 :List(SizeOfPackExpr);
-  shuffleUcVectorUcExpr @268 :List(ShuffleVectorExpr);
-  syclUniqueUcStableUcNameUcExpr @269 :List(SYCLUniqueStableNameExpr);
-  requiresUcExpr @270 :List(RequiresExpr);
-  recoveryUcExpr @271 :List(RecoveryExpr);
-  pseudoUcObjectUcExpr @272 :List(PseudoObjectExpr);
-  predefinedUcExpr @273 :List(PredefinedExpr);
-  parenUcListUcExpr @274 :List(ParenListExpr);
-  parenUcExpr @275 :List(ParenExpr);
-  packUcExpansionUcExpr @276 :List(PackExpansionExpr);
-  overloadUcExpr @277 :List(OverloadExpr);
-  unresolvedUcMemberUcExpr @278 :List(UnresolvedMemberExpr);
-  unresolvedUcLookupUcExpr @279 :List(UnresolvedLookupExpr);
-  opaqueUcValueUcExpr @280 :List(OpaqueValueExpr);
-  offsetUcOfUcExpr @281 :List(OffsetOfExpr);
-  objCSubscriptUcRefUcExpr @282 :List(ObjCSubscriptRefExpr);
-  objCStringUcLiteral @283 :List(ObjCStringLiteral);
-  objCSelectorUcExpr @284 :List(ObjCSelectorExpr);
-  objCProtocolUcExpr @285 :List(ObjCProtocolExpr);
-  objCPropertyUcRefUcExpr @286 :List(ObjCPropertyRefExpr);
-  objCMessageUcExpr @287 :List(ObjCMessageExpr);
-  objCIvarUcRefUcExpr @288 :List(ObjCIvarRefExpr);
-  objCIsaUcExpr @289 :List(ObjCIsaExpr);
-  objCIndirectUcCopyUcRestoreUcExpr @290 :List(ObjCIndirectCopyRestoreExpr);
-  objCEncodeUcExpr @291 :List(ObjCEncodeExpr);
-  objCDictionaryUcLiteral @292 :List(ObjCDictionaryLiteral);
-  objCBoxedUcExpr @293 :List(ObjCBoxedExpr);
-  objCBoolUcLiteralUcExpr @294 :List(ObjCBoolLiteralExpr);
-  objCAvailabilityUcCheckUcExpr @295 :List(ObjCAvailabilityCheckExpr);
-  objCArrayUcLiteral @296 :List(ObjCArrayLiteral);
-  ompIteratorUcExpr @297 :List(OMPIteratorExpr);
-  ompArrayUcShapingUcExpr @298 :List(OMPArrayShapingExpr);
-  ompArrayUcSectionUcExpr @299 :List(OMPArraySectionExpr);
-  noUcInitUcExpr @300 :List(NoInitExpr);
-  memberUcExpr @301 :List(MemberExpr);
-  matrixUcSubscriptUcExpr @302 :List(MatrixSubscriptExpr);
-  materializeUcTemporaryUcExpr @303 :List(MaterializeTemporaryExpr);
-  msPropertyUcSubscriptUcExpr @304 :List(MSPropertySubscriptExpr);
-  msPropertyUcRefUcExpr @305 :List(MSPropertyRefExpr);
-  lambdaUcExpr @306 :List(LambdaExpr);
-  integerUcLiteral @307 :List(IntegerLiteral);
-  initUcListUcExpr @308 :List(InitListExpr);
-  implicitUcValueUcInitUcExpr @309 :List(ImplicitValueInitExpr);
-  imaginaryUcLiteral @310 :List(ImaginaryLiteral);
-  genericUcSelectionUcExpr @311 :List(GenericSelectionExpr);
-  gnuNullUcExpr @312 :List(GNUNullExpr);
-  functionUcParmUcPackUcExpr @313 :List(FunctionParmPackExpr);
-  fullUcExpr @314 :List(FullExpr);
-  exprUcWithUcCleanups @315 :List(ExprWithCleanups);
-  constantUcExpr @316 :List(ConstantExpr);
-  floatingUcLiteral @317 :List(FloatingLiteral);
-  fixedUcPointUcLiteral @318 :List(FixedPointLiteral);
-  extUcVectorUcElementUcExpr @319 :List(ExtVectorElementExpr);
-  expressionUcTraitUcExpr @320 :List(ExpressionTraitExpr);
-  attributedUcStmt @321 :List(AttributedStmt);
-  switchUcStmt @322 :List(SwitchStmt);
-  switchUcCase @323 :List(SwitchCase);
-  defaultUcStmt @324 :List(DefaultStmt);
-  caseUcStmt @325 :List(CaseStmt);
-  type @326 :List(Type);
-  templateUcTypeUcParmUcType @327 :List(TemplateTypeParmType);
-  templateUcSpecializationUcType @328 :List(TemplateSpecializationType);
-  tagUcType @329 :List(TagType);
-  recordUcType @330 :List(RecordType);
-  enumUcType @331 :List(EnumType);
-  substUcTemplateUcTypeUcParmUcType @332 :List(SubstTemplateTypeParmType);
-  substUcTemplateUcTypeUcParmUcPackUcType @333 :List(SubstTemplateTypeParmPackType);
-  referenceUcType @334 :List(ReferenceType);
-  rValueUcReferenceUcType @335 :List(RValueReferenceType);
-  lValueUcReferenceUcType @336 :List(LValueReferenceType);
-  pointerUcType @337 :List(PointerType);
-  pipeUcType @338 :List(PipeType);
-  parenUcType @339 :List(ParenType);
-  packUcExpansionUcType @340 :List(PackExpansionType);
-  objCTypeUcParamUcType @341 :List(ObjCTypeParamType);
-  objCObjectUcType @342 :List(ObjCObjectType);
-  objCInterfaceUcType @343 :List(ObjCInterfaceType);
-  objCObjectUcPointerUcType @344 :List(ObjCObjectPointerType);
-  memberUcPointerUcType @345 :List(MemberPointerType);
-  matrixUcType @346 :List(MatrixType);
-  dependentUcSizedUcMatrixUcType @347 :List(DependentSizedMatrixType);
-  constantUcMatrixUcType @348 :List(ConstantMatrixType);
-  macroUcQualifiedUcType @349 :List(MacroQualifiedType);
-  injectedUcClassUcNameUcType @350 :List(InjectedClassNameType);
-  functionUcType @351 :List(FunctionType);
-  functionUcProtoUcType @352 :List(FunctionProtoType);
-  functionUcNoUcProtoUcType @353 :List(FunctionNoProtoType);
-  extUcIntUcType @354 :List(ExtIntType);
-  dependentUcVectorUcType @355 :List(DependentVectorType);
-  dependentUcSizedUcExtUcVectorUcType @356 :List(DependentSizedExtVectorType);
-  dependentUcExtUcIntUcType @357 :List(DependentExtIntType);
-  dependentUcAddressUcSpaceUcType @358 :List(DependentAddressSpaceType);
-  deducedUcType @359 :List(DeducedType);
-  deducedUcTemplateUcSpecializationUcType @360 :List(DeducedTemplateSpecializationType);
-  autoUcType @361 :List(AutoType);
-  decltypeUcType @362 :List(DecltypeType);
-  complexUcType @363 :List(ComplexType);
-  builtinUcType @364 :List(BuiltinType);
-  blockUcPointerUcType @365 :List(BlockPointerType);
-  attributedUcType @366 :List(AttributedType);
-  atomicUcType @367 :List(AtomicType);
-  arrayUcType @368 :List(ArrayType);
-  variableUcArrayUcType @369 :List(VariableArrayType);
-  incompleteUcArrayUcType @370 :List(IncompleteArrayType);
-  dependentUcSizedUcArrayUcType @371 :List(DependentSizedArrayType);
-  constantUcArrayUcType @372 :List(ConstantArrayType);
-  adjustedUcType @373 :List(AdjustedType);
-  decayedUcType @374 :List(DecayedType);
-  vectorUcType @375 :List(VectorType);
-  extUcVectorUcType @376 :List(ExtVectorType);
-  unresolvedUcUsingUcType @377 :List(UnresolvedUsingType);
-  unaryUcTransformUcType @378 :List(UnaryTransformType);
-  typedefUcType @379 :List(TypedefType);
-  typeUcOfUcType @380 :List(TypeOfType);
-  typeUcOfUcExprUcType @381 :List(TypeOfExprType);
+  token @0 :List(Token);
+  decl @1 :List(Decl);
+  classUcScopeUcFunctionUcSpecializationUcDecl @2 :List(ClassScopeFunctionSpecializationDecl);
+  capturedUcDecl @3 :List(CapturedDecl);
+  blockUcDecl @4 :List(BlockDecl);
+  accessUcSpecUcDecl @5 :List(AccessSpecDecl);
+  translationUcUnitUcDecl @6 :List(TranslationUnitDecl);
+  staticUcAssertUcDecl @7 :List(StaticAssertDecl);
+  requiresUcExprUcBodyUcDecl @8 :List(RequiresExprBodyDecl);
+  pragmaUcDetectUcMismatchUcDecl @9 :List(PragmaDetectMismatchDecl);
+  pragmaUcCommentUcDecl @10 :List(PragmaCommentDecl);
+  objUcCUcPropertyUcImplUcDecl @11 :List(ObjCPropertyImplDecl);
+  namedUcDecl @12 :List(NamedDecl);
+  labelUcDecl @13 :List(LabelDecl);
+  baseUcUsingUcDecl @14 :List(BaseUsingDecl);
+  usingUcEnumUcDecl @15 :List(UsingEnumDecl);
+  usingUcDecl @16 :List(UsingDecl);
+  valueUcDecl @17 :List(ValueDecl);
+  unresolvedUcUsingUcValueUcDecl @18 :List(UnresolvedUsingValueDecl);
+  templateUcParamUcObjectUcDecl @19 :List(TemplateParamObjectDecl);
+  ompUcDeclareUcReductionUcDecl @20 :List(OMPDeclareReductionDecl);
+  msUcGuidUcDecl @21 :List(MSGuidDecl);
+  indirectUcFieldUcDecl @22 :List(IndirectFieldDecl);
+  enumUcConstantUcDecl @23 :List(EnumConstantDecl);
+  declaratorUcDecl @24 :List(DeclaratorDecl);
+  varUcDecl @25 :List(VarDecl);
+  parmUcVarUcDecl @26 :List(ParmVarDecl);
+  ompUcCapturedUcExprUcDecl @27 :List(OMPCapturedExprDecl);
+  implicitUcParamUcDecl @28 :List(ImplicitParamDecl);
+  decompositionUcDecl @29 :List(DecompositionDecl);
+  varUcTemplateUcSpecializationUcDecl @30 :List(VarTemplateSpecializationDecl);
+  varUcTemplateUcPartialUcSpecializationUcDecl @31 :List(VarTemplatePartialSpecializationDecl);
+  nonUcTypeUcTemplateUcParmUcDecl @32 :List(NonTypeTemplateParmDecl);
+  msUcPropertyUcDecl @33 :List(MSPropertyDecl);
+  functionUcDecl @34 :List(FunctionDecl);
+  cxxUcMethodUcDecl @35 :List(CXXMethodDecl);
+  cxxUcDestructorUcDecl @36 :List(CXXDestructorDecl);
+  cxxUcConversionUcDecl @37 :List(CXXConversionDecl);
+  cxxUcConstructorUcDecl @38 :List(CXXConstructorDecl);
+  cxxUcDeductionUcGuideUcDecl @39 :List(CXXDeductionGuideDecl);
+  fieldUcDecl @40 :List(FieldDecl);
+  objUcCUcIvarUcDecl @41 :List(ObjCIvarDecl);
+  objUcCUcAtUcDefsUcFieldUcDecl @42 :List(ObjCAtDefsFieldDecl);
+  bindingUcDecl @43 :List(BindingDecl);
+  usingUcShadowUcDecl @44 :List(UsingShadowDecl);
+  constructorUcUsingUcShadowUcDecl @45 :List(ConstructorUsingShadowDecl);
+  usingUcPackUcDecl @46 :List(UsingPackDecl);
+  usingUcDirectiveUcDecl @47 :List(UsingDirectiveDecl);
+  unresolvedUcUsingUcIfUcExistsUcDecl @48 :List(UnresolvedUsingIfExistsDecl);
+  typeUcDecl @49 :List(TypeDecl);
+  templateUcTypeUcParmUcDecl @50 :List(TemplateTypeParmDecl);
+  tagUcDecl @51 :List(TagDecl);
+  recordUcDecl @52 :List(RecordDecl);
+  cxxUcRecordUcDecl @53 :List(CXXRecordDecl);
+  classUcTemplateUcSpecializationUcDecl @54 :List(ClassTemplateSpecializationDecl);
+  classUcTemplateUcPartialUcSpecializationUcDecl @55 :List(ClassTemplatePartialSpecializationDecl);
+  enumUcDecl @56 :List(EnumDecl);
+  unresolvedUcUsingUcTypenameUcDecl @57 :List(UnresolvedUsingTypenameDecl);
+  typedefUcNameUcDecl @58 :List(TypedefNameDecl);
+  typedefUcDecl @59 :List(TypedefDecl);
+  typeUcAliasUcDecl @60 :List(TypeAliasDecl);
+  objUcCUcTypeUcParamUcDecl @61 :List(ObjCTypeParamDecl);
+  templateUcDecl @62 :List(TemplateDecl);
+  redeclarableUcTemplateUcDecl @63 :List(RedeclarableTemplateDecl);
+  functionUcTemplateUcDecl @64 :List(FunctionTemplateDecl);
+  classUcTemplateUcDecl @65 :List(ClassTemplateDecl);
+  varUcTemplateUcDecl @66 :List(VarTemplateDecl);
+  typeUcAliasUcTemplateUcDecl @67 :List(TypeAliasTemplateDecl);
+  conceptUcDecl @68 :List(ConceptDecl);
+  builtinUcTemplateUcDecl @69 :List(BuiltinTemplateDecl);
+  templateUcTemplateUcParmUcDecl @70 :List(TemplateTemplateParmDecl);
+  objUcCUcPropertyUcDecl @71 :List(ObjCPropertyDecl);
+  objUcCUcMethodUcDecl @72 :List(ObjCMethodDecl);
+  objUcCUcContainerUcDecl @73 :List(ObjCContainerDecl);
+  objUcCUcCategoryUcDecl @74 :List(ObjCCategoryDecl);
+  objUcCUcProtocolUcDecl @75 :List(ObjCProtocolDecl);
+  objUcCUcInterfaceUcDecl @76 :List(ObjCInterfaceDecl);
+  objUcCUcImplUcDecl @77 :List(ObjCImplDecl);
+  objUcCUcCategoryUcImplUcDecl @78 :List(ObjCCategoryImplDecl);
+  objUcCUcImplementationUcDecl @79 :List(ObjCImplementationDecl);
+  objUcCUcCompatibleUcAliasUcDecl @80 :List(ObjCCompatibleAliasDecl);
+  namespaceUcDecl @81 :List(NamespaceDecl);
+  namespaceUcAliasUcDecl @82 :List(NamespaceAliasDecl);
+  linkageUcSpecUcDecl @83 :List(LinkageSpecDecl);
+  lifetimeUcExtendedUcTemporaryUcDecl @84 :List(LifetimeExtendedTemporaryDecl);
+  importUcDecl @85 :List(ImportDecl);
+  friendUcTemplateUcDecl @86 :List(FriendTemplateDecl);
+  friendUcDecl @87 :List(FriendDecl);
+  fileUcScopeUcAsmUcDecl @88 :List(FileScopeAsmDecl);
+  externUcCUcContextUcDecl @89 :List(ExternCContextDecl);
+  exportUcDecl @90 :List(ExportDecl);
+  emptyUcDecl @91 :List(EmptyDecl);
+  stmt @92 :List(Stmt);
+  sehUcTryUcStmt @93 :List(SEHTryStmt);
+  sehUcLeaveUcStmt @94 :List(SEHLeaveStmt);
+  sehUcFinallyUcStmt @95 :List(SEHFinallyStmt);
+  sehUcExceptUcStmt @96 :List(SEHExceptStmt);
+  returnUcStmt @97 :List(ReturnStmt);
+  objUcCUcForUcCollectionUcStmt @98 :List(ObjCForCollectionStmt);
+  objUcCUcAutoreleaseUcPoolUcStmt @99 :List(ObjCAutoreleasePoolStmt);
+  objUcCUcAtUcTryUcStmt @100 :List(ObjCAtTryStmt);
+  objUcCUcAtUcThrowUcStmt @101 :List(ObjCAtThrowStmt);
+  objUcCUcAtUcSynchronizedUcStmt @102 :List(ObjCAtSynchronizedStmt);
+  objUcCUcAtUcFinallyUcStmt @103 :List(ObjCAtFinallyStmt);
+  objUcCUcAtUcCatchUcStmt @104 :List(ObjCAtCatchStmt);
+  ompUcExecutableUcDirective @105 :List(OMPExecutableDirective);
+  ompUcDispatchUcDirective @106 :List(OMPDispatchDirective);
+  ompUcDepobjUcDirective @107 :List(OMPDepobjDirective);
+  ompUcCriticalUcDirective @108 :List(OMPCriticalDirective);
+  ompUcCancellationUcPointUcDirective @109 :List(OMPCancellationPointDirective);
+  ompUcCancelUcDirective @110 :List(OMPCancelDirective);
+  ompUcBarrierUcDirective @111 :List(OMPBarrierDirective);
+  ompUcAtomicUcDirective @112 :List(OMPAtomicDirective);
+  ompUcTeamsUcDirective @113 :List(OMPTeamsDirective);
+  ompUcTaskyieldUcDirective @114 :List(OMPTaskyieldDirective);
+  ompUcTaskwaitUcDirective @115 :List(OMPTaskwaitDirective);
+  ompUcTaskgroupUcDirective @116 :List(OMPTaskgroupDirective);
+  ompUcTaskUcDirective @117 :List(OMPTaskDirective);
+  ompUcTargetUcUpdateUcDirective @118 :List(OMPTargetUpdateDirective);
+  ompUcTargetUcTeamsUcDirective @119 :List(OMPTargetTeamsDirective);
+  ompUcTargetUcParallelUcDirective @120 :List(OMPTargetParallelDirective);
+  ompUcTargetUcExitUcDataUcDirective @121 :List(OMPTargetExitDataDirective);
+  ompUcTargetUcEnterUcDataUcDirective @122 :List(OMPTargetEnterDataDirective);
+  ompUcTargetUcDirective @123 :List(OMPTargetDirective);
+  ompUcTargetUcDataUcDirective @124 :List(OMPTargetDataDirective);
+  ompUcSingleUcDirective @125 :List(OMPSingleDirective);
+  ompUcSectionsUcDirective @126 :List(OMPSectionsDirective);
+  ompUcSectionUcDirective @127 :List(OMPSectionDirective);
+  ompUcScanUcDirective @128 :List(OMPScanDirective);
+  ompUcParallelUcSectionsUcDirective @129 :List(OMPParallelSectionsDirective);
+  ompUcParallelUcMasterUcDirective @130 :List(OMPParallelMasterDirective);
+  ompUcParallelUcDirective @131 :List(OMPParallelDirective);
+  ompUcOrderedUcDirective @132 :List(OMPOrderedDirective);
+  ompUcMasterUcDirective @133 :List(OMPMasterDirective);
+  ompUcMaskedUcDirective @134 :List(OMPMaskedDirective);
+  ompUcLoopUcBasedUcDirective @135 :List(OMPLoopBasedDirective);
+  ompUcUnrollUcDirective @136 :List(OMPUnrollDirective);
+  ompUcTileUcDirective @137 :List(OMPTileDirective);
+  ompUcLoopUcDirective @138 :List(OMPLoopDirective);
+  ompUcForUcSimdUcDirective @139 :List(OMPForSimdDirective);
+  ompUcForUcDirective @140 :List(OMPForDirective);
+  ompUcDistributeUcSimdUcDirective @141 :List(OMPDistributeSimdDirective);
+  ompUcDistributeUcParallelUcForUcSimdUcDirective @142 :List(OMPDistributeParallelForSimdDirective);
+  ompUcDistributeUcParallelUcForUcDirective @143 :List(OMPDistributeParallelForDirective);
+  ompUcDistributeUcDirective @144 :List(OMPDistributeDirective);
+  ompUcTeamsUcDistributeUcSimdUcDirective @145 :List(OMPTeamsDistributeSimdDirective);
+  ompUcTeamsUcDistributeUcParallelUcForUcSimdUcDirective @146 :List(OMPTeamsDistributeParallelForSimdDirective);
+  ompUcTeamsUcDistributeUcParallelUcForUcDirective @147 :List(OMPTeamsDistributeParallelForDirective);
+  ompUcTeamsUcDistributeUcDirective @148 :List(OMPTeamsDistributeDirective);
+  ompUcTaskUcLoopUcSimdUcDirective @149 :List(OMPTaskLoopSimdDirective);
+  ompUcTaskUcLoopUcDirective @150 :List(OMPTaskLoopDirective);
+  ompUcTargetUcTeamsUcDistributeUcSimdUcDirective @151 :List(OMPTargetTeamsDistributeSimdDirective);
+  ompUcTargetUcTeamsUcDistributeUcParallelUcForUcSimdUcDirective @152 :List(OMPTargetTeamsDistributeParallelForSimdDirective);
+  ompUcTargetUcTeamsUcDistributeUcParallelUcForUcDirective @153 :List(OMPTargetTeamsDistributeParallelForDirective);
+  ompUcTargetUcTeamsUcDistributeUcDirective @154 :List(OMPTargetTeamsDistributeDirective);
+  ompUcTargetUcSimdUcDirective @155 :List(OMPTargetSimdDirective);
+  ompUcTargetUcParallelUcForUcSimdUcDirective @156 :List(OMPTargetParallelForSimdDirective);
+  ompUcTargetUcParallelUcForUcDirective @157 :List(OMPTargetParallelForDirective);
+  ompUcSimdUcDirective @158 :List(OMPSimdDirective);
+  ompUcParallelUcMasterUcTaskUcLoopUcSimdUcDirective @159 :List(OMPParallelMasterTaskLoopSimdDirective);
+  ompUcParallelUcMasterUcTaskUcLoopUcDirective @160 :List(OMPParallelMasterTaskLoopDirective);
+  ompUcParallelUcForUcSimdUcDirective @161 :List(OMPParallelForSimdDirective);
+  ompUcParallelUcForUcDirective @162 :List(OMPParallelForDirective);
+  ompUcMasterUcTaskUcLoopUcSimdUcDirective @163 :List(OMPMasterTaskLoopSimdDirective);
+  ompUcMasterUcTaskUcLoopUcDirective @164 :List(OMPMasterTaskLoopDirective);
+  ompUcInteropUcDirective @165 :List(OMPInteropDirective);
+  ompUcFlushUcDirective @166 :List(OMPFlushDirective);
+  ompUcCanonicalUcLoop @167 :List(OMPCanonicalLoop);
+  nullUcStmt @168 :List(NullStmt);
+  msUcDependentUcExistsUcStmt @169 :List(MSDependentExistsStmt);
+  indirectUcGotoUcStmt @170 :List(IndirectGotoStmt);
+  ifUcStmt @171 :List(IfStmt);
+  gotoUcStmt @172 :List(GotoStmt);
+  forUcStmt @173 :List(ForStmt);
+  doUcStmt @174 :List(DoStmt);
+  declUcStmt @175 :List(DeclStmt);
+  coroutineUcBodyUcStmt @176 :List(CoroutineBodyStmt);
+  coreturnUcStmt @177 :List(CoreturnStmt);
+  continueUcStmt @178 :List(ContinueStmt);
+  compoundUcStmt @179 :List(CompoundStmt);
+  capturedUcStmt @180 :List(CapturedStmt);
+  cxxUcTryUcStmt @181 :List(CXXTryStmt);
+  cxxUcForUcRangeUcStmt @182 :List(CXXForRangeStmt);
+  cxxUcCatchUcStmt @183 :List(CXXCatchStmt);
+  breakUcStmt @184 :List(BreakStmt);
+  asmUcStmt @185 :List(AsmStmt);
+  msUcAsmUcStmt @186 :List(MSAsmStmt);
+  gccUcAsmUcStmt @187 :List(GCCAsmStmt);
+  whileUcStmt @188 :List(WhileStmt);
+  valueUcStmt @189 :List(ValueStmt);
+  labelUcStmt @190 :List(LabelStmt);
+  expr @191 :List(Expr);
+  designatedUcInitUcUpdateUcExpr @192 :List(DesignatedInitUpdateExpr);
+  designatedUcInitUcExpr @193 :List(DesignatedInitExpr);
+  dependentUcScopeUcDeclUcRefUcExpr @194 :List(DependentScopeDeclRefExpr);
+  dependentUcCoawaitUcExpr @195 :List(DependentCoawaitExpr);
+  declUcRefUcExpr @196 :List(DeclRefExpr);
+  coroutineUcSuspendUcExpr @197 :List(CoroutineSuspendExpr);
+  coawaitUcExpr @198 :List(CoawaitExpr);
+  coyieldUcExpr @199 :List(CoyieldExpr);
+  convertUcVectorUcExpr @200 :List(ConvertVectorExpr);
+  conceptUcSpecializationUcExpr @201 :List(ConceptSpecializationExpr);
+  compoundUcLiteralUcExpr @202 :List(CompoundLiteralExpr);
+  chooseUcExpr @203 :List(ChooseExpr);
+  characterUcLiteral @204 :List(CharacterLiteral);
+  castUcExpr @205 :List(CastExpr);
+  implicitUcCastUcExpr @206 :List(ImplicitCastExpr);
+  explicitUcCastUcExpr @207 :List(ExplicitCastExpr);
+  cxxUcNamedUcCastUcExpr @208 :List(CXXNamedCastExpr);
+  cxxUcDynamicUcCastUcExpr @209 :List(CXXDynamicCastExpr);
+  cxxUcConstUcCastUcExpr @210 :List(CXXConstCastExpr);
+  cxxUcAddrspaceUcCastUcExpr @211 :List(CXXAddrspaceCastExpr);
+  cxxUcStaticUcCastUcExpr @212 :List(CXXStaticCastExpr);
+  cxxUcReinterpretUcCastUcExpr @213 :List(CXXReinterpretCastExpr);
+  cxxUcFunctionalUcCastUcExpr @214 :List(CXXFunctionalCastExpr);
+  cUcStyleUcCastUcExpr @215 :List(CStyleCastExpr);
+  builtinUcBitUcCastUcExpr @216 :List(BuiltinBitCastExpr);
+  objUcCUcBridgedUcCastUcExpr @217 :List(ObjCBridgedCastExpr);
+  callUcExpr @218 :List(CallExpr);
+  cxxUcOperatorUcCallUcExpr @219 :List(CXXOperatorCallExpr);
+  cxxUcMemberUcCallUcExpr @220 :List(CXXMemberCallExpr);
+  cudaUcKernelUcCallUcExpr @221 :List(CUDAKernelCallExpr);
+  userUcDefinedUcLiteral @222 :List(UserDefinedLiteral);
+  cxxUcUuidofUcExpr @223 :List(CXXUuidofExpr);
+  cxxUcUnresolvedUcConstructUcExpr @224 :List(CXXUnresolvedConstructExpr);
+  cxxUcTypeidUcExpr @225 :List(CXXTypeidExpr);
+  cxxUcThrowUcExpr @226 :List(CXXThrowExpr);
+  cxxUcThisUcExpr @227 :List(CXXThisExpr);
+  cxxUcStdUcInitializerUcListUcExpr @228 :List(CXXStdInitializerListExpr);
+  cxxUcScalarUcValueUcInitUcExpr @229 :List(CXXScalarValueInitExpr);
+  cxxUcRewrittenUcBinaryUcOperator @230 :List(CXXRewrittenBinaryOperator);
+  cxxUcPseudoUcDestructorUcExpr @231 :List(CXXPseudoDestructorExpr);
+  cxxUcNullUcPtrUcLiteralUcExpr @232 :List(CXXNullPtrLiteralExpr);
+  cxxUcNoexceptUcExpr @233 :List(CXXNoexceptExpr);
+  cxxUcNewUcExpr @234 :List(CXXNewExpr);
+  cxxUcInheritedUcCtorUcInitUcExpr @235 :List(CXXInheritedCtorInitExpr);
+  cxxUcFoldUcExpr @236 :List(CXXFoldExpr);
+  cxxUcDependentUcScopeUcMemberUcExpr @237 :List(CXXDependentScopeMemberExpr);
+  cxxUcDeleteUcExpr @238 :List(CXXDeleteExpr);
+  cxxUcDefaultUcInitUcExpr @239 :List(CXXDefaultInitExpr);
+  cxxUcDefaultUcArgUcExpr @240 :List(CXXDefaultArgExpr);
+  cxxUcConstructUcExpr @241 :List(CXXConstructExpr);
+  cxxUcTemporaryUcObjectUcExpr @242 :List(CXXTemporaryObjectExpr);
+  cxxUcBoolUcLiteralUcExpr @243 :List(CXXBoolLiteralExpr);
+  cxxUcBindUcTemporaryUcExpr @244 :List(CXXBindTemporaryExpr);
+  blockUcExpr @245 :List(BlockExpr);
+  binaryUcOperator @246 :List(BinaryOperator);
+  compoundUcAssignUcOperator @247 :List(CompoundAssignOperator);
+  atomicUcExpr @248 :List(AtomicExpr);
+  asUcTypeUcExpr @249 :List(AsTypeExpr);
+  arrayUcTypeUcTraitUcExpr @250 :List(ArrayTypeTraitExpr);
+  arrayUcSubscriptUcExpr @251 :List(ArraySubscriptExpr);
+  arrayUcInitUcLoopUcExpr @252 :List(ArrayInitLoopExpr);
+  arrayUcInitUcIndexUcExpr @253 :List(ArrayInitIndexExpr);
+  addrUcLabelUcExpr @254 :List(AddrLabelExpr);
+  abstractUcConditionalUcOperator @255 :List(AbstractConditionalOperator);
+  conditionalUcOperator @256 :List(ConditionalOperator);
+  binaryUcConditionalUcOperator @257 :List(BinaryConditionalOperator);
+  vaUcArgUcExpr @258 :List(VAArgExpr);
+  unaryUcOperator @259 :List(UnaryOperator);
+  unaryUcExprUcOrUcTypeUcTraitUcExpr @260 :List(UnaryExprOrTypeTraitExpr);
+  typoUcExpr @261 :List(TypoExpr);
+  typeUcTraitUcExpr @262 :List(TypeTraitExpr);
+  substUcNonUcTypeUcTemplateUcParmUcPackUcExpr @263 :List(SubstNonTypeTemplateParmPackExpr);
+  substUcNonUcTypeUcTemplateUcParmUcExpr @264 :List(SubstNonTypeTemplateParmExpr);
+  stringUcLiteral @265 :List(StringLiteral);
+  stmtUcExpr @266 :List(StmtExpr);
+  sourceUcLocUcExpr @267 :List(SourceLocExpr);
+  sizeUcOfUcPackUcExpr @268 :List(SizeOfPackExpr);
+  shuffleUcVectorUcExpr @269 :List(ShuffleVectorExpr);
+  syclUcUniqueUcStableUcNameUcExpr @270 :List(SYCLUniqueStableNameExpr);
+  requiresUcExpr @271 :List(RequiresExpr);
+  recoveryUcExpr @272 :List(RecoveryExpr);
+  pseudoUcObjectUcExpr @273 :List(PseudoObjectExpr);
+  predefinedUcExpr @274 :List(PredefinedExpr);
+  parenUcListUcExpr @275 :List(ParenListExpr);
+  parenUcExpr @276 :List(ParenExpr);
+  packUcExpansionUcExpr @277 :List(PackExpansionExpr);
+  overloadUcExpr @278 :List(OverloadExpr);
+  unresolvedUcMemberUcExpr @279 :List(UnresolvedMemberExpr);
+  unresolvedUcLookupUcExpr @280 :List(UnresolvedLookupExpr);
+  opaqueUcValueUcExpr @281 :List(OpaqueValueExpr);
+  offsetUcOfUcExpr @282 :List(OffsetOfExpr);
+  objUcCUcSubscriptUcRefUcExpr @283 :List(ObjCSubscriptRefExpr);
+  objUcCUcStringUcLiteral @284 :List(ObjCStringLiteral);
+  objUcCUcSelectorUcExpr @285 :List(ObjCSelectorExpr);
+  objUcCUcProtocolUcExpr @286 :List(ObjCProtocolExpr);
+  objUcCUcPropertyUcRefUcExpr @287 :List(ObjCPropertyRefExpr);
+  objUcCUcMessageUcExpr @288 :List(ObjCMessageExpr);
+  objUcCUcIvarUcRefUcExpr @289 :List(ObjCIvarRefExpr);
+  objUcCUcIsaUcExpr @290 :List(ObjCIsaExpr);
+  objUcCUcIndirectUcCopyUcRestoreUcExpr @291 :List(ObjCIndirectCopyRestoreExpr);
+  objUcCUcEncodeUcExpr @292 :List(ObjCEncodeExpr);
+  objUcCUcDictionaryUcLiteral @293 :List(ObjCDictionaryLiteral);
+  objUcCUcBoxedUcExpr @294 :List(ObjCBoxedExpr);
+  objUcCUcBoolUcLiteralUcExpr @295 :List(ObjCBoolLiteralExpr);
+  objUcCUcAvailabilityUcCheckUcExpr @296 :List(ObjCAvailabilityCheckExpr);
+  objUcCUcArrayUcLiteral @297 :List(ObjCArrayLiteral);
+  ompUcIteratorUcExpr @298 :List(OMPIteratorExpr);
+  ompUcArrayUcShapingUcExpr @299 :List(OMPArrayShapingExpr);
+  ompUcArrayUcSectionUcExpr @300 :List(OMPArraySectionExpr);
+  noUcInitUcExpr @301 :List(NoInitExpr);
+  memberUcExpr @302 :List(MemberExpr);
+  matrixUcSubscriptUcExpr @303 :List(MatrixSubscriptExpr);
+  materializeUcTemporaryUcExpr @304 :List(MaterializeTemporaryExpr);
+  msUcPropertyUcSubscriptUcExpr @305 :List(MSPropertySubscriptExpr);
+  msUcPropertyUcRefUcExpr @306 :List(MSPropertyRefExpr);
+  lambdaUcExpr @307 :List(LambdaExpr);
+  integerUcLiteral @308 :List(IntegerLiteral);
+  initUcListUcExpr @309 :List(InitListExpr);
+  implicitUcValueUcInitUcExpr @310 :List(ImplicitValueInitExpr);
+  imaginaryUcLiteral @311 :List(ImaginaryLiteral);
+  genericUcSelectionUcExpr @312 :List(GenericSelectionExpr);
+  gnuUcNullUcExpr @313 :List(GNUNullExpr);
+  functionUcParmUcPackUcExpr @314 :List(FunctionParmPackExpr);
+  fullUcExpr @315 :List(FullExpr);
+  exprUcWithUcCleanups @316 :List(ExprWithCleanups);
+  constantUcExpr @317 :List(ConstantExpr);
+  floatingUcLiteral @318 :List(FloatingLiteral);
+  fixedUcPointUcLiteral @319 :List(FixedPointLiteral);
+  extUcVectorUcElementUcExpr @320 :List(ExtVectorElementExpr);
+  expressionUcTraitUcExpr @321 :List(ExpressionTraitExpr);
+  attributedUcStmt @322 :List(AttributedStmt);
+  switchUcStmt @323 :List(SwitchStmt);
+  switchUcCase @324 :List(SwitchCase);
+  defaultUcStmt @325 :List(DefaultStmt);
+  caseUcStmt @326 :List(CaseStmt);
+  type @327 :List(Type);
+  templateUcTypeUcParmUcType @328 :List(TemplateTypeParmType);
+  templateUcSpecializationUcType @329 :List(TemplateSpecializationType);
+  tagUcType @330 :List(TagType);
+  recordUcType @331 :List(RecordType);
+  enumUcType @332 :List(EnumType);
+  substUcTemplateUcTypeUcParmUcType @333 :List(SubstTemplateTypeParmType);
+  substUcTemplateUcTypeUcParmUcPackUcType @334 :List(SubstTemplateTypeParmPackType);
+  referenceUcType @335 :List(ReferenceType);
+  rUcValueUcReferenceUcType @336 :List(RValueReferenceType);
+  lUcValueUcReferenceUcType @337 :List(LValueReferenceType);
+  pointerUcType @338 :List(PointerType);
+  pipeUcType @339 :List(PipeType);
+  parenUcType @340 :List(ParenType);
+  packUcExpansionUcType @341 :List(PackExpansionType);
+  objUcCUcTypeUcParamUcType @342 :List(ObjCTypeParamType);
+  objUcCUcObjectUcType @343 :List(ObjCObjectType);
+  objUcCUcInterfaceUcType @344 :List(ObjCInterfaceType);
+  objUcCUcObjectUcPointerUcType @345 :List(ObjCObjectPointerType);
+  memberUcPointerUcType @346 :List(MemberPointerType);
+  matrixUcType @347 :List(MatrixType);
+  dependentUcSizedUcMatrixUcType @348 :List(DependentSizedMatrixType);
+  constantUcMatrixUcType @349 :List(ConstantMatrixType);
+  macroUcQualifiedUcType @350 :List(MacroQualifiedType);
+  injectedUcClassUcNameUcType @351 :List(InjectedClassNameType);
+  functionUcType @352 :List(FunctionType);
+  functionUcProtoUcType @353 :List(FunctionProtoType);
+  functionUcNoUcProtoUcType @354 :List(FunctionNoProtoType);
+  extUcIntUcType @355 :List(ExtIntType);
+  dependentUcVectorUcType @356 :List(DependentVectorType);
+  dependentUcSizedUcExtUcVectorUcType @357 :List(DependentSizedExtVectorType);
+  dependentUcExtUcIntUcType @358 :List(DependentExtIntType);
+  dependentUcAddressUcSpaceUcType @359 :List(DependentAddressSpaceType);
+  deducedUcType @360 :List(DeducedType);
+  deducedUcTemplateUcSpecializationUcType @361 :List(DeducedTemplateSpecializationType);
+  autoUcType @362 :List(AutoType);
+  decltypeUcType @363 :List(DecltypeType);
+  complexUcType @364 :List(ComplexType);
+  builtinUcType @365 :List(BuiltinType);
+  blockUcPointerUcType @366 :List(BlockPointerType);
+  attributedUcType @367 :List(AttributedType);
+  atomicUcType @368 :List(AtomicType);
+  arrayUcType @369 :List(ArrayType);
+  variableUcArrayUcType @370 :List(VariableArrayType);
+  incompleteUcArrayUcType @371 :List(IncompleteArrayType);
+  dependentUcSizedUcArrayUcType @372 :List(DependentSizedArrayType);
+  constantUcArrayUcType @373 :List(ConstantArrayType);
+  adjustedUcType @374 :List(AdjustedType);
+  decayedUcType @375 :List(DecayedType);
+  vectorUcType @376 :List(VectorType);
+  extUcVectorUcType @377 :List(ExtVectorType);
+  unresolvedUcUsingUcType @378 :List(UnresolvedUsingType);
+  unaryUcTransformUcType @379 :List(UnaryTransformType);
+  typedefUcType @380 :List(TypedefType);
+  typeUcOfUcType @381 :List(TypeOfType);
+  typeUcOfUcExprUcType @382 :List(TypeOfExprType);
 }

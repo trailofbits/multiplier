@@ -35,8 +35,8 @@
 #include "Parser.h"
 
 DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-index");
-DEFINE_uint32(port, 50051, "Port of mx-index");
+DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
+DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_string(path, "", "Path to the binary or JSON (compile commands) file to import");
 
 #include <iostream>
@@ -92,36 +92,10 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-
-  std::stringstream hp;
-  hp << FLAGS_host << ':' << FLAGS_port;
-
-  capnp::EzRpcClient client(hp.str());
+  capnp::EzRpcClient client(FLAGS_host + ':' + FLAGS_port);
   mx::rpc::Multiplier::Client multiplier = client.getMain<mx::rpc::Multiplier>();
 
-  kj::WaitScope &wait_scope = client.getWaitScope();
-
-//  auto request = multiplier.indexCompileCommandsRequest();
-
-//  Calculator::Client calculator = client.getMain<Calculator>();
-//
-//  grpc::ChannelArguments args;
-//  args.SetMaxSendMessageSize(std::numeric_limits<int>::max());
-//  args.SetMaxReceiveMessageSize(std::numeric_limits<int>::max());
-//
-//  auto channel = grpc::CreateCustomChannel(
-//      hp.str(), grpc::InsecureChannelCredentials(), args);
-//
-//  if (!channel) {
-//    std::cerr << "Failed to connect to irene-sever at " << hp.str();
-//    return EXIT_FAILURE;
-//  }
-//
-//  LOG(INFO)
-//      << "Publishing binary info to mx-server";
-//
-
-  importer.Build(wait_scope, multiplier);
+  importer.Build(multiplier).wait(client.getWaitScope());
 
   return EXIT_SUCCESS;
 }

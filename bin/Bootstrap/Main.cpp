@@ -98,29 +98,53 @@ static std::string CapitalCaseToSnakeCase(std::string_view name) {
   std::stringstream ss;
 
   auto i = 0u;
+  auto added_sep = false;
+  auto last_was_uc = false;
   for (auto c : name) {
     if ('_' == c) {
-      ss << c;
+      if (last_was_uc || !i) {
+        ss << '_';
+      } else {
+        ss << "__";
+      }
+      added_sep = true;
+      last_was_uc = true;
 
     } else if (std::isupper(c)) {
-      if (i && (i + 1u) < name.size()) {
+      if (!added_sep && i && (i + 1u) < name.size()) {
         if (std::islower(name[i + 1u])) {
           ss << '_';
+          added_sep = true;
         }
       }
       ss << static_cast<char>(std::tolower(c));
+      added_sep = false;
+      last_was_uc = false;
     } else {
       ss << c;
 
-      if (i && (i + 1u) < name.size()) {
+      if (!added_sep && (i + 1u) < name.size()) {
         if (std::isupper(name[i + 1u])) {
           ss << '_';
+          added_sep = true;
         }
       }
+      last_was_uc = false;
     }
     ++i;
   }
-  return ss.str();
+  auto res = ss.str();
+
+  // If it's ending with three underscores, then make it end with two
+  // underscores. This is a dumb hack to deal with some special keywords/
+  // token kinds that show up in PASTA.
+  if (auto s = res.size(); s > 3u) {
+    if (res[s - 1u] == '_' && res[s - 2u] == '_' && res[s - 3u] == '_') {
+      res.pop_back();
+    }
+  }
+
+  return res;
 }
 
 // Convert a `snake_case` name into a `camelCase` name.
@@ -136,20 +160,32 @@ static std::string SnakeCaseToCamelCase(std::string_view name) {
       ss << c;
       cs = true;
 
-    } else if (uc == 1) {
-      ss << static_cast<char>(std::toupper(c));
-      uc = 0;
-      cs = true;
-
     // Multiple `_`s inside of something else, e.g. `kw__attribute`.
     } else if (cs) {
-      ss << "Uc" << static_cast<char>(std::toupper(c));
+      if (!cs) {
+        ss << "uc";
+        --uc;
+        cs = true;
+      }
+      while (uc--) {
+        ss << "Uc";
+        cs = true;
+      }
+      ss << static_cast<char>(std::toupper(c));
       uc = 0;
       cs = true;
 
     // Multiple leading underscore, e.g. `__attribute`.
     } else {
-      ss << "uc" << static_cast<char>(std::toupper(c));
+      if (!cs) {
+        ss << "uc";
+        --uc;
+        cs = true;
+      }
+      while (uc--) {
+        ss << "Uc";
+      }
+      ss << static_cast<char>(std::toupper(c));
       uc = 0;
       cs = true;
     }
@@ -194,6 +230,7 @@ static std::string NameAndHash(std::string name) {
 static int GenerateFromHierarchies(ClassHierarchy *decl,
                                    ClassHierarchy *stmt,
                                    ClassHierarchy *type,
+                                   ClassHierarchy *token,
                                    std::ostream &schema_os,
                                    std::ostream &header_os,
                                    std::ostream &impl_os) {
@@ -204,7 +241,8 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
   auto empty_list = std::make_shared<MethodList>();
   work_list.emplace_back(type, empty_list);
   work_list.emplace_back(stmt, empty_list);
-  work_list.emplace_back(decl, std::move(empty_list));
+  work_list.emplace_back(decl, empty_list);
+  work_list.emplace_back(token, std::move(empty_list));
 
   std::unordered_set<pasta::EnumDecl> seen_enums;
 
@@ -217,7 +255,7 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
       << "# Auto-generated file; do not modify!\n\n"
       << "@0xa04be7b45e95b659;\n\n"
       << "using Cxx = import \"/capnp/c++.capnp\";\n"
-      << "$Cxx.namespace(\"mx::ast\");\n";
+      << "$Cxx.namespace(\"mx::ast\");\n\n";
 
   header_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -258,11 +296,18 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
   auto dump_enum = [&] (const std::string &method_name,
                         pasta::EnumDecl enum_decl) -> bool {
     if (seen_enums.emplace(enum_decl).second) {
-      schema_os
-         << NameAndHash("enum " + enum_decl.Name()) << " {\n";
+      auto enum_name = enum_decl.Name();
+      schema_os << NameAndHash("enum " + enum_name) << " {\n";
       auto i = 0u;
       for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
         auto val_name = val.Name();
+
+        // Take over `kRawIdentifier`, and change it to `kWhitespace`, so that
+        // we can use `kUnknown` for errors and such.
+        if (val_name == "kRawIdentifier" && enum_name == "TokenKind") {
+          val_name = "kWhitespace";
+        }
+
         std::string_view val_name_view = val_name;
         if (val_name_view[0] == 'k') {
           val_name_view = val_name_view.substr(1);
@@ -270,10 +315,17 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
 
         auto snake_name = CapitalCaseToSnakeCase(val_name_view);
         auto camel_name = SnakeCaseToCamelCase(snake_name);
-        schema_os << "  " << camel_name << " @" << i << ";\n";
+        schema_os
+            << "  " << camel_name << " @" << i << " $Cxx.name(\""
+            << snake_name << "\");\n";
         ++i;
       }
-      schema_os << "}\n\n";
+
+      // Add a last item to every enumeration so that we can easily get the
+      // number of enumerators.
+      schema_os
+          << "  numEnumerators @" << i << " $Cxx.name(\"num_enumerators\");\n"
+          << "}\n\n";
     }
     return true;
   };
@@ -379,13 +431,18 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
 static int GenerateFromClasses(std::vector<pasta::CXXRecordDecl> decls,
                                std::vector<pasta::CXXRecordDecl> stmts,
                                std::vector<pasta::CXXRecordDecl> types,
+                               pasta::CXXRecordDecl token,
                                std::ostream &schema_os,
                                std::ostream &header_os,
                                std::ostream &impl_os) {
+  std::vector<pasta::CXXRecordDecl> token_vec;
+  token_vec.emplace_back(std::move(token));
+
   std::vector<std::unique_ptr<ClassHierarchy>> alloc;
   auto decl = BuildHierarchy(alloc, std::move(decls));
   auto stmt = BuildHierarchy(alloc, std::move(stmts));
   auto type = BuildHierarchy(alloc, std::move(types));
+  auto token_class = BuildHierarchy(alloc, std::move(token_vec));
 
   if (!decl) {
     std::cerr << "Could not locate `pasta::Decl`.\n";
@@ -399,9 +456,13 @@ static int GenerateFromClasses(std::vector<pasta::CXXRecordDecl> decls,
     std::cerr << "Could not locate `pasta::Type`.\n";
     return EXIT_FAILURE;
 
+  } else if (!token_class) {
+    std::cerr << "Could not locate `pasta::Token`.\n";
+    return EXIT_FAILURE;
+
   } else {
-    return GenerateFromHierarchies(decl, stmt, type, schema_os, header_os,
-                                   impl_os);
+    return GenerateFromHierarchies(decl, stmt, type, token_class,
+                                   schema_os, header_os, impl_os);
   }
 
   return EXIT_SUCCESS;
@@ -414,6 +475,7 @@ static int GenerateFromNamespaces(std::vector<pasta::NamespaceDecl> pastas,
   std::vector<pasta::CXXRecordDecl> decls;
   std::vector<pasta::CXXRecordDecl> stmts;
   std::vector<pasta::CXXRecordDecl> types;
+  std::optional<pasta::CXXRecordDecl> token;
   for (pasta::NamespaceDecl pasta : pastas) {
     for (auto decl : pasta::DeclContext(pasta).Declarations()) {
       if (auto cls = pasta::CXXRecordDecl::From(decl);
@@ -425,6 +487,8 @@ static int GenerateFromNamespaces(std::vector<pasta::NamespaceDecl> pastas,
           stmts.emplace_back(std::move(*cls));
         } else if (gTypeNames.count(name)) {
           types.emplace_back(std::move(*cls));
+        } else if (name == "Token") {
+          token.swap(cls);
         }
       }
     }
@@ -442,9 +506,14 @@ static int GenerateFromNamespaces(std::vector<pasta::NamespaceDecl> pastas,
     std::cerr << "Could not locate any types.\n";
     return EXIT_FAILURE;
 
+  } else if (!token.has_value()) {
+    std::cerr << "Could not locate pasta::Token.\n";
+    return EXIT_FAILURE;
+
   } else {
     return GenerateFromClasses(std::move(decls), std::move(stmts),
-                               std::move(types), schema_os, header_os,
+                               std::move(types), std::move(token.value()),
+                               schema_os, header_os,
                                impl_os);
   }
 }

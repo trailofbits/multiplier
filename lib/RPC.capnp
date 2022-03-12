@@ -50,9 +50,10 @@ struct CompileCommand @0xab30180088262c95 {
   compiler @12 :CompilerName;
 }
 
-struct CompressedTokenList @0x987f05f6a48636d5 {
-  contents @0 :Data;
-  tokenKinds @1 :List(UInt16);
+struct FileTokenList @0x987f05f6a48636d5 {
+  fileId @0 :UInt64;
+  contents @1 :Data;
+  tokenKinds @2 :List(UInt16);
 }
 
 struct IndexedCode @0xe5f27760091f9a3a {

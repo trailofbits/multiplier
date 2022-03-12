@@ -256,8 +256,8 @@ class TokenTreeImpl {
   std::vector<Substitution *> substitutions;
 
   std::string data;
-  std::vector<TokenKind> token_kinds;
-  std::vector<unsigned> data_offsets;
+//  std::vector<pasta::TokenKind> token_kinds;
+//  std::vector<unsigned> data_offsets;
 
   // Build an initial token info list. This contains all of the tokens that were
   // parsed, plus the file tokens that were macro uses. This does not contain

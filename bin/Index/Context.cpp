@@ -25,16 +25,15 @@ DEFINE_string(workspace_dir, "",
 
 namespace indexer {
 
-GlobalContext::GlobalContext(const mx::Executor &exe_,
-                             const mx::DatalogClient &client)
-    : tokenized_files(mx::KeyValueStore::kPathToFileId,
-                      FLAGS_workspace_dir),
-      top_level_decl(mx::KeyValueStore::kHashToTopLevelDeclId,
-                     FLAGS_workspace_dir) {
+IndexingContext::IndexingContext(const mx::Executor &exe_)
+    : file_hash_to_file_id(mx::KeyValueStore::kPathToFileId,
+                           FLAGS_workspace_dir),
+      file_path_to_file_id(mx::KeyValueStore::kPathToFileId,
+                           FLAGS_workspace_dir),
+      decl_hash_to_code_id(mx::KeyValueStore::kHashToCodeId,
+                           FLAGS_workspace_dir) {
 
   if (FLAGS_show_progress) {
-    publish_progress.reset(new mx::ProgressBar("Publishing",
-                                               std::chrono::seconds(1)));
     command_progress.reset(new mx::ProgressBar("Command parsing",
                                                std::chrono::seconds(1)));
     ast_progress.reset(new mx::ProgressBar("AST building",
@@ -47,56 +46,39 @@ GlobalContext::GlobalContext(const mx::Executor &exe_,
     tokenizer_progress->SetNumWorkers(num_workers);
   }
 
-  auto reserved_file_ids = client.reserve_file_ids_bbf(
-      mx::TimeNow(), 1 << 13ul);
-  CHECK(reserved_file_ids);
-
-  const mx::FileId fid = reserved_file_ids->NextFileId();
-  next_file_id.store(fid);
-
-  LOG(INFO)
-      << "Next file ID will be " << fid;
+  next_file_id.store(1u);  // TODO(pag): Replace.
+  next_code_id.store(1u);  // TODO(pag): Replace.
 }
 
-std::pair<mx::FileId, bool> GlobalContext::AddFileToSet(std::string path) {
+std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
+    std::filesystem::path file_path,
+    const std::string &contents_hash) {
   bool is_new = false;
-  auto file_id = tokenized_files.GetOrSet<mx::FileId>(
-      path,
+  auto file_id = file_hash_to_file_id.GetOrSet<mx::FileId>(
+      contents_hash,
       [this, &is_new] (void) -> mx::FileId {
         is_new = true;
         return next_file_id.fetch_add(1u);
       });
+
+  file_path_to_file_id.SetIfMissing(
+      file_path.generic_string(), [=] (void) -> std::string {
+    return std::to_string(file_id);
+  });
+
   return {file_id, is_new};
 }
 
-std::pair<mx::DeclId, bool> GlobalContext::AddDeclToSet(std::string decl) {
+std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
+    const std::string &decl_hash) {
   bool is_new = false;
-  auto decl_id = top_level_decl.GetOrSet<mx::DeclId>(
-      decl,
-      [this, &is_new] (void) -> mx::DeclId {
+  auto decl_id = decl_hash_to_code_id.GetOrSet<mx::CodeId>(
+      decl_hash,
+      [this, &is_new] (void) -> mx::CodeId {
         is_new = true;
-        return next_tlp_id.fetch_add(1u);
+        return next_code_id.fetch_add(1u);
       });
   return {decl_id, is_new};
 }
-
-UpdateContext::~UpdateContext(void) {
-  if (builder.HasAnyMessages()) {
-    if (!client.Publish(builder)) {
-      LOG(ERROR)
-          << "Error sending messages to mx-server";
-    }
-  }
-}
-
-UpdateContext::UpdateContext(const mx::DatalogClient &client_,
-                             std::shared_ptr<GlobalContext> global_context_)
-  : client(client_),
-    file_manager(pasta::FileSystem::CreateNative()),
-    global_context(std::move(global_context_)),
-    publish_progress(global_context->publish_progress.get()),
-    command_progress(global_context->command_progress.get()),
-    ast_progress(global_context->ast_progress.get()),
-    tokenizer_progress(global_context->tokenizer_progress.get()) {}
 
 }  // namespace indexer

@@ -12,21 +12,20 @@
 #include <multiplier/Types.h>
 #include <pasta/Util/File.h>
 
-namespace indexer {
+#include "Context.h"
 
-class UpdateContext;
+namespace indexer {
 
 class TokenizeFileAction final : public mx::Action {
  private:
-  const std::shared_ptr<UpdateContext> context;
-  const mx::ProgressBarWork progress;
+  const std::shared_ptr<IndexingContext> context;
   const mx::FileId file_id;
   const pasta::File file;
 
  public:
   virtual ~TokenizeFileAction(void);
 
-  TokenizeFileAction(std::shared_ptr<UpdateContext> context_,
+  TokenizeFileAction(std::shared_ptr<IndexingContext> context_,
                      mx::FileId file_id_, pasta::File file_);
 
   // Tokenize the file.

@@ -28,7 +28,7 @@ class Importer {
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o);
 
-  void Build(kj::WaitScope &ws, mx::rpc::Multiplier::Client &builder);
+  kj::Promise<void> Build(mx::rpc::Multiplier::Client &builder);
 };
 
 }  // namespace importer

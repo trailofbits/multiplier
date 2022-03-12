@@ -7,13 +7,13 @@
 #include "TokenizeFile.h"
 
 #include <algorithm>
+#include <capnp/message.h>
 #include <glog/logging.h>
-#include <multiplier/Datalog.h>
+#include <kj/string-tree.h>
 #include <multiplier/Token.h>
 
 #include <fstream>
-
-#include "Context.h"
+#include <utility>
 
 namespace indexer {
 #if DCHECK_IS_ON()
@@ -23,7 +23,7 @@ namespace {
 // don't introduce issues right away.
 static bool CheckTokenLists(
     const std::string &file_path, mx::TokenList file_tokens,
-    const mx::CompressedTokenList *compressed_tokens) {
+    const mx::rpc::FileTokenList::Reader &compressed_tokens) {
   auto maybe_uncompressed = mx::TokenList::Create(compressed_tokens);
   if (maybe_uncompressed.Succeeded()) {
     auto uncompressed_file_tokens = maybe_uncompressed.TakeValue();
@@ -62,15 +62,17 @@ static bool CheckTokenLists(
 
 TokenizeFileAction::~TokenizeFileAction(void) {}
 
-TokenizeFileAction::TokenizeFileAction(std::shared_ptr<UpdateContext> context_,
-                                       mx::FileId file_id_, pasta::File file_)
+TokenizeFileAction::TokenizeFileAction(
+    std::shared_ptr<IndexingContext> context_,
+    mx::FileId file_id_, pasta::File file_)
     : context(std::move(context_)),
-      progress(context->tokenizer_progress),
       file_id(file_id_),
       file(std::move(file_)) {}
 
 // Build and index the AST.
 void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
+  mx::ProgressBarWork progress_tracker(context->tokenizer_progress.get());
+
   auto path = file.Path().generic_string();
   auto maybe_contents = file.Data();
   if (!maybe_contents.Succeeded()) {
@@ -86,9 +88,12 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   // PASTA file token lists have an `eof` token at the end; we strip it.
   CHECK_EQ(file_tokens.Size() + 1u, pasta_file_tokens.Size());
 
-  flatbuffers::FlatBufferBuilder fbb;
+  capnp::MallocMessageBuilder message;
+  mx::rpc::FileTokenList::Builder builder =
+      message.initRoot<mx::rpc::FileTokenList>();
 
-  auto maybe_offset = file_tokens.Compress(fbb);
+  builder.setFileId(file_id);
+  auto maybe_offset = file_tokens.Compress(builder);
   if (!maybe_offset.Succeeded()) {
     LOG(ERROR)
         << "Unable to compress tokens from file '"
@@ -96,28 +101,20 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     return;
   }
 
-  fbb.Finish(maybe_offset.TakeValue());
-
-  // Warn if our compression doesn't actually compress things.
-  LOG_IF(WARNING, file_tokens.Data().size() <= fbb.GetSize())
-      << "Raw data needs " << file_tokens.Data().size()
-      << " bytes, compressed flatbuffer needs "
-      << fbb.GetSize() << " bytes";
-
-  const auto bytes_ptr = fbb.GetBufferPointer();
+//  // Warn if our compression doesn't actually compress things.
+//  LOG_IF(WARNING, file_tokens.Data().size() <= builder.totalSize())
+//      << "Raw data needs " << file_tokens.Data().size()
+//      << " bytes, compressed flatbuffer needs "
+//      << fbb.GetSize() << " bytes";
 
 #if DCHECK_IS_ON()
-  auto compressed_tokens = flatbuffers::GetRoot<mx::CompressedTokenList>(
-      bytes_ptr);
-  if (!CheckTokenLists(path, file_tokens, compressed_tokens)) {
+  if (!CheckTokenLists(path, file_tokens, builder.asReader())) {
     return;
   }
 #endif
 
-  hyde::rt::Bytes token_bytes(bytes_ptr, &(bytes_ptr[fbb.GetSize()]));
-
-  std::unique_lock locker(context->builder_lock);
-  context->builder.source_file_3(file_id, path, std::move(token_bytes));
+  kj::StringTree data = builder.toString();
+  (void) data;
 }
 
 }  // namespace indexer

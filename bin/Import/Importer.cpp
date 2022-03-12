@@ -17,16 +17,16 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <kj/array.h>
+#include <kj/async.h>
 #include <llvm/Support/Format.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
 #include <multiplier/Action.h>
-#include <multiplier/Datalog.h>
 #include <multiplier/Executor.h>
 #include <multiplier/Result.h>
 #include <multiplier/Subprocess.h>
-#include <multiplier/Tool.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
@@ -300,8 +300,9 @@ static mx::rpc::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
   }
 }
 
-void Importer::Build(kj::WaitScope &ws, mx::rpc::Multiplier::Client &client) {
+kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
   mx::Executor exe;
+  auto promises = kj::heapArrayBuilder<kj::Promise<void>>(d->commands.size());
 
   for (auto &[cwd, commands] : d->commands) {
 
@@ -411,8 +412,10 @@ void Importer::Build(kj::WaitScope &ws, mx::rpc::Multiplier::Client &client) {
       cb.setCompiler(FromPasta(cc.Name()));
     }
 
-    request.send().ignoreResult().wait(ws);
+    promises.add(request.send().ignoreResult());
   }
+
+  return kj::joinPromises(promises.finish());
 }
 
 }  // namespace importer

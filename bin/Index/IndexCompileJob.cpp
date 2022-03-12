@@ -10,6 +10,7 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <llvm/ADT/FoldingSet.h>
+#include <multiplier/AST.capnp.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
@@ -223,14 +224,13 @@ static bool CanElideTokenFromTLD(pasta::Token tok) {
       return true;
 
     case pasta::TokenRole::kFileToken:
-      switch (mx::FromPasta(tok.Kind())) {
-        case mx::TokenKind::TK_comment:
-        case mx::TokenKind::TK_eof:
-        case mx::TokenKind::TK_eod:
-        case mx::TokenKind::TK_code_completion:
+      switch (tok.Kind()) {
+        case pasta::TokenKind::kComment:
+        case pasta::TokenKind::kEndOfFile:
+        case pasta::TokenKind::kEndOfDirective:
+        case pasta::TokenKind::kCodeCompletion:
           return true;
-        case mx::TokenKind::TK_whitespace:
-        case mx::TokenKind::TK_unknown:
+        case pasta::TokenKind::kUnknown:
           return IsWhitespaceOrEmpty(tok.Data());
         default:
           return false;
@@ -401,9 +401,11 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
 IndexCompileJobAction::~IndexCompileJobAction(void) {}
 
 IndexCompileJobAction::IndexCompileJobAction(
-    std::shared_ptr<UpdateContext> context_, pasta::CompileJob job_)
+    std::shared_ptr<IndexingContext> context_,
+    pasta::FileManager file_manager_,
+    pasta::CompileJob job_)
     : context(std::move(context_)),
-      progress(context->ast_progress),
+      file_manager(std::move(file_manager_)),
       job(std::move(job_)) {}
 
 // Look through all files referenced by the AST get their unique IDs. If this
@@ -411,17 +413,31 @@ IndexCompileJobAction::IndexCompileJobAction(
 void IndexCompileJobAction::MaybeTokenizeFile(
     const mx::Executor &exe, pasta::File file) {
   if (file.WasParsed()) {
-    auto [file_id, is_new_file_id] = context->AddFileToSet(
-        file.Path().generic_string());
-    if (is_new_file_id) {
-      exe.EmplaceAction<TokenizeFileAction>(context, file_id, std::move(file));
+    auto maybe_data = file.Data();
+    auto file_path = file.Path();
+    if (maybe_data.Succeeded()) {
+      auto file_hash = FileHash(maybe_data.TakeValue());
+      auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
+          file_path, file_hash);
+      if (is_new_file_id) {
+        exe.EmplaceAction<TokenizeFileAction>(context, file_id, file);
+      }
+
+      file_ids.emplace(file, file_id);
+      file_hashes.emplace(file, std::move(file_hash));
+
+    } else {
+      LOG(ERROR)
+          << "Unable to get data for file '" << file_path.generic_string()
+          << ": " << maybe_data.TakeError().message();
     }
-    file_ids.emplace(file, file_id);
   }
 }
 
 // Build and index the AST.
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
+  mx::ProgressBarWork progress_tracker(context->ast_progress.get());
+
   auto main_file_path = job.SourceFile().Path().generic_string();
   auto maybe_ast = job.Run();
   if (!maybe_ast.Succeeded()) {
@@ -560,9 +576,10 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     }
 
     // Don't create token tree if the decl is already seen. This means it's
-    // alrady been indexed.
-    auto [decl_id, is_new] = context->AddDeclToSet(
-        ComputeHash(tlds_for_tree, tok_range, begin_index, end_index));
+    // already been indexed.
+    auto [code_id, is_new] = context->GetOrCreateCodeId(
+        CodeHash(file_hashes, tlds_for_tree, tok_range,
+                 begin_index, end_index));
     if (!is_new) {
       continue;
     }

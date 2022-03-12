@@ -79,10 +79,12 @@ static std::mutex gKeyShards[kNumKeyShards];
 //            fixed prefix extractor for the column family.
 static const char *IDToKeyPrefix(KeyValueStore::KeyValueStoreID id) {
   switch (id) {
-    case KeyValueStore::kPathToFileId:
+    case KeyValueStore::kHashToFileId:
       return "fid:";
-    case KeyValueStore::kHashToTopLevelDeclId:
-      return "tld:";
+    case KeyValueStore::kPathToFileId:
+      return "pid:";
+    case KeyValueStore::kHashToCodeId:
+      return "cid:";
   }
 }
 

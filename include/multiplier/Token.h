@@ -11,6 +11,7 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <multiplier/RPC.capnp.h>
 
 #include "Result.h"
 #include "Types.h"
@@ -21,9 +22,6 @@ class TokenRange;
 class PrintedTokenRange;
 }  // namespace pasta
 namespace mx {
-
-enum class TokenKind : uint16_t;  // Auto-generated from Datalog.
-struct CompressedTokenList;  // Auto-generated from Datalog.
 
 class TokenTreeImpl;
 class TokenList;
@@ -56,8 +54,8 @@ class Token {
   // Is this a valid token?
   bool IsValid(void) const noexcept;
 
-  // Return the kind of this token.
-  TokenKind Kind(void) const noexcept;
+  // Return the kind of this token. This is an `ast::TokenKind`.
+  uint16_t Kind(void) const noexcept;
 
   // Return the data of this token.
   std::string_view Data(void) const noexcept;
@@ -205,8 +203,9 @@ class TokenList {
 
   // Serialize this token list into a "compressed token list," as represented
   // by a Flatbuffers message.
-  Result<flatbuffers::Offset<CompressedTokenList>, std::string> Compress(
-      flatbuffers::FlatBufferBuilder &fbb);
+
+  Result<std::monostate, std::string> Compress(
+      mx::rpc::FileTokenList::Builder &builder);
 
   // Create a token list from a file token range.
   static TokenList Create(const pasta::FileTokenRange &toks);
@@ -217,18 +216,9 @@ class TokenList {
   // Create a token list from a parsed token range.
   static TokenList Create(const pasta::TokenRange &toks);
 
-  // Uncompress a token list from its Flatbuffers-serialized form.
-  static Result<TokenList, std::string> Create(const CompressedTokenList &toks);
-
-  // Uncompress a token list from its Flatbuffers-serialized form.
-  inline static Result<TokenList, std::string>
-  Create(const CompressedTokenList *toks) {
-    if (toks) {
-      return Create(*toks);
-    } else {
-      return TokenList();
-    }
-  }
+  // Uncompress a token list from its Cap'n Proto-serialized form.
+  static Result<TokenList, std::string> Create(
+      const rpc::FileTokenList::Reader &toks);
 };
 
 }  // namespace mx
