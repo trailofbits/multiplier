@@ -6,13 +6,12 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(MX_BOOTSTRAP)
-  add_subdirectory("Bootstrap")
-else()
-  add_subdirectory("Import")
-  add_subdirectory("Index")
-  
-  if(MX_ENABLE_GUI)
-    add_subdirectory("GUI")
-  endif(MX_ENABLE_GUI)
-endif()
+
+class MXBuildException(Exception):
+    pass
+
+
+class UnhandledKeysException(MXBuildException):
+    def __init__(self, msg, ty=None):
+        super(UnhandledKeysException, self).__init__(msg)
+        self.type = ty
