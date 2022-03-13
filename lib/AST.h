@@ -6,9 +6,20 @@
 
 // Auto-generated file; do not modify!
 
+#pragma once
+
+#include <multiplier/AST.h>
+
 #include <pasta/AST/Decl.h>
+#include <pasta/AST/Forward.h>
 #include <pasta/AST/Stmt.h>
+#include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
+
+#include <pasta/Compile/Compiler.h>
+#include <pasta/Util/FileSystem.h>
+
 #include "AST.capnp.h"
 
 namespace mx {
+}  // namespace mx

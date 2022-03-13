@@ -24,6 +24,7 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
 #include <multiplier/Action.h>
+#include <multiplier/AST.h>
 #include <multiplier/Executor.h>
 #include <multiplier/Result.h>
 #include <multiplier/Subprocess.h>
@@ -264,40 +265,16 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   }
 }
 
-static mx::rpc::CompilerName FromPasta(pasta::CompilerName name) {
-  switch (name) {
-    case pasta::CompilerName::kUnknown:
-      return mx::rpc::CompilerName::UNKNOWN;
-    case pasta::CompilerName::kClang:
-      return mx::rpc::CompilerName::CLANG;
-    case pasta::CompilerName::kAppleClang:
-      return mx::rpc::CompilerName::APPLE_CLANG;
-    case pasta::CompilerName::kClangCL:
-      return mx::rpc::CompilerName::CLANG_CL;
-    case pasta::CompilerName::kCL:
-      return mx::rpc::CompilerName::CL;
-    case pasta::CompilerName::kGNU:
-      return mx::rpc::CompilerName::GNU;
-  }
+static mx::ast::CompilerName FromPasta(pasta::CompilerName name) {
+  return static_cast<mx::ast::CompilerName>(mx::FromPasta(name));
 }
 
-static mx::rpc::TargetLanguage FromPasta(pasta::TargetLanguage tl) {
-  switch (tl) {
-    case pasta::TargetLanguage::kC:
-      return mx::rpc::TargetLanguage::C;
-
-    case pasta::TargetLanguage::kCXX:
-      return mx::rpc::TargetLanguage::CXX;
-  }
+static mx::ast::TargetLanguage FromPasta(pasta::TargetLanguage tl) {
+  return static_cast<mx::ast::TargetLanguage>(mx::FromPasta(tl));
 }
 
-static mx::rpc::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
-  switch (ipl) {
-    case pasta::IncludePathLocation::kAbsolute:
-      return mx::rpc::IncludePathLocation::ABSOLUTE;
-    case pasta::IncludePathLocation::kSysrootRelative:
-      return mx::rpc::IncludePathLocation::SYSTEM_ROOT_INCLUDE_RELATIVE;
-  }
+static mx::ast::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
+  return static_cast<mx::ast::IncludePathLocation>(mx::FromPasta(ipl));
 }
 
 kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
@@ -399,7 +376,6 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
             p.setDirectory(path.generic_string());
             p.setLocation(FromPasta(ipl));
           });
-
 
       auto &args = job.Arguments();
       auto args_list = cb.initArguments(static_cast<unsigned>(args.Size()));

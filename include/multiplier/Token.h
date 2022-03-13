@@ -6,15 +6,16 @@
 
 #pragma once
 
+#include <capnp/common.h>
 #include <cstdint>
 #include <iterator>
+#include <kj/array.h>
 #include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
-#include <multiplier/RPC.capnp.h>
 
 #include "Result.h"
-#include "Types.h"
 
 namespace pasta {
 class FileTokenRange;
@@ -27,6 +28,8 @@ class TokenTreeImpl;
 class TokenList;
 class TokenListImpl;
 class TokenListIterator;
+
+enum class TokenKind : unsigned short;
 
 // A token from a token list.
 class Token {
@@ -55,7 +58,7 @@ class Token {
   bool IsValid(void) const noexcept;
 
   // Return the kind of this token. This is an `ast::TokenKind`.
-  uint16_t Kind(void) const noexcept;
+  TokenKind Kind(void) const noexcept;
 
   // Return the data of this token.
   std::string_view Data(void) const noexcept;
@@ -202,10 +205,12 @@ class TokenList {
   }
 
   // Serialize this token list into a "compressed token list," as represented
-  // by a Flatbuffers message.
+  // by a Cap'n Proto message.
+  Result<kj::Array<capnp::word>, std::string> Pack(void);
 
-  Result<std::monostate, std::string> Compress(
-      mx::rpc::FileTokenList::Builder &builder);
+  // Unpack a token list from its Cap'n Proto-serialized form.
+  static Result<TokenList, std::string> Unpack(
+      kj::ArrayPtr<const capnp::word> data);
 
   // Create a token list from a file token range.
   static TokenList Create(const pasta::FileTokenRange &toks);
@@ -215,10 +220,6 @@ class TokenList {
 
   // Create a token list from a parsed token range.
   static TokenList Create(const pasta::TokenRange &toks);
-
-  // Uncompress a token list from its Cap'n Proto-serialized form.
-  static Result<TokenList, std::string> Create(
-      const rpc::FileTokenList::Reader &toks);
 };
 
 }  // namespace mx

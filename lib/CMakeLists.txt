@@ -69,6 +69,7 @@ add_custom_target("copy_headers"
 
 set(util_headers
   "${source_include_dir}/Action.h"
+  "${source_include_dir}/AST.h"
   "${source_include_dir}/BloomFilter.h"
   "${source_include_dir}/Compress.h"
   "${source_include_dir}/Executor.h"
@@ -89,6 +90,8 @@ add_library("util"
     ${util_headers}
 
     "Action.cpp"
+    "AST.cpp"
+    "AST.h"
     "BloomFilter.cpp"
     "Compress.cpp"
     "Executor.cpp"
