@@ -21,7 +21,7 @@ ExternalProject_Add(capnproto
     "${CMAKE_COMMAND}"
         -G "${CMAKE_GENERATOR}"
         "-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install"
-        -DBUILD_TESTING=OFF
+        "-DBUILD_TESTING=OFF"
         "${CMAKE_CURRENT_BINARY_DIR}/source"
   BUILD_COMMAND
     "${CMAKE_COMMAND}" --build .

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <llvm/ADT/APSInt.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/raw_ostream.h>
 #include <pasta/AST/AST.h>
@@ -41,6 +42,12 @@ static const std::unordered_set<std::string> gTypeNames{
   PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
 };
 
+static const std::unordered_set<std::string> gConcreteClassNames{
+  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, PASTA_IGNORE_ABSTRACT)
+  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, PASTA_IGNORE_ABSTRACT)
+  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, PASTA_IGNORE_ABSTRACT)
+};
+
 struct ClassHierarchy {
   const pasta::CXXRecordDecl record;
   ClassHierarchy *base{nullptr};
@@ -52,7 +59,7 @@ struct ClassHierarchy {
 
 static ClassHierarchy *BuildHierarchy(
     std::vector<std::unique_ptr<ClassHierarchy>> &alloc,
-    std::vector<pasta::CXXRecordDecl> classes) {
+    const std::vector<pasta::CXXRecordDecl> &classes) {
 
   std::unordered_map<pasta::CXXRecordDecl, ClassHierarchy *> hmap;
 
@@ -112,7 +119,7 @@ static std::string CapitalCaseToSnakeCase(std::string_view name) {
 
     } else if (std::isupper(c)) {
       if (!added_sep && i && (i + 1u) < name.size()) {
-        if (std::islower(name[i + 1u])) {
+        if (std::islower(name[i + 1u]) || std::isdigit(name[i + 1u])) {
           ss << '_';
           added_sep = true;
         }
@@ -120,6 +127,17 @@ static std::string CapitalCaseToSnakeCase(std::string_view name) {
       ss << static_cast<char>(std::tolower(c));
       added_sep = false;
       last_was_uc = false;
+
+    } else if (std::isdigit(c)) {
+      ss << c;
+      if (!added_sep && (i + 1u) < name.size()) {
+        if (!std::isdigit(name[i + 1u])) {
+          ss << '_';
+          added_sep = true;
+        }
+      }
+      last_was_uc = false;
+
     } else {
       ss << c;
 
@@ -193,7 +211,40 @@ static std::string SnakeCaseToCamelCase(std::string_view name) {
   return ss.str();
 }
 
-static const char *IntType(const std::string &method_name, pasta::Type type) {
+static std::string SnakeCaseToEnumCase(std::string_view name) {
+  std::stringstream ss;
+  for (auto c : name) {
+    ss << static_cast<char>(std::toupper(c));
+  }
+  return ss.str();
+}
+
+static const char *CxxIntType(pasta::Type type) {
+  auto t = type;
+  if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
+    switch (bt->Kind()) {
+      case pasta::BuiltinTypeKind::kBoolean: return "bool";
+      case pasta::BuiltinTypeKind::kCharacterS: return "int8_t";  // `char`.
+      case pasta::BuiltinTypeKind::kCharacterU: return "uint8_t";  // `char`.
+      case pasta::BuiltinTypeKind::kSChar: return "int8_t";  // `signed char`.
+      case pasta::BuiltinTypeKind::kUChar: return "uint8_t";  // `unsigned char`.
+      case pasta::BuiltinTypeKind::kShort: return "int16_t";
+      case pasta::BuiltinTypeKind::kUShort: return "uint16_t";
+      case pasta::BuiltinTypeKind::kInt: return "int32_t";
+      case pasta::BuiltinTypeKind::kUInt: return "uint32_t";
+      case pasta::BuiltinTypeKind::kLong: return "int64_t";
+      case pasta::BuiltinTypeKind::kULong: return "uint64_t";
+      case pasta::BuiltinTypeKind::kLongLong: return "int64_t";
+      case pasta::BuiltinTypeKind::kULongLong: return "uint64_t";
+      default: break;
+    }
+  } else if (type.IsTypedefNameType()) {
+    return CxxIntType(type.DesugaredType());
+  }
+  return nullptr;
+}
+
+static const char *SchemaIntType(pasta::Type type) {
   auto t = type;
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
     switch (bt->Kind()) {
@@ -227,15 +278,206 @@ static std::string NameAndHash(std::string name) {
   return ss.str();
 }
 
-static int GenerateFromHierarchies(ClassHierarchy *decl,
-                                   ClassHierarchy *stmt,
-                                   ClassHierarchy *type,
-                                   ClassHierarchy *token,
-                                   std::ostream &schema_os,
-                                   std::ostream &header_os,
-                                   std::ostream &impl_os) {
+using MethodList = std::unordered_set<std::string>;
+using MethodListPtr = std::shared_ptr<MethodList>;
 
-  using MethodList = std::unordered_set<std::string>;
+class CodeGenerator {
+ private:
+  ClassHierarchy *decl{nullptr};
+  ClassHierarchy *stmt{nullptr};
+  ClassHierarchy *type{nullptr};
+  ClassHierarchy *token{nullptr};
+
+  std::ofstream schema_os;
+  std::ofstream lib_h_os;
+  std::ofstream lib_cpp_os;
+  std::ofstream include_h_os;
+
+  std::vector<pasta::NamespaceDecl> pastas;
+
+  std::vector<pasta::EnumDecl> enums;
+  std::vector<pasta::CXXRecordDecl> decls;
+  std::vector<pasta::CXXRecordDecl> stmts;
+  std::vector<pasta::CXXRecordDecl> types;
+  std::vector<pasta::CXXRecordDecl> tokens;
+
+  std::stringstream header_enum_ss;
+
+  void RunOnEnum(pasta::EnumDecl enum_decl);
+
+  MethodListPtr RunOnClass(ClassHierarchy *, MethodListPtr parent_methods);
+  int RunOnClassHierarchies(void);
+  int RunOnClasses(void);
+  int RunOnNamespaces(void);
+
+ public:
+  CodeGenerator(char *argv[]);
+  int RunOnTranslationUnit(pasta::TranslationUnitDecl tu);
+};
+
+void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
+  auto enum_name = enum_decl.Name();
+  schema_os << NameAndHash("enum " + enum_name) << " {\n";
+  include_h_os << "enum class " << enum_name << " : unsigned short {\n";
+  lib_cpp_os
+      << enum_name << " FromPasta(pasta::" << enum_name << " e) {\n"
+      << "  switch (e) {\n";
+
+  std::unordered_set<std::string> seen_initializers;
+  std::string initializer;
+  llvm::raw_string_ostream initializer_ss(initializer);
+
+  auto i = 0u;
+  for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
+    auto val_name = val.Name();
+    auto orig_val_name = val_name;
+
+    // Don't allow repeats of the underlying values.
+    auto ap_val = val.InitializerVal();
+    ap_val.print(initializer_ss, ap_val.isSigned());
+    initializer_ss.flush();
+    if (!seen_initializers.emplace(std::move(initializer)).second) {
+      schema_os << "  # Skipped repeat pasta::" << orig_val_name << "\n";
+      include_h_os << "  // Skipped repeat pasta::" << orig_val_name << "\n";
+      continue;
+    }
+
+    // Some of these are numbers.
+    if (enum_name == "SYCLMajorVersion") {
+      val_name = "Version" + val_name.substr(1);
+
+    } else if (enum_name == "SanitizerOrdinal" && val_name == "kNull") {
+      val_name = "Null_";
+    }
+
+    std::string_view val_name_view = val_name;
+    if (val_name_view[0] == 'k') {
+      val_name_view = val_name_view.substr(1);
+    }
+
+    auto snake_name = CapitalCaseToSnakeCase(val_name_view);
+    auto camel_name = SnakeCaseToCamelCase(snake_name);
+    auto enum_case = SnakeCaseToEnumCase(snake_name);
+
+    // Take over `kRawIdentifier`, and change it to `kWhitespace`, so that
+    // we can use `kUnknown` for errors and such.
+    if (val_name == "kRawIdentifier" && enum_name == "TokenKind") {
+      snake_name = "whitespace";
+      camel_name = "whitespace";
+      enum_case = "WHITESPACE";
+
+      lib_cpp_os
+          << "    case pasta::TokenKind::kRawIdentifier: return TokenKind::IDENTIFIER;\n";
+    } else {
+      lib_cpp_os
+          << "    case pasta::" << enum_name << "::" << orig_val_name
+          << ": return " << enum_name << "::" << enum_case << ";\n";
+    }
+
+    schema_os
+        << "  " << camel_name << " @" << i << " $Cxx.name(\""
+        << snake_name << "\");\n";
+
+    include_h_os
+        << "  " << enum_case << ",\n";
+    ++i;
+  }
+
+  lib_cpp_os
+      << "  }\n"  // End of `switch`.
+      << "}\n\n";  // End of `FromPasta`.
+
+  // Add a last item to every enumeration so that we can easily get the
+  // number of enumerators.
+  schema_os
+      << "}\n\n";
+
+  include_h_os
+      << "  NUM_ENUMERATORS\n"
+      << "};\n\n"
+      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
+}
+
+MethodListPtr CodeGenerator::RunOnClass(
+    ClassHierarchy *cls, MethodListPtr parent_methods) {
+  auto seen_methods = std::make_shared<MethodList>(*parent_methods);
+  auto record_name = cls->record.Name();
+
+  // We have our own representation for these.
+  if (record_name == "Token" || record_name == "TokenRange") {
+    return parent_methods;
+  }
+
+  schema_os << NameAndHash("struct " + record_name) << " {\n";
+  auto i = 0u;
+
+  if (cls->base) {
+    auto base_name = cls->base->record.Name();
+    auto snake_name = CapitalCaseToSnakeCase(base_name);
+    auto camel_name = SnakeCaseToCamelCase(snake_name);
+    schema_os
+        << "  " << camel_name << " @" << i << ":"
+        << base_name << ";\n";
+    ++i;
+  }
+
+  for (pasta::CXXMethodDecl method : cls->record.Methods()) {
+    auto method_name = method.Name();
+    if (method_name == "KindName" ||
+        llvm::StringRef(method_name).startswith("operator")) {
+      continue;  // E.g. `Decl::KindName()`, `operator==`.
+    }
+    if (!seen_methods->emplace(method_name).second) {
+      continue;
+    }
+
+    auto snake_name = CapitalCaseToSnakeCase(method_name);
+    auto camel_name = SnakeCaseToCamelCase(snake_name);
+    auto return_type = method.ReturnType();
+    if (auto record = return_type.AsRecordDeclaration()) {
+      auto record_name = record->Name();
+
+      // Handle `pasta::Token`.
+      if (record_name == "Token") {
+        schema_os << "  " << camel_name << " @" << i << " :Token;\n";
+        ++i;
+
+      // Handle `pasta::TokenRange`.
+      } else if (record_name == "TokenRange") {
+        schema_os << "  " << camel_name << " @" << i << " :TokenRange;\n";
+        ++i;
+
+      // Handle `std::string` and `std::string_view`.
+      } else if (record_name == "string" || record_name == "basic_string" ||
+                 record_name == "string_view" ||
+                 record_name == "basic_string_view") {
+        schema_os << "  " << camel_name << " @" << i << " :Text;\n";
+        ++i;
+      }
+
+    // Handle enumerations return types.
+    } else if (auto tag = return_type.AsTagDeclaration()) {
+      if (auto enum_decl = pasta::EnumDecl::From(*tag)) {
+        schema_os
+            << "  " << camel_name << " @" << i << " :" << enum_decl->Name()
+            << ";\n";
+        ++i;
+      }
+
+    // Handle integral return types.
+    } else if (auto int_type = SchemaIntType(return_type)) {
+      schema_os
+          << "  " << camel_name << " @" << i << " :" << int_type
+          << ";\n";
+      ++i;
+    }
+  }
+
+  schema_os << "}\n\n";
+  return seen_methods;
+}
+
+int CodeGenerator::RunOnClassHierarchies(void) {
 
   std::vector<std::pair<ClassHierarchy *, std::shared_ptr<MethodList>>> work_list;
   auto empty_list = std::make_shared<MethodList>();
@@ -243,8 +485,6 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
   work_list.emplace_back(stmt, empty_list);
   work_list.emplace_back(decl, empty_list);
   work_list.emplace_back(token, std::move(empty_list));
-
-  std::unordered_set<pasta::EnumDecl> seen_enums;
 
   schema_os
       << "# Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -257,20 +497,26 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
       << "using Cxx = import \"/capnp/c++.capnp\";\n"
       << "$Cxx.namespace(\"mx::ast\");\n\n";
 
-  header_os
+  lib_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
+      << "#include <multiplier/AST.h>\n\n"
       << "#include <pasta/AST/Decl.h>\n"
+      << "#include <pasta/AST/Forward.h>\n"
       << "#include <pasta/AST/Stmt.h>\n"
-      << "#include <pasta/AST/Type.h>\n"
+      << "#include <pasta/AST/Token.h>\n"
+      << "#include <pasta/AST/Type.h>\n\n"
+      << "#include <pasta/Compile/Compiler.h>\n"
+      << "#include <pasta/Util/FileSystem.h>\n\n"
       << "#include \"AST.capnp.h\"\n\n"
       << "namespace mx {\n";
 
-  impl_os
+  lib_cpp_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
       << "//\n"
@@ -282,10 +528,8 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
 
   // Buffers the struct output so that we can output tag types on an as-
   // needed basis.
-  std::stringstream schema_classes_ss;
-  std::stringstream header_enum_ss;
-  schema_classes_ss
-      << NameAndHash("struct TokenOffset") << " {\n"
+  schema_os
+      << NameAndHash("struct Token") << " {\n"
       << "  offset @0 :UInt32 $Cxx.name(\"offset\");\n"
       << "}\n\n"
       << NameAndHash("struct TokenRange") << " {\n"
@@ -293,124 +537,60 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
       << "  endOffset @1 :UInt32 $Cxx.name(\"end_offset\");  # Inclusive.\n"
       << "}\n\n";
 
-  auto dump_enum = [&] (const std::string &method_name,
-                        pasta::EnumDecl enum_decl) -> bool {
-    if (seen_enums.emplace(enum_decl).second) {
-      auto enum_name = enum_decl.Name();
-      schema_os << NameAndHash("enum " + enum_name) << " {\n";
-      auto i = 0u;
-      for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
-        auto val_name = val.Name();
+  include_h_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
+      << "#include <cstdint>\n\n"
+      << "namespace pasta {\n";
 
-        // Take over `kRawIdentifier`, and change it to `kWhitespace`, so that
-        // we can use `kUnknown` for errors and such.
-        if (val_name == "kRawIdentifier" && enum_name == "TokenKind") {
-          val_name = "kWhitespace";
-        }
-
-        std::string_view val_name_view = val_name;
-        if (val_name_view[0] == 'k') {
-          val_name_view = val_name_view.substr(1);
-        }
-
-        auto snake_name = CapitalCaseToSnakeCase(val_name_view);
-        auto camel_name = SnakeCaseToCamelCase(snake_name);
-        schema_os
-            << "  " << camel_name << " @" << i << " $Cxx.name(\""
-            << snake_name << "\");\n";
-        ++i;
-      }
-
-      // Add a last item to every enumeration so that we can easily get the
-      // number of enumerators.
-      schema_os
-          << "  numEnumerators @" << i << " $Cxx.name(\"num_enumerators\");\n"
-          << "}\n\n";
+  // Forward declarations.
+  for (const pasta::CXXRecordDecl &record : decls) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::CXXRecordDecl &record : stmts) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::CXXRecordDecl &record : types) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::CXXRecordDecl &record : tokens) {
+    include_h_os << "class " << record.Name() << ";\n";
+  }
+  for (const pasta::EnumDecl &tag : enums) {
+    if (auto itype = CxxIntType(tag.IntegerType())) {
+      include_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
     }
-    return true;
-  };
+  }
+  include_h_os
+      << "}  // namespace pasta\n"
+      << "namespace mx {\n";
 
   std::vector<std::string> class_names;
 
+  for (const pasta::EnumDecl &tag : enums) {
+    if (auto itype = CxxIntType(tag.IntegerType())) {
+      RunOnEnum(tag);
+    }
+  }
+
   while (!work_list.empty()) {
     auto [cls, parent_methods] = work_list.back();
-    auto seen_methods = std::make_shared<MethodList>(*parent_methods);
-
     work_list.pop_back();
+    auto seen_methods = RunOnClass(cls, std::move(parent_methods));
     for (auto derived_cls : cls->derived) {
       work_list.emplace_back(derived_cls, seen_methods);
     }
 
-    auto name = cls->record.Name();
-    schema_classes_ss << NameAndHash("struct " + name) << " {\n";
-    class_names.emplace_back(std::move(name));
-    auto i = 0u;
-
-    if (cls->base) {
-      auto base_name = cls->base->record.Name();
-      auto snake_name = CapitalCaseToSnakeCase(base_name);
-      auto camel_name = SnakeCaseToCamelCase(snake_name);
-      schema_classes_ss << "  " << camel_name << " @" << i << ":"
-         << base_name << ";\n";
-      ++i;
+    auto class_name = cls->record.Name();
+    if (gConcreteClassNames.count(class_name)) {
+      class_names.emplace_back(std::move(class_name));
     }
-
-    for (pasta::CXXMethodDecl method : cls->record.Methods()) {
-      auto method_name = method.Name();
-      if (method_name == "KindName" ||
-          llvm::StringRef(method_name).startswith("operator")) {
-        continue;  // E.g. `Decl::KindName()`, `operator==`.
-      }
-      if (!seen_methods->emplace(method_name).second) {
-        continue;
-      }
-
-      auto snake_name = CapitalCaseToSnakeCase(method_name);
-      auto camel_name = SnakeCaseToCamelCase(snake_name);
-      auto return_type = method.ReturnType();
-      if (auto record = return_type.AsRecordDeclaration()) {
-        auto record_name = record->Name();
-
-        // Handle `pasta::Token`.
-        if (record_name == "Token") {
-          schema_classes_ss << "  " << camel_name << " @" << i << " :TokenOffset;\n";
-          ++i;
-
-        // Handle `pasta::TokenRange`.
-        } else if (record_name == "TokenRange") {
-          schema_classes_ss << "  " << camel_name << " @" << i << " :TokenRange;\n";
-          ++i;
-
-        // Handle `std::string` and `std::string_view`.
-        } else if (record_name == "string" || record_name == "basic_string" ||
-                   record_name == "string_view" ||
-                   record_name == "basic_string_view") {
-          schema_classes_ss << "  " << camel_name << " @" << i << " :Text;\n";
-          ++i;
-        }
-
-      // Handle enumerations return types.
-      } else if (auto tag = return_type.AsTagDeclaration()) {
-        if (auto enum_decl = pasta::EnumDecl::From(*tag)) {
-          if (dump_enum(method_name, std::move(*enum_decl))) {
-            schema_classes_ss << "  " << camel_name << " @" << i << " :" << tag->Name()
-               << ";\n";
-            ++i;
-          }
-        }
-
-      // Handle integral return types.
-      } else if (auto int_type = IntType(method_name, return_type)) {
-        schema_classes_ss << "  " << camel_name << " @" << i << " :" << int_type
-           << ";\n";
-        ++i;
-      }
-    }
-
-    schema_classes_ss << "}\n\n";
   }
-
-  schema_os << schema_classes_ss.str();
 
   // The entity list is a storage for zero-or-more entities.
   schema_os << "struct EntityList @0xf26db0d046aab9c9 {\n";
@@ -425,24 +605,19 @@ static int GenerateFromHierarchies(ClassHierarchy *decl,
   }
   schema_os << "}\n";
 
+  lib_cpp_os << "}  // namespace mx\n";
+  lib_h_os << "}  // namespace mx\n";
+  include_h_os << "}  // namespace mx\n";
+
   return EXIT_SUCCESS;
 }
 
-static int GenerateFromClasses(std::vector<pasta::CXXRecordDecl> decls,
-                               std::vector<pasta::CXXRecordDecl> stmts,
-                               std::vector<pasta::CXXRecordDecl> types,
-                               pasta::CXXRecordDecl token,
-                               std::ostream &schema_os,
-                               std::ostream &header_os,
-                               std::ostream &impl_os) {
-  std::vector<pasta::CXXRecordDecl> token_vec;
-  token_vec.emplace_back(std::move(token));
-
+int CodeGenerator::RunOnClasses(void) {
   std::vector<std::unique_ptr<ClassHierarchy>> alloc;
-  auto decl = BuildHierarchy(alloc, std::move(decls));
-  auto stmt = BuildHierarchy(alloc, std::move(stmts));
-  auto type = BuildHierarchy(alloc, std::move(types));
-  auto token_class = BuildHierarchy(alloc, std::move(token_vec));
+  decl = BuildHierarchy(alloc, decls);
+  stmt = BuildHierarchy(alloc, stmts);
+  type = BuildHierarchy(alloc, types);
+  token = BuildHierarchy(alloc, tokens);
 
   if (!decl) {
     std::cerr << "Could not locate `pasta::Decl`.\n";
@@ -456,26 +631,18 @@ static int GenerateFromClasses(std::vector<pasta::CXXRecordDecl> decls,
     std::cerr << "Could not locate `pasta::Type`.\n";
     return EXIT_FAILURE;
 
-  } else if (!token_class) {
+  } else if (!token) {
     std::cerr << "Could not locate `pasta::Token`.\n";
     return EXIT_FAILURE;
 
   } else {
-    return GenerateFromHierarchies(decl, stmt, type, token_class,
-                                   schema_os, header_os, impl_os);
+    return RunOnClassHierarchies();
   }
 
   return EXIT_SUCCESS;
 }
 
-static int GenerateFromNamespaces(std::vector<pasta::NamespaceDecl> pastas,
-                                  std::ostream &schema_os,
-                                  std::ostream &header_os,
-                                  std::ostream &impl_os) {
-  std::vector<pasta::CXXRecordDecl> decls;
-  std::vector<pasta::CXXRecordDecl> stmts;
-  std::vector<pasta::CXXRecordDecl> types;
-  std::optional<pasta::CXXRecordDecl> token;
+int CodeGenerator::RunOnNamespaces(void) {
   for (pasta::NamespaceDecl pasta : pastas) {
     for (auto decl : pasta::DeclContext(pasta).Declarations()) {
       if (auto cls = pasta::CXXRecordDecl::From(decl);
@@ -488,7 +655,13 @@ static int GenerateFromNamespaces(std::vector<pasta::NamespaceDecl> pastas,
         } else if (gTypeNames.count(name)) {
           types.emplace_back(std::move(*cls));
         } else if (name == "Token") {
-          token.swap(cls);
+          tokens.emplace_back(std::move(*cls));
+        }
+      } else if (auto e = pasta::EnumDecl::From(decl);
+                 e && e->IsThisDeclarationADefinition()) {
+        auto name = e->Name();
+        if (name != "TokenRole" && name != "TokenContextKind") {
+          enums.emplace_back(std::move(*e));
         }
       }
     }
@@ -506,21 +679,16 @@ static int GenerateFromNamespaces(std::vector<pasta::NamespaceDecl> pastas,
     std::cerr << "Could not locate any types.\n";
     return EXIT_FAILURE;
 
-  } else if (!token.has_value()) {
+  } else if (tokens.empty()) {
     std::cerr << "Could not locate pasta::Token.\n";
     return EXIT_FAILURE;
 
   } else {
-    return GenerateFromClasses(std::move(decls), std::move(stmts),
-                               std::move(types), std::move(token.value()),
-                               schema_os, header_os,
-                               impl_os);
+    return RunOnClasses();
   }
 }
 
-static int Generate(pasta::TranslationUnitDecl tu, std::ostream &schema_os,
-                    std::ostream &header_os, std::ostream &impl_os) {
-  std::vector<pasta::NamespaceDecl> pastas;
+int CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {
   for (auto decl : pasta::DeclContext(tu).Declarations()) {
     if (auto ns = pasta::NamespaceDecl::From(decl);
         ns && ns->Name() == "pasta") {
@@ -531,23 +699,24 @@ static int Generate(pasta::TranslationUnitDecl tu, std::ostream &schema_os,
     std::cerr << "Unable to locate 'pasta' namespace.\n";
     return EXIT_FAILURE;
   } else {
-    return GenerateFromNamespaces(std::move(pastas), schema_os, header_os,
-                                  impl_os);
+    return RunOnNamespaces();
   }
 }
 
+CodeGenerator::CodeGenerator(char *argv[])
+    : schema_os(argv[3], std::ios::trunc | std::ios::out),
+      lib_h_os(argv[4], std::ios::trunc | std::ios::out),
+      lib_cpp_os(argv[5], std::ios::trunc | std::ios::out),
+      include_h_os(argv[6], std::ios::trunc | std::ios::out) {}
+
 int main(int argc, char *argv[]) {
-  if (6 != argc) {
+  if (7 != argc) {
     std::cerr
         << "Usage: " << argv[0]
-        << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH OUTPUT_SCHEMA OUTPUT_HEADER OUTPUT_IMPL"
+        << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_CAPNP LIB_H LIB_CPP INCLUDE_H"
         << std::endl;
     return EXIT_FAILURE;
   }
-
-  std::ofstream schema_os(argv[3], std::ios::trunc | std::ios::out);
-  std::ofstream header_os(argv[4], std::ios::trunc | std::ios::out);
-  std::ofstream impl_os(argv[5], std::ios::trunc | std::ios::out);
 
   pasta::InitPasta initializer;
   pasta::FileManager fm(pasta::FileSystem::CreateNative());
@@ -591,8 +760,8 @@ int main(int argc, char *argv[]) {
       std::cerr << maybe_ast.TakeError() << std::endl;
       return EXIT_FAILURE;
     } else {
-      return Generate(maybe_ast.TakeValue().TranslationUnit(), schema_os,
-                      header_os, impl_os);
+      CodeGenerator cg(argv);
+      return cg.RunOnTranslationUnit(maybe_ast.TakeValue().TranslationUnit());
     }
   }
 

@@ -8,14 +8,20 @@
 
 cmake_minimum_required(VERSION 3.19)
 
-include(CMakeDependentOption)
-include(GNUInstallDirs)
-
-include("cmake/options.cmake")
 include("cmake/ccache.cmake")
 include("cmake/vcpkg_helper.cmake")
 
-project("multiplier")
+project("multiplier" CXX C)
+
+# Have issues with imported locations for Cap'n Proto with `RelWithDebInfo`
+# build types.
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  message(FATAL_ERROR "CMAKE_BUILD_TYPE must not be RelWithDebInfo")
+endif()
+
+include(CMakeDependentOption)
+include(GNUInstallDirs)
+include("cmake/options.cmake")
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden) 
 set(CMAKE_C_VISIBILITY_PRESET hidden) 
@@ -92,9 +98,18 @@ elseif(PLATFORM_LINUX)
   set("MX_END_FORCE_LOAD_GROUP" "-Wl,--no-whole-archive")
 endif()
 
-if(NOT MX_BOOTSTRAP)
-  add_subdirectory("lib")
-endif()
+add_custom_target("copy_datalog_server_headers"
+  DEPENDS
+    ${copied_headers}
+)
 
+# The remaining arguments to `mx-bootstrap` are the paths to the files that will
+# be generated based on analyzing the types/classes in the `pasta` namespace.
+set(MX_BOOTSTRAP_LIB_AST_CAPNP "${PROJECT_SOURCE_DIR}/lib/AST.capnp")
+set(MX_BOOTSTRAP_LIB_AST_H "${PROJECT_SOURCE_DIR}/lib/AST.h")
+set(MX_BOOTSTRAP_LIB_AST_CPP "${PROJECT_SOURCE_DIR}/lib/AST.cpp")
+set(MX_BOOTSTRAP_INCLUDE_AST_H "${PROJECT_SOURCE_DIR}/include/multiplier/AST.h")
+
+add_subdirectory("lib")
 add_subdirectory("bin")
 

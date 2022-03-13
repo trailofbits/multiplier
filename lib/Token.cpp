@@ -6,10 +6,13 @@
 
 #include "Token.h"
 
+#include <capnp/serialize.h>
 #include <cassert>
 #include <cctype>
 #include <clang/Basic/TokenKinds.h>
 #include <cstdint>
+#include <kj/common.h>
+#include <multiplier/AST.h>
 #include <multiplier/Compress.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Printer.h>
@@ -20,6 +23,8 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+
+#include "RPC.capnp.h"
 
 namespace mx {
 namespace {
@@ -48,10 +53,10 @@ static const std::unordered_map<std::string_view, clang::tok::TokenKind> kSpelli
 #define KEYWORD(tok_id, avail) {#tok_id, clang::tok::kw_ ## tok_id},
 #include "clang/Basic/TokenKinds.def"
 
-//#define PPKEYWORD(tok) {"#" #tok, ast::TokenKind::TK_pp_ ## tok},
+//#define PPKEYWORD(tok) {"#" #tok, TokenKind::TK_pp_ ## tok},
 //#include "clang/Basic/TokenKinds.def"
 //
-//#define OBJC_AT_KEYWORD(tok) {"@" #tok, ast::TokenKind::TK_objc_ ## tok},
+//#define OBJC_AT_KEYWORD(tok) {"@" #tok, TokenKind::TK_objc_ ## tok},
 //#include "clang/Basic/TokenKinds.def"
 };
 
@@ -199,22 +204,22 @@ union CompressedTokenKind {
   // render the uncompressed whitespace into `ws_spelling` and token data
   // into `tok_spelling`, and then return the kind of `token` and the status of
   // the decompression.
-  std::pair<DecompressionStatus, ast::TokenKind> Uncompress(
+  std::pair<DecompressionStatus, TokenKind> Uncompress(
       std::string &ws_spelling, std::string &tok_spelling,
       const char *&data) const noexcept;
 
 } __attribute__((packed));
 
-static_assert(sizeof(CompressedTokenKind) == sizeof(ast::TokenKind));
+static_assert(sizeof(CompressedTokenKind) == sizeof(TokenKind));
 
 static constexpr CompressedTokenKind kAllOnesToken = {
     static_cast<uint16_t>(0xFFu)};
 static const auto kMaxEmbeddedLeadingSpaces =
     kAllOnesToken.token.leading_spaces;
 static constexpr auto kMaxTokenKind =
-    static_cast<uint16_t>(ast::TokenKind::NUM_ENUMERATORS);
+    static_cast<uint16_t>(TokenKind::NUM_ENUMERATORS);
 static constexpr auto kWhitespaceKind =
-    static_cast<uint16_t>(ast::TokenKind::WHITESPACE);
+    static_cast<uint16_t>(TokenKind::WHITESPACE);
 
 static bool IsIdentifierBegin(int ch) {
   return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || '_' == ch;
@@ -224,24 +229,16 @@ static bool IsDigit(int ch) {
   return '0' <= ch && ch <= '9';
 }
 
-static ast::TokenKind FromPasta(pasta::TokenKind pasta_kind) {
-  if (pasta::TokenKind::kRawIdentifier == pasta_kind) {
-    return ast::TokenKind::IDENTIFIER;
-  } else {
-    return static_cast<ast::TokenKind>(pasta_kind);
-  }
-}
-
-static pasta::TokenKind ToPasta(ast::TokenKind ast_kind) {
-  if (ast::TokenKind::WHITESPACE == ast_kind) {
+static pasta::TokenKind ToPasta(TokenKind ast_kind) {
+  if (TokenKind::WHITESPACE == ast_kind) {
     return pasta::TokenKind::kUnknown;
   } else {
     return static_cast<pasta::TokenKind>(ast_kind);
   }
 }
 
-static unsigned NameOf(ast::TokenKind ast_kind) {
-  return static_cast<unsigned>(ast_kind);
+static std::string NameOf(TokenKind ast_kind) {
+  return kj::str(static_cast<ast::TokenKind>(ast_kind)).cStr();
 }
 
 static uint16_t HexToDigit(char ch, uint16_t *is_uppercase, bool *failed) {
@@ -278,7 +275,7 @@ static constexpr struct {
 } kTokenStorage = {kMaxTokenKind};
 
 static_assert(kTokenStorage.bits == kMaxTokenKind);
-static_assert(ast::TokenKind::UNKNOWN == static_cast<ast::TokenKind>(0u));
+static_assert(TokenKind::UNKNOWN == static_cast<TokenKind>(0u));
 
 static constexpr auto kMaxSpelling = sizeof(kTokenSpelling) /
                                      sizeof(kTokenSpelling[0]);
@@ -669,7 +666,7 @@ static bool CompressWhitespace(std::string_view tok_data, Whitespace ws,
   }
 }
 
-static bool CompressSingleImpl(ast::TokenKind tok_kind, std::string_view tok_data,
+static bool CompressSingleImpl(TokenKind tok_kind, std::string_view tok_data,
                                CompressedTokenKind *ct_out,
                                std::string &output) {
 
@@ -686,13 +683,13 @@ static bool CompressSingleImpl(ast::TokenKind tok_kind, std::string_view tok_dat
   auto ws = SummarizeWhitespace(tok_data);
 
   // Normalize whitespace.
-  if (ast::TokenKind::UNKNOWN == tok_kind && ws.has_whitespace &&
+  if (TokenKind::UNKNOWN == tok_kind && ws.has_whitespace &&
       !ws.has_non_whitespace && !ws.has_unexpected_stuff) {
-    tok_kind = ast::TokenKind::WHITESPACE;
+    tok_kind = TokenKind::WHITESPACE;
   }
 
   // It's a whitespace token.
-  if (ast::TokenKind::WHITESPACE == tok_kind) {
+  if (TokenKind::WHITESPACE == tok_kind) {
     if (CompressWhitespace(tok_data, ws, ct_out)) {
       return true;
 
@@ -706,7 +703,7 @@ static bool CompressSingleImpl(ast::TokenKind tok_kind, std::string_view tok_dat
       return true;
     }
 
-  } else if (ast::TokenKind::END_OF_FILE == tok_kind) {
+  } else if (TokenKind::END_OF_FILE == tok_kind) {
     return false;
   }
 
@@ -717,7 +714,7 @@ static bool CompressSingleImpl(ast::TokenKind tok_kind, std::string_view tok_dat
 
   // Normalize by spelling.
   if (auto it = kSpellingToKind.find(tok_data); it != kSpellingToKind.end()) {
-    tok_kind = static_cast<ast::TokenKind>(it->second);
+    tok_kind = static_cast<TokenKind>(it->second);
   }
 
   CompressedTokenKind ct = {};
@@ -745,7 +742,7 @@ static bool CompressSingleImpl(ast::TokenKind tok_kind, std::string_view tok_dat
     return true;
 
   // kHex1, kHex2, kHex3, kOctal1, kOctal2, kOctal3, kOctal4.
-  } else if (ast::TokenKind::NUMERIC_CONSTANT == tok_kind &&
+  } else if (TokenKind::NUMERIC_CONSTANT == tok_kind &&
              2 <= tok_len && tok_len <= 6 && tok_data[0] == '0' &&
              CompressInteger(tok_data, ct_out)) {
     return true;
@@ -786,7 +783,7 @@ CompressedTokenState CompressedTokenKind::State(void) const {
 // render the uncompressed whitespace into `ws_spelling` and token data
 // into `tok_spelling`, and then return the kind of `token` and the status of
 // the decompression.
-std::pair<DecompressionStatus, ast::TokenKind> CompressedTokenKind::Uncompress(
+std::pair<DecompressionStatus, TokenKind> CompressedTokenKind::Uncompress(
     std::string &ws_spelling, std::string &tok_spelling,
     const char *&data) const noexcept {
 
@@ -821,51 +818,51 @@ std::pair<DecompressionStatus, ast::TokenKind> CompressedTokenKind::Uncompress(
   switch (State()) {
     case CompressedTokenState::kInvalid:
       assert(false);
-      return {DecompressionStatus::kFailedInvalidKind, ast::TokenKind::UNKNOWN};
+      return {DecompressionStatus::kFailedInvalidKind, TokenKind::UNKNOWN};
 
     case CompressedTokenState::kToken: {
       data = add_data(tok_spelling, data);
       return {DecompressionStatus::kTokenOnly,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
     case CompressedTokenState::kTokenWithLeadingSpaces: {
       add_repeats(ws_spelling, token.leading_spaces, ' ');
       data = add_data(tok_spelling, data);
       return {DecompressionStatus::kTokenAndWhitespace,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
     case CompressedTokenState::kTokenWithLeadingNewLine: {
       ws_spelling.push_back('\n');
       data = add_data(tok_spelling, data);
       return {DecompressionStatus::kTokenAndWhitespace,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
     case CompressedTokenState::kTokenWithLeadingNewLineAndSpaces: {
       ws_spelling.push_back('\n');
       add_repeats(ws_spelling, token.leading_spaces, ' ');
       data = add_data(tok_spelling, data);
       return {DecompressionStatus::kTokenAndWhitespace,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
 
     case CompressedTokenState::kTokenWithImpliedSpelling: {
       tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenOnly,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
 
     case CompressedTokenState::kTokenWithImpliedSpellingAndLeadingSpaces: {
       add_repeats(ws_spelling, token.leading_spaces, ' ');
       tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenAndWhitespace,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
 
     case CompressedTokenState::kTokenWithImpliedSpellingAndLeadingNewLine: {
       ws_spelling.push_back('\n');
       tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenAndWhitespace,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
 
     case CompressedTokenState::kTokenWithImpliedSpellingAndLeadingNewLineAndSpaces: {
@@ -873,52 +870,52 @@ std::pair<DecompressionStatus, ast::TokenKind> CompressedTokenKind::Uncompress(
       add_repeats(ws_spelling, token.leading_spaces, ' ');
       tok_spelling += kTokenSpelling[token.kind];
       return {DecompressionStatus::kTokenAndWhitespace,
-              static_cast<ast::TokenKind>(token.kind)};
+              static_cast<TokenKind>(token.kind)};
     }
 
     case CompressedTokenState::kUncompressedWhitespace:
       data = add_data(ws_spelling, data);
-      return {DecompressionStatus::kWhitespaceOnly, ast::TokenKind::WHITESPACE};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::WHITESPACE};
 
     case CompressedTokenState::kNewLines:
       add_repeats(ws_spelling, new_lines.leading_new_lines, '\n');
-      return {DecompressionStatus::kWhitespaceOnly, ast::TokenKind::WHITESPACE};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::WHITESPACE};
 
     case CompressedTokenState::kNewLinesWithContinuations:
       add_continations(ws_spelling, new_lines.leading_new_lines, 0);
-      return {DecompressionStatus::kWhitespaceOnly, ast::TokenKind::WHITESPACE};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::WHITESPACE};
 
     case CompressedTokenState::kNewLinesAndSpaces: {
       unsigned num_spaces = whitespace.excess_kind - kMaxTokenKind;
       add_repeats(ws_spelling, whitespace.leading_new_lines, '\n');
       add_repeats(ws_spelling, num_spaces, ' ');
-      return {DecompressionStatus::kWhitespaceOnly, ast::TokenKind::WHITESPACE};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::WHITESPACE};
     }
 
     case CompressedTokenState::kNewLinesWithContinuationsAndSpaces: {
       unsigned num_spaces = whitespace.excess_kind - kMaxTokenKind;
       add_continations(ws_spelling, new_lines.leading_new_lines, num_spaces);
       add_repeats(ws_spelling, num_spaces, ' ');
-      return {DecompressionStatus::kWhitespaceOnly, ast::TokenKind::WHITESPACE};
+      return {DecompressionStatus::kWhitespaceOnly, TokenKind::WHITESPACE};
     }
 
     case CompressedTokenState::kIdentifier1:
       tok_spelling.push_back(static_cast<char>(ascii_2.ascii_0));
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::IDENTIFIER};
+      return {DecompressionStatus::kTokenOnly, TokenKind::IDENTIFIER};
 
     case CompressedTokenState::kIdentifier2:
       tok_spelling.push_back(static_cast<char>(ascii_2.ascii_0));
       tok_spelling.push_back(static_cast<char>(ascii_2.ascii_1));
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::IDENTIFIER};
+      return {DecompressionStatus::kTokenOnly, TokenKind::IDENTIFIER};
 
     case CompressedTokenState::kNumber1:
       tok_spelling.push_back(static_cast<char>(ascii_2.ascii_0));
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
     case CompressedTokenState::kNumber2:
       tok_spelling.push_back(static_cast<char>(ascii_2.ascii_0));
       tok_spelling.push_back(static_cast<char>(ascii_2.ascii_1));
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
     case CompressedTokenState::kHex1:
       tok_spelling.push_back('0');
@@ -928,7 +925,7 @@ std::pair<DecompressionStatus, ast::TokenKind> CompressedTokenKind::Uncompress(
       } else {
         tok_spelling.push_back(kLowerHex[hex_3.hex_2]);
       }
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
     case CompressedTokenState::kHex2:
       tok_spelling.push_back('0');
@@ -940,7 +937,7 @@ std::pair<DecompressionStatus, ast::TokenKind> CompressedTokenKind::Uncompress(
         tok_spelling.push_back(kLowerHex[hex_3.hex_1]);
         tok_spelling.push_back(kLowerHex[hex_3.hex_2]);
       }
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
     case CompressedTokenState::kHex3:
       tok_spelling.push_back('0');
@@ -954,26 +951,26 @@ std::pair<DecompressionStatus, ast::TokenKind> CompressedTokenKind::Uncompress(
         tok_spelling.push_back(kLowerHex[hex_3.hex_1]);
         tok_spelling.push_back(kLowerHex[hex_3.hex_2]);
       }
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
 
     case CompressedTokenState::kOctal1:
       tok_spelling.push_back('0');
       tok_spelling.push_back(kOctal[octal_4.octal_3]);
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
     case CompressedTokenState::kOctal2:
       tok_spelling.push_back('0');
       tok_spelling.push_back(kOctal[octal_4.octal_2]);
       tok_spelling.push_back(kOctal[octal_4.octal_3]);
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
     case CompressedTokenState::kOctal3:
       tok_spelling.push_back('0');
       tok_spelling.push_back(kOctal[octal_4.octal_1]);
       tok_spelling.push_back(kOctal[octal_4.octal_2]);
       tok_spelling.push_back(kOctal[octal_4.octal_3]);
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
 
     case CompressedTokenState::kOctal4:
       tok_spelling.push_back('0');
@@ -981,26 +978,26 @@ std::pair<DecompressionStatus, ast::TokenKind> CompressedTokenKind::Uncompress(
       tok_spelling.push_back(kOctal[octal_4.octal_1]);
       tok_spelling.push_back(kOctal[octal_4.octal_2]);
       tok_spelling.push_back(kOctal[octal_4.octal_3]);
-      return {DecompressionStatus::kTokenOnly, ast::TokenKind::NUMERIC_CONSTANT};
+      return {DecompressionStatus::kTokenOnly, TokenKind::NUMERIC_CONSTANT};
   }
 
   assert(false);
-  return {DecompressionStatus::kFailedUnknown, ast::TokenKind::UNKNOWN};
+  return {DecompressionStatus::kFailedUnknown, TokenKind::UNKNOWN};
 }
 
-static bool CompressSingle(ast::TokenKind tok_kind, std::string_view tok_data,
+static bool CompressSingle(TokenKind tok_kind, std::string_view tok_data,
                            std::vector<uint16_t> &states,
                            std::string &output);
 
 static bool CompressLeadingWhitespace(std::string_view whitespace_data,
-                                      ast::TokenKind tok_kind,
+                                      TokenKind tok_kind,
                                       std::string_view tok_data,
                                       std::vector<uint16_t> &states,
                                       std::string &output) {
 
   // Whitespace before an EOF.
-  if (ast::TokenKind::END_OF_FILE == tok_kind) {
-    return CompressSingle(ast::TokenKind::WHITESPACE, whitespace_data,
+  if (TokenKind::END_OF_FILE == tok_kind) {
+    return CompressSingle(TokenKind::WHITESPACE, whitespace_data,
                           states, output);
   }
 
@@ -1014,7 +1011,7 @@ static bool CompressLeadingWhitespace(std::string_view whitespace_data,
       ws_ws.num_leading_new_lines > 1 ||
       ws_ws.num_leading_spaces > kMaxEmbeddedLeadingSpaces ||
       ws_ws.num_line_continuations != 0) {
-    return CompressSingle(ast::TokenKind::WHITESPACE, whitespace_data,
+    return CompressSingle(TokenKind::WHITESPACE, whitespace_data,
                           states, output) &&
            CompressSingle(tok_kind, tok_data, states, output);
   }
@@ -1040,12 +1037,12 @@ static bool CompressLeadingWhitespace(std::string_view whitespace_data,
 
   // Token was in the wrong state; materialize both.
   output.resize(old_output_size);
-  return CompressSingle(ast::TokenKind::WHITESPACE, whitespace_data,
+  return CompressSingle(TokenKind::WHITESPACE, whitespace_data,
                         states, output) &&
          CompressSingle(tok_kind, tok_data, states, output);
 }
 
-bool CompressSingle(ast::TokenKind tok_kind, std::string_view tok_data,
+bool CompressSingle(TokenKind tok_kind, std::string_view tok_data,
                     std::vector<uint16_t> &states,
                     std::string &output) {
   CompressedTokenKind ct = {};
@@ -1105,11 +1102,11 @@ bool Token::IsValid(void) const noexcept {
 }
 
 // Return the kind of this token.
-uint16_t Token::Kind(void) const noexcept {
+TokenKind Token::Kind(void) const noexcept {
   if (impl && index < impl->token_kinds.size()) {
-    return static_cast<uint16_t>(impl->token_kinds[index]);
+    return impl->token_kinds[index];
   } else {
-    return static_cast<uint16_t>(ast::TokenKind::UNKNOWN);
+    return TokenKind::UNKNOWN;
   }
 }
 
@@ -1143,7 +1140,7 @@ unsigned TokenList::Size(void) const noexcept {
   return static_cast<unsigned>(impl->token_kinds.size());
 }
 
-void TokenListImpl::AddToken(std::string_view tok_data, ast::TokenKind tok_kind,
+void TokenListImpl::AddToken(std::string_view tok_data, TokenKind tok_kind,
                              std::vector<uint16_t> &dummy_states,
                              std::string &dummy_output) {
   dummy_states.clear();
@@ -1190,7 +1187,7 @@ TokenList TokenList::Create(const pasta::FileTokenRange &toks) {
 
   for (pasta::FileToken tok : toks) {
     if (auto kind = FromPasta(tok.Kind());
-        ast::TokenKind::END_OF_FILE != kind) {
+        TokenKind::END_OF_FILE != kind) {
       ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
@@ -1208,7 +1205,7 @@ TokenList TokenList::Create(const pasta::PrintedTokenRange &toks) {
   std::string dummy_output;
   for (pasta::PrintedToken tok : toks) {
     if (auto kind = FromPasta(tok.Kind());
-        ast::TokenKind::END_OF_FILE != kind) {
+        TokenKind::END_OF_FILE != kind) {
       ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
@@ -1226,7 +1223,7 @@ TokenList TokenList::Create(const pasta::TokenRange &toks) {
   std::string dummy_output;
   for (pasta::Token tok : toks) {
     if (auto kind = FromPasta(tok.Kind());
-        ast::TokenKind::END_OF_FILE != kind) {
+        TokenKind::END_OF_FILE != kind) {
       ls->AddToken(tok.Data(), kind, dummy_states, dummy_output);
     } else {
       break;
@@ -1237,18 +1234,19 @@ TokenList TokenList::Create(const pasta::TokenRange &toks) {
   return TokenList(std::move(ls));
 }
 
-// Uncompress a token list from its Flatbuffers-serialized form.
-Result<TokenList, std::string> TokenList::Create(
-    const rpc::FileTokenList::Reader &toks) {
+// Unpack a token list from its Cap'n Proto-serialized form.
+Result<TokenList, std::string> TokenList::Unpack(
+    kj::ArrayPtr<const capnp::word> token_list_data) {
 
-  std::stringstream ss;
+  std::stringstream err;
+  rpc::TokenList::Reader toks(token_list_data);
 
   auto contents = toks.getContents();
   auto kinds = toks.getTokenKinds();
   if (!kinds.size()) {
     if (contents.size()) {
-      ss << "Empty token kinds list with non-empty contents list";
-      return ss.str();
+      err << "Empty token kinds list with non-empty contents list";
+      return err.str();
     } else {
       return TokenList();
     }
@@ -1270,9 +1268,9 @@ Result<TokenList, std::string> TokenList::Create(
   // GZIP-compresses.
   } else if (data_in.back() == static_cast<char>(1)) {
     if (data_in.size() < 4u) {
-      ss << "Corrupted token list contents; compressed contents "
+      err << "Corrupted token list contents; compressed contents "
             "should contain an uncompressed size";
-      return ss.str();
+      return err.str();
     }
 
     size_t uncompressed_size = 0;
@@ -1289,15 +1287,15 @@ Result<TokenList, std::string> TokenList::Create(
       data_in = uncompressed;
 
     } else {
-      ss << "Error uncompressing compressed token contents: "
-         << maybe_uncompressed.TakeError().message();
-      return ss.str();
+      err << "Error uncompressing compressed token contents: "
+          << maybe_uncompressed.TakeError().message();
+      return err.str();
     }
 
   // Corrupted.
   } else {
-    ss << "Corrupted token list contents; last byte should be 0 or 1";
-    return ss.str();
+    err << "Corrupted token list contents; last byte should be 0 or 1";
+    return err.str();
   }
 
   std::string ws;
@@ -1319,7 +1317,7 @@ Result<TokenList, std::string> TokenList::Create(
     switch (status) {
       case DecompressionStatus::kTokenAndWhitespace:
         ls->data.insert(ls->data.end(), ws.begin(), ws.end());
-        ls->token_kinds.push_back(ast::TokenKind::WHITESPACE);
+        ls->token_kinds.push_back(TokenKind::WHITESPACE);
 
         ls->data_offsets.push_back(static_cast<unsigned>(ls->data.size()));
         ls->data.insert(ls->data.end(), token.begin(), token.end());
@@ -1333,20 +1331,20 @@ Result<TokenList, std::string> TokenList::Create(
 
       case DecompressionStatus::kWhitespaceOnly:
         ls->data.insert(ls->data.end(), ws.begin(), ws.end());
-        ls->token_kinds.push_back(ast::TokenKind::WHITESPACE);
+        ls->token_kinds.push_back(TokenKind::WHITESPACE);
         continue;
 
       case DecompressionStatus::kFailedInvalidKind:
-        ss << "Failed to decode compressed token list; "
-              "found compressed token kind in invalid state";
-        return ss.str();
+        err << "Failed to decode compressed token list; "
+               "found compressed token kind in invalid state";
+        return err.str();
       case DecompressionStatus::kFailedNoImpliedSpelling:
-        ss << "Failed to decode compressed token list; "
-              "missing implied spelling for token";
-        return ss.str();
+        err << "Failed to decode compressed token list; "
+               "missing implied spelling for token";
+        return err.str();
       case DecompressionStatus::kFailedUnknown:
-        ss << "Failed to decode compressed token list for unknown reason";
-        return ss.str();
+        err << "Failed to decode compressed token list for unknown reason";
+        return err.str();
     }
   }
 
@@ -1355,13 +1353,57 @@ Result<TokenList, std::string> TokenList::Create(
   return TokenList(std::move(ls));
 }
 
+#ifndef NDEBUG
+namespace {
+
+// Do some sanity checking on the token list compression to make sure we
+// don't introduce issues right away.
+static bool CheckTokenLists(
+    const mx::TokenList &orig_tokens,
+    kj::ArrayPtr<const capnp::word> compressed_tokens,
+    std::stringstream &err) {
+  auto maybe_uncompressed = mx::TokenList::Unpack(compressed_tokens);
+  if (maybe_uncompressed.Succeeded()) {
+    auto uncompressed_file_tokens = maybe_uncompressed.TakeValue();
+    auto orig_num_toks = orig_tokens.Size();
+    auto new_num_toks = uncompressed_file_tokens.Size();
+    if (orig_num_toks != new_num_toks) {
+      err
+          << "Uncompressed token list has " << orig_num_toks
+          << " tokens, but compressed token list only has "
+          << new_num_toks << " tokens";
+      return false;
+    }
+
+    if (!std::equal(orig_tokens.begin(), orig_tokens.end(),
+                    uncompressed_file_tokens.begin(),
+                    uncompressed_file_tokens.end())) {
+
+      err
+          << "One or more of the tokens does not match corresponding tokens "
+             "from the uncompressed token list";
+      return false;
+    }
+
+    return true;
+  } else {
+    err
+        << "Unable to uncompress just-created compressed file token list: "
+        << maybe_uncompressed.TakeError();
+    return false;
+  }
+}
+
+}  // namespace
+#endif
+
 // Serialize this token list into a "compressed token list," as represented
 // by a Flatbuffers message.
-Result<std::monostate, std::string>
-TokenList::Compress(mx::rpc::FileTokenList::Builder &tlb) {
+Result<kj::Array<capnp::word>, std::string> TokenList::Pack(void) {
   std::string output;
   std::vector<uint16_t> states;
   std::string_view data(impl->data);
+  std::stringstream err;
 
   auto i = 0u;
   auto it = impl->token_kinds.begin();
@@ -1373,14 +1415,13 @@ TokenList::Compress(mx::rpc::FileTokenList::Builder &tlb) {
     std::string_view tok_data = data.substr(
         start_offset, end_offset - start_offset);
 
-    assert(ast::TokenKind::END_OF_FILE != tok_kind);
+    assert(TokenKind::END_OF_FILE != tok_kind);
 
     if (it == end) {
       if (!CompressSingle(tok_kind, tok_data, states, output)) {
-        std::stringstream ss;
-        ss << "Unable to compress single token " << NameOf(tok_kind)
-           << " with data <<<" << tok_data << ">>>";
-        return ss.str();
+        err << "Unable to compress single token " << NameOf(tok_kind)
+            << " with data <<<" << tok_data << ">>>";
+        return err.str();
       } else {
         break;
       }
@@ -1392,24 +1433,22 @@ TokenList::Compress(mx::rpc::FileTokenList::Builder &tlb) {
         end_offset, next_end_offset - end_offset);
 
     // We found some leading whitespace before `it`.
-    if (tok_kind == ast::TokenKind::WHITESPACE) {
+    if (tok_kind == TokenKind::WHITESPACE) {
       if (CompressLeadingWhitespace(tok_data, next_tok_kind, next_tok_data,
                                     states, output)) {
         ++it;  // Skip over the token following the whitespace.
         ++i;
       } else {
-        std::stringstream ss;
-        ss << "Unable to compress token " << NameOf(next_tok_kind)
-           << " with data <<<" << next_tok_data
-           << ">>> and leading whitespace <<<" << tok_data << ">>>";
-        return ss.str();
+        err << "Unable to compress token " << NameOf(next_tok_kind)
+            << " with data <<<" << next_tok_data
+            << ">>> and leading whitespace <<<" << tok_data << ">>>";
+        return err.str();
       }
     } else {
       if (!CompressSingle(tok_kind, tok_data, states, output)) {
-        std::stringstream ss;
-        ss << "Unable to compress single token " << NameOf(tok_kind)
-           << " with data <<<" << tok_data << ">>>";
-        return ss.str();
+        err << "Unable to compress single token " << NameOf(tok_kind)
+            << " with data <<<" << tok_data << ">>>";
+        return err.str();
       }
     }
   }
@@ -1434,12 +1473,24 @@ TokenList::Compress(mx::rpc::FileTokenList::Builder &tlb) {
       reinterpret_cast<const kj::byte *>(output.data()),
       output.size());
 
-  kj::ArrayPtr<uint16_t> token_kinds(
-      states.data(), states.size());
+  kj::ArrayPtr<uint16_t> token_kinds(states.data(), states.size());
 
-  tlb.setContents(contents);
-  tlb.setTokenKinds(token_kinds);
-  return std::monostate{};
+  capnp::MallocMessageBuilder message;
+  mx::rpc::TokenList::Builder builder =
+      message.initRoot<mx::rpc::TokenList>();
+  builder.setContents(contents);
+  builder.setTokenKinds(token_kinds);
+
+  auto ret = capnp::messageToFlatArray(message);
+
+#ifndef NDEBUG
+  auto const_ret = kj::arrayPtr<const capnp::word>(ret.begin(), ret.end());
+  if (!CheckTokenLists(*this, const_ret, err)) {
+    return err.str();
+  }
+#endif
+
+  return ret;
 }
 
 }  // namespace mx
