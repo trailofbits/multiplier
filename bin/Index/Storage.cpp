@@ -15,22 +15,9 @@
 #include <system_error>
 #include <variant>
 
-// Should we disable aynchronous insertions to the database? Where possible, we
-// enqueue stuff to be bulk-inserted into the database in a single transaction.
-DEFINE_bool(disable_async_inserts, false,
-            "Disable asynchronous inserts into the SQLite database?");
 
-// Should we disable asynchronous mode, and instead synchronize the SQLite
-// engine with the underlying storage (typically the file system)?
-DEFINE_bool(disable_async_writes, false,
-            "Disable asynchronous writes to the underlying storage engine "
-            "(e.g. the file system) containing the SQLite database?");
 
-// Path to the database file. If `:memory:` is used, then the database will be
-// temporary and live only in memory.
-DEFINE_string(database, ":memory:", "Path to the SQLite database");
-
-namespace mx {
+namespace indexer {
 namespace {
 
 // Return an absolute path to the storage location for the SQLite database.
@@ -277,4 +264,4 @@ Result<FileId, std::string> Storage::ReserveFileIds(
   return err.str();
 }
 
-}  // namespace mx
+}  // namespace indexer

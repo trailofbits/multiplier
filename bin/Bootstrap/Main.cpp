@@ -170,7 +170,9 @@ static std::string SnakeCaseToCamelCase(std::string_view name) {
   std::stringstream ss;
   auto uc = 0;
   auto cs = false;
+  auto i = 0u;
   for (auto c : name) {
+    ++i;
     if ('_' == c) {
       ++uc;
 
@@ -178,13 +180,21 @@ static std::string SnakeCaseToCamelCase(std::string_view name) {
       ss << c;
       cs = true;
 
-    // Multiple `_`s inside of something else, e.g. `kw__attribute`.
-    } else if (cs) {
-      if (!cs) {
+    // Underscore used to separate two things, e.g. `foo_bar`.
+    } else if (uc == 1) {
+      if (!cs) {  // Leading underscore, e.g. `_foo`.
         ss << "uc";
-        --uc;
-        cs = true;
+
+      } else if (i == name.size()) { // Trailing underscore.
+        ss << "Uc";
       }
+      ss << static_cast<char>(std::toupper(c));
+      uc = 0;
+      cs = true;
+
+    // Multiple `_`s inside of something else, e.g. `kw___attribute`.
+    } else if (cs) {
+      --uc;  // The first is a separator, drop it.
       while (uc--) {
         ss << "Uc";
         cs = true;
@@ -224,14 +234,14 @@ static const char *CxxIntType(pasta::Type type) {
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
     switch (bt->Kind()) {
       case pasta::BuiltinTypeKind::kBoolean: return "bool";
-      case pasta::BuiltinTypeKind::kCharacterS: return "int8_t";  // `char`.
-      case pasta::BuiltinTypeKind::kCharacterU: return "uint8_t";  // `char`.
-      case pasta::BuiltinTypeKind::kSChar: return "int8_t";  // `signed char`.
-      case pasta::BuiltinTypeKind::kUChar: return "uint8_t";  // `unsigned char`.
-      case pasta::BuiltinTypeKind::kShort: return "int16_t";
-      case pasta::BuiltinTypeKind::kUShort: return "uint16_t";
-      case pasta::BuiltinTypeKind::kInt: return "int32_t";
-      case pasta::BuiltinTypeKind::kUInt: return "uint32_t";
+      case pasta::BuiltinTypeKind::kCharacterS: return "char";  // `char`.
+      case pasta::BuiltinTypeKind::kCharacterU: return "char";  // `char`.
+      case pasta::BuiltinTypeKind::kSChar: return "signed char";  // `signed char`.
+      case pasta::BuiltinTypeKind::kUChar: return "unsigned char";  // `unsigned char`.
+      case pasta::BuiltinTypeKind::kShort: return "short";
+      case pasta::BuiltinTypeKind::kUShort: return "unsigned short";
+      case pasta::BuiltinTypeKind::kInt: return "int";
+      case pasta::BuiltinTypeKind::kUInt: return "unsigned";
       case pasta::BuiltinTypeKind::kLong: return "int64_t";
       case pasta::BuiltinTypeKind::kULong: return "uint64_t";
       case pasta::BuiltinTypeKind::kLongLong: return "int64_t";

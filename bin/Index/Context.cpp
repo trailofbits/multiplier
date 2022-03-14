@@ -7,47 +7,36 @@
 #include "Context.h"
 
 #include <chrono>
-#include <filesystem>
-#include <gflags/gflags.h>
-#include <glog/logging.h>
 #include <multiplier/Executor.h>
 #include <multiplier/ProgressBar.h>
 #include <pasta/Util/File.h>
 #include <pasta/Util/FileSystem.h>
 #include <system_error>
 
-DEFINE_bool(show_progress, false, "Show progress bars");
-
-DEFINE_string(workspace_dir, "",
-              "Path to the workspace into which semi-permanent indexer data "
-              "should be stored. Defaults to the current working directory "
-              "of `mx-index`.");
-
 namespace indexer {
 
-IndexingContext::IndexingContext(const mx::Executor &exe_)
-    : file_hash_to_file_id(mx::KeyValueStore::kPathToFileId,
-                           FLAGS_workspace_dir),
+IndexingContext::IndexingContext(std::filesystem::path workspace_dir)
+    : file_hash_to_file_id(mx::KeyValueStore::kHashToFileId,
+                           workspace_dir),
       file_path_to_file_id(mx::KeyValueStore::kPathToFileId,
-                           FLAGS_workspace_dir),
+                           workspace_dir),
       decl_hash_to_code_id(mx::KeyValueStore::kHashToCodeId,
-                           FLAGS_workspace_dir) {
-
-  if (FLAGS_show_progress) {
-    command_progress.reset(new mx::ProgressBar("Command parsing",
-                                               std::chrono::seconds(1)));
-    ast_progress.reset(new mx::ProgressBar("AST building",
-                                           std::chrono::seconds(1)));
-    tokenizer_progress.reset(new mx::ProgressBar("Tokenizer",
-                                                 std::chrono::seconds(1)));
-    auto num_workers = exe_.NumWorkers();
-    command_progress->SetNumWorkers(num_workers);
-    ast_progress->SetNumWorkers(num_workers);
-    tokenizer_progress->SetNumWorkers(num_workers);
-  }
-
+                           workspace_dir) {
   next_file_id.store(1u);  // TODO(pag): Replace.
   next_code_id.store(1u);  // TODO(pag): Replace.
+}
+
+void IndexingContext::InitializeProgressBars(const mx::Executor &exe_) {
+  command_progress.reset(new mx::ProgressBar("Command parsing",
+                                             std::chrono::seconds(1)));
+  ast_progress.reset(new mx::ProgressBar("AST building",
+                                         std::chrono::seconds(1)));
+  tokenizer_progress.reset(new mx::ProgressBar("Tokenizer",
+                                               std::chrono::seconds(1)));
+  auto num_workers = exe_.NumWorkers();
+  command_progress->SetNumWorkers(num_workers);
+  ast_progress->SetNumWorkers(num_workers);
+  tokenizer_progress->SetNumWorkers(num_workers);
 }
 
 std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(

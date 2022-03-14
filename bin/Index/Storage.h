@@ -9,19 +9,32 @@
 #include <multiplier/Result.h>
 #include <multiplier/Types.h>
 
-#include <drlojekyll/Runtime/Runtime.h>
+#include <filesystem>
 #include <optional>
 #include <string>
 
-namespace mx {
+namespace indexer {
 
 class StorageImpl;
 
 // A file to be stored in the storage.
 struct File final {
-  FileId id;
+  mx::FileId id;
   std::string path;
   hyde::rt::Bytes tokens;
+};
+
+struct StorageOptions {
+  // Should we disable aynchronous insertions to the database? Where possible, we
+  // enqueue stuff to be bulk-inserted into the database in a single transaction.
+  bool disable_async_inserts{false};
+
+  // Should we disable asynchronous mode, and instead synchronize the SQLite
+  // engine with the underlying storage (typically the file system)?
+  bool disable_async_writes{false};
+
+  // Location where the database is stored.
+  std::filesystem::path path;
 };
 
 // Persistent storage for the backing relations.
@@ -31,7 +44,7 @@ class Storage final {
 
  public:
   ~Storage(void);
-  Storage(void);
+  Storage(StorageOptions);
 
   void StoreFile(File file);
 
@@ -40,4 +53,4 @@ class Storage final {
   Result<FileId, std::string> ReserveFileIds(uint32_t num_ids_to_reserve);
 };
 
-}  // namespace mx
+}  // namespace indexer

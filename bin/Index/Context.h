@@ -51,7 +51,9 @@ class IndexingContext {
   std::unique_ptr<mx::ProgressBar> ast_progress;
   std::unique_ptr<mx::ProgressBar> tokenizer_progress;
 
-  explicit IndexingContext(const mx::Executor &exe_);
+  explicit IndexingContext(std::filesystem::path workspace_dir);
+
+  void InitializeProgressBars(const mx::Executor &exe_);
 
   std::pair<mx::FileId, bool> GetOrCreateFileId(
       std::filesystem::path file_path,
