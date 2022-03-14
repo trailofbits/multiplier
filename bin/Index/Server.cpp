@@ -7,6 +7,7 @@
 #include "Server.h"
 
 #include <capnp/message.h>
+#include <glog/logging.h>
 #include <kj/async-io.h>
 #include <kj/debug.h>
 #include <pasta/Compile/Command.h>
@@ -38,7 +39,7 @@ static pasta::ArgumentVector GetArguments(
 
 }  // namespace
 
-struct Server::Impl final {
+class ServerImpl final {
  public:
   // Worker pool for processing various commands and such.
   mx::Executor executor;
@@ -49,13 +50,20 @@ struct Server::Impl final {
   // Should we show progress bars?
   const bool show_progress_bars;
 
+  std::shared_ptr<ServerContext> server_context;
+
   std::mutex indexing_context_lock;
   std::weak_ptr<IndexingContext> indexing_context;
 
-  inline Impl(ServerOptions &options)
-      : executor(options.executor_options),
-        workspace_dir(options.workspace_dir),
-        show_progress_bars(options.show_progress_bars) {}
+  // Native file system.
+  //
+  // TODO(pag): Eventually, implement a `pasta::FileSystem` layer that caches
+  //            into RocksDB, and investigate using Cap'n Proto capabilities
+  //            to pass a file system interface to compile command indexing
+  //            requests.
+  std::shared_ptr<pasta::FileSystem> native_file_system;
+
+  ServerImpl(ServerOptions &options);
 
   // Get or create an indexing context. If there are concurrent indexing
   // jobs underway then they'll share the same context. When they're all done
@@ -63,17 +71,25 @@ struct Server::Impl final {
   std::shared_ptr<IndexingContext> GetOrCreateIndexingContext(void);
 };
 
+// Initialize the server.
+ServerImpl::ServerImpl(ServerOptions &options)
+    : executor(options.executor_options),
+      workspace_dir(options.workspace_dir),
+      show_progress_bars(options.show_progress_bars),
+      server_context(std::make_shared<ServerContext>(workspace_dir)),
+      native_file_system(pasta::FileSystem::CreateNative()) {}
+
 // Get or create an indexing context. If there are concurrent indexing
 // jobs underway then they'll share the same context. When they're all done
 // the context will go away as well.
 std::shared_ptr<IndexingContext>
-Server::Impl::GetOrCreateIndexingContext(void) {
+ServerImpl::GetOrCreateIndexingContext(void) {
   std::unique_lock<std::mutex> locker(indexing_context_lock);
   auto ic = indexing_context.lock();
   if (ic) {
     return ic;
   } else {
-    ic = std::make_shared<IndexingContext>(workspace_dir);
+    ic = std::make_shared<IndexingContext>(server_context);
     if (show_progress_bars) {
       ic->InitializeProgressBars(executor);
     }
@@ -88,7 +104,7 @@ Server::~Server(void) {
 
 // Initialize the server.
 Server::Server(ServerOptions &options_)
-    : d(std::make_unique<Impl>(options_)) {
+    : d(std::make_unique<ServerImpl>(options_)) {
   d->executor.Start();
 }
 
@@ -110,8 +126,7 @@ kj::Promise<void> Server::indexCompileCommands(
     return kj::READY_NOW;
   }
 
-  auto fs = pasta::FileSystem::CreateNative();
-  pasta::FileManager fm(fs);
+  pasta::FileManager fm(d->native_file_system);
   auto maybe_cc = pasta::Compiler::CreateHostCompiler(
       fm, pasta::TargetLanguage::kC);
   auto maybe_cxx = pasta::Compiler::CreateHostCompiler(

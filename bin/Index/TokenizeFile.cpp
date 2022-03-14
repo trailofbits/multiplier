@@ -63,8 +63,7 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 //      << " bytes, compressed flatbuffer needs "
 //      << fbb.GetSize() << " bytes";
 
-  kj::Array<capnp::word> data = maybe_tokens.TakeValue();
-  (void) data;
+  context->PutFileTokens(file_id, maybe_tokens.TakeValue());
 }
 
 }  // namespace indexer

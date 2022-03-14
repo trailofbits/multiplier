@@ -274,9 +274,10 @@ class Database {
       do {
         std::lock_guard<std::mutex> guard(detail::sqlite3_config_mutex);
         if (!detail::sqlite3_configured) {
-          sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
-          sqlite3_config(SQLITE_CONFIG_LOG,
-                         detail::sqlite_error_log_callback, nullptr);
+          CHECK_EQ(sqlite3_config(SQLITE_CONFIG_MULTITHREAD), SQLITE_OK);
+          CHECK_EQ(sqlite3_config(SQLITE_CONFIG_LOG,
+                                  detail::sqlite_error_log_callback, nullptr),
+                   SQLITE_OK);
           detail::sqlite3_configured = true;
         }
       } while (0);

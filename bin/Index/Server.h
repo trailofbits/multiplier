@@ -9,11 +9,16 @@
 #include <multiplier/Executor.h>
 #include <multiplier/RPC.capnp.h>
 
+//#include "Storage.h"
+
 namespace indexer {
 
 struct ServerOptions {
   // Options for the worker pool.
   mx::ExecutorOptions executor_options;
+
+  // Options for SQLite.
+  //indexer::StorageOptions storage_options;
 
   // Directory where data is stored.
   std::filesystem::path workspace_dir;
@@ -22,10 +27,11 @@ struct ServerOptions {
   bool show_progress_bars;
 };
 
+class ServerImpl;
+
 class Server final : public mx::rpc::Multiplier::Server {
  private:
-  struct Impl;
-  std::unique_ptr<Impl> d;
+  std::unique_ptr<ServerImpl> d;
 
  public:
   virtual ~Server(void);

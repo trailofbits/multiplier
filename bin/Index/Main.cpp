@@ -40,16 +40,16 @@ DEFINE_string(workspace_dir, "",
               "should be stored. Defaults to the current working directory "
               "of `mx-index`.");
 
-// Should we disable aynchronous insertions to the database? Where possible, we
-// enqueue stuff to be bulk-inserted into the database in a single transaction.
-DEFINE_bool(disable_async_inserts, false,
-            "Disable asynchronous inserts into the SQLite database?");
-
-// Should we disable asynchronous mode, and instead synchronize the SQLite
-// engine with the underlying storage (typically the file system)?
-DEFINE_bool(disable_async_writes, false,
-            "Disable asynchronous writes to the underlying storage engine "
-            "(e.g. the file system) containing the SQLite database?");
+//// Should we disable aynchronous insertions to the database? Where possible, we
+//// enqueue stuff to be bulk-inserted into the database in a single transaction.
+//DEFINE_bool(disable_async_inserts, false,
+//            "Disable asynchronous inserts into the SQLite database?");
+//
+//// Should we disable asynchronous mode, and instead synchronize the SQLite
+//// engine with the underlying storage (typically the file system)?
+//DEFINE_bool(disable_async_writes, false,
+//            "Disable asynchronous writes to the underlying storage engine "
+//            "(e.g. the file system) containing the SQLite database?");
 
 namespace {
 
@@ -135,6 +135,9 @@ extern "C" int main(int argc, char *argv[]) {
   options.workspace_dir = workspace_dir.TakeValue();
   options.show_progress_bars = FLAGS_show_progress;
   options.executor_options.num_workers = FLAGS_num_workers;
+//  options.storage_options.disable_async_inserts = FLAGS_disable_async_inserts;
+//  options.storage_options.disable_async_writes = FLAGS_disable_async_writes;
+//  options.storage_options.path = options.workspace_dir / "mx-index.sqlite";
 
   // Set up a server.
   capnp::EzRpcServer server(kj::heap<indexer::Server>(options),

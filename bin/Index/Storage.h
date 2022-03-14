@@ -17,13 +17,6 @@ namespace indexer {
 
 class StorageImpl;
 
-// A file to be stored in the storage.
-struct File final {
-  mx::FileId id;
-  std::string path;
-  hyde::rt::Bytes tokens;
-};
-
 struct StorageOptions {
   // Should we disable aynchronous insertions to the database? Where possible, we
   // enqueue stuff to be bulk-inserted into the database in a single transaction.
@@ -37,6 +30,13 @@ struct StorageOptions {
   std::filesystem::path path;
 };
 
+//// A file to be stored in the storage.
+//struct File final {
+//  mx::FileId id;
+//  std::string path;
+//  hyde::rt::Bytes tokens;
+//};
+
 // Persistent storage for the backing relations.
 class Storage final {
  private:
@@ -44,13 +44,10 @@ class Storage final {
 
  public:
   ~Storage(void);
-  Storage(StorageOptions);
+  explicit Storage(const StorageOptions &options);
 
-  void StoreFile(File file);
-
-  // Reserve `num_ids_to_reserve` file ids, starting at or after
-  // `prev_max_id`.
-  Result<FileId, std::string> ReserveFileIds(uint32_t num_ids_to_reserve);
+//  void StoreFile(mx::FileId id, std::filesystem::path path,
+//                 kj::ArrayPtr<capnp::word> data);
 };
 
 }  // namespace indexer

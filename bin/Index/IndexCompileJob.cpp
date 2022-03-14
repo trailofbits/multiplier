@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <fstream>
 #include <glog/logging.h>
+#include <iostream>
 #include <llvm/ADT/FoldingSet.h>
 #include <multiplier/AST.capnp.h>
 #include <pasta/AST/AST.h>
@@ -17,6 +18,7 @@
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
 #include <tuple>
+#include <unordered_set>
 #include <vector>
 
 #include "Context.h"
@@ -24,8 +26,6 @@
 #include "PrintTokenGraph.h"
 #include "TokenizeFile.h"
 #include "TokenTree.h"
-
-#include <iostream>
 
 namespace indexer {
 namespace {
