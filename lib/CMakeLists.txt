@@ -53,9 +53,6 @@ add_custom_command(
     ${MX_RPC_HEADERS}
     ${MX_AST_HEADERS}
 
-  BYPRODUCTS
-    ${copied_headers}
-
   COMMENT
     "Exporting Cap'n Proto-generated headers"
 

@@ -39,7 +39,10 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   fb.setId(file_id);
   fb.setHash(file_hash);
   auto tsb = fb.initTokens(static_cast<unsigned>(file_tokens.Size()));
+  std::string tok_data;
   for (pasta::FileToken ft : file_tokens) {
+    tok_data.clear();
+    tok_data.insert(tok_data.end(), ft.Data().begin(), ft.Data().end());
     mx::ast::FileToken::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
     ftb.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(ft.Kind())));
     ftb.setPreProcessorKeywordKind(static_cast<mx::ast::PPKeywordKind>(
@@ -48,7 +51,7 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
         mx::FromPasta(ft.ObjectiveCAtKeywordKind())));
     ftb.setLine(ft.Line());
     ftb.setColumn(ft.Column());
-    ftb.setData(kj::StringPtr(ft.Data().data(), ft.Data().size()));
+    ftb.setData(tok_data);
   }
 
   context->PutFileTokens(file_id, capnp::messageToFlatArray(message));
