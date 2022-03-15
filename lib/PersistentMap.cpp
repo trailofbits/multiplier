@@ -110,10 +110,6 @@ PersistentMapImpl::PersistentMapImpl(std::string path_)
   cf_options.compression = rocksdb::kZlibCompression;
   cf_options.bottommost_compression = rocksdb::kZlibCompression;
   cf_options.compression_opts.enabled = true;
-  cf_options.compression_opts.window_bits = 15;  // `MAX_WBITS`.
-  cf_options.compression_opts.level = 9;  // `Z_BEST_COMPRESSION`.
-  cf_options.compression_opts.strategy = 0;  // `Z_DEFAULT_STRATEGY`.
-  cf_options.bottommost_compression_opts = cf_options.compression_opts;
   cf_descs.emplace_back(rocksdb::kDefaultColumnFamilyName, cf_options);
 
   std::vector<rocksdb::ColumnFamilyHandle *> cf_handles;
