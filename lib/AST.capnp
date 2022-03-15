@@ -20,6 +20,13 @@ struct TokenRange @0xfaaa666ba10b6696 {
   endOffset @1 :UInt32 $Cxx.name("end_offset");  # Inclusive.
 }
 
+struct Ref(Entity) {
+  a @0 :UInt64;
+  b @1 :UInt32;
+  c @2 :UInt16;
+  d @3 :UInt16;
+}
+
 enum DeclKind @0x96ac187aac5afe4d {
   accessSpec @0 $Cxx.name("access_spec");
   baseUsing @1 $Cxx.name("base_using");
@@ -3646,6 +3653,41 @@ enum TargetLanguage @0xeabe5088e5bc86fc {
   cxx @1 $Cxx.name("cxx");
 }
 
+struct Compiler @0x848f89979be4f62d {
+  name @0 :CompilerName;
+  targetLanguage @1 :TargetLanguage;
+  hostTargetTriple @2 :Text;
+  targetTriple @3 :Text;
+  executablePath @4 :Text;
+  resourceDirectory @5 :Text;
+  systemRootDirectory @6 :Text;
+  systemRootIncludeDirectory @7 :Text;
+  installationDirectory @8 :Text;
+  systemIncludeDirectories @9 :List(IncludePath);
+  userIncludeDirectories @10 :List(IncludePath);
+  frameworkDirectories @11 :List(IncludePath);
+}
+
+struct IncludePath @0x956b138aef6183ee {
+  path @0 :Text;
+  location @1 :IncludePathLocation;
+}
+
+struct CompileCommand @0xd13fdf9a06e1cf47 {
+  arguments @0 :List(Text);
+  workingDirectory @1 :Text;
+}
+
+struct CompileJob @0xa4db2371361c41ba {
+  arguments @0 :List(Text);
+  workingDirectory @1 :Text;
+  resourceDirectory @2 :Text;
+  systemRootDirectory @3 :Text;
+  systemRootIncludeDirectory @4 :Text;
+  targetTriple @5 :Text;
+  auxiliaryTargetTriple @6 :Text;
+}
+
 struct FileToken @0xca57e1a97ecb7687 {
   kind @0 :TokenKind;
   preProcessorKeywordKind @1 :PPKeywordKind;
@@ -3655,983 +3697,131 @@ struct FileToken @0xca57e1a97ecb7687 {
   data @5 :Text;
 }
 
-struct Decl @0xfb5879761ffaedb6 {
-  access @0 :AccessSpecifier;
-  accessUnsafe @1 :AccessSpecifier;
-  availability @2 :AvailabilityResult;
-  beginToken @3 :Token;
-  bodyRBrace @4 :Token;
-  endToken @5 :Token;
-  friendObjectKind @6 :DeclFriendObjectKind;
-  moduleOwnershipKind @7 :DeclModuleOwnershipKind;
-  hasAttributes @8 :Bool;
-  hasBody @9 :Bool;
-  hasDefiningAttribute @10 :Bool;
-  hasOwningModule @11 :Bool;
-  hasTagIdentifierNamespace @12 :Bool;
-  isCanonicalDeclaration @13 :Bool;
-  isDefinedOutsideFunctionOrMethod @14 :Bool;
-  isDeprecated @15 :Bool;
-  isFirstDeclaration @16 :Bool;
-  isFromAstFile @17 :Bool;
-  isFunctionOrFunctionTemplate @18 :Bool;
-  isImplicit @19 :Bool;
-  isInAnonymousNamespace @20 :Bool;
-  isInLocalScopeForInstantiation @21 :Bool;
-  isInStdNamespace @22 :Bool;
-  isInvalidDeclaration @23 :Bool;
-  isModulePrivate @24 :Bool;
-  isOutOfLine @25 :Bool;
-  isParameterPack @26 :Bool;
-  isReferenced @27 :Bool;
-  isTemplateDeclaration @28 :Bool;
-  isTemplateParameter @29 :Bool;
-  isTemplateParameterPack @30 :Bool;
-  isTemplated @31 :Bool;
-  isThisDeclarationReferenced @32 :Bool;
-  isTopLevelDeclarationInObjCContainer @33 :Bool;
-  isUnavailable @34 :Bool;
-  isUnconditionallyVisible @35 :Bool;
-  isUsed @36 :Bool;
-  isWeakImported @37 :Bool;
-  kind @38 :DeclKind;
-  token @39 :Token;
-  tokenRange @40 :TokenRange;
-}
-
-struct ClassScopeFunctionSpecializationDecl @0x99eb38d6a1065986 {
-  decl @0:Decl;
-  hasExplicitTemplateArguments @1 :Bool;
-}
-
-struct CapturedDecl @0xa1c847e4871d0b0a {
-  decl @0:Decl;
-  isNothrow @1 :Bool;
-}
-
-struct BlockDecl @0xd21c906a9e197a51 {
-  decl @0:Decl;
-  blockMissingReturnType @1 :Bool;
-  canAvoidCopyToHeap @2 :Bool;
-  capturesCxxThis @3 :Bool;
-  doesNotEscape @4 :Bool;
-  caretToken @5 :Token;
-  hasCaptures @6 :Bool;
-  isConversionFromLambda @7 :Bool;
-  isVariadic @8 :Bool;
-}
-
-struct AccessSpecDecl @0xe671324616f83d3c {
-  decl @0:Decl;
-  accessSpecifierToken @1 :Token;
-  colonToken @2 :Token;
-}
-
-struct TranslationUnitDecl @0x84ba694d5be7caa3 {
-  decl @0:Decl;
-}
-
-struct StaticAssertDecl @0xe3ab98945466226a {
-  decl @0:Decl;
-  rParenToken @1 :Token;
-  isFailed @2 :Bool;
-}
-
-struct RequiresExprBodyDecl @0x9eea1ed94972a3a6 {
-  decl @0:Decl;
-}
-
-struct PragmaDetectMismatchDecl @0xc2be564c48472f5d {
-  decl @0:Decl;
-  name @1 :Text;
-  value @2 :Text;
-}
-
-struct PragmaCommentDecl @0xa32a66c4f91015cb {
-  decl @0:Decl;
-  argument @1 :Text;
-  commentKind @2 :PragmaMSCommentKind;
-}
-
-struct ObjCPropertyImplDecl @0x9c45df6dc848c200 {
-  decl @0:Decl;
-  propertyImplementation @1 :ObjCPropertyImplDeclKind;
-  propertyInstanceVariableDeclarationToken @2 :Token;
-  isInstanceVariableNameSpecified @3 :Bool;
-}
-
-struct NamedDecl @0xee8ff2639c85feae {
-  decl @0:Decl;
-  formalLinkage @1 :Linkage;
-  linkageInternal @2 :Linkage;
-  name @3 :Text;
-  objCfStringFormattingFamily @4 :ObjCStringFormatFamily;
-  qualifiedNameAsString @5 :Text;
-  visibility @6 :Visibility;
-  hasExternalFormalLinkage @7 :Bool;
-  hasLinkage @8 :Bool;
-  hasLinkageBeenComputed @9 :Bool;
-  isCxxClassMember @10 :Bool;
-  isCxxInstanceMember @11 :Bool;
-  isExternallyDeclarable @12 :Bool;
-  isExternallyVisible @13 :Bool;
-  isLinkageValid @14 :Bool;
-}
-
-struct LabelDecl @0x959116a0b50f04fe {
-  namedDecl @0:NamedDecl;
-  msAssemblyLabel @1 :Text;
-  isGnuLocal @2 :Bool;
-  isMsAssemblyLabel @3 :Bool;
-  isResolvedMsAssemblyLabel @4 :Bool;
-}
-
-struct BaseUsingDecl @0xd779d676819e5d07 {
-  namedDecl @0:NamedDecl;
-}
-
-struct UsingEnumDecl @0xa824f691f72f9236 {
-  baseUsingDecl @0:BaseUsingDecl;
-  enumToken @1 :Token;
-  usingToken @2 :Token;
-}
-
-struct UsingDecl @0xb8602dcb3f95c179 {
-  baseUsingDecl @0:BaseUsingDecl;
-  usingToken @1 :Token;
-  hasTypename @2 :Bool;
-  isAccessDeclaration @3 :Bool;
-}
-
-struct ValueDecl @0xe2704a366b05e616 {
-  namedDecl @0:NamedDecl;
-  isWeak @1 :Bool;
-}
-
-struct UnresolvedUsingValueDecl @0x8ad2fc298aa43ab1 {
-  valueDecl @0:ValueDecl;
-  ellipsisToken @1 :Token;
-  usingToken @2 :Token;
-  isAccessDeclaration @3 :Bool;
-  isPackExpansion @4 :Bool;
-}
-
-struct TemplateParamObjectDecl @0xd09f17939d7cc847 {
-  valueDecl @0:ValueDecl;
-}
-
-struct OMPDeclareReductionDecl @0xf59daefbeeafc092 {
-  valueDecl @0:ValueDecl;
-  initializerKind @1 :OMPDeclareReductionDeclInitKind;
-}
-
-struct MSGuidDecl @0x9ef09ebc4be76711 {
-  valueDecl @0:ValueDecl;
-}
-
-struct IndirectFieldDecl @0xf8f906fde6cb040f {
-  valueDecl @0:ValueDecl;
-}
-
-struct EnumConstantDecl @0xe2b34f222cdb8877 {
-  valueDecl @0:ValueDecl;
-}
-
-struct DeclaratorDecl @0xb95593a177af5810 {
-  valueDecl @0:ValueDecl;
-  innerTokenStart @1 :Token;
-  outerTokenStart @2 :Token;
-  typeSpecEndToken @3 :Token;
-  typeSpecStartToken @4 :Token;
-}
-
-struct VarDecl @0xcf9adcbc59a4e339 {
-  declaratorDecl @0:DeclaratorDecl;
-  initializerStyle @1 :VarDeclInitializationStyle;
-  languageLinkage @2 :LanguageLinkage;
-  pointOfInstantiation @3 :Token;
-  storageClass @4 :StorageClass;
-  storageDuration @5 :StorageDuration;
-  tlsKind @6 :VarDeclTLSKind;
-  tscSpec @7 :ThreadStorageClassSpecifier;
-  templateSpecializationKind @8 :TemplateSpecializationKind;
-  templateSpecializationKindForInstantiation @9 :TemplateSpecializationKind;
-  hasConstantInitialization @10 :Bool;
-  hasDependentAlignment @11 :Bool;
-  hasExternalStorage @12 :Bool;
-  hasGlobalStorage @13 :Bool;
-  hasIceInitializer @14 :Bool;
-  hasInitializer @15 :Bool;
-  hasLocalStorage @16 :Bool;
-  isArcPseudoStrong @17 :Bool;
-  isCxxForRangeDeclaration @18 :Bool;
-  isConstexpr @19 :Bool;
-  isDirectInitializer @20 :Bool;
-  isEscapingByref @21 :Bool;
-  isExceptionVariable @22 :Bool;
-  isExternUcC @23 :Bool;
-  isFileVariableDeclaration @24 :Bool;
-  isFunctionOrMethodVariableDeclaration @25 :Bool;
-  isInExternCContext @26 :Bool;
-  isInExternCxxContext @27 :Bool;
-  isInitializerCapture @28 :Bool;
-  isInline @29 :Bool;
-  isInlineSpecified @30 :Bool;
-  isKnownToBeDefined @31 :Bool;
-  isLocalVariableDeclaration @32 :Bool;
-  isLocalVariableDeclarationOrParm @33 :Bool;
-  isNrvoVariable @34 :Bool;
-  isNoDestroy @35 :Bool;
-  isNonEscapingByref @36 :Bool;
-  isObjCForDeclaration @37 :Bool;
-  isPreviousDeclarationInSameBlockScope @38 :Bool;
-  isStaticDataMember @39 :Bool;
-  isStaticLocal @40 :Bool;
-  isThisDeclarationADemotedDefinition @41 :Bool;
-  isUsableInConstantExpressions @42 :Bool;
-  mightBeUsableInConstantExpressions @43 :Bool;
-  needsDestruction @44 :QualTypeDestructionKind;
-}
-
-struct ParmVarDecl @0xedf01c1d7684de38 {
-  varDecl @0:VarDecl;
-  defaultArgumentRange @1 :TokenRange;
-  objCDeclQualifier @2 :DeclObjCDeclQualifier;
-  hasDefaultArgument @3 :Bool;
-  hasInheritedDefaultArgument @4 :Bool;
-  hasUninstantiatedDefaultArgument @5 :Bool;
-  hasUnparsedDefaultArgument @6 :Bool;
-  isDestroyedInCallee @7 :Bool;
-  isKnrPromoted @8 :Bool;
-  isObjCMethodParameter @9 :Bool;
-}
-
-struct OMPCapturedExprDecl @0x8dae8ad443b5cf77 {
-  varDecl @0:VarDecl;
-}
-
-struct ImplicitParamDecl @0x9482ac8d963f562c {
-  varDecl @0:VarDecl;
-  parameterKind @1 :ImplicitParamDeclImplicitParamKind;
-}
-
-struct DecompositionDecl @0xd32bcfb0d1a2facb {
-  varDecl @0:VarDecl;
-}
-
-struct VarTemplateSpecializationDecl @0xbaf3e3ed90ea85e0 {
-  varDecl @0:VarDecl;
-  externToken @1 :Token;
-  specializationKind @2 :TemplateSpecializationKind;
-  templateKeywordToken @3 :Token;
-  isClassScopeExplicitSpecialization @4 :Bool;
-  isExplicitInstantiationOrSpecialization @5 :Bool;
-  isExplicitSpecialization @6 :Bool;
-}
-
-struct VarTemplatePartialSpecializationDecl @0xe1d0f96cb9fa250f {
-  varTemplateSpecializationDecl @0:VarTemplateSpecializationDecl;
-  hasAssociatedConstraints @1 :Bool;
-}
-
-struct NonTypeTemplateParmDecl @0x964d2872d52f2d65 {
-  declaratorDecl @0:DeclaratorDecl;
-  defaultArgumentWasInherited @1 :Bool;
-  defaultArgumentToken @2 :Token;
-  hasDefaultArgument @3 :Bool;
-  hasPlaceholderTypeConstraint @4 :Bool;
-  isExpandedParameterPack @5 :Bool;
-  isPackExpansion @6 :Bool;
-}
-
-struct MSPropertyDecl @0x9a46ca50a3ae900f {
-  declaratorDecl @0:DeclaratorDecl;
-  hasGetter @1 :Bool;
-  hasSetter @2 :Bool;
-}
-
-struct FunctionDecl @0x92bd4789888f8ccb {
-  declaratorDecl @0:DeclaratorDecl;
-  doesDeclarationForceExternallyVisibleDefinition @1 :Bool;
-  doesThisDeclarationHaveABody @2 :Bool;
-  constexprKind @3 :ConstexprSpecKind;
-  ellipsisToken @4 :Token;
-  exceptionSpecSourceRange @5 :TokenRange;
-  exceptionSpecType @6 :ExceptionSpecificationType;
-  languageLinkage @7 :LanguageLinkage;
-  multiVersionKind @8 :MultiVersionKind;
-  overloadedOperator @9 :OverloadedOperatorKind;
-  parametersSourceRange @10 :TokenRange;
-  pointOfInstantiation @11 :Token;
-  returnTypeSourceRange @12 :TokenRange;
-  storageClass @13 :StorageClass;
-  templateSpecializationKind @14 :TemplateSpecializationKind;
-  templateSpecializationKindForInstantiation @15 :TemplateSpecializationKind;
-  templatedKind @16 :FunctionDeclTemplatedKind;
-  hasImplicitReturnZero @17 :Bool;
-  hasInheritedPrototype @18 :Bool;
-  hasOneParamOrDefaultArguments @19 :Bool;
-  hasPrototype @20 :Bool;
-  hasSkippedBody @21 :Bool;
-  hasTrivialBody @22 :Bool;
-  hasWrittenPrototype @23 :Bool;
-  instantiationIsPending @24 :Bool;
-  isCpuDispatchMultiVersion @25 :Bool;
-  isCpuSpecificMultiVersion @26 :Bool;
-  isConsteval @27 :Bool;
-  isConstexpr @28 :Bool;
-  isConstexprSpecified @29 :Bool;
-  isDefaulted @30 :Bool;
-  isDeleted @31 :Bool;
-  isDeletedAsWritten @32 :Bool;
-  isDestroyingOperatorDelete @33 :Bool;
-  isExplicitlyDefaulted @34 :Bool;
-  isExternUcC @35 :Bool;
-  isFunctionTemplateSpecialization @36 :Bool;
-  isGlobal @37 :Bool;
-  isImplicitlyInstantiable @38 :Bool;
-  isInExternCContext @39 :Bool;
-  isInExternCxxContext @40 :Bool;
-  isInlineBuiltinDeclaration @41 :Bool;
-  isInlineDefinitionExternallyVisible @42 :Bool;
-  isInlineSpecified @43 :Bool;
-  isInlined @44 :Bool;
-  isLateTemplateParsed @45 :Bool;
-  isMsExternInline @46 :Bool;
-  isMsvcrtEntryPoint @47 :Bool;
-  isMain @48 :Bool;
-  isMultiVersion @49 :Bool;
-  isNoReturn @50 :Bool;
-  isOverloadedOperator @51 :Bool;
-  isPure @52 :Bool;
-  isReplaceableGlobalAllocationFunction @53 :Bool;
-  isReservedGlobalPlacementOperator @54 :Bool;
-  isStatic @55 :Bool;
-  isTargetMultiVersion @56 :Bool;
-  isTemplateInstantiation @57 :Bool;
-  isThisDeclarationADefinition @58 :Bool;
-  isThisDeclarationInstantiatedFromAFriendDefinition @59 :Bool;
-  isTrivial @60 :Bool;
-  isTrivialForCall @61 :Bool;
-  isUserProvided @62 :Bool;
-  isVariadic @63 :Bool;
-  isVirtualAsWritten @64 :Bool;
-  usesSehTry @65 :Bool;
-  willHaveBody @66 :Bool;
-}
-
-struct CXXMethodDecl @0xd83d5835cf6512db {
-  functionDecl @0:FunctionDecl;
-  referenceQualifier @1 :RefQualifierKind;
-  hasInlineBody @2 :Bool;
-  isConst @3 :Bool;
-  isCopyAssignmentOperator @4 :Bool;
-  isInstance @5 :Bool;
-  isLambdaStaticInvoker @6 :Bool;
-  isMoveAssignmentOperator @7 :Bool;
-  isVirtual @8 :Bool;
-  isVolatile @9 :Bool;
-}
-
-struct CXXDestructorDecl @0xee0fd0438430a21c {
-  cxxMethodDecl @0:CXXMethodDecl;
-}
-
-struct CXXConversionDecl @0xac531836739115b2 {
-  cxxMethodDecl @0:CXXMethodDecl;
-  isExplicit @1 :Bool;
-  isLambdaToBlockPointerConversion @2 :Bool;
-}
-
-struct CXXConstructorDecl @0xc6bfa2c4650464b8 {
-  cxxMethodDecl @0:CXXMethodDecl;
-  isConvertingConstructor @1 :Bool;
-  isDefaultConstructor @2 :Bool;
-  isDelegatingConstructor @3 :Bool;
-  isExplicit @4 :Bool;
-  isInheritingConstructor @5 :Bool;
-  isSpecializationCopyingObject @6 :Bool;
-}
-
-struct CXXDeductionGuideDecl @0xca6c78b5c1634d9d {
-  functionDecl @0:FunctionDecl;
-  isCopyDeductionCandidate @1 :Bool;
-  isExplicit @2 :Bool;
-}
-
-struct FieldDecl @0xec8d79b82b91a5eb {
-  declaratorDecl @0:DeclaratorDecl;
-  inClassInitializerStyle @1 :InClassInitStyle;
-  hasCapturedVlaType @2 :Bool;
-  hasInClassInitializer @3 :Bool;
-  isAnonymousStructOrUnion @4 :Bool;
-  isBitField @5 :Bool;
-  isMutable @6 :Bool;
-  isUnnamedBitfield @7 :Bool;
-  isZeroLengthBitField @8 :Bool;
-  isZeroSize @9 :Bool;
-}
-
-struct ObjCIvarDecl @0xfd0f42a085839510 {
-  fieldDecl @0:FieldDecl;
-  accessControl @1 :ObjCIvarDeclAccessControl;
-  canonicalAccessControl @2 :ObjCIvarDeclAccessControl;
-  synthesize @3 :Bool;
-}
-
-struct ObjCAtDefsFieldDecl @0xd8b002eb70c258c6 {
-  fieldDecl @0:FieldDecl;
-}
-
-struct BindingDecl @0xe77651068f3e1703 {
-  valueDecl @0:ValueDecl;
-}
-
-struct UsingShadowDecl @0xef25bc2e71e7534e {
-  namedDecl @0:NamedDecl;
-}
-
-struct ConstructorUsingShadowDecl @0x8a43df80c48b7033 {
-  usingShadowDecl @0:UsingShadowDecl;
-  constructsVirtualBase @1 :Bool;
-}
-
-struct UsingPackDecl @0xf68edcc97d568bee {
-  namedDecl @0:NamedDecl;
-}
-
-struct UsingDirectiveDecl @0xf383b9039044d6f8 {
-  namedDecl @0:NamedDecl;
-  identifierToken @1 :Token;
-  namespaceKeyToken @2 :Token;
-  usingToken @3 :Token;
-}
-
-struct UnresolvedUsingIfExistsDecl @0x82421c5826bd81e2 {
-  namedDecl @0:NamedDecl;
-}
-
-struct TypeDecl @0xd349fa911db2de42 {
-  namedDecl @0:NamedDecl;
-}
-
-struct TemplateTypeParmDecl @0x87eba729b34d198a {
-  typeDecl @0:TypeDecl;
-  defaultArgumentWasInherited @1 :Bool;
-  defaultArgumentToken @2 :Token;
-  hasDefaultArgument @3 :Bool;
-  hasTypeConstraint @4 :Bool;
-  isExpandedParameterPack @5 :Bool;
-  isPackExpansion @6 :Bool;
-  wasDeclaredWithTypename @7 :Bool;
-}
-
-struct TagDecl @0x8e30dcc81a0377d1 {
-  typeDecl @0:TypeDecl;
-  braceRange @1 :TokenRange;
-  innerTokenStart @2 :Token;
-  outerTokenStart @3 :Token;
-  tagKind @4 :TagTypeKind;
-  hasNameForLinkage @5 :Bool;
-  isBeingDefined @6 :Bool;
-  isClass @7 :Bool;
-  isCompleteDefinition @8 :Bool;
-  isCompleteDefinitionRequired @9 :Bool;
-  isDependentType @10 :Bool;
-  isEmbeddedInDeclarator @11 :Bool;
-  isEnum @12 :Bool;
-  isFreeStanding @13 :Bool;
-  isInterface @14 :Bool;
-  isStruct @15 :Bool;
-  isThisDeclarationADefinition @16 :Bool;
-  isUnion @17 :Bool;
-  mayHaveOutOfDateDefinition @18 :Bool;
-}
-
-struct RecordDecl @0xae6dc96296678f51 {
-  tagDecl @0:TagDecl;
-  canPassInRegisters @1 :Bool;
-  argumentPassingRestrictions @2 :RecordDeclArgPassingKind;
-  hasFlexibleArrayMember @3 :Bool;
-  hasLoadedFieldsFromExternalStorage @4 :Bool;
-  hasNonTrivialToPrimitiveCopyCUnion @5 :Bool;
-  hasNonTrivialToPrimitiveDefaultInitializeCUnion @6 :Bool;
-  hasNonTrivialToPrimitiveDestructCUnion @7 :Bool;
-  hasObjectMember @8 :Bool;
-  hasVolatileMember @9 :Bool;
-  isAnonymousStructOrUnion @10 :Bool;
-  isCapturedRecord @11 :Bool;
-  isInjectedClassName @12 :Bool;
-  isLambda @13 :Bool;
-  isMsStruct @14 :Bool;
-  isNonTrivialToPrimitiveCopy @15 :Bool;
-  isNonTrivialToPrimitiveDefaultInitialize @16 :Bool;
-  isNonTrivialToPrimitiveDestroy @17 :Bool;
-  isOrContainsUnion @18 :Bool;
-  isParamDestroyedInCallee @19 :Bool;
-  mayInsertExtraPadding @20 :Bool;
-}
-
-struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
-  recordDecl @0:RecordDecl;
-  allowConstDefaultInitializer @1 :Bool;
-  calculateInheritanceModel @2 :MSInheritanceModel;
-  defaultedCopyConstructorIsDeleted @3 :Bool;
-  defaultedDefaultConstructorIsConstexpr @4 :Bool;
-  defaultedDestructorIsConstexpr @5 :Bool;
-  defaultedDestructorIsDeleted @6 :Bool;
-  defaultedMoveConstructorIsDeleted @7 :Bool;
-  lambdaCaptureDefault @8 :LambdaCaptureDefault;
-  msInheritanceModel @9 :MSInheritanceModel;
-  msVtorDispMode @10 :MSVtorDispMode;
-  templateSpecializationKind @11 :TemplateSpecializationKind;
-  hasAnyDependentBases @12 :Bool;
-  hasConstexprDefaultConstructor @13 :Bool;
-  hasConstexprDestructor @14 :Bool;
-  hasConstexprNonCopyMoveConstructor @15 :Bool;
-  hasCopyAssignmentWithConstParam @16 :Bool;
-  hasCopyConstructorWithConstParam @17 :Bool;
-  hasDefaultConstructor @18 :Bool;
-  hasDefinition @19 :Bool;
-  hasDirectFields @20 :Bool;
-  hasFriends @21 :Bool;
-  hasInClassInitializer @22 :Bool;
-  hasInheritedAssignment @23 :Bool;
-  hasInheritedConstructor @24 :Bool;
-  hasIrrelevantDestructor @25 :Bool;
-  hasKnownLambdaInternalLinkage @26 :Bool;
-  hasMoveAssignment @27 :Bool;
-  hasMoveConstructor @28 :Bool;
-  hasMutableFields @29 :Bool;
-  hasNonLiteralTypeFieldsOrBases @30 :Bool;
-  hasNonTrivialCopyAssignment @31 :Bool;
-  hasNonTrivialCopyConstructor @32 :Bool;
-  hasNonTrivialCopyConstructorForCall @33 :Bool;
-  hasNonTrivialDefaultConstructor @34 :Bool;
-  hasNonTrivialDestructor @35 :Bool;
-  hasNonTrivialDestructorForCall @36 :Bool;
-  hasNonTrivialMoveAssignment @37 :Bool;
-  hasNonTrivialMoveConstructor @38 :Bool;
-  hasNonTrivialMoveConstructorForCall @39 :Bool;
-  hasPrivateFields @40 :Bool;
-  hasProtectedFields @41 :Bool;
-  hasSimpleCopyAssignment @42 :Bool;
-  hasSimpleCopyConstructor @43 :Bool;
-  hasSimpleDestructor @44 :Bool;
-  hasSimpleMoveAssignment @45 :Bool;
-  hasSimpleMoveConstructor @46 :Bool;
-  hasTrivialCopyAssignment @47 :Bool;
-  hasTrivialCopyConstructor @48 :Bool;
-  hasTrivialCopyConstructorForCall @49 :Bool;
-  hasTrivialDefaultConstructor @50 :Bool;
-  hasTrivialDestructor @51 :Bool;
-  hasTrivialDestructorForCall @52 :Bool;
-  hasTrivialMoveAssignment @53 :Bool;
-  hasTrivialMoveConstructor @54 :Bool;
-  hasTrivialMoveConstructorForCall @55 :Bool;
-  hasUninitializedReferenceMember @56 :Bool;
-  hasUserDeclaredConstructor @57 :Bool;
-  hasUserDeclaredCopyAssignment @58 :Bool;
-  hasUserDeclaredCopyConstructor @59 :Bool;
-  hasUserDeclaredDestructor @60 :Bool;
-  hasUserDeclaredMoveAssignment @61 :Bool;
-  hasUserDeclaredMoveConstructor @62 :Bool;
-  hasUserDeclaredMoveOperation @63 :Bool;
-  hasUserProvidedDefaultConstructor @64 :Bool;
-  hasVariantMembers @65 :Bool;
-  implicitCopyAssignmentHasConstParam @66 :Bool;
-  implicitCopyConstructorHasConstParam @67 :Bool;
-  isAbstract @68 :Bool;
-  isAggregate @69 :Bool;
-  isAnyDestructorNoReturn @70 :Bool;
-  isCLike @71 :Bool;
-  isCxX11StandardLayout @72 :Bool;
-  isDependentLambda @73 :Bool;
-  isDynamicClass @74 :Bool;
-  isEffectivelyFinal @75 :Bool;
-  isEmpty @76 :Bool;
-  isGenericLambda @77 :Bool;
-  isInterfaceLike @78 :Bool;
-  isLiteral @79 :Bool;
-  isPod @80 :Bool;
-  isParsingBaseSpecifiers @81 :Bool;
-  isPolymorphic @82 :Bool;
-  isStandardLayout @83 :Bool;
-  isStructural @84 :Bool;
-  isTrivial @85 :Bool;
-  isTriviallyCopyable @86 :Bool;
-  lambdaIsDefaultConstructibleAndAssignable @87 :Bool;
-  mayBeAbstract @88 :Bool;
-  mayBeDynamicClass @89 :Bool;
-  mayBeNonDynamicClass @90 :Bool;
-  needsImplicitCopyAssignment @91 :Bool;
-  needsImplicitCopyConstructor @92 :Bool;
-  needsImplicitDefaultConstructor @93 :Bool;
-  needsImplicitDestructor @94 :Bool;
-  needsImplicitMoveAssignment @95 :Bool;
-  needsImplicitMoveConstructor @96 :Bool;
-  needsOverloadResolutionForCopyAssignment @97 :Bool;
-  needsOverloadResolutionForCopyConstructor @98 :Bool;
-  needsOverloadResolutionForDestructor @99 :Bool;
-  needsOverloadResolutionForMoveAssignment @100 :Bool;
-  needsOverloadResolutionForMoveConstructor @101 :Bool;
-  nullFieldOffsetIsZero @102 :Bool;
-}
-
-struct ClassTemplateSpecializationDecl @0xa81be8b0845933da {
-  cxxRecordDecl @0:CXXRecordDecl;
-  externToken @1 :Token;
-  pointOfInstantiation @2 :Token;
-  specializationKind @3 :TemplateSpecializationKind;
-  templateKeywordToken @4 :Token;
-  isClassScopeExplicitSpecialization @5 :Bool;
-  isExplicitInstantiationOrSpecialization @6 :Bool;
-  isExplicitSpecialization @7 :Bool;
-}
-
-struct ClassTemplatePartialSpecializationDecl @0x9492104c4b2eff2e {
-  classTemplateSpecializationDecl @0:ClassTemplateSpecializationDecl;
-  hasAssociatedConstraints @1 :Bool;
-}
-
-struct EnumDecl @0x93540bfa73a13c84 {
-  tagDecl @0:TagDecl;
-  integerTypeRange @1 :TokenRange;
-  templateSpecializationKind @2 :TemplateSpecializationKind;
-  isClosed @3 :Bool;
-  isClosedFlag @4 :Bool;
-  isClosedNonFlag @5 :Bool;
-  isComplete @6 :Bool;
-  isFixed @7 :Bool;
-  isScoped @8 :Bool;
-  isScopedUsingClassTag @9 :Bool;
-}
-
-struct UnresolvedUsingTypenameDecl @0x8b74c3415940bb24 {
-  typeDecl @0:TypeDecl;
-  ellipsisToken @1 :Token;
-  typenameToken @2 :Token;
-  usingToken @3 :Token;
-  isPackExpansion @4 :Bool;
-}
-
-struct TypedefNameDecl @0xe8f3a8fa9f84b388 {
-  typeDecl @0:TypeDecl;
-  isModed @1 :Bool;
-  isTransparentTag @2 :Bool;
-}
-
-struct TypedefDecl @0xcabfd592ecdf73ec {
-  typedefNameDecl @0:TypedefNameDecl;
-}
-
-struct TypeAliasDecl @0x98b3c141fd82bbdd {
-  typedefNameDecl @0:TypedefNameDecl;
-}
-
-struct ObjCTypeParamDecl @0xfea48cce2b1c50cd {
-  typedefNameDecl @0:TypedefNameDecl;
-  colonToken @1 :Token;
-  variance @2 :ObjCTypeParamVariance;
-  varianceToken @3 :Token;
-  hasExplicitBound @4 :Bool;
-}
-
-struct TemplateDecl @0x8794861cbdf44fcd {
-  namedDecl @0:NamedDecl;
-  hasAssociatedConstraints @1 :Bool;
-}
-
-struct RedeclarableTemplateDecl @0xeae96325d22b861f {
-  templateDecl @0:TemplateDecl;
-  isMemberSpecialization @1 :Bool;
-}
-
-struct FunctionTemplateDecl @0xc88144c3067080ac {
-  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
-  isAbbreviated @1 :Bool;
-  isThisDeclarationADefinition @2 :Bool;
-}
-
-struct ClassTemplateDecl @0xd77c8a2532fd776e {
-  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
-  isThisDeclarationADefinition @1 :Bool;
-}
-
-struct VarTemplateDecl @0x983bd212ec53c1f3 {
-  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
-  isThisDeclarationADefinition @1 :Bool;
-}
-
-struct TypeAliasTemplateDecl @0xcafc2a5c9d4a2d22 {
-  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
-}
-
-struct ConceptDecl @0xdbe7c6781c4169e0 {
-  templateDecl @0:TemplateDecl;
-  isTypeConcept @1 :Bool;
-}
-
-struct BuiltinTemplateDecl @0xa84039c6df79998d {
-  templateDecl @0:TemplateDecl;
-}
-
-struct TemplateTemplateParmDecl @0x8481be080ff800b8 {
-  templateDecl @0:TemplateDecl;
-  defaultArgumentWasInherited @1 :Bool;
-  defaultArgumentToken @2 :Token;
-  hasDefaultArgument @3 :Bool;
-  isExpandedParameterPack @4 :Bool;
+struct TemplateParameterList @0xee0d4e6aba92fdde {
+  numParameters @0 :UInt32;
+  numRequiredParameters @1 :UInt32;
+  depth @2 :UInt32;
+  hasUnexpandedParameterPack @3 :Bool;
+  hasParameterPack @4 :Bool;
+  templateKeywordToken @5 :Ref(Token);
+  leftAngleToken @6 :Ref(Token);
+  rightAngleToken @7 :Ref(Token);
+  tokenRange @8 :Ref(TokenRange);
+  parameters @9 :List(Ref(NamedDecl));
+}
+
+struct TemplateArgument @0xb5127dad01992f67 {
+  kind @0 :TemplateArgumentKind;
+  isNull @1 :Bool;
+  isDependent @2 :Bool;
+  isInstantiationDependent @3 :Bool;
+  containsUnexpandedParameterPack @4 :Bool;
   isPackExpansion @5 :Bool;
 }
 
-struct ObjCPropertyDecl @0x9eb7f76b62290548 {
-  namedDecl @0:NamedDecl;
-  atToken @1 :Token;
-  getterNameToken @2 :Token;
-  lParenToken @3 :Token;
-  propertyImplementation @4 :ObjCPropertyDeclPropertyControl;
-  queryKind @5 :ObjCPropertyQueryKind;
-  setterKind @6 :ObjCPropertyDeclSetterKind;
-  setterNameToken @7 :Token;
-  isAtomic @8 :Bool;
-  isClassProperty @9 :Bool;
-  isDirectProperty @10 :Bool;
-  isInstanceProperty @11 :Bool;
-  isOptional @12 :Bool;
-  isReadOnly @13 :Bool;
-  isRetaining @14 :Bool;
-}
-
-struct ObjCMethodDecl @0xf8c8c7d3c113456e {
-  namedDecl @0:NamedDecl;
-  definedInNsObject @1 :Bool;
-  declaratorEndToken @2 :Token;
-  implementationControl @3 :ObjCMethodDeclImplementationControl;
-  methodFamily @4 :ObjCMethodFamily;
-  objCDeclQualifier @5 :DeclObjCDeclQualifier;
-  returnTypeSourceRange @6 :TokenRange;
-  selectorStartToken @7 :Token;
-  hasRedeclaration @8 :Bool;
-  hasRelatedResultType @9 :Bool;
-  hasSkippedBody @10 :Bool;
-  isClassMethod @11 :Bool;
-  isDefined @12 :Bool;
-  isDesignatedInitializerForTheInterface @13 :Bool;
-  isDirectMethod @14 :Bool;
-  isInstanceMethod @15 :Bool;
-  isOptional @16 :Bool;
-  isOverriding @17 :Bool;
-  isPropertyAccessor @18 :Bool;
-  isRedeclaration @19 :Bool;
-  isSynthesizedAccessorStub @20 :Bool;
-  isThisDeclarationADefinition @21 :Bool;
-  isThisDeclarationADesignatedInitializer @22 :Bool;
-  isVariadic @23 :Bool;
-}
-
-struct ObjCContainerDecl @0xaf9db5ae0b65ce9e {
-  namedDecl @0:NamedDecl;
-  atEndRange @1 :TokenRange;
-  atStartToken @2 :Token;
-}
-
-struct ObjCCategoryDecl @0xb673566cbe41a76d {
-  objCContainerDecl @0:ObjCContainerDecl;
-  isClassExtension @1 :Bool;
-  categoryNameToken @2 :Token;
-  instanceVariableLBraceToken @3 :Token;
-  instanceVariableRBraceToken @4 :Token;
-}
-
-struct ObjCProtocolDecl @0xa8d0b0128e3a36e1 {
-  objCContainerDecl @0:ObjCContainerDecl;
-  objCRuntimeNameAsString @1 :Text;
-  hasDefinition @2 :Bool;
-  isNonRuntimeProtocol @3 :Bool;
-  isThisDeclarationADefinition @4 :Bool;
-}
-
-struct ObjCInterfaceDecl @0x851a7195d7b1d15e {
-  objCContainerDecl @0:ObjCContainerDecl;
-  declaresOrInheritsDesignatedInitializers @1 :Bool;
-  endOfDefinitionToken @2 :Token;
-  objCRuntimeNameAsString @3 :Text;
-  superClassToken @4 :Token;
-  hasDefinition @5 :Bool;
-  hasDesignatedInitializers @6 :Bool;
-  isArcWeakrefUnavailable @7 :Bool;
-  isImplicitInterfaceDeclaration @8 :Bool;
-  isThisDeclarationADefinition @9 :Bool;
-}
-
-struct ObjCImplDecl @0xfbf2d2598582b4f4 {
-  objCContainerDecl @0:ObjCContainerDecl;
-}
-
-struct ObjCCategoryImplDecl @0xb972fe178fc59d16 {
-  objCImplDecl @0:ObjCImplDecl;
-  categoryNameToken @1 :Token;
-}
-
-struct ObjCImplementationDecl @0xf2e56fe062561acd {
-  objCImplDecl @0:ObjCImplDecl;
-  instanceVariableLBraceToken @1 :Token;
-  instanceVariableRBraceToken @2 :Token;
-  objCRuntimeNameAsString @3 :Text;
-  superClassToken @4 :Token;
-  hasDestructors @5 :Bool;
-  hasNonZeroConstructors @6 :Bool;
-}
-
-struct ObjCCompatibleAliasDecl @0xc484be73cf6be95b {
-  namedDecl @0:NamedDecl;
-}
-
-struct NamespaceDecl @0xd4713edcad196585 {
-  namedDecl @0:NamedDecl;
-  rBraceToken @1 :Token;
-  isAnonymousNamespace @2 :Bool;
-  isInline @3 :Bool;
-  isOriginalNamespace @4 :Bool;
-}
-
-struct NamespaceAliasDecl @0xd8966652a484c480 {
-  namedDecl @0:NamedDecl;
-  aliasToken @1 :Token;
-  namespaceToken @2 :Token;
-  targetNameToken @3 :Token;
-}
-
-struct LinkageSpecDecl @0xb0f84c4a56c95eec {
-  decl @0:Decl;
-  externToken @1 :Token;
-  language @2 :LinkageSpecDeclLanguageIDs;
-  rBraceToken @3 :Token;
-  hasBraces @4 :Bool;
-}
-
-struct LifetimeExtendedTemporaryDecl @0x829a6a0ac2b5baa8 {
-  decl @0:Decl;
-  storageDuration @1 :StorageDuration;
-}
-
-struct ImportDecl @0x84f826d506def833 {
-  decl @0:Decl;
-}
-
-struct FriendTemplateDecl @0x82a920109bdb2178 {
-  decl @0:Decl;
-  friendToken @1 :Token;
-}
-
-struct FriendDecl @0xe6545eb838d810d0 {
-  decl @0:Decl;
-  friendToken @1 :Token;
-  isUnsupportedFriend @2 :Bool;
-}
-
-struct FileScopeAsmDecl @0xa91b82b590024228 {
-  decl @0:Decl;
-  assemblyToken @1 :Token;
-  rParenToken @2 :Token;
-}
-
-struct ExternCContextDecl @0xd79e4560c3f80cbd {
-  decl @0:Decl;
-}
-
-struct ExportDecl @0xb9bc9642842c6d81 {
-  decl @0:Decl;
-  exportToken @1 :Token;
-  rBraceToken @2 :Token;
-  hasBraces @3 :Bool;
-}
-
-struct EmptyDecl @0xdb55f7b2f60fd2a7 {
-  decl @0:Decl;
+struct CXXBaseSpecifier @0x8e0e4024ab6be99f {
+  tokenRange @0 :Ref(TokenRange);
+  baseTypeToken @1 :Ref(Token);
+  isVirtual @2 :Bool;
+  baseKind @3 :TagTypeKind;
+  isPackExpansion @4 :Bool;
+  constructorsAreInherited @5 :Bool;
+  semanticAccessSpecifier @6 :AccessSpecifier;
+  lexicalAccessSpecifier @7 :AccessSpecifier;
 }
 
 struct Stmt @0x91127d30fade9a32 {
-  beginToken @0 :Token;
-  endToken @1 :Token;
-  tokenRange @2 :TokenRange;
-  kind @3 :StmtKind;
+  children @0 :List(Ref(Stmt));
+  beginToken @1 :Ref(Token);
+  endToken @2 :Ref(Token);
+  tokenRange @3 :Ref(TokenRange);
+  kind @4 :StmtKind;
 }
 
 struct SEHTryStmt @0xf24201c85c654a91 {
   stmt @0:Stmt;
-  isCxxTry @1 :Bool;
-  tryToken @2 :Token;
+  exceptHandler @1 :Ref(SEHExceptStmt);
+  finallyHandler @2 :Ref(SEHFinallyStmt);
+  isCxxTry @3 :Bool;
+  tryBlock @4 :Ref(CompoundStmt);
+  tryToken @5 :Ref(Token);
 }
 
 struct SEHLeaveStmt @0xc4e4ea7e9d86c292 {
   stmt @0:Stmt;
-  leaveToken @1 :Token;
+  leaveToken @1 :Ref(Token);
 }
 
 struct SEHFinallyStmt @0x8331103206247bcd {
   stmt @0:Stmt;
-  finallyToken @1 :Token;
+  block @1 :Ref(CompoundStmt);
+  finallyToken @2 :Ref(Token);
 }
 
 struct SEHExceptStmt @0xec2050c67aa8fa46 {
   stmt @0:Stmt;
-  exceptToken @1 :Token;
+  block @1 :Ref(CompoundStmt);
+  exceptToken @2 :Ref(Token);
 }
 
 struct ReturnStmt @0xa64f08dfd7dbc80a {
   stmt @0:Stmt;
-  returnToken @1 :Token;
+  nrvoCandidate @1 :Ref(VarDecl);
+  returnToken @2 :Ref(Token);
 }
 
 struct ObjCForCollectionStmt @0x9eba75a6b3c891a0 {
   stmt @0:Stmt;
-  forToken @1 :Token;
-  rParenToken @2 :Token;
+  forToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct ObjCAutoreleasePoolStmt @0x9762e1f9121378d2 {
   stmt @0:Stmt;
-  atToken @1 :Token;
+  atToken @1 :Ref(Token);
 }
 
 struct ObjCAtTryStmt @0x8a11f497922c60fa {
   stmt @0:Stmt;
-  atTryToken @1 :Token;
+  atTryToken @1 :Ref(Token);
+  finallyStatement @2 :Ref(ObjCAtFinallyStmt);
+  catchStatements @3 :List(Ref(ObjCAtCatchStmt));
 }
 
 struct ObjCAtThrowStmt @0xd0de9b13bfbb829d {
   stmt @0:Stmt;
-  throwToken @1 :Token;
+  throwToken @1 :Ref(Token);
 }
 
 struct ObjCAtSynchronizedStmt @0xc002bd58ce946b42 {
   stmt @0:Stmt;
-  atSynchronizedToken @1 :Token;
+  atSynchronizedToken @1 :Ref(Token);
+  synchBody @2 :Ref(CompoundStmt);
 }
 
 struct ObjCAtFinallyStmt @0xb4641f5dbb7b9c51 {
   stmt @0:Stmt;
-  atFinallyToken @1 :Token;
+  atFinallyToken @1 :Ref(Token);
 }
 
 struct ObjCAtCatchStmt @0xea4d614d29e03f4e {
   stmt @0:Stmt;
-  atCatchToken @1 :Token;
-  rParenToken @2 :Token;
-  hasEllipsis @3 :Bool;
+  atCatchToken @1 :Ref(Token);
+  catchParamDeclaration @2 :Ref(VarDecl);
+  rParenToken @3 :Ref(Token);
+  hasEllipsis @4 :Bool;
 }
 
 struct OMPExecutableDirective @0xd9ecc0e6e88a888e {
   stmt @0:Stmt;
-  hasAssociatedStatement @1 :Bool;
-  isStandaloneDirective @2 :Bool;
+  innermostCapturedStatement @1 :Ref(CapturedStmt);
+  hasAssociatedStatement @2 :Bool;
+  isStandaloneDirective @3 :Bool;
 }
 
 struct OMPDispatchDirective @0xf2ebe316be280493 {
   ompExecutableDirective @0:OMPExecutableDirective;
-  targetCallToken @1 :Token;
+  targetCallToken @1 :Ref(Token);
 }
 
 struct OMPDepobjDirective @0xf7901aaea1e59da5 {
@@ -4768,6 +3958,14 @@ struct OMPTileDirective @0x955f68d0ea4dad7c {
 
 struct OMPLoopDirective @0x996557610848d25e {
   ompLoopBasedDirective @0:OMPLoopBasedDirective;
+  counters @1 :List(Ref(Expr));
+  dependentCounters @2 :List(Ref(Expr));
+  dependentInitializers @3 :List(Ref(Expr));
+  finals @4 :List(Ref(Expr));
+  finalsConditions @5 :List(Ref(Expr));
+  initializers @6 :List(Ref(Expr));
+  privateCounters @7 :List(Ref(Expr));
+  updates @8 :List(Ref(Expr));
 }
 
 struct OMPForSimdDirective @0xb5d719f282f43408 {
@@ -4893,58 +4091,68 @@ struct OMPFlushDirective @0xfa2df93386e63fbe {
 
 struct OMPCanonicalLoop @0xf3cf896ddd7c46d1 {
   stmt @0:Stmt;
+  distanceFunc @1 :Ref(CapturedStmt);
+  loopVariableFunc @2 :Ref(CapturedStmt);
+  loopVariableReference @3 :Ref(DeclRefExpr);
 }
 
 struct NullStmt @0xb57ca05aaf806566 {
   stmt @0:Stmt;
-  semiToken @1 :Token;
+  semiToken @1 :Ref(Token);
   hasLeadingEmptyMacro @2 :Bool;
 }
 
 struct MSDependentExistsStmt @0xb5d9dfc73eeb0939 {
   stmt @0:Stmt;
-  keywordToken @1 :Token;
-  isIfExists @2 :Bool;
-  isIfNotExists @3 :Bool;
+  keywordToken @1 :Ref(Token);
+  subStatement @2 :Ref(CompoundStmt);
+  isIfExists @3 :Bool;
+  isIfNotExists @4 :Bool;
 }
 
 struct IndirectGotoStmt @0xca063608491ba1fa {
   stmt @0:Stmt;
-  gotoToken @1 :Token;
-  starToken @2 :Token;
+  constantTarget @1 :Ref(LabelDecl);
+  gotoToken @2 :Ref(Token);
+  starToken @3 :Ref(Token);
 }
 
 struct IfStmt @0xfc829da66c4e6bb1 {
   stmt @0:Stmt;
-  elseToken @1 :Token;
-  ifToken @2 :Token;
-  lParenToken @3 :Token;
-  rParenToken @4 :Token;
-  hasElseStorage @5 :Bool;
-  hasInitializerStorage @6 :Bool;
-  hasVariableStorage @7 :Bool;
-  isConstexpr @8 :Bool;
-  isObjCAvailabilityCheck @9 :Bool;
+  conditionVariable @1 :Ref(VarDecl);
+  conditionVariableDeclarationStatement @2 :Ref(DeclStmt);
+  elseToken @3 :Ref(Token);
+  ifToken @4 :Ref(Token);
+  lParenToken @5 :Ref(Token);
+  rParenToken @6 :Ref(Token);
+  hasElseStorage @7 :Bool;
+  hasInitializerStorage @8 :Bool;
+  hasVariableStorage @9 :Bool;
+  isConstexpr @10 :Bool;
+  isObjCAvailabilityCheck @11 :Bool;
 }
 
 struct GotoStmt @0xf542902873fc6c2b {
   stmt @0:Stmt;
-  gotoToken @1 :Token;
-  labelToken @2 :Token;
+  gotoToken @1 :Ref(Token);
+  label @2 :Ref(LabelDecl);
+  labelToken @3 :Ref(Token);
 }
 
 struct ForStmt @0xb6591c23541f6a1e {
   stmt @0:Stmt;
-  forToken @1 :Token;
-  lParenToken @2 :Token;
-  rParenToken @3 :Token;
+  conditionVariable @1 :Ref(VarDecl);
+  conditionVariableDeclarationStatement @2 :Ref(DeclStmt);
+  forToken @3 :Ref(Token);
+  lParenToken @4 :Ref(Token);
+  rParenToken @5 :Ref(Token);
 }
 
 struct DoStmt @0xf6407ae4f3214356 {
   stmt @0:Stmt;
-  doToken @1 :Token;
-  rParenToken @2 :Token;
-  whileToken @3 :Token;
+  doToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
+  whileToken @3 :Ref(Token);
 }
 
 struct DeclStmt @0xa672643824ce0ba3 {
@@ -4954,81 +4162,113 @@ struct DeclStmt @0xa672643824ce0ba3 {
 
 struct CoroutineBodyStmt @0xac9fd8887bfea7d8 {
   stmt @0:Stmt;
-  hasDependentPromiseType @1 :Bool;
+  paramMoves @1 :List(Ref(Stmt));
+  promiseDeclaration @2 :Ref(VarDecl);
+  hasDependentPromiseType @3 :Bool;
 }
 
 struct CoreturnStmt @0xfada897216b226f1 {
   stmt @0:Stmt;
-  keywordToken @1 :Token;
+  keywordToken @1 :Ref(Token);
   isImplicit @2 :Bool;
 }
 
 struct ContinueStmt @0xb364bd3d9a19cd05 {
   stmt @0:Stmt;
-  continueToken @1 :Token;
+  continueToken @1 :Ref(Token);
 }
 
 struct CompoundStmt @0xd080c9192fa41c92 {
   stmt @0:Stmt;
-  lBracToken @1 :Token;
-  rBracToken @2 :Token;
+  lBracToken @1 :Ref(Token);
+  rBracToken @2 :Ref(Token);
 }
 
 struct CapturedStmt @0xa60fffc1366b48e6 {
   stmt @0:Stmt;
-  capturedRegionKind @1 :CapturedRegionKind;
+  capturedDeclaration @1 :Ref(CapturedDecl);
+  capturedRecordDeclaration @2 :Ref(RecordDecl);
+  capturedRegionKind @3 :CapturedRegionKind;
 }
 
 struct CXXTryStmt @0xf98f02d4cdc2dd3b {
   stmt @0:Stmt;
-  tryToken @1 :Token;
+  tryBlock @1 :Ref(CompoundStmt);
+  tryToken @2 :Ref(Token);
+  handlers @3 :List(Ref(CXXCatchStmt));
 }
 
 struct CXXForRangeStmt @0xa23a75b3c0fa7d86 {
   stmt @0:Stmt;
-  coawaitToken @1 :Token;
-  colonToken @2 :Token;
-  forToken @3 :Token;
-  rParenToken @4 :Token;
+  beginStatement @1 :Ref(DeclStmt);
+  coawaitToken @2 :Ref(Token);
+  colonToken @3 :Ref(Token);
+  endStatement @4 :Ref(DeclStmt);
+  forToken @5 :Ref(Token);
+  loopVariableStatement @6 :Ref(DeclStmt);
+  loopVariable @7 :Ref(VarDecl);
+  rParenToken @8 :Ref(Token);
+  rangeStatement @9 :Ref(DeclStmt);
 }
 
 struct CXXCatchStmt @0xac4b9e8390fd3a85 {
   stmt @0:Stmt;
-  catchToken @1 :Token;
+  catchToken @1 :Ref(Token);
+  exceptionDeclaration @2 :Ref(VarDecl);
 }
 
 struct BreakStmt @0x940efd4e9770cb41 {
   stmt @0:Stmt;
-  breakToken @1 :Token;
+  breakToken @1 :Ref(Token);
 }
 
 struct AsmStmt @0xa47714ac2d00fb21 {
   stmt @0:Stmt;
   generateAssemblyString @1 :Text;
-  assemblyToken @2 :Token;
-  isSimple @3 :Bool;
-  isVolatile @4 :Bool;
+  assemblyToken @2 :Ref(Token);
+  inputs @3 :List(Ref(Expr));
+  isSimple @4 :Bool;
+  isVolatile @5 :Bool;
+  outputs @6 :List(Ref(Expr));
+  outputConstraints @7 :List(Text);
+  outputExpressions @8 :List(Ref(Expr));
+  inputConstraints @9 :List(Text);
+  inputExpressions @10 :List(Ref(Expr));
+  clobbers @11 :List(Text);
 }
 
 struct MSAsmStmt @0xc504268dee34a98f {
   asmStmt @0:AsmStmt;
-  assemblyString @1 :Text;
-  lBraceToken @2 :Token;
-  hasBraces @3 :Bool;
+  allConstraints @1 :List(Text);
+  allExpressions @2 :List(Ref(Expr));
+  assemblyString @3 :Text;
+  lBraceToken @4 :Ref(Token);
+  hasBraces @5 :Bool;
 }
 
 struct GCCAsmStmt @0x9d046a0d94b425db {
   asmStmt @0:AsmStmt;
-  rParenToken @1 :Token;
-  isAssemblyGoto @2 :Bool;
+  assemblyString @1 :Ref(StringLiteral);
+  rParenToken @2 :Ref(Token);
+  isAssemblyGoto @3 :Bool;
+  labels @4 :List(Ref(AddrLabelExpr));
+  outputConstraintLiterals @5 :List(Ref(StringLiteral));
+  outputNames @6 :List(Text);
+  inputConstraintLiterals @7 :List(Ref(StringLiteral));
+  inputNames @8 :List(Text);
+  clobberStringLiterals @9 :List(Ref(StringLiteral));
+  labelExpressions @10 :List(Ref(AddrLabelExpr));
+  labelNames @11 :List(Text);
 }
 
 struct WhileStmt @0x8f0fb0e808ef8cd3 {
   stmt @0:Stmt;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
-  whileToken @3 :Token;
-  hasVariableStorage @4 :Bool;
+  conditionVariable @1 :Ref(VarDecl);
+  conditionVariableDeclarationStatement @2 :Ref(DeclStmt);
+  lParenToken @3 :Ref(Token);
+  rParenToken @4 :Ref(Token);
+  whileToken @5 :Ref(Token);
+  hasVariableStorage @6 :Bool;
 }
 
 struct ValueStmt @0xc78a8bda41f72525 {
@@ -5037,9 +4277,10 @@ struct ValueStmt @0xc78a8bda41f72525 {
 
 struct LabelStmt @0xed2b87febf6a7cc9 {
   valueStmt @0:ValueStmt;
-  identifierToken @1 :Token;
-  name @2 :Text;
-  isSideEntry @3 :Bool;
+  declaration @1 :Ref(LabelDecl);
+  identifierToken @2 :Ref(Token);
+  name @3 :Text;
+  isSideEntry @4 :Bool;
 }
 
 struct Expr @0x9e4316b5a505b8d6 {
@@ -5048,79 +4289,88 @@ struct Expr @0x9e4316b5a505b8d6 {
   hasSideEffects @2 :Bool;
   containsErrors @3 :Bool;
   containsUnexpandedParameterPack @4 :Bool;
-  expressionToken @5 :Token;
-  objectKind @6 :ExprObjectKind;
-  valueKind @7 :ExprValueKind;
-  hasNonTrivialCall @8 :Bool;
-  isBoundMemberFunction @9 :Bool;
-  isCxX11ConstantExpression @10 :Bool;
-  isCxX98IntegralConstantExpression @11 :Bool;
-  isDefaultArgument @12 :Bool;
-  isEvaluatable @13 :Bool;
-  isGlValue @14 :Bool;
-  isImplicitCxxThis @15 :Bool;
-  isInstantiationDependent @16 :Bool;
-  isIntegerConstantExpression @17 :Bool;
-  isKnownToHaveBooleanValue @18 :Bool;
-  isLValue @19 :Bool;
-  isModifiableLvalue @20 :ExprisModifiableLvalueResult;
-  isObjcgcCandidate @21 :Bool;
-  isObjCSelfExpression @22 :Bool;
-  isOrdinaryOrBitFieldObject @23 :Bool;
-  isPrValue @24 :Bool;
-  isReadIfDiscardedInCPlusPlus11 @25 :Bool;
-  isTypeDependent @26 :Bool;
-  isValueDependent @27 :Bool;
-  isXValue @28 :Bool;
-  refersToBitField @29 :Bool;
-  refersToGlobalRegisterVariable @30 :Bool;
-  refersToMatrixElement @31 :Bool;
-  refersToVectorElement @32 :Bool;
+  bestDynamicClassType @5 :Ref(CXXRecordDecl);
+  expressionToken @6 :Ref(Token);
+  objCProperty @7 :Ref(ObjCPropertyRefExpr);
+  objectKind @8 :ExprObjectKind;
+  sourceBitField @9 :Ref(FieldDecl);
+  valueKind @10 :ExprValueKind;
+  hasNonTrivialCall @11 :Bool;
+  isBoundMemberFunction @12 :Bool;
+  isCxX11ConstantExpression @13 :Bool;
+  isCxX98IntegralConstantExpression @14 :Bool;
+  isDefaultArgument @15 :Bool;
+  isEvaluatable @16 :Bool;
+  isGlValue @17 :Bool;
+  isImplicitCxxThis @18 :Bool;
+  isInstantiationDependent @19 :Bool;
+  isIntegerConstantExpression @20 :Bool;
+  isKnownToHaveBooleanValue @21 :Bool;
+  isLValue @22 :Bool;
+  isModifiableLvalue @23 :ExprisModifiableLvalueResult;
+  isObjcgcCandidate @24 :Bool;
+  isObjCSelfExpression @25 :Bool;
+  isOrdinaryOrBitFieldObject @26 :Bool;
+  isPrValue @27 :Bool;
+  isReadIfDiscardedInCPlusPlus11 @28 :Bool;
+  isTypeDependent @29 :Bool;
+  isValueDependent @30 :Bool;
+  isXValue @31 :Bool;
+  refersToBitField @32 :Bool;
+  refersToGlobalRegisterVariable @33 :Bool;
+  refersToMatrixElement @34 :Bool;
+  refersToVectorElement @35 :Bool;
 }
 
 struct DesignatedInitUpdateExpr @0xaa6c77a8da7c4fba {
   expr @0:Expr;
+  updater @1 :Ref(InitListExpr);
 }
 
 struct DesignatedInitExpr @0xeff2c52d9c942ab2 {
   expr @0:Expr;
-  designatorsSourceRange @1 :TokenRange;
-  equalOrColonToken @2 :Token;
+  designatorsSourceRange @1 :Ref(TokenRange);
+  equalOrColonToken @2 :Ref(Token);
   isDirectInitializer @3 :Bool;
   usesGnuSyntax @4 :Bool;
+  subExpressions @5 :List(Ref(Expr));
 }
 
 struct DependentScopeDeclRefExpr @0x8fbb6ccb95a3509d {
   expr @0:Expr;
-  lAngleToken @1 :Token;
-  rAngleToken @2 :Token;
-  templateKeywordToken @3 :Token;
+  lAngleToken @1 :Ref(Token);
+  rAngleToken @2 :Ref(Token);
+  templateKeywordToken @3 :Ref(Token);
   hasExplicitTemplateArguments @4 :Bool;
   hasTemplateKeyword @5 :Bool;
 }
 
 struct DependentCoawaitExpr @0x8fd8a27becb59315 {
   expr @0:Expr;
-  keywordToken @1 :Token;
+  keywordToken @1 :Ref(Token);
+  operatorCoawaitLookup @2 :Ref(UnresolvedLookupExpr);
 }
 
 struct DeclRefExpr @0xec5119d27610b166 {
   expr @0:Expr;
-  lAngleToken @1 :Token;
-  rAngleToken @2 :Token;
-  templateKeywordToken @3 :Token;
-  hadMultipleCandidates @4 :Bool;
-  hasExplicitTemplateArguments @5 :Bool;
-  hasQualifier @6 :Bool;
-  hasTemplateKwAndArgumentsInfo @7 :Bool;
-  hasTemplateKeyword @8 :Bool;
-  isNonOdrUse @9 :NonOdrUseReason;
-  refersToEnclosingVariableOrCapture @10 :Bool;
+  declaration @1 :Ref(ValueDecl);
+  foundDeclaration @2 :Ref(NamedDecl);
+  lAngleToken @3 :Ref(Token);
+  rAngleToken @4 :Ref(Token);
+  templateKeywordToken @5 :Ref(Token);
+  hadMultipleCandidates @6 :Bool;
+  hasExplicitTemplateArguments @7 :Bool;
+  hasQualifier @8 :Bool;
+  hasTemplateKwAndArgumentsInfo @9 :Bool;
+  hasTemplateKeyword @10 :Bool;
+  isNonOdrUse @11 :NonOdrUseReason;
+  refersToEnclosingVariableOrCapture @12 :Bool;
 }
 
 struct CoroutineSuspendExpr @0xbd92ba696775fd54 {
   expr @0:Expr;
-  keywordToken @1 :Token;
+  keywordToken @1 :Ref(Token);
+  opaqueValue @2 :Ref(OpaqueValueExpr);
 }
 
 struct CoawaitExpr @0xab62e23bf872526e {
@@ -5134,39 +4384,42 @@ struct CoyieldExpr @0xe587a5c6d1b766ed {
 
 struct ConvertVectorExpr @0x9d71128cb240a509 {
   expr @0:Expr;
-  builtinToken @1 :Token;
-  rParenToken @2 :Token;
+  builtinToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct ConceptSpecializationExpr @0xfed5bd9e47227653 {
   expr @0:Expr;
-  isSatisfied @1 :Bool;
+  templateArguments @1 :List(TemplateArgument);
+  isSatisfied @2 :Bool;
 }
 
 struct CompoundLiteralExpr @0x9865eabaf4e2ef8c {
   expr @0:Expr;
-  lParenToken @1 :Token;
+  lParenToken @1 :Ref(Token);
   isFileScope @2 :Bool;
 }
 
 struct ChooseExpr @0xd4a658caf5a1339e {
   expr @0:Expr;
-  builtinToken @1 :Token;
-  rParenToken @2 :Token;
+  builtinToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
   isConditionDependent @3 :Bool;
   isConditionTrue @4 :Bool;
 }
 
 struct CharacterLiteral @0xbe144b3e9bdba5d9 {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
 }
 
 struct CastExpr @0x8cabd91ab4a4dcb3 {
   expr @0:Expr;
   castKind @1 :CastKind;
   castKindName @2 :Text;
-  hasStoredFpFeatures @3 :Bool;
+  conversionFunction @3 :Ref(NamedDecl);
+  targetUnionField @4 :Ref(FieldDecl);
+  hasStoredFpFeatures @5 :Bool;
 }
 
 struct ImplicitCastExpr @0xf4659a194c7adcda {
@@ -5180,10 +4433,10 @@ struct ExplicitCastExpr @0xf68e68ae1ee44e91 {
 
 struct CXXNamedCastExpr @0x9edfd291691d4a7d {
   explicitCastExpr @0:ExplicitCastExpr;
-  angleBrackets @1 :TokenRange;
+  angleBrackets @1 :Ref(TokenRange);
   castName @2 :Text;
-  operatorToken @3 :Token;
-  rParenToken @4 :Token;
+  operatorToken @3 :Ref(Token);
+  rParenToken @4 :Ref(Token);
 }
 
 struct CXXDynamicCastExpr @0xb48d513e0fa1452b {
@@ -5209,15 +4462,15 @@ struct CXXReinterpretCastExpr @0x9ff4423f70d9541a {
 
 struct CXXFunctionalCastExpr @0xf2c246adc881d86c {
   explicitCastExpr @0:ExplicitCastExpr;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
+  lParenToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
   isListInitialization @3 :Bool;
 }
 
 struct CStyleCastExpr @0xddb96d0ba671cd89 {
   explicitCastExpr @0:ExplicitCastExpr;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
+  lParenToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct BuiltinBitCastExpr @0xc4d665f00ba3fa8b {
@@ -5226,28 +4479,30 @@ struct BuiltinBitCastExpr @0xc4d665f00ba3fa8b {
 
 struct ObjCBridgedCastExpr @0xad38ef321a1ce1e3 {
   explicitCastExpr @0:ExplicitCastExpr;
-  bridgeKeywordToken @1 :Token;
+  bridgeKeywordToken @1 :Ref(Token);
   bridgeKind @2 :ObjCBridgeCastKind;
   bridgeKindName @3 :Text;
-  lParenToken @4 :Token;
+  lParenToken @4 :Ref(Token);
 }
 
 struct CallExpr @0x8cff24c7f68e334b {
   expr @0:Expr;
-  adlCallKind @1 :CallExprADLCallKind;
-  rParenToken @2 :Token;
-  hasStoredFpFeatures @3 :Bool;
-  hasUnusedResultAttribute @4 :Bool;
-  isBuiltinAssumeFalse @5 :Bool;
-  isCallToStdMove @6 :Bool;
-  isUnevaluatedBuiltinCall @7 :Bool;
-  usesAdl @8 :Bool;
+  arguments @1 :List(Ref(Expr));
+  adlCallKind @2 :CallExprADLCallKind;
+  directCallee @3 :Ref(FunctionDecl);
+  rParenToken @4 :Ref(Token);
+  hasStoredFpFeatures @5 :Bool;
+  hasUnusedResultAttribute @6 :Bool;
+  isBuiltinAssumeFalse @7 :Bool;
+  isCallToStdMove @8 :Bool;
+  isUnevaluatedBuiltinCall @9 :Bool;
+  usesAdl @10 :Bool;
 }
 
 struct CXXOperatorCallExpr @0xb6a5653b33cdf0c5 {
   callExpr @0:CallExpr;
   operator @1 :OverloadedOperatorKind;
-  operatorToken @2 :Token;
+  operatorToken @2 :Ref(Token);
   isAssignmentOperation @3 :Bool;
   isComparisonOperation @4 :Bool;
   isInfixBinaryOperation @5 :Bool;
@@ -5255,28 +4510,33 @@ struct CXXOperatorCallExpr @0xb6a5653b33cdf0c5 {
 
 struct CXXMemberCallExpr @0x9a761539349dc02f {
   callExpr @0:CallExpr;
+  methodDeclaration @1 :Ref(CXXMethodDecl);
+  recordDeclaration @2 :Ref(CXXRecordDecl);
 }
 
 struct CUDAKernelCallExpr @0xd0bc1c26ca1e132f {
   callExpr @0:CallExpr;
+  config @1 :Ref(CallExpr);
 }
 
 struct UserDefinedLiteral @0xa1af860a6baa1029 {
   callExpr @0:CallExpr;
   literalOperatorKind @1 :UserDefinedLiteralLiteralOperatorKind;
-  udSuffixToken @2 :Token;
+  udSuffixToken @2 :Ref(Token);
 }
 
 struct CXXUuidofExpr @0xcdde7d28fc7931f6 {
   expr @0:Expr;
-  isTypeOperand @1 :Bool;
+  guidDeclaration @1 :Ref(MSGuidDecl);
+  isTypeOperand @2 :Bool;
 }
 
 struct CXXUnresolvedConstructExpr @0x9fbb7e373f171f86 {
   expr @0:Expr;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
-  isListInitialization @3 :Bool;
+  arguments @1 :List(Ref(Expr));
+  lParenToken @2 :Ref(Token);
+  rParenToken @3 :Ref(Token);
+  isListInitialization @4 :Bool;
 }
 
 struct CXXTypeidExpr @0xf325d3531a387183 {
@@ -5288,13 +4548,13 @@ struct CXXTypeidExpr @0xf325d3531a387183 {
 
 struct CXXThrowExpr @0x852a841374684e1e {
   expr @0:Expr;
-  throwToken @1 :Token;
+  throwToken @1 :Ref(Token);
   isThrownVariableInScope @2 :Bool;
 }
 
 struct CXXThisExpr @0x959ba6d5fec8b422 {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
   isImplicit @2 :Bool;
 }
 
@@ -5304,7 +4564,7 @@ struct CXXStdInitializerListExpr @0xd199eb3b19c592fa {
 
 struct CXXScalarValueInitExpr @0x9fd4b7d4985831e7 {
   expr @0:Expr;
-  rParenToken @1 :Token;
+  rParenToken @1 :Ref(Token);
 }
 
 struct CXXRewrittenBinaryOperator @0xd00648fa0bd5ccc4 {
@@ -5312,7 +4572,7 @@ struct CXXRewrittenBinaryOperator @0xd00648fa0bd5ccc4 {
   opcode @1 :BinaryOperatorKind;
   opcodeString @2 :Text;
   operator @3 :BinaryOperatorKind;
-  operatorToken @4 :Token;
+  operatorToken @4 :Ref(Token);
   isAssignmentOperation @5 :Bool;
   isComparisonOperation @6 :Bool;
   isReversed @7 :Bool;
@@ -5320,17 +4580,17 @@ struct CXXRewrittenBinaryOperator @0xd00648fa0bd5ccc4 {
 
 struct CXXPseudoDestructorExpr @0xfb788932e740ac07 {
   expr @0:Expr;
-  colonColonToken @1 :Token;
-  destroyedTypeToken @2 :Token;
-  operatorToken @3 :Token;
-  tildeToken @4 :Token;
+  colonColonToken @1 :Ref(Token);
+  destroyedTypeToken @2 :Ref(Token);
+  operatorToken @3 :Ref(Token);
+  tildeToken @4 :Ref(Token);
   hasQualifier @5 :Bool;
   isArrow @6 :Bool;
 }
 
 struct CXXNullPtrLiteralExpr @0x80352ea6175b520f {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
 }
 
 struct CXXNoexceptExpr @0x97e76c7f0648cbe4 {
@@ -5341,76 +4601,88 @@ struct CXXNoexceptExpr @0x97e76c7f0648cbe4 {
 struct CXXNewExpr @0x9dca0c0f9404e2b5 {
   expr @0:Expr;
   doesUsualArrayDeleteWantSize @1 :Bool;
-  directInitializerRange @2 :TokenRange;
-  initializationStyle @3 :CXXNewExprInitializationStyle;
-  typeIdParentheses @4 :TokenRange;
-  hasInitializer @5 :Bool;
-  isArray @6 :Bool;
-  isGlobalNew @7 :Bool;
-  isParenthesisTypeId @8 :Bool;
-  passAlignment @9 :Bool;
-  shouldNullCheckAllocation @10 :Bool;
+  constructExpression @2 :Ref(CXXConstructExpr);
+  directInitializerRange @3 :Ref(TokenRange);
+  initializationStyle @4 :CXXNewExprInitializationStyle;
+  operatorDelete @5 :Ref(FunctionDecl);
+  operatorNew @6 :Ref(FunctionDecl);
+  typeIdParentheses @7 :Ref(TokenRange);
+  hasInitializer @8 :Bool;
+  isArray @9 :Bool;
+  isGlobalNew @10 :Bool;
+  isParenthesisTypeId @11 :Bool;
+  passAlignment @12 :Bool;
+  placementArguments @13 :List(Ref(Expr));
+  shouldNullCheckAllocation @14 :Bool;
 }
 
 struct CXXInheritedCtorInitExpr @0xd5db83de022b1ee3 {
   expr @0:Expr;
   constructsVirtualBase @1 :Bool;
   constructionKind @2 :CXXConstructExprConstructionKind;
-  token @3 :Token;
-  inheritedFromVirtualBase @4 :Bool;
+  constructor @3 :Ref(CXXConstructorDecl);
+  token @4 :Ref(Token);
+  inheritedFromVirtualBase @5 :Bool;
 }
 
 struct CXXFoldExpr @0x8a593922e3ea9d50 {
   expr @0:Expr;
-  ellipsisToken @1 :Token;
-  lParenToken @2 :Token;
-  operator @3 :BinaryOperatorKind;
-  rParenToken @4 :Token;
-  isLeftFold @5 :Bool;
-  isRightFold @6 :Bool;
+  callee @1 :Ref(UnresolvedLookupExpr);
+  ellipsisToken @2 :Ref(Token);
+  lParenToken @3 :Ref(Token);
+  operator @4 :BinaryOperatorKind;
+  rParenToken @5 :Ref(Token);
+  isLeftFold @6 :Bool;
+  isRightFold @7 :Bool;
 }
 
 struct CXXDependentScopeMemberExpr @0xa1a21ac74e691c1f {
   expr @0:Expr;
-  lAngleToken @1 :Token;
-  memberToken @2 :Token;
-  operatorToken @3 :Token;
-  rAngleToken @4 :Token;
-  templateKeywordToken @5 :Token;
-  hasExplicitTemplateArguments @6 :Bool;
-  hasTemplateKeyword @7 :Bool;
-  isArrow @8 :Bool;
-  isImplicitAccess @9 :Bool;
+  firstQualifierFoundInScope @1 :Ref(NamedDecl);
+  lAngleToken @2 :Ref(Token);
+  memberToken @3 :Ref(Token);
+  operatorToken @4 :Ref(Token);
+  rAngleToken @5 :Ref(Token);
+  templateKeywordToken @6 :Ref(Token);
+  hasExplicitTemplateArguments @7 :Bool;
+  hasTemplateKeyword @8 :Bool;
+  isArrow @9 :Bool;
+  isImplicitAccess @10 :Bool;
 }
 
 struct CXXDeleteExpr @0x80f6cd450a27b9d4 {
   expr @0:Expr;
   doesUsualArrayDeleteWantSize @1 :Bool;
-  isArrayForm @2 :Bool;
-  isArrayFormAsWritten @3 :Bool;
-  isGlobalDelete @4 :Bool;
+  operatorDelete @2 :Ref(FunctionDecl);
+  isArrayForm @3 :Bool;
+  isArrayFormAsWritten @4 :Bool;
+  isGlobalDelete @5 :Bool;
 }
 
 struct CXXDefaultInitExpr @0xa78e81b7ba8da8e6 {
   expr @0:Expr;
-  usedToken @1 :Token;
+  field @1 :Ref(FieldDecl);
+  usedToken @2 :Ref(Token);
 }
 
 struct CXXDefaultArgExpr @0x9f9ee9dcf349cbcf {
   expr @0:Expr;
-  usedToken @1 :Token;
+  param @1 :Ref(ParmVarDecl);
+  usedToken @2 :Ref(Token);
 }
 
 struct CXXConstructExpr @0xb3d036394c09ed48 {
   expr @0:Expr;
-  constructionKind @1 :CXXConstructExprConstructionKind;
-  token @2 :Token;
-  parenthesisOrBraceRange @3 :TokenRange;
-  hadMultipleCandidates @4 :Bool;
-  isElidable @5 :Bool;
-  isListInitialization @6 :Bool;
-  isStdInitializerListInitialization @7 :Bool;
-  requiresZeroInitialization @8 :Bool;
+  arguments @1 :List(Ref(Expr));
+  constructionKind @2 :CXXConstructExprConstructionKind;
+  constructor @3 :Ref(CXXConstructorDecl);
+  token @4 :Ref(Token);
+  parenthesisOrBraceRange @5 :Ref(TokenRange);
+  hadMultipleCandidates @6 :Bool;
+  isElidable @7 :Bool;
+  isListInitialization @8 :Bool;
+  isStdInitializerListInitialization @9 :Bool;
+  requiresZeroInitialization @10 :Bool;
 }
 
 struct CXXTemporaryObjectExpr @0xb4be9b66753a2671 {
@@ -5419,7 +4691,7 @@ struct CXXTemporaryObjectExpr @0xb4be9b66753a2671 {
 
 struct CXXBoolLiteralExpr @0x862b8d87bd2905e0 {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
   value @2 :Bool;
 }
 
@@ -5429,14 +4701,15 @@ struct CXXBindTemporaryExpr @0xc6a96978d42dc702 {
 
 struct BlockExpr @0xc2ae5be0934c61f3 {
   expr @0:Expr;
-  caretToken @1 :Token;
+  blockDeclaration @1 :Ref(BlockDecl);
+  caretToken @2 :Ref(Token);
 }
 
 struct BinaryOperator @0xd858b89bd116f05f {
   expr @0:Expr;
   opcode @1 :BinaryOperatorKind;
   opcodeString @2 :Text;
-  operatorToken @3 :Token;
+  operatorToken @3 :Ref(Token);
   hasStoredFpFeatures @4 :Bool;
   isAdditiveOperation @5 :Bool;
   isAssignmentOperation @6 :Bool;
@@ -5459,18 +4732,19 @@ struct CompoundAssignOperator @0xe6e7bc711d327cb9 {
 
 struct AtomicExpr @0xc730b6c3f33ecb9f {
   expr @0:Expr;
-  builtinToken @1 :Token;
+  builtinToken @1 :Ref(Token);
   operation @2 :AtomicExprAtomicOp;
-  rParenToken @3 :Token;
+  rParenToken @3 :Ref(Token);
   isCmpXChg @4 :Bool;
   isOpenCl @5 :Bool;
   isVolatile @6 :Bool;
+  subExpressions @7 :List(Ref(Expr));
 }
 
 struct AsTypeExpr @0xf646590167dcf1ab {
   expr @0:Expr;
-  builtinToken @1 :Token;
-  rParenToken @2 :Token;
+  builtinToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct ArrayTypeTraitExpr @0xcbcb35a78956a3cc {
@@ -5480,11 +4754,12 @@ struct ArrayTypeTraitExpr @0xcbcb35a78956a3cc {
 
 struct ArraySubscriptExpr @0xb5bb680da7ccce33 {
   expr @0:Expr;
-  rBracketToken @1 :Token;
+  rBracketToken @1 :Ref(Token);
 }
 
 struct ArrayInitLoopExpr @0xbe95601783117ebe {
   expr @0:Expr;
+  commonExpression @1 :Ref(OpaqueValueExpr);
 }
 
 struct ArrayInitIndexExpr @0xc9bc62bebe2cdbb8 {
@@ -5493,14 +4768,15 @@ struct ArrayInitIndexExpr @0xc9bc62bebe2cdbb8 {
 
 struct AddrLabelExpr @0xc1abc55fece6aa91 {
   expr @0:Expr;
-  ampAmpToken @1 :Token;
-  labelToken @2 :Token;
+  ampAmpToken @1 :Ref(Token);
+  label @2 :Ref(LabelDecl);
+  labelToken @3 :Ref(Token);
 }
 
 struct AbstractConditionalOperator @0xee7097774f7aaa45 {
   expr @0:Expr;
-  colonToken @1 :Token;
-  questionToken @2 :Token;
+  colonToken @1 :Ref(Token);
+  questionToken @2 :Ref(Token);
 }
 
 struct ConditionalOperator @0xd3810312a3bd13c7 {
@@ -5509,12 +4785,13 @@ struct ConditionalOperator @0xd3810312a3bd13c7 {
 
 struct BinaryConditionalOperator @0xde5f047672b1ac84 {
   abstractConditionalOperator @0:AbstractConditionalOperator;
+  opaqueValue @1 :Ref(OpaqueValueExpr);
 }
 
 struct VAArgExpr @0x8fa746d782ee27c9 {
   expr @0:Expr;
-  builtinToken @1 :Token;
-  rParenToken @2 :Token;
+  builtinToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
   isMicrosoftAbi @3 :Bool;
 }
 
@@ -5522,7 +4799,7 @@ struct UnaryOperator @0xaa78820aaa7f22b8 {
   expr @0:Expr;
   canOverflow @1 :Bool;
   opcode @2 :UnaryOperatorKind;
-  operatorToken @3 :Token;
+  operatorToken @3 :Ref(Token);
   hasStoredFpFeatures @4 :Bool;
   isArithmeticOperation @5 :Bool;
   isDecrementOperation @6 :Bool;
@@ -5534,8 +4811,8 @@ struct UnaryOperator @0xaa78820aaa7f22b8 {
 
 struct UnaryExprOrTypeTraitExpr @0xbc37e32561d53a59 {
   expr @0:Expr;
-  operatorToken @1 :Token;
-  rParenToken @2 :Token;
+  operatorToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
   isArgumentType @3 :Bool;
 }
 
@@ -5551,13 +4828,15 @@ struct TypeTraitExpr @0xeeb042141bc436ae {
 
 struct SubstNonTypeTemplateParmPackExpr @0xbffc5dc4488326c8 {
   expr @0:Expr;
-  parameterPackToken @1 :Token;
+  parameterPack @1 :Ref(NonTypeTemplateParmDecl);
+  parameterPackToken @2 :Ref(Token);
 }
 
 struct SubstNonTypeTemplateParmExpr @0xad38ba4bfe617a6f {
   expr @0:Expr;
-  nameToken @1 :Token;
-  isReferenceParameter @2 :Bool;
+  nameToken @1 :Ref(Token);
+  parameter @2 :Ref(NonTypeTemplateParmDecl);
+  isReferenceParameter @3 :Bool;
 }
 
 struct StringLiteral @0xd0cec44e02f59cf2 {
@@ -5576,94 +4855,105 @@ struct StringLiteral @0xd0cec44e02f59cf2 {
 
 struct StmtExpr @0xe3606abe04461b8a {
   expr @0:Expr;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
+  lParenToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
+  subStatement @3 :Ref(CompoundStmt);
 }
 
 struct SourceLocExpr @0xd4bebb374e1e6d58 {
   expr @0:Expr;
   builtinString @1 :Text;
   identifierKind @2 :SourceLocExprIdentKind;
-  token @3 :Token;
+  token @3 :Ref(Token);
   isIntType @4 :Bool;
   isStringType @5 :Bool;
 }
 
 struct SizeOfPackExpr @0xa4f777d7b3ce890c {
   expr @0:Expr;
-  operatorToken @1 :Token;
-  packToken @2 :Token;
-  rParenToken @3 :Token;
-  isPartiallySubstituted @4 :Bool;
+  operatorToken @1 :Ref(Token);
+  pack @2 :Ref(NamedDecl);
+  packToken @3 :Ref(Token);
+  partialArguments @4 :List(TemplateArgument);
+  rParenToken @5 :Ref(Token);
+  isPartiallySubstituted @6 :Bool;
 }
 
 struct ShuffleVectorExpr @0xdfa87964ccc4abd6 {
   expr @0:Expr;
-  builtinToken @1 :Token;
-  rParenToken @2 :Token;
+  builtinToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct SYCLUniqueStableNameExpr @0xfa67d59d16f9a78a {
   expr @0:Expr;
   computeName @1 :Text;
-  lParenToken @2 :Token;
-  token @3 :Token;
-  rParenToken @4 :Token;
+  lParenToken @2 :Ref(Token);
+  token @3 :Ref(Token);
+  rParenToken @4 :Ref(Token);
 }
 
 struct RequiresExpr @0xe4f5db5ba506ab26 {
   expr @0:Expr;
-  rBraceToken @1 :Token;
-  requiresKwToken @2 :Token;
-  isSatisfied @3 :Bool;
+  body @1 :Ref(RequiresExprBodyDecl);
+  localParameters @2 :List(Ref(ParmVarDecl));
+  rBraceToken @3 :Ref(Token);
+  requiresKwToken @4 :Ref(Token);
+  isSatisfied @5 :Bool;
 }
 
 struct RecoveryExpr @0xa9e048a5bbe9f6bd {
   expr @0:Expr;
+  subExpressions @1 :List(Ref(Expr));
 }
 
 struct PseudoObjectExpr @0xf7795b8660a50a1e {
   expr @0:Expr;
+  semantics @1 :List(Ref(Expr));
+  semanticExpressions @2 :List(Ref(Expr));
 }
 
 struct PredefinedExpr @0xf512f62d75089164 {
   expr @0:Expr;
-  identifierKind @1 :PredefinedExprIdentKind;
-  identifierKindName @2 :Text;
-  token @3 :Token;
+  functionName @1 :Ref(StringLiteral);
+  identifierKind @2 :PredefinedExprIdentKind;
+  identifierKindName @3 :Text;
+  token @4 :Ref(Token);
 }
 
 struct ParenListExpr @0xc7ba76bb20cf6201 {
   expr @0:Expr;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
+  lParenToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
+  expressions @3 :List(Ref(Expr));
 }
 
 struct ParenExpr @0x821bf890921895cd {
   expr @0:Expr;
-  lParen @1 :Token;
-  rParen @2 :Token;
+  lParen @1 :Ref(Token);
+  rParen @2 :Ref(Token);
 }
 
 struct PackExpansionExpr @0xbf1eafc846bba2e0 {
   expr @0:Expr;
-  ellipsisToken @1 :Token;
+  ellipsisToken @1 :Ref(Token);
 }
 
 struct OverloadExpr @0xe1320ca92341cff5 {
   expr @0:Expr;
-  lAngleToken @1 :Token;
-  nameToken @2 :Token;
-  rAngleToken @3 :Token;
-  templateKeywordToken @4 :Token;
-  hasExplicitTemplateArguments @5 :Bool;
-  hasTemplateKeyword @6 :Bool;
+  lAngleToken @1 :Ref(Token);
+  nameToken @2 :Ref(Token);
+  namingClass @3 :Ref(CXXRecordDecl);
+  rAngleToken @4 :Ref(Token);
+  templateKeywordToken @5 :Ref(Token);
+  hasExplicitTemplateArguments @6 :Bool;
+  hasTemplateKeyword @7 :Bool;
 }
 
 struct UnresolvedMemberExpr @0xbd4aeea6486879d1 {
   overloadExpr @0:OverloadExpr;
-  memberToken @1 :Token;
-  operatorToken @2 :Token;
+  memberToken @1 :Ref(Token);
+  operatorToken @2 :Ref(Token);
   hasUnresolvedUsing @3 :Bool;
   isArrow @4 :Bool;
   isImplicitAccess @5 :Bool;
@@ -5677,81 +4967,93 @@ struct UnresolvedLookupExpr @0xd04212a95a4ab25d {
 
 struct OpaqueValueExpr @0xd0ebba3413f46f6d {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
   isUnique @2 :Bool;
 }
 
 struct OffsetOfExpr @0xe74e51b681474f08 {
   expr @0:Expr;
-  operatorToken @1 :Token;
-  rParenToken @2 :Token;
+  operatorToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct ObjCSubscriptRefExpr @0x827d6564c3126c7a {
   expr @0:Expr;
-  rBracket @1 :Token;
-  isArraySubscriptReferenceExpression @2 :Bool;
+  atIndexMethodDeclaration @1 :Ref(ObjCMethodDecl);
+  rBracket @2 :Ref(Token);
+  isArraySubscriptReferenceExpression @3 :Bool;
 }
 
 struct ObjCStringLiteral @0x84470e968f7365fb {
   expr @0:Expr;
-  atToken @1 :Token;
+  atToken @1 :Ref(Token);
+  string @2 :Ref(StringLiteral);
 }
 
 struct ObjCSelectorExpr @0xa6687e4a6275988d {
   expr @0:Expr;
-  atToken @1 :Token;
-  rParenToken @2 :Token;
+  atToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct ObjCProtocolExpr @0xb07709e6d6281804 {
   expr @0:Expr;
-  atToken @1 :Token;
-  protocolIdToken @2 :Token;
-  rParenToken @3 :Token;
+  atToken @1 :Ref(Token);
+  protocol @2 :Ref(ObjCProtocolDecl);
+  protocolIdToken @3 :Ref(Token);
+  rParenToken @4 :Ref(Token);
 }
 
 struct ObjCPropertyRefExpr @0x9f75c18ee7f1c7a2 {
   expr @0:Expr;
-  token @1 :Token;
-  receiverToken @2 :Token;
-  isClassReceiver @3 :Bool;
-  isExplicitProperty @4 :Bool;
-  isImplicitProperty @5 :Bool;
-  isMessagingGetter @6 :Bool;
-  isMessagingSetter @7 :Bool;
-  isObjectReceiver @8 :Bool;
-  isSuperReceiver @9 :Bool;
+  classReceiver @1 :Ref(ObjCInterfaceDecl);
+  explicitProperty @2 :Ref(ObjCPropertyDecl);
+  implicitPropertyGetter @3 :Ref(ObjCMethodDecl);
+  implicitPropertySetter @4 :Ref(ObjCMethodDecl);
+  token @5 :Ref(Token);
+  receiverToken @6 :Ref(Token);
+  isClassReceiver @7 :Bool;
+  isExplicitProperty @8 :Bool;
+  isImplicitProperty @9 :Bool;
+  isMessagingGetter @10 :Bool;
+  isMessagingSetter @11 :Bool;
+  isObjectReceiver @12 :Bool;
+  isSuperReceiver @13 :Bool;
 }
 
 struct ObjCMessageExpr @0xc53f62c71ed8d723 {
   expr @0:Expr;
-  leftToken @1 :Token;
-  methodFamily @2 :ObjCMethodFamily;
-  receiverKind @3 :ObjCMessageExprReceiverKind;
-  receiverRange @4 :TokenRange;
-  rightToken @5 :Token;
-  selectorStartToken @6 :Token;
-  superToken @7 :Token;
-  isClassMessage @8 :Bool;
-  isDelegateInitializerCall @9 :Bool;
-  isImplicit @10 :Bool;
-  isInstanceMessage @11 :Bool;
+  arguments @1 :List(Ref(Expr));
+  leftToken @2 :Ref(Token);
+  methodDeclaration @3 :Ref(ObjCMethodDecl);
+  methodFamily @4 :ObjCMethodFamily;
+  receiverInterface @5 :Ref(ObjCInterfaceDecl);
+  receiverKind @6 :ObjCMessageExprReceiverKind;
+  receiverRange @7 :Ref(TokenRange);
+  rightToken @8 :Ref(Token);
+  selectorStartToken @9 :Ref(Token);
+  superToken @10 :Ref(Token);
+  isClassMessage @11 :Bool;
+  isDelegateInitializerCall @12 :Bool;
+  isImplicit @13 :Bool;
+  isInstanceMessage @14 :Bool;
+  selectorTokens @15 :List(Ref(Token));
 }
 
 struct ObjCIvarRefExpr @0xec7058b5b38773dd {
   expr @0:Expr;
-  token @1 :Token;
-  operationToken @2 :Token;
-  isArrow @3 :Bool;
-  isFreeInstanceVariable @4 :Bool;
+  declaration @1 :Ref(ObjCIvarDecl);
+  token @2 :Ref(Token);
+  operationToken @3 :Ref(Token);
+  isArrow @4 :Bool;
+  isFreeInstanceVariable @5 :Bool;
 }
 
 struct ObjCIsaExpr @0xe3c04c83aef329c8 {
   expr @0:Expr;
-  baseTokenEnd @1 :Token;
-  isaMemberToken @2 :Token;
-  operationToken @3 :Token;
+  baseTokenEnd @1 :Ref(Token);
+  isaMemberToken @2 :Ref(Token);
+  operationToken @3 :Ref(Token);
   isArrow @4 :Bool;
 }
 
@@ -5762,23 +5064,25 @@ struct ObjCIndirectCopyRestoreExpr @0x9475cc6d12ba1afb {
 
 struct ObjCEncodeExpr @0x911855b6fa2d9812 {
   expr @0:Expr;
-  atToken @1 :Token;
-  rParenToken @2 :Token;
+  atToken @1 :Ref(Token);
+  rParenToken @2 :Ref(Token);
 }
 
 struct ObjCDictionaryLiteral @0xaef4d291186415b7 {
   expr @0:Expr;
+  dictionaryWithObjectsMethod @1 :Ref(ObjCMethodDecl);
 }
 
 struct ObjCBoxedExpr @0xae80861f1a63c950 {
   expr @0:Expr;
-  atToken @1 :Token;
-  isExpressibleAsConstantInitializer @2 :Bool;
+  atToken @1 :Ref(Token);
+  boxingMethod @2 :Ref(ObjCMethodDecl);
+  isExpressibleAsConstantInitializer @3 :Bool;
 }
 
 struct ObjCBoolLiteralExpr @0xb2d027f2c8cad1fb {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
   value @2 :Bool;
 }
 
@@ -5789,26 +5093,30 @@ struct ObjCAvailabilityCheckExpr @0xbd477d54907fe95a {
 
 struct ObjCArrayLiteral @0xa36b5cac081b468a {
   expr @0:Expr;
+  arrayWithObjectsMethod @1 :Ref(ObjCMethodDecl);
+  elements @2 :List(Ref(Expr));
 }
 
 struct OMPIteratorExpr @0xd52a7668addb282d {
   expr @0:Expr;
-  iteratorKwToken @1 :Token;
-  lParenToken @2 :Token;
-  rParenToken @3 :Token;
+  iteratorKwToken @1 :Ref(Token);
+  lParenToken @2 :Ref(Token);
+  rParenToken @3 :Ref(Token);
 }
 
 struct OMPArrayShapingExpr @0xcddd3cf38d603be1 {
   expr @0:Expr;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
+  bracketsRanges @1 :List(Ref(TokenRange));
+  dimensions @2 :List(Ref(Expr));
+  lParenToken @3 :Ref(Token);
+  rParenToken @4 :Ref(Token);
 }
 
 struct OMPArraySectionExpr @0xca2808db37aea2e0 {
   expr @0:Expr;
-  colonTokenFirst @1 :Token;
-  colonTokenSecond @2 :Token;
-  rBracketToken @3 :Token;
+  colonTokenFirst @1 :Ref(Token);
+  colonTokenSecond @2 :Ref(Token);
+  rBracketToken @3 :Ref(Token);
 }
 
 struct NoInitExpr @0xadedf240a5b5d3d1 {
@@ -5817,72 +5125,86 @@ struct NoInitExpr @0xadedf240a5b5d3d1 {
 
 struct MemberExpr @0xd8c89de1fe446ed0 {
   expr @0:Expr;
-  lAngleToken @1 :Token;
-  memberToken @2 :Token;
-  operatorToken @3 :Token;
-  rAngleToken @4 :Token;
-  templateKeywordToken @5 :Token;
-  hadMultipleCandidates @6 :Bool;
-  hasExplicitTemplateArguments @7 :Bool;
-  hasQualifier @8 :Bool;
-  hasTemplateKeyword @9 :Bool;
-  isArrow @10 :Bool;
-  isImplicitAccess @11 :Bool;
-  isNonOdrUse @12 :NonOdrUseReason;
+  lAngleToken @1 :Ref(Token);
+  memberDeclaration @2 :Ref(ValueDecl);
+  memberToken @3 :Ref(Token);
+  operatorToken @4 :Ref(Token);
+  rAngleToken @5 :Ref(Token);
+  templateKeywordToken @6 :Ref(Token);
+  hadMultipleCandidates @7 :Bool;
+  hasExplicitTemplateArguments @8 :Bool;
+  hasQualifier @9 :Bool;
+  hasTemplateKeyword @10 :Bool;
+  isArrow @11 :Bool;
+  isImplicitAccess @12 :Bool;
+  isNonOdrUse @13 :NonOdrUseReason;
 }
 
 struct MatrixSubscriptExpr @0xc6e8f0398e560e56 {
   expr @0:Expr;
-  rBracketToken @1 :Token;
+  rBracketToken @1 :Ref(Token);
   isIncomplete @2 :Bool;
 }
 
 struct MaterializeTemporaryExpr @0x81f0ffa9f501c48d {
   expr @0:Expr;
-  storageDuration @1 :StorageDuration;
-  isBoundToLvalueReference @2 :Bool;
-  isUsableInConstantExpressions @3 :Bool;
+  extendingDeclaration @1 :Ref(ValueDecl);
+  lifetimeExtendedTemporaryDeclaration @2 :Ref(LifetimeExtendedTemporaryDecl);
+  storageDuration @3 :StorageDuration;
+  isBoundToLvalueReference @4 :Bool;
+  isUsableInConstantExpressions @5 :Bool;
 }
 
 struct MSPropertySubscriptExpr @0xdca78c710e8a0bc9 {
   expr @0:Expr;
-  rBracketToken @1 :Token;
+  rBracketToken @1 :Ref(Token);
 }
 
 struct MSPropertyRefExpr @0xb14da9f10b21425d {
   expr @0:Expr;
-  memberToken @1 :Token;
-  isArrow @2 :Bool;
-  isImplicitAccess @3 :Bool;
+  memberToken @1 :Ref(Token);
+  propertyDeclaration @2 :Ref(MSPropertyDecl);
+  isArrow @3 :Bool;
+  isImplicitAccess @4 :Bool;
 }
 
 struct LambdaExpr @0xd1773aeaaf57de49 {
   expr @0:Expr;
-  captureDefault @1 :LambdaCaptureDefault;
-  captureDefaultToken @2 :Token;
-  introducerRange @3 :TokenRange;
-  hasExplicitParameters @4 :Bool;
-  hasExplicitResultType @5 :Bool;
-  isGenericLambda @6 :Bool;
-  isMutable @7 :Bool;
+  callOperator @1 :Ref(CXXMethodDecl);
+  captureDefault @2 :LambdaCaptureDefault;
+  captureDefaultToken @3 :Ref(Token);
+  compoundStatementBody @4 :Ref(CompoundStmt);
+  dependentCallOperator @5 :Ref(FunctionTemplateDecl);
+  explicitTemplateParameters @6 :List(Ref(NamedDecl));
+  introducerRange @7 :Ref(TokenRange);
+  lambdaClass @8 :Ref(CXXRecordDecl);
+  templateParameterList @9 :TemplateParameterList;
+  hasExplicitParameters @10 :Bool;
+  hasExplicitResultType @11 :Bool;
+  isGenericLambda @12 :Bool;
+  isMutable @13 :Bool;
 }
 
 struct IntegerLiteral @0x9555503bb691c665 {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
 }
 
 struct InitListExpr @0xee5bc39a46a85bfd {
   expr @0:Expr;
-  lBraceToken @1 :Token;
-  rBraceToken @2 :Token;
-  hadArrayRangeDesignator @3 :Bool;
-  hasArrayFiller @4 :Bool;
-  isExplicit @5 :Bool;
-  isSemanticForm @6 :Bool;
-  isStringLiteralInitializer @7 :Bool;
-  isSyntacticForm @8 :Bool;
-  isTransparent @9 :Bool;
+  initializedFieldInUnion @1 :Ref(FieldDecl);
+  lBraceToken @2 :Ref(Token);
+  rBraceToken @3 :Ref(Token);
+  semanticForm @4 :Ref(InitListExpr);
+  syntacticForm @5 :Ref(InitListExpr);
+  hadArrayRangeDesignator @6 :Bool;
+  hasArrayFiller @7 :Bool;
+  initializers @8 :List(Ref(Expr));
+  isExplicit @9 :Bool;
+  isSemanticForm @10 :Bool;
+  isStringLiteralInitializer @11 :Bool;
+  isSyntacticForm @12 :Bool;
+  isTransparent @13 :Bool;
 }
 
 struct ImplicitValueInitExpr @0xa74a9776ddeaccc0 {
@@ -5895,20 +5217,23 @@ struct ImaginaryLiteral @0xe6373a2b8f6af5f3 {
 
 struct GenericSelectionExpr @0xb9c714e9030a2703 {
   expr @0:Expr;
-  defaultToken @1 :Token;
-  genericToken @2 :Token;
-  rParenToken @3 :Token;
-  isResultDependent @4 :Bool;
+  associationExpressions @1 :List(Ref(Expr));
+  defaultToken @2 :Ref(Token);
+  genericToken @3 :Ref(Token);
+  rParenToken @4 :Ref(Token);
+  isResultDependent @5 :Bool;
 }
 
 struct GNUNullExpr @0xed67a32bfb3e1820 {
   expr @0:Expr;
-  tokenToken @1 :Token;
+  tokenToken @1 :Ref(Token);
 }
 
 struct FunctionParmPackExpr @0x9b1418ed71492c60 {
   expr @0:Expr;
-  parameterPackToken @1 :Token;
+  parameterPack @1 :Ref(VarDecl);
+  parameterPackToken @2 :Ref(Token);
+  expansions @3 :List(Ref(VarDecl));
 }
 
 struct FullExpr @0x823209f8d52ac4fb {
@@ -5929,19 +5254,19 @@ struct ConstantExpr @0xb118d0dca5dbdf6e {
 
 struct FloatingLiteral @0xf9afab4b69f8f504 {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
   isExact @2 :Bool;
 }
 
 struct FixedPointLiteral @0xb376f274c18baf5a {
   expr @0:Expr;
-  token @1 :Token;
+  token @1 :Ref(Token);
 }
 
 struct ExtVectorElementExpr @0xba6c9e86786ed31a {
   expr @0:Expr;
   containsDuplicateElements @1 :Bool;
-  accessorToken @2 :Token;
+  accessorToken @2 :Ref(Token);
   isArrow @3 :Bool;
 }
 
@@ -5953,991 +5278,1400 @@ struct ExpressionTraitExpr @0xf53890283fc830c0 {
 
 struct AttributedStmt @0xc33cd79cc9238608 {
   valueStmt @0:ValueStmt;
-  attributeToken @1 :Token;
+  attributeToken @1 :Ref(Token);
 }
 
 struct SwitchStmt @0x8f2566a2d81612cd {
   stmt @0:Stmt;
-  lParenToken @1 :Token;
-  rParenToken @2 :Token;
-  switchToken @3 :Token;
-  hasInitializerStorage @4 :Bool;
-  hasVariableStorage @5 :Bool;
-  isAllEnumCasesCovered @6 :Bool;
+  conditionVariable @1 :Ref(VarDecl);
+  conditionVariableDeclarationStatement @2 :Ref(DeclStmt);
+  lParenToken @3 :Ref(Token);
+  rParenToken @4 :Ref(Token);
+  switchToken @5 :Ref(Token);
+  hasInitializerStorage @6 :Bool;
+  hasVariableStorage @7 :Bool;
+  isAllEnumCasesCovered @8 :Bool;
 }
 
 struct SwitchCase @0xeecb8bb11e4c8ed7 {
   stmt @0:Stmt;
-  colonToken @1 :Token;
-  keywordToken @2 :Token;
+  colonToken @1 :Ref(Token);
+  keywordToken @2 :Ref(Token);
 }
 
 struct DefaultStmt @0xf8ae119f01317845 {
   switchCase @0:SwitchCase;
-  defaultToken @1 :Token;
+  defaultToken @1 :Ref(Token);
 }
 
 struct CaseStmt @0x829897c890006599 {
   switchCase @0:SwitchCase;
   caseStatementIsGnuRange @1 :Bool;
-  caseToken @2 :Token;
-  ellipsisToken @3 :Token;
+  caseToken @2 :Ref(Token);
+  ellipsisToken @3 :Ref(Token);
 }
 
-struct Type @0xd739e808bc1b3fd7 {
-  acceptsObjCTypeParams @0 :Bool;
-  canDecayToPointerType @1 :Bool;
-  canHaveNullability @2 :Bool;
-  containsErrors @3 :Bool;
-  containsUnexpandedParameterPack @4 :Bool;
-  linkage @5 :Linkage;
-  scalarTypeKind @6 :TypeScalarTypeKind;
-  kind @7 :TypeKind;
-  visibility @8 :Visibility;
-  hasAutoForTrailingReturnType @9 :Bool;
-  hasFloatingRepresentation @10 :Bool;
-  hasIntegerRepresentation @11 :Bool;
-  hasObjCPointerRepresentation @12 :Bool;
-  hasPointerRepresentation @13 :Bool;
-  hasSignedIntegerRepresentation @14 :Bool;
-  hasSizedVlaType @15 :Bool;
-  hasUnnamedOrLocalType @16 :Bool;
-  hasUnsignedIntegerRepresentation @17 :Bool;
-  isAggregateType @18 :Bool;
-  isAlignValUcT @19 :Bool;
-  isAnyCharacterType @20 :Bool;
-  isAnyComplexType @21 :Bool;
-  isAnyPointerType @22 :Bool;
-  isArithmeticType @23 :Bool;
-  isArrayType @24 :Bool;
-  isAtomicType @25 :Bool;
-  isBFloat16Type @26 :Bool;
-  isBlockCompatibleObjCPointerType @27 :Bool;
-  isBlockPointerType @28 :Bool;
-  isBooleanType @29 :Bool;
-  isBuiltinType @30 :Bool;
-  isCarcBridgableType @31 :Bool;
-  isCudaDeviceBuiltinSurfaceType @32 :Bool;
-  isCudaDeviceBuiltinTextureType @33 :Bool;
-  isCanonicalUnqualified @34 :Bool;
-  isChar16Type @35 :Bool;
-  isChar32Type @36 :Bool;
-  isChar8Type @37 :Bool;
-  isCharacterType @38 :Bool;
-  isClassType @39 :Bool;
-  isClkEventUcT @40 :Bool;
-  isComplexIntegerType @41 :Bool;
-  isComplexType @42 :Bool;
-  isCompoundType @43 :Bool;
-  isConstantArrayType @44 :Bool;
-  isConstantMatrixType @45 :Bool;
-  isConstantSizeType @46 :Bool;
-  isDecltypeType @47 :Bool;
-  isDependentAddressSpaceType @48 :Bool;
-  isDependentSizedArrayType @49 :Bool;
-  isDependentType @50 :Bool;
-  isElaboratedTypeSpecifier @51 :Bool;
-  isEnumeralType @52 :Bool;
-  isEventUcT @53 :Bool;
-  isExtIntType @54 :Bool;
-  isExtVectorType @55 :Bool;
-  isFixedPointOrIntegerType @56 :Bool;
-  isFixedPointType @57 :Bool;
-  isFloat128Type @58 :Bool;
-  isFloat16Type @59 :Bool;
-  isFloatingType @60 :Bool;
-  isFromAst @61 :Bool;
-  isFunctionNoProtoType @62 :Bool;
-  isFunctionPointerType @63 :Bool;
-  isFunctionProtoType @64 :Bool;
-  isFunctionReferenceType @65 :Bool;
-  isFunctionType @66 :Bool;
-  isFundamentalType @67 :Bool;
-  isHalfType @68 :Bool;
-  isImageType @69 :Bool;
-  isIncompleteArrayType @70 :Bool;
-  isIncompleteOrObjectType @71 :Bool;
-  isIncompleteType @72 :Bool;
-  isInstantiationDependentType @73 :Bool;
-  isIntegerType @74 :Bool;
-  isIntegralOrEnumerationType @75 :Bool;
-  isIntegralOrUnscopedEnumerationType @76 :Bool;
-  isIntegralType @77 :Bool;
-  isInterfaceType @78 :Bool;
-  isLValueReferenceType @79 :Bool;
-  isLinkageValid @80 :Bool;
-  isLiteralType @81 :Bool;
-  isMatrixType @82 :Bool;
-  isMemberDataPointerType @83 :Bool;
-  isMemberFunctionPointerType @84 :Bool;
-  isMemberPointerType @85 :Bool;
-  isNonOverloadPlaceholderType @86 :Bool;
-  isNothrowUcT @87 :Bool;
-  isNullPointerType @88 :Bool;
-  isOclExtOpaqueType @89 :Bool;
-  isOclImage1DarrayRoType @90 :Bool;
-  isOclImage1DarrayRwType @91 :Bool;
-  isOclImage1DarrayWoType @92 :Bool;
-  isOclImage1DbufferRoType @93 :Bool;
-  isOclImage1DbufferRwType @94 :Bool;
-  isOclImage1DbufferWoType @95 :Bool;
-  isOclImage1DroType @96 :Bool;
-  isOclImage1DrwType @97 :Bool;
-  isOclImage1DwoType @98 :Bool;
-  isOclImage2DarrayDepthRoType @99 :Bool;
-  isOclImage2DarrayDepthRwType @100 :Bool;
-  isOclImage2DarrayDepthWoType @101 :Bool;
-  isOclImage2DarrayMsaaDepthRoType @102 :Bool;
-  isOclImage2DarrayMsaaDepthRwType @103 :Bool;
-  isOclImage2DarrayMsaaDepthWoType @104 :Bool;
-  isOclImage2DarrayMsaaroType @105 :Bool;
-  isOclImage2DarrayMsaarwType @106 :Bool;
-  isOclImage2DarrayMsaawoType @107 :Bool;
-  isOclImage2DarrayRoType @108 :Bool;
-  isOclImage2DarrayRwType @109 :Bool;
-  isOclImage2DarrayWoType @110 :Bool;
-  isOclImage2DdepthRoType @111 :Bool;
-  isOclImage2DdepthRwType @112 :Bool;
-  isOclImage2DdepthWoType @113 :Bool;
-  isOclImage2DmsaaDepthRoType @114 :Bool;
-  isOclImage2DmsaaDepthRwType @115 :Bool;
-  isOclImage2DmsaaDepthWoType @116 :Bool;
-  isOclImage2DmsaaroType @117 :Bool;
-  isOclImage2DmsaarwType @118 :Bool;
-  isOclImage2DmsaawoType @119 :Bool;
-  isOclImage2DroType @120 :Bool;
-  isOclImage2DrwType @121 :Bool;
-  isOclImage2DwoType @122 :Bool;
-  isOclImage3DroType @123 :Bool;
-  isOclImage3DrwType @124 :Bool;
-  isOclImage3DwoType @125 :Bool;
-  isOclIntelSubgroupAvcImeDualReferenceStreaminType @126 :Bool;
-  isOclIntelSubgroupAvcImePayloadType @127 :Bool;
-  isOclIntelSubgroupAvcImeResultDualReferenceStreamoutType @128 :Bool;
-  isOclIntelSubgroupAvcImeResultSingleReferenceStreamoutType @129 :Bool;
-  isOclIntelSubgroupAvcImeResultType @130 :Bool;
-  isOclIntelSubgroupAvcImeSingleReferenceStreaminType @131 :Bool;
-  isOclIntelSubgroupAvcMcePayloadType @132 :Bool;
-  isOclIntelSubgroupAvcMceResultType @133 :Bool;
-  isOclIntelSubgroupAvcRefPayloadType @134 :Bool;
-  isOclIntelSubgroupAvcRefResultType @135 :Bool;
-  isOclIntelSubgroupAvcSicPayloadType @136 :Bool;
-  isOclIntelSubgroupAvcSicResultType @137 :Bool;
-  isOclIntelSubgroupAvcType @138 :Bool;
-  isObjCarcBridgableType @139 :Bool;
-  isObjCarcImplicitlyUnretainedType @140 :Bool;
-  isObjCBoxableRecordType @141 :Bool;
-  isObjCBuiltinType @142 :Bool;
-  isObjCClassOrClassKindOfType @143 :Bool;
-  isObjCClassType @144 :Bool;
-  isObjCIdType @145 :Bool;
-  isObjCIndependentClassType @146 :Bool;
-  isObjCIndirectLifetimeType @147 :Bool;
-  isObjCInertUnsafeUnretainedType @148 :Bool;
-  isObjCLifetimeType @149 :Bool;
-  isObjCnsObjectType @150 :Bool;
-  isObjCObjectOrInterfaceType @151 :Bool;
-  isObjCObjectPointerType @152 :Bool;
-  isObjCObjectType @153 :Bool;
-  isObjCQualifiedClassType @154 :Bool;
-  isObjCQualifiedIdType @155 :Bool;
-  isObjCQualifiedInterfaceType @156 :Bool;
-  isObjCRetainableType @157 :Bool;
-  isObjCSelType @158 :Bool;
-  isObjectPointerType @159 :Bool;
-  isObjectType @160 :Bool;
-  isOpenClSpecificType @161 :Bool;
-  isOverloadableType @162 :Bool;
-  isPipeType @163 :Bool;
-  isPlaceholderType @164 :Bool;
-  isPointerType @165 :Bool;
-  isPromotableIntegerType @166 :Bool;
-  isQueueUcT @167 :Bool;
-  isRValueReferenceType @168 :Bool;
-  isRealFloatingType @169 :Bool;
-  isRealType @170 :Bool;
-  isRecordType @171 :Bool;
-  isReferenceType @172 :Bool;
-  isReserveIdt @173 :Bool;
-  isSamplerUcT @174 :Bool;
-  isSaturatedFixedPointType @175 :Bool;
-  isScalarType @176 :Bool;
-  isScopedEnumeralType @177 :Bool;
-  isSignedFixedPointType @178 :Bool;
-  isSignedIntegerOrEnumerationType @179 :Bool;
-  isSignedIntegerType @180 :Bool;
-  isSizelessBuiltinType @181 :Bool;
-  isSizelessType @182 :Bool;
-  isSpecifierType @183 :Bool;
-  isStandardLayoutType @184 :Bool;
-  isStdByteType @185 :Bool;
-  isStructuralType @186 :Bool;
-  isStructureOrClassType @187 :Bool;
-  isStructureType @188 :Bool;
-  isTemplateTypeParmType @189 :Bool;
-  isTypedefNameType @190 :Bool;
-  isUndeducedAutoType @191 :Bool;
-  isUndeducedType @192 :Bool;
-  isUnionType @193 :Bool;
-  isUnsaturatedFixedPointType @194 :Bool;
-  isUnscopedEnumerationType @195 :Bool;
-  isUnsignedFixedPointType @196 :Bool;
-  isUnsignedIntegerOrEnumerationType @197 :Bool;
-  isUnsignedIntegerType @198 :Bool;
-  isVlstBuiltinType @199 :Bool;
-  isVariableArrayType @200 :Bool;
-  isVariablyModifiedType @201 :Bool;
-  isVectorType @202 :Bool;
-  isVisibilityExplicit @203 :Bool;
-  isVoidPointerType @204 :Bool;
-  isVoidType @205 :Bool;
-  isWideCharacterType @206 :Bool;
-  isQualified @207 :Bool;
-  addressSpace @208 :LangAS;
-  hasAddressSpace @209 :Bool;
-  hasLocalNonFastQualifiers @210 :Bool;
-  hasLocalQualifiers @211 :Bool;
-  hasNonTrivialObjCLifetime @212 :Bool;
-  hasNonTrivialToPrimitiveCopyCUnion @213 :Bool;
-  hasNonTrivialToPrimitiveDefaultInitializeCUnion @214 :Bool;
-  hasNonTrivialToPrimitiveDestructCUnion @215 :Bool;
-  hasQualifiers @216 :Bool;
-  hasStrongOrWeakObjCLifetime @217 :Bool;
-  isCForbiddenLValueType @218 :Bool;
-  isCxX11PodType @219 :Bool;
-  isCxX98PodType @220 :Bool;
-  isCanonical @221 :Bool;
-  isCanonicalAsParam @222 :Bool;
-  isConstQualified @223 :Bool;
-  isConstant @224 :Bool;
-  isDestructedType @225 :QualTypeDestructionKind;
-  isLocalConstQualified @226 :Bool;
-  isLocalRestrictQualified @227 :Bool;
-  isLocalVolatileQualified @228 :Bool;
-  isNonTrivialToPrimitiveCopy @229 :QualTypePrimitiveCopyKind;
-  isNonTrivialToPrimitiveDefaultInitialize @230 :QualTypePrimitiveDefaultInitializeKind;
-  isNonTrivialToPrimitiveDestructiveMove @231 :QualTypePrimitiveCopyKind;
-  isNonWeakInMrrWithObjCWeak @232 :Bool;
-  isNull @233 :Bool;
-  isObjCgcStrong @234 :Bool;
-  isObjCgcWeak @235 :Bool;
-  isPodType @236 :Bool;
-  isRestrictQualified @237 :Bool;
-  isTrivialType @238 :Bool;
-  isTriviallyCopyableType @239 :Bool;
-  isVolatileQualified @240 :Bool;
-  mayBeDynamicClass @241 :Bool;
-  mayBeNotDynamicClass @242 :Bool;
+struct Decl @0xfb5879761ffaedb6 {
+  access @0 :AccessSpecifier;
+  accessUnsafe @1 :AccessSpecifier;
+  asFunction @2 :Ref(FunctionDecl);
+  availability @3 :AvailabilityResult;
+  beginToken @4 :Ref(Token);
+  bodyRBrace @5 :Ref(Token);
+  describedTemplate @6 :Ref(TemplateDecl);
+  describedTemplateParams @7 :TemplateParameterList;
+  endToken @8 :Ref(Token);
+  friendObjectKind @9 :DeclFriendObjectKind;
+  moduleOwnershipKind @10 :DeclModuleOwnershipKind;
+  translationUnitDeclaration @11 :Ref(TranslationUnitDecl);
+  hasAttributes @12 :Bool;
+  hasBody @13 :Bool;
+  hasDefiningAttribute @14 :Bool;
+  hasOwningModule @15 :Bool;
+  hasTagIdentifierNamespace @16 :Bool;
+  isCanonicalDeclaration @17 :Bool;
+  isDefinedOutsideFunctionOrMethod @18 :Bool;
+  isDeprecated @19 :Bool;
+  isFirstDeclaration @20 :Bool;
+  isFromAstFile @21 :Bool;
+  isFunctionOrFunctionTemplate @22 :Bool;
+  isImplicit @23 :Bool;
+  isInAnonymousNamespace @24 :Bool;
+  isInLocalScopeForInstantiation @25 :Bool;
+  isInStdNamespace @26 :Bool;
+  isInvalidDeclaration @27 :Bool;
+  isModulePrivate @28 :Bool;
+  isOutOfLine @29 :Bool;
+  isParameterPack @30 :Bool;
+  isReferenced @31 :Bool;
+  isTemplateDeclaration @32 :Bool;
+  isTemplateParameter @33 :Bool;
+  isTemplateParameterPack @34 :Bool;
+  isTemplated @35 :Bool;
+  isThisDeclarationReferenced @36 :Bool;
+  isTopLevelDeclarationInObjCContainer @37 :Bool;
+  isUnavailable @38 :Bool;
+  isUnconditionallyVisible @39 :Bool;
+  isUsed @40 :Bool;
+  isWeakImported @41 :Bool;
+  redeclarations @42 :List(Ref(Decl));
+  kind @43 :DeclKind;
+  token @44 :Ref(Token);
+  tokenRange @45 :Ref(TokenRange);
 }
 
-struct TemplateTypeParmType @0xe786690ae408805f {
-  type @0:Type;
-  isParameterPack @1 :Bool;
-  isSugared @2 :Bool;
+struct ClassScopeFunctionSpecializationDecl @0x99eb38d6a1065986 {
+  decl @0:Decl;
+  specialization @1 :Ref(CXXMethodDecl);
+  hasExplicitTemplateArguments @2 :Bool;
 }
 
-struct TemplateSpecializationType @0xfa056c60dc6c1e09 {
-  type @0:Type;
-  isCurrentInstantiation @1 :Bool;
-  isSugared @2 :Bool;
-  isTypeAlias @3 :Bool;
+struct CapturedDecl @0xa1c847e4871d0b0a {
+  decl @0:Decl;
+  contextParam @1 :Ref(ImplicitParamDecl);
+  isNothrow @2 :Bool;
+  parameters @3 :List(Ref(ImplicitParamDecl));
+  params @4 :List(Ref(ImplicitParamDecl));
 }
 
-struct TagType @0xc5f6e35856974d9c {
-  type @0:Type;
-  isBeingDefined @1 :Bool;
+struct BlockDecl @0xd21c906a9e197a51 {
+  decl @0:Decl;
+  blockMissingReturnType @1 :Bool;
+  canAvoidCopyToHeap @2 :Bool;
+  capturesCxxThis @3 :Bool;
+  doesNotEscape @4 :Bool;
+  caretToken @5 :Ref(Token);
+  compoundBody @6 :Ref(CompoundStmt);
+  hasCaptures @7 :Bool;
+  isConversionFromLambda @8 :Bool;
+  isVariadic @9 :Bool;
+  parameters @10 :List(Ref(ParmVarDecl));
+  paramDeclarations @11 :List(Ref(ParmVarDecl));
 }
 
-struct RecordType @0xa5a5c23895050f69 {
-  tagType @0:TagType;
-  hasConstFields @1 :Bool;
-  isSugared @2 :Bool;
+struct AccessSpecDecl @0xe671324616f83d3c {
+  decl @0:Decl;
+  accessSpecifierToken @1 :Ref(Token);
+  colonToken @2 :Ref(Token);
 }
 
-struct EnumType @0xeceb1819da64112c {
-  tagType @0:TagType;
-  isSugared @1 :Bool;
+struct TranslationUnitDecl @0x84ba694d5be7caa3 {
+  decl @0:Decl;
+  anonymousNamespace @1 :Ref(NamespaceDecl);
 }
 
-struct SubstTemplateTypeParmType @0x8be567616218a913 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct StaticAssertDecl @0xe3ab98945466226a {
+  decl @0:Decl;
+  message @1 :Ref(StringLiteral);
+  rParenToken @2 :Ref(Token);
+  isFailed @3 :Bool;
 }
 
-struct SubstTemplateTypeParmPackType @0x8e845eb2b04a7eee {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct RequiresExprBodyDecl @0x9eea1ed94972a3a6 {
+  decl @0:Decl;
 }
 
-struct ReferenceType @0xf0b00042a60e0b80 {
-  type @0:Type;
-  isInnerReference @1 :Bool;
-  isSpelledAsLValue @2 :Bool;
+struct PragmaDetectMismatchDecl @0xc2be564c48472f5d {
+  decl @0:Decl;
+  name @1 :Text;
+  value @2 :Text;
 }
 
-struct RValueReferenceType @0xbecf2238a530256c {
-  referenceType @0:ReferenceType;
-  isSugared @1 :Bool;
+struct PragmaCommentDecl @0xa32a66c4f91015cb {
+  decl @0:Decl;
+  argument @1 :Text;
+  commentKind @2 :PragmaMSCommentKind;
 }
 
-struct LValueReferenceType @0xc3ffdde8d840e1f8 {
-  referenceType @0:ReferenceType;
-  isSugared @1 :Bool;
+struct ObjCPropertyImplDecl @0x9c45df6dc848c200 {
+  decl @0:Decl;
+  getterMethodDeclaration @1 :Ref(ObjCMethodDecl);
+  propertyDeclaration @2 :Ref(ObjCPropertyDecl);
+  propertyImplementation @3 :ObjCPropertyImplDeclKind;
+  propertyInstanceVariableDeclaration @4 :Ref(ObjCIvarDecl);
+  propertyInstanceVariableDeclarationToken @5 :Ref(Token);
+  setterMethodDeclaration @6 :Ref(ObjCMethodDecl);
+  isInstanceVariableNameSpecified @7 :Bool;
 }
 
-struct PointerType @0xbfb931627d65b65e {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct NamedDecl @0xee8ff2639c85feae {
+  decl @0:Decl;
+  formalLinkage @1 :Linkage;
+  linkageInternal @2 :Linkage;
+  name @3 :Text;
+  objCfStringFormattingFamily @4 :ObjCStringFormatFamily;
+  qualifiedNameAsString @5 :Text;
+  underlyingDeclaration @6 :Ref(NamedDecl);
+  visibility @7 :Visibility;
+  hasExternalFormalLinkage @8 :Bool;
+  hasLinkage @9 :Bool;
+  hasLinkageBeenComputed @10 :Bool;
+  isCxxClassMember @11 :Bool;
+  isCxxInstanceMember @12 :Bool;
+  isExternallyDeclarable @13 :Bool;
+  isExternallyVisible @14 :Bool;
+  isLinkageValid @15 :Bool;
 }
 
-struct PipeType @0xa153518ebe860937 {
-  type @0:Type;
-  isReadOnly @1 :Bool;
-  isSugared @2 :Bool;
+struct LabelDecl @0x959116a0b50f04fe {
+  namedDecl @0:NamedDecl;
+  msAssemblyLabel @1 :Text;
+  statement @2 :Ref(LabelStmt);
+  isGnuLocal @3 :Bool;
+  isMsAssemblyLabel @4 :Bool;
+  isResolvedMsAssemblyLabel @5 :Bool;
 }
 
-struct ParenType @0xff7efc28ab285ec4 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct BaseUsingDecl @0xd779d676819e5d07 {
+  namedDecl @0:NamedDecl;
+  shadows @1 :List(Ref(UsingShadowDecl));
 }
 
-struct PackExpansionType @0xd267d004a8c359b6 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct UsingEnumDecl @0xa824f691f72f9236 {
+  baseUsingDecl @0:BaseUsingDecl;
+  enumDeclaration @1 :Ref(EnumDecl);
+  enumToken @2 :Ref(Token);
+  usingToken @3 :Ref(Token);
 }
 
-struct ObjCTypeParamType @0xac0ad54259298e1c {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct UsingDecl @0xb8602dcb3f95c179 {
+  baseUsingDecl @0:BaseUsingDecl;
+  usingToken @1 :Ref(Token);
+  hasTypename @2 :Bool;
+  isAccessDeclaration @3 :Bool;
 }
 
-struct ObjCObjectType @0xdb7630160ba51f56 {
-  type @0:Type;
-  isKindOfType @1 :Bool;
-  isKindOfTypeAsWritten @2 :Bool;
-  isObjCClass @3 :Bool;
-  isObjCId @4 :Bool;
-  isObjCQualifiedClass @5 :Bool;
-  isObjCQualifiedId @6 :Bool;
-  isObjCUnqualifiedClass @7 :Bool;
-  isObjCUnqualifiedId @8 :Bool;
-  isObjCUnqualifiedIdOrClass @9 :Bool;
-  isSpecialized @10 :Bool;
-  isSpecializedAsWritten @11 :Bool;
-  isSugared @12 :Bool;
-  isUnspecialized @13 :Bool;
-  isUnspecializedAsWritten @14 :Bool;
+struct ValueDecl @0xe2704a366b05e616 {
+  namedDecl @0:NamedDecl;
+  isWeak @1 :Bool;
 }
 
-struct ObjCInterfaceType @0xeaf73283b88684f2 {
-  objCObjectType @0:ObjCObjectType;
+struct UnresolvedUsingValueDecl @0x8ad2fc298aa43ab1 {
+  valueDecl @0:ValueDecl;
+  ellipsisToken @1 :Ref(Token);
+  usingToken @2 :Ref(Token);
+  isAccessDeclaration @3 :Bool;
+  isPackExpansion @4 :Bool;
 }
 
-struct ObjCObjectPointerType @0x83fd17147f556ba9 {
-  type @0:Type;
-  isKindOfType @1 :Bool;
-  isObjCIdOrClassType @2 :Bool;
-  isSpecialized @3 :Bool;
-  isSpecializedAsWritten @4 :Bool;
-  isSugared @5 :Bool;
-  isUnspecialized @6 :Bool;
-  isUnspecializedAsWritten @7 :Bool;
+struct TemplateParamObjectDecl @0xd09f17939d7cc847 {
+  valueDecl @0:ValueDecl;
 }
 
-struct MemberPointerType @0xcd7316ac3d809b66 {
-  type @0:Type;
-  isMemberDataPointer @1 :Bool;
-  isMemberFunctionPointer @2 :Bool;
-  isSugared @3 :Bool;
+struct OMPDeclareReductionDecl @0xf59daefbeeafc092 {
+  valueDecl @0:ValueDecl;
+  initializerKind @1 :OMPDeclareReductionDeclInitKind;
+  prevDeclarationInScope @2 :Ref(OMPDeclareReductionDecl);
 }
 
-struct MatrixType @0xfce6c7a94952d4ac {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct MSGuidDecl @0x9ef09ebc4be76711 {
+  valueDecl @0:ValueDecl;
 }
 
-struct DependentSizedMatrixType @0xa068a0de73cc64b1 {
-  matrixType @0:MatrixType;
-  attributeToken @1 :Token;
+struct IndirectFieldDecl @0xf8f906fde6cb040f {
+  valueDecl @0:ValueDecl;
+  chain @1 :List(Ref(NamedDecl));
+  anonymousField @2 :Ref(FieldDecl);
+  variableDeclaration @3 :Ref(VarDecl);
 }
 
-struct ConstantMatrixType @0x9fe8639dcd3a4d9e {
-  matrixType @0:MatrixType;
+struct EnumConstantDecl @0xe2b34f222cdb8877 {
+  valueDecl @0:ValueDecl;
 }
 
-struct MacroQualifiedType @0x8494e2a4b85c9f19 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct DeclaratorDecl @0xb95593a177af5810 {
+  valueDecl @0:ValueDecl;
+  innerTokenStart @1 :Ref(Token);
+  outerTokenStart @2 :Ref(Token);
+  typeSpecEndToken @3 :Ref(Token);
+  typeSpecStartToken @4 :Ref(Token);
+  templateParameterLists @5 :List(TemplateParameterList);
 }
 
-struct InjectedClassNameType @0xa6c2e5edfcbf618a {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct VarDecl @0xcf9adcbc59a4e339 {
+  declaratorDecl @0:DeclaratorDecl;
+  initializerStyle @1 :VarDeclInitializationStyle;
+  languageLinkage @2 :LanguageLinkage;
+  pointOfInstantiation @3 :Ref(Token);
+  storageClass @4 :StorageClass;
+  storageDuration @5 :StorageDuration;
+  tlsKind @6 :VarDeclTLSKind;
+  tscSpec @7 :ThreadStorageClassSpecifier;
+  templateSpecializationKind @8 :TemplateSpecializationKind;
+  templateSpecializationKindForInstantiation @9 :TemplateSpecializationKind;
+  hasConstantInitialization @10 :Bool;
+  hasDependentAlignment @11 :Bool;
+  hasExternalStorage @12 :Bool;
+  hasGlobalStorage @13 :Bool;
+  hasIceInitializer @14 :Bool;
+  hasInitializer @15 :Bool;
+  hasLocalStorage @16 :Bool;
+  isArcPseudoStrong @17 :Bool;
+  isCxxForRangeDeclaration @18 :Bool;
+  isConstexpr @19 :Bool;
+  isDirectInitializer @20 :Bool;
+  isEscapingByref @21 :Bool;
+  isExceptionVariable @22 :Bool;
+  isExternUcC @23 :Bool;
+  isFileVariableDeclaration @24 :Bool;
+  isFunctionOrMethodVariableDeclaration @25 :Bool;
+  isInExternCContext @26 :Bool;
+  isInExternCxxContext @27 :Bool;
+  isInitializerCapture @28 :Bool;
+  isInline @29 :Bool;
+  isInlineSpecified @30 :Bool;
+  isKnownToBeDefined @31 :Bool;
+  isLocalVariableDeclaration @32 :Bool;
+  isLocalVariableDeclarationOrParm @33 :Bool;
+  isNrvoVariable @34 :Bool;
+  isNoDestroy @35 :Bool;
+  isNonEscapingByref @36 :Bool;
+  isObjCForDeclaration @37 :Bool;
+  isPreviousDeclarationInSameBlockScope @38 :Bool;
+  isStaticDataMember @39 :Bool;
+  isStaticLocal @40 :Bool;
+  isThisDeclarationADemotedDefinition @41 :Bool;
+  isUsableInConstantExpressions @42 :Bool;
+  mightBeUsableInConstantExpressions @43 :Bool;
+  needsDestruction @44 :QualTypeDestructionKind;
 }
 
-struct FunctionType @0x948975919b3cdebd {
-  type @0:Type;
-  callConv @1 :CallingConv;
-  cmseNsCallAttribute @2 :Bool;
-  hasRegParm @3 :Bool;
-  noReturnAttribute @4 :Bool;
-  isConst @5 :Bool;
-  isRestrict @6 :Bool;
-  isVolatile @7 :Bool;
+struct ParmVarDecl @0xedf01c1d7684de38 {
+  varDecl @0:VarDecl;
+  defaultArgumentRange @1 :Ref(TokenRange);
+  objCDeclQualifier @2 :DeclObjCDeclQualifier;
+  hasDefaultArgument @3 :Bool;
+  hasInheritedDefaultArgument @4 :Bool;
+  hasUninstantiatedDefaultArgument @5 :Bool;
+  hasUnparsedDefaultArgument @6 :Bool;
+  isDestroyedInCallee @7 :Bool;
+  isKnrPromoted @8 :Bool;
+  isObjCMethodParameter @9 :Bool;
 }
 
-struct FunctionProtoType @0xfbd27cbfbac5efbb {
-  functionType @0:FunctionType;
-  canThrow @1 :CanThrowResult;
-  ellipsisToken @2 :Token;
-  exceptionSpecType @3 :ExceptionSpecificationType;
-  referenceQualifier @4 :RefQualifierKind;
-  hasDependentExceptionSpec @5 :Bool;
-  hasDynamicExceptionSpec @6 :Bool;
-  hasExceptionSpec @7 :Bool;
-  hasExtParameterInfos @8 :Bool;
-  hasInstantiationDependentExceptionSpec @9 :Bool;
-  hasNoexceptExceptionSpec @10 :Bool;
-  hasTrailingReturn @11 :Bool;
-  isNothrow @12 :Bool;
-  isSugared @13 :Bool;
-  isTemplateVariadic @14 :Bool;
-  isVariadic @15 :Bool;
+struct OMPCapturedExprDecl @0x8dae8ad443b5cf77 {
+  varDecl @0:VarDecl;
 }
 
-struct FunctionNoProtoType @0x8290ca5570d70e02 {
-  functionType @0:FunctionType;
-  isSugared @1 :Bool;
+struct ImplicitParamDecl @0x9482ac8d963f562c {
+  varDecl @0:VarDecl;
+  parameterKind @1 :ImplicitParamDeclImplicitParamKind;
 }
 
-struct ExtIntType @0xc48fbfce9c3676d5 {
-  type @0:Type;
-  isSigned @1 :Bool;
-  isSugared @2 :Bool;
-  isUnsigned @3 :Bool;
+struct DecompositionDecl @0xd32bcfb0d1a2facb {
+  varDecl @0:VarDecl;
+  bindings @1 :List(Ref(BindingDecl));
 }
 
-struct DependentVectorType @0xc6ccf5cfae8940a4 {
-  type @0:Type;
-  attributeToken @1 :Token;
-  vectorKind @2 :VectorTypeVectorKind;
-  isSugared @3 :Bool;
+struct VarTemplateSpecializationDecl @0xbaf3e3ed90ea85e0 {
+  varDecl @0:VarDecl;
+  externToken @1 :Ref(Token);
+  specializationKind @2 :TemplateSpecializationKind;
+  specializedTemplate @3 :Ref(VarTemplateDecl);
+  templateArguments @4 :List(TemplateArgument);
+  templateInstantiationArguments @5 :List(TemplateArgument);
+  templateKeywordToken @6 :Ref(Token);
+  isClassScopeExplicitSpecialization @7 :Bool;
+  isExplicitInstantiationOrSpecialization @8 :Bool;
+  isExplicitSpecialization @9 :Bool;
 }
 
-struct DependentSizedExtVectorType @0xd1e2872240f527b7 {
-  type @0:Type;
-  attributeToken @1 :Token;
-  isSugared @2 :Bool;
+struct VarTemplatePartialSpecializationDecl @0xe1d0f96cb9fa250f {
+  varTemplateSpecializationDecl @0:VarTemplateSpecializationDecl;
+  instantiatedFromMember @1 :Ref(VarTemplatePartialSpecializationDecl);
+  templateParameters @2 :TemplateParameterList;
+  hasAssociatedConstraints @3 :Bool;
 }
 
-struct DependentExtIntType @0xedfca4126b0a36ef {
-  type @0:Type;
-  isSigned @1 :Bool;
-  isSugared @2 :Bool;
-  isUnsigned @3 :Bool;
+struct NonTypeTemplateParmDecl @0x964d2872d52f2d65 {
+  declaratorDecl @0:DeclaratorDecl;
+  defaultArgumentWasInherited @1 :Bool;
+  defaultArgumentToken @2 :Ref(Token);
+  hasDefaultArgument @3 :Bool;
+  hasPlaceholderTypeConstraint @4 :Bool;
+  isExpandedParameterPack @5 :Bool;
+  isPackExpansion @6 :Bool;
 }
 
-struct DependentAddressSpaceType @0xadb13a8d42ac14c8 {
-  type @0:Type;
-  attributeToken @1 :Token;
-  isSugared @2 :Bool;
+struct MSPropertyDecl @0x9a46ca50a3ae900f {
+  declaratorDecl @0:DeclaratorDecl;
+  hasGetter @1 :Bool;
+  hasSetter @2 :Bool;
 }
 
-struct DeducedType @0x9b62aead3bf58839 {
-  type @0:Type;
-  isDeduced @1 :Bool;
-  isSugared @2 :Bool;
+struct FunctionDecl @0x92bd4789888f8ccb {
+  declaratorDecl @0:DeclaratorDecl;
+  doesDeclarationForceExternallyVisibleDefinition @1 :Bool;
+  doesThisDeclarationHaveABody @2 :Bool;
+  constexprKind @3 :ConstexprSpecKind;
+  definition @4 :Ref(FunctionDecl);
+  ellipsisToken @5 :Ref(Token);
+  exceptionSpecSourceRange @6 :Ref(TokenRange);
+  exceptionSpecType @7 :ExceptionSpecificationType;
+  languageLinkage @8 :LanguageLinkage;
+  multiVersionKind @9 :MultiVersionKind;
+  overloadedOperator @10 :OverloadedOperatorKind;
+  parametersSourceRange @11 :Ref(TokenRange);
+  pointOfInstantiation @12 :Ref(Token);
+  returnTypeSourceRange @13 :Ref(TokenRange);
+  storageClass @14 :StorageClass;
+  templateSpecializationKind @15 :TemplateSpecializationKind;
+  templateSpecializationKindForInstantiation @16 :TemplateSpecializationKind;
+  templatedKind @17 :FunctionDeclTemplatedKind;
+  hasImplicitReturnZero @18 :Bool;
+  hasInheritedPrototype @19 :Bool;
+  hasOneParamOrDefaultArguments @20 :Bool;
+  hasPrototype @21 :Bool;
+  hasSkippedBody @22 :Bool;
+  hasTrivialBody @23 :Bool;
+  hasWrittenPrototype @24 :Bool;
+  instantiationIsPending @25 :Bool;
+  isCpuDispatchMultiVersion @26 :Bool;
+  isCpuSpecificMultiVersion @27 :Bool;
+  isConsteval @28 :Bool;
+  isConstexpr @29 :Bool;
+  isConstexprSpecified @30 :Bool;
+  isDefaulted @31 :Bool;
+  isDeleted @32 :Bool;
+  isDeletedAsWritten @33 :Bool;
+  isDestroyingOperatorDelete @34 :Bool;
+  isExplicitlyDefaulted @35 :Bool;
+  isExternUcC @36 :Bool;
+  isFunctionTemplateSpecialization @37 :Bool;
+  isGlobal @38 :Bool;
+  isImplicitlyInstantiable @39 :Bool;
+  isInExternCContext @40 :Bool;
+  isInExternCxxContext @41 :Bool;
+  isInlineBuiltinDeclaration @42 :Bool;
+  isInlineDefinitionExternallyVisible @43 :Bool;
+  isInlineSpecified @44 :Bool;
+  isInlined @45 :Bool;
+  isLateTemplateParsed @46 :Bool;
+  isMsExternInline @47 :Bool;
+  isMsvcrtEntryPoint @48 :Bool;
+  isMain @49 :Bool;
+  isMultiVersion @50 :Bool;
+  isNoReturn @51 :Bool;
+  isOverloadedOperator @52 :Bool;
+  isPure @53 :Bool;
+  isReplaceableGlobalAllocationFunction @54 :Bool;
+  isReservedGlobalPlacementOperator @55 :Bool;
+  isStatic @56 :Bool;
+  isTargetMultiVersion @57 :Bool;
+  isTemplateInstantiation @58 :Bool;
+  isThisDeclarationADefinition @59 :Bool;
+  isThisDeclarationInstantiatedFromAFriendDefinition @60 :Bool;
+  isTrivial @61 :Bool;
+  isTrivialForCall @62 :Bool;
+  isUserProvided @63 :Bool;
+  isVariadic @64 :Bool;
+  isVirtualAsWritten @65 :Bool;
+  parameters @66 :List(Ref(ParmVarDecl));
+  usesSehTry @67 :Bool;
+  willHaveBody @68 :Bool;
+  paramDeclarations @69 :List(Ref(ParmVarDecl));
 }
 
-struct DeducedTemplateSpecializationType @0x9a096862188ecc6e {
-  deducedType @0:DeducedType;
+struct CXXMethodDecl @0xd83d5835cf6512db {
+  functionDecl @0:FunctionDecl;
+  parent @1 :Ref(CXXRecordDecl);
+  referenceQualifier @2 :RefQualifierKind;
+  hasInlineBody @3 :Bool;
+  isConst @4 :Bool;
+  isCopyAssignmentOperator @5 :Bool;
+  isInstance @6 :Bool;
+  isLambdaStaticInvoker @7 :Bool;
+  isMoveAssignmentOperator @8 :Bool;
+  isVirtual @9 :Bool;
+  isVolatile @10 :Bool;
+  overriddenMethods @11 :List(Ref(CXXMethodDecl));
 }
 
-struct AutoType @0x84e063e662c52b4b {
-  deducedType @0:DeducedType;
-  keyword @1 :AutoTypeKeyword;
-  isConstrained @2 :Bool;
-  isDecltypeAuto @3 :Bool;
+struct CXXDestructorDecl @0xee0fd0438430a21c {
+  cxxMethodDecl @0:CXXMethodDecl;
+  operatorDelete @1 :Ref(FunctionDecl);
 }
 
-struct DecltypeType @0x8167d2682b1df777 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct CXXConversionDecl @0xac531836739115b2 {
+  cxxMethodDecl @0:CXXMethodDecl;
+  isExplicit @1 :Bool;
+  isLambdaToBlockPointerConversion @2 :Bool;
 }
 
-struct ComplexType @0xedb0c5447bfbabbd {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct CXXConstructorDecl @0xc6bfa2c4650464b8 {
+  cxxMethodDecl @0:CXXMethodDecl;
+  targetConstructor @1 :Ref(CXXConstructorDecl);
+  isConvertingConstructor @2 :Bool;
+  isDefaultConstructor @3 :Bool;
+  isDelegatingConstructor @4 :Bool;
+  isExplicit @5 :Bool;
+  isInheritingConstructor @6 :Bool;
+  isSpecializationCopyingObject @7 :Bool;
 }
 
-struct BuiltinType @0xb9df1f7a0b9bd785 {
-  type @0:Type;
-  isFloatingPoint @1 :Bool;
-  isInteger @2 :Bool;
-  isSignedInteger @3 :Bool;
-  isSugared @4 :Bool;
-  isUnsignedInteger @5 :Bool;
+struct CXXDeductionGuideDecl @0xca6c78b5c1634d9d {
+  functionDecl @0:FunctionDecl;
+  correspondingConstructor @1 :Ref(CXXConstructorDecl);
+  deducedTemplate @2 :Ref(TemplateDecl);
+  isCopyDeductionCandidate @3 :Bool;
+  isExplicit @4 :Bool;
 }
 
-struct BlockPointerType @0xcf1a6a054f3aaac3 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct FieldDecl @0xec8d79b82b91a5eb {
+  declaratorDecl @0:DeclaratorDecl;
+  inClassInitializerStyle @1 :InClassInitStyle;
+  parent @2 :Ref(RecordDecl);
+  hasCapturedVlaType @3 :Bool;
+  hasInClassInitializer @4 :Bool;
+  isAnonymousStructOrUnion @5 :Bool;
+  isBitField @6 :Bool;
+  isMutable @7 :Bool;
+  isUnnamedBitfield @8 :Bool;
+  isZeroLengthBitField @9 :Bool;
+  isZeroSize @10 :Bool;
 }
 
-struct AttributedType @0xfae2a754903efb8f {
-  type @0:Type;
-  attributeKind @1 :AttributeKind;
-  isCallingConv @2 :Bool;
-  isMsTypeSpec @3 :Bool;
-  isQualifier @4 :Bool;
-  isSugared @5 :Bool;
+struct ObjCIvarDecl @0xfd0f42a085839510 {
+  fieldDecl @0:FieldDecl;
+  accessControl @1 :ObjCIvarDeclAccessControl;
+  canonicalAccessControl @2 :ObjCIvarDeclAccessControl;
+  containingInterface @3 :Ref(ObjCInterfaceDecl);
+  nextInstanceVariable @4 :Ref(ObjCIvarDecl);
+  synthesize @5 :Bool;
 }
 
-struct AtomicType @0x856d35fbcc3358de {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct ObjCAtDefsFieldDecl @0xd8b002eb70c258c6 {
+  fieldDecl @0:FieldDecl;
 }
 
-struct ArrayType @0xf51c56dc11dd4d5a {
-  type @0:Type;
-  sizeModifier @1 :ArrayTypeArraySizeModifier;
+struct BindingDecl @0xe77651068f3e1703 {
+  valueDecl @0:ValueDecl;
+  decomposedDeclaration @1 :Ref(ValueDecl);
+  holdingVariable @2 :Ref(VarDecl);
 }
 
-struct VariableArrayType @0x82d4d76c013109f5 {
-  arrayType @0:ArrayType;
-  bracketsRange @1 :TokenRange;
-  lBracketToken @2 :Token;
-  rBracketToken @3 :Token;
-  isSugared @4 :Bool;
+struct UsingShadowDecl @0xef25bc2e71e7534e {
+  namedDecl @0:NamedDecl;
+  introducer @1 :Ref(BaseUsingDecl);
+  nextUsingShadowDeclaration @2 :Ref(UsingShadowDecl);
+  targetDeclaration @3 :Ref(NamedDecl);
 }
 
-struct IncompleteArrayType @0xd4f7a93527ce975e {
-  arrayType @0:ArrayType;
-  isSugared @1 :Bool;
+struct ConstructorUsingShadowDecl @0x8a43df80c48b7033 {
+  usingShadowDecl @0:UsingShadowDecl;
+  constructsVirtualBase @1 :Bool;
+  constructedBaseClass @2 :Ref(CXXRecordDecl);
+  nominatedBaseClass @3 :Ref(CXXRecordDecl);
+  parent @4 :Ref(CXXRecordDecl);
 }
 
-struct DependentSizedArrayType @0xeb3238fd4299c322 {
-  arrayType @0:ArrayType;
-  bracketsRange @1 :TokenRange;
-  lBracketToken @2 :Token;
-  rBracketToken @3 :Token;
-  isSugared @4 :Bool;
+struct UsingPackDecl @0xf68edcc97d568bee {
+  namedDecl @0:NamedDecl;
+  expansions @1 :List(Ref(NamedDecl));
+  instantiatedFromUsingDeclaration @2 :Ref(NamedDecl);
 }
 
-struct ConstantArrayType @0xa122a9fa825e1120 {
-  arrayType @0:ArrayType;
-  isSugared @1 :Bool;
+struct UsingDirectiveDecl @0xf383b9039044d6f8 {
+  namedDecl @0:NamedDecl;
+  identifierToken @1 :Ref(Token);
+  namespaceKeyToken @2 :Ref(Token);
+  nominatedNamespace @3 :Ref(NamespaceDecl);
+  nominatedNamespaceAsWritten @4 :Ref(NamedDecl);
+  usingToken @5 :Ref(Token);
 }
 
-struct AdjustedType @0x85459004973a94cc {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct UnresolvedUsingIfExistsDecl @0x82421c5826bd81e2 {
+  namedDecl @0:NamedDecl;
 }
 
-struct DecayedType @0x9500bc81a552e7af {
-  adjustedType @0:AdjustedType;
+struct TypeDecl @0xd349fa911db2de42 {
+  namedDecl @0:NamedDecl;
 }
 
-struct VectorType @0xeb831d4f2ea047d6 {
-  type @0:Type;
-  vectorKind @1 :VectorTypeVectorKind;
-  isSugared @2 :Bool;
+struct TemplateTypeParmDecl @0x87eba729b34d198a {
+  typeDecl @0:TypeDecl;
+  defaultArgumentWasInherited @1 :Bool;
+  defaultArgumentToken @2 :Ref(Token);
+  hasDefaultArgument @3 :Bool;
+  hasTypeConstraint @4 :Bool;
+  isExpandedParameterPack @5 :Bool;
+  isPackExpansion @6 :Bool;
+  wasDeclaredWithTypename @7 :Bool;
 }
 
-struct ExtVectorType @0x9822bb6b9f91b427 {
-  vectorType @0:VectorType;
+struct TagDecl @0x8e30dcc81a0377d1 {
+  typeDecl @0:TypeDecl;
+  braceRange @1 :Ref(TokenRange);
+  innerTokenStart @2 :Ref(Token);
+  outerTokenStart @3 :Ref(Token);
+  tagKind @4 :TagTypeKind;
+  typedefNameForAnonymousDeclaration @5 :Ref(TypedefNameDecl);
+  hasNameForLinkage @6 :Bool;
+  isBeingDefined @7 :Bool;
+  isClass @8 :Bool;
+  isCompleteDefinition @9 :Bool;
+  isCompleteDefinitionRequired @10 :Bool;
+  isDependentType @11 :Bool;
+  isEmbeddedInDeclarator @12 :Bool;
+  isEnum @13 :Bool;
+  isFreeStanding @14 :Bool;
+  isInterface @15 :Bool;
+  isStruct @16 :Bool;
+  isThisDeclarationADefinition @17 :Bool;
+  isUnion @18 :Bool;
+  mayHaveOutOfDateDefinition @19 :Bool;
+  templateParameterLists @20 :List(TemplateParameterList);
 }
 
-struct UnresolvedUsingType @0xb008cd48c50f310f {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct RecordDecl @0xae6dc96296678f51 {
+  tagDecl @0:TagDecl;
+  canPassInRegisters @1 :Bool;
+  fields @2 :List(Ref(FieldDecl));
+  argumentPassingRestrictions @3 :RecordDeclArgPassingKind;
+  hasFlexibleArrayMember @4 :Bool;
+  hasLoadedFieldsFromExternalStorage @5 :Bool;
+  hasNonTrivialToPrimitiveCopyCUnion @6 :Bool;
+  hasNonTrivialToPrimitiveDefaultInitializeCUnion @7 :Bool;
+  hasNonTrivialToPrimitiveDestructCUnion @8 :Bool;
+  hasObjectMember @9 :Bool;
+  hasVolatileMember @10 :Bool;
+  isAnonymousStructOrUnion @11 :Bool;
+  isCapturedRecord @12 :Bool;
+  isInjectedClassName @13 :Bool;
+  isLambda @14 :Bool;
+  isMsStruct @15 :Bool;
+  isNonTrivialToPrimitiveCopy @16 :Bool;
+  isNonTrivialToPrimitiveDefaultInitialize @17 :Bool;
+  isNonTrivialToPrimitiveDestroy @18 :Bool;
+  isOrContainsUnion @19 :Bool;
+  isParamDestroyedInCallee @20 :Bool;
+  mayInsertExtraPadding @21 :Bool;
 }
 
-struct UnaryTransformType @0xf3f137ad71547e38 {
-  type @0:Type;
-  uttKind @1 :UnaryTransformTypeUTTKind;
-  isSugared @2 :Bool;
+struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
+  recordDecl @0:RecordDecl;
+  allowConstDefaultInitializer @1 :Bool;
+  bases @2 :List(CXXBaseSpecifier);
+  calculateInheritanceModel @3 :MSInheritanceModel;
+  constructors @4 :List(Ref(CXXConstructorDecl));
+  defaultedCopyConstructorIsDeleted @5 :Bool;
+  defaultedDefaultConstructorIsConstexpr @6 :Bool;
+  defaultedDestructorIsConstexpr @7 :Bool;
+  defaultedDestructorIsDeleted @8 :Bool;
+  defaultedMoveConstructorIsDeleted @9 :Bool;
+  friends @10 :List(Ref(FriendDecl));
+  dependentLambdaCallOperator @11 :Ref(FunctionTemplateDecl);
+  describedClassTemplate @12 :Ref(ClassTemplateDecl);
+  destructor @13 :Ref(CXXDestructorDecl);
+  genericLambdaTemplateParameterList @14 :TemplateParameterList;
+  instantiatedFromMemberClass @15 :Ref(CXXRecordDecl);
+  lambdaCallOperator @16 :Ref(CXXMethodDecl);
+  lambdaCaptureDefault @17 :LambdaCaptureDefault;
+  lambdaExplicitTemplateParameters @18 :List(Ref(NamedDecl));
+  msInheritanceModel @19 :MSInheritanceModel;
+  msVtorDispMode @20 :MSVtorDispMode;
+  mostRecentNonInjectedDeclaration @21 :Ref(CXXRecordDecl);
+  templateInstantiationPattern @22 :Ref(CXXRecordDecl);
+  templateSpecializationKind @23 :TemplateSpecializationKind;
+  hasAnyDependentBases @24 :Bool;
+  hasConstexprDefaultConstructor @25 :Bool;
+  hasConstexprDestructor @26 :Bool;
+  hasConstexprNonCopyMoveConstructor @27 :Bool;
+  hasCopyAssignmentWithConstParam @28 :Bool;
+  hasCopyConstructorWithConstParam @29 :Bool;
+  hasDefaultConstructor @30 :Bool;
+  hasDefinition @31 :Bool;
+  hasDirectFields @32 :Bool;
+  hasFriends @33 :Bool;
+  hasInClassInitializer @34 :Bool;
+  hasInheritedAssignment @35 :Bool;
+  hasInheritedConstructor @36 :Bool;
+  hasIrrelevantDestructor @37 :Bool;
+  hasKnownLambdaInternalLinkage @38 :Bool;
+  hasMoveAssignment @39 :Bool;
+  hasMoveConstructor @40 :Bool;
+  hasMutableFields @41 :Bool;
+  hasNonLiteralTypeFieldsOrBases @42 :Bool;
+  hasNonTrivialCopyAssignment @43 :Bool;
+  hasNonTrivialCopyConstructor @44 :Bool;
+  hasNonTrivialCopyConstructorForCall @45 :Bool;
+  hasNonTrivialDefaultConstructor @46 :Bool;
+  hasNonTrivialDestructor @47 :Bool;
+  hasNonTrivialDestructorForCall @48 :Bool;
+  hasNonTrivialMoveAssignment @49 :Bool;
+  hasNonTrivialMoveConstructor @50 :Bool;
+  hasNonTrivialMoveConstructorForCall @51 :Bool;
+  hasPrivateFields @52 :Bool;
+  hasProtectedFields @53 :Bool;
+  hasSimpleCopyAssignment @54 :Bool;
+  hasSimpleCopyConstructor @55 :Bool;
+  hasSimpleDestructor @56 :Bool;
+  hasSimpleMoveAssignment @57 :Bool;
+  hasSimpleMoveConstructor @58 :Bool;
+  hasTrivialCopyAssignment @59 :Bool;
+  hasTrivialCopyConstructor @60 :Bool;
+  hasTrivialCopyConstructorForCall @61 :Bool;
+  hasTrivialDefaultConstructor @62 :Bool;
+  hasTrivialDestructor @63 :Bool;
+  hasTrivialDestructorForCall @64 :Bool;
+  hasTrivialMoveAssignment @65 :Bool;
+  hasTrivialMoveConstructor @66 :Bool;
+  hasTrivialMoveConstructorForCall @67 :Bool;
+  hasUninitializedReferenceMember @68 :Bool;
+  hasUserDeclaredConstructor @69 :Bool;
+  hasUserDeclaredCopyAssignment @70 :Bool;
+  hasUserDeclaredCopyConstructor @71 :Bool;
+  hasUserDeclaredDestructor @72 :Bool;
+  hasUserDeclaredMoveAssignment @73 :Bool;
+  hasUserDeclaredMoveConstructor @74 :Bool;
+  hasUserDeclaredMoveOperation @75 :Bool;
+  hasUserProvidedDefaultConstructor @76 :Bool;
+  hasVariantMembers @77 :Bool;
+  implicitCopyAssignmentHasConstParam @78 :Bool;
+  implicitCopyConstructorHasConstParam @79 :Bool;
+  isAbstract @80 :Bool;
+  isAggregate @81 :Bool;
+  isAnyDestructorNoReturn @82 :Bool;
+  isCLike @83 :Bool;
+  isCxX11StandardLayout @84 :Bool;
+  isDependentLambda @85 :Bool;
+  isDynamicClass @86 :Bool;
+  isEffectivelyFinal @87 :Bool;
+  isEmpty @88 :Bool;
+  isGenericLambda @89 :Bool;
+  isInterfaceLike @90 :Bool;
+  isLiteral @91 :Bool;
+  isLocalClass @92 :Ref(FunctionDecl);
+  isPod @93 :Bool;
+  isParsingBaseSpecifiers @94 :Bool;
+  isPolymorphic @95 :Bool;
+  isStandardLayout @96 :Bool;
+  isStructural @97 :Bool;
+  isTrivial @98 :Bool;
+  isTriviallyCopyable @99 :Bool;
+  lambdaIsDefaultConstructibleAndAssignable @100 :Bool;
+  mayBeAbstract @101 :Bool;
+  mayBeDynamicClass @102 :Bool;
+  mayBeNonDynamicClass @103 :Bool;
+  methods @104 :List(Ref(CXXMethodDecl));
+  needsImplicitCopyAssignment @105 :Bool;
+  needsImplicitCopyConstructor @106 :Bool;
+  needsImplicitDefaultConstructor @107 :Bool;
+  needsImplicitDestructor @108 :Bool;
+  needsImplicitMoveAssignment @109 :Bool;
+  needsImplicitMoveConstructor @110 :Bool;
+  needsOverloadResolutionForCopyAssignment @111 :Bool;
+  needsOverloadResolutionForCopyConstructor @112 :Bool;
+  needsOverloadResolutionForDestructor @113 :Bool;
+  needsOverloadResolutionForMoveAssignment @114 :Bool;
+  needsOverloadResolutionForMoveConstructor @115 :Bool;
+  nullFieldOffsetIsZero @116 :Bool;
+  virtualBases @117 :List(CXXBaseSpecifier);
 }
 
-struct TypedefType @0x9983fc1d3106ae9c {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct ClassTemplateSpecializationDecl @0xa81be8b0845933da {
+  cxxRecordDecl @0:CXXRecordDecl;
+  externToken @1 :Ref(Token);
+  pointOfInstantiation @2 :Ref(Token);
+  specializationKind @3 :TemplateSpecializationKind;
+  specializedTemplate @4 :Ref(ClassTemplateDecl);
+  templateArguments @5 :List(TemplateArgument);
+  templateInstantiationArguments @6 :List(TemplateArgument);
+  templateKeywordToken @7 :Ref(Token);
+  isClassScopeExplicitSpecialization @8 :Bool;
+  isExplicitInstantiationOrSpecialization @9 :Bool;
+  isExplicitSpecialization @10 :Bool;
 }
 
-struct TypeOfType @0xc82d0038e5e0ea52 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct ClassTemplatePartialSpecializationDecl @0x9492104c4b2eff2e {
+  classTemplateSpecializationDecl @0:ClassTemplateSpecializationDecl;
+  instantiatedFromMember @1 :Ref(ClassTemplatePartialSpecializationDecl);
+  instantiatedFromMemberTemplate @2 :Ref(ClassTemplatePartialSpecializationDecl);
+  templateParameters @3 :TemplateParameterList;
+  hasAssociatedConstraints @4 :Bool;
 }
 
-struct TypeOfExprType @0x9be487fb240a6fe1 {
-  type @0:Type;
-  isSugared @1 :Bool;
+struct EnumDecl @0x93540bfa73a13c84 {
+  tagDecl @0:TagDecl;
+  enumerators @1 :List(Ref(EnumConstantDecl));
+  integerTypeRange @2 :Ref(TokenRange);
+  templateSpecializationKind @3 :TemplateSpecializationKind;
+  isClosed @4 :Bool;
+  isClosedFlag @5 :Bool;
+  isClosedNonFlag @6 :Bool;
+  isComplete @7 :Bool;
+  isFixed @8 :Bool;
+  isScoped @9 :Bool;
+  isScopedUsingClassTag @10 :Bool;
+}
+
+struct UnresolvedUsingTypenameDecl @0x8b74c3415940bb24 {
+  typeDecl @0:TypeDecl;
+  ellipsisToken @1 :Ref(Token);
+  typenameToken @2 :Ref(Token);
+  usingToken @3 :Ref(Token);
+  isPackExpansion @4 :Bool;
+}
+
+struct TypedefNameDecl @0xe8f3a8fa9f84b388 {
+  typeDecl @0:TypeDecl;
+  isModed @1 :Bool;
+  isTransparentTag @2 :Bool;
+}
+
+struct TypedefDecl @0xcabfd592ecdf73ec {
+  typedefNameDecl @0:TypedefNameDecl;
+}
+
+struct TypeAliasDecl @0x98b3c141fd82bbdd {
+  typedefNameDecl @0:TypedefNameDecl;
+}
+
+struct ObjCTypeParamDecl @0xfea48cce2b1c50cd {
+  typedefNameDecl @0:TypedefNameDecl;
+  colonToken @1 :Ref(Token);
+  variance @2 :ObjCTypeParamVariance;
+  varianceToken @3 :Ref(Token);
+  hasExplicitBound @4 :Bool;
+}
+
+struct TemplateDecl @0x8794861cbdf44fcd {
+  namedDecl @0:NamedDecl;
+  templateParameters @1 :TemplateParameterList;
+  templatedDeclaration @2 :Ref(NamedDecl);
+  hasAssociatedConstraints @3 :Bool;
+}
+
+struct RedeclarableTemplateDecl @0xeae96325d22b861f {
+  templateDecl @0:TemplateDecl;
+  instantiatedFromMemberTemplate @1 :Ref(RedeclarableTemplateDecl);
+  isMemberSpecialization @2 :Bool;
+}
+
+struct FunctionTemplateDecl @0xc88144c3067080ac {
+  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
+  isAbbreviated @1 :Bool;
+  isThisDeclarationADefinition @2 :Bool;
+  specializations @3 :List(Ref(FunctionDecl));
+}
+
+struct ClassTemplateDecl @0xd77c8a2532fd776e {
+  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
+  isThisDeclarationADefinition @1 :Bool;
+  specializations @2 :List(Ref(ClassTemplateSpecializationDecl));
+}
+
+struct VarTemplateDecl @0x983bd212ec53c1f3 {
+  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
+  isThisDeclarationADefinition @1 :Bool;
+  specializations @2 :List(Ref(VarTemplateSpecializationDecl));
+}
+
+struct TypeAliasTemplateDecl @0xcafc2a5c9d4a2d22 {
+  redeclarableTemplateDecl @0:RedeclarableTemplateDecl;
+}
+
+struct ConceptDecl @0xdbe7c6781c4169e0 {
+  templateDecl @0:TemplateDecl;
+  isTypeConcept @1 :Bool;
+}
+
+struct BuiltinTemplateDecl @0xa84039c6df79998d {
+  templateDecl @0:TemplateDecl;
+}
+
+struct TemplateTemplateParmDecl @0x8481be080ff800b8 {
+  templateDecl @0:TemplateDecl;
+  defaultArgumentWasInherited @1 :Bool;
+  defaultArgumentToken @2 :Ref(Token);
+  hasDefaultArgument @3 :Bool;
+  isExpandedParameterPack @4 :Bool;
+  isPackExpansion @5 :Bool;
+}
+
+struct ObjCPropertyDecl @0x9eb7f76b62290548 {
+  namedDecl @0:NamedDecl;
+  atToken @1 :Ref(Token);
+  getterMethodDeclaration @2 :Ref(ObjCMethodDecl);
+  getterNameToken @3 :Ref(Token);
+  lParenToken @4 :Ref(Token);
+  propertyImplementation @5 :ObjCPropertyDeclPropertyControl;
+  propertyInstanceVariableDeclaration @6 :Ref(ObjCIvarDecl);
+  queryKind @7 :ObjCPropertyQueryKind;
+  setterKind @8 :ObjCPropertyDeclSetterKind;
+  setterMethodDeclaration @9 :Ref(ObjCMethodDecl);
+  setterNameToken @10 :Ref(Token);
+  isAtomic @11 :Bool;
+  isClassProperty @12 :Bool;
+  isDirectProperty @13 :Bool;
+  isInstanceProperty @14 :Bool;
+  isOptional @15 :Bool;
+  isReadOnly @16 :Bool;
+  isRetaining @17 :Bool;
+}
+
+struct ObjCMethodDecl @0xf8c8c7d3c113456e {
+  namedDecl @0:NamedDecl;
+  definedInNsObject @1 :Bool;
+  findPropertyDeclaration @2 :Ref(ObjCPropertyDecl);
+  category @3 :Ref(ObjCCategoryDecl);
+  classInterface @4 :Ref(ObjCInterfaceDecl);
+  cmdDeclaration @5 :Ref(ImplicitParamDecl);
+  declaratorEndToken @6 :Ref(Token);
+  implementationControl @7 :ObjCMethodDeclImplementationControl;
+  methodFamily @8 :ObjCMethodFamily;
+  objCDeclQualifier @9 :DeclObjCDeclQualifier;
+  returnTypeSourceRange @10 :Ref(TokenRange);
+  selectorStartToken @11 :Ref(Token);
+  selfDeclaration @12 :Ref(ImplicitParamDecl);
+  hasRedeclaration @13 :Bool;
+  hasRelatedResultType @14 :Bool;
+  hasSkippedBody @15 :Bool;
+  isClassMethod @16 :Bool;
+  isDefined @17 :Bool;
+  isDesignatedInitializerForTheInterface @18 :Bool;
+  isDirectMethod @19 :Bool;
+  isInstanceMethod @20 :Bool;
+  isOptional @21 :Bool;
+  isOverriding @22 :Bool;
+  isPropertyAccessor @23 :Bool;
+  isRedeclaration @24 :Bool;
+  isSynthesizedAccessorStub @25 :Bool;
+  isThisDeclarationADefinition @26 :Bool;
+  isThisDeclarationADesignatedInitializer @27 :Bool;
+  isVariadic @28 :Bool;
+  parameters @29 :List(Ref(ParmVarDecl));
+  selectorTokens @30 :List(Ref(Token));
+}
+
+struct ObjCContainerDecl @0xaf9db5ae0b65ce9e {
+  namedDecl @0:NamedDecl;
+  classMethods @1 :List(Ref(ObjCMethodDecl));
+  classProperties @2 :List(Ref(ObjCPropertyDecl));
+  atEndRange @3 :Ref(TokenRange);
+  atStartToken @4 :Ref(Token);
+  instanceMethods @5 :List(Ref(ObjCMethodDecl));
+  instanceProperties @6 :List(Ref(ObjCPropertyDecl));
+  methods @7 :List(Ref(ObjCMethodDecl));
+  properties @8 :List(Ref(ObjCPropertyDecl));
+}
+
+struct ObjCCategoryDecl @0xb673566cbe41a76d {
+  objCContainerDecl @0:ObjCContainerDecl;
+  isClassExtension @1 :Bool;
+  categoryNameToken @2 :Ref(Token);
+  classInterface @3 :Ref(ObjCInterfaceDecl);
+  implementation @4 :Ref(ObjCCategoryImplDecl);
+  instanceVariableLBraceToken @5 :Ref(Token);
+  instanceVariableRBraceToken @6 :Ref(Token);
+  nextClassCategory @7 :Ref(ObjCCategoryDecl);
+  nextClassCategoryRaw @8 :Ref(ObjCCategoryDecl);
+  instanceVariables @9 :List(Ref(ObjCIvarDecl));
+  protocolTokens @10 :List(Ref(Token));
+  protocols @11 :List(Ref(ObjCProtocolDecl));
+}
+
+struct ObjCProtocolDecl @0xa8d0b0128e3a36e1 {
+  objCContainerDecl @0:ObjCContainerDecl;
+  definition @1 :Ref(ObjCProtocolDecl);
+  objCRuntimeNameAsString @2 :Text;
+  hasDefinition @3 :Bool;
+  isNonRuntimeProtocol @4 :Bool;
+  isThisDeclarationADefinition @5 :Bool;
+  protocolTokens @6 :List(Ref(Token));
+  protocols @7 :List(Ref(ObjCProtocolDecl));
+}
+
+struct ObjCInterfaceDecl @0x851a7195d7b1d15e {
+  objCContainerDecl @0:ObjCContainerDecl;
+  allReferencedProtocols @1 :List(Ref(ObjCProtocolDecl));
+  declaresOrInheritsDesignatedInitializers @2 :Bool;
+  categoryListRaw @3 :Ref(ObjCCategoryDecl);
+  definition @4 :Ref(ObjCInterfaceDecl);
+  endOfDefinitionToken @5 :Ref(Token);
+  implementation @6 :Ref(ObjCImplementationDecl);
+  objCRuntimeNameAsString @7 :Text;
+  superClass @8 :Ref(ObjCInterfaceDecl);
+  superClassToken @9 :Ref(Token);
+  hasDefinition @10 :Bool;
+  hasDesignatedInitializers @11 :Bool;
+  isArcWeakrefUnavailable @12 :Bool;
+  isImplicitInterfaceDeclaration @13 :Bool;
+  isObjCRequiresPropertyDefinitions @14 :Ref(ObjCInterfaceDecl);
+  isThisDeclarationADefinition @15 :Bool;
+  instanceVariables @16 :List(Ref(ObjCIvarDecl));
+  knownCategories @17 :List(Ref(ObjCCategoryDecl));
+  knownExtensions @18 :List(Ref(ObjCCategoryDecl));
+  protocolTokens @19 :List(Ref(Token));
+  protocols @20 :List(Ref(ObjCProtocolDecl));
+  visibleCategories @21 :List(Ref(ObjCCategoryDecl));
+  visibleExtensions @22 :List(Ref(ObjCCategoryDecl));
+}
+
+struct ObjCImplDecl @0xfbf2d2598582b4f4 {
+  objCContainerDecl @0:ObjCContainerDecl;
+  classInterface @1 :Ref(ObjCInterfaceDecl);
+  propertyImplementations @2 :List(Ref(ObjCPropertyImplDecl));
+}
+
+struct ObjCCategoryImplDecl @0xb972fe178fc59d16 {
+  objCImplDecl @0:ObjCImplDecl;
+  categoryDeclaration @1 :Ref(ObjCCategoryDecl);
+  categoryNameToken @2 :Ref(Token);
+}
+
+struct ObjCImplementationDecl @0xf2e56fe062561acd {
+  objCImplDecl @0:ObjCImplDecl;
+  instanceVariableLBraceToken @1 :Ref(Token);
+  instanceVariableRBraceToken @2 :Ref(Token);
+  objCRuntimeNameAsString @3 :Text;
+  superClass @4 :Ref(ObjCInterfaceDecl);
+  superClassToken @5 :Ref(Token);
+  hasDestructors @6 :Bool;
+  hasNonZeroConstructors @7 :Bool;
+  instanceVariables @8 :List(Ref(ObjCIvarDecl));
+}
+
+struct ObjCCompatibleAliasDecl @0xc484be73cf6be95b {
+  namedDecl @0:NamedDecl;
+  classInterface @1 :Ref(ObjCInterfaceDecl);
+}
+
+struct NamespaceDecl @0xd4713edcad196585 {
+  namedDecl @0:NamedDecl;
+  anonymousNamespace @1 :Ref(NamespaceDecl);
+  originalNamespace @2 :Ref(NamespaceDecl);
+  rBraceToken @3 :Ref(Token);
+  isAnonymousNamespace @4 :Bool;
+  isInline @5 :Bool;
+  isOriginalNamespace @6 :Bool;
+}
+
+struct NamespaceAliasDecl @0xd8966652a484c480 {
+  namedDecl @0:NamedDecl;
+  aliasToken @1 :Ref(Token);
+  aliasedNamespace @2 :Ref(NamedDecl);
+  namespace @3 :Ref(NamespaceDecl);
+  namespaceToken @4 :Ref(Token);
+  targetNameToken @5 :Ref(Token);
+}
+
+struct LinkageSpecDecl @0xb0f84c4a56c95eec {
+  decl @0:Decl;
+  externToken @1 :Ref(Token);
+  language @2 :LinkageSpecDeclLanguageIDs;
+  rBraceToken @3 :Ref(Token);
+  hasBraces @4 :Bool;
+}
+
+struct LifetimeExtendedTemporaryDecl @0x829a6a0ac2b5baa8 {
+  decl @0:Decl;
+  childrenExpression @1 :List(Ref(Stmt));
+  extendingDeclaration @2 :Ref(ValueDecl);
+  storageDuration @3 :StorageDuration;
+}
+
+struct ImportDecl @0x84f826d506def833 {
+  decl @0:Decl;
+  identifierTokens @1 :List(Ref(Token));
+}
+
+struct FriendTemplateDecl @0x82a920109bdb2178 {
+  decl @0:Decl;
+  friendDeclaration @1 :Ref(NamedDecl);
+  friendToken @2 :Ref(Token);
+  templateParameterLists @3 :List(TemplateParameterList);
+}
+
+struct FriendDecl @0xe6545eb838d810d0 {
+  decl @0:Decl;
+  friendDeclaration @1 :Ref(NamedDecl);
+  friendToken @2 :Ref(Token);
+  isUnsupportedFriend @3 :Bool;
+  friendTypeTemplateParameterLists @4 :List(TemplateParameterList);
+}
+
+struct FileScopeAsmDecl @0xa91b82b590024228 {
+  decl @0:Decl;
+  assemblyToken @1 :Ref(Token);
+  assemblyString @2 :Ref(StringLiteral);
+  rParenToken @3 :Ref(Token);
+}
+
+struct ExternCContextDecl @0xd79e4560c3f80cbd {
+  decl @0:Decl;
+}
+
+struct ExportDecl @0xb9bc9642842c6d81 {
+  decl @0:Decl;
+  exportToken @1 :Ref(Token);
+  rBraceToken @2 :Ref(Token);
+  hasBraces @3 :Bool;
+}
+
+struct EmptyDecl @0xdb55f7b2f60fd2a7 {
+  decl @0:Decl;
 }
 
 struct EntityList @0xf26db0d046aab9c9 {
-  classScopeFunctionSpecializationDecl @0 :List(ClassScopeFunctionSpecializationDecl);
-  capturedDecl @1 :List(CapturedDecl);
-  blockDecl @2 :List(BlockDecl);
-  accessSpecDecl @3 :List(AccessSpecDecl);
-  translationUnitDecl @4 :List(TranslationUnitDecl);
-  staticAssertDecl @5 :List(StaticAssertDecl);
-  requiresExprBodyDecl @6 :List(RequiresExprBodyDecl);
-  pragmaDetectMismatchDecl @7 :List(PragmaDetectMismatchDecl);
-  pragmaCommentDecl @8 :List(PragmaCommentDecl);
-  objCPropertyImplDecl @9 :List(ObjCPropertyImplDecl);
-  namedDecl @10 :List(NamedDecl);
-  labelDecl @11 :List(LabelDecl);
-  baseUsingDecl @12 :List(BaseUsingDecl);
-  usingEnumDecl @13 :List(UsingEnumDecl);
-  usingDecl @14 :List(UsingDecl);
-  valueDecl @15 :List(ValueDecl);
-  unresolvedUsingValueDecl @16 :List(UnresolvedUsingValueDecl);
-  templateParamObjectDecl @17 :List(TemplateParamObjectDecl);
-  ompDeclareReductionDecl @18 :List(OMPDeclareReductionDecl);
-  msGuidDecl @19 :List(MSGuidDecl);
-  indirectFieldDecl @20 :List(IndirectFieldDecl);
-  enumConstantDecl @21 :List(EnumConstantDecl);
-  declaratorDecl @22 :List(DeclaratorDecl);
-  varDecl @23 :List(VarDecl);
-  parmVarDecl @24 :List(ParmVarDecl);
-  ompCapturedExprDecl @25 :List(OMPCapturedExprDecl);
-  implicitParamDecl @26 :List(ImplicitParamDecl);
-  decompositionDecl @27 :List(DecompositionDecl);
-  varTemplateSpecializationDecl @28 :List(VarTemplateSpecializationDecl);
-  varTemplatePartialSpecializationDecl @29 :List(VarTemplatePartialSpecializationDecl);
-  nonTypeTemplateParmDecl @30 :List(NonTypeTemplateParmDecl);
-  msPropertyDecl @31 :List(MSPropertyDecl);
-  functionDecl @32 :List(FunctionDecl);
-  cxxMethodDecl @33 :List(CXXMethodDecl);
-  cxxDestructorDecl @34 :List(CXXDestructorDecl);
-  cxxConversionDecl @35 :List(CXXConversionDecl);
-  cxxConstructorDecl @36 :List(CXXConstructorDecl);
-  cxxDeductionGuideDecl @37 :List(CXXDeductionGuideDecl);
-  fieldDecl @38 :List(FieldDecl);
-  objCIvarDecl @39 :List(ObjCIvarDecl);
-  objCAtDefsFieldDecl @40 :List(ObjCAtDefsFieldDecl);
-  bindingDecl @41 :List(BindingDecl);
-  usingShadowDecl @42 :List(UsingShadowDecl);
-  constructorUsingShadowDecl @43 :List(ConstructorUsingShadowDecl);
-  usingPackDecl @44 :List(UsingPackDecl);
-  usingDirectiveDecl @45 :List(UsingDirectiveDecl);
-  unresolvedUsingIfExistsDecl @46 :List(UnresolvedUsingIfExistsDecl);
-  typeDecl @47 :List(TypeDecl);
-  templateTypeParmDecl @48 :List(TemplateTypeParmDecl);
-  tagDecl @49 :List(TagDecl);
-  recordDecl @50 :List(RecordDecl);
-  cxxRecordDecl @51 :List(CXXRecordDecl);
-  classTemplateSpecializationDecl @52 :List(ClassTemplateSpecializationDecl);
-  classTemplatePartialSpecializationDecl @53 :List(ClassTemplatePartialSpecializationDecl);
-  enumDecl @54 :List(EnumDecl);
-  unresolvedUsingTypenameDecl @55 :List(UnresolvedUsingTypenameDecl);
-  typedefNameDecl @56 :List(TypedefNameDecl);
-  typedefDecl @57 :List(TypedefDecl);
-  typeAliasDecl @58 :List(TypeAliasDecl);
-  objCTypeParamDecl @59 :List(ObjCTypeParamDecl);
-  templateDecl @60 :List(TemplateDecl);
-  redeclarableTemplateDecl @61 :List(RedeclarableTemplateDecl);
-  functionTemplateDecl @62 :List(FunctionTemplateDecl);
-  classTemplateDecl @63 :List(ClassTemplateDecl);
-  varTemplateDecl @64 :List(VarTemplateDecl);
-  typeAliasTemplateDecl @65 :List(TypeAliasTemplateDecl);
-  conceptDecl @66 :List(ConceptDecl);
-  builtinTemplateDecl @67 :List(BuiltinTemplateDecl);
-  templateTemplateParmDecl @68 :List(TemplateTemplateParmDecl);
-  objCPropertyDecl @69 :List(ObjCPropertyDecl);
-  objCMethodDecl @70 :List(ObjCMethodDecl);
-  objCContainerDecl @71 :List(ObjCContainerDecl);
-  objCCategoryDecl @72 :List(ObjCCategoryDecl);
-  objCProtocolDecl @73 :List(ObjCProtocolDecl);
-  objCInterfaceDecl @74 :List(ObjCInterfaceDecl);
-  objCImplDecl @75 :List(ObjCImplDecl);
-  objCCategoryImplDecl @76 :List(ObjCCategoryImplDecl);
-  objCImplementationDecl @77 :List(ObjCImplementationDecl);
-  objCCompatibleAliasDecl @78 :List(ObjCCompatibleAliasDecl);
-  namespaceDecl @79 :List(NamespaceDecl);
-  namespaceAliasDecl @80 :List(NamespaceAliasDecl);
-  linkageSpecDecl @81 :List(LinkageSpecDecl);
-  lifetimeExtendedTemporaryDecl @82 :List(LifetimeExtendedTemporaryDecl);
-  importDecl @83 :List(ImportDecl);
-  friendTemplateDecl @84 :List(FriendTemplateDecl);
-  friendDecl @85 :List(FriendDecl);
-  fileScopeAsmDecl @86 :List(FileScopeAsmDecl);
-  externCContextDecl @87 :List(ExternCContextDecl);
-  exportDecl @88 :List(ExportDecl);
-  emptyDecl @89 :List(EmptyDecl);
-  sehTryStmt @90 :List(SEHTryStmt);
-  sehLeaveStmt @91 :List(SEHLeaveStmt);
-  sehFinallyStmt @92 :List(SEHFinallyStmt);
-  sehExceptStmt @93 :List(SEHExceptStmt);
-  returnStmt @94 :List(ReturnStmt);
-  objCForCollectionStmt @95 :List(ObjCForCollectionStmt);
-  objCAutoreleasePoolStmt @96 :List(ObjCAutoreleasePoolStmt);
-  objCAtTryStmt @97 :List(ObjCAtTryStmt);
-  objCAtThrowStmt @98 :List(ObjCAtThrowStmt);
-  objCAtSynchronizedStmt @99 :List(ObjCAtSynchronizedStmt);
-  objCAtFinallyStmt @100 :List(ObjCAtFinallyStmt);
-  objCAtCatchStmt @101 :List(ObjCAtCatchStmt);
-  ompDispatchDirective @102 :List(OMPDispatchDirective);
-  ompDepobjDirective @103 :List(OMPDepobjDirective);
-  ompCriticalDirective @104 :List(OMPCriticalDirective);
-  ompCancellationPointDirective @105 :List(OMPCancellationPointDirective);
-  ompCancelDirective @106 :List(OMPCancelDirective);
-  ompBarrierDirective @107 :List(OMPBarrierDirective);
-  ompAtomicDirective @108 :List(OMPAtomicDirective);
-  ompTeamsDirective @109 :List(OMPTeamsDirective);
-  ompTaskyieldDirective @110 :List(OMPTaskyieldDirective);
-  ompTaskwaitDirective @111 :List(OMPTaskwaitDirective);
-  ompTaskgroupDirective @112 :List(OMPTaskgroupDirective);
-  ompTaskDirective @113 :List(OMPTaskDirective);
-  ompTargetUpdateDirective @114 :List(OMPTargetUpdateDirective);
-  ompTargetTeamsDirective @115 :List(OMPTargetTeamsDirective);
-  ompTargetParallelDirective @116 :List(OMPTargetParallelDirective);
-  ompTargetExitDataDirective @117 :List(OMPTargetExitDataDirective);
-  ompTargetEnterDataDirective @118 :List(OMPTargetEnterDataDirective);
-  ompTargetDirective @119 :List(OMPTargetDirective);
-  ompTargetDataDirective @120 :List(OMPTargetDataDirective);
-  ompSingleDirective @121 :List(OMPSingleDirective);
-  ompSectionsDirective @122 :List(OMPSectionsDirective);
-  ompSectionDirective @123 :List(OMPSectionDirective);
-  ompScanDirective @124 :List(OMPScanDirective);
-  ompParallelSectionsDirective @125 :List(OMPParallelSectionsDirective);
-  ompParallelMasterDirective @126 :List(OMPParallelMasterDirective);
-  ompParallelDirective @127 :List(OMPParallelDirective);
-  ompOrderedDirective @128 :List(OMPOrderedDirective);
-  ompMasterDirective @129 :List(OMPMasterDirective);
-  ompMaskedDirective @130 :List(OMPMaskedDirective);
-  ompUnrollDirective @131 :List(OMPUnrollDirective);
-  ompTileDirective @132 :List(OMPTileDirective);
-  ompForSimdDirective @133 :List(OMPForSimdDirective);
-  ompForDirective @134 :List(OMPForDirective);
-  ompDistributeSimdDirective @135 :List(OMPDistributeSimdDirective);
-  ompDistributeParallelForSimdDirective @136 :List(OMPDistributeParallelForSimdDirective);
-  ompDistributeParallelForDirective @137 :List(OMPDistributeParallelForDirective);
-  ompDistributeDirective @138 :List(OMPDistributeDirective);
-  ompTeamsDistributeSimdDirective @139 :List(OMPTeamsDistributeSimdDirective);
-  ompTeamsDistributeParallelForSimdDirective @140 :List(OMPTeamsDistributeParallelForSimdDirective);
-  ompTeamsDistributeParallelForDirective @141 :List(OMPTeamsDistributeParallelForDirective);
-  ompTeamsDistributeDirective @142 :List(OMPTeamsDistributeDirective);
-  ompTaskLoopSimdDirective @143 :List(OMPTaskLoopSimdDirective);
-  ompTaskLoopDirective @144 :List(OMPTaskLoopDirective);
-  ompTargetTeamsDistributeSimdDirective @145 :List(OMPTargetTeamsDistributeSimdDirective);
-  ompTargetTeamsDistributeParallelForSimdDirective @146 :List(OMPTargetTeamsDistributeParallelForSimdDirective);
-  ompTargetTeamsDistributeParallelForDirective @147 :List(OMPTargetTeamsDistributeParallelForDirective);
-  ompTargetTeamsDistributeDirective @148 :List(OMPTargetTeamsDistributeDirective);
-  ompTargetSimdDirective @149 :List(OMPTargetSimdDirective);
-  ompTargetParallelForSimdDirective @150 :List(OMPTargetParallelForSimdDirective);
-  ompTargetParallelForDirective @151 :List(OMPTargetParallelForDirective);
-  ompSimdDirective @152 :List(OMPSimdDirective);
-  ompParallelMasterTaskLoopSimdDirective @153 :List(OMPParallelMasterTaskLoopSimdDirective);
-  ompParallelMasterTaskLoopDirective @154 :List(OMPParallelMasterTaskLoopDirective);
-  ompParallelForSimdDirective @155 :List(OMPParallelForSimdDirective);
-  ompParallelForDirective @156 :List(OMPParallelForDirective);
-  ompMasterTaskLoopSimdDirective @157 :List(OMPMasterTaskLoopSimdDirective);
-  ompMasterTaskLoopDirective @158 :List(OMPMasterTaskLoopDirective);
-  ompInteropDirective @159 :List(OMPInteropDirective);
-  ompFlushDirective @160 :List(OMPFlushDirective);
-  ompCanonicalLoop @161 :List(OMPCanonicalLoop);
-  nullStmt @162 :List(NullStmt);
-  msDependentExistsStmt @163 :List(MSDependentExistsStmt);
-  indirectGotoStmt @164 :List(IndirectGotoStmt);
-  ifStmt @165 :List(IfStmt);
-  gotoStmt @166 :List(GotoStmt);
-  forStmt @167 :List(ForStmt);
-  doStmt @168 :List(DoStmt);
-  declStmt @169 :List(DeclStmt);
-  coroutineBodyStmt @170 :List(CoroutineBodyStmt);
-  coreturnStmt @171 :List(CoreturnStmt);
-  continueStmt @172 :List(ContinueStmt);
-  compoundStmt @173 :List(CompoundStmt);
-  capturedStmt @174 :List(CapturedStmt);
-  cxxTryStmt @175 :List(CXXTryStmt);
-  cxxForRangeStmt @176 :List(CXXForRangeStmt);
-  cxxCatchStmt @177 :List(CXXCatchStmt);
-  breakStmt @178 :List(BreakStmt);
-  msAsmStmt @179 :List(MSAsmStmt);
-  gccAsmStmt @180 :List(GCCAsmStmt);
-  whileStmt @181 :List(WhileStmt);
-  labelStmt @182 :List(LabelStmt);
-  designatedInitUpdateExpr @183 :List(DesignatedInitUpdateExpr);
-  designatedInitExpr @184 :List(DesignatedInitExpr);
-  dependentScopeDeclRefExpr @185 :List(DependentScopeDeclRefExpr);
-  dependentCoawaitExpr @186 :List(DependentCoawaitExpr);
-  declRefExpr @187 :List(DeclRefExpr);
-  coawaitExpr @188 :List(CoawaitExpr);
-  coyieldExpr @189 :List(CoyieldExpr);
-  convertVectorExpr @190 :List(ConvertVectorExpr);
-  conceptSpecializationExpr @191 :List(ConceptSpecializationExpr);
-  compoundLiteralExpr @192 :List(CompoundLiteralExpr);
-  chooseExpr @193 :List(ChooseExpr);
-  characterLiteral @194 :List(CharacterLiteral);
-  implicitCastExpr @195 :List(ImplicitCastExpr);
-  cxxDynamicCastExpr @196 :List(CXXDynamicCastExpr);
-  cxxConstCastExpr @197 :List(CXXConstCastExpr);
-  cxxAddrspaceCastExpr @198 :List(CXXAddrspaceCastExpr);
-  cxxStaticCastExpr @199 :List(CXXStaticCastExpr);
-  cxxReinterpretCastExpr @200 :List(CXXReinterpretCastExpr);
-  cxxFunctionalCastExpr @201 :List(CXXFunctionalCastExpr);
-  cStyleCastExpr @202 :List(CStyleCastExpr);
-  builtinBitCastExpr @203 :List(BuiltinBitCastExpr);
-  objCBridgedCastExpr @204 :List(ObjCBridgedCastExpr);
-  callExpr @205 :List(CallExpr);
-  cxxOperatorCallExpr @206 :List(CXXOperatorCallExpr);
-  cxxMemberCallExpr @207 :List(CXXMemberCallExpr);
-  cudaKernelCallExpr @208 :List(CUDAKernelCallExpr);
-  userDefinedLiteral @209 :List(UserDefinedLiteral);
-  cxxUuidofExpr @210 :List(CXXUuidofExpr);
-  cxxUnresolvedConstructExpr @211 :List(CXXUnresolvedConstructExpr);
-  cxxTypeidExpr @212 :List(CXXTypeidExpr);
-  cxxThrowExpr @213 :List(CXXThrowExpr);
-  cxxThisExpr @214 :List(CXXThisExpr);
-  cxxStdInitializerListExpr @215 :List(CXXStdInitializerListExpr);
-  cxxScalarValueInitExpr @216 :List(CXXScalarValueInitExpr);
-  cxxRewrittenBinaryOperator @217 :List(CXXRewrittenBinaryOperator);
-  cxxPseudoDestructorExpr @218 :List(CXXPseudoDestructorExpr);
-  cxxNullPtrLiteralExpr @219 :List(CXXNullPtrLiteralExpr);
-  cxxNoexceptExpr @220 :List(CXXNoexceptExpr);
-  cxxNewExpr @221 :List(CXXNewExpr);
-  cxxInheritedCtorInitExpr @222 :List(CXXInheritedCtorInitExpr);
-  cxxFoldExpr @223 :List(CXXFoldExpr);
-  cxxDependentScopeMemberExpr @224 :List(CXXDependentScopeMemberExpr);
-  cxxDeleteExpr @225 :List(CXXDeleteExpr);
-  cxxDefaultInitExpr @226 :List(CXXDefaultInitExpr);
-  cxxDefaultArgExpr @227 :List(CXXDefaultArgExpr);
-  cxxConstructExpr @228 :List(CXXConstructExpr);
-  cxxTemporaryObjectExpr @229 :List(CXXTemporaryObjectExpr);
-  cxxBoolLiteralExpr @230 :List(CXXBoolLiteralExpr);
-  cxxBindTemporaryExpr @231 :List(CXXBindTemporaryExpr);
-  blockExpr @232 :List(BlockExpr);
-  binaryOperator @233 :List(BinaryOperator);
-  compoundAssignOperator @234 :List(CompoundAssignOperator);
-  atomicExpr @235 :List(AtomicExpr);
-  asTypeExpr @236 :List(AsTypeExpr);
-  arrayTypeTraitExpr @237 :List(ArrayTypeTraitExpr);
-  arraySubscriptExpr @238 :List(ArraySubscriptExpr);
-  arrayInitLoopExpr @239 :List(ArrayInitLoopExpr);
-  arrayInitIndexExpr @240 :List(ArrayInitIndexExpr);
-  addrLabelExpr @241 :List(AddrLabelExpr);
-  conditionalOperator @242 :List(ConditionalOperator);
-  binaryConditionalOperator @243 :List(BinaryConditionalOperator);
-  vaArgExpr @244 :List(VAArgExpr);
-  unaryOperator @245 :List(UnaryOperator);
-  unaryExprOrTypeTraitExpr @246 :List(UnaryExprOrTypeTraitExpr);
-  typoExpr @247 :List(TypoExpr);
-  typeTraitExpr @248 :List(TypeTraitExpr);
-  substNonTypeTemplateParmPackExpr @249 :List(SubstNonTypeTemplateParmPackExpr);
-  substNonTypeTemplateParmExpr @250 :List(SubstNonTypeTemplateParmExpr);
-  stringLiteral @251 :List(StringLiteral);
-  stmtExpr @252 :List(StmtExpr);
-  sourceLocExpr @253 :List(SourceLocExpr);
-  sizeOfPackExpr @254 :List(SizeOfPackExpr);
-  shuffleVectorExpr @255 :List(ShuffleVectorExpr);
-  syclUniqueStableNameExpr @256 :List(SYCLUniqueStableNameExpr);
-  requiresExpr @257 :List(RequiresExpr);
-  recoveryExpr @258 :List(RecoveryExpr);
-  pseudoObjectExpr @259 :List(PseudoObjectExpr);
-  predefinedExpr @260 :List(PredefinedExpr);
-  parenListExpr @261 :List(ParenListExpr);
-  parenExpr @262 :List(ParenExpr);
-  packExpansionExpr @263 :List(PackExpansionExpr);
-  unresolvedMemberExpr @264 :List(UnresolvedMemberExpr);
-  unresolvedLookupExpr @265 :List(UnresolvedLookupExpr);
-  opaqueValueExpr @266 :List(OpaqueValueExpr);
-  offsetOfExpr @267 :List(OffsetOfExpr);
-  objCSubscriptRefExpr @268 :List(ObjCSubscriptRefExpr);
-  objCStringLiteral @269 :List(ObjCStringLiteral);
-  objCSelectorExpr @270 :List(ObjCSelectorExpr);
-  objCProtocolExpr @271 :List(ObjCProtocolExpr);
-  objCPropertyRefExpr @272 :List(ObjCPropertyRefExpr);
-  objCMessageExpr @273 :List(ObjCMessageExpr);
-  objCIvarRefExpr @274 :List(ObjCIvarRefExpr);
-  objCIsaExpr @275 :List(ObjCIsaExpr);
-  objCIndirectCopyRestoreExpr @276 :List(ObjCIndirectCopyRestoreExpr);
-  objCEncodeExpr @277 :List(ObjCEncodeExpr);
-  objCDictionaryLiteral @278 :List(ObjCDictionaryLiteral);
-  objCBoxedExpr @279 :List(ObjCBoxedExpr);
-  objCBoolLiteralExpr @280 :List(ObjCBoolLiteralExpr);
-  objCAvailabilityCheckExpr @281 :List(ObjCAvailabilityCheckExpr);
-  objCArrayLiteral @282 :List(ObjCArrayLiteral);
-  ompIteratorExpr @283 :List(OMPIteratorExpr);
-  ompArrayShapingExpr @284 :List(OMPArrayShapingExpr);
-  ompArraySectionExpr @285 :List(OMPArraySectionExpr);
-  noInitExpr @286 :List(NoInitExpr);
-  memberExpr @287 :List(MemberExpr);
-  matrixSubscriptExpr @288 :List(MatrixSubscriptExpr);
-  materializeTemporaryExpr @289 :List(MaterializeTemporaryExpr);
-  msPropertySubscriptExpr @290 :List(MSPropertySubscriptExpr);
-  msPropertyRefExpr @291 :List(MSPropertyRefExpr);
-  lambdaExpr @292 :List(LambdaExpr);
-  integerLiteral @293 :List(IntegerLiteral);
-  initListExpr @294 :List(InitListExpr);
-  implicitValueInitExpr @295 :List(ImplicitValueInitExpr);
-  imaginaryLiteral @296 :List(ImaginaryLiteral);
-  genericSelectionExpr @297 :List(GenericSelectionExpr);
-  gnuNullExpr @298 :List(GNUNullExpr);
-  functionParmPackExpr @299 :List(FunctionParmPackExpr);
-  exprWithCleanups @300 :List(ExprWithCleanups);
-  constantExpr @301 :List(ConstantExpr);
-  floatingLiteral @302 :List(FloatingLiteral);
-  fixedPointLiteral @303 :List(FixedPointLiteral);
-  extVectorElementExpr @304 :List(ExtVectorElementExpr);
-  expressionTraitExpr @305 :List(ExpressionTraitExpr);
-  attributedStmt @306 :List(AttributedStmt);
-  switchStmt @307 :List(SwitchStmt);
-  defaultStmt @308 :List(DefaultStmt);
-  caseStmt @309 :List(CaseStmt);
-  templateTypeParmType @310 :List(TemplateTypeParmType);
-  templateSpecializationType @311 :List(TemplateSpecializationType);
-  tagType @312 :List(TagType);
-  recordType @313 :List(RecordType);
-  enumType @314 :List(EnumType);
-  substTemplateTypeParmType @315 :List(SubstTemplateTypeParmType);
-  substTemplateTypeParmPackType @316 :List(SubstTemplateTypeParmPackType);
-  referenceType @317 :List(ReferenceType);
-  rValueReferenceType @318 :List(RValueReferenceType);
-  lValueReferenceType @319 :List(LValueReferenceType);
-  pointerType @320 :List(PointerType);
-  pipeType @321 :List(PipeType);
-  parenType @322 :List(ParenType);
-  packExpansionType @323 :List(PackExpansionType);
-  objCTypeParamType @324 :List(ObjCTypeParamType);
-  objCObjectType @325 :List(ObjCObjectType);
-  objCInterfaceType @326 :List(ObjCInterfaceType);
-  objCObjectPointerType @327 :List(ObjCObjectPointerType);
-  memberPointerType @328 :List(MemberPointerType);
-  matrixType @329 :List(MatrixType);
-  dependentSizedMatrixType @330 :List(DependentSizedMatrixType);
-  constantMatrixType @331 :List(ConstantMatrixType);
-  macroQualifiedType @332 :List(MacroQualifiedType);
-  injectedClassNameType @333 :List(InjectedClassNameType);
-  functionType @334 :List(FunctionType);
-  functionProtoType @335 :List(FunctionProtoType);
-  functionNoProtoType @336 :List(FunctionNoProtoType);
-  extIntType @337 :List(ExtIntType);
-  dependentVectorType @338 :List(DependentVectorType);
-  dependentSizedExtVectorType @339 :List(DependentSizedExtVectorType);
-  dependentExtIntType @340 :List(DependentExtIntType);
-  dependentAddressSpaceType @341 :List(DependentAddressSpaceType);
-  deducedType @342 :List(DeducedType);
-  deducedTemplateSpecializationType @343 :List(DeducedTemplateSpecializationType);
-  autoType @344 :List(AutoType);
-  decltypeType @345 :List(DecltypeType);
-  complexType @346 :List(ComplexType);
-  builtinType @347 :List(BuiltinType);
-  blockPointerType @348 :List(BlockPointerType);
-  attributedType @349 :List(AttributedType);
-  atomicType @350 :List(AtomicType);
-  arrayType @351 :List(ArrayType);
-  variableArrayType @352 :List(VariableArrayType);
-  incompleteArrayType @353 :List(IncompleteArrayType);
-  dependentSizedArrayType @354 :List(DependentSizedArrayType);
-  constantArrayType @355 :List(ConstantArrayType);
-  adjustedType @356 :List(AdjustedType);
-  decayedType @357 :List(DecayedType);
-  vectorType @358 :List(VectorType);
-  extVectorType @359 :List(ExtVectorType);
-  unresolvedUsingType @360 :List(UnresolvedUsingType);
-  unaryTransformType @361 :List(UnaryTransformType);
-  typedefType @362 :List(TypedefType);
-  typeOfType @363 :List(TypeOfType);
-  typeOfExprType @364 :List(TypeOfExprType);
+  compiler @0 :List(Compiler);
+  includePath @1 :List(IncludePath);
+  compileCommand @2 :List(CompileCommand);
+  compileJob @3 :List(CompileJob);
+  fileToken @4 :List(FileToken);
+  templateParameterList @5 :List(TemplateParameterList);
+  templateArgument @6 :List(TemplateArgument);
+  cxxBaseSpecifier @7 :List(CXXBaseSpecifier);
+  tokenRange @8 :List(TokenRange);
+  token @9 :List(Token);
+  sehTryStmt @10 :List(SEHTryStmt);
+  sehLeaveStmt @11 :List(SEHLeaveStmt);
+  sehFinallyStmt @12 :List(SEHFinallyStmt);
+  sehExceptStmt @13 :List(SEHExceptStmt);
+  returnStmt @14 :List(ReturnStmt);
+  objCForCollectionStmt @15 :List(ObjCForCollectionStmt);
+  objCAutoreleasePoolStmt @16 :List(ObjCAutoreleasePoolStmt);
+  objCAtTryStmt @17 :List(ObjCAtTryStmt);
+  objCAtThrowStmt @18 :List(ObjCAtThrowStmt);
+  objCAtSynchronizedStmt @19 :List(ObjCAtSynchronizedStmt);
+  objCAtFinallyStmt @20 :List(ObjCAtFinallyStmt);
+  objCAtCatchStmt @21 :List(ObjCAtCatchStmt);
+  ompDispatchDirective @22 :List(OMPDispatchDirective);
+  ompDepobjDirective @23 :List(OMPDepobjDirective);
+  ompCriticalDirective @24 :List(OMPCriticalDirective);
+  ompCancellationPointDirective @25 :List(OMPCancellationPointDirective);
+  ompCancelDirective @26 :List(OMPCancelDirective);
+  ompBarrierDirective @27 :List(OMPBarrierDirective);
+  ompAtomicDirective @28 :List(OMPAtomicDirective);
+  ompTeamsDirective @29 :List(OMPTeamsDirective);
+  ompTaskyieldDirective @30 :List(OMPTaskyieldDirective);
+  ompTaskwaitDirective @31 :List(OMPTaskwaitDirective);
+  ompTaskgroupDirective @32 :List(OMPTaskgroupDirective);
+  ompTaskDirective @33 :List(OMPTaskDirective);
+  ompTargetUpdateDirective @34 :List(OMPTargetUpdateDirective);
+  ompTargetTeamsDirective @35 :List(OMPTargetTeamsDirective);
+  ompTargetParallelDirective @36 :List(OMPTargetParallelDirective);
+  ompTargetExitDataDirective @37 :List(OMPTargetExitDataDirective);
+  ompTargetEnterDataDirective @38 :List(OMPTargetEnterDataDirective);
+  ompTargetDirective @39 :List(OMPTargetDirective);
+  ompTargetDataDirective @40 :List(OMPTargetDataDirective);
+  ompSingleDirective @41 :List(OMPSingleDirective);
+  ompSectionsDirective @42 :List(OMPSectionsDirective);
+  ompSectionDirective @43 :List(OMPSectionDirective);
+  ompScanDirective @44 :List(OMPScanDirective);
+  ompParallelSectionsDirective @45 :List(OMPParallelSectionsDirective);
+  ompParallelMasterDirective @46 :List(OMPParallelMasterDirective);
+  ompParallelDirective @47 :List(OMPParallelDirective);
+  ompOrderedDirective @48 :List(OMPOrderedDirective);
+  ompMasterDirective @49 :List(OMPMasterDirective);
+  ompMaskedDirective @50 :List(OMPMaskedDirective);
+  ompUnrollDirective @51 :List(OMPUnrollDirective);
+  ompTileDirective @52 :List(OMPTileDirective);
+  ompForSimdDirective @53 :List(OMPForSimdDirective);
+  ompForDirective @54 :List(OMPForDirective);
+  ompDistributeSimdDirective @55 :List(OMPDistributeSimdDirective);
+  ompDistributeParallelForSimdDirective @56 :List(OMPDistributeParallelForSimdDirective);
+  ompDistributeParallelForDirective @57 :List(OMPDistributeParallelForDirective);
+  ompDistributeDirective @58 :List(OMPDistributeDirective);
+  ompTeamsDistributeSimdDirective @59 :List(OMPTeamsDistributeSimdDirective);
+  ompTeamsDistributeParallelForSimdDirective @60 :List(OMPTeamsDistributeParallelForSimdDirective);
+  ompTeamsDistributeParallelForDirective @61 :List(OMPTeamsDistributeParallelForDirective);
+  ompTeamsDistributeDirective @62 :List(OMPTeamsDistributeDirective);
+  ompTaskLoopSimdDirective @63 :List(OMPTaskLoopSimdDirective);
+  ompTaskLoopDirective @64 :List(OMPTaskLoopDirective);
+  ompTargetTeamsDistributeSimdDirective @65 :List(OMPTargetTeamsDistributeSimdDirective);
+  ompTargetTeamsDistributeParallelForSimdDirective @66 :List(OMPTargetTeamsDistributeParallelForSimdDirective);
+  ompTargetTeamsDistributeParallelForDirective @67 :List(OMPTargetTeamsDistributeParallelForDirective);
+  ompTargetTeamsDistributeDirective @68 :List(OMPTargetTeamsDistributeDirective);
+  ompTargetSimdDirective @69 :List(OMPTargetSimdDirective);
+  ompTargetParallelForSimdDirective @70 :List(OMPTargetParallelForSimdDirective);
+  ompTargetParallelForDirective @71 :List(OMPTargetParallelForDirective);
+  ompSimdDirective @72 :List(OMPSimdDirective);
+  ompParallelMasterTaskLoopSimdDirective @73 :List(OMPParallelMasterTaskLoopSimdDirective);
+  ompParallelMasterTaskLoopDirective @74 :List(OMPParallelMasterTaskLoopDirective);
+  ompParallelForSimdDirective @75 :List(OMPParallelForSimdDirective);
+  ompParallelForDirective @76 :List(OMPParallelForDirective);
+  ompMasterTaskLoopSimdDirective @77 :List(OMPMasterTaskLoopSimdDirective);
+  ompMasterTaskLoopDirective @78 :List(OMPMasterTaskLoopDirective);
+  ompInteropDirective @79 :List(OMPInteropDirective);
+  ompFlushDirective @80 :List(OMPFlushDirective);
+  ompCanonicalLoop @81 :List(OMPCanonicalLoop);
+  nullStmt @82 :List(NullStmt);
+  msDependentExistsStmt @83 :List(MSDependentExistsStmt);
+  indirectGotoStmt @84 :List(IndirectGotoStmt);
+  ifStmt @85 :List(IfStmt);
+  gotoStmt @86 :List(GotoStmt);
+  forStmt @87 :List(ForStmt);
+  doStmt @88 :List(DoStmt);
+  declStmt @89 :List(DeclStmt);
+  coroutineBodyStmt @90 :List(CoroutineBodyStmt);
+  coreturnStmt @91 :List(CoreturnStmt);
+  continueStmt @92 :List(ContinueStmt);
+  compoundStmt @93 :List(CompoundStmt);
+  capturedStmt @94 :List(CapturedStmt);
+  cxxTryStmt @95 :List(CXXTryStmt);
+  cxxForRangeStmt @96 :List(CXXForRangeStmt);
+  cxxCatchStmt @97 :List(CXXCatchStmt);
+  breakStmt @98 :List(BreakStmt);
+  msAsmStmt @99 :List(MSAsmStmt);
+  gccAsmStmt @100 :List(GCCAsmStmt);
+  whileStmt @101 :List(WhileStmt);
+  labelStmt @102 :List(LabelStmt);
+  designatedInitUpdateExpr @103 :List(DesignatedInitUpdateExpr);
+  designatedInitExpr @104 :List(DesignatedInitExpr);
+  dependentScopeDeclRefExpr @105 :List(DependentScopeDeclRefExpr);
+  dependentCoawaitExpr @106 :List(DependentCoawaitExpr);
+  declRefExpr @107 :List(DeclRefExpr);
+  coawaitExpr @108 :List(CoawaitExpr);
+  coyieldExpr @109 :List(CoyieldExpr);
+  convertVectorExpr @110 :List(ConvertVectorExpr);
+  conceptSpecializationExpr @111 :List(ConceptSpecializationExpr);
+  compoundLiteralExpr @112 :List(CompoundLiteralExpr);
+  chooseExpr @113 :List(ChooseExpr);
+  characterLiteral @114 :List(CharacterLiteral);
+  implicitCastExpr @115 :List(ImplicitCastExpr);
+  cxxDynamicCastExpr @116 :List(CXXDynamicCastExpr);
+  cxxConstCastExpr @117 :List(CXXConstCastExpr);
+  cxxAddrspaceCastExpr @118 :List(CXXAddrspaceCastExpr);
+  cxxStaticCastExpr @119 :List(CXXStaticCastExpr);
+  cxxReinterpretCastExpr @120 :List(CXXReinterpretCastExpr);
+  cxxFunctionalCastExpr @121 :List(CXXFunctionalCastExpr);
+  cStyleCastExpr @122 :List(CStyleCastExpr);
+  builtinBitCastExpr @123 :List(BuiltinBitCastExpr);
+  objCBridgedCastExpr @124 :List(ObjCBridgedCastExpr);
+  callExpr @125 :List(CallExpr);
+  cxxOperatorCallExpr @126 :List(CXXOperatorCallExpr);
+  cxxMemberCallExpr @127 :List(CXXMemberCallExpr);
+  cudaKernelCallExpr @128 :List(CUDAKernelCallExpr);
+  userDefinedLiteral @129 :List(UserDefinedLiteral);
+  cxxUuidofExpr @130 :List(CXXUuidofExpr);
+  cxxUnresolvedConstructExpr @131 :List(CXXUnresolvedConstructExpr);
+  cxxTypeidExpr @132 :List(CXXTypeidExpr);
+  cxxThrowExpr @133 :List(CXXThrowExpr);
+  cxxThisExpr @134 :List(CXXThisExpr);
+  cxxStdInitializerListExpr @135 :List(CXXStdInitializerListExpr);
+  cxxScalarValueInitExpr @136 :List(CXXScalarValueInitExpr);
+  cxxRewrittenBinaryOperator @137 :List(CXXRewrittenBinaryOperator);
+  cxxPseudoDestructorExpr @138 :List(CXXPseudoDestructorExpr);
+  cxxNullPtrLiteralExpr @139 :List(CXXNullPtrLiteralExpr);
+  cxxNoexceptExpr @140 :List(CXXNoexceptExpr);
+  cxxNewExpr @141 :List(CXXNewExpr);
+  cxxInheritedCtorInitExpr @142 :List(CXXInheritedCtorInitExpr);
+  cxxFoldExpr @143 :List(CXXFoldExpr);
+  cxxDependentScopeMemberExpr @144 :List(CXXDependentScopeMemberExpr);
+  cxxDeleteExpr @145 :List(CXXDeleteExpr);
+  cxxDefaultInitExpr @146 :List(CXXDefaultInitExpr);
+  cxxDefaultArgExpr @147 :List(CXXDefaultArgExpr);
+  cxxConstructExpr @148 :List(CXXConstructExpr);
+  cxxTemporaryObjectExpr @149 :List(CXXTemporaryObjectExpr);
+  cxxBoolLiteralExpr @150 :List(CXXBoolLiteralExpr);
+  cxxBindTemporaryExpr @151 :List(CXXBindTemporaryExpr);
+  blockExpr @152 :List(BlockExpr);
+  binaryOperator @153 :List(BinaryOperator);
+  compoundAssignOperator @154 :List(CompoundAssignOperator);
+  atomicExpr @155 :List(AtomicExpr);
+  asTypeExpr @156 :List(AsTypeExpr);
+  arrayTypeTraitExpr @157 :List(ArrayTypeTraitExpr);
+  arraySubscriptExpr @158 :List(ArraySubscriptExpr);
+  arrayInitLoopExpr @159 :List(ArrayInitLoopExpr);
+  arrayInitIndexExpr @160 :List(ArrayInitIndexExpr);
+  addrLabelExpr @161 :List(AddrLabelExpr);
+  conditionalOperator @162 :List(ConditionalOperator);
+  binaryConditionalOperator @163 :List(BinaryConditionalOperator);
+  vaArgExpr @164 :List(VAArgExpr);
+  unaryOperator @165 :List(UnaryOperator);
+  unaryExprOrTypeTraitExpr @166 :List(UnaryExprOrTypeTraitExpr);
+  typoExpr @167 :List(TypoExpr);
+  typeTraitExpr @168 :List(TypeTraitExpr);
+  substNonTypeTemplateParmPackExpr @169 :List(SubstNonTypeTemplateParmPackExpr);
+  substNonTypeTemplateParmExpr @170 :List(SubstNonTypeTemplateParmExpr);
+  stringLiteral @171 :List(StringLiteral);
+  stmtExpr @172 :List(StmtExpr);
+  sourceLocExpr @173 :List(SourceLocExpr);
+  sizeOfPackExpr @174 :List(SizeOfPackExpr);
+  shuffleVectorExpr @175 :List(ShuffleVectorExpr);
+  syclUniqueStableNameExpr @176 :List(SYCLUniqueStableNameExpr);
+  requiresExpr @177 :List(RequiresExpr);
+  recoveryExpr @178 :List(RecoveryExpr);
+  pseudoObjectExpr @179 :List(PseudoObjectExpr);
+  predefinedExpr @180 :List(PredefinedExpr);
+  parenListExpr @181 :List(ParenListExpr);
+  parenExpr @182 :List(ParenExpr);
+  packExpansionExpr @183 :List(PackExpansionExpr);
+  unresolvedMemberExpr @184 :List(UnresolvedMemberExpr);
+  unresolvedLookupExpr @185 :List(UnresolvedLookupExpr);
+  opaqueValueExpr @186 :List(OpaqueValueExpr);
+  offsetOfExpr @187 :List(OffsetOfExpr);
+  objCSubscriptRefExpr @188 :List(ObjCSubscriptRefExpr);
+  objCStringLiteral @189 :List(ObjCStringLiteral);
+  objCSelectorExpr @190 :List(ObjCSelectorExpr);
+  objCProtocolExpr @191 :List(ObjCProtocolExpr);
+  objCPropertyRefExpr @192 :List(ObjCPropertyRefExpr);
+  objCMessageExpr @193 :List(ObjCMessageExpr);
+  objCIvarRefExpr @194 :List(ObjCIvarRefExpr);
+  objCIsaExpr @195 :List(ObjCIsaExpr);
+  objCIndirectCopyRestoreExpr @196 :List(ObjCIndirectCopyRestoreExpr);
+  objCEncodeExpr @197 :List(ObjCEncodeExpr);
+  objCDictionaryLiteral @198 :List(ObjCDictionaryLiteral);
+  objCBoxedExpr @199 :List(ObjCBoxedExpr);
+  objCBoolLiteralExpr @200 :List(ObjCBoolLiteralExpr);
+  objCAvailabilityCheckExpr @201 :List(ObjCAvailabilityCheckExpr);
+  objCArrayLiteral @202 :List(ObjCArrayLiteral);
+  ompIteratorExpr @203 :List(OMPIteratorExpr);
+  ompArrayShapingExpr @204 :List(OMPArrayShapingExpr);
+  ompArraySectionExpr @205 :List(OMPArraySectionExpr);
+  noInitExpr @206 :List(NoInitExpr);
+  memberExpr @207 :List(MemberExpr);
+  matrixSubscriptExpr @208 :List(MatrixSubscriptExpr);
+  materializeTemporaryExpr @209 :List(MaterializeTemporaryExpr);
+  msPropertySubscriptExpr @210 :List(MSPropertySubscriptExpr);
+  msPropertyRefExpr @211 :List(MSPropertyRefExpr);
+  lambdaExpr @212 :List(LambdaExpr);
+  integerLiteral @213 :List(IntegerLiteral);
+  initListExpr @214 :List(InitListExpr);
+  implicitValueInitExpr @215 :List(ImplicitValueInitExpr);
+  imaginaryLiteral @216 :List(ImaginaryLiteral);
+  genericSelectionExpr @217 :List(GenericSelectionExpr);
+  gnuNullExpr @218 :List(GNUNullExpr);
+  functionParmPackExpr @219 :List(FunctionParmPackExpr);
+  exprWithCleanups @220 :List(ExprWithCleanups);
+  constantExpr @221 :List(ConstantExpr);
+  floatingLiteral @222 :List(FloatingLiteral);
+  fixedPointLiteral @223 :List(FixedPointLiteral);
+  extVectorElementExpr @224 :List(ExtVectorElementExpr);
+  expressionTraitExpr @225 :List(ExpressionTraitExpr);
+  attributedStmt @226 :List(AttributedStmt);
+  switchStmt @227 :List(SwitchStmt);
+  defaultStmt @228 :List(DefaultStmt);
+  caseStmt @229 :List(CaseStmt);
+  classScopeFunctionSpecializationDecl @230 :List(ClassScopeFunctionSpecializationDecl);
+  capturedDecl @231 :List(CapturedDecl);
+  blockDecl @232 :List(BlockDecl);
+  accessSpecDecl @233 :List(AccessSpecDecl);
+  translationUnitDecl @234 :List(TranslationUnitDecl);
+  staticAssertDecl @235 :List(StaticAssertDecl);
+  requiresExprBodyDecl @236 :List(RequiresExprBodyDecl);
+  pragmaDetectMismatchDecl @237 :List(PragmaDetectMismatchDecl);
+  pragmaCommentDecl @238 :List(PragmaCommentDecl);
+  objCPropertyImplDecl @239 :List(ObjCPropertyImplDecl);
+  namedDecl @240 :List(NamedDecl);
+  labelDecl @241 :List(LabelDecl);
+  baseUsingDecl @242 :List(BaseUsingDecl);
+  usingEnumDecl @243 :List(UsingEnumDecl);
+  usingDecl @244 :List(UsingDecl);
+  valueDecl @245 :List(ValueDecl);
+  unresolvedUsingValueDecl @246 :List(UnresolvedUsingValueDecl);
+  templateParamObjectDecl @247 :List(TemplateParamObjectDecl);
+  ompDeclareReductionDecl @248 :List(OMPDeclareReductionDecl);
+  msGuidDecl @249 :List(MSGuidDecl);
+  indirectFieldDecl @250 :List(IndirectFieldDecl);
+  enumConstantDecl @251 :List(EnumConstantDecl);
+  declaratorDecl @252 :List(DeclaratorDecl);
+  varDecl @253 :List(VarDecl);
+  parmVarDecl @254 :List(ParmVarDecl);
+  ompCapturedExprDecl @255 :List(OMPCapturedExprDecl);
+  implicitParamDecl @256 :List(ImplicitParamDecl);
+  decompositionDecl @257 :List(DecompositionDecl);
+  varTemplateSpecializationDecl @258 :List(VarTemplateSpecializationDecl);
+  varTemplatePartialSpecializationDecl @259 :List(VarTemplatePartialSpecializationDecl);
+  nonTypeTemplateParmDecl @260 :List(NonTypeTemplateParmDecl);
+  msPropertyDecl @261 :List(MSPropertyDecl);
+  functionDecl @262 :List(FunctionDecl);
+  cxxMethodDecl @263 :List(CXXMethodDecl);
+  cxxDestructorDecl @264 :List(CXXDestructorDecl);
+  cxxConversionDecl @265 :List(CXXConversionDecl);
+  cxxConstructorDecl @266 :List(CXXConstructorDecl);
+  cxxDeductionGuideDecl @267 :List(CXXDeductionGuideDecl);
+  fieldDecl @268 :List(FieldDecl);
+  objCIvarDecl @269 :List(ObjCIvarDecl);
+  objCAtDefsFieldDecl @270 :List(ObjCAtDefsFieldDecl);
+  bindingDecl @271 :List(BindingDecl);
+  usingShadowDecl @272 :List(UsingShadowDecl);
+  constructorUsingShadowDecl @273 :List(ConstructorUsingShadowDecl);
+  usingPackDecl @274 :List(UsingPackDecl);
+  usingDirectiveDecl @275 :List(UsingDirectiveDecl);
+  unresolvedUsingIfExistsDecl @276 :List(UnresolvedUsingIfExistsDecl);
+  typeDecl @277 :List(TypeDecl);
+  templateTypeParmDecl @278 :List(TemplateTypeParmDecl);
+  tagDecl @279 :List(TagDecl);
+  recordDecl @280 :List(RecordDecl);
+  cxxRecordDecl @281 :List(CXXRecordDecl);
+  classTemplateSpecializationDecl @282 :List(ClassTemplateSpecializationDecl);
+  classTemplatePartialSpecializationDecl @283 :List(ClassTemplatePartialSpecializationDecl);
+  enumDecl @284 :List(EnumDecl);
+  unresolvedUsingTypenameDecl @285 :List(UnresolvedUsingTypenameDecl);
+  typedefNameDecl @286 :List(TypedefNameDecl);
+  typedefDecl @287 :List(TypedefDecl);
+  typeAliasDecl @288 :List(TypeAliasDecl);
+  objCTypeParamDecl @289 :List(ObjCTypeParamDecl);
+  templateDecl @290 :List(TemplateDecl);
+  redeclarableTemplateDecl @291 :List(RedeclarableTemplateDecl);
+  functionTemplateDecl @292 :List(FunctionTemplateDecl);
+  classTemplateDecl @293 :List(ClassTemplateDecl);
+  varTemplateDecl @294 :List(VarTemplateDecl);
+  typeAliasTemplateDecl @295 :List(TypeAliasTemplateDecl);
+  conceptDecl @296 :List(ConceptDecl);
+  builtinTemplateDecl @297 :List(BuiltinTemplateDecl);
+  templateTemplateParmDecl @298 :List(TemplateTemplateParmDecl);
+  objCPropertyDecl @299 :List(ObjCPropertyDecl);
+  objCMethodDecl @300 :List(ObjCMethodDecl);
+  objCContainerDecl @301 :List(ObjCContainerDecl);
+  objCCategoryDecl @302 :List(ObjCCategoryDecl);
+  objCProtocolDecl @303 :List(ObjCProtocolDecl);
+  objCInterfaceDecl @304 :List(ObjCInterfaceDecl);
+  objCImplDecl @305 :List(ObjCImplDecl);
+  objCCategoryImplDecl @306 :List(ObjCCategoryImplDecl);
+  objCImplementationDecl @307 :List(ObjCImplementationDecl);
+  objCCompatibleAliasDecl @308 :List(ObjCCompatibleAliasDecl);
+  namespaceDecl @309 :List(NamespaceDecl);
+  namespaceAliasDecl @310 :List(NamespaceAliasDecl);
+  linkageSpecDecl @311 :List(LinkageSpecDecl);
+  lifetimeExtendedTemporaryDecl @312 :List(LifetimeExtendedTemporaryDecl);
+  importDecl @313 :List(ImportDecl);
+  friendTemplateDecl @314 :List(FriendTemplateDecl);
+  friendDecl @315 :List(FriendDecl);
+  fileScopeAsmDecl @316 :List(FileScopeAsmDecl);
+  externCContextDecl @317 :List(ExternCContextDecl);
+  exportDecl @318 :List(ExportDecl);
+  emptyDecl @319 :List(EmptyDecl);
 }

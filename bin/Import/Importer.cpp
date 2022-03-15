@@ -332,50 +332,36 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
       cb.setResourceDirectory(job.ResourceDirectory().generic_string());
       cb.setInstallationDirectory(cc.InstallationDirectory().generic_string());
 
+      auto system_includes = cc.SystemIncludeDirectories();
+      auto user_includes = cc.UserIncludeDirectories();
+      auto frameworks = cc.FrameworkDirectories();
+
       auto j = 0u;
-      cc.ForEachSystemIncludeDirectory(
-          [&] (const std::filesystem::path &,
-               pasta::IncludePathLocation ) { ++j; });
-      auto paths = cb.initSystemIncludePaths(j);
+      auto paths = cb.initSystemIncludePaths(
+          static_cast<unsigned>(system_includes.size()));
+      for (const auto &ip : system_includes) {
+        mx::rpc::IncludePath::Builder ipb = paths[j++];
+        ipb.setDirectory(ip.Path().generic_string());
+        ipb.setLocation(FromPasta(ip.Location()));
+      }
 
       j = 0u;
-      cc.ForEachSystemIncludeDirectory(
-          [&] (const std::filesystem::path &path,
-               pasta::IncludePathLocation ipl) {
-            mx::rpc::IncludePath::Builder p = paths[j++];
-            p.setDirectory(path.generic_string());
-            p.setLocation(FromPasta(ipl));
-          });
+      paths = cb.initUserIncludePaths(
+          static_cast<unsigned>(user_includes.size()));
+      for (const auto &ip : user_includes) {
+        mx::rpc::IncludePath::Builder ipb = paths[j++];
+        ipb.setDirectory(ip.Path().generic_string());
+        ipb.setLocation(FromPasta(ip.Location()));
+      }
 
       j = 0u;
-      cc.ForEachUserIncludeDirectory(
-          [&] (const std::filesystem::path &,
-               pasta::IncludePathLocation ) { ++j; });
-      paths = cb.initUserIncludePaths(j);
-
-      j = 0u;
-      cc.ForEachUserIncludeDirectory(
-          [&] (const std::filesystem::path &path,
-               pasta::IncludePathLocation ipl) {
-            mx::rpc::IncludePath::Builder p = paths[j++];
-            p.setDirectory(path.generic_string());
-            p.setLocation(FromPasta(ipl));
-          });
-
-      j = 0u;
-      cc.ForEachFrameworkDirectory(
-          [&] (const std::filesystem::path &,
-               pasta::IncludePathLocation ) { ++j; });
-      paths = cb.initFrameworkPaths(j);
-
-      j = 0u;
-      cc.ForEachFrameworkDirectory(
-          [&] (const std::filesystem::path &path,
-               pasta::IncludePathLocation ipl) {
-            mx::rpc::IncludePath::Builder p = paths[j++];
-            p.setDirectory(path.generic_string());
-            p.setLocation(FromPasta(ipl));
-          });
+      paths = cb.initFrameworkPaths(
+          static_cast<unsigned>(frameworks.size()));
+      for (const auto &ip : frameworks) {
+        mx::rpc::IncludePath::Builder ipb = paths[j++];
+        ipb.setDirectory(ip.Path().generic_string());
+        ipb.setLocation(FromPasta(ip.Location()));
+      }
 
       auto &args = job.Arguments();
       auto args_list = cb.initArguments(static_cast<unsigned>(args.Size()));

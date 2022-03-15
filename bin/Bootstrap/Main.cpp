@@ -39,13 +39,31 @@ static const std::unordered_set<std::string> gStmtNames{
 };
 
 static const std::unordered_set<std::string> gTypeNames{
-  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
+//  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
+};
+
+#define NON_REF_TYPES \
+    "IncludePath", \
+    "Compiler", \
+    "CompileCommand", \
+    "CompileJob", \
+    "TemplateParameter", \
+    "TemplateArgument", \
+    "CXXBaseSpecifier", \
+    "TemplateParameterList"
+
+static const std::unordered_set<std::string> gNotReferenceTypes{
+  NON_REF_TYPES
 };
 
 static const std::unordered_set<std::string> gConcreteClassNames{
+  "Token",
+  "TokenRange",
+  "FileToken",
+  NON_REF_TYPES,
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, PASTA_IGNORE_ABSTRACT)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, PASTA_IGNORE_ABSTRACT)
-  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, PASTA_IGNORE_ABSTRACT)
+//  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, PASTA_IGNORE_ABSTRACT)
 };
 
 struct ClassHierarchy {
@@ -57,13 +75,13 @@ struct ClassHierarchy {
       : record(std::move(record_)) {}
 };
 
-static ClassHierarchy *BuildHierarchy(
+static void BuildHierarchy(
     std::vector<std::unique_ptr<ClassHierarchy>> &alloc,
-    const std::vector<pasta::CXXRecordDecl> &classes) {
+    const std::vector<pasta::CXXRecordDecl> &classes,
+    std::vector<ClassHierarchy *> &roots_out) {
 
   std::unordered_map<pasta::CXXRecordDecl, ClassHierarchy *> hmap;
 
-  ClassHierarchy *root = nullptr;
   for (auto progress = true; progress; ) {
     progress = false;
     for (const pasta::CXXRecordDecl &cls : classes) {
@@ -76,8 +94,7 @@ static ClassHierarchy *BuildHierarchy(
       if (bases.empty()) {
        h = new ClassHierarchy(cls);
        alloc.emplace_back(h);
-       assert(!root);
-       root = h;
+       roots_out.push_back(h);
        progress = true;
 
       } else {
@@ -96,8 +113,6 @@ static ClassHierarchy *BuildHierarchy(
       }
     }
   }
-
-  return root;
 }
 
 // Convert a `CapitalCase` name into a `snake_case` name.
@@ -293,10 +308,7 @@ using MethodListPtr = std::shared_ptr<MethodList>;
 
 class CodeGenerator {
  private:
-  ClassHierarchy *decl{nullptr};
-  ClassHierarchy *stmt{nullptr};
-  ClassHierarchy *type{nullptr};
-  ClassHierarchy *token{nullptr};
+  std::vector<ClassHierarchy *> roots;
 
   std::ofstream schema_os;
   std::ofstream lib_h_os;
@@ -411,14 +423,14 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 MethodListPtr CodeGenerator::RunOnClass(
     ClassHierarchy *cls, MethodListPtr parent_methods) {
   auto seen_methods = std::make_shared<MethodList>(*parent_methods);
-  auto record_name = cls->record.Name();
+  auto class_name = cls->record.Name();
 
   // We have our own representation for these.
-  if (record_name == "Token" || record_name == "TokenRange") {
+  if (class_name == "Token" || class_name == "TokenRange") {
     return parent_methods;
   }
 
-  schema_os << NameAndHash("struct " + record_name) << " {\n";
+  schema_os << NameAndHash("struct " + class_name) << " {\n";
   auto i = 0u;
 
   if (cls->base) {
@@ -433,8 +445,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   for (pasta::CXXMethodDecl method : cls->record.Methods()) {
     auto method_name = method.Name();
+    llvm::StringRef method_name_ref(method_name);
     if (method_name == "KindName" ||
-        llvm::StringRef(method_name).startswith("operator")) {
+        method_name_ref.startswith("operator") ||
+        method_name_ref.startswith("~")) {
       continue;  // E.g. `Decl::KindName()`, `operator==`.
     }
     if (!seen_methods->emplace(method_name).second) {
@@ -443,18 +457,22 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     auto snake_name = CapitalCaseToSnakeCase(method_name);
     auto camel_name = SnakeCaseToCamelCase(snake_name);
-    auto return_type = method.ReturnType();
+    auto return_type = method.ReturnType().UnqualifiedType();
+    if (auto return_type_ref = pasta::ReferenceType::From(return_type)) {
+      return_type = return_type_ref->PointeeType().UnqualifiedType();
+    }
+
     if (auto record = return_type.AsRecordDeclaration()) {
       auto record_name = record->Name();
 
       // Handle `pasta::Token`.
       if (record_name == "Token") {
-        schema_os << "  " << camel_name << " @" << i << " :Token;\n";
+        schema_os << "  " << camel_name << " @" << i << " :Ref(Token);\n";
         ++i;
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
-        schema_os << "  " << camel_name << " @" << i << " :TokenRange;\n";
+        schema_os << "  " << camel_name << " @" << i << " :Ref(TokenRange);\n";
         ++i;
 
       // Handle `std::string` and `std::string_view`.
@@ -462,6 +480,72 @@ MethodListPtr CodeGenerator::RunOnClass(
                  record_name == "string_view" ||
                  record_name == "basic_string_view") {
         schema_os << "  " << camel_name << " @" << i << " :Text;\n";
+        ++i;
+
+      // In pasta.
+      } else if (record_name == "ArgumentVector") {
+        schema_os << "  " << camel_name << " @" << i << " :List(Text);\n";
+        ++i;
+
+      // Probably `std::filesystem::path`.
+      } else if (record_name == "path") {
+        schema_os << "  " << camel_name << " @" << i << " :Text;\n";
+        ++i;
+
+      // TODO(pag): Figure out optionals in Cap'n Proto.
+      } else if (record_name == "optional") {
+
+      // List of things; figure out what.
+      } else if (record_name == "vector") {
+        if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
+          std::optional<std::string> element_name;
+          for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
+            if (auto arg_type = arg.AsType()) {
+              if (auto arg_record = arg_type->AsRecordDeclaration()) {
+                element_name = arg_record->Name();
+                break;
+              }
+            }
+          }
+
+          std::string capn_element_name;
+          if (!element_name) {
+
+          } else if (*element_name == "string" ||
+                     *element_name == "basic_string" ||
+                     *element_name == "string_view" ||
+                     *element_name == "basic_string_view" ||
+                     *element_name == "path") {
+            capn_element_name = "Text";
+
+          } else if (gNotReferenceTypes.count(*element_name)) {
+            capn_element_name = element_name.value();
+
+          } else if (gConcreteClassNames.count(*element_name) ||
+                     gDeclNames.count(*element_name) ||
+                     gStmtNames.count(*element_name) ||
+                     gTypeNames.count(*element_name)) {
+            capn_element_name = "Ref(" + element_name.value() + ")";
+          }
+
+          if (!capn_element_name.empty()) {
+            schema_os
+                << "  " << camel_name << " @" << i << " :List("
+                << capn_element_name << ");\n";
+            ++i;
+          }
+        }
+
+      } else if (gNotReferenceTypes.count(record_name)) {
+        schema_os
+            << "  " << camel_name << " @" << i << " :" << record_name
+            << ";\n";
+        ++i;
+
+      } else if (gConcreteClassNames.count(record_name)) {
+        schema_os
+            << "  " << camel_name << " @" << i << " :Ref(" << record_name
+            << ");\n";
         ++i;
       }
 
@@ -491,10 +575,9 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
   std::vector<std::pair<ClassHierarchy *, std::shared_ptr<MethodList>>> work_list;
   auto empty_list = std::make_shared<MethodList>();
-  work_list.emplace_back(type, empty_list);
-  work_list.emplace_back(stmt, empty_list);
-  work_list.emplace_back(decl, empty_list);
-  work_list.emplace_back(token, std::move(empty_list));
+  for (auto root : roots) {
+    work_list.emplace_back(root, empty_list);
+  }
 
   schema_os
       << "# Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -545,6 +628,12 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << NameAndHash("struct TokenRange") << " {\n"
       << "  beginOffset @0 :UInt32 $Cxx.name(\"begin_offset\");\n"
       << "  endOffset @1 :UInt32 $Cxx.name(\"end_offset\");  # Inclusive.\n"
+      << "}\n\n"
+      << "struct Ref(Entity) {\n"  // NOTE(pag): generic types don't have hashes.
+      << "  a @0 :UInt64;\n"
+      << "  b @1 :UInt32;\n"
+      << "  c @2 :UInt16;\n"
+      << "  d @3 :UInt16;\n"
       << "}\n\n";
 
   include_h_os
@@ -624,32 +713,11 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
 int CodeGenerator::RunOnClasses(void) {
   std::vector<std::unique_ptr<ClassHierarchy>> alloc;
-  decl = BuildHierarchy(alloc, decls);
-  stmt = BuildHierarchy(alloc, stmts);
-  type = BuildHierarchy(alloc, types);
-  token = BuildHierarchy(alloc, tokens);
-
-  if (!decl) {
-    std::cerr << "Could not locate `pasta::Decl`.\n";
-    return EXIT_FAILURE;
-
-  } else if (!stmt) {
-    std::cerr << "Could not locate `pasta::Stmt`.\n";
-    return EXIT_FAILURE;
-
-  } else if (!type) {
-    std::cerr << "Could not locate `pasta::Type`.\n";
-    return EXIT_FAILURE;
-
-  } else if (!token) {
-    std::cerr << "Could not locate `pasta::Token`.\n";
-    return EXIT_FAILURE;
-
-  } else {
-    return RunOnClassHierarchies();
-  }
-
-  return EXIT_SUCCESS;
+  BuildHierarchy(alloc, decls, roots);
+  BuildHierarchy(alloc, stmts, roots);
+  BuildHierarchy(alloc, types, roots);
+  BuildHierarchy(alloc, tokens, roots);
+  return RunOnClassHierarchies();
 }
 
 int CodeGenerator::RunOnNamespaces(void) {
@@ -664,7 +732,7 @@ int CodeGenerator::RunOnNamespaces(void) {
           stmts.emplace_back(std::move(*cls));
         } else if (gTypeNames.count(name)) {
           types.emplace_back(std::move(*cls));
-        } else if (name == "Token" || name == "FileToken") {
+        } else if (gConcreteClassNames.count(name)) {
           tokens.emplace_back(std::move(*cls));
         }
       } else if (auto e = pasta::EnumDecl::From(decl);
@@ -685,9 +753,9 @@ int CodeGenerator::RunOnNamespaces(void) {
     std::cerr << "Could not locate any statements.\n";
     return EXIT_FAILURE;
 
-  } else if (types.empty()) {
-    std::cerr << "Could not locate any types.\n";
-    return EXIT_FAILURE;
+//  } else if (types.empty()) {
+//    std::cerr << "Could not locate any types.\n";
+//    return EXIT_FAILURE;
 
   } else if (tokens.empty()) {
     std::cerr << "Could not locate pasta::Token.\n";
