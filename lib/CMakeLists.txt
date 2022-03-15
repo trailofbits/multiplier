@@ -83,7 +83,6 @@ set(util_headers
   "${source_include_dir}/SQLite.h"
   "${source_include_dir}/Serialize.h"
   "${source_include_dir}/Subprocess.h"
-  "${source_include_dir}/Token.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/WorkerPool.h"
   ${copied_headers}
@@ -104,8 +103,6 @@ add_library("util"
     "Signal.cpp"
     "SQLite.cpp"
     "Subprocess.cpp"
-    "Token.cpp"
-    "Token.h"
     "Types.cpp"
     "WorkerPool.cpp"
     

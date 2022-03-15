@@ -401,6 +401,7 @@ class ObjCInterfaceType;
 class RValueReferenceType;
 class RecordType;
 class Token;
+class FileToken;
 enum class DeclKind : unsigned;
 enum class ArrayTypeArraySizeModifier : unsigned;
 enum class AtomicExprAtomicOp : unsigned;

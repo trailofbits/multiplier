@@ -664,7 +664,7 @@ int CodeGenerator::RunOnNamespaces(void) {
           stmts.emplace_back(std::move(*cls));
         } else if (gTypeNames.count(name)) {
           types.emplace_back(std::move(*cls));
-        } else if (name == "Token") {
+        } else if (name == "Token" || name == "FileToken") {
           tokens.emplace_back(std::move(*cls));
         }
       } else if (auto e = pasta::EnumDecl::From(decl);

@@ -10,7 +10,7 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
-#include <llvm/ADT/FoldingSet.h>
+#include <map>
 #include <multiplier/AST.capnp.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
@@ -131,6 +131,279 @@ class TLDFinder final : public pasta::DeclVisitor {
   void VisitDecl(const pasta::Decl &decl) final {
     if (!decl.IsImplicit()) {
       tlds.emplace_back(decl);
+    }
+  }
+};
+
+enum class EntityKind : uint16_t {
+  kDeclaration,
+  kStatement,
+  kType
+};
+
+struct EntityId {
+  mx::CodeId code_id;
+  uint32_t entity_offset;  // In a list.
+  uint16_t entity_kind;
+  uint16_t entity_sub_kind;
+};
+
+// Labels entities (decls, stmts, types, tokens). The idea here is that in
+// `ast::EntityList`, which is derived from a Cap'n Proto schema, we have a
+// bunch of lists of different types of entities (decls, stmts, etc.). We index
+// code at the granularity of "code chunks," which contain one or more top-level
+// declarations. Each code chunk has a unique code ID, and there is an
+// `ast::EntityList` associated with each code chunk. We'd like to be able to
+// reference across code chunks, and to do so deterministically. The way we do
+// this is that we assign IDs to each entity in a deterministic way for each
+// code chunk, so then we we go and build the serialized form of a code chunk,
+// then we can just use these IDs to build up the references and know that
+// things will generally work out. One trick is our IDs are compound: they
+// include the code chunk ID, the entity kind, the entity sub-kind, and then
+// the offset in one of the many `List(...)` types inside of the
+// `ast::EntityList`. This way, it's easy to identify exactly which entity we
+// need to reference inside of an entity list.
+class EntityLabeller final : protected pasta::DeclVisitor,
+                             protected pasta::StmtVisitor,
+                             protected pasta::TypeVisitor {
+ private:
+  mx::CodeId code_id{0u};
+  std::unordered_map<const void *, EntityId> entity_id;
+  std::map<std::pair<mx::CodeId, pasta::DeclKind>, uint32_t> next_decl_offset;
+  std::map<std::pair<mx::CodeId, pasta::StmtKind>, uint32_t> next_stmt_offset;
+//  std::map<std::pair<mx::CodeId, pasta::TypeKind>, uint32_t> next_type_offset;
+
+  bool Label(const pasta::Decl &entity) {
+    auto kind = entity.Kind();
+    auto &next_offset = next_decl_offset[{code_id, kind}];
+    EntityId id{
+        code_id,
+        next_offset,
+        static_cast<uint16_t>(EntityKind::kDeclaration),
+        static_cast<uint16_t>(kind)};
+
+    if (entity_id.emplace(entity.RawDecl(), id).second) {
+      ++next_offset;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool Label(const pasta::Stmt &entity) {
+    auto kind = entity.Kind();
+    auto &next_offset = next_stmt_offset[{code_id, kind}];
+    EntityId id{
+        code_id,
+        next_offset,
+        static_cast<uint16_t>(EntityKind::kStatement),
+        static_cast<uint16_t>(kind)};
+
+    if (entity_id.emplace(entity.RawStmt(), id).second) {
+      ++next_offset;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+//  bool Label(const pasta::Type &entity) {
+//    auto kind = entity.Kind();
+//    auto &next_offset = next_decl_offset[{code_id, kind}];
+//    EntityId id{
+//        code_id,
+//        next_offset,
+//        static_cast<uint16_t>(EntityKind::kType),
+//        static_cast<uint16_t>(kind)};
+//
+//    if (entity_id.emplace(entity, id).second) {
+//      ++next_offset;
+//      return true;
+//    } else {
+//      return false;
+//    }
+//  }
+
+
+  void VisitDeclContext(const pasta::DeclContext &dc) {;
+    for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
+      this->DeclVisitor::Accept(decl);
+    }
+  }
+
+  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
+    assert(false);
+    VisitDeclContext(decl);
+  }
+
+  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
+    assert(false);
+    VisitDeclContext(decl);
+  }
+
+  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
+    assert(false);
+    VisitDeclContext(decl);
+  }
+
+  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
+    assert(false);
+    VisitDeclContext(decl);
+  }
+
+  void VisitClassTemplatePartialSpecializationDecl(
+      const pasta::ClassTemplatePartialSpecializationDecl &) final {}
+  void VisitVarTemplatePartialSpecializationDecl(
+      const pasta::VarTemplatePartialSpecializationDecl &) final {}
+  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &) final {}
+  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final {}
+  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &) final {}
+
+  void VisitVarDecl(const pasta::VarDecl &decl) final {
+    if (Label(decl)) {
+      if (auto init_expr = decl.Initializer()) {
+        this->StmtVisitor::Accept(*init_expr);
+      }
+    }
+  }
+
+  void VisitParmVarDecl(const pasta::ParmVarDecl &decl) final {
+    if (Label(decl)) {
+      if (!decl.HasUninstantiatedDefaultArgument() &&
+          !decl.HasUnparsedDefaultArgument()) {
+        if (auto init_expr = decl.DefaultArgument()) {
+          this->StmtVisitor::Accept(*init_expr);
+        }
+      }
+    }
+  }
+
+  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    if (Label(decl)) {
+      VisitDeclContext(decl);
+      for (pasta::ParmVarDecl param : decl.Parameters()) {
+        this->DeclVisitor::Accept(param);
+      }
+      if (decl.DoesThisDeclarationHaveABody()) {
+        this->StmtVisitor::Accept(decl.Body());
+      }
+    }
+  }
+
+  void VisitFieldDecl(const pasta::FieldDecl &decl) final {
+    if (Label(decl)) {
+      if (auto bit_width = decl.BitWidth()) {
+        this->StmtVisitor::Accept(*bit_width);
+      }
+      if (auto init = decl.InClassInitializer()) {
+        this->StmtVisitor::Accept(*init);
+      }
+    }
+  }
+
+  // Structs, unions, etc.
+  void VisitRecordDecl(const pasta::RecordDecl &decl) final {
+    if (Label(decl)) {
+      VisitDeclContext(decl);
+      for (pasta::FieldDecl field : decl.Fields()) {
+        this->DeclVisitor::Accept(field);
+      }
+    }
+  }
+
+  void VisitEnumConstantDecl(const pasta::EnumConstantDecl &decl) final {
+    if (Label(decl)) {
+      if (auto init = decl.InitializerExpression()) {
+        this->StmtVisitor::Accept(*init);
+      }
+    }
+  }
+
+  // Enumerators.
+  void VisitEnumDecl(const pasta::EnumDecl &decl) final {
+    if (Label(decl)) {
+      VisitDeclContext(decl);
+      for (pasta::EnumConstantDecl enumerator : decl.Enumerators()) {
+        this->DeclVisitor::Accept(enumerator);
+      }
+    }
+  }
+
+  void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final {
+    if (Label(stmt)) {
+      for (auto child : stmt.InputConstraintLiterals()) {
+        this->StmtVisitor::Accept(child);
+      }
+      for (auto child : stmt.InputExpressions()) {
+        this->StmtVisitor::Accept(child);
+      }
+      for (auto child : stmt.OutputConstraintLiterals()) {
+        this->StmtVisitor::Accept(child);
+      }
+      for (auto child : stmt.OutputExpressions()) {
+        this->StmtVisitor::Accept(child);
+      }
+      for (auto child : stmt.Children()) {
+        this->StmtVisitor::Accept(child);
+      }
+    }
+  }
+
+  void VisitMSAsmStmt(const pasta::MSAsmStmt &stmt) final {
+    if (Label(stmt)) {
+      for (auto child : stmt.AllExpressions()) {
+        this->StmtVisitor::Accept(child);
+      }
+      for (auto child : stmt.InputExpressions()) {
+        this->StmtVisitor::Accept(child);
+      }
+    }
+  }
+
+  void VisitBreakStmt(const pasta::BreakStmt &stmt) final {
+    if (Label(stmt)) {
+      for (auto child : stmt.Children()) {
+        this->StmtVisitor::Accept(child);
+      }
+    }
+  }
+
+  void VisitCompoundStmt(const pasta::CompoundStmt &stmt) final {
+    if (Label(stmt)) {
+      for (pasta::Stmt child : stmt.Children()) {
+        this->StmtVisitor::Accept(child);
+      }
+    }
+  }
+
+  void VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) final {
+    if (Label(decl)) {
+      if (auto tag = decl.AnonymousDeclarationWithTypedefName()) {
+        this->DeclVisitor::Accept(*tag);
+      }
+    }
+  }
+
+  // Backups.
+  void VisitDecl(const pasta::Decl &decl) final {
+    (void) Label(decl);
+  }
+
+  void VisitStmt(const pasta::Stmt &stmt) final {
+    if (Label(stmt)) {
+      for (auto child : stmt.Children()) {
+        Label(child);
+      }
+    }
+  }
+
+ public:
+  virtual ~EntityLabeller(void) = default;
+
+  void EnterCode(mx::CodeId code_id_, const std::vector<pasta::Decl> &tlds) {
+    code_id = code_id_;
+    for (const pasta::Decl &tld : tlds) {
+      this->DeclVisitor::Accept(tld);
     }
   }
 };
@@ -266,28 +539,6 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
     }
   }
 
-//  if (auto td = pasta::TagDecl::From(decl)) {
-//    if (auto tt = td->OuterTokenStart()) {
-//      begin_tok_index = std::min(begin_tok_index, tt.Index());
-//      end_tok_index = std::max(end_tok_index, tt.Index());
-//    }
-//    if (auto tt = td->InnerTokenStart()) {
-//      begin_tok_index = std::min(begin_tok_index, tt.Index());
-//      end_tok_index = std::max(end_tok_index, tt.Index());
-//    }
-//  }
-//
-//  if (auto nd = pasta::NamedDecl::From(decl)) {
-//    if (auto tt = nd->BeginToken()) {
-//      begin_tok_index = std::min(begin_tok_index, tt.Index());
-//      end_tok_index = std::max(end_tok_index, tt.Index());
-//    }
-//    if (auto tt = nd->EndToken()) {
-//      begin_tok_index = std::min(begin_tok_index, tt.Index());
-//      end_tok_index = std::max(end_tok_index, tt.Index());
-//    }
-//  }
-
   return {begin_tok_index, end_tok_index};
 }
 
@@ -420,7 +671,8 @@ void IndexCompileJobAction::MaybeTokenizeFile(
       auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
           file_path, file_hash);
       if (is_new_file_id) {
-        exe.EmplaceAction<TokenizeFileAction>(context, file_id, file);
+        exe.EmplaceAction<TokenizeFileAction>(
+            context, file_id, file_hash, file);
       }
 
       file_ids.emplace(file, file_id);
@@ -457,7 +709,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   std::vector<DeclRange> decl_ranges;
   decl_ranges.reserve(8192u);
 
-  // TODO(pag): Handle top-level statements, e.g. asm.
+  // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
   pasta::TokenRange tok_range = ast.Tokens();
   auto tlds = FindTLDs(ast.TranslationUnit());
   for (pasta::Decl decl : tlds) {
@@ -527,15 +779,34 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
                      }
                    });
 
-  std::vector<pasta::Decl> tlds_for_tree;
+  EntityLabeller labeller;
+
+  // Summary information about a group of top-level declarations that are
+  // somehow lexically/syntactically "stuck together" and thus serialized
+  // together. For example, `int optind, opterr, optopt;` is one example of
+  // being syntactically stuck together. Another example would be a C macro
+  // that expands into two separate top-level declarations. We don't want to
+  // break this macro expansion into two, as in the original source file it
+  // represents a single logical thing.
+  struct CodeChunk {
+    mx::CodeId code_id;
+    std::vector<pasta::Decl> decls;
+    uint64_t begin_index;
+    uint64_t end_index;
+  };
+
+  std::vector<pasta::Decl> decls_for_chunk;
+  std::vector<CodeChunk> code_chunks;
+
   for (size_t i = 0u, max_i = decl_ranges.size(); i < max_i; ) {
     auto [decl, begin_index, end_index] = std::move(decl_ranges[i++]);
-    tlds_for_tree.clear();
-    tlds_for_tree.push_back(decl);
+    decls_for_chunk.clear();
+    decls_for_chunk.push_back(decl);
 
     // Try to accumulate the nearby top-level declarations whose token ranges
-    // overlap with `decl` into `tlds_for_tree`. For example, this process will
-    // accumulate three `VarDecl`s into `tlds_for_tree` in the following case:
+    // overlap with `decl` into `decls_for_chunk`. For example, this process
+    // will accumulate three `VarDecl`s into `decls_for_chunk` in the following
+    // case:
     //
     //      int optind, opterr, optopt;
     //
@@ -553,17 +824,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
               << " is repeated in top-level decl list for job on file "
               << " on main job file " << main_file_path;
         } else {
-//          DLOG(INFO)
-//              << "Declaration of " << decl.KindName()
-//              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
-//              << " encloses over subsequent "
-//              << next_decl.KindName() << PrefixedName(next_decl) << " declaration"
-//              << PrefixedName(next_decl)
-//              << PrefixedLocation(next_decl, " at or near ")
-//              << " on main job file " << main_file_path;
-
-          // Keep track of enclosed decls.
-          tlds_for_tree.push_back(std::move(next_decl));
+          decls_for_chunk.push_back(std::move(next_decl));
         }
 
         // Make sure we definitely enclose over the next decl.
@@ -575,15 +836,35 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       }
     }
 
-    // Don't create token tree if the decl is already seen. This means it's
-    // already been indexed.
+    // Don't create token `decls_for_chunk` if the decl is already seen. This
+    // means it's already been indexed.
     auto [code_id, is_new] = context->GetOrCreateCodeId(
-        CodeHash(file_hashes, tlds_for_tree, tok_range,
+        CodeHash(file_hashes, decls_for_chunk, tok_range,
                  begin_index, end_index));
-    if (!is_new) {
-      continue;
-    }
 
+    // We always need to enter the code for a chunk, regardless of if it
+    // `is_new`. This is because each chunk might have arbitrary references to
+    // other declarations. We need to be able to form cross-chunk references
+    // when serializing things, so we use the labeller to assign IDs to entities
+    // (decls, statements, etc.) in a uniform and deterministic way so that
+    // other threads doing similar indexing will form identically labelled
+    // chunks for the same logical entities.
+    labeller.EnterCode(code_id, decls_for_chunk);
+
+    if (is_new) {
+      CodeChunk tree;
+      tree.code_id = code_id;
+      tree.decls = std::move(decls_for_chunk);
+      tree.begin_index = begin_index;
+      tree.end_index = end_index;
+      code_chunks.emplace_back(std::move(tree));
+    }
+  }
+
+  // Serialize the new code chunks.
+  for (const CodeChunk &chunk : code_chunks) {
+    const auto &[code_id, decls, begin_index, end_index] = chunk;
+    const pasta::Decl &leader_decl = decls[0];
     mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(
         tok_range, begin_index, end_index);
     if (maybe_tt.Succeeded()) {
@@ -591,7 +872,8 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     } else {
       LOG(ERROR)
           << maybe_tt.TakeError() << " for top-level declaration "
-          << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
+          << DeclToString(leader_decl)
+          << PrefixedLocation(leader_decl, " at or near ")
           << " on main job file " << main_file_path;
     }
   }

@@ -1109,7 +1109,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
-  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
 
   impl->BuildInitialTokenList(std::move(range), begin_index, end_index);
   if (impl->tokens_alloc.empty()) {
@@ -1117,7 +1117,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return err.str();
   }
 
-  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
 //  for (auto info = &(tokens_alloc.front()); info; info = info->next) {
 //    switch (info->category) {
 //      case TokenInfo::kFileToken:
@@ -1136,14 +1136,14 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
   if (!sub) {
     return err.str();
   }
-  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-  sub->Print(std::cerr);
+//  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//  sub->Print(std::cerr);
 //  std::cerr
 //      << "\n\ndigraph {\n"
 //      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
 //  sub->PrintDOT(std::cerr);
 //  std::cerr << "\n}\n";
-  std::cerr << "\n\n\n";
+//  std::cerr << "\n\n\n";
   return TokenTree(std::move(impl));
 }
 

@@ -7,12 +7,14 @@
 #include "TokenizeFile.h"
 
 #include <algorithm>
+#include <capnp/common.h>
 #include <capnp/message.h>
+#include <capnp/serialize.h>
+#include <fstream>
 #include <glog/logging.h>
 #include <kj/string-tree.h>
-#include <multiplier/Token.h>
-
-#include <fstream>
+#include <multiplier/AST.h>
+#include <multiplier/RPC.capnp.h>
 #include <utility>
 
 namespace indexer {
@@ -21,49 +23,35 @@ TokenizeFileAction::~TokenizeFileAction(void) {}
 
 TokenizeFileAction::TokenizeFileAction(
     std::shared_ptr<IndexingContext> context_,
-    mx::FileId file_id_, pasta::File file_)
+    mx::FileId file_id_, std::string file_hash_, pasta::File file_)
     : context(std::move(context_)),
       file_id(file_id_),
+      file_hash(std::move(file_hash_)),
       file(std::move(file_)) {}
 
 // Build and index the AST.
 void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   mx::ProgressBarWork progress_tracker(context->tokenizer_progress.get());
+  auto file_tokens = file.Tokens();
 
-  auto path = file.Path().generic_string();
-  auto maybe_contents = file.Data();
-  if (!maybe_contents.Succeeded()) {
-    LOG(ERROR)
-        << "Unable to read contents of file " << path
-        << ": " << maybe_contents.TakeError().message();
-    return;
+  capnp::MallocMessageBuilder message;
+  auto fb = message.initRoot<mx::rpc::File>();
+  fb.setId(file_id);
+  fb.setHash(file_hash);
+  auto tsb = fb.initTokens(static_cast<unsigned>(file_tokens.Size()));
+  for (pasta::FileToken ft : file_tokens) {
+    mx::ast::FileToken::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
+    ftb.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(ft.Kind())));
+    ftb.setPreProcessorKeywordKind(static_cast<mx::ast::PPKeywordKind>(
+        mx::FromPasta(ft.PreProcessorKeywordKind())));
+    ftb.setObjectiveCAtKeywordKind(static_cast<mx::ast::ObjCKeywordKind>(
+        mx::FromPasta(ft.ObjectiveCAtKeywordKind())));
+    ftb.setLine(ft.Line());
+    ftb.setColumn(ft.Column());
+    ftb.setData(kj::StringPtr(ft.Data().data(), ft.Data().size()));
   }
 
-  auto pasta_file_tokens = file.Tokens();
-  auto file_tokens = mx::TokenList::Create(pasta_file_tokens);
-
-  // PASTA file token lists have an `eof` token at the end; we strip it.
-  CHECK_EQ(file_tokens.Size() + 1u, pasta_file_tokens.Size());
-
-
-
-  (void) file_id;
-
-  auto maybe_tokens = file_tokens.Pack();
-  if (!maybe_tokens.Succeeded()) {
-    LOG(ERROR)
-        << "Unable to compress tokens from file '"
-        << file.Path().generic_string() << "': " << maybe_tokens.TakeError();
-    return;
-  }
-
-//  // Warn if our compression doesn't actually compress things.
-//  LOG_IF(WARNING, file_tokens.Data().size() <= builder.totalSize())
-//      << "Raw data needs " << file_tokens.Data().size()
-//      << " bytes, compressed flatbuffer needs "
-//      << fbb.GetSize() << " bytes";
-
-  context->PutFileTokens(file_id, maybe_tokens.TakeValue());
+  context->PutFileTokens(file_id, capnp::messageToFlatArray(message));
 }
 
 }  // namespace indexer

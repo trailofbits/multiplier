@@ -27,9 +27,10 @@ struct CompileCommand @0xab30180088262c95 {
   compiler @12 :AST.CompilerName;
 }
 
-struct TokenList @0x987f05f6a48636d5 {
-  contents @0 :Data;
-  tokenKinds @1 :List(UInt16);
+struct File @0x987f05f6a48636d5 {
+  id @0 :UInt64;
+  hash @1 :Text;
+  tokens @2 :List(AST.FileToken);
 }
 
 struct IndexedCode @0xe5f27760091f9a3a {

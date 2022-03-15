@@ -20,13 +20,15 @@ class TokenizeFileAction final : public mx::Action {
  private:
   const std::shared_ptr<IndexingContext> context;
   const mx::FileId file_id;
+  const std::string file_hash;
   const pasta::File file;
 
  public:
   virtual ~TokenizeFileAction(void);
 
   TokenizeFileAction(std::shared_ptr<IndexingContext> context_,
-                     mx::FileId file_id_, pasta::File file_);
+                     mx::FileId file_id_, std::string file_hash_,
+                     pasta::File file_);
 
   // Tokenize the file.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

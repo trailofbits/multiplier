@@ -3646,6 +3646,15 @@ enum TargetLanguage @0xeabe5088e5bc86fc {
   cxx @1 $Cxx.name("cxx");
 }
 
+struct FileToken @0xca57e1a97ecb7687 {
+  kind @0 :TokenKind;
+  preProcessorKeywordKind @1 :PPKeywordKind;
+  objectiveCAtKeywordKind @2 :ObjCKeywordKind;
+  line @3 :UInt32;
+  column @4 :UInt32;
+  data @5 :Text;
+}
+
 struct Decl @0xfb5879761ffaedb6 {
   access @0 :AccessSpecifier;
   accessUnsafe @1 :AccessSpecifier;

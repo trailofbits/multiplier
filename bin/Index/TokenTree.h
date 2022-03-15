@@ -7,7 +7,7 @@
 #pragma once
 
 #include <multiplier/Result.h>
-#include <multiplier/Token.h>
+#include <pasta/AST/Token.h>
 #include <string>
 
 namespace mx {
