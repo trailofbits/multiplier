@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-namespace mx {
+namespace indexer {
 
 struct TokenInfo {
   enum Category {
@@ -1089,7 +1089,7 @@ TokenTree::~TokenTree(void) {}
 
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
-Result<TokenTree, std::string>
+mx::Result<TokenTree, std::string>
 TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
                   uint64_t end_index) {
   std::stringstream err;
@@ -1147,4 +1147,4 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
   return TokenTree(std::move(impl));
 }
 
-}  // namespace mx
+}  // namespace indexer

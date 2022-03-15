@@ -7,7 +7,9 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace pasta {
 class ArgumentVector;
@@ -21,7 +23,7 @@ class Subprocess {
   // command input and capture output. Passing `nullptr` to any of `input`,
   // `output`, or `error` is acceptable.
   static int Execute(
-      const pasta::ArgumentVector &args,
+      const std::vector<std::string> &args,
       const std::unordered_map<std::string, std::string> *env=nullptr,
       std::istream *input=nullptr,
       std::ostream *output=nullptr,

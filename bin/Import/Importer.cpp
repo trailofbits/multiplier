@@ -99,19 +99,16 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   new_args.emplace_back("-Wno-missing-sysroot");
   new_args.emplace_back("-E");
   new_args.emplace_back("-v");
-  pasta::ArgumentVector cmd_sysroot(new_args);
-
-  new_args.emplace_back("-isysroot");
-  new_args.emplace_back(command.working_dir + "/xyz");
-  pasta::ArgumentVector cmd_no_sysroot(new_args);
 
   std::stringstream output_sysroot;
-  std::stringstream output_no_sysroot;
   (void) mx::Subprocess::Execute(
-      cmd_sysroot, &(command.env), nullptr, nullptr, &output_sysroot);
+      new_args, &(command.env), nullptr, nullptr, &output_sysroot);
 
+  std::stringstream output_no_sysroot;
+  new_args.emplace_back("-isysroot");
+  new_args.emplace_back(command.working_dir + "/xyz");
   (void) mx::Subprocess::Execute(
-      cmd_no_sysroot, &(command.env), nullptr, nullptr, &output_no_sysroot);
+      new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
 
   return {output_sysroot.str(), output_no_sysroot.str()};
 }
@@ -294,7 +291,7 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
       continue;
     }
 
-    // Now re-build a host file sytem, and let it observe the changed working
+    // Now re-build a host file system, and let it observe the changed working
     // directory.
     auto host_fs = pasta::FileSystem::CreateNative();
     pasta::FileManager fm(host_fs);
@@ -312,7 +309,8 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
     }
 
     auto request = client.indexCompileCommandsRequest();
-    auto commands_builder = request.initCommands(static_cast<unsigned>(jobs.size()));
+    auto commands_builder = request.initCommands(
+        static_cast<unsigned>(jobs.size()));
 
     // If we've got any messages, then send them out. The granularity is likely
     // to be small because we don't expect many files to operate in the same

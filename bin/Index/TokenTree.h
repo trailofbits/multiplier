@@ -10,7 +10,7 @@
 #include <pasta/AST/Token.h>
 #include <string>
 
-namespace mx {
+namespace indexer {
 
 class TokenTreeImpl;
 
@@ -29,8 +29,8 @@ class TokenTree {
 
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
-  static Result<TokenTree, std::string>
+  static mx::Result<TokenTree, std::string>
   Create(pasta::TokenRange range, uint64_t begin_index, uint64_t end_index);
 };
 
-}  // namespace mx
+}  // namespace indexer

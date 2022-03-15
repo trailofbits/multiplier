@@ -26,6 +26,7 @@
 #include "PrintTokenGraph.h"
 #include "TokenizeFile.h"
 #include "TokenTree.h"
+#include "Util.h"
 
 namespace indexer {
 namespace {
@@ -475,19 +476,6 @@ static std::string PrefixedLocation(const pasta::Decl &decl,
   return "";
 }
 
-// Returns `true` if `data` contains only whitespace or is empty.
-static bool IsWhitespaceOrEmpty(std::string_view data) {
-  for (auto ch : data) {
-    switch (ch) {
-      case ' ': case '\t': case '\r': case '\n': case '\\':
-        continue;
-      default:
-        return false;
-    }
-  }
-  return true;
-}
-
 // Can we elide this token from the beginning or end of a top-level
 // declaration's range of tokens?
 static bool CanElideTokenFromTLD(pasta::Token tok) {
@@ -865,7 +853,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   for (const CodeChunk &chunk : code_chunks) {
     const auto &[code_id, decls, begin_index, end_index] = chunk;
     const pasta::Decl &leader_decl = decls[0];
-    mx::Result<mx::TokenTree, std::string> maybe_tt = mx::TokenTree::Create(
+    mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
         tok_range, begin_index, end_index);
     if (maybe_tt.Succeeded()) {
 

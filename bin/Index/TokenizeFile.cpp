@@ -17,6 +17,8 @@
 #include <multiplier/RPC.capnp.h>
 #include <utility>
 
+#include "Util.h"
+
 namespace indexer {
 
 TokenizeFileAction::~TokenizeFileAction(void) {}
@@ -44,7 +46,11 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     tok_data.clear();
     tok_data.insert(tok_data.end(), ft.Data().begin(), ft.Data().end());
     mx::ast::FileToken::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
-    ftb.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(ft.Kind())));
+    if (IsWhitespaceOrEmpty(ft.Data()) && !ft.Data().empty()) {
+      ftb.setKind(mx::ast::TokenKind::WHITESPACE);
+    } else {
+      ftb.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(ft.Kind())));
+    }
     ftb.setPreProcessorKeywordKind(static_cast<mx::ast::PPKeywordKind>(
         mx::FromPasta(ft.PreProcessorKeywordKind())));
     ftb.setObjectiveCAtKeywordKind(static_cast<mx::ast::ObjCKeywordKind>(

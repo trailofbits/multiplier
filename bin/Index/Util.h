@@ -4,13 +4,13 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-// Auto-generated file; do not modify!
-
 #pragma once
 
-#include <multiplier/AST.h>
+#include <string_view>
 
-#include "AST.capnp.h"
+namespace indexer {
 
-namespace mx {
-}  // namespace mx
+// Returns `true` if `data` contains only whitespace or is empty.
+bool IsWhitespaceOrEmpty(std::string_view data);
+
+}  // namespace indexer

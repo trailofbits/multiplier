@@ -29,6 +29,7 @@ set_target_properties("${exe_name}"
 target_link_libraries("${exe_name}"
   PRIVATE
     "util"
+    pasta::pasta
 )
 
 if(IRENE_ENABLE_INSTALL)

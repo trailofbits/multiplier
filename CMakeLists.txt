@@ -49,14 +49,14 @@ find_package(RocksDB CONFIG REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
-add_library(mx_sqlite INTERFACE)
-target_link_libraries(mx_sqlite INTERFACE
-  ${SQLite_LIBRARIES}
-)
-
-target_include_directories(mx_sqlite INTERFACE
-  ${SQLite_INCLUDE_DIRS}
-)
+#add_library(mx_sqlite INTERFACE)
+#target_link_libraries(mx_sqlite INTERFACE
+#  ${SQLite_LIBRARIES}
+#)
+#
+#target_include_directories(mx_sqlite INTERFACE
+#  ${SQLite_INCLUDE_DIRS}
+#)
 
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
@@ -109,6 +109,8 @@ set(MX_BOOTSTRAP_LIB_AST_CAPNP "${PROJECT_SOURCE_DIR}/lib/AST.capnp")
 set(MX_BOOTSTRAP_LIB_AST_H "${PROJECT_SOURCE_DIR}/lib/AST.h")
 set(MX_BOOTSTRAP_LIB_AST_CPP "${PROJECT_SOURCE_DIR}/lib/AST.cpp")
 set(MX_BOOTSTRAP_INCLUDE_AST_H "${PROJECT_SOURCE_DIR}/include/multiplier/AST.h")
+set(MX_BOOTSTRAP_INDEX_SERIALIZE_H "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.h")
+set(MX_BOOTSTRAP_INDEX_SERIALIZE_CPP "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.cpp")
 
 add_subdirectory("lib")
 add_subdirectory("bin")

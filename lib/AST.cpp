@@ -10,4102 +10,4341 @@
 
 namespace mx {
 DeclKind FromPasta(pasta::DeclKind e) {
-  switch (e) {
-    case pasta::DeclKind::kAccessSpec: return DeclKind::ACCESS_SPEC;
-    case pasta::DeclKind::kBaseUsing: return DeclKind::BASE_USING;
-    case pasta::DeclKind::kBinding: return DeclKind::BINDING;
-    case pasta::DeclKind::kBlock: return DeclKind::BLOCK;
-    case pasta::DeclKind::kBuiltinTemplate: return DeclKind::BUILTIN_TEMPLATE;
-    case pasta::DeclKind::kCXXConstructor: return DeclKind::CXX_CONSTRUCTOR;
-    case pasta::DeclKind::kCXXConversion: return DeclKind::CXX_CONVERSION;
-    case pasta::DeclKind::kCXXDeductionGuide: return DeclKind::CXX_DEDUCTION_GUIDE;
-    case pasta::DeclKind::kCXXDestructor: return DeclKind::CXX_DESTRUCTOR;
-    case pasta::DeclKind::kCXXMethod: return DeclKind::CXX_METHOD;
-    case pasta::DeclKind::kCXXRecord: return DeclKind::CXX_RECORD;
-    case pasta::DeclKind::kCaptured: return DeclKind::CAPTURED;
-    case pasta::DeclKind::kClassScopeFunctionSpecialization: return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
-    case pasta::DeclKind::kClassTemplate: return DeclKind::CLASS_TEMPLATE;
-    case pasta::DeclKind::kClassTemplatePartialSpecialization: return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
-    case pasta::DeclKind::kClassTemplateSpecialization: return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;
-    case pasta::DeclKind::kConcept: return DeclKind::CONCEPT;
-    case pasta::DeclKind::kConstructorUsingShadow: return DeclKind::CONSTRUCTOR_USING_SHADOW;
-    case pasta::DeclKind::kDeclarator: return DeclKind::DECLARATOR;
-    case pasta::DeclKind::kDecomposition: return DeclKind::DECOMPOSITION;
-    case pasta::DeclKind::kEmpty: return DeclKind::EMPTY;
-    case pasta::DeclKind::kEnumConstant: return DeclKind::ENUM_CONSTANT;
-    case pasta::DeclKind::kEnum: return DeclKind::ENUM;
-    case pasta::DeclKind::kExport: return DeclKind::EXPORT;
-    case pasta::DeclKind::kExternCContext: return DeclKind::EXTERN_C_CONTEXT;
-    case pasta::DeclKind::kField: return DeclKind::FIELD;
-    case pasta::DeclKind::kFileScopeAsm: return DeclKind::FILE_SCOPE_ASM;
-    case pasta::DeclKind::kFriend: return DeclKind::FRIEND;
-    case pasta::DeclKind::kFriendTemplate: return DeclKind::FRIEND_TEMPLATE;
-    case pasta::DeclKind::kFunction: return DeclKind::FUNCTION;
-    case pasta::DeclKind::kFunctionTemplate: return DeclKind::FUNCTION_TEMPLATE;
-    case pasta::DeclKind::kImplicitParam: return DeclKind::IMPLICIT_PARAM;
-    case pasta::DeclKind::kImport: return DeclKind::IMPORT;
-    case pasta::DeclKind::kIndirectField: return DeclKind::INDIRECT_FIELD;
-    case pasta::DeclKind::kLabel: return DeclKind::LABEL;
-    case pasta::DeclKind::kLifetimeExtendedTemporary: return DeclKind::LIFETIME_EXTENDED_TEMPORARY;
-    case pasta::DeclKind::kLinkageSpec: return DeclKind::LINKAGE_SPEC;
-    case pasta::DeclKind::kMSGuid: return DeclKind::MS_GUID;
-    case pasta::DeclKind::kMSProperty: return DeclKind::MS_PROPERTY;
-    case pasta::DeclKind::kNamed: return DeclKind::NAMED;
-    case pasta::DeclKind::kNamespaceAlias: return DeclKind::NAMESPACE_ALIAS;
-    case pasta::DeclKind::kNamespace: return DeclKind::NAMESPACE;
-    case pasta::DeclKind::kNonTypeTemplateParm: return DeclKind::NON_TYPE_TEMPLATE_PARM;
-    case pasta::DeclKind::kOMPAllocate: return DeclKind::OMP_ALLOCATE;
-    case pasta::DeclKind::kOMPCapturedExpr: return DeclKind::OMP_CAPTURED_EXPR;
-    case pasta::DeclKind::kOMPDeclareMapper: return DeclKind::OMP_DECLARE_MAPPER;
-    case pasta::DeclKind::kOMPDeclareReduction: return DeclKind::OMP_DECLARE_REDUCTION;
-    case pasta::DeclKind::kOMPRequires: return DeclKind::OMP_REQUIRES;
-    case pasta::DeclKind::kOMPThreadPrivate: return DeclKind::OMP_THREAD_PRIVATE;
-    case pasta::DeclKind::kObjCAtDefsField: return DeclKind::OBJ_C_AT_DEFS_FIELD;
-    case pasta::DeclKind::kObjCCategory: return DeclKind::OBJ_C_CATEGORY;
-    case pasta::DeclKind::kObjCCategoryImpl: return DeclKind::OBJ_C_CATEGORY_IMPL;
-    case pasta::DeclKind::kObjCCompatibleAlias: return DeclKind::OBJ_C_COMPATIBLE_ALIAS;
-    case pasta::DeclKind::kObjCContainer: return DeclKind::OBJ_C_CONTAINER;
-    case pasta::DeclKind::kObjCImpl: return DeclKind::OBJ_C_IMPL;
-    case pasta::DeclKind::kObjCImplementation: return DeclKind::OBJ_C_IMPLEMENTATION;
-    case pasta::DeclKind::kObjCInterface: return DeclKind::OBJ_C_INTERFACE;
-    case pasta::DeclKind::kObjCIvar: return DeclKind::OBJ_C_IVAR;
-    case pasta::DeclKind::kObjCMethod: return DeclKind::OBJ_C_METHOD;
-    case pasta::DeclKind::kObjCProperty: return DeclKind::OBJ_C_PROPERTY;
-    case pasta::DeclKind::kObjCPropertyImpl: return DeclKind::OBJ_C_PROPERTY_IMPL;
-    case pasta::DeclKind::kObjCProtocol: return DeclKind::OBJ_C_PROTOCOL;
-    case pasta::DeclKind::kObjCTypeParam: return DeclKind::OBJ_C_TYPE_PARAM;
-    case pasta::DeclKind::kParmVar: return DeclKind::PARM_VAR;
-    case pasta::DeclKind::kPragmaComment: return DeclKind::PRAGMA_COMMENT;
-    case pasta::DeclKind::kPragmaDetectMismatch: return DeclKind::PRAGMA_DETECT_MISMATCH;
-    case pasta::DeclKind::kRecord: return DeclKind::RECORD;
-    case pasta::DeclKind::kRedeclarableTemplate: return DeclKind::REDECLARABLE_TEMPLATE;
-    case pasta::DeclKind::kRequiresExprBody: return DeclKind::REQUIRES_EXPR_BODY;
-    case pasta::DeclKind::kStaticAssert: return DeclKind::STATIC_ASSERT;
-    case pasta::DeclKind::kTag: return DeclKind::TAG;
-    case pasta::DeclKind::kTemplate: return DeclKind::TEMPLATE;
-    case pasta::DeclKind::kTemplateParamObject: return DeclKind::TEMPLATE_PARAM_OBJECT;
-    case pasta::DeclKind::kTemplateTemplateParm: return DeclKind::TEMPLATE_TEMPLATE_PARM;
-    case pasta::DeclKind::kTemplateTypeParm: return DeclKind::TEMPLATE_TYPE_PARM;
-    case pasta::DeclKind::kTranslationUnit: return DeclKind::TRANSLATION_UNIT;
-    case pasta::DeclKind::kTypeAlias: return DeclKind::TYPE_ALIAS;
-    case pasta::DeclKind::kTypeAliasTemplate: return DeclKind::TYPE_ALIAS_TEMPLATE;
-    case pasta::DeclKind::kType: return DeclKind::TYPE;
-    case pasta::DeclKind::kTypedef: return DeclKind::TYPEDEF;
-    case pasta::DeclKind::kTypedefName: return DeclKind::TYPEDEF_NAME;
-    case pasta::DeclKind::kUnresolvedUsingIfExists: return DeclKind::UNRESOLVED_USING_IF_EXISTS;
-    case pasta::DeclKind::kUnresolvedUsingTypename: return DeclKind::UNRESOLVED_USING_TYPENAME;
-    case pasta::DeclKind::kUnresolvedUsingValue: return DeclKind::UNRESOLVED_USING_VALUE;
-    case pasta::DeclKind::kUsing: return DeclKind::USING;
-    case pasta::DeclKind::kUsingDirective: return DeclKind::USING_DIRECTIVE;
-    case pasta::DeclKind::kUsingEnum: return DeclKind::USING_ENUM;
-    case pasta::DeclKind::kUsingPack: return DeclKind::USING_PACK;
-    case pasta::DeclKind::kUsingShadow: return DeclKind::USING_SHADOW;
-    case pasta::DeclKind::kValue: return DeclKind::VALUE;
-    case pasta::DeclKind::kVar: return DeclKind::VAR;
-    case pasta::DeclKind::kVarTemplate: return DeclKind::VAR_TEMPLATE;
-    case pasta::DeclKind::kVarTemplatePartialSpecialization: return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
-    case pasta::DeclKind::kVarTemplateSpecialization: return DeclKind::VAR_TEMPLATE_SPECIALIZATION;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DeclKind::ACCESS_SPEC;
+    case 1: return DeclKind::BASE_USING;
+    case 2: return DeclKind::BINDING;
+    case 3: return DeclKind::BLOCK;
+    case 4: return DeclKind::BUILTIN_TEMPLATE;
+    case 5: return DeclKind::CXX_CONSTRUCTOR;
+    case 6: return DeclKind::CXX_CONVERSION;
+    case 7: return DeclKind::CXX_DEDUCTION_GUIDE;
+    case 8: return DeclKind::CXX_DESTRUCTOR;
+    case 9: return DeclKind::CXX_METHOD;
+    case 10: return DeclKind::CXX_RECORD;
+    case 11: return DeclKind::CAPTURED;
+    case 12: return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
+    case 13: return DeclKind::CLASS_TEMPLATE;
+    case 14: return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
+    case 15: return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;
+    case 16: return DeclKind::CONCEPT;
+    case 17: return DeclKind::CONSTRUCTOR_USING_SHADOW;
+    case 18: return DeclKind::DECLARATOR;
+    case 19: return DeclKind::DECOMPOSITION;
+    case 20: return DeclKind::EMPTY;
+    case 21: return DeclKind::ENUM_CONSTANT;
+    case 22: return DeclKind::ENUM;
+    case 23: return DeclKind::EXPORT;
+    case 24: return DeclKind::EXTERN_C_CONTEXT;
+    case 25: return DeclKind::FIELD;
+    case 26: return DeclKind::FILE_SCOPE_ASM;
+    case 27: return DeclKind::FRIEND;
+    case 28: return DeclKind::FRIEND_TEMPLATE;
+    case 29: return DeclKind::FUNCTION;
+    case 30: return DeclKind::FUNCTION_TEMPLATE;
+    case 31: return DeclKind::IMPLICIT_PARAM;
+    case 32: return DeclKind::IMPORT;
+    case 33: return DeclKind::INDIRECT_FIELD;
+    case 34: return DeclKind::LABEL;
+    case 35: return DeclKind::LIFETIME_EXTENDED_TEMPORARY;
+    case 36: return DeclKind::LINKAGE_SPEC;
+    case 37: return DeclKind::MS_GUID;
+    case 38: return DeclKind::MS_PROPERTY;
+    case 39: return DeclKind::NAMED;
+    case 40: return DeclKind::NAMESPACE_ALIAS;
+    case 41: return DeclKind::NAMESPACE;
+    case 42: return DeclKind::NON_TYPE_TEMPLATE_PARM;
+    case 43: return DeclKind::OMP_ALLOCATE;
+    case 44: return DeclKind::OMP_CAPTURED_EXPR;
+    case 45: return DeclKind::OMP_DECLARE_MAPPER;
+    case 46: return DeclKind::OMP_DECLARE_REDUCTION;
+    case 47: return DeclKind::OMP_REQUIRES;
+    case 48: return DeclKind::OMP_THREAD_PRIVATE;
+    case 49: return DeclKind::OBJ_C_AT_DEFS_FIELD;
+    case 50: return DeclKind::OBJ_C_CATEGORY;
+    case 51: return DeclKind::OBJ_C_CATEGORY_IMPL;
+    case 52: return DeclKind::OBJ_C_COMPATIBLE_ALIAS;
+    case 53: return DeclKind::OBJ_C_CONTAINER;
+    case 54: return DeclKind::OBJ_C_IMPL;
+    case 55: return DeclKind::OBJ_C_IMPLEMENTATION;
+    case 56: return DeclKind::OBJ_C_INTERFACE;
+    case 57: return DeclKind::OBJ_C_IVAR;
+    case 58: return DeclKind::OBJ_C_METHOD;
+    case 59: return DeclKind::OBJ_C_PROPERTY;
+    case 60: return DeclKind::OBJ_C_PROPERTY_IMPL;
+    case 61: return DeclKind::OBJ_C_PROTOCOL;
+    case 62: return DeclKind::OBJ_C_TYPE_PARAM;
+    case 63: return DeclKind::PARM_VAR;
+    case 64: return DeclKind::PRAGMA_COMMENT;
+    case 65: return DeclKind::PRAGMA_DETECT_MISMATCH;
+    case 66: return DeclKind::RECORD;
+    case 67: return DeclKind::REDECLARABLE_TEMPLATE;
+    case 68: return DeclKind::REQUIRES_EXPR_BODY;
+    case 69: return DeclKind::STATIC_ASSERT;
+    case 70: return DeclKind::TAG;
+    case 71: return DeclKind::TEMPLATE;
+    case 72: return DeclKind::TEMPLATE_PARAM_OBJECT;
+    case 73: return DeclKind::TEMPLATE_TEMPLATE_PARM;
+    case 74: return DeclKind::TEMPLATE_TYPE_PARM;
+    case 75: return DeclKind::TRANSLATION_UNIT;
+    case 76: return DeclKind::TYPE_ALIAS;
+    case 77: return DeclKind::TYPE_ALIAS_TEMPLATE;
+    case 78: return DeclKind::TYPE;
+    case 79: return DeclKind::TYPEDEF;
+    case 80: return DeclKind::TYPEDEF_NAME;
+    case 81: return DeclKind::UNRESOLVED_USING_IF_EXISTS;
+    case 82: return DeclKind::UNRESOLVED_USING_TYPENAME;
+    case 83: return DeclKind::UNRESOLVED_USING_VALUE;
+    case 84: return DeclKind::USING;
+    case 85: return DeclKind::USING_DIRECTIVE;
+    case 86: return DeclKind::USING_ENUM;
+    case 87: return DeclKind::USING_PACK;
+    case 88: return DeclKind::USING_SHADOW;
+    case 89: return DeclKind::VALUE;
+    case 90: return DeclKind::VAR;
+    case 91: return DeclKind::VAR_TEMPLATE;
+    case 92: return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
+    case 93: return DeclKind::VAR_TEMPLATE_SPECIALIZATION;
+    default: __builtin_unreachable();
   }
 }
 
 ArrayTypeArraySizeModifier FromPasta(pasta::ArrayTypeArraySizeModifier e) {
-  switch (e) {
-    case pasta::ArrayTypeArraySizeModifier::kNormal: return ArrayTypeArraySizeModifier::NORMAL;
-    case pasta::ArrayTypeArraySizeModifier::kStatic: return ArrayTypeArraySizeModifier::STATIC;
-    case pasta::ArrayTypeArraySizeModifier::kStar: return ArrayTypeArraySizeModifier::STAR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArrayTypeArraySizeModifier::NORMAL;
+    case 1: return ArrayTypeArraySizeModifier::STATIC;
+    case 2: return ArrayTypeArraySizeModifier::STAR;
+    default: __builtin_unreachable();
   }
 }
 
 AtomicExprAtomicOp FromPasta(pasta::AtomicExprAtomicOp e) {
-  switch (e) {
-    case pasta::AtomicExprAtomicOp::kC11AtomicInitializer: return AtomicExprAtomicOp::C11_ATOMIC_INITIALIZER;
-    case pasta::AtomicExprAtomicOp::kC11AtomicLoad: return AtomicExprAtomicOp::C11_ATOMIC_LOAD;
-    case pasta::AtomicExprAtomicOp::kC11AtomicStore: return AtomicExprAtomicOp::C11_ATOMIC_STORE;
-    case pasta::AtomicExprAtomicOp::kC11AtomicExchange: return AtomicExprAtomicOp::C11_ATOMIC_EXCHANGE;
-    case pasta::AtomicExprAtomicOp::kC11AtomicCompareExchangeStrong: return AtomicExprAtomicOp::C11_ATOMIC_COMPARE_EXCHANGE_STRONG;
-    case pasta::AtomicExprAtomicOp::kC11AtomicCompareExchangeWeak: return AtomicExprAtomicOp::C11_ATOMIC_COMPARE_EXCHANGE_WEAK;
-    case pasta::AtomicExprAtomicOp::kC11AtomicFetchAdd: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_ADD;
-    case pasta::AtomicExprAtomicOp::kC11AtomicFetchSub: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_SUB;
-    case pasta::AtomicExprAtomicOp::kC11AtomicFetchAnd: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_AND;
-    case pasta::AtomicExprAtomicOp::kC11AtomicFetchOr: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_OR;
-    case pasta::AtomicExprAtomicOp::kC11AtomicFetchXor: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_XOR;
-    case pasta::AtomicExprAtomicOp::kC11AtomicFetchMax: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_MAX;
-    case pasta::AtomicExprAtomicOp::kC11AtomicFetchMin: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_MIN;
-    case pasta::AtomicExprAtomicOp::kAtomicLoad: return AtomicExprAtomicOp::ATOMIC_LOAD;
-    case pasta::AtomicExprAtomicOp::kAtomicLoadN: return AtomicExprAtomicOp::ATOMIC_LOAD_N;
-    case pasta::AtomicExprAtomicOp::kAtomicStore: return AtomicExprAtomicOp::ATOMIC_STORE;
-    case pasta::AtomicExprAtomicOp::kAtomicStoreN: return AtomicExprAtomicOp::ATOMIC_STORE_N;
-    case pasta::AtomicExprAtomicOp::kAtomicExchange: return AtomicExprAtomicOp::ATOMIC_EXCHANGE;
-    case pasta::AtomicExprAtomicOp::kAtomicExchangeN: return AtomicExprAtomicOp::ATOMIC_EXCHANGE_N;
-    case pasta::AtomicExprAtomicOp::kAtomicCompareExchange: return AtomicExprAtomicOp::ATOMIC_COMPARE_EXCHANGE;
-    case pasta::AtomicExprAtomicOp::kAtomicCompareExchangeN: return AtomicExprAtomicOp::ATOMIC_COMPARE_EXCHANGE_N;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchAdd: return AtomicExprAtomicOp::ATOMIC_FETCH_ADD;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchSub: return AtomicExprAtomicOp::ATOMIC_FETCH_SUB;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchAnd: return AtomicExprAtomicOp::ATOMIC_FETCH_AND;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchOr: return AtomicExprAtomicOp::ATOMIC_FETCH_OR;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchXor: return AtomicExprAtomicOp::ATOMIC_FETCH_XOR;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchNand: return AtomicExprAtomicOp::ATOMIC_FETCH_NAND;
-    case pasta::AtomicExprAtomicOp::kAtomicAddFetch: return AtomicExprAtomicOp::ATOMIC_ADD_FETCH;
-    case pasta::AtomicExprAtomicOp::kAtomicSubFetch: return AtomicExprAtomicOp::ATOMIC_SUB_FETCH;
-    case pasta::AtomicExprAtomicOp::kAtomicAndFetch: return AtomicExprAtomicOp::ATOMIC_AND_FETCH;
-    case pasta::AtomicExprAtomicOp::kAtomicOrFetch: return AtomicExprAtomicOp::ATOMIC_OR_FETCH;
-    case pasta::AtomicExprAtomicOp::kAtomicXorFetch: return AtomicExprAtomicOp::ATOMIC_XOR_FETCH;
-    case pasta::AtomicExprAtomicOp::kAtomicMaxFetch: return AtomicExprAtomicOp::ATOMIC_MAX_FETCH;
-    case pasta::AtomicExprAtomicOp::kAtomicMinFetch: return AtomicExprAtomicOp::ATOMIC_MIN_FETCH;
-    case pasta::AtomicExprAtomicOp::kAtomicNandFetch: return AtomicExprAtomicOp::ATOMIC_NAND_FETCH;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicInitializer: return AtomicExprAtomicOp::OPENCL_ATOMIC_INITIALIZER;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicLoad: return AtomicExprAtomicOp::OPENCL_ATOMIC_LOAD;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicStore: return AtomicExprAtomicOp::OPENCL_ATOMIC_STORE;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicExchange: return AtomicExprAtomicOp::OPENCL_ATOMIC_EXCHANGE;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicCompareExchangeStrong: return AtomicExprAtomicOp::OPENCL_ATOMIC_COMPARE_EXCHANGE_STRONG;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicCompareExchangeWeak: return AtomicExprAtomicOp::OPENCL_ATOMIC_COMPARE_EXCHANGE_WEAK;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicFetchAdd: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_ADD;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicFetchSub: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_SUB;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicFetchAnd: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_AND;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicFetchOr: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_OR;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicFetchXor: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_XOR;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicFetchMin: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_MIN;
-    case pasta::AtomicExprAtomicOp::kOpenclAtomicFetchMax: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_MAX;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchMin: return AtomicExprAtomicOp::ATOMIC_FETCH_MIN;
-    case pasta::AtomicExprAtomicOp::kAtomicFetchMax: return AtomicExprAtomicOp::ATOMIC_FETCH_MAX;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AtomicExprAtomicOp::C11_ATOMIC_INITIALIZER;
+    case 1: return AtomicExprAtomicOp::C11_ATOMIC_LOAD;
+    case 2: return AtomicExprAtomicOp::C11_ATOMIC_STORE;
+    case 3: return AtomicExprAtomicOp::C11_ATOMIC_EXCHANGE;
+    case 4: return AtomicExprAtomicOp::C11_ATOMIC_COMPARE_EXCHANGE_STRONG;
+    case 5: return AtomicExprAtomicOp::C11_ATOMIC_COMPARE_EXCHANGE_WEAK;
+    case 6: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_ADD;
+    case 7: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_SUB;
+    case 8: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_AND;
+    case 9: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_OR;
+    case 10: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_XOR;
+    case 11: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_MAX;
+    case 12: return AtomicExprAtomicOp::C11_ATOMIC_FETCH_MIN;
+    case 13: return AtomicExprAtomicOp::ATOMIC_LOAD;
+    case 14: return AtomicExprAtomicOp::ATOMIC_LOAD_N;
+    case 15: return AtomicExprAtomicOp::ATOMIC_STORE;
+    case 16: return AtomicExprAtomicOp::ATOMIC_STORE_N;
+    case 17: return AtomicExprAtomicOp::ATOMIC_EXCHANGE;
+    case 18: return AtomicExprAtomicOp::ATOMIC_EXCHANGE_N;
+    case 19: return AtomicExprAtomicOp::ATOMIC_COMPARE_EXCHANGE;
+    case 20: return AtomicExprAtomicOp::ATOMIC_COMPARE_EXCHANGE_N;
+    case 21: return AtomicExprAtomicOp::ATOMIC_FETCH_ADD;
+    case 22: return AtomicExprAtomicOp::ATOMIC_FETCH_SUB;
+    case 23: return AtomicExprAtomicOp::ATOMIC_FETCH_AND;
+    case 24: return AtomicExprAtomicOp::ATOMIC_FETCH_OR;
+    case 25: return AtomicExprAtomicOp::ATOMIC_FETCH_XOR;
+    case 26: return AtomicExprAtomicOp::ATOMIC_FETCH_NAND;
+    case 27: return AtomicExprAtomicOp::ATOMIC_ADD_FETCH;
+    case 28: return AtomicExprAtomicOp::ATOMIC_SUB_FETCH;
+    case 29: return AtomicExprAtomicOp::ATOMIC_AND_FETCH;
+    case 30: return AtomicExprAtomicOp::ATOMIC_OR_FETCH;
+    case 31: return AtomicExprAtomicOp::ATOMIC_XOR_FETCH;
+    case 32: return AtomicExprAtomicOp::ATOMIC_MAX_FETCH;
+    case 33: return AtomicExprAtomicOp::ATOMIC_MIN_FETCH;
+    case 34: return AtomicExprAtomicOp::ATOMIC_NAND_FETCH;
+    case 35: return AtomicExprAtomicOp::OPENCL_ATOMIC_INITIALIZER;
+    case 36: return AtomicExprAtomicOp::OPENCL_ATOMIC_LOAD;
+    case 37: return AtomicExprAtomicOp::OPENCL_ATOMIC_STORE;
+    case 38: return AtomicExprAtomicOp::OPENCL_ATOMIC_EXCHANGE;
+    case 39: return AtomicExprAtomicOp::OPENCL_ATOMIC_COMPARE_EXCHANGE_STRONG;
+    case 40: return AtomicExprAtomicOp::OPENCL_ATOMIC_COMPARE_EXCHANGE_WEAK;
+    case 41: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_ADD;
+    case 42: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_SUB;
+    case 43: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_AND;
+    case 44: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_OR;
+    case 45: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_XOR;
+    case 46: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_MIN;
+    case 47: return AtomicExprAtomicOp::OPENCL_ATOMIC_FETCH_MAX;
+    case 48: return AtomicExprAtomicOp::ATOMIC_FETCH_MIN;
+    case 49: return AtomicExprAtomicOp::ATOMIC_FETCH_MAX;
+    default: __builtin_unreachable();
   }
 }
 
 BuiltinTypeKind FromPasta(pasta::BuiltinTypeKind e) {
-  switch (e) {
-    case pasta::BuiltinTypeKind::kOCLImage1dRO: return BuiltinTypeKind::OCL_IMAGE1_DRO;
-    case pasta::BuiltinTypeKind::kOCLImage1dArrayRO: return BuiltinTypeKind::OCL_IMAGE1_DARRAY_RO;
-    case pasta::BuiltinTypeKind::kOCLImage1dBufferRO: return BuiltinTypeKind::OCL_IMAGE1_DBUFFER_RO;
-    case pasta::BuiltinTypeKind::kOCLImage2dRO: return BuiltinTypeKind::OCL_IMAGE2_DRO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayRO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_RO;
-    case pasta::BuiltinTypeKind::kOCLImage2dDepthRO: return BuiltinTypeKind::OCL_IMAGE2_DDEPTH_RO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayDepthRO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_DEPTH_RO;
-    case pasta::BuiltinTypeKind::kOCLImage2dMSAARO: return BuiltinTypeKind::OCL_IMAGE2_DMSAARO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayMSAARO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAARO;
-    case pasta::BuiltinTypeKind::kOCLImage2dMSAADepthRO: return BuiltinTypeKind::OCL_IMAGE2_DMSAA_DEPTH_RO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayMSAADepthRO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAA_DEPTH_RO;
-    case pasta::BuiltinTypeKind::kOCLImage3dRO: return BuiltinTypeKind::OCL_IMAGE3_DRO;
-    case pasta::BuiltinTypeKind::kOCLImage1dWO: return BuiltinTypeKind::OCL_IMAGE1_DWO;
-    case pasta::BuiltinTypeKind::kOCLImage1dArrayWO: return BuiltinTypeKind::OCL_IMAGE1_DARRAY_WO;
-    case pasta::BuiltinTypeKind::kOCLImage1dBufferWO: return BuiltinTypeKind::OCL_IMAGE1_DBUFFER_WO;
-    case pasta::BuiltinTypeKind::kOCLImage2dWO: return BuiltinTypeKind::OCL_IMAGE2_DWO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayWO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_WO;
-    case pasta::BuiltinTypeKind::kOCLImage2dDepthWO: return BuiltinTypeKind::OCL_IMAGE2_DDEPTH_WO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayDepthWO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_DEPTH_WO;
-    case pasta::BuiltinTypeKind::kOCLImage2dMSAAWO: return BuiltinTypeKind::OCL_IMAGE2_DMSAAWO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayMSAAWO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAAWO;
-    case pasta::BuiltinTypeKind::kOCLImage2dMSAADepthWO: return BuiltinTypeKind::OCL_IMAGE2_DMSAA_DEPTH_WO;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayMSAADepthWO: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAA_DEPTH_WO;
-    case pasta::BuiltinTypeKind::kOCLImage3dWO: return BuiltinTypeKind::OCL_IMAGE3_DWO;
-    case pasta::BuiltinTypeKind::kOCLImage1dRW: return BuiltinTypeKind::OCL_IMAGE1_DRW;
-    case pasta::BuiltinTypeKind::kOCLImage1dArrayRW: return BuiltinTypeKind::OCL_IMAGE1_DARRAY_RW;
-    case pasta::BuiltinTypeKind::kOCLImage1dBufferRW: return BuiltinTypeKind::OCL_IMAGE1_DBUFFER_RW;
-    case pasta::BuiltinTypeKind::kOCLImage2dRW: return BuiltinTypeKind::OCL_IMAGE2_DRW;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayRW: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_RW;
-    case pasta::BuiltinTypeKind::kOCLImage2dDepthRW: return BuiltinTypeKind::OCL_IMAGE2_DDEPTH_RW;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayDepthRW: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_DEPTH_RW;
-    case pasta::BuiltinTypeKind::kOCLImage2dMSAARW: return BuiltinTypeKind::OCL_IMAGE2_DMSAARW;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayMSAARW: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAARW;
-    case pasta::BuiltinTypeKind::kOCLImage2dMSAADepthRW: return BuiltinTypeKind::OCL_IMAGE2_DMSAA_DEPTH_RW;
-    case pasta::BuiltinTypeKind::kOCLImage2dArrayMSAADepthRW: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAA_DEPTH_RW;
-    case pasta::BuiltinTypeKind::kOCLImage3dRW: return BuiltinTypeKind::OCL_IMAGE3_DRW;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCMcePayload: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_MCE_PAYLOAD;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCImePayload: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_PAYLOAD;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCRefPayload: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_REF_PAYLOAD;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCSicPayload: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_SIC_PAYLOAD;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCMceResult: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_MCE_RESULT;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCImeResult: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_RESULT;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCRefResult: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_REF_RESULT;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCSicResult: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_SIC_RESULT;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCImeResultSingleReferenceStreamout: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_RESULT_SINGLE_REFERENCE_STREAMOUT;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCImeResultDualReferenceStreamout: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_RESULT_DUAL_REFERENCE_STREAMOUT;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCImeSingleReferenceStreamin: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_SINGLE_REFERENCE_STREAMIN;
-    case pasta::BuiltinTypeKind::kOCLIntelSubgroupAVCImeDualReferenceStreamin: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_DUAL_REFERENCE_STREAMIN;
-    case pasta::BuiltinTypeKind::kSveInt8: return BuiltinTypeKind::SVE_INT8;
-    case pasta::BuiltinTypeKind::kSveInt16: return BuiltinTypeKind::SVE_INT16;
-    case pasta::BuiltinTypeKind::kSveInt32: return BuiltinTypeKind::SVE_INT32;
-    case pasta::BuiltinTypeKind::kSveInt64: return BuiltinTypeKind::SVE_INT64;
-    case pasta::BuiltinTypeKind::kSveUint8: return BuiltinTypeKind::SVE_UINT8;
-    case pasta::BuiltinTypeKind::kSveUint16: return BuiltinTypeKind::SVE_UINT16;
-    case pasta::BuiltinTypeKind::kSveUint32: return BuiltinTypeKind::SVE_UINT32;
-    case pasta::BuiltinTypeKind::kSveUint64: return BuiltinTypeKind::SVE_UINT64;
-    case pasta::BuiltinTypeKind::kSveFloat16: return BuiltinTypeKind::SVE_FLOAT16;
-    case pasta::BuiltinTypeKind::kSveFloat32: return BuiltinTypeKind::SVE_FLOAT32;
-    case pasta::BuiltinTypeKind::kSveFloat64: return BuiltinTypeKind::SVE_FLOAT64;
-    case pasta::BuiltinTypeKind::kSveBFloat16: return BuiltinTypeKind::SVE_B_FLOAT16;
-    case pasta::BuiltinTypeKind::kSveInt8x2: return BuiltinTypeKind::SVE_INT8_X2;
-    case pasta::BuiltinTypeKind::kSveInt16x2: return BuiltinTypeKind::SVE_INT16_X2;
-    case pasta::BuiltinTypeKind::kSveInt32x2: return BuiltinTypeKind::SVE_INT32_X2;
-    case pasta::BuiltinTypeKind::kSveInt64x2: return BuiltinTypeKind::SVE_INT64_X2;
-    case pasta::BuiltinTypeKind::kSveUint8x2: return BuiltinTypeKind::SVE_UINT8_X2;
-    case pasta::BuiltinTypeKind::kSveUint16x2: return BuiltinTypeKind::SVE_UINT16_X2;
-    case pasta::BuiltinTypeKind::kSveUint32x2: return BuiltinTypeKind::SVE_UINT32_X2;
-    case pasta::BuiltinTypeKind::kSveUint64x2: return BuiltinTypeKind::SVE_UINT64_X2;
-    case pasta::BuiltinTypeKind::kSveFloat16x2: return BuiltinTypeKind::SVE_FLOAT16_X2;
-    case pasta::BuiltinTypeKind::kSveFloat32x2: return BuiltinTypeKind::SVE_FLOAT32_X2;
-    case pasta::BuiltinTypeKind::kSveFloat64x2: return BuiltinTypeKind::SVE_FLOAT64_X2;
-    case pasta::BuiltinTypeKind::kSveBFloat16x2: return BuiltinTypeKind::SVE_B_FLOAT16_X2;
-    case pasta::BuiltinTypeKind::kSveInt8x3: return BuiltinTypeKind::SVE_INT8_X3;
-    case pasta::BuiltinTypeKind::kSveInt16x3: return BuiltinTypeKind::SVE_INT16_X3;
-    case pasta::BuiltinTypeKind::kSveInt32x3: return BuiltinTypeKind::SVE_INT32_X3;
-    case pasta::BuiltinTypeKind::kSveInt64x3: return BuiltinTypeKind::SVE_INT64_X3;
-    case pasta::BuiltinTypeKind::kSveUint8x3: return BuiltinTypeKind::SVE_UINT8_X3;
-    case pasta::BuiltinTypeKind::kSveUint16x3: return BuiltinTypeKind::SVE_UINT16_X3;
-    case pasta::BuiltinTypeKind::kSveUint32x3: return BuiltinTypeKind::SVE_UINT32_X3;
-    case pasta::BuiltinTypeKind::kSveUint64x3: return BuiltinTypeKind::SVE_UINT64_X3;
-    case pasta::BuiltinTypeKind::kSveFloat16x3: return BuiltinTypeKind::SVE_FLOAT16_X3;
-    case pasta::BuiltinTypeKind::kSveFloat32x3: return BuiltinTypeKind::SVE_FLOAT32_X3;
-    case pasta::BuiltinTypeKind::kSveFloat64x3: return BuiltinTypeKind::SVE_FLOAT64_X3;
-    case pasta::BuiltinTypeKind::kSveBFloat16x3: return BuiltinTypeKind::SVE_B_FLOAT16_X3;
-    case pasta::BuiltinTypeKind::kSveInt8x4: return BuiltinTypeKind::SVE_INT8_X4;
-    case pasta::BuiltinTypeKind::kSveInt16x4: return BuiltinTypeKind::SVE_INT16_X4;
-    case pasta::BuiltinTypeKind::kSveInt32x4: return BuiltinTypeKind::SVE_INT32_X4;
-    case pasta::BuiltinTypeKind::kSveInt64x4: return BuiltinTypeKind::SVE_INT64_X4;
-    case pasta::BuiltinTypeKind::kSveUint8x4: return BuiltinTypeKind::SVE_UINT8_X4;
-    case pasta::BuiltinTypeKind::kSveUint16x4: return BuiltinTypeKind::SVE_UINT16_X4;
-    case pasta::BuiltinTypeKind::kSveUint32x4: return BuiltinTypeKind::SVE_UINT32_X4;
-    case pasta::BuiltinTypeKind::kSveUint64x4: return BuiltinTypeKind::SVE_UINT64_X4;
-    case pasta::BuiltinTypeKind::kSveFloat16x4: return BuiltinTypeKind::SVE_FLOAT16_X4;
-    case pasta::BuiltinTypeKind::kSveFloat32x4: return BuiltinTypeKind::SVE_FLOAT32_X4;
-    case pasta::BuiltinTypeKind::kSveFloat64x4: return BuiltinTypeKind::SVE_FLOAT64_X4;
-    case pasta::BuiltinTypeKind::kSveBFloat16x4: return BuiltinTypeKind::SVE_B_FLOAT16_X4;
-    case pasta::BuiltinTypeKind::kSveBoolean: return BuiltinTypeKind::SVE_BOOLEAN;
-    case pasta::BuiltinTypeKind::kVectorQuad: return BuiltinTypeKind::VECTOR_QUAD;
-    case pasta::BuiltinTypeKind::kVectorPair: return BuiltinTypeKind::VECTOR_PAIR;
-    case pasta::BuiltinTypeKind::kRvvInt8mf8: return BuiltinTypeKind::RVV_INT8_MF8;
-    case pasta::BuiltinTypeKind::kRvvInt8mf4: return BuiltinTypeKind::RVV_INT8_MF4;
-    case pasta::BuiltinTypeKind::kRvvInt8mf2: return BuiltinTypeKind::RVV_INT8_MF2;
-    case pasta::BuiltinTypeKind::kRvvInt8m1: return BuiltinTypeKind::RVV_INT8_M1;
-    case pasta::BuiltinTypeKind::kRvvInt8m2: return BuiltinTypeKind::RVV_INT8_M2;
-    case pasta::BuiltinTypeKind::kRvvInt8m4: return BuiltinTypeKind::RVV_INT8_M4;
-    case pasta::BuiltinTypeKind::kRvvInt8m8: return BuiltinTypeKind::RVV_INT8_M8;
-    case pasta::BuiltinTypeKind::kRvvUint8mf8: return BuiltinTypeKind::RVV_UINT8_MF8;
-    case pasta::BuiltinTypeKind::kRvvUint8mf4: return BuiltinTypeKind::RVV_UINT8_MF4;
-    case pasta::BuiltinTypeKind::kRvvUint8mf2: return BuiltinTypeKind::RVV_UINT8_MF2;
-    case pasta::BuiltinTypeKind::kRvvUint8m1: return BuiltinTypeKind::RVV_UINT8_M1;
-    case pasta::BuiltinTypeKind::kRvvUint8m2: return BuiltinTypeKind::RVV_UINT8_M2;
-    case pasta::BuiltinTypeKind::kRvvUint8m4: return BuiltinTypeKind::RVV_UINT8_M4;
-    case pasta::BuiltinTypeKind::kRvvUint8m8: return BuiltinTypeKind::RVV_UINT8_M8;
-    case pasta::BuiltinTypeKind::kRvvInt16mf4: return BuiltinTypeKind::RVV_INT16_MF4;
-    case pasta::BuiltinTypeKind::kRvvInt16mf2: return BuiltinTypeKind::RVV_INT16_MF2;
-    case pasta::BuiltinTypeKind::kRvvInt16m1: return BuiltinTypeKind::RVV_INT16_M1;
-    case pasta::BuiltinTypeKind::kRvvInt16m2: return BuiltinTypeKind::RVV_INT16_M2;
-    case pasta::BuiltinTypeKind::kRvvInt16m4: return BuiltinTypeKind::RVV_INT16_M4;
-    case pasta::BuiltinTypeKind::kRvvInt16m8: return BuiltinTypeKind::RVV_INT16_M8;
-    case pasta::BuiltinTypeKind::kRvvUint16mf4: return BuiltinTypeKind::RVV_UINT16_MF4;
-    case pasta::BuiltinTypeKind::kRvvUint16mf2: return BuiltinTypeKind::RVV_UINT16_MF2;
-    case pasta::BuiltinTypeKind::kRvvUint16m1: return BuiltinTypeKind::RVV_UINT16_M1;
-    case pasta::BuiltinTypeKind::kRvvUint16m2: return BuiltinTypeKind::RVV_UINT16_M2;
-    case pasta::BuiltinTypeKind::kRvvUint16m4: return BuiltinTypeKind::RVV_UINT16_M4;
-    case pasta::BuiltinTypeKind::kRvvUint16m8: return BuiltinTypeKind::RVV_UINT16_M8;
-    case pasta::BuiltinTypeKind::kRvvInt32mf2: return BuiltinTypeKind::RVV_INT32_MF2;
-    case pasta::BuiltinTypeKind::kRvvInt32m1: return BuiltinTypeKind::RVV_INT32_M1;
-    case pasta::BuiltinTypeKind::kRvvInt32m2: return BuiltinTypeKind::RVV_INT32_M2;
-    case pasta::BuiltinTypeKind::kRvvInt32m4: return BuiltinTypeKind::RVV_INT32_M4;
-    case pasta::BuiltinTypeKind::kRvvInt32m8: return BuiltinTypeKind::RVV_INT32_M8;
-    case pasta::BuiltinTypeKind::kRvvUint32mf2: return BuiltinTypeKind::RVV_UINT32_MF2;
-    case pasta::BuiltinTypeKind::kRvvUint32m1: return BuiltinTypeKind::RVV_UINT32_M1;
-    case pasta::BuiltinTypeKind::kRvvUint32m2: return BuiltinTypeKind::RVV_UINT32_M2;
-    case pasta::BuiltinTypeKind::kRvvUint32m4: return BuiltinTypeKind::RVV_UINT32_M4;
-    case pasta::BuiltinTypeKind::kRvvUint32m8: return BuiltinTypeKind::RVV_UINT32_M8;
-    case pasta::BuiltinTypeKind::kRvvInt64m1: return BuiltinTypeKind::RVV_INT64_M1;
-    case pasta::BuiltinTypeKind::kRvvInt64m2: return BuiltinTypeKind::RVV_INT64_M2;
-    case pasta::BuiltinTypeKind::kRvvInt64m4: return BuiltinTypeKind::RVV_INT64_M4;
-    case pasta::BuiltinTypeKind::kRvvInt64m8: return BuiltinTypeKind::RVV_INT64_M8;
-    case pasta::BuiltinTypeKind::kRvvUint64m1: return BuiltinTypeKind::RVV_UINT64_M1;
-    case pasta::BuiltinTypeKind::kRvvUint64m2: return BuiltinTypeKind::RVV_UINT64_M2;
-    case pasta::BuiltinTypeKind::kRvvUint64m4: return BuiltinTypeKind::RVV_UINT64_M4;
-    case pasta::BuiltinTypeKind::kRvvUint64m8: return BuiltinTypeKind::RVV_UINT64_M8;
-    case pasta::BuiltinTypeKind::kRvvFloat16mf4: return BuiltinTypeKind::RVV_FLOAT16_MF4;
-    case pasta::BuiltinTypeKind::kRvvFloat16mf2: return BuiltinTypeKind::RVV_FLOAT16_MF2;
-    case pasta::BuiltinTypeKind::kRvvFloat16m1: return BuiltinTypeKind::RVV_FLOAT16_M1;
-    case pasta::BuiltinTypeKind::kRvvFloat16m2: return BuiltinTypeKind::RVV_FLOAT16_M2;
-    case pasta::BuiltinTypeKind::kRvvFloat16m4: return BuiltinTypeKind::RVV_FLOAT16_M4;
-    case pasta::BuiltinTypeKind::kRvvFloat16m8: return BuiltinTypeKind::RVV_FLOAT16_M8;
-    case pasta::BuiltinTypeKind::kRvvFloat32mf2: return BuiltinTypeKind::RVV_FLOAT32_MF2;
-    case pasta::BuiltinTypeKind::kRvvFloat32m1: return BuiltinTypeKind::RVV_FLOAT32_M1;
-    case pasta::BuiltinTypeKind::kRvvFloat32m2: return BuiltinTypeKind::RVV_FLOAT32_M2;
-    case pasta::BuiltinTypeKind::kRvvFloat32m4: return BuiltinTypeKind::RVV_FLOAT32_M4;
-    case pasta::BuiltinTypeKind::kRvvFloat32m8: return BuiltinTypeKind::RVV_FLOAT32_M8;
-    case pasta::BuiltinTypeKind::kRvvFloat64m1: return BuiltinTypeKind::RVV_FLOAT64_M1;
-    case pasta::BuiltinTypeKind::kRvvFloat64m2: return BuiltinTypeKind::RVV_FLOAT64_M2;
-    case pasta::BuiltinTypeKind::kRvvFloat64m4: return BuiltinTypeKind::RVV_FLOAT64_M4;
-    case pasta::BuiltinTypeKind::kRvvFloat64m8: return BuiltinTypeKind::RVV_FLOAT64_M8;
-    case pasta::BuiltinTypeKind::kRvvBool1: return BuiltinTypeKind::RVV_BOOL1;
-    case pasta::BuiltinTypeKind::kRvvBool2: return BuiltinTypeKind::RVV_BOOL2;
-    case pasta::BuiltinTypeKind::kRvvBool4: return BuiltinTypeKind::RVV_BOOL4;
-    case pasta::BuiltinTypeKind::kRvvBool8: return BuiltinTypeKind::RVV_BOOL8;
-    case pasta::BuiltinTypeKind::kRvvBool16: return BuiltinTypeKind::RVV_BOOL16;
-    case pasta::BuiltinTypeKind::kRvvBool32: return BuiltinTypeKind::RVV_BOOL32;
-    case pasta::BuiltinTypeKind::kRvvBool64: return BuiltinTypeKind::RVV_BOOL64;
-    case pasta::BuiltinTypeKind::kVoid: return BuiltinTypeKind::VOID;
-    case pasta::BuiltinTypeKind::kBoolean: return BuiltinTypeKind::BOOLEAN;
-    case pasta::BuiltinTypeKind::kCharacterU: return BuiltinTypeKind::CHARACTER_U;
-    case pasta::BuiltinTypeKind::kUChar: return BuiltinTypeKind::U_CHAR;
-    case pasta::BuiltinTypeKind::kWCharU: return BuiltinTypeKind::W_CHAR_U;
-    case pasta::BuiltinTypeKind::kChar8: return BuiltinTypeKind::CHAR8;
-    case pasta::BuiltinTypeKind::kChar16: return BuiltinTypeKind::CHAR16;
-    case pasta::BuiltinTypeKind::kChar32: return BuiltinTypeKind::CHAR32;
-    case pasta::BuiltinTypeKind::kUShort: return BuiltinTypeKind::U_SHORT;
-    case pasta::BuiltinTypeKind::kUInt: return BuiltinTypeKind::U_INT;
-    case pasta::BuiltinTypeKind::kULong: return BuiltinTypeKind::U_LONG;
-    case pasta::BuiltinTypeKind::kULongLong: return BuiltinTypeKind::U_LONG_LONG;
-    case pasta::BuiltinTypeKind::kUInt128: return BuiltinTypeKind::U_INT128;
-    case pasta::BuiltinTypeKind::kCharacterS: return BuiltinTypeKind::CHARACTER_S;
-    case pasta::BuiltinTypeKind::kSChar: return BuiltinTypeKind::S_CHAR;
-    case pasta::BuiltinTypeKind::kWCharS: return BuiltinTypeKind::W_CHAR_S;
-    case pasta::BuiltinTypeKind::kShort: return BuiltinTypeKind::SHORT;
-    case pasta::BuiltinTypeKind::kInt: return BuiltinTypeKind::INT;
-    case pasta::BuiltinTypeKind::kLong: return BuiltinTypeKind::LONG;
-    case pasta::BuiltinTypeKind::kLongLong: return BuiltinTypeKind::LONG_LONG;
-    case pasta::BuiltinTypeKind::kInt128: return BuiltinTypeKind::INT128;
-    case pasta::BuiltinTypeKind::kShortAccum: return BuiltinTypeKind::SHORT_ACCUM;
-    case pasta::BuiltinTypeKind::kAccum: return BuiltinTypeKind::ACCUM;
-    case pasta::BuiltinTypeKind::kLongAccum: return BuiltinTypeKind::LONG_ACCUM;
-    case pasta::BuiltinTypeKind::kUShortAccum: return BuiltinTypeKind::U_SHORT_ACCUM;
-    case pasta::BuiltinTypeKind::kUAccum: return BuiltinTypeKind::U_ACCUM;
-    case pasta::BuiltinTypeKind::kULongAccum: return BuiltinTypeKind::U_LONG_ACCUM;
-    case pasta::BuiltinTypeKind::kShortFract: return BuiltinTypeKind::SHORT_FRACT;
-    case pasta::BuiltinTypeKind::kFract: return BuiltinTypeKind::FRACT;
-    case pasta::BuiltinTypeKind::kLongFract: return BuiltinTypeKind::LONG_FRACT;
-    case pasta::BuiltinTypeKind::kUShortFract: return BuiltinTypeKind::U_SHORT_FRACT;
-    case pasta::BuiltinTypeKind::kUFract: return BuiltinTypeKind::U_FRACT;
-    case pasta::BuiltinTypeKind::kULongFract: return BuiltinTypeKind::U_LONG_FRACT;
-    case pasta::BuiltinTypeKind::kSatShortAccum: return BuiltinTypeKind::SAT_SHORT_ACCUM;
-    case pasta::BuiltinTypeKind::kSatAccum: return BuiltinTypeKind::SAT_ACCUM;
-    case pasta::BuiltinTypeKind::kSatLongAccum: return BuiltinTypeKind::SAT_LONG_ACCUM;
-    case pasta::BuiltinTypeKind::kSatUShortAccum: return BuiltinTypeKind::SAT_U_SHORT_ACCUM;
-    case pasta::BuiltinTypeKind::kSatUAccum: return BuiltinTypeKind::SAT_U_ACCUM;
-    case pasta::BuiltinTypeKind::kSatULongAccum: return BuiltinTypeKind::SAT_U_LONG_ACCUM;
-    case pasta::BuiltinTypeKind::kSatShortFract: return BuiltinTypeKind::SAT_SHORT_FRACT;
-    case pasta::BuiltinTypeKind::kSatFract: return BuiltinTypeKind::SAT_FRACT;
-    case pasta::BuiltinTypeKind::kSatLongFract: return BuiltinTypeKind::SAT_LONG_FRACT;
-    case pasta::BuiltinTypeKind::kSatUShortFract: return BuiltinTypeKind::SAT_U_SHORT_FRACT;
-    case pasta::BuiltinTypeKind::kSatUFract: return BuiltinTypeKind::SAT_U_FRACT;
-    case pasta::BuiltinTypeKind::kSatULongFract: return BuiltinTypeKind::SAT_U_LONG_FRACT;
-    case pasta::BuiltinTypeKind::kHalf: return BuiltinTypeKind::HALF;
-    case pasta::BuiltinTypeKind::kFloat: return BuiltinTypeKind::FLOAT;
-    case pasta::BuiltinTypeKind::kDouble: return BuiltinTypeKind::DOUBLE;
-    case pasta::BuiltinTypeKind::kLongDouble: return BuiltinTypeKind::LONG_DOUBLE;
-    case pasta::BuiltinTypeKind::kFloat16: return BuiltinTypeKind::FLOAT16;
-    case pasta::BuiltinTypeKind::kBFloat16: return BuiltinTypeKind::B_FLOAT16;
-    case pasta::BuiltinTypeKind::kFloat128: return BuiltinTypeKind::FLOAT128;
-    case pasta::BuiltinTypeKind::kNullPointer: return BuiltinTypeKind::NULL_POINTER;
-    case pasta::BuiltinTypeKind::kObjCId: return BuiltinTypeKind::OBJ_C_ID;
-    case pasta::BuiltinTypeKind::kObjCClass: return BuiltinTypeKind::OBJ_C_CLASS;
-    case pasta::BuiltinTypeKind::kObjCSel: return BuiltinTypeKind::OBJ_C_SEL;
-    case pasta::BuiltinTypeKind::kOCLSampler: return BuiltinTypeKind::OCL_SAMPLER;
-    case pasta::BuiltinTypeKind::kOCLEvent: return BuiltinTypeKind::OCL_EVENT;
-    case pasta::BuiltinTypeKind::kOCLClkEvent: return BuiltinTypeKind::OCL_CLK_EVENT;
-    case pasta::BuiltinTypeKind::kOCLQueue: return BuiltinTypeKind::OCL_QUEUE;
-    case pasta::BuiltinTypeKind::kOCLReserveID: return BuiltinTypeKind::OCL_RESERVE_ID;
-    case pasta::BuiltinTypeKind::kDependent: return BuiltinTypeKind::DEPENDENT;
-    case pasta::BuiltinTypeKind::kOverload: return BuiltinTypeKind::OVERLOAD;
-    case pasta::BuiltinTypeKind::kBoundMember: return BuiltinTypeKind::BOUND_MEMBER;
-    case pasta::BuiltinTypeKind::kPseudoObject: return BuiltinTypeKind::PSEUDO_OBJECT;
-    case pasta::BuiltinTypeKind::kUnknownAny: return BuiltinTypeKind::UNKNOWN_ANY;
-    case pasta::BuiltinTypeKind::kBuiltinFn: return BuiltinTypeKind::BUILTIN_FN;
-    case pasta::BuiltinTypeKind::kARCUnbridgedCast: return BuiltinTypeKind::ARC_UNBRIDGED_CAST;
-    case pasta::BuiltinTypeKind::kIncompleteMatrixIndex: return BuiltinTypeKind::INCOMPLETE_MATRIX_INDEX;
-    case pasta::BuiltinTypeKind::kOMPArraySection: return BuiltinTypeKind::OMP_ARRAY_SECTION;
-    case pasta::BuiltinTypeKind::kOMPArrayShaping: return BuiltinTypeKind::OMP_ARRAY_SHAPING;
-    case pasta::BuiltinTypeKind::kOMPIterator: return BuiltinTypeKind::OMP_ITERATOR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BuiltinTypeKind::OCL_IMAGE1_DRO;
+    case 1: return BuiltinTypeKind::OCL_IMAGE1_DARRAY_RO;
+    case 2: return BuiltinTypeKind::OCL_IMAGE1_DBUFFER_RO;
+    case 3: return BuiltinTypeKind::OCL_IMAGE2_DRO;
+    case 4: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_RO;
+    case 5: return BuiltinTypeKind::OCL_IMAGE2_DDEPTH_RO;
+    case 6: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_DEPTH_RO;
+    case 7: return BuiltinTypeKind::OCL_IMAGE2_DMSAARO;
+    case 8: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAARO;
+    case 9: return BuiltinTypeKind::OCL_IMAGE2_DMSAA_DEPTH_RO;
+    case 10: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAA_DEPTH_RO;
+    case 11: return BuiltinTypeKind::OCL_IMAGE3_DRO;
+    case 12: return BuiltinTypeKind::OCL_IMAGE1_DWO;
+    case 13: return BuiltinTypeKind::OCL_IMAGE1_DARRAY_WO;
+    case 14: return BuiltinTypeKind::OCL_IMAGE1_DBUFFER_WO;
+    case 15: return BuiltinTypeKind::OCL_IMAGE2_DWO;
+    case 16: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_WO;
+    case 17: return BuiltinTypeKind::OCL_IMAGE2_DDEPTH_WO;
+    case 18: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_DEPTH_WO;
+    case 19: return BuiltinTypeKind::OCL_IMAGE2_DMSAAWO;
+    case 20: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAAWO;
+    case 21: return BuiltinTypeKind::OCL_IMAGE2_DMSAA_DEPTH_WO;
+    case 22: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAA_DEPTH_WO;
+    case 23: return BuiltinTypeKind::OCL_IMAGE3_DWO;
+    case 24: return BuiltinTypeKind::OCL_IMAGE1_DRW;
+    case 25: return BuiltinTypeKind::OCL_IMAGE1_DARRAY_RW;
+    case 26: return BuiltinTypeKind::OCL_IMAGE1_DBUFFER_RW;
+    case 27: return BuiltinTypeKind::OCL_IMAGE2_DRW;
+    case 28: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_RW;
+    case 29: return BuiltinTypeKind::OCL_IMAGE2_DDEPTH_RW;
+    case 30: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_DEPTH_RW;
+    case 31: return BuiltinTypeKind::OCL_IMAGE2_DMSAARW;
+    case 32: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAARW;
+    case 33: return BuiltinTypeKind::OCL_IMAGE2_DMSAA_DEPTH_RW;
+    case 34: return BuiltinTypeKind::OCL_IMAGE2_DARRAY_MSAA_DEPTH_RW;
+    case 35: return BuiltinTypeKind::OCL_IMAGE3_DRW;
+    case 36: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_MCE_PAYLOAD;
+    case 37: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_PAYLOAD;
+    case 38: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_REF_PAYLOAD;
+    case 39: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_SIC_PAYLOAD;
+    case 40: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_MCE_RESULT;
+    case 41: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_RESULT;
+    case 42: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_REF_RESULT;
+    case 43: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_SIC_RESULT;
+    case 44: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_RESULT_SINGLE_REFERENCE_STREAMOUT;
+    case 45: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_RESULT_DUAL_REFERENCE_STREAMOUT;
+    case 46: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_SINGLE_REFERENCE_STREAMIN;
+    case 47: return BuiltinTypeKind::OCL_INTEL_SUBGROUP_AVC_IME_DUAL_REFERENCE_STREAMIN;
+    case 48: return BuiltinTypeKind::SVE_INT8;
+    case 49: return BuiltinTypeKind::SVE_INT16;
+    case 50: return BuiltinTypeKind::SVE_INT32;
+    case 51: return BuiltinTypeKind::SVE_INT64;
+    case 52: return BuiltinTypeKind::SVE_UINT8;
+    case 53: return BuiltinTypeKind::SVE_UINT16;
+    case 54: return BuiltinTypeKind::SVE_UINT32;
+    case 55: return BuiltinTypeKind::SVE_UINT64;
+    case 56: return BuiltinTypeKind::SVE_FLOAT16;
+    case 57: return BuiltinTypeKind::SVE_FLOAT32;
+    case 58: return BuiltinTypeKind::SVE_FLOAT64;
+    case 59: return BuiltinTypeKind::SVE_B_FLOAT16;
+    case 60: return BuiltinTypeKind::SVE_INT8_X2;
+    case 61: return BuiltinTypeKind::SVE_INT16_X2;
+    case 62: return BuiltinTypeKind::SVE_INT32_X2;
+    case 63: return BuiltinTypeKind::SVE_INT64_X2;
+    case 64: return BuiltinTypeKind::SVE_UINT8_X2;
+    case 65: return BuiltinTypeKind::SVE_UINT16_X2;
+    case 66: return BuiltinTypeKind::SVE_UINT32_X2;
+    case 67: return BuiltinTypeKind::SVE_UINT64_X2;
+    case 68: return BuiltinTypeKind::SVE_FLOAT16_X2;
+    case 69: return BuiltinTypeKind::SVE_FLOAT32_X2;
+    case 70: return BuiltinTypeKind::SVE_FLOAT64_X2;
+    case 71: return BuiltinTypeKind::SVE_B_FLOAT16_X2;
+    case 72: return BuiltinTypeKind::SVE_INT8_X3;
+    case 73: return BuiltinTypeKind::SVE_INT16_X3;
+    case 74: return BuiltinTypeKind::SVE_INT32_X3;
+    case 75: return BuiltinTypeKind::SVE_INT64_X3;
+    case 76: return BuiltinTypeKind::SVE_UINT8_X3;
+    case 77: return BuiltinTypeKind::SVE_UINT16_X3;
+    case 78: return BuiltinTypeKind::SVE_UINT32_X3;
+    case 79: return BuiltinTypeKind::SVE_UINT64_X3;
+    case 80: return BuiltinTypeKind::SVE_FLOAT16_X3;
+    case 81: return BuiltinTypeKind::SVE_FLOAT32_X3;
+    case 82: return BuiltinTypeKind::SVE_FLOAT64_X3;
+    case 83: return BuiltinTypeKind::SVE_B_FLOAT16_X3;
+    case 84: return BuiltinTypeKind::SVE_INT8_X4;
+    case 85: return BuiltinTypeKind::SVE_INT16_X4;
+    case 86: return BuiltinTypeKind::SVE_INT32_X4;
+    case 87: return BuiltinTypeKind::SVE_INT64_X4;
+    case 88: return BuiltinTypeKind::SVE_UINT8_X4;
+    case 89: return BuiltinTypeKind::SVE_UINT16_X4;
+    case 90: return BuiltinTypeKind::SVE_UINT32_X4;
+    case 91: return BuiltinTypeKind::SVE_UINT64_X4;
+    case 92: return BuiltinTypeKind::SVE_FLOAT16_X4;
+    case 93: return BuiltinTypeKind::SVE_FLOAT32_X4;
+    case 94: return BuiltinTypeKind::SVE_FLOAT64_X4;
+    case 95: return BuiltinTypeKind::SVE_B_FLOAT16_X4;
+    case 96: return BuiltinTypeKind::SVE_BOOLEAN;
+    case 97: return BuiltinTypeKind::VECTOR_QUAD;
+    case 98: return BuiltinTypeKind::VECTOR_PAIR;
+    case 99: return BuiltinTypeKind::RVV_INT8_MF8;
+    case 100: return BuiltinTypeKind::RVV_INT8_MF4;
+    case 101: return BuiltinTypeKind::RVV_INT8_MF2;
+    case 102: return BuiltinTypeKind::RVV_INT8_M1;
+    case 103: return BuiltinTypeKind::RVV_INT8_M2;
+    case 104: return BuiltinTypeKind::RVV_INT8_M4;
+    case 105: return BuiltinTypeKind::RVV_INT8_M8;
+    case 106: return BuiltinTypeKind::RVV_UINT8_MF8;
+    case 107: return BuiltinTypeKind::RVV_UINT8_MF4;
+    case 108: return BuiltinTypeKind::RVV_UINT8_MF2;
+    case 109: return BuiltinTypeKind::RVV_UINT8_M1;
+    case 110: return BuiltinTypeKind::RVV_UINT8_M2;
+    case 111: return BuiltinTypeKind::RVV_UINT8_M4;
+    case 112: return BuiltinTypeKind::RVV_UINT8_M8;
+    case 113: return BuiltinTypeKind::RVV_INT16_MF4;
+    case 114: return BuiltinTypeKind::RVV_INT16_MF2;
+    case 115: return BuiltinTypeKind::RVV_INT16_M1;
+    case 116: return BuiltinTypeKind::RVV_INT16_M2;
+    case 117: return BuiltinTypeKind::RVV_INT16_M4;
+    case 118: return BuiltinTypeKind::RVV_INT16_M8;
+    case 119: return BuiltinTypeKind::RVV_UINT16_MF4;
+    case 120: return BuiltinTypeKind::RVV_UINT16_MF2;
+    case 121: return BuiltinTypeKind::RVV_UINT16_M1;
+    case 122: return BuiltinTypeKind::RVV_UINT16_M2;
+    case 123: return BuiltinTypeKind::RVV_UINT16_M4;
+    case 124: return BuiltinTypeKind::RVV_UINT16_M8;
+    case 125: return BuiltinTypeKind::RVV_INT32_MF2;
+    case 126: return BuiltinTypeKind::RVV_INT32_M1;
+    case 127: return BuiltinTypeKind::RVV_INT32_M2;
+    case 128: return BuiltinTypeKind::RVV_INT32_M4;
+    case 129: return BuiltinTypeKind::RVV_INT32_M8;
+    case 130: return BuiltinTypeKind::RVV_UINT32_MF2;
+    case 131: return BuiltinTypeKind::RVV_UINT32_M1;
+    case 132: return BuiltinTypeKind::RVV_UINT32_M2;
+    case 133: return BuiltinTypeKind::RVV_UINT32_M4;
+    case 134: return BuiltinTypeKind::RVV_UINT32_M8;
+    case 135: return BuiltinTypeKind::RVV_INT64_M1;
+    case 136: return BuiltinTypeKind::RVV_INT64_M2;
+    case 137: return BuiltinTypeKind::RVV_INT64_M4;
+    case 138: return BuiltinTypeKind::RVV_INT64_M8;
+    case 139: return BuiltinTypeKind::RVV_UINT64_M1;
+    case 140: return BuiltinTypeKind::RVV_UINT64_M2;
+    case 141: return BuiltinTypeKind::RVV_UINT64_M4;
+    case 142: return BuiltinTypeKind::RVV_UINT64_M8;
+    case 143: return BuiltinTypeKind::RVV_FLOAT16_MF4;
+    case 144: return BuiltinTypeKind::RVV_FLOAT16_MF2;
+    case 145: return BuiltinTypeKind::RVV_FLOAT16_M1;
+    case 146: return BuiltinTypeKind::RVV_FLOAT16_M2;
+    case 147: return BuiltinTypeKind::RVV_FLOAT16_M4;
+    case 148: return BuiltinTypeKind::RVV_FLOAT16_M8;
+    case 149: return BuiltinTypeKind::RVV_FLOAT32_MF2;
+    case 150: return BuiltinTypeKind::RVV_FLOAT32_M1;
+    case 151: return BuiltinTypeKind::RVV_FLOAT32_M2;
+    case 152: return BuiltinTypeKind::RVV_FLOAT32_M4;
+    case 153: return BuiltinTypeKind::RVV_FLOAT32_M8;
+    case 154: return BuiltinTypeKind::RVV_FLOAT64_M1;
+    case 155: return BuiltinTypeKind::RVV_FLOAT64_M2;
+    case 156: return BuiltinTypeKind::RVV_FLOAT64_M4;
+    case 157: return BuiltinTypeKind::RVV_FLOAT64_M8;
+    case 158: return BuiltinTypeKind::RVV_BOOL1;
+    case 159: return BuiltinTypeKind::RVV_BOOL2;
+    case 160: return BuiltinTypeKind::RVV_BOOL4;
+    case 161: return BuiltinTypeKind::RVV_BOOL8;
+    case 162: return BuiltinTypeKind::RVV_BOOL16;
+    case 163: return BuiltinTypeKind::RVV_BOOL32;
+    case 164: return BuiltinTypeKind::RVV_BOOL64;
+    case 165: return BuiltinTypeKind::VOID;
+    case 166: return BuiltinTypeKind::BOOLEAN;
+    case 167: return BuiltinTypeKind::CHARACTER_U;
+    case 168: return BuiltinTypeKind::U_CHAR;
+    case 169: return BuiltinTypeKind::W_CHAR_U;
+    case 170: return BuiltinTypeKind::CHAR8;
+    case 171: return BuiltinTypeKind::CHAR16;
+    case 172: return BuiltinTypeKind::CHAR32;
+    case 173: return BuiltinTypeKind::U_SHORT;
+    case 174: return BuiltinTypeKind::U_INT;
+    case 175: return BuiltinTypeKind::U_LONG;
+    case 176: return BuiltinTypeKind::U_LONG_LONG;
+    case 177: return BuiltinTypeKind::U_INT128;
+    case 178: return BuiltinTypeKind::CHARACTER_S;
+    case 179: return BuiltinTypeKind::S_CHAR;
+    case 180: return BuiltinTypeKind::W_CHAR_S;
+    case 181: return BuiltinTypeKind::SHORT;
+    case 182: return BuiltinTypeKind::INT;
+    case 183: return BuiltinTypeKind::LONG;
+    case 184: return BuiltinTypeKind::LONG_LONG;
+    case 185: return BuiltinTypeKind::INT128;
+    case 186: return BuiltinTypeKind::SHORT_ACCUM;
+    case 187: return BuiltinTypeKind::ACCUM;
+    case 188: return BuiltinTypeKind::LONG_ACCUM;
+    case 189: return BuiltinTypeKind::U_SHORT_ACCUM;
+    case 190: return BuiltinTypeKind::U_ACCUM;
+    case 191: return BuiltinTypeKind::U_LONG_ACCUM;
+    case 192: return BuiltinTypeKind::SHORT_FRACT;
+    case 193: return BuiltinTypeKind::FRACT;
+    case 194: return BuiltinTypeKind::LONG_FRACT;
+    case 195: return BuiltinTypeKind::U_SHORT_FRACT;
+    case 196: return BuiltinTypeKind::U_FRACT;
+    case 197: return BuiltinTypeKind::U_LONG_FRACT;
+    case 198: return BuiltinTypeKind::SAT_SHORT_ACCUM;
+    case 199: return BuiltinTypeKind::SAT_ACCUM;
+    case 200: return BuiltinTypeKind::SAT_LONG_ACCUM;
+    case 201: return BuiltinTypeKind::SAT_U_SHORT_ACCUM;
+    case 202: return BuiltinTypeKind::SAT_U_ACCUM;
+    case 203: return BuiltinTypeKind::SAT_U_LONG_ACCUM;
+    case 204: return BuiltinTypeKind::SAT_SHORT_FRACT;
+    case 205: return BuiltinTypeKind::SAT_FRACT;
+    case 206: return BuiltinTypeKind::SAT_LONG_FRACT;
+    case 207: return BuiltinTypeKind::SAT_U_SHORT_FRACT;
+    case 208: return BuiltinTypeKind::SAT_U_FRACT;
+    case 209: return BuiltinTypeKind::SAT_U_LONG_FRACT;
+    case 210: return BuiltinTypeKind::HALF;
+    case 211: return BuiltinTypeKind::FLOAT;
+    case 212: return BuiltinTypeKind::DOUBLE;
+    case 213: return BuiltinTypeKind::LONG_DOUBLE;
+    case 214: return BuiltinTypeKind::FLOAT16;
+    case 215: return BuiltinTypeKind::B_FLOAT16;
+    case 216: return BuiltinTypeKind::FLOAT128;
+    case 217: return BuiltinTypeKind::NULL_POINTER;
+    case 218: return BuiltinTypeKind::OBJ_C_ID;
+    case 219: return BuiltinTypeKind::OBJ_C_CLASS;
+    case 220: return BuiltinTypeKind::OBJ_C_SEL;
+    case 221: return BuiltinTypeKind::OCL_SAMPLER;
+    case 222: return BuiltinTypeKind::OCL_EVENT;
+    case 223: return BuiltinTypeKind::OCL_CLK_EVENT;
+    case 224: return BuiltinTypeKind::OCL_QUEUE;
+    case 225: return BuiltinTypeKind::OCL_RESERVE_ID;
+    case 226: return BuiltinTypeKind::DEPENDENT;
+    case 227: return BuiltinTypeKind::OVERLOAD;
+    case 228: return BuiltinTypeKind::BOUND_MEMBER;
+    case 229: return BuiltinTypeKind::PSEUDO_OBJECT;
+    case 230: return BuiltinTypeKind::UNKNOWN_ANY;
+    case 231: return BuiltinTypeKind::BUILTIN_FN;
+    case 232: return BuiltinTypeKind::ARC_UNBRIDGED_CAST;
+    case 233: return BuiltinTypeKind::INCOMPLETE_MATRIX_INDEX;
+    case 234: return BuiltinTypeKind::OMP_ARRAY_SECTION;
+    case 235: return BuiltinTypeKind::OMP_ARRAY_SHAPING;
+    case 236: return BuiltinTypeKind::OMP_ITERATOR;
+    default: __builtin_unreachable();
   }
 }
 
 CXXConstructExprConstructionKind FromPasta(pasta::CXXConstructExprConstructionKind e) {
-  switch (e) {
-    case pasta::CXXConstructExprConstructionKind::kComplete: return CXXConstructExprConstructionKind::COMPLETE;
-    case pasta::CXXConstructExprConstructionKind::kNonVirtualBase: return CXXConstructExprConstructionKind::NON_VIRTUAL_BASE;
-    case pasta::CXXConstructExprConstructionKind::kVirtualBase: return CXXConstructExprConstructionKind::VIRTUAL_BASE;
-    case pasta::CXXConstructExprConstructionKind::kDelegating: return CXXConstructExprConstructionKind::DELEGATING;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CXXConstructExprConstructionKind::COMPLETE;
+    case 1: return CXXConstructExprConstructionKind::NON_VIRTUAL_BASE;
+    case 2: return CXXConstructExprConstructionKind::VIRTUAL_BASE;
+    case 3: return CXXConstructExprConstructionKind::DELEGATING;
+    default: __builtin_unreachable();
   }
 }
 
 CXXNewExprInitializationStyle FromPasta(pasta::CXXNewExprInitializationStyle e) {
-  switch (e) {
-    case pasta::CXXNewExprInitializationStyle::kNoInitializer: return CXXNewExprInitializationStyle::NO_INITIALIZER;
-    case pasta::CXXNewExprInitializationStyle::kCallInitializer: return CXXNewExprInitializationStyle::CALL_INITIALIZER;
-    case pasta::CXXNewExprInitializationStyle::kListInitializer: return CXXNewExprInitializationStyle::LIST_INITIALIZER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CXXNewExprInitializationStyle::NO_INITIALIZER;
+    case 1: return CXXNewExprInitializationStyle::CALL_INITIALIZER;
+    case 2: return CXXNewExprInitializationStyle::LIST_INITIALIZER;
+    default: __builtin_unreachable();
   }
 }
 
 CallExprADLCallKind FromPasta(pasta::CallExprADLCallKind e) {
-  switch (e) {
-    case pasta::CallExprADLCallKind::kNotADL: return CallExprADLCallKind::NOT_ADL;
-    case pasta::CallExprADLCallKind::kUsesADL: return CallExprADLCallKind::USES_ADL;
+  switch (static_cast<bool>(e)) {
+    case 0: return CallExprADLCallKind::NOT_ADL;
+    case 1: return CallExprADLCallKind::USES_ADL;
+    default: __builtin_unreachable();
   }
 }
 
 CapturedStmtVariableCaptureKind FromPasta(pasta::CapturedStmtVariableCaptureKind e) {
-  switch (e) {
-    case pasta::CapturedStmtVariableCaptureKind::kThis: return CapturedStmtVariableCaptureKind::THIS;
-    case pasta::CapturedStmtVariableCaptureKind::kByReference: return CapturedStmtVariableCaptureKind::BY_REFERENCE;
-    case pasta::CapturedStmtVariableCaptureKind::kByCopy: return CapturedStmtVariableCaptureKind::BY_COPY;
-    case pasta::CapturedStmtVariableCaptureKind::kVLAType: return CapturedStmtVariableCaptureKind::VLA_TYPE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CapturedStmtVariableCaptureKind::THIS;
+    case 1: return CapturedStmtVariableCaptureKind::BY_REFERENCE;
+    case 2: return CapturedStmtVariableCaptureKind::BY_COPY;
+    case 3: return CapturedStmtVariableCaptureKind::VLA_TYPE;
+    default: __builtin_unreachable();
   }
 }
 
 CharacterLiteralCharacterKind FromPasta(pasta::CharacterLiteralCharacterKind e) {
-  switch (e) {
-    case pasta::CharacterLiteralCharacterKind::kAscii: return CharacterLiteralCharacterKind::ASCII;
-    case pasta::CharacterLiteralCharacterKind::kWide: return CharacterLiteralCharacterKind::WIDE;
-    case pasta::CharacterLiteralCharacterKind::kUTF8: return CharacterLiteralCharacterKind::UT_F8;
-    case pasta::CharacterLiteralCharacterKind::kUTF16: return CharacterLiteralCharacterKind::UT_F16;
-    case pasta::CharacterLiteralCharacterKind::kUTF32: return CharacterLiteralCharacterKind::UT_F32;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CharacterLiteralCharacterKind::ASCII;
+    case 1: return CharacterLiteralCharacterKind::WIDE;
+    case 2: return CharacterLiteralCharacterKind::UT_F8;
+    case 3: return CharacterLiteralCharacterKind::UT_F16;
+    case 4: return CharacterLiteralCharacterKind::UT_F32;
+    default: __builtin_unreachable();
   }
 }
 
 ConstantExprResultStorageKind FromPasta(pasta::ConstantExprResultStorageKind e) {
-  switch (e) {
-    case pasta::ConstantExprResultStorageKind::kNone: return ConstantExprResultStorageKind::NONE;
-    case pasta::ConstantExprResultStorageKind::kInt64: return ConstantExprResultStorageKind::INT64;
-    case pasta::ConstantExprResultStorageKind::kAPValue: return ConstantExprResultStorageKind::AP_VALUE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConstantExprResultStorageKind::NONE;
+    case 1: return ConstantExprResultStorageKind::INT64;
+    case 2: return ConstantExprResultStorageKind::AP_VALUE;
+    default: __builtin_unreachable();
   }
 }
 
 DeclFriendObjectKind FromPasta(pasta::DeclFriendObjectKind e) {
-  switch (e) {
-    case pasta::DeclFriendObjectKind::kNone: return DeclFriendObjectKind::NONE;
-    case pasta::DeclFriendObjectKind::kDeclared: return DeclFriendObjectKind::DECLARED;
-    case pasta::DeclFriendObjectKind::kUndeclared: return DeclFriendObjectKind::UNDECLARED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DeclFriendObjectKind::NONE;
+    case 1: return DeclFriendObjectKind::DECLARED;
+    case 2: return DeclFriendObjectKind::UNDECLARED;
+    default: __builtin_unreachable();
   }
 }
 
 DeclIdentifierNamespace FromPasta(pasta::DeclIdentifierNamespace e) {
-  switch (e) {
-    case pasta::DeclIdentifierNamespace::kLabel: return DeclIdentifierNamespace::LABEL;
-    case pasta::DeclIdentifierNamespace::kTag: return DeclIdentifierNamespace::TAG;
-    case pasta::DeclIdentifierNamespace::kType: return DeclIdentifierNamespace::TYPE;
-    case pasta::DeclIdentifierNamespace::kMember: return DeclIdentifierNamespace::MEMBER;
-    case pasta::DeclIdentifierNamespace::kNamespace: return DeclIdentifierNamespace::NAMESPACE;
-    case pasta::DeclIdentifierNamespace::kOrdinary: return DeclIdentifierNamespace::ORDINARY;
-    case pasta::DeclIdentifierNamespace::kObjCProtocol: return DeclIdentifierNamespace::OBJ_C_PROTOCOL;
-    case pasta::DeclIdentifierNamespace::kOrdinaryFriend: return DeclIdentifierNamespace::ORDINARY_FRIEND;
-    case pasta::DeclIdentifierNamespace::kTagFriend: return DeclIdentifierNamespace::TAG_FRIEND;
-    case pasta::DeclIdentifierNamespace::kUsing: return DeclIdentifierNamespace::USING;
-    case pasta::DeclIdentifierNamespace::kNonMemberOperator: return DeclIdentifierNamespace::NON_MEMBER_OPERATOR;
-    case pasta::DeclIdentifierNamespace::kLocalExtern: return DeclIdentifierNamespace::LOCAL_EXTERN;
-    case pasta::DeclIdentifierNamespace::kOMPReduction: return DeclIdentifierNamespace::OMP_REDUCTION;
-    case pasta::DeclIdentifierNamespace::kOMPMapper: return DeclIdentifierNamespace::OMP_MAPPER;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return DeclIdentifierNamespace::LABEL;
+    case 2: return DeclIdentifierNamespace::TAG;
+    case 4: return DeclIdentifierNamespace::TYPE;
+    case 8: return DeclIdentifierNamespace::MEMBER;
+    case 16: return DeclIdentifierNamespace::NAMESPACE;
+    case 32: return DeclIdentifierNamespace::ORDINARY;
+    case 64: return DeclIdentifierNamespace::OBJ_C_PROTOCOL;
+    case 128: return DeclIdentifierNamespace::ORDINARY_FRIEND;
+    case 256: return DeclIdentifierNamespace::TAG_FRIEND;
+    case 512: return DeclIdentifierNamespace::USING;
+    case 1024: return DeclIdentifierNamespace::NON_MEMBER_OPERATOR;
+    case 2048: return DeclIdentifierNamespace::LOCAL_EXTERN;
+    case 4096: return DeclIdentifierNamespace::OMP_REDUCTION;
+    case 8192: return DeclIdentifierNamespace::OMP_MAPPER;
+    default: __builtin_unreachable();
   }
 }
 
 DeclModuleOwnershipKind FromPasta(pasta::DeclModuleOwnershipKind e) {
-  switch (e) {
-    case pasta::DeclModuleOwnershipKind::kUnowned: return DeclModuleOwnershipKind::UNOWNED;
-    case pasta::DeclModuleOwnershipKind::kVisible: return DeclModuleOwnershipKind::VISIBLE;
-    case pasta::DeclModuleOwnershipKind::kVisibleWhenImported: return DeclModuleOwnershipKind::VISIBLE_WHEN_IMPORTED;
-    case pasta::DeclModuleOwnershipKind::kModulePrivate: return DeclModuleOwnershipKind::MODULE_PRIVATE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DeclModuleOwnershipKind::UNOWNED;
+    case 1: return DeclModuleOwnershipKind::VISIBLE;
+    case 2: return DeclModuleOwnershipKind::VISIBLE_WHEN_IMPORTED;
+    case 3: return DeclModuleOwnershipKind::MODULE_PRIVATE;
+    default: __builtin_unreachable();
   }
 }
 
 DeclObjCDeclQualifier FromPasta(pasta::DeclObjCDeclQualifier e) {
-  switch (e) {
-    case pasta::DeclObjCDeclQualifier::kNone: return DeclObjCDeclQualifier::NONE;
-    case pasta::DeclObjCDeclQualifier::kIn: return DeclObjCDeclQualifier::IN;
-    case pasta::DeclObjCDeclQualifier::kInout: return DeclObjCDeclQualifier::INOUT;
-    case pasta::DeclObjCDeclQualifier::kOut: return DeclObjCDeclQualifier::OUT;
-    case pasta::DeclObjCDeclQualifier::kBycopy: return DeclObjCDeclQualifier::BYCOPY;
-    case pasta::DeclObjCDeclQualifier::kByref: return DeclObjCDeclQualifier::BYREF;
-    case pasta::DeclObjCDeclQualifier::kOneway: return DeclObjCDeclQualifier::ONEWAY;
-    case pasta::DeclObjCDeclQualifier::kCSNullability: return DeclObjCDeclQualifier::CS_NULLABILITY;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DeclObjCDeclQualifier::NONE;
+    case 1: return DeclObjCDeclQualifier::IN;
+    case 2: return DeclObjCDeclQualifier::INOUT;
+    case 4: return DeclObjCDeclQualifier::OUT;
+    case 8: return DeclObjCDeclQualifier::BYCOPY;
+    case 16: return DeclObjCDeclQualifier::BYREF;
+    case 32: return DeclObjCDeclQualifier::ONEWAY;
+    case 64: return DeclObjCDeclQualifier::CS_NULLABILITY;
+    default: __builtin_unreachable();
   }
 }
 
 ExprConstantExprKind FromPasta(pasta::ExprConstantExprKind e) {
-  switch (e) {
-    case pasta::ExprConstantExprKind::kNormal: return ExprConstantExprKind::NORMAL;
-    case pasta::ExprConstantExprKind::kNonClassTemplateArgument: return ExprConstantExprKind::NON_CLASS_TEMPLATE_ARGUMENT;
-    case pasta::ExprConstantExprKind::kClassTemplateArgument: return ExprConstantExprKind::CLASS_TEMPLATE_ARGUMENT;
-    case pasta::ExprConstantExprKind::kImmediateInvocation: return ExprConstantExprKind::IMMEDIATE_INVOCATION;
+  switch (static_cast<int>(e)) {
+    case 0: return ExprConstantExprKind::NORMAL;
+    case 1: return ExprConstantExprKind::NON_CLASS_TEMPLATE_ARGUMENT;
+    case 2: return ExprConstantExprKind::CLASS_TEMPLATE_ARGUMENT;
+    case 3: return ExprConstantExprKind::IMMEDIATE_INVOCATION;
+    default: __builtin_unreachable();
   }
 }
 
 ExprLValueClassification FromPasta(pasta::ExprLValueClassification e) {
-  switch (e) {
-    case pasta::ExprLValueClassification::kValid: return ExprLValueClassification::VALID;
-    case pasta::ExprLValueClassification::kNotObjectType: return ExprLValueClassification::NOT_OBJECT_TYPE;
-    case pasta::ExprLValueClassification::kIncompleteVoidType: return ExprLValueClassification::INCOMPLETE_VOID_TYPE;
-    case pasta::ExprLValueClassification::kDuplicateVectorComponents: return ExprLValueClassification::DUPLICATE_VECTOR_COMPONENTS;
-    case pasta::ExprLValueClassification::kInvalidExpression: return ExprLValueClassification::INVALID_EXPRESSION;
-    case pasta::ExprLValueClassification::kInvalidMessageExpression: return ExprLValueClassification::INVALID_MESSAGE_EXPRESSION;
-    case pasta::ExprLValueClassification::kMemberFunction: return ExprLValueClassification::MEMBER_FUNCTION;
-    case pasta::ExprLValueClassification::kSubObjCPropertySetting: return ExprLValueClassification::SUB_OBJ_C_PROPERTY_SETTING;
-    case pasta::ExprLValueClassification::kClassTemporary: return ExprLValueClassification::CLASS_TEMPORARY;
-    case pasta::ExprLValueClassification::kArrayTemporary: return ExprLValueClassification::ARRAY_TEMPORARY;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExprLValueClassification::VALID;
+    case 1: return ExprLValueClassification::NOT_OBJECT_TYPE;
+    case 2: return ExprLValueClassification::INCOMPLETE_VOID_TYPE;
+    case 3: return ExprLValueClassification::DUPLICATE_VECTOR_COMPONENTS;
+    case 4: return ExprLValueClassification::INVALID_EXPRESSION;
+    case 5: return ExprLValueClassification::INVALID_MESSAGE_EXPRESSION;
+    case 6: return ExprLValueClassification::MEMBER_FUNCTION;
+    case 7: return ExprLValueClassification::SUB_OBJ_C_PROPERTY_SETTING;
+    case 8: return ExprLValueClassification::CLASS_TEMPORARY;
+    case 9: return ExprLValueClassification::ARRAY_TEMPORARY;
+    default: __builtin_unreachable();
   }
 }
 
 ExprNullPointerConstantKind FromPasta(pasta::ExprNullPointerConstantKind e) {
-  switch (e) {
-    case pasta::ExprNullPointerConstantKind::kNotNull: return ExprNullPointerConstantKind::NOT_NULL;
-    case pasta::ExprNullPointerConstantKind::kZeroExpression: return ExprNullPointerConstantKind::ZERO_EXPRESSION;
-    case pasta::ExprNullPointerConstantKind::kZeroLiteral: return ExprNullPointerConstantKind::ZERO_LITERAL;
-    case pasta::ExprNullPointerConstantKind::kCXX11Nullptr: return ExprNullPointerConstantKind::CX_X11_NULLPTR;
-    case pasta::ExprNullPointerConstantKind::kGNUNull: return ExprNullPointerConstantKind::GNU_NULL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExprNullPointerConstantKind::NOT_NULL;
+    case 1: return ExprNullPointerConstantKind::ZERO_EXPRESSION;
+    case 2: return ExprNullPointerConstantKind::ZERO_LITERAL;
+    case 3: return ExprNullPointerConstantKind::CX_X11_NULLPTR;
+    case 4: return ExprNullPointerConstantKind::GNU_NULL;
+    default: __builtin_unreachable();
   }
 }
 
 ExprNullPointerConstantValueDependence FromPasta(pasta::ExprNullPointerConstantValueDependence e) {
-  switch (e) {
-    case pasta::ExprNullPointerConstantValueDependence::kNeverValueDependent: return ExprNullPointerConstantValueDependence::NEVER_VALUE_DEPENDENT;
-    case pasta::ExprNullPointerConstantValueDependence::kValueDependentIsNull: return ExprNullPointerConstantValueDependence::VALUE_DEPENDENT_IS_NULL;
-    case pasta::ExprNullPointerConstantValueDependence::kValueDependentIsNotNull: return ExprNullPointerConstantValueDependence::VALUE_DEPENDENT_IS_NOT_NULL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExprNullPointerConstantValueDependence::NEVER_VALUE_DEPENDENT;
+    case 1: return ExprNullPointerConstantValueDependence::VALUE_DEPENDENT_IS_NULL;
+    case 2: return ExprNullPointerConstantValueDependence::VALUE_DEPENDENT_IS_NOT_NULL;
+    default: __builtin_unreachable();
   }
 }
 
 ExprSideEffectsKind FromPasta(pasta::ExprSideEffectsKind e) {
-  switch (e) {
-    case pasta::ExprSideEffectsKind::kNoSideEffects: return ExprSideEffectsKind::NO_SIDE_EFFECTS;
-    case pasta::ExprSideEffectsKind::kAllowUndefinedBehavior: return ExprSideEffectsKind::ALLOW_UNDEFINED_BEHAVIOR;
-    case pasta::ExprSideEffectsKind::kAllowSideEffects: return ExprSideEffectsKind::ALLOW_SIDE_EFFECTS;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExprSideEffectsKind::NO_SIDE_EFFECTS;
+    case 1: return ExprSideEffectsKind::ALLOW_UNDEFINED_BEHAVIOR;
+    case 2: return ExprSideEffectsKind::ALLOW_SIDE_EFFECTS;
+    default: __builtin_unreachable();
   }
 }
 
 ExprisModifiableLvalueResult FromPasta(pasta::ExprisModifiableLvalueResult e) {
-  switch (e) {
-    case pasta::ExprisModifiableLvalueResult::kValid: return ExprisModifiableLvalueResult::VALID;
-    case pasta::ExprisModifiableLvalueResult::kNotObjectType: return ExprisModifiableLvalueResult::NOT_OBJECT_TYPE;
-    case pasta::ExprisModifiableLvalueResult::kIncompleteVoidType: return ExprisModifiableLvalueResult::INCOMPLETE_VOID_TYPE;
-    case pasta::ExprisModifiableLvalueResult::kDuplicateVectorComponents: return ExprisModifiableLvalueResult::DUPLICATE_VECTOR_COMPONENTS;
-    case pasta::ExprisModifiableLvalueResult::kInvalidExpression: return ExprisModifiableLvalueResult::INVALID_EXPRESSION;
-    case pasta::ExprisModifiableLvalueResult::kLValueCast: return ExprisModifiableLvalueResult::L_VALUE_CAST;
-    case pasta::ExprisModifiableLvalueResult::kIncompleteType: return ExprisModifiableLvalueResult::INCOMPLETE_TYPE;
-    case pasta::ExprisModifiableLvalueResult::kConstQualified: return ExprisModifiableLvalueResult::CONST_QUALIFIED;
-    case pasta::ExprisModifiableLvalueResult::kConstQualifiedField: return ExprisModifiableLvalueResult::CONST_QUALIFIED_FIELD;
-    case pasta::ExprisModifiableLvalueResult::kConstAddrSpace: return ExprisModifiableLvalueResult::CONST_ADDR_SPACE;
-    case pasta::ExprisModifiableLvalueResult::kArrayType: return ExprisModifiableLvalueResult::ARRAY_TYPE;
-    case pasta::ExprisModifiableLvalueResult::kNoSetterProperty: return ExprisModifiableLvalueResult::NO_SETTER_PROPERTY;
-    case pasta::ExprisModifiableLvalueResult::kMemberFunction: return ExprisModifiableLvalueResult::MEMBER_FUNCTION;
-    case pasta::ExprisModifiableLvalueResult::kSubObjCPropertySetting: return ExprisModifiableLvalueResult::SUB_OBJ_C_PROPERTY_SETTING;
-    case pasta::ExprisModifiableLvalueResult::kInvalidMessageExpression: return ExprisModifiableLvalueResult::INVALID_MESSAGE_EXPRESSION;
-    case pasta::ExprisModifiableLvalueResult::kClassTemporary: return ExprisModifiableLvalueResult::CLASS_TEMPORARY;
-    case pasta::ExprisModifiableLvalueResult::kArrayTemporary: return ExprisModifiableLvalueResult::ARRAY_TEMPORARY;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExprisModifiableLvalueResult::VALID;
+    case 1: return ExprisModifiableLvalueResult::NOT_OBJECT_TYPE;
+    case 2: return ExprisModifiableLvalueResult::INCOMPLETE_VOID_TYPE;
+    case 3: return ExprisModifiableLvalueResult::DUPLICATE_VECTOR_COMPONENTS;
+    case 4: return ExprisModifiableLvalueResult::INVALID_EXPRESSION;
+    case 5: return ExprisModifiableLvalueResult::L_VALUE_CAST;
+    case 6: return ExprisModifiableLvalueResult::INCOMPLETE_TYPE;
+    case 7: return ExprisModifiableLvalueResult::CONST_QUALIFIED;
+    case 8: return ExprisModifiableLvalueResult::CONST_QUALIFIED_FIELD;
+    case 9: return ExprisModifiableLvalueResult::CONST_ADDR_SPACE;
+    case 10: return ExprisModifiableLvalueResult::ARRAY_TYPE;
+    case 11: return ExprisModifiableLvalueResult::NO_SETTER_PROPERTY;
+    case 12: return ExprisModifiableLvalueResult::MEMBER_FUNCTION;
+    case 13: return ExprisModifiableLvalueResult::SUB_OBJ_C_PROPERTY_SETTING;
+    case 14: return ExprisModifiableLvalueResult::INVALID_MESSAGE_EXPRESSION;
+    case 15: return ExprisModifiableLvalueResult::CLASS_TEMPORARY;
+    case 16: return ExprisModifiableLvalueResult::ARRAY_TEMPORARY;
+    default: __builtin_unreachable();
   }
 }
 
 FunctionDeclTemplatedKind FromPasta(pasta::FunctionDeclTemplatedKind e) {
-  switch (e) {
-    case pasta::FunctionDeclTemplatedKind::kNonTemplate: return FunctionDeclTemplatedKind::NON_TEMPLATE;
-    case pasta::FunctionDeclTemplatedKind::kFunctionTemplate: return FunctionDeclTemplatedKind::FUNCTION_TEMPLATE;
-    case pasta::FunctionDeclTemplatedKind::kMemberSpecialization: return FunctionDeclTemplatedKind::MEMBER_SPECIALIZATION;
-    case pasta::FunctionDeclTemplatedKind::kFunctionTemplateSpecialization: return FunctionDeclTemplatedKind::FUNCTION_TEMPLATE_SPECIALIZATION;
-    case pasta::FunctionDeclTemplatedKind::kDependentFunctionTemplateSpecialization: return FunctionDeclTemplatedKind::DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FunctionDeclTemplatedKind::NON_TEMPLATE;
+    case 1: return FunctionDeclTemplatedKind::FUNCTION_TEMPLATE;
+    case 2: return FunctionDeclTemplatedKind::MEMBER_SPECIALIZATION;
+    case 3: return FunctionDeclTemplatedKind::FUNCTION_TEMPLATE_SPECIALIZATION;
+    case 4: return FunctionDeclTemplatedKind::DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION;
+    default: __builtin_unreachable();
   }
 }
 
 ImplicitCastExprOnStack FromPasta(pasta::ImplicitCastExprOnStack e) {
-  switch (e) {
-    case pasta::ImplicitCastExprOnStack::kOnStack: return ImplicitCastExprOnStack::ON_STACK;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ImplicitCastExprOnStack::ON_STACK;
+    default: __builtin_unreachable();
   }
 }
 
 ImplicitParamDeclImplicitParamKind FromPasta(pasta::ImplicitParamDeclImplicitParamKind e) {
-  switch (e) {
-    case pasta::ImplicitParamDeclImplicitParamKind::kObjCSelf: return ImplicitParamDeclImplicitParamKind::OBJ_C_SELF;
-    case pasta::ImplicitParamDeclImplicitParamKind::kObjCCmd: return ImplicitParamDeclImplicitParamKind::OBJ_C_CMD;
-    case pasta::ImplicitParamDeclImplicitParamKind::kCXXThis: return ImplicitParamDeclImplicitParamKind::CXX_THIS;
-    case pasta::ImplicitParamDeclImplicitParamKind::kCXXVTT: return ImplicitParamDeclImplicitParamKind::CXXVTT;
-    case pasta::ImplicitParamDeclImplicitParamKind::kCapturedContext: return ImplicitParamDeclImplicitParamKind::CAPTURED_CONTEXT;
-    case pasta::ImplicitParamDeclImplicitParamKind::kOther: return ImplicitParamDeclImplicitParamKind::OTHER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ImplicitParamDeclImplicitParamKind::OBJ_C_SELF;
+    case 1: return ImplicitParamDeclImplicitParamKind::OBJ_C_CMD;
+    case 2: return ImplicitParamDeclImplicitParamKind::CXX_THIS;
+    case 3: return ImplicitParamDeclImplicitParamKind::CXXVTT;
+    case 4: return ImplicitParamDeclImplicitParamKind::CAPTURED_CONTEXT;
+    case 5: return ImplicitParamDeclImplicitParamKind::OTHER;
+    default: __builtin_unreachable();
   }
 }
 
 LinkageSpecDeclLanguageIDs FromPasta(pasta::LinkageSpecDeclLanguageIDs e) {
-  switch (e) {
-    case pasta::LinkageSpecDeclLanguageIDs::kC: return LinkageSpecDeclLanguageIDs::C;
-    case pasta::LinkageSpecDeclLanguageIDs::kCxx: return LinkageSpecDeclLanguageIDs::CXX;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return LinkageSpecDeclLanguageIDs::C;
+    case 2: return LinkageSpecDeclLanguageIDs::CXX;
+    default: __builtin_unreachable();
   }
 }
 
 NamedDeclExplicitVisibilityKind FromPasta(pasta::NamedDeclExplicitVisibilityKind e) {
-  switch (e) {
-    case pasta::NamedDeclExplicitVisibilityKind::kVisibilityForType: return NamedDeclExplicitVisibilityKind::VISIBILITY_FOR_TYPE;
-    case pasta::NamedDeclExplicitVisibilityKind::kVisibilityForValue: return NamedDeclExplicitVisibilityKind::VISIBILITY_FOR_VALUE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NamedDeclExplicitVisibilityKind::VISIBILITY_FOR_TYPE;
+    case 1: return NamedDeclExplicitVisibilityKind::VISIBILITY_FOR_VALUE;
+    default: __builtin_unreachable();
   }
 }
 
 OMPDeclareReductionDeclInitKind FromPasta(pasta::OMPDeclareReductionDeclInitKind e) {
-  switch (e) {
-    case pasta::OMPDeclareReductionDeclInitKind::kCallInitializer: return OMPDeclareReductionDeclInitKind::CALL_INITIALIZER;
-    case pasta::OMPDeclareReductionDeclInitKind::kDirectInitializer: return OMPDeclareReductionDeclInitKind::DIRECT_INITIALIZER;
-    case pasta::OMPDeclareReductionDeclInitKind::kCopyInitializer: return OMPDeclareReductionDeclInitKind::COPY_INITIALIZER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OMPDeclareReductionDeclInitKind::CALL_INITIALIZER;
+    case 1: return OMPDeclareReductionDeclInitKind::DIRECT_INITIALIZER;
+    case 2: return OMPDeclareReductionDeclInitKind::COPY_INITIALIZER;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCIvarDeclAccessControl FromPasta(pasta::ObjCIvarDeclAccessControl e) {
-  switch (e) {
-    case pasta::ObjCIvarDeclAccessControl::kNone: return ObjCIvarDeclAccessControl::NONE;
-    case pasta::ObjCIvarDeclAccessControl::kPrivate: return ObjCIvarDeclAccessControl::PRIVATE;
-    case pasta::ObjCIvarDeclAccessControl::kProtected: return ObjCIvarDeclAccessControl::PROTECTED;
-    case pasta::ObjCIvarDeclAccessControl::kPublic: return ObjCIvarDeclAccessControl::PUBLIC;
-    case pasta::ObjCIvarDeclAccessControl::kPackage: return ObjCIvarDeclAccessControl::PACKAGE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCIvarDeclAccessControl::NONE;
+    case 1: return ObjCIvarDeclAccessControl::PRIVATE;
+    case 2: return ObjCIvarDeclAccessControl::PROTECTED;
+    case 3: return ObjCIvarDeclAccessControl::PUBLIC;
+    case 4: return ObjCIvarDeclAccessControl::PACKAGE;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCMessageExprReceiverKind FromPasta(pasta::ObjCMessageExprReceiverKind e) {
-  switch (e) {
-    case pasta::ObjCMessageExprReceiverKind::kClass: return ObjCMessageExprReceiverKind::CLASS;
-    case pasta::ObjCMessageExprReceiverKind::kInstance: return ObjCMessageExprReceiverKind::INSTANCE;
-    case pasta::ObjCMessageExprReceiverKind::kSuperClass: return ObjCMessageExprReceiverKind::SUPER_CLASS;
-    case pasta::ObjCMessageExprReceiverKind::kSuperInstance: return ObjCMessageExprReceiverKind::SUPER_INSTANCE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCMessageExprReceiverKind::CLASS;
+    case 1: return ObjCMessageExprReceiverKind::INSTANCE;
+    case 2: return ObjCMessageExprReceiverKind::SUPER_CLASS;
+    case 3: return ObjCMessageExprReceiverKind::SUPER_INSTANCE;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCMethodDeclImplementationControl FromPasta(pasta::ObjCMethodDeclImplementationControl e) {
-  switch (e) {
-    case pasta::ObjCMethodDeclImplementationControl::kNone: return ObjCMethodDeclImplementationControl::NONE;
-    case pasta::ObjCMethodDeclImplementationControl::kRequired: return ObjCMethodDeclImplementationControl::REQUIRED;
-    case pasta::ObjCMethodDeclImplementationControl::kOptional: return ObjCMethodDeclImplementationControl::OPTIONAL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCMethodDeclImplementationControl::NONE;
+    case 1: return ObjCMethodDeclImplementationControl::REQUIRED;
+    case 2: return ObjCMethodDeclImplementationControl::OPTIONAL;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCPropertyDeclPropertyControl FromPasta(pasta::ObjCPropertyDeclPropertyControl e) {
-  switch (e) {
-    case pasta::ObjCPropertyDeclPropertyControl::kNone: return ObjCPropertyDeclPropertyControl::NONE;
-    case pasta::ObjCPropertyDeclPropertyControl::kRequired: return ObjCPropertyDeclPropertyControl::REQUIRED;
-    case pasta::ObjCPropertyDeclPropertyControl::kOptional: return ObjCPropertyDeclPropertyControl::OPTIONAL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCPropertyDeclPropertyControl::NONE;
+    case 1: return ObjCPropertyDeclPropertyControl::REQUIRED;
+    case 2: return ObjCPropertyDeclPropertyControl::OPTIONAL;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCPropertyDeclSetterKind FromPasta(pasta::ObjCPropertyDeclSetterKind e) {
-  switch (e) {
-    case pasta::ObjCPropertyDeclSetterKind::kAssign: return ObjCPropertyDeclSetterKind::ASSIGN;
-    case pasta::ObjCPropertyDeclSetterKind::kRetain: return ObjCPropertyDeclSetterKind::RETAIN;
-    case pasta::ObjCPropertyDeclSetterKind::kCopy: return ObjCPropertyDeclSetterKind::COPY;
-    case pasta::ObjCPropertyDeclSetterKind::kWeak: return ObjCPropertyDeclSetterKind::WEAK;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCPropertyDeclSetterKind::ASSIGN;
+    case 1: return ObjCPropertyDeclSetterKind::RETAIN;
+    case 2: return ObjCPropertyDeclSetterKind::COPY;
+    case 3: return ObjCPropertyDeclSetterKind::WEAK;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCPropertyImplDeclKind FromPasta(pasta::ObjCPropertyImplDeclKind e) {
-  switch (e) {
-    case pasta::ObjCPropertyImplDeclKind::kSynthesize: return ObjCPropertyImplDeclKind::SYNTHESIZE;
-    case pasta::ObjCPropertyImplDeclKind::kDynamic: return ObjCPropertyImplDeclKind::DYNAMIC;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCPropertyImplDeclKind::SYNTHESIZE;
+    case 1: return ObjCPropertyImplDeclKind::DYNAMIC;
+    default: __builtin_unreachable();
   }
 }
 
 PredefinedExprIdentKind FromPasta(pasta::PredefinedExprIdentKind e) {
-  switch (e) {
-    case pasta::PredefinedExprIdentKind::kFunc: return PredefinedExprIdentKind::FUNC;
-    case pasta::PredefinedExprIdentKind::kFunction: return PredefinedExprIdentKind::FUNCTION;
-    case pasta::PredefinedExprIdentKind::kLFunction: return PredefinedExprIdentKind::L_FUNCTION;
-    case pasta::PredefinedExprIdentKind::kFuncDName: return PredefinedExprIdentKind::FUNC_D_NAME;
-    case pasta::PredefinedExprIdentKind::kFuncSig: return PredefinedExprIdentKind::FUNC_SIG;
-    case pasta::PredefinedExprIdentKind::kLFuncSig: return PredefinedExprIdentKind::L_FUNC_SIG;
-    case pasta::PredefinedExprIdentKind::kPrettyFunction: return PredefinedExprIdentKind::PRETTY_FUNCTION;
-    case pasta::PredefinedExprIdentKind::kPrettyFunctionNoVirtual: return PredefinedExprIdentKind::PRETTY_FUNCTION_NO_VIRTUAL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PredefinedExprIdentKind::FUNC;
+    case 1: return PredefinedExprIdentKind::FUNCTION;
+    case 2: return PredefinedExprIdentKind::L_FUNCTION;
+    case 3: return PredefinedExprIdentKind::FUNC_D_NAME;
+    case 4: return PredefinedExprIdentKind::FUNC_SIG;
+    case 5: return PredefinedExprIdentKind::L_FUNC_SIG;
+    case 6: return PredefinedExprIdentKind::PRETTY_FUNCTION;
+    case 7: return PredefinedExprIdentKind::PRETTY_FUNCTION_NO_VIRTUAL;
+    default: __builtin_unreachable();
   }
 }
 
 QualTypeDestructionKind FromPasta(pasta::QualTypeDestructionKind e) {
-  switch (e) {
-    case pasta::QualTypeDestructionKind::kNone: return QualTypeDestructionKind::NONE;
-    case pasta::QualTypeDestructionKind::kCxxDestructor: return QualTypeDestructionKind::CXX_DESTRUCTOR;
-    case pasta::QualTypeDestructionKind::kObjcStrongLifetime: return QualTypeDestructionKind::OBJC_STRONG_LIFETIME;
-    case pasta::QualTypeDestructionKind::kObjcWeakLifetime: return QualTypeDestructionKind::OBJC_WEAK_LIFETIME;
-    case pasta::QualTypeDestructionKind::kNontrivialCStruct: return QualTypeDestructionKind::NONTRIVIAL_C_STRUCT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return QualTypeDestructionKind::NONE;
+    case 1: return QualTypeDestructionKind::CXX_DESTRUCTOR;
+    case 2: return QualTypeDestructionKind::OBJC_STRONG_LIFETIME;
+    case 3: return QualTypeDestructionKind::OBJC_WEAK_LIFETIME;
+    case 4: return QualTypeDestructionKind::NONTRIVIAL_C_STRUCT;
+    default: __builtin_unreachable();
   }
 }
 
 QualTypePrimitiveCopyKind FromPasta(pasta::QualTypePrimitiveCopyKind e) {
-  switch (e) {
-    case pasta::QualTypePrimitiveCopyKind::kTrivial: return QualTypePrimitiveCopyKind::TRIVIAL;
-    case pasta::QualTypePrimitiveCopyKind::kVolatileTrivial: return QualTypePrimitiveCopyKind::VOLATILE_TRIVIAL;
-    case pasta::QualTypePrimitiveCopyKind::kARCStrong: return QualTypePrimitiveCopyKind::ARC_STRONG;
-    case pasta::QualTypePrimitiveCopyKind::kARCWeak: return QualTypePrimitiveCopyKind::ARC_WEAK;
-    case pasta::QualTypePrimitiveCopyKind::kStruct: return QualTypePrimitiveCopyKind::STRUCT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return QualTypePrimitiveCopyKind::TRIVIAL;
+    case 1: return QualTypePrimitiveCopyKind::VOLATILE_TRIVIAL;
+    case 2: return QualTypePrimitiveCopyKind::ARC_STRONG;
+    case 3: return QualTypePrimitiveCopyKind::ARC_WEAK;
+    case 4: return QualTypePrimitiveCopyKind::STRUCT;
+    default: __builtin_unreachable();
   }
 }
 
 QualTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualTypePrimitiveDefaultInitializeKind e) {
-  switch (e) {
-    case pasta::QualTypePrimitiveDefaultInitializeKind::kTrivial: return QualTypePrimitiveDefaultInitializeKind::TRIVIAL;
-    case pasta::QualTypePrimitiveDefaultInitializeKind::kARCStrong: return QualTypePrimitiveDefaultInitializeKind::ARC_STRONG;
-    case pasta::QualTypePrimitiveDefaultInitializeKind::kARCWeak: return QualTypePrimitiveDefaultInitializeKind::ARC_WEAK;
-    case pasta::QualTypePrimitiveDefaultInitializeKind::kStruct: return QualTypePrimitiveDefaultInitializeKind::STRUCT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return QualTypePrimitiveDefaultInitializeKind::TRIVIAL;
+    case 1: return QualTypePrimitiveDefaultInitializeKind::ARC_STRONG;
+    case 2: return QualTypePrimitiveDefaultInitializeKind::ARC_WEAK;
+    case 3: return QualTypePrimitiveDefaultInitializeKind::STRUCT;
+    default: __builtin_unreachable();
   }
 }
 
 RecordDeclArgPassingKind FromPasta(pasta::RecordDeclArgPassingKind e) {
-  switch (e) {
-    case pasta::RecordDeclArgPassingKind::kCanPassInRegs: return RecordDeclArgPassingKind::CAN_PASS_IN_REGS;
-    case pasta::RecordDeclArgPassingKind::kCannotPassInRegs: return RecordDeclArgPassingKind::CANNOT_PASS_IN_REGS;
-    case pasta::RecordDeclArgPassingKind::kCanNeverPassInRegs: return RecordDeclArgPassingKind::CAN_NEVER_PASS_IN_REGS;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RecordDeclArgPassingKind::CAN_PASS_IN_REGS;
+    case 1: return RecordDeclArgPassingKind::CANNOT_PASS_IN_REGS;
+    case 2: return RecordDeclArgPassingKind::CAN_NEVER_PASS_IN_REGS;
+    default: __builtin_unreachable();
   }
 }
 
 SourceLocExprIdentKind FromPasta(pasta::SourceLocExprIdentKind e) {
-  switch (e) {
-    case pasta::SourceLocExprIdentKind::kFunction: return SourceLocExprIdentKind::FUNCTION;
-    case pasta::SourceLocExprIdentKind::kFile: return SourceLocExprIdentKind::FILE;
-    case pasta::SourceLocExprIdentKind::kLine: return SourceLocExprIdentKind::LINE;
-    case pasta::SourceLocExprIdentKind::kColumn: return SourceLocExprIdentKind::COLUMN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SourceLocExprIdentKind::FUNCTION;
+    case 1: return SourceLocExprIdentKind::FILE;
+    case 2: return SourceLocExprIdentKind::LINE;
+    case 3: return SourceLocExprIdentKind::COLUMN;
+    default: __builtin_unreachable();
   }
 }
 
 StmtLikelihood FromPasta(pasta::StmtLikelihood e) {
-  switch (e) {
-    case pasta::StmtLikelihood::kUnlikely: return StmtLikelihood::UNLIKELY;
-    case pasta::StmtLikelihood::kNone: return StmtLikelihood::NONE;
-    case pasta::StmtLikelihood::kLikely: return StmtLikelihood::LIKELY;
+  switch (static_cast<int>(e)) {
+    case -1: return StmtLikelihood::UNLIKELY;
+    case 0: return StmtLikelihood::NONE;
+    case 1: return StmtLikelihood::LIKELY;
+    default: __builtin_unreachable();
   }
 }
 
 StmtKind FromPasta(pasta::StmtKind e) {
-  switch (e) {
-    case pasta::StmtKind::kGCCAsmStmt: return StmtKind::GCC_ASM_STMT;
-    case pasta::StmtKind::kMSAsmStmt: return StmtKind::MS_ASM_STMT;
-    case pasta::StmtKind::kBreakStmt: return StmtKind::BREAK_STMT;
-    case pasta::StmtKind::kCXXCatchStmt: return StmtKind::CXX_CATCH_STMT;
-    case pasta::StmtKind::kCXXForRangeStmt: return StmtKind::CXX_FOR_RANGE_STMT;
-    case pasta::StmtKind::kCXXTryStmt: return StmtKind::CXX_TRY_STMT;
-    case pasta::StmtKind::kCapturedStmt: return StmtKind::CAPTURED_STMT;
-    case pasta::StmtKind::kCompoundStmt: return StmtKind::COMPOUND_STMT;
-    case pasta::StmtKind::kContinueStmt: return StmtKind::CONTINUE_STMT;
-    case pasta::StmtKind::kCoreturnStmt: return StmtKind::CORETURN_STMT;
-    case pasta::StmtKind::kCoroutineBodyStmt: return StmtKind::COROUTINE_BODY_STMT;
-    case pasta::StmtKind::kDeclStmt: return StmtKind::DECL_STMT;
-    case pasta::StmtKind::kDoStmt: return StmtKind::DO_STMT;
-    case pasta::StmtKind::kForStmt: return StmtKind::FOR_STMT;
-    case pasta::StmtKind::kGotoStmt: return StmtKind::GOTO_STMT;
-    case pasta::StmtKind::kIfStmt: return StmtKind::IF_STMT;
-    case pasta::StmtKind::kIndirectGotoStmt: return StmtKind::INDIRECT_GOTO_STMT;
-    case pasta::StmtKind::kMSDependentExistsStmt: return StmtKind::MS_DEPENDENT_EXISTS_STMT;
-    case pasta::StmtKind::kNullStmt: return StmtKind::NULL_STMT;
-    case pasta::StmtKind::kOMPCanonicalLoop: return StmtKind::OMP_CANONICAL_LOOP;
-    case pasta::StmtKind::kOMPAtomicDirective: return StmtKind::OMP_ATOMIC_DIRECTIVE;
-    case pasta::StmtKind::kOMPBarrierDirective: return StmtKind::OMP_BARRIER_DIRECTIVE;
-    case pasta::StmtKind::kOMPCancelDirective: return StmtKind::OMP_CANCEL_DIRECTIVE;
-    case pasta::StmtKind::kOMPCancellationPointDirective: return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;
-    case pasta::StmtKind::kOMPCriticalDirective: return StmtKind::OMP_CRITICAL_DIRECTIVE;
-    case pasta::StmtKind::kOMPDepobjDirective: return StmtKind::OMP_DEPOBJ_DIRECTIVE;
-    case pasta::StmtKind::kOMPDispatchDirective: return StmtKind::OMP_DISPATCH_DIRECTIVE;
-    case pasta::StmtKind::kOMPFlushDirective: return StmtKind::OMP_FLUSH_DIRECTIVE;
-    case pasta::StmtKind::kOMPInteropDirective: return StmtKind::OMP_INTEROP_DIRECTIVE;
-    case pasta::StmtKind::kOMPDistributeDirective: return StmtKind::OMP_DISTRIBUTE_DIRECTIVE;
-    case pasta::StmtKind::kOMPDistributeParallelForDirective: return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
-    case pasta::StmtKind::kOMPDistributeParallelForSimdDirective: return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPDistributeSimdDirective: return StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPForDirective: return StmtKind::OMP_FOR_DIRECTIVE;
-    case pasta::StmtKind::kOMPForSimdDirective: return StmtKind::OMP_FOR_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPMasterTaskLoopDirective: return StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE;
-    case pasta::StmtKind::kOMPMasterTaskLoopSimdDirective: return StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPParallelForDirective: return StmtKind::OMP_PARALLEL_FOR_DIRECTIVE;
-    case pasta::StmtKind::kOMPParallelForSimdDirective: return StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPParallelMasterTaskLoopDirective: return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE;
-    case pasta::StmtKind::kOMPParallelMasterTaskLoopSimdDirective: return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPSimdDirective: return StmtKind::OMP_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetParallelForSimdDirective: return StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetSimdDirective: return StmtKind::OMP_TARGET_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetTeamsDistributeDirective: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetTeamsDistributeParallelForDirective: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetTeamsDistributeParallelForSimdDirective: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetTeamsDistributeSimdDirective: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTaskLoopDirective: return StmtKind::OMP_TASK_LOOP_DIRECTIVE;
-    case pasta::StmtKind::kOMPTaskLoopSimdDirective: return StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTeamsDistributeDirective: return StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE;
-    case pasta::StmtKind::kOMPTeamsDistributeParallelForDirective: return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
-    case pasta::StmtKind::kOMPTeamsDistributeParallelForSimdDirective: return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTeamsDistributeSimdDirective: return StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTileDirective: return StmtKind::OMP_TILE_DIRECTIVE;
-    case pasta::StmtKind::kOMPUnrollDirective: return StmtKind::OMP_UNROLL_DIRECTIVE;
-    case pasta::StmtKind::kOMPMaskedDirective: return StmtKind::OMP_MASKED_DIRECTIVE;
-    case pasta::StmtKind::kOMPMasterDirective: return StmtKind::OMP_MASTER_DIRECTIVE;
-    case pasta::StmtKind::kOMPOrderedDirective: return StmtKind::OMP_ORDERED_DIRECTIVE;
-    case pasta::StmtKind::kOMPParallelDirective: return StmtKind::OMP_PARALLEL_DIRECTIVE;
-    case pasta::StmtKind::kOMPParallelMasterDirective: return StmtKind::OMP_PARALLEL_MASTER_DIRECTIVE;
-    case pasta::StmtKind::kOMPParallelSectionsDirective: return StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE;
-    case pasta::StmtKind::kOMPScanDirective: return StmtKind::OMP_SCAN_DIRECTIVE;
-    case pasta::StmtKind::kOMPSectionDirective: return StmtKind::OMP_SECTION_DIRECTIVE;
-    case pasta::StmtKind::kOMPSectionsDirective: return StmtKind::OMP_SECTIONS_DIRECTIVE;
-    case pasta::StmtKind::kOMPSingleDirective: return StmtKind::OMP_SINGLE_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetDataDirective: return StmtKind::OMP_TARGET_DATA_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetDirective: return StmtKind::OMP_TARGET_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetEnterDataDirective: return StmtKind::OMP_TARGET_ENTER_DATA_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetExitDataDirective: return StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetParallelDirective: return StmtKind::OMP_TARGET_PARALLEL_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetParallelForDirective: return StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetTeamsDirective: return StmtKind::OMP_TARGET_TEAMS_DIRECTIVE;
-    case pasta::StmtKind::kOMPTargetUpdateDirective: return StmtKind::OMP_TARGET_UPDATE_DIRECTIVE;
-    case pasta::StmtKind::kOMPTaskDirective: return StmtKind::OMP_TASK_DIRECTIVE;
-    case pasta::StmtKind::kOMPTaskgroupDirective: return StmtKind::OMP_TASKGROUP_DIRECTIVE;
-    case pasta::StmtKind::kOMPTaskwaitDirective: return StmtKind::OMP_TASKWAIT_DIRECTIVE;
-    case pasta::StmtKind::kOMPTaskyieldDirective: return StmtKind::OMP_TASKYIELD_DIRECTIVE;
-    case pasta::StmtKind::kOMPTeamsDirective: return StmtKind::OMP_TEAMS_DIRECTIVE;
-    case pasta::StmtKind::kObjCAtCatchStmt: return StmtKind::OBJ_C_AT_CATCH_STMT;
-    case pasta::StmtKind::kObjCAtFinallyStmt: return StmtKind::OBJ_C_AT_FINALLY_STMT;
-    case pasta::StmtKind::kObjCAtSynchronizedStmt: return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;
-    case pasta::StmtKind::kObjCAtThrowStmt: return StmtKind::OBJ_C_AT_THROW_STMT;
-    case pasta::StmtKind::kObjCAtTryStmt: return StmtKind::OBJ_C_AT_TRY_STMT;
-    case pasta::StmtKind::kObjCAutoreleasePoolStmt: return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;
-    case pasta::StmtKind::kObjCForCollectionStmt: return StmtKind::OBJ_C_FOR_COLLECTION_STMT;
-    case pasta::StmtKind::kReturnStmt: return StmtKind::RETURN_STMT;
-    case pasta::StmtKind::kSEHExceptStmt: return StmtKind::SEH_EXCEPT_STMT;
-    case pasta::StmtKind::kSEHFinallyStmt: return StmtKind::SEH_FINALLY_STMT;
-    case pasta::StmtKind::kSEHLeaveStmt: return StmtKind::SEH_LEAVE_STMT;
-    case pasta::StmtKind::kSEHTryStmt: return StmtKind::SEH_TRY_STMT;
-    case pasta::StmtKind::kCaseStmt: return StmtKind::CASE_STMT;
-    case pasta::StmtKind::kDefaultStmt: return StmtKind::DEFAULT_STMT;
-    case pasta::StmtKind::kSwitchStmt: return StmtKind::SWITCH_STMT;
-    case pasta::StmtKind::kAttributedStmt: return StmtKind::ATTRIBUTED_STMT;
-    case pasta::StmtKind::kBinaryConditionalOperator: return StmtKind::BINARY_CONDITIONAL_OPERATOR;
-    case pasta::StmtKind::kConditionalOperator: return StmtKind::CONDITIONAL_OPERATOR;
-    case pasta::StmtKind::kAddrLabelExpr: return StmtKind::ADDR_LABEL_EXPR;
-    case pasta::StmtKind::kArrayInitIndexExpr: return StmtKind::ARRAY_INIT_INDEX_EXPR;
-    case pasta::StmtKind::kArrayInitLoopExpr: return StmtKind::ARRAY_INIT_LOOP_EXPR;
-    case pasta::StmtKind::kArraySubscriptExpr: return StmtKind::ARRAY_SUBSCRIPT_EXPR;
-    case pasta::StmtKind::kArrayTypeTraitExpr: return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
-    case pasta::StmtKind::kAsTypeExpr: return StmtKind::AS_TYPE_EXPR;
-    case pasta::StmtKind::kAtomicExpr: return StmtKind::ATOMIC_EXPR;
-    case pasta::StmtKind::kBinaryOperator: return StmtKind::BINARY_OPERATOR;
-    case pasta::StmtKind::kCompoundAssignOperator: return StmtKind::COMPOUND_ASSIGN_OPERATOR;
-    case pasta::StmtKind::kBlockExpr: return StmtKind::BLOCK_EXPR;
-    case pasta::StmtKind::kCXXBindTemporaryExpr: return StmtKind::CXX_BIND_TEMPORARY_EXPR;
-    case pasta::StmtKind::kCXXBoolLiteralExpr: return StmtKind::CXX_BOOL_LITERAL_EXPR;
-    case pasta::StmtKind::kCXXConstructExpr: return StmtKind::CXX_CONSTRUCT_EXPR;
-    case pasta::StmtKind::kCXXTemporaryObjectExpr: return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;
-    case pasta::StmtKind::kCXXDefaultArgExpr: return StmtKind::CXX_DEFAULT_ARG_EXPR;
-    case pasta::StmtKind::kCXXDefaultInitExpr: return StmtKind::CXX_DEFAULT_INIT_EXPR;
-    case pasta::StmtKind::kCXXDeleteExpr: return StmtKind::CXX_DELETE_EXPR;
-    case pasta::StmtKind::kCXXDependentScopeMemberExpr: return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;
-    case pasta::StmtKind::kCXXFoldExpr: return StmtKind::CXX_FOLD_EXPR;
-    case pasta::StmtKind::kCXXInheritedCtorInitExpr: return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;
-    case pasta::StmtKind::kCXXNewExpr: return StmtKind::CXX_NEW_EXPR;
-    case pasta::StmtKind::kCXXNoexceptExpr: return StmtKind::CXX_NOEXCEPT_EXPR;
-    case pasta::StmtKind::kCXXNullPtrLiteralExpr: return StmtKind::CXX_NULL_PTR_LITERAL_EXPR;
-    case pasta::StmtKind::kCXXPseudoDestructorExpr: return StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR;
-    case pasta::StmtKind::kCXXRewrittenBinaryOperator: return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
-    case pasta::StmtKind::kCXXScalarValueInitExpr: return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;
-    case pasta::StmtKind::kCXXStdInitializerListExpr: return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;
-    case pasta::StmtKind::kCXXThisExpr: return StmtKind::CXX_THIS_EXPR;
-    case pasta::StmtKind::kCXXThrowExpr: return StmtKind::CXX_THROW_EXPR;
-    case pasta::StmtKind::kCXXTypeidExpr: return StmtKind::CXX_TYPEID_EXPR;
-    case pasta::StmtKind::kCXXUnresolvedConstructExpr: return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;
-    case pasta::StmtKind::kCXXUuidofExpr: return StmtKind::CXX_UUIDOF_EXPR;
-    case pasta::StmtKind::kCallExpr: return StmtKind::CALL_EXPR;
-    case pasta::StmtKind::kCUDAKernelCallExpr: return StmtKind::CUDA_KERNEL_CALL_EXPR;
-    case pasta::StmtKind::kCXXMemberCallExpr: return StmtKind::CXX_MEMBER_CALL_EXPR;
-    case pasta::StmtKind::kCXXOperatorCallExpr: return StmtKind::CXX_OPERATOR_CALL_EXPR;
-    case pasta::StmtKind::kUserDefinedLiteral: return StmtKind::USER_DEFINED_LITERAL;
-    case pasta::StmtKind::kBuiltinBitCastExpr: return StmtKind::BUILTIN_BIT_CAST_EXPR;
-    case pasta::StmtKind::kCStyleCastExpr: return StmtKind::C_STYLE_CAST_EXPR;
-    case pasta::StmtKind::kCXXFunctionalCastExpr: return StmtKind::CXX_FUNCTIONAL_CAST_EXPR;
-    case pasta::StmtKind::kCXXAddrspaceCastExpr: return StmtKind::CXX_ADDRSPACE_CAST_EXPR;
-    case pasta::StmtKind::kCXXConstCastExpr: return StmtKind::CXX_CONST_CAST_EXPR;
-    case pasta::StmtKind::kCXXDynamicCastExpr: return StmtKind::CXX_DYNAMIC_CAST_EXPR;
-    case pasta::StmtKind::kCXXReinterpretCastExpr: return StmtKind::CXX_REINTERPRET_CAST_EXPR;
-    case pasta::StmtKind::kCXXStaticCastExpr: return StmtKind::CXX_STATIC_CAST_EXPR;
-    case pasta::StmtKind::kObjCBridgedCastExpr: return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;
-    case pasta::StmtKind::kImplicitCastExpr: return StmtKind::IMPLICIT_CAST_EXPR;
-    case pasta::StmtKind::kCharacterLiteral: return StmtKind::CHARACTER_LITERAL;
-    case pasta::StmtKind::kChooseExpr: return StmtKind::CHOOSE_EXPR;
-    case pasta::StmtKind::kCompoundLiteralExpr: return StmtKind::COMPOUND_LITERAL_EXPR;
-    case pasta::StmtKind::kConceptSpecializationExpr: return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
-    case pasta::StmtKind::kConvertVectorExpr: return StmtKind::CONVERT_VECTOR_EXPR;
-    case pasta::StmtKind::kCoawaitExpr: return StmtKind::COAWAIT_EXPR;
-    case pasta::StmtKind::kCoyieldExpr: return StmtKind::COYIELD_EXPR;
-    case pasta::StmtKind::kDeclRefExpr: return StmtKind::DECL_REF_EXPR;
-    case pasta::StmtKind::kDependentCoawaitExpr: return StmtKind::DEPENDENT_COAWAIT_EXPR;
-    case pasta::StmtKind::kDependentScopeDeclRefExpr: return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;
-    case pasta::StmtKind::kDesignatedInitExpr: return StmtKind::DESIGNATED_INIT_EXPR;
-    case pasta::StmtKind::kDesignatedInitUpdateExpr: return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;
-    case pasta::StmtKind::kExpressionTraitExpr: return StmtKind::EXPRESSION_TRAIT_EXPR;
-    case pasta::StmtKind::kExtVectorElementExpr: return StmtKind::EXT_VECTOR_ELEMENT_EXPR;
-    case pasta::StmtKind::kFixedPointLiteral: return StmtKind::FIXED_POINT_LITERAL;
-    case pasta::StmtKind::kFloatingLiteral: return StmtKind::FLOATING_LITERAL;
-    case pasta::StmtKind::kConstantExpr: return StmtKind::CONSTANT_EXPR;
-    case pasta::StmtKind::kExprWithCleanups: return StmtKind::EXPR_WITH_CLEANUPS;
-    case pasta::StmtKind::kFunctionParmPackExpr: return StmtKind::FUNCTION_PARM_PACK_EXPR;
-    case pasta::StmtKind::kGNUNullExpr: return StmtKind::GNU_NULL_EXPR;
-    case pasta::StmtKind::kGenericSelectionExpr: return StmtKind::GENERIC_SELECTION_EXPR;
-    case pasta::StmtKind::kImaginaryLiteral: return StmtKind::IMAGINARY_LITERAL;
-    case pasta::StmtKind::kImplicitValueInitExpr: return StmtKind::IMPLICIT_VALUE_INIT_EXPR;
-    case pasta::StmtKind::kInitListExpr: return StmtKind::INIT_LIST_EXPR;
-    case pasta::StmtKind::kIntegerLiteral: return StmtKind::INTEGER_LITERAL;
-    case pasta::StmtKind::kLambdaExpr: return StmtKind::LAMBDA_EXPR;
-    case pasta::StmtKind::kMSPropertyRefExpr: return StmtKind::MS_PROPERTY_REF_EXPR;
-    case pasta::StmtKind::kMSPropertySubscriptExpr: return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
-    case pasta::StmtKind::kMaterializeTemporaryExpr: return StmtKind::MATERIALIZE_TEMPORARY_EXPR;
-    case pasta::StmtKind::kMatrixSubscriptExpr: return StmtKind::MATRIX_SUBSCRIPT_EXPR;
-    case pasta::StmtKind::kMemberExpr: return StmtKind::MEMBER_EXPR;
-    case pasta::StmtKind::kNoInitExpr: return StmtKind::NO_INIT_EXPR;
-    case pasta::StmtKind::kOMPArraySectionExpr: return StmtKind::OMP_ARRAY_SECTION_EXPR;
-    case pasta::StmtKind::kOMPArrayShapingExpr: return StmtKind::OMP_ARRAY_SHAPING_EXPR;
-    case pasta::StmtKind::kOMPIteratorExpr: return StmtKind::OMP_ITERATOR_EXPR;
-    case pasta::StmtKind::kObjCArrayLiteral: return StmtKind::OBJ_C_ARRAY_LITERAL;
-    case pasta::StmtKind::kObjCAvailabilityCheckExpr: return StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR;
-    case pasta::StmtKind::kObjCBoolLiteralExpr: return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
-    case pasta::StmtKind::kObjCBoxedExpr: return StmtKind::OBJ_C_BOXED_EXPR;
-    case pasta::StmtKind::kObjCDictionaryLiteral: return StmtKind::OBJ_C_DICTIONARY_LITERAL;
-    case pasta::StmtKind::kObjCEncodeExpr: return StmtKind::OBJ_C_ENCODE_EXPR;
-    case pasta::StmtKind::kObjCIndirectCopyRestoreExpr: return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;
-    case pasta::StmtKind::kObjCIsaExpr: return StmtKind::OBJ_C_ISA_EXPR;
-    case pasta::StmtKind::kObjCIvarRefExpr: return StmtKind::OBJ_C_IVAR_REF_EXPR;
-    case pasta::StmtKind::kObjCMessageExpr: return StmtKind::OBJ_C_MESSAGE_EXPR;
-    case pasta::StmtKind::kObjCPropertyRefExpr: return StmtKind::OBJ_C_PROPERTY_REF_EXPR;
-    case pasta::StmtKind::kObjCProtocolExpr: return StmtKind::OBJ_C_PROTOCOL_EXPR;
-    case pasta::StmtKind::kObjCSelectorExpr: return StmtKind::OBJ_C_SELECTOR_EXPR;
-    case pasta::StmtKind::kObjCStringLiteral: return StmtKind::OBJ_C_STRING_LITERAL;
-    case pasta::StmtKind::kObjCSubscriptRefExpr: return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;
-    case pasta::StmtKind::kOffsetOfExpr: return StmtKind::OFFSET_OF_EXPR;
-    case pasta::StmtKind::kOpaqueValueExpr: return StmtKind::OPAQUE_VALUE_EXPR;
-    case pasta::StmtKind::kUnresolvedLookupExpr: return StmtKind::UNRESOLVED_LOOKUP_EXPR;
-    case pasta::StmtKind::kUnresolvedMemberExpr: return StmtKind::UNRESOLVED_MEMBER_EXPR;
-    case pasta::StmtKind::kPackExpansionExpr: return StmtKind::PACK_EXPANSION_EXPR;
-    case pasta::StmtKind::kParenExpr: return StmtKind::PAREN_EXPR;
-    case pasta::StmtKind::kParenListExpr: return StmtKind::PAREN_LIST_EXPR;
-    case pasta::StmtKind::kPredefinedExpr: return StmtKind::PREDEFINED_EXPR;
-    case pasta::StmtKind::kPseudoObjectExpr: return StmtKind::PSEUDO_OBJECT_EXPR;
-    case pasta::StmtKind::kRecoveryExpr: return StmtKind::RECOVERY_EXPR;
-    case pasta::StmtKind::kRequiresExpr: return StmtKind::REQUIRES_EXPR;
-    case pasta::StmtKind::kSYCLUniqueStableNameExpr: return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
-    case pasta::StmtKind::kShuffleVectorExpr: return StmtKind::SHUFFLE_VECTOR_EXPR;
-    case pasta::StmtKind::kSizeOfPackExpr: return StmtKind::SIZE_OF_PACK_EXPR;
-    case pasta::StmtKind::kSourceLocExpr: return StmtKind::SOURCE_LOC_EXPR;
-    case pasta::StmtKind::kStmtExpr: return StmtKind::STMT_EXPR;
-    case pasta::StmtKind::kStringLiteral: return StmtKind::STRING_LITERAL;
-    case pasta::StmtKind::kSubstNonTypeTemplateParmExpr: return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;
-    case pasta::StmtKind::kSubstNonTypeTemplateParmPackExpr: return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR;
-    case pasta::StmtKind::kTypeTraitExpr: return StmtKind::TYPE_TRAIT_EXPR;
-    case pasta::StmtKind::kTypoExpr: return StmtKind::TYPO_EXPR;
-    case pasta::StmtKind::kUnaryExprOrTypeTraitExpr: return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
-    case pasta::StmtKind::kUnaryOperator: return StmtKind::UNARY_OPERATOR;
-    case pasta::StmtKind::kVAArgExpr: return StmtKind::VA_ARG_EXPR;
-    case pasta::StmtKind::kLabelStmt: return StmtKind::LABEL_STMT;
-    case pasta::StmtKind::kWhileStmt: return StmtKind::WHILE_STMT;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return StmtKind::GCC_ASM_STMT;
+    case 2: return StmtKind::MS_ASM_STMT;
+    case 3: return StmtKind::BREAK_STMT;
+    case 4: return StmtKind::CXX_CATCH_STMT;
+    case 5: return StmtKind::CXX_FOR_RANGE_STMT;
+    case 6: return StmtKind::CXX_TRY_STMT;
+    case 7: return StmtKind::CAPTURED_STMT;
+    case 8: return StmtKind::COMPOUND_STMT;
+    case 9: return StmtKind::CONTINUE_STMT;
+    case 10: return StmtKind::CORETURN_STMT;
+    case 11: return StmtKind::COROUTINE_BODY_STMT;
+    case 12: return StmtKind::DECL_STMT;
+    case 13: return StmtKind::DO_STMT;
+    case 14: return StmtKind::FOR_STMT;
+    case 15: return StmtKind::GOTO_STMT;
+    case 16: return StmtKind::IF_STMT;
+    case 17: return StmtKind::INDIRECT_GOTO_STMT;
+    case 18: return StmtKind::MS_DEPENDENT_EXISTS_STMT;
+    case 19: return StmtKind::NULL_STMT;
+    case 20: return StmtKind::OMP_CANONICAL_LOOP;
+    case 21: return StmtKind::OMP_ATOMIC_DIRECTIVE;
+    case 22: return StmtKind::OMP_BARRIER_DIRECTIVE;
+    case 23: return StmtKind::OMP_CANCEL_DIRECTIVE;
+    case 24: return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;
+    case 25: return StmtKind::OMP_CRITICAL_DIRECTIVE;
+    case 26: return StmtKind::OMP_DEPOBJ_DIRECTIVE;
+    case 27: return StmtKind::OMP_DISPATCH_DIRECTIVE;
+    case 28: return StmtKind::OMP_FLUSH_DIRECTIVE;
+    case 29: return StmtKind::OMP_INTEROP_DIRECTIVE;
+    case 30: return StmtKind::OMP_DISTRIBUTE_DIRECTIVE;
+    case 31: return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
+    case 32: return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
+    case 33: return StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE;
+    case 34: return StmtKind::OMP_FOR_DIRECTIVE;
+    case 35: return StmtKind::OMP_FOR_SIMD_DIRECTIVE;
+    case 36: return StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE;
+    case 37: return StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
+    case 38: return StmtKind::OMP_PARALLEL_FOR_DIRECTIVE;
+    case 39: return StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE;
+    case 40: return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE;
+    case 41: return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
+    case 42: return StmtKind::OMP_SIMD_DIRECTIVE;
+    case 43: return StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE;
+    case 44: return StmtKind::OMP_TARGET_SIMD_DIRECTIVE;
+    case 45: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE;
+    case 46: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
+    case 47: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
+    case 48: return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
+    case 49: return StmtKind::OMP_TASK_LOOP_DIRECTIVE;
+    case 50: return StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE;
+    case 51: return StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE;
+    case 52: return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
+    case 53: return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
+    case 54: return StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
+    case 55: return StmtKind::OMP_TILE_DIRECTIVE;
+    case 56: return StmtKind::OMP_UNROLL_DIRECTIVE;
+    case 57: return StmtKind::OMP_MASKED_DIRECTIVE;
+    case 58: return StmtKind::OMP_MASTER_DIRECTIVE;
+    case 59: return StmtKind::OMP_ORDERED_DIRECTIVE;
+    case 60: return StmtKind::OMP_PARALLEL_DIRECTIVE;
+    case 61: return StmtKind::OMP_PARALLEL_MASTER_DIRECTIVE;
+    case 62: return StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE;
+    case 63: return StmtKind::OMP_SCAN_DIRECTIVE;
+    case 64: return StmtKind::OMP_SECTION_DIRECTIVE;
+    case 65: return StmtKind::OMP_SECTIONS_DIRECTIVE;
+    case 66: return StmtKind::OMP_SINGLE_DIRECTIVE;
+    case 67: return StmtKind::OMP_TARGET_DATA_DIRECTIVE;
+    case 68: return StmtKind::OMP_TARGET_DIRECTIVE;
+    case 69: return StmtKind::OMP_TARGET_ENTER_DATA_DIRECTIVE;
+    case 70: return StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE;
+    case 71: return StmtKind::OMP_TARGET_PARALLEL_DIRECTIVE;
+    case 72: return StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE;
+    case 73: return StmtKind::OMP_TARGET_TEAMS_DIRECTIVE;
+    case 74: return StmtKind::OMP_TARGET_UPDATE_DIRECTIVE;
+    case 75: return StmtKind::OMP_TASK_DIRECTIVE;
+    case 76: return StmtKind::OMP_TASKGROUP_DIRECTIVE;
+    case 77: return StmtKind::OMP_TASKWAIT_DIRECTIVE;
+    case 78: return StmtKind::OMP_TASKYIELD_DIRECTIVE;
+    case 79: return StmtKind::OMP_TEAMS_DIRECTIVE;
+    case 80: return StmtKind::OBJ_C_AT_CATCH_STMT;
+    case 81: return StmtKind::OBJ_C_AT_FINALLY_STMT;
+    case 82: return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;
+    case 83: return StmtKind::OBJ_C_AT_THROW_STMT;
+    case 84: return StmtKind::OBJ_C_AT_TRY_STMT;
+    case 85: return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;
+    case 86: return StmtKind::OBJ_C_FOR_COLLECTION_STMT;
+    case 87: return StmtKind::RETURN_STMT;
+    case 88: return StmtKind::SEH_EXCEPT_STMT;
+    case 89: return StmtKind::SEH_FINALLY_STMT;
+    case 90: return StmtKind::SEH_LEAVE_STMT;
+    case 91: return StmtKind::SEH_TRY_STMT;
+    case 92: return StmtKind::CASE_STMT;
+    case 93: return StmtKind::DEFAULT_STMT;
+    case 94: return StmtKind::SWITCH_STMT;
+    case 95: return StmtKind::ATTRIBUTED_STMT;
+    case 96: return StmtKind::BINARY_CONDITIONAL_OPERATOR;
+    case 97: return StmtKind::CONDITIONAL_OPERATOR;
+    case 98: return StmtKind::ADDR_LABEL_EXPR;
+    case 99: return StmtKind::ARRAY_INIT_INDEX_EXPR;
+    case 100: return StmtKind::ARRAY_INIT_LOOP_EXPR;
+    case 101: return StmtKind::ARRAY_SUBSCRIPT_EXPR;
+    case 102: return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
+    case 103: return StmtKind::AS_TYPE_EXPR;
+    case 104: return StmtKind::ATOMIC_EXPR;
+    case 105: return StmtKind::BINARY_OPERATOR;
+    case 106: return StmtKind::COMPOUND_ASSIGN_OPERATOR;
+    case 107: return StmtKind::BLOCK_EXPR;
+    case 108: return StmtKind::CXX_BIND_TEMPORARY_EXPR;
+    case 109: return StmtKind::CXX_BOOL_LITERAL_EXPR;
+    case 110: return StmtKind::CXX_CONSTRUCT_EXPR;
+    case 111: return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;
+    case 112: return StmtKind::CXX_DEFAULT_ARG_EXPR;
+    case 113: return StmtKind::CXX_DEFAULT_INIT_EXPR;
+    case 114: return StmtKind::CXX_DELETE_EXPR;
+    case 115: return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;
+    case 116: return StmtKind::CXX_FOLD_EXPR;
+    case 117: return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;
+    case 118: return StmtKind::CXX_NEW_EXPR;
+    case 119: return StmtKind::CXX_NOEXCEPT_EXPR;
+    case 120: return StmtKind::CXX_NULL_PTR_LITERAL_EXPR;
+    case 121: return StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR;
+    case 122: return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
+    case 123: return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;
+    case 124: return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;
+    case 125: return StmtKind::CXX_THIS_EXPR;
+    case 126: return StmtKind::CXX_THROW_EXPR;
+    case 127: return StmtKind::CXX_TYPEID_EXPR;
+    case 128: return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;
+    case 129: return StmtKind::CXX_UUIDOF_EXPR;
+    case 130: return StmtKind::CALL_EXPR;
+    case 131: return StmtKind::CUDA_KERNEL_CALL_EXPR;
+    case 132: return StmtKind::CXX_MEMBER_CALL_EXPR;
+    case 133: return StmtKind::CXX_OPERATOR_CALL_EXPR;
+    case 134: return StmtKind::USER_DEFINED_LITERAL;
+    case 135: return StmtKind::BUILTIN_BIT_CAST_EXPR;
+    case 136: return StmtKind::C_STYLE_CAST_EXPR;
+    case 137: return StmtKind::CXX_FUNCTIONAL_CAST_EXPR;
+    case 138: return StmtKind::CXX_ADDRSPACE_CAST_EXPR;
+    case 139: return StmtKind::CXX_CONST_CAST_EXPR;
+    case 140: return StmtKind::CXX_DYNAMIC_CAST_EXPR;
+    case 141: return StmtKind::CXX_REINTERPRET_CAST_EXPR;
+    case 142: return StmtKind::CXX_STATIC_CAST_EXPR;
+    case 143: return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;
+    case 144: return StmtKind::IMPLICIT_CAST_EXPR;
+    case 145: return StmtKind::CHARACTER_LITERAL;
+    case 146: return StmtKind::CHOOSE_EXPR;
+    case 147: return StmtKind::COMPOUND_LITERAL_EXPR;
+    case 148: return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
+    case 149: return StmtKind::CONVERT_VECTOR_EXPR;
+    case 150: return StmtKind::COAWAIT_EXPR;
+    case 151: return StmtKind::COYIELD_EXPR;
+    case 152: return StmtKind::DECL_REF_EXPR;
+    case 153: return StmtKind::DEPENDENT_COAWAIT_EXPR;
+    case 154: return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;
+    case 155: return StmtKind::DESIGNATED_INIT_EXPR;
+    case 156: return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;
+    case 157: return StmtKind::EXPRESSION_TRAIT_EXPR;
+    case 158: return StmtKind::EXT_VECTOR_ELEMENT_EXPR;
+    case 159: return StmtKind::FIXED_POINT_LITERAL;
+    case 160: return StmtKind::FLOATING_LITERAL;
+    case 161: return StmtKind::CONSTANT_EXPR;
+    case 162: return StmtKind::EXPR_WITH_CLEANUPS;
+    case 163: return StmtKind::FUNCTION_PARM_PACK_EXPR;
+    case 164: return StmtKind::GNU_NULL_EXPR;
+    case 165: return StmtKind::GENERIC_SELECTION_EXPR;
+    case 166: return StmtKind::IMAGINARY_LITERAL;
+    case 167: return StmtKind::IMPLICIT_VALUE_INIT_EXPR;
+    case 168: return StmtKind::INIT_LIST_EXPR;
+    case 169: return StmtKind::INTEGER_LITERAL;
+    case 170: return StmtKind::LAMBDA_EXPR;
+    case 171: return StmtKind::MS_PROPERTY_REF_EXPR;
+    case 172: return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
+    case 173: return StmtKind::MATERIALIZE_TEMPORARY_EXPR;
+    case 174: return StmtKind::MATRIX_SUBSCRIPT_EXPR;
+    case 175: return StmtKind::MEMBER_EXPR;
+    case 176: return StmtKind::NO_INIT_EXPR;
+    case 177: return StmtKind::OMP_ARRAY_SECTION_EXPR;
+    case 178: return StmtKind::OMP_ARRAY_SHAPING_EXPR;
+    case 179: return StmtKind::OMP_ITERATOR_EXPR;
+    case 180: return StmtKind::OBJ_C_ARRAY_LITERAL;
+    case 181: return StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR;
+    case 182: return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
+    case 183: return StmtKind::OBJ_C_BOXED_EXPR;
+    case 184: return StmtKind::OBJ_C_DICTIONARY_LITERAL;
+    case 185: return StmtKind::OBJ_C_ENCODE_EXPR;
+    case 186: return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;
+    case 187: return StmtKind::OBJ_C_ISA_EXPR;
+    case 188: return StmtKind::OBJ_C_IVAR_REF_EXPR;
+    case 189: return StmtKind::OBJ_C_MESSAGE_EXPR;
+    case 190: return StmtKind::OBJ_C_PROPERTY_REF_EXPR;
+    case 191: return StmtKind::OBJ_C_PROTOCOL_EXPR;
+    case 192: return StmtKind::OBJ_C_SELECTOR_EXPR;
+    case 193: return StmtKind::OBJ_C_STRING_LITERAL;
+    case 194: return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;
+    case 195: return StmtKind::OFFSET_OF_EXPR;
+    case 196: return StmtKind::OPAQUE_VALUE_EXPR;
+    case 197: return StmtKind::UNRESOLVED_LOOKUP_EXPR;
+    case 198: return StmtKind::UNRESOLVED_MEMBER_EXPR;
+    case 199: return StmtKind::PACK_EXPANSION_EXPR;
+    case 200: return StmtKind::PAREN_EXPR;
+    case 201: return StmtKind::PAREN_LIST_EXPR;
+    case 202: return StmtKind::PREDEFINED_EXPR;
+    case 203: return StmtKind::PSEUDO_OBJECT_EXPR;
+    case 204: return StmtKind::RECOVERY_EXPR;
+    case 205: return StmtKind::REQUIRES_EXPR;
+    case 206: return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
+    case 207: return StmtKind::SHUFFLE_VECTOR_EXPR;
+    case 208: return StmtKind::SIZE_OF_PACK_EXPR;
+    case 209: return StmtKind::SOURCE_LOC_EXPR;
+    case 210: return StmtKind::STMT_EXPR;
+    case 211: return StmtKind::STRING_LITERAL;
+    case 212: return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;
+    case 213: return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR;
+    case 214: return StmtKind::TYPE_TRAIT_EXPR;
+    case 215: return StmtKind::TYPO_EXPR;
+    case 216: return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
+    case 217: return StmtKind::UNARY_OPERATOR;
+    case 218: return StmtKind::VA_ARG_EXPR;
+    case 219: return StmtKind::LABEL_STMT;
+    case 220: return StmtKind::WHILE_STMT;
+    default: __builtin_unreachable();
   }
 }
 
 StringLiteralStringKind FromPasta(pasta::StringLiteralStringKind e) {
-  switch (e) {
-    case pasta::StringLiteralStringKind::kAscii: return StringLiteralStringKind::ASCII;
-    case pasta::StringLiteralStringKind::kWide: return StringLiteralStringKind::WIDE;
-    case pasta::StringLiteralStringKind::kUTF8: return StringLiteralStringKind::UT_F8;
-    case pasta::StringLiteralStringKind::kUTF16: return StringLiteralStringKind::UT_F16;
-    case pasta::StringLiteralStringKind::kUTF32: return StringLiteralStringKind::UT_F32;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StringLiteralStringKind::ASCII;
+    case 1: return StringLiteralStringKind::WIDE;
+    case 2: return StringLiteralStringKind::UT_F8;
+    case 3: return StringLiteralStringKind::UT_F16;
+    case 4: return StringLiteralStringKind::UT_F32;
+    default: __builtin_unreachable();
   }
 }
 
 TemplateArgumentKind FromPasta(pasta::TemplateArgumentKind e) {
-  switch (e) {
-    case pasta::TemplateArgumentKind::kEmpty: return TemplateArgumentKind::EMPTY;
-    case pasta::TemplateArgumentKind::kType: return TemplateArgumentKind::TYPE;
-    case pasta::TemplateArgumentKind::kDeclaration: return TemplateArgumentKind::DECLARATION;
-    case pasta::TemplateArgumentKind::kNullPointer: return TemplateArgumentKind::NULL_POINTER;
-    case pasta::TemplateArgumentKind::kIntegral: return TemplateArgumentKind::INTEGRAL;
-    case pasta::TemplateArgumentKind::kTemplate: return TemplateArgumentKind::TEMPLATE;
-    case pasta::TemplateArgumentKind::kTemplateExpansion: return TemplateArgumentKind::TEMPLATE_EXPANSION;
-    case pasta::TemplateArgumentKind::kExpression: return TemplateArgumentKind::EXPRESSION;
-    case pasta::TemplateArgumentKind::kPack: return TemplateArgumentKind::PACK;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TemplateArgumentKind::EMPTY;
+    case 1: return TemplateArgumentKind::TYPE;
+    case 2: return TemplateArgumentKind::DECLARATION;
+    case 3: return TemplateArgumentKind::NULL_POINTER;
+    case 4: return TemplateArgumentKind::INTEGRAL;
+    case 5: return TemplateArgumentKind::TEMPLATE;
+    case 6: return TemplateArgumentKind::TEMPLATE_EXPANSION;
+    case 7: return TemplateArgumentKind::EXPRESSION;
+    case 8: return TemplateArgumentKind::PACK;
+    default: __builtin_unreachable();
   }
 }
 
 TypeScalarTypeKind FromPasta(pasta::TypeScalarTypeKind e) {
-  switch (e) {
-    case pasta::TypeScalarTypeKind::kCPointer: return TypeScalarTypeKind::C_POINTER;
-    case pasta::TypeScalarTypeKind::kBlockPointer: return TypeScalarTypeKind::BLOCK_POINTER;
-    case pasta::TypeScalarTypeKind::kObjCObjectPointer: return TypeScalarTypeKind::OBJ_C_OBJECT_POINTER;
-    case pasta::TypeScalarTypeKind::kMemberPointer: return TypeScalarTypeKind::MEMBER_POINTER;
-    case pasta::TypeScalarTypeKind::kBoolean: return TypeScalarTypeKind::BOOLEAN;
-    case pasta::TypeScalarTypeKind::kIntegral: return TypeScalarTypeKind::INTEGRAL;
-    case pasta::TypeScalarTypeKind::kFloating: return TypeScalarTypeKind::FLOATING;
-    case pasta::TypeScalarTypeKind::kIntegralComplex: return TypeScalarTypeKind::INTEGRAL_COMPLEX;
-    case pasta::TypeScalarTypeKind::kFloatingComplex: return TypeScalarTypeKind::FLOATING_COMPLEX;
-    case pasta::TypeScalarTypeKind::kFixedPoint: return TypeScalarTypeKind::FIXED_POINT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeScalarTypeKind::C_POINTER;
+    case 1: return TypeScalarTypeKind::BLOCK_POINTER;
+    case 2: return TypeScalarTypeKind::OBJ_C_OBJECT_POINTER;
+    case 3: return TypeScalarTypeKind::MEMBER_POINTER;
+    case 4: return TypeScalarTypeKind::BOOLEAN;
+    case 5: return TypeScalarTypeKind::INTEGRAL;
+    case 6: return TypeScalarTypeKind::FLOATING;
+    case 7: return TypeScalarTypeKind::INTEGRAL_COMPLEX;
+    case 8: return TypeScalarTypeKind::FLOATING_COMPLEX;
+    case 9: return TypeScalarTypeKind::FIXED_POINT;
+    default: __builtin_unreachable();
   }
 }
 
 TypeKind FromPasta(pasta::TypeKind e) {
-  switch (e) {
-    case pasta::TypeKind::kAdjusted: return TypeKind::ADJUSTED;
-    case pasta::TypeKind::kDecayed: return TypeKind::DECAYED;
-    case pasta::TypeKind::kConstantArray: return TypeKind::CONSTANT_ARRAY;
-    case pasta::TypeKind::kDependentSizedArray: return TypeKind::DEPENDENT_SIZED_ARRAY;
-    case pasta::TypeKind::kIncompleteArray: return TypeKind::INCOMPLETE_ARRAY;
-    case pasta::TypeKind::kVariableArray: return TypeKind::VARIABLE_ARRAY;
-    case pasta::TypeKind::kAtomic: return TypeKind::ATOMIC;
-    case pasta::TypeKind::kAttributed: return TypeKind::ATTRIBUTED;
-    case pasta::TypeKind::kBlockPointer: return TypeKind::BLOCK_POINTER;
-    case pasta::TypeKind::kBuiltin: return TypeKind::BUILTIN;
-    case pasta::TypeKind::kComplex: return TypeKind::COMPLEX;
-    case pasta::TypeKind::kDecltype: return TypeKind::DECLTYPE;
-    case pasta::TypeKind::kAuto: return TypeKind::AUTO;
-    case pasta::TypeKind::kDeducedTemplateSpecialization: return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;
-    case pasta::TypeKind::kDependentAddressSpace: return TypeKind::DEPENDENT_ADDRESS_SPACE;
-    case pasta::TypeKind::kDependentExtInt: return TypeKind::DEPENDENT_EXT_INT;
-    case pasta::TypeKind::kDependentName: return TypeKind::DEPENDENT_NAME;
-    case pasta::TypeKind::kDependentSizedExtVector: return TypeKind::DEPENDENT_SIZED_EXT_VECTOR;
-    case pasta::TypeKind::kDependentTemplateSpecialization: return TypeKind::DEPENDENT_TEMPLATE_SPECIALIZATION;
-    case pasta::TypeKind::kDependentVector: return TypeKind::DEPENDENT_VECTOR;
-    case pasta::TypeKind::kElaborated: return TypeKind::ELABORATED;
-    case pasta::TypeKind::kExtInt: return TypeKind::EXT_INT;
-    case pasta::TypeKind::kFunctionNoProto: return TypeKind::FUNCTION_NO_PROTO;
-    case pasta::TypeKind::kFunctionProto: return TypeKind::FUNCTION_PROTO;
-    case pasta::TypeKind::kInjectedClassName: return TypeKind::INJECTED_CLASS_NAME;
-    case pasta::TypeKind::kMacroQualified: return TypeKind::MACRO_QUALIFIED;
-    case pasta::TypeKind::kConstantMatrix: return TypeKind::CONSTANT_MATRIX;
-    case pasta::TypeKind::kDependentSizedMatrix: return TypeKind::DEPENDENT_SIZED_MATRIX;
-    case pasta::TypeKind::kMemberPointer: return TypeKind::MEMBER_POINTER;
-    case pasta::TypeKind::kObjCObjectPointer: return TypeKind::OBJ_C_OBJECT_POINTER;
-    case pasta::TypeKind::kObjCObject: return TypeKind::OBJ_C_OBJECT;
-    case pasta::TypeKind::kObjCInterface: return TypeKind::OBJ_C_INTERFACE;
-    case pasta::TypeKind::kObjCTypeParam: return TypeKind::OBJ_C_TYPE_PARAM;
-    case pasta::TypeKind::kPackExpansion: return TypeKind::PACK_EXPANSION;
-    case pasta::TypeKind::kParen: return TypeKind::PAREN;
-    case pasta::TypeKind::kPipe: return TypeKind::PIPE;
-    case pasta::TypeKind::kPointer: return TypeKind::POINTER;
-    case pasta::TypeKind::kLValueReference: return TypeKind::L_VALUE_REFERENCE;
-    case pasta::TypeKind::kRValueReference: return TypeKind::R_VALUE_REFERENCE;
-    case pasta::TypeKind::kSubstTemplateTypeParmPack: return TypeKind::SUBST_TEMPLATE_TYPE_PARM_PACK;
-    case pasta::TypeKind::kSubstTemplateTypeParm: return TypeKind::SUBST_TEMPLATE_TYPE_PARM;
-    case pasta::TypeKind::kEnum: return TypeKind::ENUM;
-    case pasta::TypeKind::kRecord: return TypeKind::RECORD;
-    case pasta::TypeKind::kTemplateSpecialization: return TypeKind::TEMPLATE_SPECIALIZATION;
-    case pasta::TypeKind::kTemplateTypeParm: return TypeKind::TEMPLATE_TYPE_PARM;
-    case pasta::TypeKind::kTypeOfExpr: return TypeKind::TYPE_OF_EXPR;
-    case pasta::TypeKind::kTypeOf: return TypeKind::TYPE_OF;
-    case pasta::TypeKind::kTypedef: return TypeKind::TYPEDEF;
-    case pasta::TypeKind::kUnaryTransform: return TypeKind::UNARY_TRANSFORM;
-    case pasta::TypeKind::kUnresolvedUsing: return TypeKind::UNRESOLVED_USING;
-    case pasta::TypeKind::kVector: return TypeKind::VECTOR;
-    case pasta::TypeKind::kExtVector: return TypeKind::EXT_VECTOR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeKind::ADJUSTED;
+    case 1: return TypeKind::DECAYED;
+    case 2: return TypeKind::CONSTANT_ARRAY;
+    case 3: return TypeKind::DEPENDENT_SIZED_ARRAY;
+    case 4: return TypeKind::INCOMPLETE_ARRAY;
+    case 5: return TypeKind::VARIABLE_ARRAY;
+    case 6: return TypeKind::ATOMIC;
+    case 7: return TypeKind::ATTRIBUTED;
+    case 8: return TypeKind::BLOCK_POINTER;
+    case 9: return TypeKind::BUILTIN;
+    case 10: return TypeKind::COMPLEX;
+    case 11: return TypeKind::DECLTYPE;
+    case 12: return TypeKind::AUTO;
+    case 13: return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;
+    case 14: return TypeKind::DEPENDENT_ADDRESS_SPACE;
+    case 15: return TypeKind::DEPENDENT_EXT_INT;
+    case 16: return TypeKind::DEPENDENT_NAME;
+    case 17: return TypeKind::DEPENDENT_SIZED_EXT_VECTOR;
+    case 18: return TypeKind::DEPENDENT_TEMPLATE_SPECIALIZATION;
+    case 19: return TypeKind::DEPENDENT_VECTOR;
+    case 20: return TypeKind::ELABORATED;
+    case 21: return TypeKind::EXT_INT;
+    case 22: return TypeKind::FUNCTION_NO_PROTO;
+    case 23: return TypeKind::FUNCTION_PROTO;
+    case 24: return TypeKind::INJECTED_CLASS_NAME;
+    case 25: return TypeKind::MACRO_QUALIFIED;
+    case 26: return TypeKind::CONSTANT_MATRIX;
+    case 27: return TypeKind::DEPENDENT_SIZED_MATRIX;
+    case 28: return TypeKind::MEMBER_POINTER;
+    case 29: return TypeKind::OBJ_C_OBJECT_POINTER;
+    case 30: return TypeKind::OBJ_C_OBJECT;
+    case 31: return TypeKind::OBJ_C_INTERFACE;
+    case 32: return TypeKind::OBJ_C_TYPE_PARAM;
+    case 33: return TypeKind::PACK_EXPANSION;
+    case 34: return TypeKind::PAREN;
+    case 35: return TypeKind::PIPE;
+    case 36: return TypeKind::POINTER;
+    case 37: return TypeKind::L_VALUE_REFERENCE;
+    case 38: return TypeKind::R_VALUE_REFERENCE;
+    case 39: return TypeKind::SUBST_TEMPLATE_TYPE_PARM_PACK;
+    case 40: return TypeKind::SUBST_TEMPLATE_TYPE_PARM;
+    case 41: return TypeKind::ENUM;
+    case 42: return TypeKind::RECORD;
+    case 43: return TypeKind::TEMPLATE_SPECIALIZATION;
+    case 44: return TypeKind::TEMPLATE_TYPE_PARM;
+    case 45: return TypeKind::TYPE_OF_EXPR;
+    case 46: return TypeKind::TYPE_OF;
+    case 47: return TypeKind::TYPEDEF;
+    case 48: return TypeKind::UNARY_TRANSFORM;
+    case 49: return TypeKind::UNRESOLVED_USING;
+    case 50: return TypeKind::VECTOR;
+    case 51: return TypeKind::EXT_VECTOR;
+    default: __builtin_unreachable();
   }
 }
 
 UnaryTransformTypeUTTKind FromPasta(pasta::UnaryTransformTypeUTTKind e) {
-  switch (e) {
-    case pasta::UnaryTransformTypeUTTKind::kEnumUnderlyingType: return UnaryTransformTypeUTTKind::ENUM_UNDERLYING_TYPE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UnaryTransformTypeUTTKind::ENUM_UNDERLYING_TYPE;
+    default: __builtin_unreachable();
   }
 }
 
 UserDefinedLiteralLiteralOperatorKind FromPasta(pasta::UserDefinedLiteralLiteralOperatorKind e) {
-  switch (e) {
-    case pasta::UserDefinedLiteralLiteralOperatorKind::kRaw: return UserDefinedLiteralLiteralOperatorKind::RAW;
-    case pasta::UserDefinedLiteralLiteralOperatorKind::kTemplate: return UserDefinedLiteralLiteralOperatorKind::TEMPLATE;
-    case pasta::UserDefinedLiteralLiteralOperatorKind::kInteger: return UserDefinedLiteralLiteralOperatorKind::INTEGER;
-    case pasta::UserDefinedLiteralLiteralOperatorKind::kFloating: return UserDefinedLiteralLiteralOperatorKind::FLOATING;
-    case pasta::UserDefinedLiteralLiteralOperatorKind::kString: return UserDefinedLiteralLiteralOperatorKind::STRING;
-    case pasta::UserDefinedLiteralLiteralOperatorKind::kCharacter: return UserDefinedLiteralLiteralOperatorKind::CHARACTER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UserDefinedLiteralLiteralOperatorKind::RAW;
+    case 1: return UserDefinedLiteralLiteralOperatorKind::TEMPLATE;
+    case 2: return UserDefinedLiteralLiteralOperatorKind::INTEGER;
+    case 3: return UserDefinedLiteralLiteralOperatorKind::FLOATING;
+    case 4: return UserDefinedLiteralLiteralOperatorKind::STRING;
+    case 5: return UserDefinedLiteralLiteralOperatorKind::CHARACTER;
+    default: __builtin_unreachable();
   }
 }
 
 VarDeclDefinitionKind FromPasta(pasta::VarDeclDefinitionKind e) {
-  switch (e) {
-    case pasta::VarDeclDefinitionKind::kDeclarationOnly: return VarDeclDefinitionKind::DECLARATION_ONLY;
-    case pasta::VarDeclDefinitionKind::kTentativeDefinition: return VarDeclDefinitionKind::TENTATIVE_DEFINITION;
-    case pasta::VarDeclDefinitionKind::kDefinition: return VarDeclDefinitionKind::DEFINITION;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VarDeclDefinitionKind::DECLARATION_ONLY;
+    case 1: return VarDeclDefinitionKind::TENTATIVE_DEFINITION;
+    case 2: return VarDeclDefinitionKind::DEFINITION;
+    default: __builtin_unreachable();
   }
 }
 
 VarDeclInitializationStyle FromPasta(pasta::VarDeclInitializationStyle e) {
-  switch (e) {
-    case pasta::VarDeclInitializationStyle::kCInit: return VarDeclInitializationStyle::C_INIT;
-    case pasta::VarDeclInitializationStyle::kCallInitializer: return VarDeclInitializationStyle::CALL_INITIALIZER;
-    case pasta::VarDeclInitializationStyle::kListInitializer: return VarDeclInitializationStyle::LIST_INITIALIZER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VarDeclInitializationStyle::C_INIT;
+    case 1: return VarDeclInitializationStyle::CALL_INITIALIZER;
+    case 2: return VarDeclInitializationStyle::LIST_INITIALIZER;
+    default: __builtin_unreachable();
   }
 }
 
 VarDeclTLSKind FromPasta(pasta::VarDeclTLSKind e) {
-  switch (e) {
-    case pasta::VarDeclTLSKind::kNone: return VarDeclTLSKind::NONE;
-    case pasta::VarDeclTLSKind::kStatic: return VarDeclTLSKind::STATIC;
-    case pasta::VarDeclTLSKind::kDynamic: return VarDeclTLSKind::DYNAMIC;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VarDeclTLSKind::NONE;
+    case 1: return VarDeclTLSKind::STATIC;
+    case 2: return VarDeclTLSKind::DYNAMIC;
+    default: __builtin_unreachable();
   }
 }
 
 VectorTypeVectorKind FromPasta(pasta::VectorTypeVectorKind e) {
-  switch (e) {
-    case pasta::VectorTypeVectorKind::kGenericVector: return VectorTypeVectorKind::GENERIC_VECTOR;
-    case pasta::VectorTypeVectorKind::kAltiVecVector: return VectorTypeVectorKind::ALTI_VEC_VECTOR;
-    case pasta::VectorTypeVectorKind::kAltiVecPixel: return VectorTypeVectorKind::ALTI_VEC_PIXEL;
-    case pasta::VectorTypeVectorKind::kAltiVecBoolean: return VectorTypeVectorKind::ALTI_VEC_BOOLEAN;
-    case pasta::VectorTypeVectorKind::kNeonVector: return VectorTypeVectorKind::NEON_VECTOR;
-    case pasta::VectorTypeVectorKind::kNeonPolyVector: return VectorTypeVectorKind::NEON_POLY_VECTOR;
-    case pasta::VectorTypeVectorKind::kSveFixedLengthDataVector: return VectorTypeVectorKind::SVE_FIXED_LENGTH_DATA_VECTOR;
-    case pasta::VectorTypeVectorKind::kSveFixedLengthPredicateVector: return VectorTypeVectorKind::SVE_FIXED_LENGTH_PREDICATE_VECTOR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VectorTypeVectorKind::GENERIC_VECTOR;
+    case 1: return VectorTypeVectorKind::ALTI_VEC_VECTOR;
+    case 2: return VectorTypeVectorKind::ALTI_VEC_PIXEL;
+    case 3: return VectorTypeVectorKind::ALTI_VEC_BOOLEAN;
+    case 4: return VectorTypeVectorKind::NEON_VECTOR;
+    case 5: return VectorTypeVectorKind::NEON_POLY_VECTOR;
+    case 6: return VectorTypeVectorKind::SVE_FIXED_LENGTH_DATA_VECTOR;
+    case 7: return VectorTypeVectorKind::SVE_FIXED_LENGTH_PREDICATE_VECTOR;
+    default: __builtin_unreachable();
   }
 }
 
 ASTDumpOutputFormat FromPasta(pasta::ASTDumpOutputFormat e) {
-  switch (e) {
-    case pasta::ASTDumpOutputFormat::kDefault: return ASTDumpOutputFormat::DEFAULT;
-    case pasta::ASTDumpOutputFormat::kJSON: return ASTDumpOutputFormat::JSON;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ASTDumpOutputFormat::DEFAULT;
+    case 1: return ASTDumpOutputFormat::JSON;
+    default: __builtin_unreachable();
   }
 }
 
 AccessSpecifier FromPasta(pasta::AccessSpecifier e) {
-  switch (e) {
-    case pasta::AccessSpecifier::kPublic: return AccessSpecifier::PUBLIC;
-    case pasta::AccessSpecifier::kProtected: return AccessSpecifier::PROTECTED;
-    case pasta::AccessSpecifier::kPrivate: return AccessSpecifier::PRIVATE;
-    case pasta::AccessSpecifier::kNone: return AccessSpecifier::NONE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AccessSpecifier::PUBLIC;
+    case 1: return AccessSpecifier::PROTECTED;
+    case 2: return AccessSpecifier::PRIVATE;
+    case 3: return AccessSpecifier::NONE;
+    default: __builtin_unreachable();
   }
 }
 
 AddrSpaceMapMangling FromPasta(pasta::AddrSpaceMapMangling e) {
-  switch (e) {
-    case pasta::AddrSpaceMapMangling::kTarget: return AddrSpaceMapMangling::TARGET;
-    case pasta::AddrSpaceMapMangling::kOn: return AddrSpaceMapMangling::ON;
-    case pasta::AddrSpaceMapMangling::kOff: return AddrSpaceMapMangling::OFF;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AddrSpaceMapMangling::TARGET;
+    case 1: return AddrSpaceMapMangling::ON;
+    case 2: return AddrSpaceMapMangling::OFF;
+    default: __builtin_unreachable();
   }
 }
 
 AllocatorTypeTy FromPasta(pasta::AllocatorTypeTy e) {
-  switch (e) {
-    case pasta::AllocatorTypeTy::kOMPNullMemoryAlloc: return AllocatorTypeTy::OMP_NULL_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPDefaultMemoryAlloc: return AllocatorTypeTy::OMP_DEFAULT_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPLargeCapMemoryAlloc: return AllocatorTypeTy::OMP_LARGE_CAP_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPConstMemoryAlloc: return AllocatorTypeTy::OMP_CONST_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPHighBWMemoryAlloc: return AllocatorTypeTy::OMP_HIGH_BW_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPLowLatMemoryAlloc: return AllocatorTypeTy::OMP_LOW_LAT_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPCGroupMemoryAlloc: return AllocatorTypeTy::OMPC_GROUP_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPPTeamMemoryAlloc: return AllocatorTypeTy::OMPP_TEAM_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPThreadMemoryAlloc: return AllocatorTypeTy::OMP_THREAD_MEMORY_ALLOC;
-    case pasta::AllocatorTypeTy::kOMPUserDefinedMemoryAlloc: return AllocatorTypeTy::OMP_USER_DEFINED_MEMORY_ALLOC;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AllocatorTypeTy::OMP_NULL_MEMORY_ALLOC;
+    case 1: return AllocatorTypeTy::OMP_DEFAULT_MEMORY_ALLOC;
+    case 2: return AllocatorTypeTy::OMP_LARGE_CAP_MEMORY_ALLOC;
+    case 3: return AllocatorTypeTy::OMP_CONST_MEMORY_ALLOC;
+    case 4: return AllocatorTypeTy::OMP_HIGH_BW_MEMORY_ALLOC;
+    case 5: return AllocatorTypeTy::OMP_LOW_LAT_MEMORY_ALLOC;
+    case 6: return AllocatorTypeTy::OMPC_GROUP_MEMORY_ALLOC;
+    case 7: return AllocatorTypeTy::OMPP_TEAM_MEMORY_ALLOC;
+    case 8: return AllocatorTypeTy::OMP_THREAD_MEMORY_ALLOC;
+    case 9: return AllocatorTypeTy::OMP_USER_DEFINED_MEMORY_ALLOC;
+    default: __builtin_unreachable();
   }
 }
 
 AltivecSrcCompatKind FromPasta(pasta::AltivecSrcCompatKind e) {
-  switch (e) {
-    case pasta::AltivecSrcCompatKind::kMixed: return AltivecSrcCompatKind::MIXED;
-    case pasta::AltivecSrcCompatKind::kGCC: return AltivecSrcCompatKind::GCC;
-    case pasta::AltivecSrcCompatKind::kXL: return AltivecSrcCompatKind::XL;
+  switch (static_cast<int>(e)) {
+    case 0: return AltivecSrcCompatKind::MIXED;
+    case 1: return AltivecSrcCompatKind::GCC;
+    case 2: return AltivecSrcCompatKind::XL;
+    default: __builtin_unreachable();
   }
 }
 
 ArgumentKind FromPasta(pasta::ArgumentKind e) {
-  switch (e) {
-    case pasta::ArgumentKind::kStdString: return ArgumentKind::STD_STRING;
-    case pasta::ArgumentKind::kCString: return ArgumentKind::C_STRING;
-    case pasta::ArgumentKind::kSint: return ArgumentKind::SINT;
-    case pasta::ArgumentKind::kUint: return ArgumentKind::UINT;
-    case pasta::ArgumentKind::kTokenkind: return ArgumentKind::TOKENKIND;
-    case pasta::ArgumentKind::kIdentifierinfo: return ArgumentKind::IDENTIFIERINFO;
-    case pasta::ArgumentKind::kAddrspace: return ArgumentKind::ADDRSPACE;
-    case pasta::ArgumentKind::kQualified: return ArgumentKind::QUALIFIED;
-    case pasta::ArgumentKind::kQualtype: return ArgumentKind::QUALTYPE;
-    case pasta::ArgumentKind::kDeclarationname: return ArgumentKind::DECLARATIONNAME;
-    case pasta::ArgumentKind::kNameddecl: return ArgumentKind::NAMEDDECL;
-    case pasta::ArgumentKind::kNestednamespec: return ArgumentKind::NESTEDNAMESPEC;
-    case pasta::ArgumentKind::kDeclcontext: return ArgumentKind::DECLCONTEXT;
-    case pasta::ArgumentKind::kQualtypePair: return ArgumentKind::QUALTYPE_PAIR;
-    case pasta::ArgumentKind::kAttribute: return ArgumentKind::ATTRIBUTE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArgumentKind::STD_STRING;
+    case 1: return ArgumentKind::C_STRING;
+    case 2: return ArgumentKind::SINT;
+    case 3: return ArgumentKind::UINT;
+    case 4: return ArgumentKind::TOKENKIND;
+    case 5: return ArgumentKind::IDENTIFIERINFO;
+    case 6: return ArgumentKind::ADDRSPACE;
+    case 7: return ArgumentKind::QUALIFIED;
+    case 8: return ArgumentKind::QUALTYPE;
+    case 9: return ArgumentKind::DECLARATIONNAME;
+    case 10: return ArgumentKind::NAMEDDECL;
+    case 11: return ArgumentKind::NESTEDNAMESPEC;
+    case 12: return ArgumentKind::DECLCONTEXT;
+    case 13: return ArgumentKind::QUALTYPE_PAIR;
+    case 14: return ArgumentKind::ATTRIBUTE;
+    default: __builtin_unreachable();
   }
 }
 
 ArrayTypeTrait FromPasta(pasta::ArrayTypeTrait e) {
-  switch (e) {
-    case pasta::ArrayTypeTrait::kArrayRank: return ArrayTypeTrait::ARRAY_RANK;
-    case pasta::ArrayTypeTrait::kArrayExtent: return ArrayTypeTrait::ARRAY_EXTENT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArrayTypeTrait::ARRAY_RANK;
+    case 1: return ArrayTypeTrait::ARRAY_EXTENT;
+    default: __builtin_unreachable();
   }
 }
 
 AtomicScopeModelKind FromPasta(pasta::AtomicScopeModelKind e) {
-  switch (e) {
-    case pasta::AtomicScopeModelKind::kNone: return AtomicScopeModelKind::NONE;
-    case pasta::AtomicScopeModelKind::kOpenCL: return AtomicScopeModelKind::OPEN_CL;
+  switch (static_cast<int>(e)) {
+    case 0: return AtomicScopeModelKind::NONE;
+    case 1: return AtomicScopeModelKind::OPEN_CL;
+    default: __builtin_unreachable();
   }
 }
 
 AttributeKind FromPasta(pasta::AttributeKind e) {
-  switch (e) {
-    case pasta::AttributeKind::kAddressSpace: return AttributeKind::ADDRESS_SPACE;
-    case pasta::AttributeKind::kArmMveStrictPolymorphism: return AttributeKind::ARM_MVE_STRICT_POLYMORPHISM;
-    case pasta::AttributeKind::kCmseNSCall: return AttributeKind::CMSE_NS_CALL;
-    case pasta::AttributeKind::kNoDeref: return AttributeKind::NO_DEREF;
-    case pasta::AttributeKind::kObjCGC: return AttributeKind::OBJ_CGC;
-    case pasta::AttributeKind::kObjCInertUnsafeUnretained: return AttributeKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
-    case pasta::AttributeKind::kObjCKindOf: return AttributeKind::OBJ_C_KIND_OF;
-    case pasta::AttributeKind::kOpenCLConstantAddressSpace: return AttributeKind::OPEN_CL_CONSTANT_ADDRESS_SPACE;
-    case pasta::AttributeKind::kOpenCLGenericAddressSpace: return AttributeKind::OPEN_CL_GENERIC_ADDRESS_SPACE;
-    case pasta::AttributeKind::kOpenCLGlobalAddressSpace: return AttributeKind::OPEN_CL_GLOBAL_ADDRESS_SPACE;
-    case pasta::AttributeKind::kOpenCLGlobalDeviceAddressSpace: return AttributeKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
-    case pasta::AttributeKind::kOpenCLGlobalHostAddressSpace: return AttributeKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
-    case pasta::AttributeKind::kOpenCLLocalAddressSpace: return AttributeKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
-    case pasta::AttributeKind::kOpenCLPrivateAddressSpace: return AttributeKind::OPEN_CL_PRIVATE_ADDRESS_SPACE;
-    case pasta::AttributeKind::kPtr32: return AttributeKind::PTR32;
-    case pasta::AttributeKind::kPtr64: return AttributeKind::PTR64;
-    case pasta::AttributeKind::kSPtr: return AttributeKind::S_PTR;
-    case pasta::AttributeKind::kTypeNonNull: return AttributeKind::TYPE_NON_NULL;
-    case pasta::AttributeKind::kTypeNullUnspecified: return AttributeKind::TYPE_NULL_UNSPECIFIED;
-    case pasta::AttributeKind::kTypeNullable: return AttributeKind::TYPE_NULLABLE;
-    case pasta::AttributeKind::kTypeNullableResult: return AttributeKind::TYPE_NULLABLE_RESULT;
-    case pasta::AttributeKind::kUPtr: return AttributeKind::U_PTR;
-    case pasta::AttributeKind::kFallThrough: return AttributeKind::FALL_THROUGH;
-    case pasta::AttributeKind::kLikely: return AttributeKind::LIKELY;
-    case pasta::AttributeKind::kMustTail: return AttributeKind::MUST_TAIL;
-    case pasta::AttributeKind::kOpenCLUnrollHint: return AttributeKind::OPEN_CL_UNROLL_HINT;
-    case pasta::AttributeKind::kSuppress: return AttributeKind::SUPPRESS;
-    case pasta::AttributeKind::kUnlikely: return AttributeKind::UNLIKELY;
-    case pasta::AttributeKind::kNoMerge: return AttributeKind::NO_MERGE;
-    case pasta::AttributeKind::kAArch64VectorPcs: return AttributeKind::A_ARCH64_VECTOR_PCS;
-    case pasta::AttributeKind::kAcquireHandle: return AttributeKind::ACQUIRE_HANDLE;
-    case pasta::AttributeKind::kAnyX86NoCfCheck: return AttributeKind::ANY_X86_NO_CF_CHECK;
-    case pasta::AttributeKind::kCDecl: return AttributeKind::C_DECL;
-    case pasta::AttributeKind::kFastCall: return AttributeKind::FAST_CALL;
-    case pasta::AttributeKind::kIntelOclBicc: return AttributeKind::INTEL_OCL_BICC;
-    case pasta::AttributeKind::kLifetimeBound: return AttributeKind::LIFETIME_BOUND;
-    case pasta::AttributeKind::kMSABI: return AttributeKind::MSABI;
-    case pasta::AttributeKind::kNSReturnsRetained: return AttributeKind::NS_RETURNS_RETAINED;
-    case pasta::AttributeKind::kObjCOwnership: return AttributeKind::OBJ_C_OWNERSHIP;
-    case pasta::AttributeKind::kPascal: return AttributeKind::PASCAL;
-    case pasta::AttributeKind::kPcs: return AttributeKind::PCS;
-    case pasta::AttributeKind::kPreserveAll: return AttributeKind::PRESERVE_ALL;
-    case pasta::AttributeKind::kPreserveMost: return AttributeKind::PRESERVE_MOST;
-    case pasta::AttributeKind::kRegCall: return AttributeKind::REG_CALL;
-    case pasta::AttributeKind::kStdCall: return AttributeKind::STD_CALL;
-    case pasta::AttributeKind::kSwiftAsyncCall: return AttributeKind::SWIFT_ASYNC_CALL;
-    case pasta::AttributeKind::kSwiftCall: return AttributeKind::SWIFT_CALL;
-    case pasta::AttributeKind::kSysVABI: return AttributeKind::SYS_VABI;
-    case pasta::AttributeKind::kThisCall: return AttributeKind::THIS_CALL;
-    case pasta::AttributeKind::kVectorCall: return AttributeKind::VECTOR_CALL;
-    case pasta::AttributeKind::kSwiftAsyncContext: return AttributeKind::SWIFT_ASYNC_CONTEXT;
-    case pasta::AttributeKind::kSwiftContext: return AttributeKind::SWIFT_CONTEXT;
-    case pasta::AttributeKind::kSwiftErrorResult: return AttributeKind::SWIFT_ERROR_RESULT;
-    case pasta::AttributeKind::kSwiftIndirectResult: return AttributeKind::SWIFT_INDIRECT_RESULT;
-    case pasta::AttributeKind::kAnnotate: return AttributeKind::ANNOTATE;
-    case pasta::AttributeKind::kCFConsumed: return AttributeKind::CF_CONSUMED;
-    case pasta::AttributeKind::kCarriesDependency: return AttributeKind::CARRIES_DEPENDENCY;
-    case pasta::AttributeKind::kNSConsumed: return AttributeKind::NS_CONSUMED;
-    case pasta::AttributeKind::kNonNull: return AttributeKind::NON_NULL;
-    case pasta::AttributeKind::kOSConsumed: return AttributeKind::OS_CONSUMED;
-    case pasta::AttributeKind::kPassObjectSize: return AttributeKind::PASS_OBJECT_SIZE;
-    case pasta::AttributeKind::kReleaseHandle: return AttributeKind::RELEASE_HANDLE;
-    case pasta::AttributeKind::kUseHandle: return AttributeKind::USE_HANDLE;
-    case pasta::AttributeKind::kAMDGPUFlatWorkGroupSize: return AttributeKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
-    case pasta::AttributeKind::kAMDGPUNumSGPR: return AttributeKind::AMDGPU_NUM_SGPR;
-    case pasta::AttributeKind::kAMDGPUNumVGPR: return AttributeKind::AMDGPU_NUM_VGPR;
-    case pasta::AttributeKind::kAMDGPUWavesPerEU: return AttributeKind::AMDGPU_WAVES_PER_EU;
-    case pasta::AttributeKind::kARMInterrupt: return AttributeKind::ARM_INTERRUPT;
-    case pasta::AttributeKind::kAVRInterrupt: return AttributeKind::AVR_INTERRUPT;
-    case pasta::AttributeKind::kAVRSignal: return AttributeKind::AVR_SIGNAL;
-    case pasta::AttributeKind::kAcquireCapability: return AttributeKind::ACQUIRE_CAPABILITY;
-    case pasta::AttributeKind::kAcquiredAfter: return AttributeKind::ACQUIRED_AFTER;
-    case pasta::AttributeKind::kAcquiredBefore: return AttributeKind::ACQUIRED_BEFORE;
-    case pasta::AttributeKind::kAlignMac68k: return AttributeKind::ALIGN_MAC68_K;
-    case pasta::AttributeKind::kAlignNatural: return AttributeKind::ALIGN_NATURAL;
-    case pasta::AttributeKind::kAligned: return AttributeKind::ALIGNED;
-    case pasta::AttributeKind::kAllocAlign: return AttributeKind::ALLOC_ALIGN;
-    case pasta::AttributeKind::kAllocSize: return AttributeKind::ALLOC_SIZE;
-    case pasta::AttributeKind::kAlwaysDestroy: return AttributeKind::ALWAYS_DESTROY;
-    case pasta::AttributeKind::kAlwaysInline: return AttributeKind::ALWAYS_INLINE;
-    case pasta::AttributeKind::kAnalyzerNoReturn: return AttributeKind::ANALYZER_NO_RETURN;
-    case pasta::AttributeKind::kAnyX86Interrupt: return AttributeKind::ANY_X86_INTERRUPT;
-    case pasta::AttributeKind::kAnyX86NoCallerSavedRegisters: return AttributeKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
-    case pasta::AttributeKind::kArcWeakrefUnavailable: return AttributeKind::ARC_WEAKREF_UNAVAILABLE;
-    case pasta::AttributeKind::kArgumentWithTypeTag: return AttributeKind::ARGUMENT_WITH_TYPE_TAG;
-    case pasta::AttributeKind::kArmBuiltinAlias: return AttributeKind::ARM_BUILTIN_ALIAS;
-    case pasta::AttributeKind::kArtificial: return AttributeKind::ARTIFICIAL;
-    case pasta::AttributeKind::kAssemblyLabel: return AttributeKind::ASSEMBLY_LABEL;
-    case pasta::AttributeKind::kAssertCapability: return AttributeKind::ASSERT_CAPABILITY;
-    case pasta::AttributeKind::kAssertExclusiveLock: return AttributeKind::ASSERT_EXCLUSIVE_LOCK;
-    case pasta::AttributeKind::kAssertSharedLock: return AttributeKind::ASSERT_SHARED_LOCK;
-    case pasta::AttributeKind::kAssumeAligned: return AttributeKind::ASSUME_ALIGNED;
-    case pasta::AttributeKind::kAssumption: return AttributeKind::ASSUMPTION;
-    case pasta::AttributeKind::kAvailability: return AttributeKind::AVAILABILITY;
-    case pasta::AttributeKind::kBPFPreserveAccessIndex: return AttributeKind::BPF_PRESERVE_ACCESS_INDEX;
-    case pasta::AttributeKind::kBlocks: return AttributeKind::BLOCKS;
-    case pasta::AttributeKind::kBuiltin: return AttributeKind::BUILTIN;
-    case pasta::AttributeKind::kC11NoReturn: return AttributeKind::C11_NO_RETURN;
-    case pasta::AttributeKind::kCFAuditedTransfer: return AttributeKind::CF_AUDITED_TRANSFER;
-    case pasta::AttributeKind::kCFGuard: return AttributeKind::CF_GUARD;
-    case pasta::AttributeKind::kCFICanonicalJumpTable: return AttributeKind::CFI_CANONICAL_JUMP_TABLE;
-    case pasta::AttributeKind::kCFReturnsNotRetained: return AttributeKind::CF_RETURNS_NOT_RETAINED;
-    case pasta::AttributeKind::kCFReturnsRetained: return AttributeKind::CF_RETURNS_RETAINED;
-    case pasta::AttributeKind::kCFUnknownTransfer: return AttributeKind::CF_UNKNOWN_TRANSFER;
-    case pasta::AttributeKind::kCPUDispatch: return AttributeKind::CPU_DISPATCH;
-    case pasta::AttributeKind::kCPUSpecific: return AttributeKind::CPU_SPECIFIC;
-    case pasta::AttributeKind::kCUDAConstant: return AttributeKind::CUDA_CONSTANT;
-    case pasta::AttributeKind::kCUDADevice: return AttributeKind::CUDA_DEVICE;
-    case pasta::AttributeKind::kCUDADeviceBuiltinSurfaceType: return AttributeKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
-    case pasta::AttributeKind::kCUDADeviceBuiltinTextureType: return AttributeKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;
-    case pasta::AttributeKind::kCUDAGlobal: return AttributeKind::CUDA_GLOBAL;
-    case pasta::AttributeKind::kCUDAHost: return AttributeKind::CUDA_HOST;
-    case pasta::AttributeKind::kCUDAInvalidTarget: return AttributeKind::CUDA_INVALID_TARGET;
-    case pasta::AttributeKind::kCUDALaunchBounds: return AttributeKind::CUDA_LAUNCH_BOUNDS;
-    case pasta::AttributeKind::kCUDAShared: return AttributeKind::CUDA_SHARED;
-    case pasta::AttributeKind::kCXX11NoReturn: return AttributeKind::CX_X11_NO_RETURN;
-    case pasta::AttributeKind::kCallableWhen: return AttributeKind::CALLABLE_WHEN;
-    case pasta::AttributeKind::kCallback: return AttributeKind::CALLBACK;
-    case pasta::AttributeKind::kCapability: return AttributeKind::CAPABILITY;
-    case pasta::AttributeKind::kCapturedRecord: return AttributeKind::CAPTURED_RECORD;
-    case pasta::AttributeKind::kCleanup: return AttributeKind::CLEANUP;
-    case pasta::AttributeKind::kCmseNSEntry: return AttributeKind::CMSE_NS_ENTRY;
-    case pasta::AttributeKind::kCodeSeg: return AttributeKind::CODE_SEG;
-    case pasta::AttributeKind::kCold: return AttributeKind::COLD;
-    case pasta::AttributeKind::kCommon: return AttributeKind::COMMON;
-    case pasta::AttributeKind::kConst: return AttributeKind::CONST;
-    case pasta::AttributeKind::kConstInitializer: return AttributeKind::CONST_INITIALIZER;
-    case pasta::AttributeKind::kConstructor: return AttributeKind::CONSTRUCTOR;
-    case pasta::AttributeKind::kConsumable: return AttributeKind::CONSUMABLE;
-    case pasta::AttributeKind::kConsumableAutoCast: return AttributeKind::CONSUMABLE_AUTO_CAST;
-    case pasta::AttributeKind::kConsumableSetOnRead: return AttributeKind::CONSUMABLE_SET_ON_READ;
-    case pasta::AttributeKind::kConvergent: return AttributeKind::CONVERGENT;
-    case pasta::AttributeKind::kDLLExport: return AttributeKind::DLL_EXPORT;
-    case pasta::AttributeKind::kDLLExportStaticLocal: return AttributeKind::DLL_EXPORT_STATIC_LOCAL;
-    case pasta::AttributeKind::kDLLImport: return AttributeKind::DLL_IMPORT;
-    case pasta::AttributeKind::kDLLImportStaticLocal: return AttributeKind::DLL_IMPORT_STATIC_LOCAL;
-    case pasta::AttributeKind::kDeprecated: return AttributeKind::DEPRECATED;
-    case pasta::AttributeKind::kDestructor: return AttributeKind::DESTRUCTOR;
-    case pasta::AttributeKind::kDiagnoseIf: return AttributeKind::DIAGNOSE_IF;
-    case pasta::AttributeKind::kDisableTailCalls: return AttributeKind::DISABLE_TAIL_CALLS;
-    case pasta::AttributeKind::kEmptyBases: return AttributeKind::EMPTY_BASES;
-    case pasta::AttributeKind::kEnableIf: return AttributeKind::ENABLE_IF;
-    case pasta::AttributeKind::kEnforceTCB: return AttributeKind::ENFORCE_TCB;
-    case pasta::AttributeKind::kEnforceTCBLeaf: return AttributeKind::ENFORCE_TCB_LEAF;
-    case pasta::AttributeKind::kEnumExtensibility: return AttributeKind::ENUM_EXTENSIBILITY;
-    case pasta::AttributeKind::kExcludeFromExplicitInstantiation: return AttributeKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
-    case pasta::AttributeKind::kExclusiveTrylockFunction: return AttributeKind::EXCLUSIVE_TRYLOCK_FUNCTION;
-    case pasta::AttributeKind::kExternalSourceSymbol: return AttributeKind::EXTERNAL_SOURCE_SYMBOL;
-    case pasta::AttributeKind::kFinal: return AttributeKind::FINAL;
-    case pasta::AttributeKind::kFlagEnum: return AttributeKind::FLAG_ENUM;
-    case pasta::AttributeKind::kFlatten: return AttributeKind::FLATTEN;
-    case pasta::AttributeKind::kFormat: return AttributeKind::FORMAT;
-    case pasta::AttributeKind::kFormatArgument: return AttributeKind::FORMAT_ARGUMENT;
-    case pasta::AttributeKind::kGNUInline: return AttributeKind::GNU_INLINE;
-    case pasta::AttributeKind::kGuardedBy: return AttributeKind::GUARDED_BY;
-    case pasta::AttributeKind::kGuardedVariable: return AttributeKind::GUARDED_VARIABLE;
-    case pasta::AttributeKind::kHIPManaged: return AttributeKind::HIP_MANAGED;
-    case pasta::AttributeKind::kHot: return AttributeKind::HOT;
-    case pasta::AttributeKind::kIBAction: return AttributeKind::IB_ACTION;
-    case pasta::AttributeKind::kIBOutlet: return AttributeKind::IB_OUTLET;
-    case pasta::AttributeKind::kIBOutletCollection: return AttributeKind::IB_OUTLET_COLLECTION;
-    case pasta::AttributeKind::kInitializerPriority: return AttributeKind::INITIALIZER_PRIORITY;
-    case pasta::AttributeKind::kInternalLinkage: return AttributeKind::INTERNAL_LINKAGE;
-    case pasta::AttributeKind::kLTOVisibilityPublic: return AttributeKind::LTO_VISIBILITY_PUBLIC;
-    case pasta::AttributeKind::kLayoutVersion: return AttributeKind::LAYOUT_VERSION;
-    case pasta::AttributeKind::kLeaf: return AttributeKind::LEAF;
-    case pasta::AttributeKind::kLockReturned: return AttributeKind::LOCK_RETURNED;
-    case pasta::AttributeKind::kLocksExcluded: return AttributeKind::LOCKS_EXCLUDED;
-    case pasta::AttributeKind::kM68kInterrupt: return AttributeKind::M68_KINTERRUPT;
-    case pasta::AttributeKind::kMIGServerRoutine: return AttributeKind::MIG_SERVER_ROUTINE;
-    case pasta::AttributeKind::kMSAllocator: return AttributeKind::MS_ALLOCATOR;
-    case pasta::AttributeKind::kMSInheritance: return AttributeKind::MS_INHERITANCE;
-    case pasta::AttributeKind::kMSNoVTable: return AttributeKind::MS_NO_V_TABLE;
-    case pasta::AttributeKind::kMSP430Interrupt: return AttributeKind::MS_P430_INTERRUPT;
-    case pasta::AttributeKind::kMSStruct: return AttributeKind::MS_STRUCT;
-    case pasta::AttributeKind::kMSVtorDisp: return AttributeKind::MS_VTOR_DISP;
-    case pasta::AttributeKind::kMaxFieldAlignment: return AttributeKind::MAX_FIELD_ALIGNMENT;
-    case pasta::AttributeKind::kMayAlias: return AttributeKind::MAY_ALIAS;
-    case pasta::AttributeKind::kMicroMips: return AttributeKind::MICRO_MIPS;
-    case pasta::AttributeKind::kMinSize: return AttributeKind::MIN_SIZE;
-    case pasta::AttributeKind::kMinVectorWidth: return AttributeKind::MIN_VECTOR_WIDTH;
-    case pasta::AttributeKind::kMips16: return AttributeKind::MIPS16;
-    case pasta::AttributeKind::kMipsInterrupt: return AttributeKind::MIPS_INTERRUPT;
-    case pasta::AttributeKind::kMipsLongCall: return AttributeKind::MIPS_LONG_CALL;
-    case pasta::AttributeKind::kMipsShortCall: return AttributeKind::MIPS_SHORT_CALL;
-    case pasta::AttributeKind::kNSConsumesSelf: return AttributeKind::NS_CONSUMES_SELF;
-    case pasta::AttributeKind::kNSErrorDomain: return AttributeKind::NS_ERROR_DOMAIN;
-    case pasta::AttributeKind::kNSReturnsAutoreleased: return AttributeKind::NS_RETURNS_AUTORELEASED;
-    case pasta::AttributeKind::kNSReturnsNotRetained: return AttributeKind::NS_RETURNS_NOT_RETAINED;
-    case pasta::AttributeKind::kNaked: return AttributeKind::NAKED;
-    case pasta::AttributeKind::kNoAlias: return AttributeKind::NO_ALIAS;
-    case pasta::AttributeKind::kNoCommon: return AttributeKind::NO_COMMON;
-    case pasta::AttributeKind::kNoDebug: return AttributeKind::NO_DEBUG;
-    case pasta::AttributeKind::kNoDestroy: return AttributeKind::NO_DESTROY;
-    case pasta::AttributeKind::kNoDuplicate: return AttributeKind::NO_DUPLICATE;
-    case pasta::AttributeKind::kNoInline: return AttributeKind::NO_INLINE;
-    case pasta::AttributeKind::kNoInstrumentFunction: return AttributeKind::NO_INSTRUMENT_FUNCTION;
-    case pasta::AttributeKind::kNoMicroMips: return AttributeKind::NO_MICRO_MIPS;
-    case pasta::AttributeKind::kNoMips16: return AttributeKind::NO_MIPS16;
-    case pasta::AttributeKind::kNoProfileFunction: return AttributeKind::NO_PROFILE_FUNCTION;
-    case pasta::AttributeKind::kNoReturn: return AttributeKind::NO_RETURN;
-    case pasta::AttributeKind::kNoSanitize: return AttributeKind::NO_SANITIZE;
-    case pasta::AttributeKind::kNoSpeculativeLoadHardening: return AttributeKind::NO_SPECULATIVE_LOAD_HARDENING;
-    case pasta::AttributeKind::kNoSplitStack: return AttributeKind::NO_SPLIT_STACK;
-    case pasta::AttributeKind::kNoStackProtector: return AttributeKind::NO_STACK_PROTECTOR;
-    case pasta::AttributeKind::kNoThreadSafetyAnalysis: return AttributeKind::NO_THREAD_SAFETY_ANALYSIS;
-    case pasta::AttributeKind::kNoThrow: return AttributeKind::NO_THROW;
-    case pasta::AttributeKind::kNoUniqueAddress: return AttributeKind::NO_UNIQUE_ADDRESS;
-    case pasta::AttributeKind::kNotTailCalled: return AttributeKind::NOT_TAIL_CALLED;
-    case pasta::AttributeKind::kOMPAllocateDeclaration: return AttributeKind::OMP_ALLOCATE_DECLARATION;
-    case pasta::AttributeKind::kOMPCaptureNoInitializer: return AttributeKind::OMP_CAPTURE_NO_INITIALIZER;
-    case pasta::AttributeKind::kOMPDeclareTargetDeclaration: return AttributeKind::OMP_DECLARE_TARGET_DECLARATION;
-    case pasta::AttributeKind::kOMPDeclareVariant: return AttributeKind::OMP_DECLARE_VARIANT;
-    case pasta::AttributeKind::kOMPThreadPrivateDeclaration: return AttributeKind::OMP_THREAD_PRIVATE_DECLARATION;
-    case pasta::AttributeKind::kOSConsumesThis: return AttributeKind::OS_CONSUMES_THIS;
-    case pasta::AttributeKind::kOSReturnsNotRetained: return AttributeKind::OS_RETURNS_NOT_RETAINED;
-    case pasta::AttributeKind::kOSReturnsRetained: return AttributeKind::OS_RETURNS_RETAINED;
-    case pasta::AttributeKind::kOSReturnsRetainedOnNonZero: return AttributeKind::OS_RETURNS_RETAINED_ON_NON_ZERO;
-    case pasta::AttributeKind::kOSReturnsRetainedOnZero: return AttributeKind::OS_RETURNS_RETAINED_ON_ZERO;
-    case pasta::AttributeKind::kObjCBridge: return AttributeKind::OBJ_C_BRIDGE;
-    case pasta::AttributeKind::kObjCBridgeMutable: return AttributeKind::OBJ_C_BRIDGE_MUTABLE;
-    case pasta::AttributeKind::kObjCBridgeRelated: return AttributeKind::OBJ_C_BRIDGE_RELATED;
-    case pasta::AttributeKind::kObjCException: return AttributeKind::OBJ_C_EXCEPTION;
-    case pasta::AttributeKind::kObjCExplicitProtocolImplementation: return AttributeKind::OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION;
-    case pasta::AttributeKind::kObjCExternallyRetained: return AttributeKind::OBJ_C_EXTERNALLY_RETAINED;
-    case pasta::AttributeKind::kObjCIndependentClass: return AttributeKind::OBJ_C_INDEPENDENT_CLASS;
-    case pasta::AttributeKind::kObjCMethodFamily: return AttributeKind::OBJ_C_METHOD_FAMILY;
-    case pasta::AttributeKind::kObjCNSObject: return AttributeKind::OBJ_CNS_OBJECT;
-    case pasta::AttributeKind::kObjCPreciseLifetime: return AttributeKind::OBJ_C_PRECISE_LIFETIME;
-    case pasta::AttributeKind::kObjCRequiresPropertyDefinitions: return AttributeKind::OBJ_C_REQUIRES_PROPERTY_DEFINITIONS;
-    case pasta::AttributeKind::kObjCRequiresSuper: return AttributeKind::OBJ_C_REQUIRES_SUPER;
-    case pasta::AttributeKind::kObjCReturnsInnerPointer: return AttributeKind::OBJ_C_RETURNS_INNER_POINTER;
-    case pasta::AttributeKind::kObjCRootClass: return AttributeKind::OBJ_C_ROOT_CLASS;
-    case pasta::AttributeKind::kObjCSubclassingRestricted: return AttributeKind::OBJ_C_SUBCLASSING_RESTRICTED;
-    case pasta::AttributeKind::kOpenCLIntelReqdSubGroupSize: return AttributeKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
-    case pasta::AttributeKind::kOpenCLKernel: return AttributeKind::OPEN_CL_KERNEL;
-    case pasta::AttributeKind::kOptimizeNone: return AttributeKind::OPTIMIZE_NONE;
-    case pasta::AttributeKind::kOverride: return AttributeKind::OVERRIDE;
-    case pasta::AttributeKind::kOwner: return AttributeKind::OWNER;
-    case pasta::AttributeKind::kOwnership: return AttributeKind::OWNERSHIP;
-    case pasta::AttributeKind::kPacked: return AttributeKind::PACKED;
-    case pasta::AttributeKind::kParamTypestate: return AttributeKind::PARAM_TYPESTATE;
-    case pasta::AttributeKind::kPatchableFunctionEntry: return AttributeKind::PATCHABLE_FUNCTION_ENTRY;
-    case pasta::AttributeKind::kPointer: return AttributeKind::POINTER;
-    case pasta::AttributeKind::kPragmaClangBSSSection: return AttributeKind::PRAGMA_CLANG_BSS_SECTION;
-    case pasta::AttributeKind::kPragmaClangDataSection: return AttributeKind::PRAGMA_CLANG_DATA_SECTION;
-    case pasta::AttributeKind::kPragmaClangRelroSection: return AttributeKind::PRAGMA_CLANG_RELRO_SECTION;
-    case pasta::AttributeKind::kPragmaClangRodataSection: return AttributeKind::PRAGMA_CLANG_RODATA_SECTION;
-    case pasta::AttributeKind::kPragmaClangTextSection: return AttributeKind::PRAGMA_CLANG_TEXT_SECTION;
-    case pasta::AttributeKind::kPreferredName: return AttributeKind::PREFERRED_NAME;
-    case pasta::AttributeKind::kPtGuardedBy: return AttributeKind::PT_GUARDED_BY;
-    case pasta::AttributeKind::kPtGuardedVariable: return AttributeKind::PT_GUARDED_VARIABLE;
-    case pasta::AttributeKind::kPure: return AttributeKind::PURE;
-    case pasta::AttributeKind::kRISCVInterrupt: return AttributeKind::RISCV_INTERRUPT;
-    case pasta::AttributeKind::kReinitializes: return AttributeKind::REINITIALIZES;
-    case pasta::AttributeKind::kReleaseCapability: return AttributeKind::RELEASE_CAPABILITY;
-    case pasta::AttributeKind::kReqdWorkGroupSize: return AttributeKind::REQD_WORK_GROUP_SIZE;
-    case pasta::AttributeKind::kRequiresCapability: return AttributeKind::REQUIRES_CAPABILITY;
-    case pasta::AttributeKind::kRestrict: return AttributeKind::RESTRICT;
-    case pasta::AttributeKind::kRetain: return AttributeKind::RETAIN;
-    case pasta::AttributeKind::kReturnTypestate: return AttributeKind::RETURN_TYPESTATE;
-    case pasta::AttributeKind::kReturnsNonNull: return AttributeKind::RETURNS_NON_NULL;
-    case pasta::AttributeKind::kReturnsTwice: return AttributeKind::RETURNS_TWICE;
-    case pasta::AttributeKind::kSYCLKernel: return AttributeKind::SYCL_KERNEL;
-    case pasta::AttributeKind::kScopedLockable: return AttributeKind::SCOPED_LOCKABLE;
-    case pasta::AttributeKind::kSection: return AttributeKind::SECTION;
-    case pasta::AttributeKind::kSelectAny: return AttributeKind::SELECT_ANY;
-    case pasta::AttributeKind::kSentinel: return AttributeKind::SENTINEL;
-    case pasta::AttributeKind::kSetTypestate: return AttributeKind::SET_TYPESTATE;
-    case pasta::AttributeKind::kSharedTrylockFunction: return AttributeKind::SHARED_TRYLOCK_FUNCTION;
-    case pasta::AttributeKind::kSpeculativeLoadHardening: return AttributeKind::SPECULATIVE_LOAD_HARDENING;
-    case pasta::AttributeKind::kStandaloneDebug: return AttributeKind::STANDALONE_DEBUG;
-    case pasta::AttributeKind::kStrictFP: return AttributeKind::STRICT_FP;
-    case pasta::AttributeKind::kSwiftAsync: return AttributeKind::SWIFT_ASYNC;
-    case pasta::AttributeKind::kSwiftAsyncError: return AttributeKind::SWIFT_ASYNC_ERROR;
-    case pasta::AttributeKind::kSwiftAsyncName: return AttributeKind::SWIFT_ASYNC_NAME;
-    case pasta::AttributeKind::kSwiftAttribute: return AttributeKind::SWIFT_ATTRIBUTE;
-    case pasta::AttributeKind::kSwiftBridge: return AttributeKind::SWIFT_BRIDGE;
-    case pasta::AttributeKind::kSwiftBridgedTypedef: return AttributeKind::SWIFT_BRIDGED_TYPEDEF;
-    case pasta::AttributeKind::kSwiftError: return AttributeKind::SWIFT_ERROR;
-    case pasta::AttributeKind::kSwiftName: return AttributeKind::SWIFT_NAME;
-    case pasta::AttributeKind::kSwiftNewType: return AttributeKind::SWIFT_NEW_TYPE;
-    case pasta::AttributeKind::kSwiftPrivate: return AttributeKind::SWIFT_PRIVATE;
-    case pasta::AttributeKind::kTLSModel: return AttributeKind::TLS_MODEL;
-    case pasta::AttributeKind::kTarget: return AttributeKind::TARGET;
-    case pasta::AttributeKind::kTestTypestate: return AttributeKind::TEST_TYPESTATE;
-    case pasta::AttributeKind::kTransparentUnion: return AttributeKind::TRANSPARENT_UNION;
-    case pasta::AttributeKind::kTrivialABI: return AttributeKind::TRIVIAL_ABI;
-    case pasta::AttributeKind::kTryAcquireCapability: return AttributeKind::TRY_ACQUIRE_CAPABILITY;
-    case pasta::AttributeKind::kTypeTagForDatatype: return AttributeKind::TYPE_TAG_FOR_DATATYPE;
-    case pasta::AttributeKind::kTypeVisibility: return AttributeKind::TYPE_VISIBILITY;
-    case pasta::AttributeKind::kUnavailable: return AttributeKind::UNAVAILABLE;
-    case pasta::AttributeKind::kUninitialized: return AttributeKind::UNINITIALIZED;
-    case pasta::AttributeKind::kUnused: return AttributeKind::UNUSED;
-    case pasta::AttributeKind::kUsed: return AttributeKind::USED;
-    case pasta::AttributeKind::kUsingIfExists: return AttributeKind::USING_IF_EXISTS;
-    case pasta::AttributeKind::kUuid: return AttributeKind::UUID;
-    case pasta::AttributeKind::kVecReturn: return AttributeKind::VEC_RETURN;
-    case pasta::AttributeKind::kVecTypeHint: return AttributeKind::VEC_TYPE_HINT;
-    case pasta::AttributeKind::kVisibility: return AttributeKind::VISIBILITY;
-    case pasta::AttributeKind::kWarnUnused: return AttributeKind::WARN_UNUSED;
-    case pasta::AttributeKind::kWarnUnusedResult: return AttributeKind::WARN_UNUSED_RESULT;
-    case pasta::AttributeKind::kWeak: return AttributeKind::WEAK;
-    case pasta::AttributeKind::kWeakImport: return AttributeKind::WEAK_IMPORT;
-    case pasta::AttributeKind::kWeakReference: return AttributeKind::WEAK_REFERENCE;
-    case pasta::AttributeKind::kWebAssemblyExportName: return AttributeKind::WEB_ASSEMBLY_EXPORT_NAME;
-    case pasta::AttributeKind::kWebAssemblyImportModule: return AttributeKind::WEB_ASSEMBLY_IMPORT_MODULE;
-    case pasta::AttributeKind::kWebAssemblyImportName: return AttributeKind::WEB_ASSEMBLY_IMPORT_NAME;
-    case pasta::AttributeKind::kWorkGroupSizeHint: return AttributeKind::WORK_GROUP_SIZE_HINT;
-    case pasta::AttributeKind::kX86ForceAlignArgumentPointer: return AttributeKind::X86_FORCE_ALIGN_ARGUMENT_POINTER;
-    case pasta::AttributeKind::kXRayInstrument: return AttributeKind::X_RAY_INSTRUMENT;
-    case pasta::AttributeKind::kXRayLogArguments: return AttributeKind::X_RAY_LOG_ARGUMENTS;
-    case pasta::AttributeKind::kAbiTag: return AttributeKind::ABI_TAG;
-    case pasta::AttributeKind::kAlias: return AttributeKind::ALIAS;
-    case pasta::AttributeKind::kAlignValue: return AttributeKind::ALIGN_VALUE;
-    case pasta::AttributeKind::kBuiltinAlias: return AttributeKind::BUILTIN_ALIAS;
-    case pasta::AttributeKind::kCalledOnce: return AttributeKind::CALLED_ONCE;
-    case pasta::AttributeKind::kIFunc: return AttributeKind::I_FUNC;
-    case pasta::AttributeKind::kInitializerSeg: return AttributeKind::INITIALIZER_SEG;
-    case pasta::AttributeKind::kLoaderUninitialized: return AttributeKind::LOADER_UNINITIALIZED;
-    case pasta::AttributeKind::kLoopHint: return AttributeKind::LOOP_HINT;
-    case pasta::AttributeKind::kMode: return AttributeKind::MODE;
-    case pasta::AttributeKind::kNoBuiltin: return AttributeKind::NO_BUILTIN;
-    case pasta::AttributeKind::kNoEscape: return AttributeKind::NO_ESCAPE;
-    case pasta::AttributeKind::kOMPCaptureKind: return AttributeKind::OMP_CAPTURE_KIND;
-    case pasta::AttributeKind::kOMPDeclareSimdDeclaration: return AttributeKind::OMP_DECLARE_SIMD_DECLARATION;
-    case pasta::AttributeKind::kOMPReferencedVariable: return AttributeKind::OMP_REFERENCED_VARIABLE;
-    case pasta::AttributeKind::kObjCBoxable: return AttributeKind::OBJ_C_BOXABLE;
-    case pasta::AttributeKind::kObjCClassStub: return AttributeKind::OBJ_C_CLASS_STUB;
-    case pasta::AttributeKind::kObjCDesignatedInitializer: return AttributeKind::OBJ_C_DESIGNATED_INITIALIZER;
-    case pasta::AttributeKind::kObjCDirect: return AttributeKind::OBJ_C_DIRECT;
-    case pasta::AttributeKind::kObjCDirectMembers: return AttributeKind::OBJ_C_DIRECT_MEMBERS;
-    case pasta::AttributeKind::kObjCNonLazyClass: return AttributeKind::OBJ_C_NON_LAZY_CLASS;
-    case pasta::AttributeKind::kObjCNonRuntimeProtocol: return AttributeKind::OBJ_C_NON_RUNTIME_PROTOCOL;
-    case pasta::AttributeKind::kObjCRuntimeName: return AttributeKind::OBJ_C_RUNTIME_NAME;
-    case pasta::AttributeKind::kObjCRuntimeVisible: return AttributeKind::OBJ_C_RUNTIME_VISIBLE;
-    case pasta::AttributeKind::kOpenCLAccess: return AttributeKind::OPEN_CL_ACCESS;
-    case pasta::AttributeKind::kOverloadable: return AttributeKind::OVERLOADABLE;
-    case pasta::AttributeKind::kRenderScriptKernel: return AttributeKind::RENDER_SCRIPT_KERNEL;
-    case pasta::AttributeKind::kSwiftObjCMembers: return AttributeKind::SWIFT_OBJ_C_MEMBERS;
-    case pasta::AttributeKind::kThread: return AttributeKind::THREAD;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AttributeKind::ADDRESS_SPACE;
+    case 1: return AttributeKind::ARM_MVE_STRICT_POLYMORPHISM;
+    case 2: return AttributeKind::CMSE_NS_CALL;
+    case 3: return AttributeKind::NO_DEREF;
+    case 4: return AttributeKind::OBJ_CGC;
+    case 5: return AttributeKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
+    case 6: return AttributeKind::OBJ_C_KIND_OF;
+    case 7: return AttributeKind::OPEN_CL_CONSTANT_ADDRESS_SPACE;
+    case 8: return AttributeKind::OPEN_CL_GENERIC_ADDRESS_SPACE;
+    case 9: return AttributeKind::OPEN_CL_GLOBAL_ADDRESS_SPACE;
+    case 10: return AttributeKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
+    case 11: return AttributeKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
+    case 12: return AttributeKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
+    case 13: return AttributeKind::OPEN_CL_PRIVATE_ADDRESS_SPACE;
+    case 14: return AttributeKind::PTR32;
+    case 15: return AttributeKind::PTR64;
+    case 16: return AttributeKind::S_PTR;
+    case 17: return AttributeKind::TYPE_NON_NULL;
+    case 18: return AttributeKind::TYPE_NULL_UNSPECIFIED;
+    case 19: return AttributeKind::TYPE_NULLABLE;
+    case 20: return AttributeKind::TYPE_NULLABLE_RESULT;
+    case 21: return AttributeKind::U_PTR;
+    case 22: return AttributeKind::FALL_THROUGH;
+    case 23: return AttributeKind::LIKELY;
+    case 24: return AttributeKind::MUST_TAIL;
+    case 25: return AttributeKind::OPEN_CL_UNROLL_HINT;
+    case 26: return AttributeKind::SUPPRESS;
+    case 27: return AttributeKind::UNLIKELY;
+    case 28: return AttributeKind::NO_MERGE;
+    case 29: return AttributeKind::A_ARCH64_VECTOR_PCS;
+    case 30: return AttributeKind::ACQUIRE_HANDLE;
+    case 31: return AttributeKind::ANY_X86_NO_CF_CHECK;
+    case 32: return AttributeKind::C_DECL;
+    case 33: return AttributeKind::FAST_CALL;
+    case 34: return AttributeKind::INTEL_OCL_BICC;
+    case 35: return AttributeKind::LIFETIME_BOUND;
+    case 36: return AttributeKind::MSABI;
+    case 37: return AttributeKind::NS_RETURNS_RETAINED;
+    case 38: return AttributeKind::OBJ_C_OWNERSHIP;
+    case 39: return AttributeKind::PASCAL;
+    case 40: return AttributeKind::PCS;
+    case 41: return AttributeKind::PRESERVE_ALL;
+    case 42: return AttributeKind::PRESERVE_MOST;
+    case 43: return AttributeKind::REG_CALL;
+    case 44: return AttributeKind::STD_CALL;
+    case 45: return AttributeKind::SWIFT_ASYNC_CALL;
+    case 46: return AttributeKind::SWIFT_CALL;
+    case 47: return AttributeKind::SYS_VABI;
+    case 48: return AttributeKind::THIS_CALL;
+    case 49: return AttributeKind::VECTOR_CALL;
+    case 50: return AttributeKind::SWIFT_ASYNC_CONTEXT;
+    case 51: return AttributeKind::SWIFT_CONTEXT;
+    case 52: return AttributeKind::SWIFT_ERROR_RESULT;
+    case 53: return AttributeKind::SWIFT_INDIRECT_RESULT;
+    case 54: return AttributeKind::ANNOTATE;
+    case 55: return AttributeKind::CF_CONSUMED;
+    case 56: return AttributeKind::CARRIES_DEPENDENCY;
+    case 57: return AttributeKind::NS_CONSUMED;
+    case 58: return AttributeKind::NON_NULL;
+    case 59: return AttributeKind::OS_CONSUMED;
+    case 60: return AttributeKind::PASS_OBJECT_SIZE;
+    case 61: return AttributeKind::RELEASE_HANDLE;
+    case 62: return AttributeKind::USE_HANDLE;
+    case 63: return AttributeKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
+    case 64: return AttributeKind::AMDGPU_NUM_SGPR;
+    case 65: return AttributeKind::AMDGPU_NUM_VGPR;
+    case 66: return AttributeKind::AMDGPU_WAVES_PER_EU;
+    case 67: return AttributeKind::ARM_INTERRUPT;
+    case 68: return AttributeKind::AVR_INTERRUPT;
+    case 69: return AttributeKind::AVR_SIGNAL;
+    case 70: return AttributeKind::ACQUIRE_CAPABILITY;
+    case 71: return AttributeKind::ACQUIRED_AFTER;
+    case 72: return AttributeKind::ACQUIRED_BEFORE;
+    case 73: return AttributeKind::ALIGN_MAC68_K;
+    case 74: return AttributeKind::ALIGN_NATURAL;
+    case 75: return AttributeKind::ALIGNED;
+    case 76: return AttributeKind::ALLOC_ALIGN;
+    case 77: return AttributeKind::ALLOC_SIZE;
+    case 78: return AttributeKind::ALWAYS_DESTROY;
+    case 79: return AttributeKind::ALWAYS_INLINE;
+    case 80: return AttributeKind::ANALYZER_NO_RETURN;
+    case 81: return AttributeKind::ANY_X86_INTERRUPT;
+    case 82: return AttributeKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
+    case 83: return AttributeKind::ARC_WEAKREF_UNAVAILABLE;
+    case 84: return AttributeKind::ARGUMENT_WITH_TYPE_TAG;
+    case 85: return AttributeKind::ARM_BUILTIN_ALIAS;
+    case 86: return AttributeKind::ARTIFICIAL;
+    case 87: return AttributeKind::ASSEMBLY_LABEL;
+    case 88: return AttributeKind::ASSERT_CAPABILITY;
+    case 89: return AttributeKind::ASSERT_EXCLUSIVE_LOCK;
+    case 90: return AttributeKind::ASSERT_SHARED_LOCK;
+    case 91: return AttributeKind::ASSUME_ALIGNED;
+    case 92: return AttributeKind::ASSUMPTION;
+    case 93: return AttributeKind::AVAILABILITY;
+    case 94: return AttributeKind::BPF_PRESERVE_ACCESS_INDEX;
+    case 95: return AttributeKind::BLOCKS;
+    case 96: return AttributeKind::BUILTIN;
+    case 97: return AttributeKind::C11_NO_RETURN;
+    case 98: return AttributeKind::CF_AUDITED_TRANSFER;
+    case 99: return AttributeKind::CF_GUARD;
+    case 100: return AttributeKind::CFI_CANONICAL_JUMP_TABLE;
+    case 101: return AttributeKind::CF_RETURNS_NOT_RETAINED;
+    case 102: return AttributeKind::CF_RETURNS_RETAINED;
+    case 103: return AttributeKind::CF_UNKNOWN_TRANSFER;
+    case 104: return AttributeKind::CPU_DISPATCH;
+    case 105: return AttributeKind::CPU_SPECIFIC;
+    case 106: return AttributeKind::CUDA_CONSTANT;
+    case 107: return AttributeKind::CUDA_DEVICE;
+    case 108: return AttributeKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
+    case 109: return AttributeKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;
+    case 110: return AttributeKind::CUDA_GLOBAL;
+    case 111: return AttributeKind::CUDA_HOST;
+    case 112: return AttributeKind::CUDA_INVALID_TARGET;
+    case 113: return AttributeKind::CUDA_LAUNCH_BOUNDS;
+    case 114: return AttributeKind::CUDA_SHARED;
+    case 115: return AttributeKind::CX_X11_NO_RETURN;
+    case 116: return AttributeKind::CALLABLE_WHEN;
+    case 117: return AttributeKind::CALLBACK;
+    case 118: return AttributeKind::CAPABILITY;
+    case 119: return AttributeKind::CAPTURED_RECORD;
+    case 120: return AttributeKind::CLEANUP;
+    case 121: return AttributeKind::CMSE_NS_ENTRY;
+    case 122: return AttributeKind::CODE_SEG;
+    case 123: return AttributeKind::COLD;
+    case 124: return AttributeKind::COMMON;
+    case 125: return AttributeKind::CONST;
+    case 126: return AttributeKind::CONST_INITIALIZER;
+    case 127: return AttributeKind::CONSTRUCTOR;
+    case 128: return AttributeKind::CONSUMABLE;
+    case 129: return AttributeKind::CONSUMABLE_AUTO_CAST;
+    case 130: return AttributeKind::CONSUMABLE_SET_ON_READ;
+    case 131: return AttributeKind::CONVERGENT;
+    case 132: return AttributeKind::DLL_EXPORT;
+    case 133: return AttributeKind::DLL_EXPORT_STATIC_LOCAL;
+    case 134: return AttributeKind::DLL_IMPORT;
+    case 135: return AttributeKind::DLL_IMPORT_STATIC_LOCAL;
+    case 136: return AttributeKind::DEPRECATED;
+    case 137: return AttributeKind::DESTRUCTOR;
+    case 138: return AttributeKind::DIAGNOSE_IF;
+    case 139: return AttributeKind::DISABLE_TAIL_CALLS;
+    case 140: return AttributeKind::EMPTY_BASES;
+    case 141: return AttributeKind::ENABLE_IF;
+    case 142: return AttributeKind::ENFORCE_TCB;
+    case 143: return AttributeKind::ENFORCE_TCB_LEAF;
+    case 144: return AttributeKind::ENUM_EXTENSIBILITY;
+    case 145: return AttributeKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
+    case 146: return AttributeKind::EXCLUSIVE_TRYLOCK_FUNCTION;
+    case 147: return AttributeKind::EXTERNAL_SOURCE_SYMBOL;
+    case 148: return AttributeKind::FINAL;
+    case 149: return AttributeKind::FLAG_ENUM;
+    case 150: return AttributeKind::FLATTEN;
+    case 151: return AttributeKind::FORMAT;
+    case 152: return AttributeKind::FORMAT_ARGUMENT;
+    case 153: return AttributeKind::GNU_INLINE;
+    case 154: return AttributeKind::GUARDED_BY;
+    case 155: return AttributeKind::GUARDED_VARIABLE;
+    case 156: return AttributeKind::HIP_MANAGED;
+    case 157: return AttributeKind::HOT;
+    case 158: return AttributeKind::IB_ACTION;
+    case 159: return AttributeKind::IB_OUTLET;
+    case 160: return AttributeKind::IB_OUTLET_COLLECTION;
+    case 161: return AttributeKind::INITIALIZER_PRIORITY;
+    case 162: return AttributeKind::INTERNAL_LINKAGE;
+    case 163: return AttributeKind::LTO_VISIBILITY_PUBLIC;
+    case 164: return AttributeKind::LAYOUT_VERSION;
+    case 165: return AttributeKind::LEAF;
+    case 166: return AttributeKind::LOCK_RETURNED;
+    case 167: return AttributeKind::LOCKS_EXCLUDED;
+    case 168: return AttributeKind::M68_KINTERRUPT;
+    case 169: return AttributeKind::MIG_SERVER_ROUTINE;
+    case 170: return AttributeKind::MS_ALLOCATOR;
+    case 171: return AttributeKind::MS_INHERITANCE;
+    case 172: return AttributeKind::MS_NO_V_TABLE;
+    case 173: return AttributeKind::MS_P430_INTERRUPT;
+    case 174: return AttributeKind::MS_STRUCT;
+    case 175: return AttributeKind::MS_VTOR_DISP;
+    case 176: return AttributeKind::MAX_FIELD_ALIGNMENT;
+    case 177: return AttributeKind::MAY_ALIAS;
+    case 178: return AttributeKind::MICRO_MIPS;
+    case 179: return AttributeKind::MIN_SIZE;
+    case 180: return AttributeKind::MIN_VECTOR_WIDTH;
+    case 181: return AttributeKind::MIPS16;
+    case 182: return AttributeKind::MIPS_INTERRUPT;
+    case 183: return AttributeKind::MIPS_LONG_CALL;
+    case 184: return AttributeKind::MIPS_SHORT_CALL;
+    case 185: return AttributeKind::NS_CONSUMES_SELF;
+    case 186: return AttributeKind::NS_ERROR_DOMAIN;
+    case 187: return AttributeKind::NS_RETURNS_AUTORELEASED;
+    case 188: return AttributeKind::NS_RETURNS_NOT_RETAINED;
+    case 189: return AttributeKind::NAKED;
+    case 190: return AttributeKind::NO_ALIAS;
+    case 191: return AttributeKind::NO_COMMON;
+    case 192: return AttributeKind::NO_DEBUG;
+    case 193: return AttributeKind::NO_DESTROY;
+    case 194: return AttributeKind::NO_DUPLICATE;
+    case 195: return AttributeKind::NO_INLINE;
+    case 196: return AttributeKind::NO_INSTRUMENT_FUNCTION;
+    case 197: return AttributeKind::NO_MICRO_MIPS;
+    case 198: return AttributeKind::NO_MIPS16;
+    case 199: return AttributeKind::NO_PROFILE_FUNCTION;
+    case 200: return AttributeKind::NO_RETURN;
+    case 201: return AttributeKind::NO_SANITIZE;
+    case 202: return AttributeKind::NO_SPECULATIVE_LOAD_HARDENING;
+    case 203: return AttributeKind::NO_SPLIT_STACK;
+    case 204: return AttributeKind::NO_STACK_PROTECTOR;
+    case 205: return AttributeKind::NO_THREAD_SAFETY_ANALYSIS;
+    case 206: return AttributeKind::NO_THROW;
+    case 207: return AttributeKind::NO_UNIQUE_ADDRESS;
+    case 208: return AttributeKind::NOT_TAIL_CALLED;
+    case 209: return AttributeKind::OMP_ALLOCATE_DECLARATION;
+    case 210: return AttributeKind::OMP_CAPTURE_NO_INITIALIZER;
+    case 211: return AttributeKind::OMP_DECLARE_TARGET_DECLARATION;
+    case 212: return AttributeKind::OMP_DECLARE_VARIANT;
+    case 213: return AttributeKind::OMP_THREAD_PRIVATE_DECLARATION;
+    case 214: return AttributeKind::OS_CONSUMES_THIS;
+    case 215: return AttributeKind::OS_RETURNS_NOT_RETAINED;
+    case 216: return AttributeKind::OS_RETURNS_RETAINED;
+    case 217: return AttributeKind::OS_RETURNS_RETAINED_ON_NON_ZERO;
+    case 218: return AttributeKind::OS_RETURNS_RETAINED_ON_ZERO;
+    case 219: return AttributeKind::OBJ_C_BRIDGE;
+    case 220: return AttributeKind::OBJ_C_BRIDGE_MUTABLE;
+    case 221: return AttributeKind::OBJ_C_BRIDGE_RELATED;
+    case 222: return AttributeKind::OBJ_C_EXCEPTION;
+    case 223: return AttributeKind::OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION;
+    case 224: return AttributeKind::OBJ_C_EXTERNALLY_RETAINED;
+    case 225: return AttributeKind::OBJ_C_INDEPENDENT_CLASS;
+    case 226: return AttributeKind::OBJ_C_METHOD_FAMILY;
+    case 227: return AttributeKind::OBJ_CNS_OBJECT;
+    case 228: return AttributeKind::OBJ_C_PRECISE_LIFETIME;
+    case 229: return AttributeKind::OBJ_C_REQUIRES_PROPERTY_DEFINITIONS;
+    case 230: return AttributeKind::OBJ_C_REQUIRES_SUPER;
+    case 231: return AttributeKind::OBJ_C_RETURNS_INNER_POINTER;
+    case 232: return AttributeKind::OBJ_C_ROOT_CLASS;
+    case 233: return AttributeKind::OBJ_C_SUBCLASSING_RESTRICTED;
+    case 234: return AttributeKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
+    case 235: return AttributeKind::OPEN_CL_KERNEL;
+    case 236: return AttributeKind::OPTIMIZE_NONE;
+    case 237: return AttributeKind::OVERRIDE;
+    case 238: return AttributeKind::OWNER;
+    case 239: return AttributeKind::OWNERSHIP;
+    case 240: return AttributeKind::PACKED;
+    case 241: return AttributeKind::PARAM_TYPESTATE;
+    case 242: return AttributeKind::PATCHABLE_FUNCTION_ENTRY;
+    case 243: return AttributeKind::POINTER;
+    case 244: return AttributeKind::PRAGMA_CLANG_BSS_SECTION;
+    case 245: return AttributeKind::PRAGMA_CLANG_DATA_SECTION;
+    case 246: return AttributeKind::PRAGMA_CLANG_RELRO_SECTION;
+    case 247: return AttributeKind::PRAGMA_CLANG_RODATA_SECTION;
+    case 248: return AttributeKind::PRAGMA_CLANG_TEXT_SECTION;
+    case 249: return AttributeKind::PREFERRED_NAME;
+    case 250: return AttributeKind::PT_GUARDED_BY;
+    case 251: return AttributeKind::PT_GUARDED_VARIABLE;
+    case 252: return AttributeKind::PURE;
+    case 253: return AttributeKind::RISCV_INTERRUPT;
+    case 254: return AttributeKind::REINITIALIZES;
+    case 255: return AttributeKind::RELEASE_CAPABILITY;
+    case 256: return AttributeKind::REQD_WORK_GROUP_SIZE;
+    case 257: return AttributeKind::REQUIRES_CAPABILITY;
+    case 258: return AttributeKind::RESTRICT;
+    case 259: return AttributeKind::RETAIN;
+    case 260: return AttributeKind::RETURN_TYPESTATE;
+    case 261: return AttributeKind::RETURNS_NON_NULL;
+    case 262: return AttributeKind::RETURNS_TWICE;
+    case 263: return AttributeKind::SYCL_KERNEL;
+    case 264: return AttributeKind::SCOPED_LOCKABLE;
+    case 265: return AttributeKind::SECTION;
+    case 266: return AttributeKind::SELECT_ANY;
+    case 267: return AttributeKind::SENTINEL;
+    case 268: return AttributeKind::SET_TYPESTATE;
+    case 269: return AttributeKind::SHARED_TRYLOCK_FUNCTION;
+    case 270: return AttributeKind::SPECULATIVE_LOAD_HARDENING;
+    case 271: return AttributeKind::STANDALONE_DEBUG;
+    case 272: return AttributeKind::STRICT_FP;
+    case 273: return AttributeKind::SWIFT_ASYNC;
+    case 274: return AttributeKind::SWIFT_ASYNC_ERROR;
+    case 275: return AttributeKind::SWIFT_ASYNC_NAME;
+    case 276: return AttributeKind::SWIFT_ATTRIBUTE;
+    case 277: return AttributeKind::SWIFT_BRIDGE;
+    case 278: return AttributeKind::SWIFT_BRIDGED_TYPEDEF;
+    case 279: return AttributeKind::SWIFT_ERROR;
+    case 280: return AttributeKind::SWIFT_NAME;
+    case 281: return AttributeKind::SWIFT_NEW_TYPE;
+    case 282: return AttributeKind::SWIFT_PRIVATE;
+    case 283: return AttributeKind::TLS_MODEL;
+    case 284: return AttributeKind::TARGET;
+    case 285: return AttributeKind::TEST_TYPESTATE;
+    case 286: return AttributeKind::TRANSPARENT_UNION;
+    case 287: return AttributeKind::TRIVIAL_ABI;
+    case 288: return AttributeKind::TRY_ACQUIRE_CAPABILITY;
+    case 289: return AttributeKind::TYPE_TAG_FOR_DATATYPE;
+    case 290: return AttributeKind::TYPE_VISIBILITY;
+    case 291: return AttributeKind::UNAVAILABLE;
+    case 292: return AttributeKind::UNINITIALIZED;
+    case 293: return AttributeKind::UNUSED;
+    case 294: return AttributeKind::USED;
+    case 295: return AttributeKind::USING_IF_EXISTS;
+    case 296: return AttributeKind::UUID;
+    case 297: return AttributeKind::VEC_RETURN;
+    case 298: return AttributeKind::VEC_TYPE_HINT;
+    case 299: return AttributeKind::VISIBILITY;
+    case 300: return AttributeKind::WARN_UNUSED;
+    case 301: return AttributeKind::WARN_UNUSED_RESULT;
+    case 302: return AttributeKind::WEAK;
+    case 303: return AttributeKind::WEAK_IMPORT;
+    case 304: return AttributeKind::WEAK_REFERENCE;
+    case 305: return AttributeKind::WEB_ASSEMBLY_EXPORT_NAME;
+    case 306: return AttributeKind::WEB_ASSEMBLY_IMPORT_MODULE;
+    case 307: return AttributeKind::WEB_ASSEMBLY_IMPORT_NAME;
+    case 308: return AttributeKind::WORK_GROUP_SIZE_HINT;
+    case 309: return AttributeKind::X86_FORCE_ALIGN_ARGUMENT_POINTER;
+    case 310: return AttributeKind::X_RAY_INSTRUMENT;
+    case 311: return AttributeKind::X_RAY_LOG_ARGUMENTS;
+    case 312: return AttributeKind::ABI_TAG;
+    case 313: return AttributeKind::ALIAS;
+    case 314: return AttributeKind::ALIGN_VALUE;
+    case 315: return AttributeKind::BUILTIN_ALIAS;
+    case 316: return AttributeKind::CALLED_ONCE;
+    case 317: return AttributeKind::I_FUNC;
+    case 318: return AttributeKind::INITIALIZER_SEG;
+    case 319: return AttributeKind::LOADER_UNINITIALIZED;
+    case 320: return AttributeKind::LOOP_HINT;
+    case 321: return AttributeKind::MODE;
+    case 322: return AttributeKind::NO_BUILTIN;
+    case 323: return AttributeKind::NO_ESCAPE;
+    case 324: return AttributeKind::OMP_CAPTURE_KIND;
+    case 325: return AttributeKind::OMP_DECLARE_SIMD_DECLARATION;
+    case 326: return AttributeKind::OMP_REFERENCED_VARIABLE;
+    case 327: return AttributeKind::OBJ_C_BOXABLE;
+    case 328: return AttributeKind::OBJ_C_CLASS_STUB;
+    case 329: return AttributeKind::OBJ_C_DESIGNATED_INITIALIZER;
+    case 330: return AttributeKind::OBJ_C_DIRECT;
+    case 331: return AttributeKind::OBJ_C_DIRECT_MEMBERS;
+    case 332: return AttributeKind::OBJ_C_NON_LAZY_CLASS;
+    case 333: return AttributeKind::OBJ_C_NON_RUNTIME_PROTOCOL;
+    case 334: return AttributeKind::OBJ_C_RUNTIME_NAME;
+    case 335: return AttributeKind::OBJ_C_RUNTIME_VISIBLE;
+    case 336: return AttributeKind::OPEN_CL_ACCESS;
+    case 337: return AttributeKind::OVERLOADABLE;
+    case 338: return AttributeKind::RENDER_SCRIPT_KERNEL;
+    case 339: return AttributeKind::SWIFT_OBJ_C_MEMBERS;
+    case 340: return AttributeKind::THREAD;
+    default: __builtin_unreachable();
   }
 }
 
 AutoTypeKeyword FromPasta(pasta::AutoTypeKeyword e) {
-  switch (e) {
-    case pasta::AutoTypeKeyword::kAuto: return AutoTypeKeyword::AUTO;
-    case pasta::AutoTypeKeyword::kDecltypeAuto: return AutoTypeKeyword::DECLTYPE_AUTO;
-    case pasta::AutoTypeKeyword::kGNUAutoType: return AutoTypeKeyword::GNU_AUTO_TYPE;
+  switch (static_cast<int>(e)) {
+    case 0: return AutoTypeKeyword::AUTO;
+    case 1: return AutoTypeKeyword::DECLTYPE_AUTO;
+    case 2: return AutoTypeKeyword::GNU_AUTO_TYPE;
+    default: __builtin_unreachable();
   }
 }
 
 AvailabilityResult FromPasta(pasta::AvailabilityResult e) {
-  switch (e) {
-    case pasta::AvailabilityResult::kAvailable: return AvailabilityResult::AVAILABLE;
-    case pasta::AvailabilityResult::kNotYetIntroduced: return AvailabilityResult::NOT_YET_INTRODUCED;
-    case pasta::AvailabilityResult::kDeprecated: return AvailabilityResult::DEPRECATED;
-    case pasta::AvailabilityResult::kUnavailable: return AvailabilityResult::UNAVAILABLE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AvailabilityResult::AVAILABLE;
+    case 1: return AvailabilityResult::NOT_YET_INTRODUCED;
+    case 2: return AvailabilityResult::DEPRECATED;
+    case 3: return AvailabilityResult::UNAVAILABLE;
+    default: __builtin_unreachable();
   }
 }
 
 BinaryOperatorKind FromPasta(pasta::BinaryOperatorKind e) {
-  switch (e) {
-    case pasta::BinaryOperatorKind::kPointerMemoryD: return BinaryOperatorKind::POINTER_MEMORY_D;
-    case pasta::BinaryOperatorKind::kPointerMemoryI: return BinaryOperatorKind::POINTER_MEMORY_I;
-    case pasta::BinaryOperatorKind::kMul: return BinaryOperatorKind::MUL;
-    case pasta::BinaryOperatorKind::kDiv: return BinaryOperatorKind::DIV;
-    case pasta::BinaryOperatorKind::kRem: return BinaryOperatorKind::REM;
-    case pasta::BinaryOperatorKind::kAdd: return BinaryOperatorKind::ADD;
-    case pasta::BinaryOperatorKind::kSub: return BinaryOperatorKind::SUB;
-    case pasta::BinaryOperatorKind::kShl: return BinaryOperatorKind::SHL;
-    case pasta::BinaryOperatorKind::kShr: return BinaryOperatorKind::SHR;
-    case pasta::BinaryOperatorKind::kCmp: return BinaryOperatorKind::CMP;
-    case pasta::BinaryOperatorKind::kLT: return BinaryOperatorKind::LT;
-    case pasta::BinaryOperatorKind::kGT: return BinaryOperatorKind::GT;
-    case pasta::BinaryOperatorKind::kLE: return BinaryOperatorKind::LE;
-    case pasta::BinaryOperatorKind::kGE: return BinaryOperatorKind::GE;
-    case pasta::BinaryOperatorKind::kEQ: return BinaryOperatorKind::EQ;
-    case pasta::BinaryOperatorKind::kNE: return BinaryOperatorKind::NE;
-    case pasta::BinaryOperatorKind::kAnd: return BinaryOperatorKind::AND;
-    case pasta::BinaryOperatorKind::kXor: return BinaryOperatorKind::XOR;
-    case pasta::BinaryOperatorKind::kOr: return BinaryOperatorKind::OR;
-    case pasta::BinaryOperatorKind::kLAnd: return BinaryOperatorKind::L_AND;
-    case pasta::BinaryOperatorKind::kLOr: return BinaryOperatorKind::L_OR;
-    case pasta::BinaryOperatorKind::kAssign: return BinaryOperatorKind::ASSIGN;
-    case pasta::BinaryOperatorKind::kMulAssign: return BinaryOperatorKind::MUL_ASSIGN;
-    case pasta::BinaryOperatorKind::kDivAssign: return BinaryOperatorKind::DIV_ASSIGN;
-    case pasta::BinaryOperatorKind::kRemAssign: return BinaryOperatorKind::REM_ASSIGN;
-    case pasta::BinaryOperatorKind::kAddAssign: return BinaryOperatorKind::ADD_ASSIGN;
-    case pasta::BinaryOperatorKind::kSubAssign: return BinaryOperatorKind::SUB_ASSIGN;
-    case pasta::BinaryOperatorKind::kShlAssign: return BinaryOperatorKind::SHL_ASSIGN;
-    case pasta::BinaryOperatorKind::kShrAssign: return BinaryOperatorKind::SHR_ASSIGN;
-    case pasta::BinaryOperatorKind::kAndAssign: return BinaryOperatorKind::AND_ASSIGN;
-    case pasta::BinaryOperatorKind::kXorAssign: return BinaryOperatorKind::XOR_ASSIGN;
-    case pasta::BinaryOperatorKind::kOrAssign: return BinaryOperatorKind::OR_ASSIGN;
-    case pasta::BinaryOperatorKind::kComma: return BinaryOperatorKind::COMMA;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BinaryOperatorKind::POINTER_MEMORY_D;
+    case 1: return BinaryOperatorKind::POINTER_MEMORY_I;
+    case 2: return BinaryOperatorKind::MUL;
+    case 3: return BinaryOperatorKind::DIV;
+    case 4: return BinaryOperatorKind::REM;
+    case 5: return BinaryOperatorKind::ADD;
+    case 6: return BinaryOperatorKind::SUB;
+    case 7: return BinaryOperatorKind::SHL;
+    case 8: return BinaryOperatorKind::SHR;
+    case 9: return BinaryOperatorKind::CMP;
+    case 10: return BinaryOperatorKind::LT;
+    case 11: return BinaryOperatorKind::GT;
+    case 12: return BinaryOperatorKind::LE;
+    case 13: return BinaryOperatorKind::GE;
+    case 14: return BinaryOperatorKind::EQ;
+    case 15: return BinaryOperatorKind::NE;
+    case 16: return BinaryOperatorKind::AND;
+    case 17: return BinaryOperatorKind::XOR;
+    case 18: return BinaryOperatorKind::OR;
+    case 19: return BinaryOperatorKind::L_AND;
+    case 20: return BinaryOperatorKind::L_OR;
+    case 21: return BinaryOperatorKind::ASSIGN;
+    case 22: return BinaryOperatorKind::MUL_ASSIGN;
+    case 23: return BinaryOperatorKind::DIV_ASSIGN;
+    case 24: return BinaryOperatorKind::REM_ASSIGN;
+    case 25: return BinaryOperatorKind::ADD_ASSIGN;
+    case 26: return BinaryOperatorKind::SUB_ASSIGN;
+    case 27: return BinaryOperatorKind::SHL_ASSIGN;
+    case 28: return BinaryOperatorKind::SHR_ASSIGN;
+    case 29: return BinaryOperatorKind::AND_ASSIGN;
+    case 30: return BinaryOperatorKind::XOR_ASSIGN;
+    case 31: return BinaryOperatorKind::OR_ASSIGN;
+    case 32: return BinaryOperatorKind::COMMA;
+    default: __builtin_unreachable();
   }
 }
 
 Bits FromPasta(pasta::Bits e) {
-  switch (e) {
-    case pasta::Bits::kNone: return Bits::NONE;
-    case pasta::Bits::kUnexpandedPack: return Bits::UNEXPANDED_PACK;
-    case pasta::Bits::kInstantiation: return Bits::INSTANTIATION;
-    case pasta::Bits::kType: return Bits::TYPE;
-    case pasta::Bits::kValue: return Bits::VALUE;
-    case pasta::Bits::kDependent: return Bits::DEPENDENT;
-    case pasta::Bits::kError: return Bits::ERROR;
-    case pasta::Bits::kVariablyModified: return Bits::VARIABLY_MODIFIED;
-    case pasta::Bits::kSyntactic: return Bits::SYNTACTIC;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return Bits::NONE;
+    case 1: return Bits::UNEXPANDED_PACK;
+    case 2: return Bits::INSTANTIATION;
+    case 4: return Bits::TYPE;
+    case 8: return Bits::VALUE;
+    case 12: return Bits::DEPENDENT;
+    case 16: return Bits::ERROR;
+    case 32: return Bits::VARIABLY_MODIFIED;
+    case 19: return Bits::SYNTACTIC;
+    default: __builtin_unreachable();
   }
 }
 
 BlockType FromPasta(pasta::BlockType e) {
-  switch (e) {
-    case pasta::BlockType::kByReference: return BlockType::BY_REFERENCE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BlockType::BY_REFERENCE;
+    default: __builtin_unreachable();
   }
 }
 
 BranchStateTy FromPasta(pasta::BranchStateTy e) {
-  switch (e) {
-    case pasta::BranchStateTy::kUndefined: return BranchStateTy::UNDEFINED;
-    case pasta::BranchStateTy::kInbranch: return BranchStateTy::INBRANCH;
-    case pasta::BranchStateTy::kNotinbranch: return BranchStateTy::NOTINBRANCH;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BranchStateTy::UNDEFINED;
+    case 1: return BranchStateTy::INBRANCH;
+    case 2: return BranchStateTy::NOTINBRANCH;
+    default: __builtin_unreachable();
   }
 }
 
 CallingConv FromPasta(pasta::CallingConv e) {
-  switch (e) {
-    case pasta::CallingConv::kC: return CallingConv::C;
-    case pasta::CallingConv::kX86StdCall: return CallingConv::X86_STD_CALL;
-    case pasta::CallingConv::kX86FastCall: return CallingConv::X86_FAST_CALL;
-    case pasta::CallingConv::kX86ThisCall: return CallingConv::X86_THIS_CALL;
-    case pasta::CallingConv::kX86VectorCall: return CallingConv::X86_VECTOR_CALL;
-    case pasta::CallingConv::kX86Pascal: return CallingConv::X86_PASCAL;
-    case pasta::CallingConv::kWin64: return CallingConv::WIN64;
-    case pasta::CallingConv::kX8664SysV: return CallingConv::X8664_SYS_V;
-    case pasta::CallingConv::kX86RegCall: return CallingConv::X86_REG_CALL;
-    case pasta::CallingConv::kAAPCS: return CallingConv::AAPCS;
-    case pasta::CallingConv::kAAPCSVFP: return CallingConv::AAPCSVFP;
-    case pasta::CallingConv::kIntelOclBicc: return CallingConv::INTEL_OCL_BICC;
-    case pasta::CallingConv::kSpirFunction: return CallingConv::SPIR_FUNCTION;
-    case pasta::CallingConv::kOpenCLKernel: return CallingConv::OPEN_CL_KERNEL;
-    case pasta::CallingConv::kSwift: return CallingConv::SWIFT;
-    case pasta::CallingConv::kSwiftAsync: return CallingConv::SWIFT_ASYNC;
-    case pasta::CallingConv::kPreserveMost: return CallingConv::PRESERVE_MOST;
-    case pasta::CallingConv::kPreserveAll: return CallingConv::PRESERVE_ALL;
-    case pasta::CallingConv::kAArch64VectorCall: return CallingConv::A_ARCH64_VECTOR_CALL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CallingConv::C;
+    case 1: return CallingConv::X86_STD_CALL;
+    case 2: return CallingConv::X86_FAST_CALL;
+    case 3: return CallingConv::X86_THIS_CALL;
+    case 4: return CallingConv::X86_VECTOR_CALL;
+    case 5: return CallingConv::X86_PASCAL;
+    case 6: return CallingConv::WIN64;
+    case 7: return CallingConv::X8664_SYS_V;
+    case 8: return CallingConv::X86_REG_CALL;
+    case 9: return CallingConv::AAPCS;
+    case 10: return CallingConv::AAPCSVFP;
+    case 11: return CallingConv::INTEL_OCL_BICC;
+    case 12: return CallingConv::SPIR_FUNCTION;
+    case 13: return CallingConv::OPEN_CL_KERNEL;
+    case 14: return CallingConv::SWIFT;
+    case 15: return CallingConv::SWIFT_ASYNC;
+    case 16: return CallingConv::PRESERVE_MOST;
+    case 17: return CallingConv::PRESERVE_ALL;
+    case 18: return CallingConv::A_ARCH64_VECTOR_CALL;
+    default: __builtin_unreachable();
   }
 }
 
 CanThrowResult FromPasta(pasta::CanThrowResult e) {
-  switch (e) {
-    case pasta::CanThrowResult::kCannot: return CanThrowResult::CANNOT;
-    case pasta::CanThrowResult::kDependent: return CanThrowResult::DEPENDENT;
-    case pasta::CanThrowResult::kCan: return CanThrowResult::CAN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CanThrowResult::CANNOT;
+    case 1: return CanThrowResult::DEPENDENT;
+    case 2: return CanThrowResult::CAN;
+    default: __builtin_unreachable();
   }
 }
 
 CapturedRegionKind FromPasta(pasta::CapturedRegionKind e) {
-  switch (e) {
-    case pasta::CapturedRegionKind::kDefault: return CapturedRegionKind::DEFAULT;
-    case pasta::CapturedRegionKind::kObjCAtFinally: return CapturedRegionKind::OBJ_C_AT_FINALLY;
-    case pasta::CapturedRegionKind::kOpenMP: return CapturedRegionKind::OPEN_MP;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CapturedRegionKind::DEFAULT;
+    case 1: return CapturedRegionKind::OBJ_C_AT_FINALLY;
+    case 2: return CapturedRegionKind::OPEN_MP;
+    default: __builtin_unreachable();
   }
 }
 
 CastKind FromPasta(pasta::CastKind e) {
-  switch (e) {
-    case pasta::CastKind::kDependent: return CastKind::DEPENDENT;
-    case pasta::CastKind::kBitCast: return CastKind::BIT_CAST;
-    case pasta::CastKind::kLValueBitCast: return CastKind::L_VALUE_BIT_CAST;
-    case pasta::CastKind::kLValueToRValueBitCast: return CastKind::L_VALUE_TO_R_VALUE_BIT_CAST;
-    case pasta::CastKind::kLValueToRValue: return CastKind::L_VALUE_TO_R_VALUE;
-    case pasta::CastKind::kNoOperation: return CastKind::NO_OPERATION;
-    case pasta::CastKind::kBaseToDerived: return CastKind::BASE_TO_DERIVED;
-    case pasta::CastKind::kDerivedToBase: return CastKind::DERIVED_TO_BASE;
-    case pasta::CastKind::kUncheckedDerivedToBase: return CastKind::UNCHECKED_DERIVED_TO_BASE;
-    case pasta::CastKind::kDynamic: return CastKind::DYNAMIC;
-    case pasta::CastKind::kToUnion: return CastKind::TO_UNION;
-    case pasta::CastKind::kArrayToPointerDecay: return CastKind::ARRAY_TO_POINTER_DECAY;
-    case pasta::CastKind::kFunctionToPointerDecay: return CastKind::FUNCTION_TO_POINTER_DECAY;
-    case pasta::CastKind::kNullToPointer: return CastKind::NULL_TO_POINTER;
-    case pasta::CastKind::kNullToMemberPointer: return CastKind::NULL_TO_MEMBER_POINTER;
-    case pasta::CastKind::kBaseToDerivedMemberPointer: return CastKind::BASE_TO_DERIVED_MEMBER_POINTER;
-    case pasta::CastKind::kDerivedToBaseMemberPointer: return CastKind::DERIVED_TO_BASE_MEMBER_POINTER;
-    case pasta::CastKind::kMemberPointerToBoolean: return CastKind::MEMBER_POINTER_TO_BOOLEAN;
-    case pasta::CastKind::kReinterpretMemberPointer: return CastKind::REINTERPRET_MEMBER_POINTER;
-    case pasta::CastKind::kUserDefinedConversion: return CastKind::USER_DEFINED_CONVERSION;
-    case pasta::CastKind::kConstructorConversion: return CastKind::CONSTRUCTOR_CONVERSION;
-    case pasta::CastKind::kIntegralToPointer: return CastKind::INTEGRAL_TO_POINTER;
-    case pasta::CastKind::kPointerToIntegral: return CastKind::POINTER_TO_INTEGRAL;
-    case pasta::CastKind::kPointerToBoolean: return CastKind::POINTER_TO_BOOLEAN;
-    case pasta::CastKind::kToVoid: return CastKind::TO_VOID;
-    case pasta::CastKind::kMatrixCast: return CastKind::MATRIX_CAST;
-    case pasta::CastKind::kVectorSplat: return CastKind::VECTOR_SPLAT;
-    case pasta::CastKind::kIntegralCast: return CastKind::INTEGRAL_CAST;
-    case pasta::CastKind::kIntegralToBoolean: return CastKind::INTEGRAL_TO_BOOLEAN;
-    case pasta::CastKind::kIntegralToFloating: return CastKind::INTEGRAL_TO_FLOATING;
-    case pasta::CastKind::kFloatingToFixedPoint: return CastKind::FLOATING_TO_FIXED_POINT;
-    case pasta::CastKind::kFixedPointToFloating: return CastKind::FIXED_POINT_TO_FLOATING;
-    case pasta::CastKind::kFixedPointCast: return CastKind::FIXED_POINT_CAST;
-    case pasta::CastKind::kFixedPointToIntegral: return CastKind::FIXED_POINT_TO_INTEGRAL;
-    case pasta::CastKind::kIntegralToFixedPoint: return CastKind::INTEGRAL_TO_FIXED_POINT;
-    case pasta::CastKind::kFixedPointToBoolean: return CastKind::FIXED_POINT_TO_BOOLEAN;
-    case pasta::CastKind::kFloatingToIntegral: return CastKind::FLOATING_TO_INTEGRAL;
-    case pasta::CastKind::kFloatingToBoolean: return CastKind::FLOATING_TO_BOOLEAN;
-    case pasta::CastKind::kBooleanToSignedIntegral: return CastKind::BOOLEAN_TO_SIGNED_INTEGRAL;
-    case pasta::CastKind::kFloatingCast: return CastKind::FLOATING_CAST;
-    case pasta::CastKind::kCPointerToObjCPointerCast: return CastKind::C_POINTER_TO_OBJ_C_POINTER_CAST;
-    case pasta::CastKind::kBlockPointerToObjCPointerCast: return CastKind::BLOCK_POINTER_TO_OBJ_C_POINTER_CAST;
-    case pasta::CastKind::kAnyPointerToBlockPointerCast: return CastKind::ANY_POINTER_TO_BLOCK_POINTER_CAST;
-    case pasta::CastKind::kObjCObjectLValueCast: return CastKind::OBJ_C_OBJECT_L_VALUE_CAST;
-    case pasta::CastKind::kFloatingRealToComplex: return CastKind::FLOATING_REAL_TO_COMPLEX;
-    case pasta::CastKind::kFloatingComplexToReal: return CastKind::FLOATING_COMPLEX_TO_REAL;
-    case pasta::CastKind::kFloatingComplexToBoolean: return CastKind::FLOATING_COMPLEX_TO_BOOLEAN;
-    case pasta::CastKind::kFloatingComplexCast: return CastKind::FLOATING_COMPLEX_CAST;
-    case pasta::CastKind::kFloatingComplexToIntegralComplex: return CastKind::FLOATING_COMPLEX_TO_INTEGRAL_COMPLEX;
-    case pasta::CastKind::kIntegralRealToComplex: return CastKind::INTEGRAL_REAL_TO_COMPLEX;
-    case pasta::CastKind::kIntegralComplexToReal: return CastKind::INTEGRAL_COMPLEX_TO_REAL;
-    case pasta::CastKind::kIntegralComplexToBoolean: return CastKind::INTEGRAL_COMPLEX_TO_BOOLEAN;
-    case pasta::CastKind::kIntegralComplexCast: return CastKind::INTEGRAL_COMPLEX_CAST;
-    case pasta::CastKind::kIntegralComplexToFloatingComplex: return CastKind::INTEGRAL_COMPLEX_TO_FLOATING_COMPLEX;
-    case pasta::CastKind::kARCProduceObject: return CastKind::ARC_PRODUCE_OBJECT;
-    case pasta::CastKind::kARCConsumeObject: return CastKind::ARC_CONSUME_OBJECT;
-    case pasta::CastKind::kARCReclaimReturnedObject: return CastKind::ARC_RECLAIM_RETURNED_OBJECT;
-    case pasta::CastKind::kARCExtendBlockObject: return CastKind::ARC_EXTEND_BLOCK_OBJECT;
-    case pasta::CastKind::kAtomicToNonAtomic: return CastKind::ATOMIC_TO_NON_ATOMIC;
-    case pasta::CastKind::kNonAtomicToAtomic: return CastKind::NON_ATOMIC_TO_ATOMIC;
-    case pasta::CastKind::kCopyAndAutoreleaseBlockObject: return CastKind::COPY_AND_AUTORELEASE_BLOCK_OBJECT;
-    case pasta::CastKind::kBuiltinFnToFnPointer: return CastKind::BUILTIN_FN_TO_FN_POINTER;
-    case pasta::CastKind::kZeroToOCLOpaqueType: return CastKind::ZERO_TO_OCL_OPAQUE_TYPE;
-    case pasta::CastKind::kAddressSpaceConversion: return CastKind::ADDRESS_SPACE_CONVERSION;
-    case pasta::CastKind::kIntToOCLSampler: return CastKind::INT_TO_OCL_SAMPLER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CastKind::DEPENDENT;
+    case 1: return CastKind::BIT_CAST;
+    case 2: return CastKind::L_VALUE_BIT_CAST;
+    case 3: return CastKind::L_VALUE_TO_R_VALUE_BIT_CAST;
+    case 4: return CastKind::L_VALUE_TO_R_VALUE;
+    case 5: return CastKind::NO_OPERATION;
+    case 6: return CastKind::BASE_TO_DERIVED;
+    case 7: return CastKind::DERIVED_TO_BASE;
+    case 8: return CastKind::UNCHECKED_DERIVED_TO_BASE;
+    case 9: return CastKind::DYNAMIC;
+    case 10: return CastKind::TO_UNION;
+    case 11: return CastKind::ARRAY_TO_POINTER_DECAY;
+    case 12: return CastKind::FUNCTION_TO_POINTER_DECAY;
+    case 13: return CastKind::NULL_TO_POINTER;
+    case 14: return CastKind::NULL_TO_MEMBER_POINTER;
+    case 15: return CastKind::BASE_TO_DERIVED_MEMBER_POINTER;
+    case 16: return CastKind::DERIVED_TO_BASE_MEMBER_POINTER;
+    case 17: return CastKind::MEMBER_POINTER_TO_BOOLEAN;
+    case 18: return CastKind::REINTERPRET_MEMBER_POINTER;
+    case 19: return CastKind::USER_DEFINED_CONVERSION;
+    case 20: return CastKind::CONSTRUCTOR_CONVERSION;
+    case 21: return CastKind::INTEGRAL_TO_POINTER;
+    case 22: return CastKind::POINTER_TO_INTEGRAL;
+    case 23: return CastKind::POINTER_TO_BOOLEAN;
+    case 24: return CastKind::TO_VOID;
+    case 25: return CastKind::MATRIX_CAST;
+    case 26: return CastKind::VECTOR_SPLAT;
+    case 27: return CastKind::INTEGRAL_CAST;
+    case 28: return CastKind::INTEGRAL_TO_BOOLEAN;
+    case 29: return CastKind::INTEGRAL_TO_FLOATING;
+    case 30: return CastKind::FLOATING_TO_FIXED_POINT;
+    case 31: return CastKind::FIXED_POINT_TO_FLOATING;
+    case 32: return CastKind::FIXED_POINT_CAST;
+    case 33: return CastKind::FIXED_POINT_TO_INTEGRAL;
+    case 34: return CastKind::INTEGRAL_TO_FIXED_POINT;
+    case 35: return CastKind::FIXED_POINT_TO_BOOLEAN;
+    case 36: return CastKind::FLOATING_TO_INTEGRAL;
+    case 37: return CastKind::FLOATING_TO_BOOLEAN;
+    case 38: return CastKind::BOOLEAN_TO_SIGNED_INTEGRAL;
+    case 39: return CastKind::FLOATING_CAST;
+    case 40: return CastKind::C_POINTER_TO_OBJ_C_POINTER_CAST;
+    case 41: return CastKind::BLOCK_POINTER_TO_OBJ_C_POINTER_CAST;
+    case 42: return CastKind::ANY_POINTER_TO_BLOCK_POINTER_CAST;
+    case 43: return CastKind::OBJ_C_OBJECT_L_VALUE_CAST;
+    case 44: return CastKind::FLOATING_REAL_TO_COMPLEX;
+    case 45: return CastKind::FLOATING_COMPLEX_TO_REAL;
+    case 46: return CastKind::FLOATING_COMPLEX_TO_BOOLEAN;
+    case 47: return CastKind::FLOATING_COMPLEX_CAST;
+    case 48: return CastKind::FLOATING_COMPLEX_TO_INTEGRAL_COMPLEX;
+    case 49: return CastKind::INTEGRAL_REAL_TO_COMPLEX;
+    case 50: return CastKind::INTEGRAL_COMPLEX_TO_REAL;
+    case 51: return CastKind::INTEGRAL_COMPLEX_TO_BOOLEAN;
+    case 52: return CastKind::INTEGRAL_COMPLEX_CAST;
+    case 53: return CastKind::INTEGRAL_COMPLEX_TO_FLOATING_COMPLEX;
+    case 54: return CastKind::ARC_PRODUCE_OBJECT;
+    case 55: return CastKind::ARC_CONSUME_OBJECT;
+    case 56: return CastKind::ARC_RECLAIM_RETURNED_OBJECT;
+    case 57: return CastKind::ARC_EXTEND_BLOCK_OBJECT;
+    case 58: return CastKind::ATOMIC_TO_NON_ATOMIC;
+    case 59: return CastKind::NON_ATOMIC_TO_ATOMIC;
+    case 60: return CastKind::COPY_AND_AUTORELEASE_BLOCK_OBJECT;
+    case 61: return CastKind::BUILTIN_FN_TO_FN_POINTER;
+    case 62: return CastKind::ZERO_TO_OCL_OPAQUE_TYPE;
+    case 63: return CastKind::ADDRESS_SPACE_CONVERSION;
+    case 64: return CastKind::INT_TO_OCL_SAMPLER;
+    default: __builtin_unreachable();
   }
 }
 
 ClangABI FromPasta(pasta::ClangABI e) {
-  switch (e) {
-    case pasta::ClangABI::kVer38: return ClangABI::VER38;
-    case pasta::ClangABI::kVer4: return ClangABI::VER4;
-    case pasta::ClangABI::kVer6: return ClangABI::VER6;
-    case pasta::ClangABI::kVer7: return ClangABI::VER7;
-    case pasta::ClangABI::kVer9: return ClangABI::VER9;
-    case pasta::ClangABI::kVer11: return ClangABI::VER11;
-    case pasta::ClangABI::kVer12: return ClangABI::VER12;
-    case pasta::ClangABI::kLatest: return ClangABI::LATEST;
+  switch (static_cast<int>(e)) {
+    case 0: return ClangABI::VER38;
+    case 1: return ClangABI::VER4;
+    case 2: return ClangABI::VER6;
+    case 3: return ClangABI::VER7;
+    case 4: return ClangABI::VER9;
+    case 5: return ClangABI::VER11;
+    case 6: return ClangABI::VER12;
+    case 7: return ClangABI::LATEST;
+    default: __builtin_unreachable();
   }
 }
 
 CommentKind FromPasta(pasta::CommentKind e) {
-  switch (e) {
-    case pasta::CommentKind::kInvalid: return CommentKind::INVALID;
-    case pasta::CommentKind::kOrdinaryBCPL: return CommentKind::ORDINARY_BCPL;
-    case pasta::CommentKind::kOrdinaryC: return CommentKind::ORDINARY_C;
-    case pasta::CommentKind::kBCPLSlash: return CommentKind::BCPL_SLASH;
-    case pasta::CommentKind::kBCPLExcl: return CommentKind::BCPL_EXCL;
-    case pasta::CommentKind::kJavaDoc: return CommentKind::JAVA_DOC;
-    case pasta::CommentKind::kQt: return CommentKind::QT;
-    case pasta::CommentKind::kMerged: return CommentKind::MERGED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CommentKind::INVALID;
+    case 1: return CommentKind::ORDINARY_BCPL;
+    case 2: return CommentKind::ORDINARY_C;
+    case 3: return CommentKind::BCPL_SLASH;
+    case 4: return CommentKind::BCPL_EXCL;
+    case 5: return CommentKind::JAVA_DOC;
+    case 6: return CommentKind::QT;
+    case 7: return CommentKind::MERGED;
+    default: __builtin_unreachable();
   }
 }
 
 ComparisonCategoryResult FromPasta(pasta::ComparisonCategoryResult e) {
-  switch (e) {
-    case pasta::ComparisonCategoryResult::kEqual: return ComparisonCategoryResult::EQUAL;
-    case pasta::ComparisonCategoryResult::kEquivalent: return ComparisonCategoryResult::EQUIVALENT;
-    case pasta::ComparisonCategoryResult::kLess: return ComparisonCategoryResult::LESS;
-    case pasta::ComparisonCategoryResult::kGreater: return ComparisonCategoryResult::GREATER;
-    case pasta::ComparisonCategoryResult::kUnordered: return ComparisonCategoryResult::UNORDERED;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return ComparisonCategoryResult::EQUAL;
+    case 1: return ComparisonCategoryResult::EQUIVALENT;
+    case 2: return ComparisonCategoryResult::LESS;
+    case 3: return ComparisonCategoryResult::GREATER;
+    case 4: return ComparisonCategoryResult::UNORDERED;
+    default: __builtin_unreachable();
   }
 }
 
 ComparisonCategoryType FromPasta(pasta::ComparisonCategoryType e) {
-  switch (e) {
-    case pasta::ComparisonCategoryType::kPartialOrdering: return ComparisonCategoryType::PARTIAL_ORDERING;
-    case pasta::ComparisonCategoryType::kWeakOrdering: return ComparisonCategoryType::WEAK_ORDERING;
-    case pasta::ComparisonCategoryType::kStrongOrdering: return ComparisonCategoryType::STRONG_ORDERING;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return ComparisonCategoryType::PARTIAL_ORDERING;
+    case 1: return ComparisonCategoryType::WEAK_ORDERING;
+    case 2: return ComparisonCategoryType::STRONG_ORDERING;
+    default: __builtin_unreachable();
   }
 }
 
 CompilingModuleKind FromPasta(pasta::CompilingModuleKind e) {
-  switch (e) {
-    case pasta::CompilingModuleKind::kNone: return CompilingModuleKind::NONE;
-    case pasta::CompilingModuleKind::kModuleMap: return CompilingModuleKind::MODULE_MAP;
-    case pasta::CompilingModuleKind::kHeaderModule: return CompilingModuleKind::HEADER_MODULE;
-    case pasta::CompilingModuleKind::kModuleInterface: return CompilingModuleKind::MODULE_INTERFACE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CompilingModuleKind::NONE;
+    case 1: return CompilingModuleKind::MODULE_MAP;
+    case 2: return CompilingModuleKind::HEADER_MODULE;
+    case 3: return CompilingModuleKind::MODULE_INTERFACE;
+    default: __builtin_unreachable();
   }
 }
 
 ConstexprSpecKind FromPasta(pasta::ConstexprSpecKind e) {
-  switch (e) {
-    case pasta::ConstexprSpecKind::kUnspecified: return ConstexprSpecKind::UNSPECIFIED;
-    case pasta::ConstexprSpecKind::kConstexpr: return ConstexprSpecKind::CONSTEXPR;
-    case pasta::ConstexprSpecKind::kConsteval: return ConstexprSpecKind::CONSTEVAL;
-    case pasta::ConstexprSpecKind::kConstinit: return ConstexprSpecKind::CONSTINIT;
+  switch (static_cast<int>(e)) {
+    case 0: return ConstexprSpecKind::UNSPECIFIED;
+    case 1: return ConstexprSpecKind::CONSTEXPR;
+    case 2: return ConstexprSpecKind::CONSTEVAL;
+    case 3: return ConstexprSpecKind::CONSTINIT;
+    default: __builtin_unreachable();
   }
 }
 
 ConsumedState FromPasta(pasta::ConsumedState e) {
-  switch (e) {
-    case pasta::ConsumedState::kUnknown: return ConsumedState::UNKNOWN;
-    case pasta::ConsumedState::kConsumed: return ConsumedState::CONSUMED;
-    case pasta::ConsumedState::kUnconsumed: return ConsumedState::UNCONSUMED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConsumedState::UNKNOWN;
+    case 1: return ConsumedState::CONSUMED;
+    case 2: return ConsumedState::UNCONSUMED;
+    default: __builtin_unreachable();
   }
 }
 
 ConventionKind FromPasta(pasta::ConventionKind e) {
-  switch (e) {
-    case pasta::ConventionKind::kNone: return ConventionKind::NONE;
-    case pasta::ConventionKind::kNonNullError: return ConventionKind::NON_NULL_ERROR;
-    case pasta::ConventionKind::kZeroArgument: return ConventionKind::ZERO_ARGUMENT;
-    case pasta::ConventionKind::kNonZeroArgument: return ConventionKind::NON_ZERO_ARGUMENT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConventionKind::NONE;
+    case 1: return ConventionKind::NON_NULL_ERROR;
+    case 2: return ConventionKind::ZERO_ARGUMENT;
+    case 3: return ConventionKind::NON_ZERO_ARGUMENT;
+    default: __builtin_unreachable();
   }
 }
 
 CoreFoundationABI FromPasta(pasta::CoreFoundationABI e) {
-  switch (e) {
-    case pasta::CoreFoundationABI::kUnspecified: return CoreFoundationABI::UNSPECIFIED;
-    case pasta::CoreFoundationABI::kStandalone: return CoreFoundationABI::STANDALONE;
-    case pasta::CoreFoundationABI::kObjectiveC: return CoreFoundationABI::OBJECTIVE_C;
-    case pasta::CoreFoundationABI::kSwift: return CoreFoundationABI::SWIFT;
-    case pasta::CoreFoundationABI::kSwift50: return CoreFoundationABI::SWIFT50;
-    case pasta::CoreFoundationABI::kSwift42: return CoreFoundationABI::SWIFT42;
-    case pasta::CoreFoundationABI::kSwift41: return CoreFoundationABI::SWIFT41;
+  switch (static_cast<int>(e)) {
+    case 0: return CoreFoundationABI::UNSPECIFIED;
+    case 1: return CoreFoundationABI::STANDALONE;
+    case 2: return CoreFoundationABI::OBJECTIVE_C;
+    case 3: return CoreFoundationABI::SWIFT;
+    case 4: return CoreFoundationABI::SWIFT50;
+    case 5: return CoreFoundationABI::SWIFT42;
+    case 6: return CoreFoundationABI::SWIFT41;
+    default: __builtin_unreachable();
   }
 }
 
 DefaultArgKind FromPasta(pasta::DefaultArgKind e) {
-  switch (e) {
-    case pasta::DefaultArgKind::kNone: return DefaultArgKind::NONE;
-    case pasta::DefaultArgKind::kUnparsed: return DefaultArgKind::UNPARSED;
-    case pasta::DefaultArgKind::kUninstantiated: return DefaultArgKind::UNINSTANTIATED;
-    case pasta::DefaultArgKind::kNormal: return DefaultArgKind::NORMAL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DefaultArgKind::NONE;
+    case 1: return DefaultArgKind::UNPARSED;
+    case 2: return DefaultArgKind::UNINSTANTIATED;
+    case 3: return DefaultArgKind::NORMAL;
+    default: __builtin_unreachable();
   }
 }
 
 DefaultCallingConvention FromPasta(pasta::DefaultCallingConvention e) {
-  switch (e) {
-    case pasta::DefaultCallingConvention::kNone: return DefaultCallingConvention::NONE;
-    case pasta::DefaultCallingConvention::kCDecl: return DefaultCallingConvention::C_DECL;
-    case pasta::DefaultCallingConvention::kFastCall: return DefaultCallingConvention::FAST_CALL;
-    case pasta::DefaultCallingConvention::kStdCall: return DefaultCallingConvention::STD_CALL;
-    case pasta::DefaultCallingConvention::kVectorCall: return DefaultCallingConvention::VECTOR_CALL;
-    case pasta::DefaultCallingConvention::kRegCall: return DefaultCallingConvention::REG_CALL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DefaultCallingConvention::NONE;
+    case 1: return DefaultCallingConvention::C_DECL;
+    case 2: return DefaultCallingConvention::FAST_CALL;
+    case 3: return DefaultCallingConvention::STD_CALL;
+    case 4: return DefaultCallingConvention::VECTOR_CALL;
+    case 5: return DefaultCallingConvention::REG_CALL;
+    default: __builtin_unreachable();
   }
 }
 
 DevTypeTy FromPasta(pasta::DevTypeTy e) {
-  switch (e) {
-    case pasta::DevTypeTy::kHost: return DevTypeTy::HOST;
-    case pasta::DevTypeTy::kNoHost: return DevTypeTy::NO_HOST;
-    case pasta::DevTypeTy::kAny: return DevTypeTy::ANY;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DevTypeTy::HOST;
+    case 1: return DevTypeTy::NO_HOST;
+    case 2: return DevTypeTy::ANY;
+    default: __builtin_unreachable();
   }
 }
 
 DiagnosticLevelMask FromPasta(pasta::DiagnosticLevelMask e) {
-  switch (e) {
-    case pasta::DiagnosticLevelMask::kNone: return DiagnosticLevelMask::NONE;
-    case pasta::DiagnosticLevelMask::kNote: return DiagnosticLevelMask::NOTE;
-    case pasta::DiagnosticLevelMask::kRemark: return DiagnosticLevelMask::REMARK;
-    case pasta::DiagnosticLevelMask::kWarning: return DiagnosticLevelMask::WARNING;
-    case pasta::DiagnosticLevelMask::kError: return DiagnosticLevelMask::ERROR;
-    case pasta::DiagnosticLevelMask::kAll: return DiagnosticLevelMask::ALL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DiagnosticLevelMask::NONE;
+    case 1: return DiagnosticLevelMask::NOTE;
+    case 2: return DiagnosticLevelMask::REMARK;
+    case 4: return DiagnosticLevelMask::WARNING;
+    case 8: return DiagnosticLevelMask::ERROR;
+    case 15: return DiagnosticLevelMask::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 DiagnosticType FromPasta(pasta::DiagnosticType e) {
-  switch (e) {
-    case pasta::DiagnosticType::kError: return DiagnosticType::ERROR;
-    case pasta::DiagnosticType::kWarning: return DiagnosticType::WARNING;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DiagnosticType::ERROR;
+    case 1: return DiagnosticType::WARNING;
+    default: __builtin_unreachable();
   }
 }
 
 ElaboratedTypeKeyword FromPasta(pasta::ElaboratedTypeKeyword e) {
-  switch (e) {
-    case pasta::ElaboratedTypeKeyword::kStruct: return ElaboratedTypeKeyword::STRUCT;
-    case pasta::ElaboratedTypeKeyword::kInterface: return ElaboratedTypeKeyword::INTERFACE;
-    case pasta::ElaboratedTypeKeyword::kUnion: return ElaboratedTypeKeyword::UNION;
-    case pasta::ElaboratedTypeKeyword::kClass: return ElaboratedTypeKeyword::CLASS;
-    case pasta::ElaboratedTypeKeyword::kEnum: return ElaboratedTypeKeyword::ENUM;
-    case pasta::ElaboratedTypeKeyword::kTypename: return ElaboratedTypeKeyword::TYPENAME;
-    case pasta::ElaboratedTypeKeyword::kNone: return ElaboratedTypeKeyword::NONE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ElaboratedTypeKeyword::STRUCT;
+    case 1: return ElaboratedTypeKeyword::INTERFACE;
+    case 2: return ElaboratedTypeKeyword::UNION;
+    case 3: return ElaboratedTypeKeyword::CLASS;
+    case 4: return ElaboratedTypeKeyword::ENUM;
+    case 5: return ElaboratedTypeKeyword::TYPENAME;
+    case 6: return ElaboratedTypeKeyword::NONE;
+    default: __builtin_unreachable();
   }
 }
 
 EmbedBitcodeKind FromPasta(pasta::EmbedBitcodeKind e) {
-  switch (e) {
-    case pasta::EmbedBitcodeKind::kEmbedOff: return EmbedBitcodeKind::EMBED_OFF;
-    case pasta::EmbedBitcodeKind::kEmbedAll: return EmbedBitcodeKind::EMBED_ALL;
-    case pasta::EmbedBitcodeKind::kEmbedBitcode: return EmbedBitcodeKind::EMBED_BITCODE;
-    case pasta::EmbedBitcodeKind::kEmbedMarker: return EmbedBitcodeKind::EMBED_MARKER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return EmbedBitcodeKind::EMBED_OFF;
+    case 1: return EmbedBitcodeKind::EMBED_ALL;
+    case 2: return EmbedBitcodeKind::EMBED_BITCODE;
+    case 3: return EmbedBitcodeKind::EMBED_MARKER;
+    default: __builtin_unreachable();
   }
 }
 
 ExceptionHandlingKind FromPasta(pasta::ExceptionHandlingKind e) {
-  switch (e) {
-    case pasta::ExceptionHandlingKind::kNone: return ExceptionHandlingKind::NONE;
-    case pasta::ExceptionHandlingKind::kSjLj: return ExceptionHandlingKind::SJ_LJ;
-    case pasta::ExceptionHandlingKind::kWinEH: return ExceptionHandlingKind::WIN_EH;
-    case pasta::ExceptionHandlingKind::kDwarfCFI: return ExceptionHandlingKind::DWARF_CFI;
-    case pasta::ExceptionHandlingKind::kWasm: return ExceptionHandlingKind::WASM;
+  switch (static_cast<int>(e)) {
+    case 0: return ExceptionHandlingKind::NONE;
+    case 1: return ExceptionHandlingKind::SJ_LJ;
+    case 2: return ExceptionHandlingKind::WIN_EH;
+    case 3: return ExceptionHandlingKind::DWARF_CFI;
+    case 4: return ExceptionHandlingKind::WASM;
+    default: __builtin_unreachable();
   }
 }
 
 ExceptionSpecificationType FromPasta(pasta::ExceptionSpecificationType e) {
-  switch (e) {
-    case pasta::ExceptionSpecificationType::kNone: return ExceptionSpecificationType::NONE;
-    case pasta::ExceptionSpecificationType::kDynamicNone: return ExceptionSpecificationType::DYNAMIC_NONE;
-    case pasta::ExceptionSpecificationType::kDynamic: return ExceptionSpecificationType::DYNAMIC;
-    case pasta::ExceptionSpecificationType::kMSAny: return ExceptionSpecificationType::MS_ANY;
-    case pasta::ExceptionSpecificationType::kNoThrow: return ExceptionSpecificationType::NO_THROW;
-    case pasta::ExceptionSpecificationType::kBasicNoexcept: return ExceptionSpecificationType::BASIC_NOEXCEPT;
-    case pasta::ExceptionSpecificationType::kDependentNoexcept: return ExceptionSpecificationType::DEPENDENT_NOEXCEPT;
-    case pasta::ExceptionSpecificationType::kNoexceptFalse: return ExceptionSpecificationType::NOEXCEPT_FALSE;
-    case pasta::ExceptionSpecificationType::kNoexceptTrue: return ExceptionSpecificationType::NOEXCEPT_TRUE;
-    case pasta::ExceptionSpecificationType::kUnevaluated: return ExceptionSpecificationType::UNEVALUATED;
-    case pasta::ExceptionSpecificationType::kUninstantiated: return ExceptionSpecificationType::UNINSTANTIATED;
-    case pasta::ExceptionSpecificationType::kUnparsed: return ExceptionSpecificationType::UNPARSED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExceptionSpecificationType::NONE;
+    case 1: return ExceptionSpecificationType::DYNAMIC_NONE;
+    case 2: return ExceptionSpecificationType::DYNAMIC;
+    case 3: return ExceptionSpecificationType::MS_ANY;
+    case 4: return ExceptionSpecificationType::NO_THROW;
+    case 5: return ExceptionSpecificationType::BASIC_NOEXCEPT;
+    case 6: return ExceptionSpecificationType::DEPENDENT_NOEXCEPT;
+    case 7: return ExceptionSpecificationType::NOEXCEPT_FALSE;
+    case 8: return ExceptionSpecificationType::NOEXCEPT_TRUE;
+    case 9: return ExceptionSpecificationType::UNEVALUATED;
+    case 10: return ExceptionSpecificationType::UNINSTANTIATED;
+    case 11: return ExceptionSpecificationType::UNPARSED;
+    default: __builtin_unreachable();
   }
 }
 
 ExplicitSpecKind FromPasta(pasta::ExplicitSpecKind e) {
-  switch (e) {
-    case pasta::ExplicitSpecKind::kResolvedFalse: return ExplicitSpecKind::RESOLVED_FALSE;
-    case pasta::ExplicitSpecKind::kResolvedTrue: return ExplicitSpecKind::RESOLVED_TRUE;
-    case pasta::ExplicitSpecKind::kUnresolved: return ExplicitSpecKind::UNRESOLVED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExplicitSpecKind::RESOLVED_FALSE;
+    case 1: return ExplicitSpecKind::RESOLVED_TRUE;
+    case 2: return ExplicitSpecKind::UNRESOLVED;
+    default: __builtin_unreachable();
   }
 }
 
 ExprDependence FromPasta(pasta::ExprDependence e) {
-  switch (e) {
-    case pasta::ExprDependence::kUnexpandedPack: return ExprDependence::UNEXPANDED_PACK;
-    case pasta::ExprDependence::kInstantiation: return ExprDependence::INSTANTIATION;
-    case pasta::ExprDependence::kType: return ExprDependence::TYPE;
-    case pasta::ExprDependence::kValue: return ExprDependence::VALUE;
-    case pasta::ExprDependence::kError: return ExprDependence::ERROR;
-    case pasta::ExprDependence::kNone: return ExprDependence::NONE;
-    case pasta::ExprDependence::kAll: return ExprDependence::ALL;
-    case pasta::ExprDependence::kTypeValue: return ExprDependence::TYPE_VALUE;
-    case pasta::ExprDependence::kTypeInstantiation: return ExprDependence::TYPE_INSTANTIATION;
-    case pasta::ExprDependence::kValueInstantiation: return ExprDependence::VALUE_INSTANTIATION;
-    case pasta::ExprDependence::kTypeValueInstantiation: return ExprDependence::TYPE_VALUE_INSTANTIATION;
-    case pasta::ExprDependence::kErrorDependent: return ExprDependence::ERROR_DEPENDENT;
+  switch (static_cast<unsigned char>(e)) {
+    case 1: return ExprDependence::UNEXPANDED_PACK;
+    case 2: return ExprDependence::INSTANTIATION;
+    case 4: return ExprDependence::TYPE;
+    case 8: return ExprDependence::VALUE;
+    case 16: return ExprDependence::ERROR;
+    case 0: return ExprDependence::NONE;
+    case 31: return ExprDependence::ALL;
+    case 12: return ExprDependence::TYPE_VALUE;
+    case 6: return ExprDependence::TYPE_INSTANTIATION;
+    case 10: return ExprDependence::VALUE_INSTANTIATION;
+    case 14: return ExprDependence::TYPE_VALUE_INSTANTIATION;
+    case 26: return ExprDependence::ERROR_DEPENDENT;
+    default: __builtin_unreachable();
   }
 }
 
 ExprObjectKind FromPasta(pasta::ExprObjectKind e) {
-  switch (e) {
-    case pasta::ExprObjectKind::kOrdinary: return ExprObjectKind::ORDINARY;
-    case pasta::ExprObjectKind::kBitField: return ExprObjectKind::BIT_FIELD;
-    case pasta::ExprObjectKind::kVectorComponent: return ExprObjectKind::VECTOR_COMPONENT;
-    case pasta::ExprObjectKind::kObjCProperty: return ExprObjectKind::OBJ_C_PROPERTY;
-    case pasta::ExprObjectKind::kObjCSubscript: return ExprObjectKind::OBJ_C_SUBSCRIPT;
-    case pasta::ExprObjectKind::kMatrixComponent: return ExprObjectKind::MATRIX_COMPONENT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExprObjectKind::ORDINARY;
+    case 1: return ExprObjectKind::BIT_FIELD;
+    case 2: return ExprObjectKind::VECTOR_COMPONENT;
+    case 3: return ExprObjectKind::OBJ_C_PROPERTY;
+    case 4: return ExprObjectKind::OBJ_C_SUBSCRIPT;
+    case 5: return ExprObjectKind::MATRIX_COMPONENT;
+    default: __builtin_unreachable();
   }
 }
 
 ExprOffsets FromPasta(pasta::ExprOffsets e) {
-  switch (e) {
-    case pasta::ExprOffsets::kAllocator: return ExprOffsets::ALLOCATOR;
-    case pasta::ExprOffsets::kAllocatorTraits: return ExprOffsets::ALLOCATOR_TRAITS;
-    case pasta::ExprOffsets::kTotal: return ExprOffsets::TOTAL;
+  switch (static_cast<int>(e)) {
+    case 0: return ExprOffsets::ALLOCATOR;
+    case 1: return ExprOffsets::ALLOCATOR_TRAITS;
+    case 2: return ExprOffsets::TOTAL;
+    default: __builtin_unreachable();
   }
 }
 
 ExprValueKind FromPasta(pasta::ExprValueKind e) {
-  switch (e) {
-    case pasta::ExprValueKind::kPRValue: return ExprValueKind::PR_VALUE;
-    case pasta::ExprValueKind::kLValue: return ExprValueKind::L_VALUE;
-    case pasta::ExprValueKind::kXValue: return ExprValueKind::X_VALUE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExprValueKind::PR_VALUE;
+    case 1: return ExprValueKind::L_VALUE;
+    case 2: return ExprValueKind::X_VALUE;
+    default: __builtin_unreachable();
   }
 }
 
 ExpressionTrait FromPasta(pasta::ExpressionTrait e) {
-  switch (e) {
-    case pasta::ExpressionTrait::kIsLValueExpression: return ExpressionTrait::IS_L_VALUE_EXPRESSION;
-    case pasta::ExpressionTrait::kIsRValueExpression: return ExpressionTrait::IS_R_VALUE_EXPRESSION;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExpressionTrait::IS_L_VALUE_EXPRESSION;
+    case 1: return ExpressionTrait::IS_R_VALUE_EXPRESSION;
+    default: __builtin_unreachable();
   }
 }
 
 ExtKind FromPasta(pasta::ExtKind e) {
-  switch (e) {
-    case pasta::ExtKind::kAlways: return ExtKind::ALWAYS;
-    case pasta::ExtKind::kNever: return ExtKind::NEVER;
-    case pasta::ExtKind::kReplyHazy: return ExtKind::REPLY_HAZY;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExtKind::ALWAYS;
+    case 1: return ExtKind::NEVER;
+    case 2: return ExtKind::REPLY_HAZY;
+    default: __builtin_unreachable();
   }
 }
 
 ExtendArgsKind FromPasta(pasta::ExtendArgsKind e) {
-  switch (e) {
-    case pasta::ExtendArgsKind::kExtendTo32: return ExtendArgsKind::EXTEND_TO32;
-    case pasta::ExtendArgsKind::kExtendTo64: return ExtendArgsKind::EXTEND_TO64;
+  switch (static_cast<int>(e)) {
+    case 0: return ExtendArgsKind::EXTEND_TO32;
+    case 1: return ExtendArgsKind::EXTEND_TO64;
+    default: __builtin_unreachable();
   }
 }
 
 FPExceptionModeKind FromPasta(pasta::FPExceptionModeKind e) {
-  switch (e) {
-    case pasta::FPExceptionModeKind::kIgnore: return FPExceptionModeKind::IGNORE;
-    case pasta::FPExceptionModeKind::kMayTrap: return FPExceptionModeKind::MAY_TRAP;
-    case pasta::FPExceptionModeKind::kStrict: return FPExceptionModeKind::STRICT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FPExceptionModeKind::IGNORE;
+    case 1: return FPExceptionModeKind::MAY_TRAP;
+    case 2: return FPExceptionModeKind::STRICT;
+    default: __builtin_unreachable();
   }
 }
 
 FPModeKind FromPasta(pasta::FPModeKind e) {
-  switch (e) {
-    case pasta::FPModeKind::kOff: return FPModeKind::OFF;
-    case pasta::FPModeKind::kOn: return FPModeKind::ON;
-    case pasta::FPModeKind::kFast: return FPModeKind::FAST;
-    case pasta::FPModeKind::kFastHonorPragmas: return FPModeKind::FAST_HONOR_PRAGMAS;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FPModeKind::OFF;
+    case 1: return FPModeKind::ON;
+    case 2: return FPModeKind::FAST;
+    case 3: return FPModeKind::FAST_HONOR_PRAGMAS;
+    default: __builtin_unreachable();
   }
 }
 
 FamilyKind FromPasta(pasta::FamilyKind e) {
-  switch (e) {
-    case pasta::FamilyKind::kNone: return FamilyKind::NONE;
-    case pasta::FamilyKind::kAlloc: return FamilyKind::ALLOC;
-    case pasta::FamilyKind::kCopy: return FamilyKind::COPY;
-    case pasta::FamilyKind::kInitializer: return FamilyKind::INITIALIZER;
-    case pasta::FamilyKind::kMutableCopy: return FamilyKind::MUTABLE_COPY;
-    case pasta::FamilyKind::kNew: return FamilyKind::NEW;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FamilyKind::NONE;
+    case 1: return FamilyKind::ALLOC;
+    case 2: return FamilyKind::COPY;
+    case 3: return FamilyKind::INITIALIZER;
+    case 4: return FamilyKind::MUTABLE_COPY;
+    case 5: return FamilyKind::NEW;
+    default: __builtin_unreachable();
   }
 }
 
 FiniteLoopsKind FromPasta(pasta::FiniteLoopsKind e) {
-  switch (e) {
-    case pasta::FiniteLoopsKind::kLanguage: return FiniteLoopsKind::LANGUAGE;
-    case pasta::FiniteLoopsKind::kAlways: return FiniteLoopsKind::ALWAYS;
-    case pasta::FiniteLoopsKind::kNever: return FiniteLoopsKind::NEVER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FiniteLoopsKind::LANGUAGE;
+    case 1: return FiniteLoopsKind::ALWAYS;
+    case 2: return FiniteLoopsKind::NEVER;
+    default: __builtin_unreachable();
   }
 }
 
 FramePointerKind FromPasta(pasta::FramePointerKind e) {
-  switch (e) {
-    case pasta::FramePointerKind::kNone: return FramePointerKind::NONE;
-    case pasta::FramePointerKind::kNonLeaf: return FramePointerKind::NON_LEAF;
-    case pasta::FramePointerKind::kAll: return FramePointerKind::ALL;
+  switch (static_cast<int>(e)) {
+    case 0: return FramePointerKind::NONE;
+    case 1: return FramePointerKind::NON_LEAF;
+    case 2: return FramePointerKind::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 GC FromPasta(pasta::GC e) {
-  switch (e) {
-    case pasta::GC::kGCNone: return GC::GC_NONE;
-    case pasta::GC::kWeak: return GC::WEAK;
-    case pasta::GC::kStrong: return GC::STRONG;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return GC::GC_NONE;
+    case 1: return GC::WEAK;
+    case 2: return GC::STRONG;
+    default: __builtin_unreachable();
   }
 }
 
 GCMode FromPasta(pasta::GCMode e) {
-  switch (e) {
-    case pasta::GCMode::kNonGC: return GCMode::NON_GC;
-    case pasta::GCMode::kGCOnly: return GCMode::GC_ONLY;
-    case pasta::GCMode::kHybridGC: return GCMode::HYBRID_GC;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return GCMode::NON_GC;
+    case 1: return GCMode::GC_ONLY;
+    case 2: return GCMode::HYBRID_GC;
+    default: __builtin_unreachable();
   }
 }
 
 GVALinkage FromPasta(pasta::GVALinkage e) {
-  switch (e) {
-    case pasta::GVALinkage::kInternal: return GVALinkage::INTERNAL;
-    case pasta::GVALinkage::kAvailableExternally: return GVALinkage::AVAILABLE_EXTERNALLY;
-    case pasta::GVALinkage::kDiscardableODR: return GVALinkage::DISCARDABLE_ODR;
-    case pasta::GVALinkage::kStrongExternal: return GVALinkage::STRONG_EXTERNAL;
-    case pasta::GVALinkage::kStrongODR: return GVALinkage::STRONG_ODR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return GVALinkage::INTERNAL;
+    case 1: return GVALinkage::AVAILABLE_EXTERNALLY;
+    case 2: return GVALinkage::DISCARDABLE_ODR;
+    case 3: return GVALinkage::STRONG_EXTERNAL;
+    case 4: return GVALinkage::STRONG_ODR;
+    default: __builtin_unreachable();
   }
 }
 
 GetBuiltinTypeError FromPasta(pasta::GetBuiltinTypeError e) {
-  switch (e) {
-    case pasta::GetBuiltinTypeError::kNone: return GetBuiltinTypeError::NONE;
-    case pasta::GetBuiltinTypeError::kMissingType: return GetBuiltinTypeError::MISSING_TYPE;
-    case pasta::GetBuiltinTypeError::kMissingStdio: return GetBuiltinTypeError::MISSING_STDIO;
-    case pasta::GetBuiltinTypeError::kMissing: return GetBuiltinTypeError::MISSING;
-    case pasta::GetBuiltinTypeError::kMissingUcontext: return GetBuiltinTypeError::MISSING_UCONTEXT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return GetBuiltinTypeError::NONE;
+    case 1: return GetBuiltinTypeError::MISSING_TYPE;
+    case 2: return GetBuiltinTypeError::MISSING_STDIO;
+    case 3: return GetBuiltinTypeError::MISSING;
+    case 4: return GetBuiltinTypeError::MISSING_UCONTEXT;
+    default: __builtin_unreachable();
   }
 }
 
 GuardArg FromPasta(pasta::GuardArg e) {
-  switch (e) {
-    case pasta::GuardArg::kNocf: return GuardArg::NOCF;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return GuardArg::NOCF;
+    default: __builtin_unreachable();
   }
 }
 
 ID FromPasta(pasta::ID e) {
-  switch (e) {
-    case pasta::ID::kWorkGroup: return ID::WORK_GROUP;
-    case pasta::ID::kDevice: return ID::DEVICE;
-    case pasta::ID::kAllSVMDevices: return ID::ALL_SVM_DEVICES;
-    case pasta::ID::kSubGroup: return ID::SUB_GROUP;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return ID::WORK_GROUP;
+    case 2: return ID::DEVICE;
+    case 3: return ID::ALL_SVM_DEVICES;
+    case 4: return ID::SUB_GROUP;
+    default: __builtin_unreachable();
   }
 }
 
 IdentifierInfoFlag FromPasta(pasta::IdentifierInfoFlag e) {
-  switch (e) {
-    case pasta::IdentifierInfoFlag::kZeroArgument: return IdentifierInfoFlag::ZERO_ARGUMENT;
-    case pasta::IdentifierInfoFlag::kOneArgument: return IdentifierInfoFlag::ONE_ARGUMENT;
-    case pasta::IdentifierInfoFlag::kMultiArgument: return IdentifierInfoFlag::MULTI_ARGUMENT;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return IdentifierInfoFlag::ZERO_ARGUMENT;
+    case 2: return IdentifierInfoFlag::ONE_ARGUMENT;
+    case 7: return IdentifierInfoFlag::MULTI_ARGUMENT;
+    default: __builtin_unreachable();
   }
 }
 
 ImbueAttribute FromPasta(pasta::ImbueAttribute e) {
-  switch (e) {
-    case pasta::ImbueAttribute::kNONE: return ImbueAttribute::NONE;
-    case pasta::ImbueAttribute::kALWAYS: return ImbueAttribute::ALWAYS;
-    case pasta::ImbueAttribute::kNEVER: return ImbueAttribute::NEVER;
-    case pasta::ImbueAttribute::kALWAYSARG1: return ImbueAttribute::ALWAYSAR_G1;
+  switch (static_cast<int>(e)) {
+    case 0: return ImbueAttribute::NONE;
+    case 1: return ImbueAttribute::ALWAYS;
+    case 2: return ImbueAttribute::NEVER;
+    case 3: return ImbueAttribute::ALWAYSAR_G1;
+    default: __builtin_unreachable();
   }
 }
 
 ImplicitReason FromPasta(pasta::ImplicitReason e) {
-  switch (e) {
-    case pasta::ImplicitReason::kNone: return ImplicitReason::NONE;
-    case pasta::ImplicitReason::kARCForbiddenType: return ImplicitReason::ARC_FORBIDDEN_TYPE;
-    case pasta::ImplicitReason::kForbiddenWeak: return ImplicitReason::FORBIDDEN_WEAK;
-    case pasta::ImplicitReason::kARCForbiddenConversion: return ImplicitReason::ARC_FORBIDDEN_CONVERSION;
-    case pasta::ImplicitReason::kARCInitReturnsUnrelated: return ImplicitReason::ARC_INIT_RETURNS_UNRELATED;
-    case pasta::ImplicitReason::kARCFieldWithOwnership: return ImplicitReason::ARC_FIELD_WITH_OWNERSHIP;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ImplicitReason::NONE;
+    case 1: return ImplicitReason::ARC_FORBIDDEN_TYPE;
+    case 2: return ImplicitReason::FORBIDDEN_WEAK;
+    case 3: return ImplicitReason::ARC_FORBIDDEN_CONVERSION;
+    case 4: return ImplicitReason::ARC_INIT_RETURNS_UNRELATED;
+    case 5: return ImplicitReason::ARC_FIELD_WITH_OWNERSHIP;
+    default: __builtin_unreachable();
   }
 }
 
 InClassInitStyle FromPasta(pasta::InClassInitStyle e) {
-  switch (e) {
-    case pasta::InClassInitStyle::kNoInitializer: return InClassInitStyle::NO_INITIALIZER;
-    case pasta::InClassInitStyle::kCopyInitializer: return InClassInitStyle::COPY_INITIALIZER;
-    case pasta::InClassInitStyle::kListInitializer: return InClassInitStyle::LIST_INITIALIZER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return InClassInitStyle::NO_INITIALIZER;
+    case 1: return InClassInitStyle::COPY_INITIALIZER;
+    case 2: return InClassInitStyle::LIST_INITIALIZER;
+    default: __builtin_unreachable();
   }
 }
 
 InheritedDesignatedInitializersState FromPasta(pasta::InheritedDesignatedInitializersState e) {
-  switch (e) {
-    case pasta::InheritedDesignatedInitializersState::kUnknown: return InheritedDesignatedInitializersState::UNKNOWN;
-    case pasta::InheritedDesignatedInitializersState::kInherited: return InheritedDesignatedInitializersState::INHERITED;
-    case pasta::InheritedDesignatedInitializersState::kNotInherited: return InheritedDesignatedInitializersState::NOT_INHERITED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return InheritedDesignatedInitializersState::UNKNOWN;
+    case 1: return InheritedDesignatedInitializersState::INHERITED;
+    case 2: return InheritedDesignatedInitializersState::NOT_INHERITED;
+    default: __builtin_unreachable();
   }
 }
 
 InitStorageKind FromPasta(pasta::InitStorageKind e) {
-  switch (e) {
-    case pasta::InitStorageKind::kNoInitializer: return InitStorageKind::NO_INITIALIZER;
-    case pasta::InitStorageKind::kInClassCopyInitializer: return InitStorageKind::IN_CLASS_COPY_INITIALIZER;
-    case pasta::InitStorageKind::kInClassListInitializer: return InitStorageKind::IN_CLASS_LIST_INITIALIZER;
-    case pasta::InitStorageKind::kCapturedVLAType: return InitStorageKind::CAPTURED_VLA_TYPE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return InitStorageKind::NO_INITIALIZER;
+    case 1: return InitStorageKind::IN_CLASS_COPY_INITIALIZER;
+    case 2: return InitStorageKind::IN_CLASS_LIST_INITIALIZER;
+    case 3: return InitStorageKind::CAPTURED_VLA_TYPE;
+    default: __builtin_unreachable();
   }
 }
 
 InlineVariableDefinitionKind FromPasta(pasta::InlineVariableDefinitionKind e) {
-  switch (e) {
-    case pasta::InlineVariableDefinitionKind::kNone: return InlineVariableDefinitionKind::NONE;
-    case pasta::InlineVariableDefinitionKind::kWeak: return InlineVariableDefinitionKind::WEAK;
-    case pasta::InlineVariableDefinitionKind::kWeakUnknown: return InlineVariableDefinitionKind::WEAK_UNKNOWN;
-    case pasta::InlineVariableDefinitionKind::kStrong: return InlineVariableDefinitionKind::STRONG;
+  switch (static_cast<int>(e)) {
+    case 0: return InlineVariableDefinitionKind::NONE;
+    case 1: return InlineVariableDefinitionKind::WEAK;
+    case 2: return InlineVariableDefinitionKind::WEAK_UNKNOWN;
+    case 3: return InlineVariableDefinitionKind::STRONG;
+    default: __builtin_unreachable();
   }
 }
 
 InliningMethod FromPasta(pasta::InliningMethod e) {
-  switch (e) {
-    case pasta::InliningMethod::kNormalInlining: return InliningMethod::NORMAL_INLINING;
-    case pasta::InliningMethod::kOnlyHintInlining: return InliningMethod::ONLY_HINT_INLINING;
-    case pasta::InliningMethod::kOnlyAlwaysInlining: return InliningMethod::ONLY_ALWAYS_INLINING;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return InliningMethod::NORMAL_INLINING;
+    case 1: return InliningMethod::ONLY_HINT_INLINING;
+    case 2: return InliningMethod::ONLY_ALWAYS_INLINING;
+    default: __builtin_unreachable();
   }
 }
 
 InterruptType FromPasta(pasta::InterruptType e) {
-  switch (e) {
-    case pasta::InterruptType::kIRQ: return InterruptType::IRQ;
-    case pasta::InterruptType::kFIQ: return InterruptType::FIQ;
-    case pasta::InterruptType::kSWI: return InterruptType::SWI;
-    case pasta::InterruptType::kABORT: return InterruptType::ABORT;
-    case pasta::InterruptType::kUNDEF: return InterruptType::UNDEF;
-    case pasta::InterruptType::kGeneric: return InterruptType::GENERIC;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return InterruptType::IRQ;
+    case 1: return InterruptType::FIQ;
+    case 2: return InterruptType::SWI;
+    case 3: return InterruptType::ABORT;
+    case 4: return InterruptType::UNDEF;
+    case 5: return InterruptType::GENERIC;
+    default: __builtin_unreachable();
   }
 }
 
 Kinds FromPasta(pasta::Kinds e) {
-  switch (e) {
-    case pasta::Kinds::kLValue: return Kinds::L_VALUE;
-    case pasta::Kinds::kXValue: return Kinds::X_VALUE;
-    case pasta::Kinds::kFunction: return Kinds::FUNCTION;
-    case pasta::Kinds::kVoid: return Kinds::VOID;
-    case pasta::Kinds::kAddressableVoid: return Kinds::ADDRESSABLE_VOID;
-    case pasta::Kinds::kDuplicateVectorComponents: return Kinds::DUPLICATE_VECTOR_COMPONENTS;
-    case pasta::Kinds::kMemberFunction: return Kinds::MEMBER_FUNCTION;
-    case pasta::Kinds::kSubObjCPropertySetting: return Kinds::SUB_OBJ_C_PROPERTY_SETTING;
-    case pasta::Kinds::kClassTemporary: return Kinds::CLASS_TEMPORARY;
-    case pasta::Kinds::kArrayTemporary: return Kinds::ARRAY_TEMPORARY;
-    case pasta::Kinds::kObjCMessageRValue: return Kinds::OBJ_C_MESSAGE_R_VALUE;
-    case pasta::Kinds::kPRValue: return Kinds::PR_VALUE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return Kinds::L_VALUE;
+    case 1: return Kinds::X_VALUE;
+    case 2: return Kinds::FUNCTION;
+    case 3: return Kinds::VOID;
+    case 4: return Kinds::ADDRESSABLE_VOID;
+    case 5: return Kinds::DUPLICATE_VECTOR_COMPONENTS;
+    case 6: return Kinds::MEMBER_FUNCTION;
+    case 7: return Kinds::SUB_OBJ_C_PROPERTY_SETTING;
+    case 8: return Kinds::CLASS_TEMPORARY;
+    case 9: return Kinds::ARRAY_TEMPORARY;
+    case 10: return Kinds::OBJ_C_MESSAGE_R_VALUE;
+    case 11: return Kinds::PR_VALUE;
+    default: __builtin_unreachable();
   }
 }
 
 LambdaCaptureDefault FromPasta(pasta::LambdaCaptureDefault e) {
-  switch (e) {
-    case pasta::LambdaCaptureDefault::kNone: return LambdaCaptureDefault::NONE;
-    case pasta::LambdaCaptureDefault::kByCopy: return LambdaCaptureDefault::BY_COPY;
-    case pasta::LambdaCaptureDefault::kByReference: return LambdaCaptureDefault::BY_REFERENCE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LambdaCaptureDefault::NONE;
+    case 1: return LambdaCaptureDefault::BY_COPY;
+    case 2: return LambdaCaptureDefault::BY_REFERENCE;
+    default: __builtin_unreachable();
   }
 }
 
 LambdaCaptureKind FromPasta(pasta::LambdaCaptureKind e) {
-  switch (e) {
-    case pasta::LambdaCaptureKind::kThis: return LambdaCaptureKind::THIS;
-    case pasta::LambdaCaptureKind::kStarThis: return LambdaCaptureKind::STAR_THIS;
-    case pasta::LambdaCaptureKind::kByCopy: return LambdaCaptureKind::BY_COPY;
-    case pasta::LambdaCaptureKind::kByReference: return LambdaCaptureKind::BY_REFERENCE;
-    case pasta::LambdaCaptureKind::kVLAType: return LambdaCaptureKind::VLA_TYPE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LambdaCaptureKind::THIS;
+    case 1: return LambdaCaptureKind::STAR_THIS;
+    case 2: return LambdaCaptureKind::BY_COPY;
+    case 3: return LambdaCaptureKind::BY_REFERENCE;
+    case 4: return LambdaCaptureKind::VLA_TYPE;
+    default: __builtin_unreachable();
   }
 }
 
 LangAS FromPasta(pasta::LangAS e) {
-  switch (e) {
-    case pasta::LangAS::kDefault: return LangAS::DEFAULT;
-    case pasta::LangAS::kOpenclGlobal: return LangAS::OPENCL_GLOBAL;
-    case pasta::LangAS::kOpenclLocal: return LangAS::OPENCL_LOCAL;
-    case pasta::LangAS::kOpenclConstant: return LangAS::OPENCL_CONSTANT;
-    case pasta::LangAS::kOpenclPrivate: return LangAS::OPENCL_PRIVATE;
-    case pasta::LangAS::kOpenclGeneric: return LangAS::OPENCL_GENERIC;
-    case pasta::LangAS::kOpenclGlobalDevice: return LangAS::OPENCL_GLOBAL_DEVICE;
-    case pasta::LangAS::kOpenclGlobalHost: return LangAS::OPENCL_GLOBAL_HOST;
-    case pasta::LangAS::kCudaDevice: return LangAS::CUDA_DEVICE;
-    case pasta::LangAS::kCudaConstant: return LangAS::CUDA_CONSTANT;
-    case pasta::LangAS::kCudaShared: return LangAS::CUDA_SHARED;
-    case pasta::LangAS::kSyclGlobal: return LangAS::SYCL_GLOBAL;
-    case pasta::LangAS::kSyclGlobalDevice: return LangAS::SYCL_GLOBAL_DEVICE;
-    case pasta::LangAS::kSyclGlobalHost: return LangAS::SYCL_GLOBAL_HOST;
-    case pasta::LangAS::kSyclLocal: return LangAS::SYCL_LOCAL;
-    case pasta::LangAS::kSyclPrivate: return LangAS::SYCL_PRIVATE;
-    case pasta::LangAS::kPtr32Sptr: return LangAS::PTR32_SPTR;
-    case pasta::LangAS::kPtr32Uptr: return LangAS::PTR32_UPTR;
-    case pasta::LangAS::kPtr64: return LangAS::PTR64;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LangAS::DEFAULT;
+    case 1: return LangAS::OPENCL_GLOBAL;
+    case 2: return LangAS::OPENCL_LOCAL;
+    case 3: return LangAS::OPENCL_CONSTANT;
+    case 4: return LangAS::OPENCL_PRIVATE;
+    case 5: return LangAS::OPENCL_GENERIC;
+    case 6: return LangAS::OPENCL_GLOBAL_DEVICE;
+    case 7: return LangAS::OPENCL_GLOBAL_HOST;
+    case 8: return LangAS::CUDA_DEVICE;
+    case 9: return LangAS::CUDA_CONSTANT;
+    case 10: return LangAS::CUDA_SHARED;
+    case 11: return LangAS::SYCL_GLOBAL;
+    case 12: return LangAS::SYCL_GLOBAL_DEVICE;
+    case 13: return LangAS::SYCL_GLOBAL_HOST;
+    case 14: return LangAS::SYCL_LOCAL;
+    case 15: return LangAS::SYCL_PRIVATE;
+    case 16: return LangAS::PTR32_SPTR;
+    case 17: return LangAS::PTR32_UPTR;
+    case 18: return LangAS::PTR64;
+    default: __builtin_unreachable();
   }
 }
 
 LangFeatures FromPasta(pasta::LangFeatures e) {
-  switch (e) {
-    case pasta::LangFeatures::kLineComment: return LangFeatures::LINE_COMMENT;
-    case pasta::LangFeatures::kC99: return LangFeatures::C99;
-    case pasta::LangFeatures::kC11: return LangFeatures::C11;
-    case pasta::LangFeatures::kC17: return LangFeatures::C17;
-    case pasta::LangFeatures::kC2x: return LangFeatures::C2_X;
-    case pasta::LangFeatures::kCPlusPlus: return LangFeatures::C_PLUS_PLUS;
-    case pasta::LangFeatures::kCPlusPlus11: return LangFeatures::C_PLUS_PLUS11;
-    case pasta::LangFeatures::kCPlusPlus14: return LangFeatures::C_PLUS_PLUS14;
-    case pasta::LangFeatures::kCPlusPlus17: return LangFeatures::C_PLUS_PLUS17;
-    case pasta::LangFeatures::kCPlusPlus20: return LangFeatures::C_PLUS_PLUS20;
-    case pasta::LangFeatures::kCPlusPlus2b: return LangFeatures::C_PLUS_PLUS2_B;
-    case pasta::LangFeatures::kDigraphs: return LangFeatures::DIGRAPHS;
-    case pasta::LangFeatures::kGNUMode: return LangFeatures::GNU_MODE;
-    case pasta::LangFeatures::kHexFloat: return LangFeatures::HEX_FLOAT;
-    case pasta::LangFeatures::kImplicitInt: return LangFeatures::IMPLICIT_INT;
-    case pasta::LangFeatures::kOpenCL: return LangFeatures::OPEN_CL;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return LangFeatures::LINE_COMMENT;
+    case 2: return LangFeatures::C99;
+    case 4: return LangFeatures::C11;
+    case 8: return LangFeatures::C17;
+    case 16: return LangFeatures::C2_X;
+    case 32: return LangFeatures::C_PLUS_PLUS;
+    case 64: return LangFeatures::C_PLUS_PLUS11;
+    case 128: return LangFeatures::C_PLUS_PLUS14;
+    case 256: return LangFeatures::C_PLUS_PLUS17;
+    case 512: return LangFeatures::C_PLUS_PLUS20;
+    case 1024: return LangFeatures::C_PLUS_PLUS2_B;
+    case 2048: return LangFeatures::DIGRAPHS;
+    case 4096: return LangFeatures::GNU_MODE;
+    case 8192: return LangFeatures::HEX_FLOAT;
+    case 16384: return LangFeatures::IMPLICIT_INT;
+    case 32768: return LangFeatures::OPEN_CL;
+    default: __builtin_unreachable();
   }
 }
 
 Language FromPasta(pasta::Language e) {
-  switch (e) {
-    case pasta::Language::kUnknown: return Language::UNKNOWN;
-    case pasta::Language::kAssembly: return Language::ASSEMBLY;
-    case pasta::Language::kLLVMIR: return Language::LLVMIR;
-    case pasta::Language::kC: return Language::C;
-    case pasta::Language::kCXX: return Language::CXX;
-    case pasta::Language::kObjC: return Language::OBJ_C;
-    case pasta::Language::kObjCXX: return Language::OBJ_CXX;
-    case pasta::Language::kOpenCL: return Language::OPEN_CL;
-    case pasta::Language::kOpenCLCXX: return Language::OPEN_CLCXX;
-    case pasta::Language::kCUDA: return Language::CUDA;
-    case pasta::Language::kRenderScript: return Language::RENDER_SCRIPT;
-    case pasta::Language::kHIP: return Language::HIP;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return Language::UNKNOWN;
+    case 1: return Language::ASSEMBLY;
+    case 2: return Language::LLVMIR;
+    case 3: return Language::C;
+    case 4: return Language::CXX;
+    case 5: return Language::OBJ_C;
+    case 6: return Language::OBJ_CXX;
+    case 7: return Language::OPEN_CL;
+    case 8: return Language::OPEN_CLCXX;
+    case 9: return Language::CUDA;
+    case 10: return Language::RENDER_SCRIPT;
+    case 11: return Language::HIP;
+    default: __builtin_unreachable();
   }
 }
 
 LanguageLinkage FromPasta(pasta::LanguageLinkage e) {
-  switch (e) {
-    case pasta::LanguageLinkage::kCLanguageLinkage: return LanguageLinkage::C_LANGUAGE_LINKAGE;
-    case pasta::LanguageLinkage::kCXXLanguageLinkage: return LanguageLinkage::CXX_LANGUAGE_LINKAGE;
-    case pasta::LanguageLinkage::kNoLanguageLinkage: return LanguageLinkage::NO_LANGUAGE_LINKAGE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LanguageLinkage::C_LANGUAGE_LINKAGE;
+    case 1: return LanguageLinkage::CXX_LANGUAGE_LINKAGE;
+    case 2: return LanguageLinkage::NO_LANGUAGE_LINKAGE;
+    default: __builtin_unreachable();
   }
 }
 
 LaxVectorConversionKind FromPasta(pasta::LaxVectorConversionKind e) {
-  switch (e) {
-    case pasta::LaxVectorConversionKind::kNone: return LaxVectorConversionKind::NONE;
-    case pasta::LaxVectorConversionKind::kInteger: return LaxVectorConversionKind::INTEGER;
-    case pasta::LaxVectorConversionKind::kAll: return LaxVectorConversionKind::ALL;
+  switch (static_cast<int>(e)) {
+    case 0: return LaxVectorConversionKind::NONE;
+    case 1: return LaxVectorConversionKind::INTEGER;
+    case 2: return LaxVectorConversionKind::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 Level FromPasta(pasta::Level e) {
-  switch (e) {
-    case pasta::Level::kIgnored: return Level::IGNORED;
-    case pasta::Level::kNote: return Level::NOTE;
-    case pasta::Level::kRemark: return Level::REMARK;
-    case pasta::Level::kWarning: return Level::WARNING;
-    case pasta::Level::kError: return Level::ERROR;
-    case pasta::Level::kFatal: return Level::FATAL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return Level::IGNORED;
+    case 1: return Level::NOTE;
+    case 2: return Level::REMARK;
+    case 3: return Level::WARNING;
+    case 4: return Level::ERROR;
+    case 5: return Level::FATAL;
+    default: __builtin_unreachable();
   }
 }
 
 Linkage FromPasta(pasta::Linkage e) {
-  switch (e) {
-    case pasta::Linkage::kNoLinkage: return Linkage::NO_LINKAGE;
-    case pasta::Linkage::kInternalLinkage: return Linkage::INTERNAL_LINKAGE;
-    case pasta::Linkage::kUniqueExternalLinkage: return Linkage::UNIQUE_EXTERNAL_LINKAGE;
-    case pasta::Linkage::kVisibleNoLinkage: return Linkage::VISIBLE_NO_LINKAGE;
-    case pasta::Linkage::kModuleInternalLinkage: return Linkage::MODULE_INTERNAL_LINKAGE;
-    case pasta::Linkage::kModuleLinkage: return Linkage::MODULE_LINKAGE;
-    case pasta::Linkage::kExternalLinkage: return Linkage::EXTERNAL_LINKAGE;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return Linkage::NO_LINKAGE;
+    case 1: return Linkage::INTERNAL_LINKAGE;
+    case 2: return Linkage::UNIQUE_EXTERNAL_LINKAGE;
+    case 3: return Linkage::VISIBLE_NO_LINKAGE;
+    case 4: return Linkage::MODULE_INTERNAL_LINKAGE;
+    case 5: return Linkage::MODULE_LINKAGE;
+    case 6: return Linkage::EXTERNAL_LINKAGE;
+    default: __builtin_unreachable();
   }
 }
 
 LoopHintState FromPasta(pasta::LoopHintState e) {
-  switch (e) {
-    case pasta::LoopHintState::kEnable: return LoopHintState::ENABLE;
-    case pasta::LoopHintState::kDisable: return LoopHintState::DISABLE;
-    case pasta::LoopHintState::kNumeric: return LoopHintState::NUMERIC;
-    case pasta::LoopHintState::kFixedWidth: return LoopHintState::FIXED_WIDTH;
-    case pasta::LoopHintState::kScalableWidth: return LoopHintState::SCALABLE_WIDTH;
-    case pasta::LoopHintState::kAssumeSafety: return LoopHintState::ASSUME_SAFETY;
-    case pasta::LoopHintState::kFull: return LoopHintState::FULL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LoopHintState::ENABLE;
+    case 1: return LoopHintState::DISABLE;
+    case 2: return LoopHintState::NUMERIC;
+    case 3: return LoopHintState::FIXED_WIDTH;
+    case 4: return LoopHintState::SCALABLE_WIDTH;
+    case 5: return LoopHintState::ASSUME_SAFETY;
+    case 6: return LoopHintState::FULL;
+    default: __builtin_unreachable();
   }
 }
 
 MSInheritanceModel FromPasta(pasta::MSInheritanceModel e) {
-  switch (e) {
-    case pasta::MSInheritanceModel::kSingle: return MSInheritanceModel::SINGLE;
-    case pasta::MSInheritanceModel::kMultiple: return MSInheritanceModel::MULTIPLE;
-    case pasta::MSInheritanceModel::kVirtual: return MSInheritanceModel::VIRTUAL;
-    case pasta::MSInheritanceModel::kUnspecified: return MSInheritanceModel::UNSPECIFIED;
+  switch (static_cast<int>(e)) {
+    case 0: return MSInheritanceModel::SINGLE;
+    case 1: return MSInheritanceModel::MULTIPLE;
+    case 2: return MSInheritanceModel::VIRTUAL;
+    case 3: return MSInheritanceModel::UNSPECIFIED;
+    default: __builtin_unreachable();
   }
 }
 
 MSVCMajorVersion FromPasta(pasta::MSVCMajorVersion e) {
-  switch (e) {
-    case pasta::MSVCMajorVersion::kMSVC2010: return MSVCMajorVersion::MSV_C2010;
-    case pasta::MSVCMajorVersion::kMSVC2012: return MSVCMajorVersion::MSV_C2012;
-    case pasta::MSVCMajorVersion::kMSVC2013: return MSVCMajorVersion::MSV_C2013;
-    case pasta::MSVCMajorVersion::kMSVC2015: return MSVCMajorVersion::MSV_C2015;
-    case pasta::MSVCMajorVersion::kMSVC2017: return MSVCMajorVersion::MSV_C2017;
-    case pasta::MSVCMajorVersion::kMSVC20175: return MSVCMajorVersion::MSV_C20175;
-    case pasta::MSVCMajorVersion::kMSVC20177: return MSVCMajorVersion::MSV_C20177;
-    case pasta::MSVCMajorVersion::kMSVC2019: return MSVCMajorVersion::MSV_C2019;
-    case pasta::MSVCMajorVersion::kMSVC20198: return MSVCMajorVersion::MSV_C20198;
+  switch (static_cast<unsigned>(e)) {
+    case 1600: return MSVCMajorVersion::MSV_C2010;
+    case 1700: return MSVCMajorVersion::MSV_C2012;
+    case 1800: return MSVCMajorVersion::MSV_C2013;
+    case 1900: return MSVCMajorVersion::MSV_C2015;
+    case 1910: return MSVCMajorVersion::MSV_C2017;
+    case 1912: return MSVCMajorVersion::MSV_C20175;
+    case 1914: return MSVCMajorVersion::MSV_C20177;
+    case 1920: return MSVCMajorVersion::MSV_C2019;
+    case 1928: return MSVCMajorVersion::MSV_C20198;
+    default: __builtin_unreachable();
   }
 }
 
 MSVtorDispMode FromPasta(pasta::MSVtorDispMode e) {
-  switch (e) {
-    case pasta::MSVtorDispMode::kNever: return MSVtorDispMode::NEVER;
-    case pasta::MSVtorDispMode::kForVirtualBaseOverride: return MSVtorDispMode::FOR_VIRTUAL_BASE_OVERRIDE;
-    case pasta::MSVtorDispMode::kForVFTable: return MSVtorDispMode::FOR_VF_TABLE;
+  switch (static_cast<int>(e)) {
+    case 0: return MSVtorDispMode::NEVER;
+    case 1: return MSVtorDispMode::FOR_VIRTUAL_BASE_OVERRIDE;
+    case 2: return MSVtorDispMode::FOR_VF_TABLE;
+    default: __builtin_unreachable();
   }
 }
 
 MapTypeTy FromPasta(pasta::MapTypeTy e) {
-  switch (e) {
-    case pasta::MapTypeTy::kTo: return MapTypeTy::TO;
-    case pasta::MapTypeTy::kLink: return MapTypeTy::LINK;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MapTypeTy::TO;
+    case 1: return MapTypeTy::LINK;
+    default: __builtin_unreachable();
   }
 }
 
 MethodRefFlags FromPasta(pasta::MethodRefFlags e) {
-  switch (e) {
-    case pasta::MethodRefFlags::kMethodReferenceNone: return MethodRefFlags::METHOD_REFERENCE_NONE;
-    case pasta::MethodRefFlags::kMethodReferenceGetter: return MethodRefFlags::METHOD_REFERENCE_GETTER;
-    case pasta::MethodRefFlags::kMethodReferenceSetter: return MethodRefFlags::METHOD_REFERENCE_SETTER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MethodRefFlags::METHOD_REFERENCE_NONE;
+    case 1: return MethodRefFlags::METHOD_REFERENCE_GETTER;
+    case 2: return MethodRefFlags::METHOD_REFERENCE_SETTER;
+    default: __builtin_unreachable();
   }
 }
 
 ModifiableType FromPasta(pasta::ModifiableType e) {
-  switch (e) {
-    case pasta::ModifiableType::kUntested: return ModifiableType::UNTESTED;
-    case pasta::ModifiableType::kModifiable: return ModifiableType::MODIFIABLE;
-    case pasta::ModifiableType::kRValue: return ModifiableType::R_VALUE;
-    case pasta::ModifiableType::kFunction: return ModifiableType::FUNCTION;
-    case pasta::ModifiableType::kLValueCast: return ModifiableType::L_VALUE_CAST;
-    case pasta::ModifiableType::kNoSetterProperty: return ModifiableType::NO_SETTER_PROPERTY;
-    case pasta::ModifiableType::kConstQualified: return ModifiableType::CONST_QUALIFIED;
-    case pasta::ModifiableType::kConstQualifiedField: return ModifiableType::CONST_QUALIFIED_FIELD;
-    case pasta::ModifiableType::kConstAddrSpace: return ModifiableType::CONST_ADDR_SPACE;
-    case pasta::ModifiableType::kArrayType: return ModifiableType::ARRAY_TYPE;
-    case pasta::ModifiableType::kIncompleteType: return ModifiableType::INCOMPLETE_TYPE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ModifiableType::UNTESTED;
+    case 1: return ModifiableType::MODIFIABLE;
+    case 2: return ModifiableType::R_VALUE;
+    case 3: return ModifiableType::FUNCTION;
+    case 4: return ModifiableType::L_VALUE_CAST;
+    case 5: return ModifiableType::NO_SETTER_PROPERTY;
+    case 6: return ModifiableType::CONST_QUALIFIED;
+    case 7: return ModifiableType::CONST_QUALIFIED_FIELD;
+    case 8: return ModifiableType::CONST_ADDR_SPACE;
+    case 9: return ModifiableType::ARRAY_TYPE;
+    case 10: return ModifiableType::INCOMPLETE_TYPE;
+    default: __builtin_unreachable();
   }
 }
 
 MultiVersionKind FromPasta(pasta::MultiVersionKind e) {
-  switch (e) {
-    case pasta::MultiVersionKind::kNone: return MultiVersionKind::NONE;
-    case pasta::MultiVersionKind::kTarget: return MultiVersionKind::TARGET;
-    case pasta::MultiVersionKind::kCPUSpecific: return MultiVersionKind::CPU_SPECIFIC;
-    case pasta::MultiVersionKind::kCPUDispatch: return MultiVersionKind::CPU_DISPATCH;
+  switch (static_cast<int>(e)) {
+    case 0: return MultiVersionKind::NONE;
+    case 1: return MultiVersionKind::TARGET;
+    case 2: return MultiVersionKind::CPU_SPECIFIC;
+    case 3: return MultiVersionKind::CPU_DISPATCH;
+    default: __builtin_unreachable();
   }
 }
 
 NameKind FromPasta(pasta::NameKind e) {
-  switch (e) {
-    case pasta::NameKind::kTemplate: return NameKind::TEMPLATE;
-    case pasta::NameKind::kOverloadedTemplate: return NameKind::OVERLOADED_TEMPLATE;
-    case pasta::NameKind::kAssumedTemplate: return NameKind::ASSUMED_TEMPLATE;
-    case pasta::NameKind::kQualifiedTemplate: return NameKind::QUALIFIED_TEMPLATE;
-    case pasta::NameKind::kDependentTemplate: return NameKind::DEPENDENT_TEMPLATE;
-    case pasta::NameKind::kSubstTemplateTemplateParm: return NameKind::SUBST_TEMPLATE_TEMPLATE_PARM;
-    case pasta::NameKind::kSubstTemplateTemplateParmPack: return NameKind::SUBST_TEMPLATE_TEMPLATE_PARM_PACK;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NameKind::TEMPLATE;
+    case 1: return NameKind::OVERLOADED_TEMPLATE;
+    case 2: return NameKind::ASSUMED_TEMPLATE;
+    case 3: return NameKind::QUALIFIED_TEMPLATE;
+    case 4: return NameKind::DEPENDENT_TEMPLATE;
+    case 5: return NameKind::SUBST_TEMPLATE_TEMPLATE_PARM;
+    case 6: return NameKind::SUBST_TEMPLATE_TEMPLATE_PARM_PACK;
+    default: __builtin_unreachable();
   }
 }
 
 NeedExtraManglingDecl FromPasta(pasta::NeedExtraManglingDecl e) {
-  switch (e) {
-    case pasta::NeedExtraManglingDecl::kNeedExtraManglingDeclaration: return NeedExtraManglingDecl::NEED_EXTRA_MANGLING_DECLARATION;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NeedExtraManglingDecl::NEED_EXTRA_MANGLING_DECLARATION;
+    default: __builtin_unreachable();
   }
 }
 
 NestedNameSpecifierDependence FromPasta(pasta::NestedNameSpecifierDependence e) {
-  switch (e) {
-    case pasta::NestedNameSpecifierDependence::kUnexpandedPack: return NestedNameSpecifierDependence::UNEXPANDED_PACK;
-    case pasta::NestedNameSpecifierDependence::kInstantiation: return NestedNameSpecifierDependence::INSTANTIATION;
-    case pasta::NestedNameSpecifierDependence::kDependent: return NestedNameSpecifierDependence::DEPENDENT;
-    case pasta::NestedNameSpecifierDependence::kError: return NestedNameSpecifierDependence::ERROR;
-    case pasta::NestedNameSpecifierDependence::kNone: return NestedNameSpecifierDependence::NONE;
-    case pasta::NestedNameSpecifierDependence::kDependentInstantiation: return NestedNameSpecifierDependence::DEPENDENT_INSTANTIATION;
-    case pasta::NestedNameSpecifierDependence::kAll: return NestedNameSpecifierDependence::ALL;
+  switch (static_cast<unsigned char>(e)) {
+    case 1: return NestedNameSpecifierDependence::UNEXPANDED_PACK;
+    case 2: return NestedNameSpecifierDependence::INSTANTIATION;
+    case 4: return NestedNameSpecifierDependence::DEPENDENT;
+    case 8: return NestedNameSpecifierDependence::ERROR;
+    case 0: return NestedNameSpecifierDependence::NONE;
+    case 6: return NestedNameSpecifierDependence::DEPENDENT_INSTANTIATION;
+    case 15: return NestedNameSpecifierDependence::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 NewtypeKind FromPasta(pasta::NewtypeKind e) {
-  switch (e) {
-    case pasta::NewtypeKind::kStruct: return NewtypeKind::STRUCT;
-    case pasta::NewtypeKind::kEnum: return NewtypeKind::ENUM;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NewtypeKind::STRUCT;
+    case 1: return NewtypeKind::ENUM;
+    default: __builtin_unreachable();
   }
 }
 
 NonOdrUseReason FromPasta(pasta::NonOdrUseReason e) {
-  switch (e) {
-    case pasta::NonOdrUseReason::kNone: return NonOdrUseReason::NONE;
-    case pasta::NonOdrUseReason::kUnevaluated: return NonOdrUseReason::UNEVALUATED;
-    case pasta::NonOdrUseReason::kConstant: return NonOdrUseReason::CONSTANT;
-    case pasta::NonOdrUseReason::kDiscarded: return NonOdrUseReason::DISCARDED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NonOdrUseReason::NONE;
+    case 1: return NonOdrUseReason::UNEVALUATED;
+    case 2: return NonOdrUseReason::CONSTANT;
+    case 3: return NonOdrUseReason::DISCARDED;
+    default: __builtin_unreachable();
   }
 }
 
 NonceObjCInterface FromPasta(pasta::NonceObjCInterface e) {
-  switch (e) {
-    case pasta::NonceObjCInterface::kObjCInterface: return NonceObjCInterface::OBJ_C_INTERFACE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NonceObjCInterface::OBJ_C_INTERFACE;
+    default: __builtin_unreachable();
   }
 }
 
 NullabilityKind FromPasta(pasta::NullabilityKind e) {
-  switch (e) {
-    case pasta::NullabilityKind::kNonNull: return NullabilityKind::NON_NULL;
-    case pasta::NullabilityKind::kNullable: return NullabilityKind::NULLABLE;
-    case pasta::NullabilityKind::kUnspecified: return NullabilityKind::UNSPECIFIED;
-    case pasta::NullabilityKind::kNullableResult: return NullabilityKind::NULLABLE_RESULT;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return NullabilityKind::NON_NULL;
+    case 1: return NullabilityKind::NULLABLE;
+    case 2: return NullabilityKind::UNSPECIFIED;
+    case 3: return NullabilityKind::NULLABLE_RESULT;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCBridgeCastKind FromPasta(pasta::ObjCBridgeCastKind e) {
-  switch (e) {
-    case pasta::ObjCBridgeCastKind::kBridge: return ObjCBridgeCastKind::BRIDGE;
-    case pasta::ObjCBridgeCastKind::kBridgeTransfer: return ObjCBridgeCastKind::BRIDGE_TRANSFER;
-    case pasta::ObjCBridgeCastKind::kBridgeRetained: return ObjCBridgeCastKind::BRIDGE_RETAINED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCBridgeCastKind::BRIDGE;
+    case 1: return ObjCBridgeCastKind::BRIDGE_TRANSFER;
+    case 2: return ObjCBridgeCastKind::BRIDGE_RETAINED;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCDispatchMethodKind FromPasta(pasta::ObjCDispatchMethodKind e) {
-  switch (e) {
-    case pasta::ObjCDispatchMethodKind::kLegacy: return ObjCDispatchMethodKind::LEGACY;
-    case pasta::ObjCDispatchMethodKind::kNonLegacy: return ObjCDispatchMethodKind::NON_LEGACY;
-    case pasta::ObjCDispatchMethodKind::kMixed: return ObjCDispatchMethodKind::MIXED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCDispatchMethodKind::LEGACY;
+    case 1: return ObjCDispatchMethodKind::NON_LEGACY;
+    case 2: return ObjCDispatchMethodKind::MIXED;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCInstanceTypeFamily FromPasta(pasta::ObjCInstanceTypeFamily e) {
-  switch (e) {
-    case pasta::ObjCInstanceTypeFamily::kNone: return ObjCInstanceTypeFamily::NONE;
-    case pasta::ObjCInstanceTypeFamily::kArray: return ObjCInstanceTypeFamily::ARRAY;
-    case pasta::ObjCInstanceTypeFamily::kDictionary: return ObjCInstanceTypeFamily::DICTIONARY;
-    case pasta::ObjCInstanceTypeFamily::kSingleton: return ObjCInstanceTypeFamily::SINGLETON;
-    case pasta::ObjCInstanceTypeFamily::kInitializer: return ObjCInstanceTypeFamily::INITIALIZER;
-    case pasta::ObjCInstanceTypeFamily::kReturnsSelf: return ObjCInstanceTypeFamily::RETURNS_SELF;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCInstanceTypeFamily::NONE;
+    case 1: return ObjCInstanceTypeFamily::ARRAY;
+    case 2: return ObjCInstanceTypeFamily::DICTIONARY;
+    case 3: return ObjCInstanceTypeFamily::SINGLETON;
+    case 4: return ObjCInstanceTypeFamily::INITIALIZER;
+    case 5: return ObjCInstanceTypeFamily::RETURNS_SELF;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCKeywordKind FromPasta(pasta::ObjCKeywordKind e) {
-  switch (e) {
-    case pasta::ObjCKeywordKind::kNotKeyword: return ObjCKeywordKind::NOT_KEYWORD;
-    case pasta::ObjCKeywordKind::kClass: return ObjCKeywordKind::CLASS;
-    case pasta::ObjCKeywordKind::kCompatibilityAlias: return ObjCKeywordKind::COMPATIBILITY_ALIAS;
-    case pasta::ObjCKeywordKind::kDefinitions: return ObjCKeywordKind::DEFINITIONS;
-    case pasta::ObjCKeywordKind::kEncode: return ObjCKeywordKind::ENCODE;
-    case pasta::ObjCKeywordKind::kObjcEnd: return ObjCKeywordKind::OBJC_END;
-    case pasta::ObjCKeywordKind::kImplementation: return ObjCKeywordKind::IMPLEMENTATION;
-    case pasta::ObjCKeywordKind::kInterface: return ObjCKeywordKind::INTERFACE;
-    case pasta::ObjCKeywordKind::kPrivate: return ObjCKeywordKind::PRIVATE;
-    case pasta::ObjCKeywordKind::kProtected: return ObjCKeywordKind::PROTECTED;
-    case pasta::ObjCKeywordKind::kProtocol: return ObjCKeywordKind::PROTOCOL;
-    case pasta::ObjCKeywordKind::kPublic: return ObjCKeywordKind::PUBLIC;
-    case pasta::ObjCKeywordKind::kSelector: return ObjCKeywordKind::SELECTOR;
-    case pasta::ObjCKeywordKind::kThrow: return ObjCKeywordKind::THROW;
-    case pasta::ObjCKeywordKind::kTry: return ObjCKeywordKind::TRY;
-    case pasta::ObjCKeywordKind::kCatch: return ObjCKeywordKind::CATCH;
-    case pasta::ObjCKeywordKind::kFinally: return ObjCKeywordKind::FINALLY;
-    case pasta::ObjCKeywordKind::kSynchronized: return ObjCKeywordKind::SYNCHRONIZED;
-    case pasta::ObjCKeywordKind::kAutoreleasepool: return ObjCKeywordKind::AUTORELEASEPOOL;
-    case pasta::ObjCKeywordKind::kProperty: return ObjCKeywordKind::PROPERTY;
-    case pasta::ObjCKeywordKind::kPackage: return ObjCKeywordKind::PACKAGE;
-    case pasta::ObjCKeywordKind::kRequired: return ObjCKeywordKind::REQUIRED;
-    case pasta::ObjCKeywordKind::kOptional: return ObjCKeywordKind::OPTIONAL;
-    case pasta::ObjCKeywordKind::kSynthesize: return ObjCKeywordKind::SYNTHESIZE;
-    case pasta::ObjCKeywordKind::kDynamic: return ObjCKeywordKind::DYNAMIC;
-    case pasta::ObjCKeywordKind::kImport: return ObjCKeywordKind::IMPORT;
-    case pasta::ObjCKeywordKind::kAvailable: return ObjCKeywordKind::AVAILABLE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCKeywordKind::NOT_KEYWORD;
+    case 1: return ObjCKeywordKind::CLASS;
+    case 2: return ObjCKeywordKind::COMPATIBILITY_ALIAS;
+    case 3: return ObjCKeywordKind::DEFINITIONS;
+    case 4: return ObjCKeywordKind::ENCODE;
+    case 5: return ObjCKeywordKind::OBJC_END;
+    case 6: return ObjCKeywordKind::IMPLEMENTATION;
+    case 7: return ObjCKeywordKind::INTERFACE;
+    case 8: return ObjCKeywordKind::PRIVATE;
+    case 9: return ObjCKeywordKind::PROTECTED;
+    case 10: return ObjCKeywordKind::PROTOCOL;
+    case 11: return ObjCKeywordKind::PUBLIC;
+    case 12: return ObjCKeywordKind::SELECTOR;
+    case 13: return ObjCKeywordKind::THROW;
+    case 14: return ObjCKeywordKind::TRY;
+    case 15: return ObjCKeywordKind::CATCH;
+    case 16: return ObjCKeywordKind::FINALLY;
+    case 17: return ObjCKeywordKind::SYNCHRONIZED;
+    case 18: return ObjCKeywordKind::AUTORELEASEPOOL;
+    case 19: return ObjCKeywordKind::PROPERTY;
+    case 20: return ObjCKeywordKind::PACKAGE;
+    case 21: return ObjCKeywordKind::REQUIRED;
+    case 22: return ObjCKeywordKind::OPTIONAL;
+    case 23: return ObjCKeywordKind::SYNTHESIZE;
+    case 24: return ObjCKeywordKind::DYNAMIC;
+    case 25: return ObjCKeywordKind::IMPORT;
+    case 26: return ObjCKeywordKind::AVAILABLE;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCLifetime FromPasta(pasta::ObjCLifetime e) {
-  switch (e) {
-    case pasta::ObjCLifetime::kNone: return ObjCLifetime::NONE;
-    case pasta::ObjCLifetime::kExplicitNone: return ObjCLifetime::EXPLICIT_NONE;
-    case pasta::ObjCLifetime::kStrong: return ObjCLifetime::STRONG;
-    case pasta::ObjCLifetime::kWeak: return ObjCLifetime::WEAK;
-    case pasta::ObjCLifetime::kAutoreleasing: return ObjCLifetime::AUTORELEASING;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCLifetime::NONE;
+    case 1: return ObjCLifetime::EXPLICIT_NONE;
+    case 2: return ObjCLifetime::STRONG;
+    case 3: return ObjCLifetime::WEAK;
+    case 4: return ObjCLifetime::AUTORELEASING;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCMethodFamily FromPasta(pasta::ObjCMethodFamily e) {
-  switch (e) {
-    case pasta::ObjCMethodFamily::kNone: return ObjCMethodFamily::NONE;
-    case pasta::ObjCMethodFamily::kAlloc: return ObjCMethodFamily::ALLOC;
-    case pasta::ObjCMethodFamily::kCopy: return ObjCMethodFamily::COPY;
-    case pasta::ObjCMethodFamily::kInitializer: return ObjCMethodFamily::INITIALIZER;
-    case pasta::ObjCMethodFamily::kMutableCopy: return ObjCMethodFamily::MUTABLE_COPY;
-    case pasta::ObjCMethodFamily::kNew: return ObjCMethodFamily::NEW;
-    case pasta::ObjCMethodFamily::kAutorelease: return ObjCMethodFamily::AUTORELEASE;
-    case pasta::ObjCMethodFamily::kDealloc: return ObjCMethodFamily::DEALLOC;
-    case pasta::ObjCMethodFamily::kFinalize: return ObjCMethodFamily::FINALIZE;
-    case pasta::ObjCMethodFamily::kRelease: return ObjCMethodFamily::RELEASE;
-    case pasta::ObjCMethodFamily::kRetain: return ObjCMethodFamily::RETAIN;
-    case pasta::ObjCMethodFamily::kRetainCount: return ObjCMethodFamily::RETAIN_COUNT;
-    case pasta::ObjCMethodFamily::kSelf: return ObjCMethodFamily::SELF;
-    case pasta::ObjCMethodFamily::kInitialize: return ObjCMethodFamily::INITIALIZE;
-    case pasta::ObjCMethodFamily::kPerformSelector: return ObjCMethodFamily::PERFORM_SELECTOR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCMethodFamily::NONE;
+    case 1: return ObjCMethodFamily::ALLOC;
+    case 2: return ObjCMethodFamily::COPY;
+    case 3: return ObjCMethodFamily::INITIALIZER;
+    case 4: return ObjCMethodFamily::MUTABLE_COPY;
+    case 5: return ObjCMethodFamily::NEW;
+    case 6: return ObjCMethodFamily::AUTORELEASE;
+    case 7: return ObjCMethodFamily::DEALLOC;
+    case 8: return ObjCMethodFamily::FINALIZE;
+    case 9: return ObjCMethodFamily::RELEASE;
+    case 10: return ObjCMethodFamily::RETAIN;
+    case 11: return ObjCMethodFamily::RETAIN_COUNT;
+    case 12: return ObjCMethodFamily::SELF;
+    case 13: return ObjCMethodFamily::INITIALIZE;
+    case 14: return ObjCMethodFamily::PERFORM_SELECTOR;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCPropertyQueryKind FromPasta(pasta::ObjCPropertyQueryKind e) {
-  switch (e) {
-    case pasta::ObjCPropertyQueryKind::kQueryUnknown: return ObjCPropertyQueryKind::QUERY_UNKNOWN;
-    case pasta::ObjCPropertyQueryKind::kQueryInstance: return ObjCPropertyQueryKind::QUERY_INSTANCE;
-    case pasta::ObjCPropertyQueryKind::kQueryClass: return ObjCPropertyQueryKind::QUERY_CLASS;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return ObjCPropertyQueryKind::QUERY_UNKNOWN;
+    case 1: return ObjCPropertyQueryKind::QUERY_INSTANCE;
+    case 2: return ObjCPropertyQueryKind::QUERY_CLASS;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCStringFormatFamily FromPasta(pasta::ObjCStringFormatFamily e) {
-  switch (e) {
-    case pasta::ObjCStringFormatFamily::kNone: return ObjCStringFormatFamily::NONE;
-    case pasta::ObjCStringFormatFamily::kNSString: return ObjCStringFormatFamily::NS_STRING;
-    case pasta::ObjCStringFormatFamily::kCFString: return ObjCStringFormatFamily::CF_STRING;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCStringFormatFamily::NONE;
+    case 1: return ObjCStringFormatFamily::NS_STRING;
+    case 2: return ObjCStringFormatFamily::CF_STRING;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCSubstitutionContext FromPasta(pasta::ObjCSubstitutionContext e) {
-  switch (e) {
-    case pasta::ObjCSubstitutionContext::kOrdinary: return ObjCSubstitutionContext::ORDINARY;
-    case pasta::ObjCSubstitutionContext::kResult: return ObjCSubstitutionContext::RESULT;
-    case pasta::ObjCSubstitutionContext::kParameter: return ObjCSubstitutionContext::PARAMETER;
-    case pasta::ObjCSubstitutionContext::kProperty: return ObjCSubstitutionContext::PROPERTY;
-    case pasta::ObjCSubstitutionContext::kSuperclass: return ObjCSubstitutionContext::SUPERCLASS;
+  switch (static_cast<int>(e)) {
+    case 0: return ObjCSubstitutionContext::ORDINARY;
+    case 1: return ObjCSubstitutionContext::RESULT;
+    case 2: return ObjCSubstitutionContext::PARAMETER;
+    case 3: return ObjCSubstitutionContext::PROPERTY;
+    case 4: return ObjCSubstitutionContext::SUPERCLASS;
+    default: __builtin_unreachable();
   }
 }
 
 ObjCTypeParamVariance FromPasta(pasta::ObjCTypeParamVariance e) {
-  switch (e) {
-    case pasta::ObjCTypeParamVariance::kInvariant: return ObjCTypeParamVariance::INVARIANT;
-    case pasta::ObjCTypeParamVariance::kCovariant: return ObjCTypeParamVariance::COVARIANT;
-    case pasta::ObjCTypeParamVariance::kContravariant: return ObjCTypeParamVariance::CONTRAVARIANT;
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return ObjCTypeParamVariance::INVARIANT;
+    case 1: return ObjCTypeParamVariance::COVARIANT;
+    case 2: return ObjCTypeParamVariance::CONTRAVARIANT;
+    default: __builtin_unreachable();
   }
 }
 
 OnOffSwitch FromPasta(pasta::OnOffSwitch e) {
-  switch (e) {
-    case pasta::OnOffSwitch::kON: return OnOffSwitch::ON;
-    case pasta::OnOffSwitch::kOFF: return OnOffSwitch::OFF;
-    case pasta::OnOffSwitch::kDEFAULT: return OnOffSwitch::DEFAULT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OnOffSwitch::ON;
+    case 1: return OnOffSwitch::OFF;
+    case 2: return OnOffSwitch::DEFAULT;
+    default: __builtin_unreachable();
   }
 }
 
 OnStackType FromPasta(pasta::OnStackType e) {
-  switch (e) {
-    case pasta::OnStackType::kOnStack: return OnStackType::ON_STACK;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OnStackType::ON_STACK;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPAtomicDefaultMemOrderClauseKind FromPasta(pasta::OpenMPAtomicDefaultMemOrderClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPAtomicDefaultMemOrderClauseKind::kSeqCst: return OpenMPAtomicDefaultMemOrderClauseKind::SEQ_CST;
-    case pasta::OpenMPAtomicDefaultMemOrderClauseKind::kAcqRel: return OpenMPAtomicDefaultMemOrderClauseKind::ACQ_REL;
-    case pasta::OpenMPAtomicDefaultMemOrderClauseKind::kRelaxed: return OpenMPAtomicDefaultMemOrderClauseKind::RELAXED;
-    case pasta::OpenMPAtomicDefaultMemOrderClauseKind::kUnknown: return OpenMPAtomicDefaultMemOrderClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPAtomicDefaultMemOrderClauseKind::SEQ_CST;
+    case 1: return OpenMPAtomicDefaultMemOrderClauseKind::ACQ_REL;
+    case 2: return OpenMPAtomicDefaultMemOrderClauseKind::RELAXED;
+    case 3: return OpenMPAtomicDefaultMemOrderClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPDefaultmapClauseKind FromPasta(pasta::OpenMPDefaultmapClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPDefaultmapClauseKind::kScalar: return OpenMPDefaultmapClauseKind::SCALAR;
-    case pasta::OpenMPDefaultmapClauseKind::kAggregate: return OpenMPDefaultmapClauseKind::AGGREGATE;
-    case pasta::OpenMPDefaultmapClauseKind::kPointer: return OpenMPDefaultmapClauseKind::POINTER;
-    case pasta::OpenMPDefaultmapClauseKind::kUnknown: return OpenMPDefaultmapClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPDefaultmapClauseKind::SCALAR;
+    case 1: return OpenMPDefaultmapClauseKind::AGGREGATE;
+    case 2: return OpenMPDefaultmapClauseKind::POINTER;
+    case 3: return OpenMPDefaultmapClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPDefaultmapClauseModifier FromPasta(pasta::OpenMPDefaultmapClauseModifier e) {
-  switch (e) {
-    case pasta::OpenMPDefaultmapClauseModifier::kUnknown: return OpenMPDefaultmapClauseModifier::UNKNOWN;
-    case pasta::OpenMPDefaultmapClauseModifier::kAlloc: return OpenMPDefaultmapClauseModifier::ALLOC;
-    case pasta::OpenMPDefaultmapClauseModifier::kTo: return OpenMPDefaultmapClauseModifier::TO;
-    case pasta::OpenMPDefaultmapClauseModifier::kFrom: return OpenMPDefaultmapClauseModifier::FROM;
-    case pasta::OpenMPDefaultmapClauseModifier::kTofrom: return OpenMPDefaultmapClauseModifier::TOFROM;
-    case pasta::OpenMPDefaultmapClauseModifier::kNone: return OpenMPDefaultmapClauseModifier::NONE;
-    case pasta::OpenMPDefaultmapClauseModifier::kDefault: return OpenMPDefaultmapClauseModifier::DEFAULT;
-    case pasta::OpenMPDefaultmapClauseModifier::kPresent: return OpenMPDefaultmapClauseModifier::PRESENT;
+  switch (static_cast<unsigned>(e)) {
+    case 3: return OpenMPDefaultmapClauseModifier::UNKNOWN;
+    case 4: return OpenMPDefaultmapClauseModifier::ALLOC;
+    case 5: return OpenMPDefaultmapClauseModifier::TO;
+    case 6: return OpenMPDefaultmapClauseModifier::FROM;
+    case 7: return OpenMPDefaultmapClauseModifier::TOFROM;
+    case 9: return OpenMPDefaultmapClauseModifier::NONE;
+    case 10: return OpenMPDefaultmapClauseModifier::DEFAULT;
+    case 11: return OpenMPDefaultmapClauseModifier::PRESENT;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPDependClauseKind FromPasta(pasta::OpenMPDependClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPDependClauseKind::kIn: return OpenMPDependClauseKind::IN;
-    case pasta::OpenMPDependClauseKind::kOut: return OpenMPDependClauseKind::OUT;
-    case pasta::OpenMPDependClauseKind::kInout: return OpenMPDependClauseKind::INOUT;
-    case pasta::OpenMPDependClauseKind::kMutexinoutset: return OpenMPDependClauseKind::MUTEXINOUTSET;
-    case pasta::OpenMPDependClauseKind::kDepobj: return OpenMPDependClauseKind::DEPOBJ;
-    case pasta::OpenMPDependClauseKind::kSource: return OpenMPDependClauseKind::SOURCE;
-    case pasta::OpenMPDependClauseKind::kSink: return OpenMPDependClauseKind::SINK;
-    case pasta::OpenMPDependClauseKind::kUnknown: return OpenMPDependClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPDependClauseKind::IN;
+    case 1: return OpenMPDependClauseKind::OUT;
+    case 2: return OpenMPDependClauseKind::INOUT;
+    case 3: return OpenMPDependClauseKind::MUTEXINOUTSET;
+    case 4: return OpenMPDependClauseKind::DEPOBJ;
+    case 5: return OpenMPDependClauseKind::SOURCE;
+    case 6: return OpenMPDependClauseKind::SINK;
+    case 7: return OpenMPDependClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPDeviceClauseModifier FromPasta(pasta::OpenMPDeviceClauseModifier e) {
-  switch (e) {
-    case pasta::OpenMPDeviceClauseModifier::kAncestor: return OpenMPDeviceClauseModifier::ANCESTOR;
-    case pasta::OpenMPDeviceClauseModifier::kDeviceNum: return OpenMPDeviceClauseModifier::DEVICE_NUM;
-    case pasta::OpenMPDeviceClauseModifier::kUnknown: return OpenMPDeviceClauseModifier::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPDeviceClauseModifier::ANCESTOR;
+    case 1: return OpenMPDeviceClauseModifier::DEVICE_NUM;
+    case 2: return OpenMPDeviceClauseModifier::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPDeviceType FromPasta(pasta::OpenMPDeviceType e) {
-  switch (e) {
-    case pasta::OpenMPDeviceType::kHost: return OpenMPDeviceType::HOST;
-    case pasta::OpenMPDeviceType::kNohost: return OpenMPDeviceType::NOHOST;
-    case pasta::OpenMPDeviceType::kAny: return OpenMPDeviceType::ANY;
-    case pasta::OpenMPDeviceType::kUnknown: return OpenMPDeviceType::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPDeviceType::HOST;
+    case 1: return OpenMPDeviceType::NOHOST;
+    case 2: return OpenMPDeviceType::ANY;
+    case 3: return OpenMPDeviceType::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPDistScheduleClauseKind FromPasta(pasta::OpenMPDistScheduleClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPDistScheduleClauseKind::kStatic: return OpenMPDistScheduleClauseKind::STATIC;
-    case pasta::OpenMPDistScheduleClauseKind::kUnknown: return OpenMPDistScheduleClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPDistScheduleClauseKind::STATIC;
+    case 1: return OpenMPDistScheduleClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPLastprivateModifier FromPasta(pasta::OpenMPLastprivateModifier e) {
-  switch (e) {
-    case pasta::OpenMPLastprivateModifier::kConditional: return OpenMPLastprivateModifier::CONDITIONAL;
-    case pasta::OpenMPLastprivateModifier::kUnknown: return OpenMPLastprivateModifier::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPLastprivateModifier::CONDITIONAL;
+    case 1: return OpenMPLastprivateModifier::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPLinearClauseKind FromPasta(pasta::OpenMPLinearClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPLinearClauseKind::kVal: return OpenMPLinearClauseKind::VAL;
-    case pasta::OpenMPLinearClauseKind::kReference: return OpenMPLinearClauseKind::REFERENCE;
-    case pasta::OpenMPLinearClauseKind::kUval: return OpenMPLinearClauseKind::UVAL;
-    case pasta::OpenMPLinearClauseKind::kUnknown: return OpenMPLinearClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPLinearClauseKind::VAL;
+    case 1: return OpenMPLinearClauseKind::REFERENCE;
+    case 2: return OpenMPLinearClauseKind::UVAL;
+    case 3: return OpenMPLinearClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPMapClauseKind FromPasta(pasta::OpenMPMapClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPMapClauseKind::kAlloc: return OpenMPMapClauseKind::ALLOC;
-    case pasta::OpenMPMapClauseKind::kTo: return OpenMPMapClauseKind::TO;
-    case pasta::OpenMPMapClauseKind::kFrom: return OpenMPMapClauseKind::FROM;
-    case pasta::OpenMPMapClauseKind::kTofrom: return OpenMPMapClauseKind::TOFROM;
-    case pasta::OpenMPMapClauseKind::kDelete: return OpenMPMapClauseKind::DELETE;
-    case pasta::OpenMPMapClauseKind::kRelease: return OpenMPMapClauseKind::RELEASE;
-    case pasta::OpenMPMapClauseKind::kUnknown: return OpenMPMapClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPMapClauseKind::ALLOC;
+    case 1: return OpenMPMapClauseKind::TO;
+    case 2: return OpenMPMapClauseKind::FROM;
+    case 3: return OpenMPMapClauseKind::TOFROM;
+    case 4: return OpenMPMapClauseKind::DELETE;
+    case 5: return OpenMPMapClauseKind::RELEASE;
+    case 6: return OpenMPMapClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPMapModifierKind FromPasta(pasta::OpenMPMapModifierKind e) {
-  switch (e) {
-    case pasta::OpenMPMapModifierKind::kUnknown: return OpenMPMapModifierKind::UNKNOWN;
-    case pasta::OpenMPMapModifierKind::kAlways: return OpenMPMapModifierKind::ALWAYS;
-    case pasta::OpenMPMapModifierKind::kClose: return OpenMPMapModifierKind::CLOSE;
-    case pasta::OpenMPMapModifierKind::kMapper: return OpenMPMapModifierKind::MAPPER;
-    case pasta::OpenMPMapModifierKind::kPresent: return OpenMPMapModifierKind::PRESENT;
+  switch (static_cast<unsigned>(e)) {
+    case 6: return OpenMPMapModifierKind::UNKNOWN;
+    case 7: return OpenMPMapModifierKind::ALWAYS;
+    case 8: return OpenMPMapModifierKind::CLOSE;
+    case 9: return OpenMPMapModifierKind::MAPPER;
+    case 10: return OpenMPMapModifierKind::PRESENT;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPMotionModifierKind FromPasta(pasta::OpenMPMotionModifierKind e) {
-  switch (e) {
-    case pasta::OpenMPMotionModifierKind::kMOTIONMODIFIERMapper: return OpenMPMotionModifierKind::MOTIONMODIFIER_MAPPER;
-    case pasta::OpenMPMotionModifierKind::kMOTIONMODIFIERPresent: return OpenMPMotionModifierKind::MOTIONMODIFIER_PRESENT;
-    case pasta::OpenMPMotionModifierKind::kMOTIONMODIFIERUnknown: return OpenMPMotionModifierKind::MOTIONMODIFIER_UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPMotionModifierKind::MOTIONMODIFIER_MAPPER;
+    case 1: return OpenMPMotionModifierKind::MOTIONMODIFIER_PRESENT;
+    case 2: return OpenMPMotionModifierKind::MOTIONMODIFIER_UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPOrderClauseKind FromPasta(pasta::OpenMPOrderClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPOrderClauseKind::kConcurrent: return OpenMPOrderClauseKind::CONCURRENT;
-    case pasta::OpenMPOrderClauseKind::kUnknown: return OpenMPOrderClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPOrderClauseKind::CONCURRENT;
+    case 1: return OpenMPOrderClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPReductionClauseModifier FromPasta(pasta::OpenMPReductionClauseModifier e) {
-  switch (e) {
-    case pasta::OpenMPReductionClauseModifier::kDefault: return OpenMPReductionClauseModifier::DEFAULT;
-    case pasta::OpenMPReductionClauseModifier::kInscan: return OpenMPReductionClauseModifier::INSCAN;
-    case pasta::OpenMPReductionClauseModifier::kTask: return OpenMPReductionClauseModifier::TASK;
-    case pasta::OpenMPReductionClauseModifier::kUnknown: return OpenMPReductionClauseModifier::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPReductionClauseModifier::DEFAULT;
+    case 1: return OpenMPReductionClauseModifier::INSCAN;
+    case 2: return OpenMPReductionClauseModifier::TASK;
+    case 3: return OpenMPReductionClauseModifier::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPScheduleClauseKind FromPasta(pasta::OpenMPScheduleClauseKind e) {
-  switch (e) {
-    case pasta::OpenMPScheduleClauseKind::kStatic: return OpenMPScheduleClauseKind::STATIC;
-    case pasta::OpenMPScheduleClauseKind::kDynamic: return OpenMPScheduleClauseKind::DYNAMIC;
-    case pasta::OpenMPScheduleClauseKind::kGuided: return OpenMPScheduleClauseKind::GUIDED;
-    case pasta::OpenMPScheduleClauseKind::kAuto: return OpenMPScheduleClauseKind::AUTO;
-    case pasta::OpenMPScheduleClauseKind::kRuntime: return OpenMPScheduleClauseKind::RUNTIME;
-    case pasta::OpenMPScheduleClauseKind::kUnknown: return OpenMPScheduleClauseKind::UNKNOWN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenMPScheduleClauseKind::STATIC;
+    case 1: return OpenMPScheduleClauseKind::DYNAMIC;
+    case 2: return OpenMPScheduleClauseKind::GUIDED;
+    case 3: return OpenMPScheduleClauseKind::AUTO;
+    case 4: return OpenMPScheduleClauseKind::RUNTIME;
+    case 5: return OpenMPScheduleClauseKind::UNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 OpenMPScheduleClauseModifier FromPasta(pasta::OpenMPScheduleClauseModifier e) {
-  switch (e) {
-    case pasta::OpenMPScheduleClauseModifier::kUnknown: return OpenMPScheduleClauseModifier::UNKNOWN;
-    case pasta::OpenMPScheduleClauseModifier::kMonotonic: return OpenMPScheduleClauseModifier::MONOTONIC;
-    case pasta::OpenMPScheduleClauseModifier::kNonmonotonic: return OpenMPScheduleClauseModifier::NONMONOTONIC;
-    case pasta::OpenMPScheduleClauseModifier::kSimd: return OpenMPScheduleClauseModifier::SIMD;
+  switch (static_cast<unsigned>(e)) {
+    case 5: return OpenMPScheduleClauseModifier::UNKNOWN;
+    case 6: return OpenMPScheduleClauseModifier::MONOTONIC;
+    case 7: return OpenMPScheduleClauseModifier::NONMONOTONIC;
+    case 8: return OpenMPScheduleClauseModifier::SIMD;
+    default: __builtin_unreachable();
   }
 }
 
 OptionType FromPasta(pasta::OptionType e) {
-  switch (e) {
-    case pasta::OptionType::kVectorize: return OptionType::VECTORIZE;
-    case pasta::OptionType::kVectorizeWidth: return OptionType::VECTORIZE_WIDTH;
-    case pasta::OptionType::kInterleave: return OptionType::INTERLEAVE;
-    case pasta::OptionType::kInterleaveCount: return OptionType::INTERLEAVE_COUNT;
-    case pasta::OptionType::kUnroll: return OptionType::UNROLL;
-    case pasta::OptionType::kUnrollCount: return OptionType::UNROLL_COUNT;
-    case pasta::OptionType::kUnrollAndJam: return OptionType::UNROLL_AND_JAM;
-    case pasta::OptionType::kUnrollAndJamCount: return OptionType::UNROLL_AND_JAM_COUNT;
-    case pasta::OptionType::kPipelineDisabled: return OptionType::PIPELINE_DISABLED;
-    case pasta::OptionType::kPipelineInitiationInterval: return OptionType::PIPELINE_INITIATION_INTERVAL;
-    case pasta::OptionType::kDistribute: return OptionType::DISTRIBUTE;
-    case pasta::OptionType::kVectorizePredicate: return OptionType::VECTORIZE_PREDICATE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OptionType::VECTORIZE;
+    case 1: return OptionType::VECTORIZE_WIDTH;
+    case 2: return OptionType::INTERLEAVE;
+    case 3: return OptionType::INTERLEAVE_COUNT;
+    case 4: return OptionType::UNROLL;
+    case 5: return OptionType::UNROLL_COUNT;
+    case 6: return OptionType::UNROLL_AND_JAM;
+    case 7: return OptionType::UNROLL_AND_JAM_COUNT;
+    case 8: return OptionType::PIPELINE_DISABLED;
+    case 9: return OptionType::PIPELINE_INITIATION_INTERVAL;
+    case 10: return OptionType::DISTRIBUTE;
+    case 11: return OptionType::VECTORIZE_PREDICATE;
+    default: __builtin_unreachable();
   }
 }
 
 OverloadedOperatorKind FromPasta(pasta::OverloadedOperatorKind e) {
-  switch (e) {
-    case pasta::OverloadedOperatorKind::kNone: return OverloadedOperatorKind::NONE;
-    case pasta::OverloadedOperatorKind::kNew: return OverloadedOperatorKind::NEW;
-    case pasta::OverloadedOperatorKind::kDelete: return OverloadedOperatorKind::DELETE;
-    case pasta::OverloadedOperatorKind::kArrayNew: return OverloadedOperatorKind::ARRAY_NEW;
-    case pasta::OverloadedOperatorKind::kArrayDelete: return OverloadedOperatorKind::ARRAY_DELETE;
-    case pasta::OverloadedOperatorKind::kPlus: return OverloadedOperatorKind::PLUS;
-    case pasta::OverloadedOperatorKind::kMinus: return OverloadedOperatorKind::MINUS;
-    case pasta::OverloadedOperatorKind::kStar: return OverloadedOperatorKind::STAR;
-    case pasta::OverloadedOperatorKind::kSlash: return OverloadedOperatorKind::SLASH;
-    case pasta::OverloadedOperatorKind::kPercent: return OverloadedOperatorKind::PERCENT;
-    case pasta::OverloadedOperatorKind::kCaret: return OverloadedOperatorKind::CARET;
-    case pasta::OverloadedOperatorKind::kAmp: return OverloadedOperatorKind::AMP;
-    case pasta::OverloadedOperatorKind::kPipe: return OverloadedOperatorKind::PIPE;
-    case pasta::OverloadedOperatorKind::kTilde: return OverloadedOperatorKind::TILDE;
-    case pasta::OverloadedOperatorKind::kExclaim: return OverloadedOperatorKind::EXCLAIM;
-    case pasta::OverloadedOperatorKind::kEqual: return OverloadedOperatorKind::EQUAL;
-    case pasta::OverloadedOperatorKind::kLess: return OverloadedOperatorKind::LESS;
-    case pasta::OverloadedOperatorKind::kGreater: return OverloadedOperatorKind::GREATER;
-    case pasta::OverloadedOperatorKind::kPlusEqual: return OverloadedOperatorKind::PLUS_EQUAL;
-    case pasta::OverloadedOperatorKind::kMinusEqual: return OverloadedOperatorKind::MINUS_EQUAL;
-    case pasta::OverloadedOperatorKind::kStarEqual: return OverloadedOperatorKind::STAR_EQUAL;
-    case pasta::OverloadedOperatorKind::kSlashEqual: return OverloadedOperatorKind::SLASH_EQUAL;
-    case pasta::OverloadedOperatorKind::kPercentEqual: return OverloadedOperatorKind::PERCENT_EQUAL;
-    case pasta::OverloadedOperatorKind::kCaretEqual: return OverloadedOperatorKind::CARET_EQUAL;
-    case pasta::OverloadedOperatorKind::kAmpEqual: return OverloadedOperatorKind::AMP_EQUAL;
-    case pasta::OverloadedOperatorKind::kPipeEqual: return OverloadedOperatorKind::PIPE_EQUAL;
-    case pasta::OverloadedOperatorKind::kLessLess: return OverloadedOperatorKind::LESS_LESS;
-    case pasta::OverloadedOperatorKind::kGreaterGreater: return OverloadedOperatorKind::GREATER_GREATER;
-    case pasta::OverloadedOperatorKind::kLessLessEqual: return OverloadedOperatorKind::LESS_LESS_EQUAL;
-    case pasta::OverloadedOperatorKind::kGreaterGreaterEqual: return OverloadedOperatorKind::GREATER_GREATER_EQUAL;
-    case pasta::OverloadedOperatorKind::kEqualEqual: return OverloadedOperatorKind::EQUAL_EQUAL;
-    case pasta::OverloadedOperatorKind::kExclaimEqual: return OverloadedOperatorKind::EXCLAIM_EQUAL;
-    case pasta::OverloadedOperatorKind::kLessEqual: return OverloadedOperatorKind::LESS_EQUAL;
-    case pasta::OverloadedOperatorKind::kGreaterEqual: return OverloadedOperatorKind::GREATER_EQUAL;
-    case pasta::OverloadedOperatorKind::kSpaceship: return OverloadedOperatorKind::SPACESHIP;
-    case pasta::OverloadedOperatorKind::kAmpAmp: return OverloadedOperatorKind::AMP_AMP;
-    case pasta::OverloadedOperatorKind::kPipePipe: return OverloadedOperatorKind::PIPE_PIPE;
-    case pasta::OverloadedOperatorKind::kPlusPlus: return OverloadedOperatorKind::PLUS_PLUS;
-    case pasta::OverloadedOperatorKind::kMinusMinus: return OverloadedOperatorKind::MINUS_MINUS;
-    case pasta::OverloadedOperatorKind::kComma: return OverloadedOperatorKind::COMMA;
-    case pasta::OverloadedOperatorKind::kArrowStar: return OverloadedOperatorKind::ARROW_STAR;
-    case pasta::OverloadedOperatorKind::kArrow: return OverloadedOperatorKind::ARROW;
-    case pasta::OverloadedOperatorKind::kCall: return OverloadedOperatorKind::CALL;
-    case pasta::OverloadedOperatorKind::kSubscript: return OverloadedOperatorKind::SUBSCRIPT;
-    case pasta::OverloadedOperatorKind::kConditional: return OverloadedOperatorKind::CONDITIONAL;
-    case pasta::OverloadedOperatorKind::kCoawait: return OverloadedOperatorKind::COAWAIT;
+  switch (static_cast<int>(e)) {
+    case 0: return OverloadedOperatorKind::NONE;
+    case 1: return OverloadedOperatorKind::NEW;
+    case 2: return OverloadedOperatorKind::DELETE;
+    case 3: return OverloadedOperatorKind::ARRAY_NEW;
+    case 4: return OverloadedOperatorKind::ARRAY_DELETE;
+    case 5: return OverloadedOperatorKind::PLUS;
+    case 6: return OverloadedOperatorKind::MINUS;
+    case 7: return OverloadedOperatorKind::STAR;
+    case 8: return OverloadedOperatorKind::SLASH;
+    case 9: return OverloadedOperatorKind::PERCENT;
+    case 10: return OverloadedOperatorKind::CARET;
+    case 11: return OverloadedOperatorKind::AMP;
+    case 12: return OverloadedOperatorKind::PIPE;
+    case 13: return OverloadedOperatorKind::TILDE;
+    case 14: return OverloadedOperatorKind::EXCLAIM;
+    case 15: return OverloadedOperatorKind::EQUAL;
+    case 16: return OverloadedOperatorKind::LESS;
+    case 17: return OverloadedOperatorKind::GREATER;
+    case 18: return OverloadedOperatorKind::PLUS_EQUAL;
+    case 19: return OverloadedOperatorKind::MINUS_EQUAL;
+    case 20: return OverloadedOperatorKind::STAR_EQUAL;
+    case 21: return OverloadedOperatorKind::SLASH_EQUAL;
+    case 22: return OverloadedOperatorKind::PERCENT_EQUAL;
+    case 23: return OverloadedOperatorKind::CARET_EQUAL;
+    case 24: return OverloadedOperatorKind::AMP_EQUAL;
+    case 25: return OverloadedOperatorKind::PIPE_EQUAL;
+    case 26: return OverloadedOperatorKind::LESS_LESS;
+    case 27: return OverloadedOperatorKind::GREATER_GREATER;
+    case 28: return OverloadedOperatorKind::LESS_LESS_EQUAL;
+    case 29: return OverloadedOperatorKind::GREATER_GREATER_EQUAL;
+    case 30: return OverloadedOperatorKind::EQUAL_EQUAL;
+    case 31: return OverloadedOperatorKind::EXCLAIM_EQUAL;
+    case 32: return OverloadedOperatorKind::LESS_EQUAL;
+    case 33: return OverloadedOperatorKind::GREATER_EQUAL;
+    case 34: return OverloadedOperatorKind::SPACESHIP;
+    case 35: return OverloadedOperatorKind::AMP_AMP;
+    case 36: return OverloadedOperatorKind::PIPE_PIPE;
+    case 37: return OverloadedOperatorKind::PLUS_PLUS;
+    case 38: return OverloadedOperatorKind::MINUS_MINUS;
+    case 39: return OverloadedOperatorKind::COMMA;
+    case 40: return OverloadedOperatorKind::ARROW_STAR;
+    case 41: return OverloadedOperatorKind::ARROW;
+    case 42: return OverloadedOperatorKind::CALL;
+    case 43: return OverloadedOperatorKind::SUBSCRIPT;
+    case 44: return OverloadedOperatorKind::CONDITIONAL;
+    case 45: return OverloadedOperatorKind::COAWAIT;
+    default: __builtin_unreachable();
   }
 }
 
 OverloadsShown FromPasta(pasta::OverloadsShown e) {
-  switch (e) {
-    case pasta::OverloadsShown::kAll: return OverloadsShown::ALL;
-    case pasta::OverloadsShown::kBest: return OverloadsShown::BEST;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OverloadsShown::ALL;
+    case 1: return OverloadsShown::BEST;
+    default: __builtin_unreachable();
   }
 }
 
 OwnershipKind FromPasta(pasta::OwnershipKind e) {
-  switch (e) {
-    case pasta::OwnershipKind::kHolds: return OwnershipKind::HOLDS;
-    case pasta::OwnershipKind::kReturns: return OwnershipKind::RETURNS;
-    case pasta::OwnershipKind::kTakes: return OwnershipKind::TAKES;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OwnershipKind::HOLDS;
+    case 1: return OwnershipKind::RETURNS;
+    case 2: return OwnershipKind::TAKES;
+    default: __builtin_unreachable();
   }
 }
 
 PCSType FromPasta(pasta::PCSType e) {
-  switch (e) {
-    case pasta::PCSType::kAAPCS: return PCSType::AAPCS;
-    case pasta::PCSType::kVFP: return PCSType::VFP;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PCSType::AAPCS;
+    case 1: return PCSType::VFP;
+    default: __builtin_unreachable();
   }
 }
 
 PPKeywordKind FromPasta(pasta::PPKeywordKind e) {
-  switch (e) {
-    case pasta::PPKeywordKind::kNotKeyword: return PPKeywordKind::NOT_KEYWORD;
-    case pasta::PPKeywordKind::kIf: return PPKeywordKind::IF;
-    case pasta::PPKeywordKind::kIfdef: return PPKeywordKind::IFDEF;
-    case pasta::PPKeywordKind::kIfndef: return PPKeywordKind::IFNDEF;
-    case pasta::PPKeywordKind::kElif: return PPKeywordKind::ELIF;
-    case pasta::PPKeywordKind::kElifdef: return PPKeywordKind::ELIFDEF;
-    case pasta::PPKeywordKind::kElifndef: return PPKeywordKind::ELIFNDEF;
-    case pasta::PPKeywordKind::kElse: return PPKeywordKind::ELSE;
-    case pasta::PPKeywordKind::kEndif: return PPKeywordKind::ENDIF;
-    case pasta::PPKeywordKind::kDefined: return PPKeywordKind::DEFINED;
-    case pasta::PPKeywordKind::kInclude: return PPKeywordKind::INCLUDE;
-    case pasta::PPKeywordKind::k__IncludeMacros: return PPKeywordKind::__INCLUDE_MACROS;
-    case pasta::PPKeywordKind::kDefine: return PPKeywordKind::DEFINE;
-    case pasta::PPKeywordKind::kUndef: return PPKeywordKind::UNDEF;
-    case pasta::PPKeywordKind::kLine: return PPKeywordKind::LINE;
-    case pasta::PPKeywordKind::kError: return PPKeywordKind::ERROR;
-    case pasta::PPKeywordKind::kPragma: return PPKeywordKind::PRAGMA;
-    case pasta::PPKeywordKind::kImport: return PPKeywordKind::IMPORT;
-    case pasta::PPKeywordKind::kIncludeNext: return PPKeywordKind::INCLUDE_NEXT;
-    case pasta::PPKeywordKind::kWarning: return PPKeywordKind::WARNING;
-    case pasta::PPKeywordKind::kIdentifier: return PPKeywordKind::IDENTIFIER;
-    case pasta::PPKeywordKind::kSccs: return PPKeywordKind::SCCS;
-    case pasta::PPKeywordKind::kAssert: return PPKeywordKind::ASSERT;
-    case pasta::PPKeywordKind::kUnassert: return PPKeywordKind::UNASSERT;
-    case pasta::PPKeywordKind::k__PublicMacro: return PPKeywordKind::__PUBLIC_MACRO;
-    case pasta::PPKeywordKind::k__PrivateMacro: return PPKeywordKind::__PRIVATE_MACRO;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PPKeywordKind::NOT_KEYWORD;
+    case 1: return PPKeywordKind::IF;
+    case 2: return PPKeywordKind::IFDEF;
+    case 3: return PPKeywordKind::IFNDEF;
+    case 4: return PPKeywordKind::ELIF;
+    case 5: return PPKeywordKind::ELIFDEF;
+    case 6: return PPKeywordKind::ELIFNDEF;
+    case 7: return PPKeywordKind::ELSE;
+    case 8: return PPKeywordKind::ENDIF;
+    case 9: return PPKeywordKind::DEFINED;
+    case 10: return PPKeywordKind::INCLUDE;
+    case 11: return PPKeywordKind::__INCLUDE_MACROS;
+    case 12: return PPKeywordKind::DEFINE;
+    case 13: return PPKeywordKind::UNDEF;
+    case 14: return PPKeywordKind::LINE;
+    case 15: return PPKeywordKind::ERROR;
+    case 16: return PPKeywordKind::PRAGMA;
+    case 17: return PPKeywordKind::IMPORT;
+    case 18: return PPKeywordKind::INCLUDE_NEXT;
+    case 19: return PPKeywordKind::WARNING;
+    case 20: return PPKeywordKind::IDENTIFIER;
+    case 21: return PPKeywordKind::SCCS;
+    case 22: return PPKeywordKind::ASSERT;
+    case 23: return PPKeywordKind::UNASSERT;
+    case 24: return PPKeywordKind::__PUBLIC_MACRO;
+    case 25: return PPKeywordKind::__PRIVATE_MACRO;
+    default: __builtin_unreachable();
   }
 }
 
 ParameterABI FromPasta(pasta::ParameterABI e) {
-  switch (e) {
-    case pasta::ParameterABI::kOrdinary: return ParameterABI::ORDINARY;
-    case pasta::ParameterABI::kSwiftIndirectResult: return ParameterABI::SWIFT_INDIRECT_RESULT;
-    case pasta::ParameterABI::kSwiftErrorResult: return ParameterABI::SWIFT_ERROR_RESULT;
-    case pasta::ParameterABI::kSwiftContext: return ParameterABI::SWIFT_CONTEXT;
-    case pasta::ParameterABI::kSwiftAsyncContext: return ParameterABI::SWIFT_ASYNC_CONTEXT;
+  switch (static_cast<int>(e)) {
+    case 0: return ParameterABI::ORDINARY;
+    case 1: return ParameterABI::SWIFT_INDIRECT_RESULT;
+    case 2: return ParameterABI::SWIFT_ERROR_RESULT;
+    case 3: return ParameterABI::SWIFT_CONTEXT;
+    case 4: return ParameterABI::SWIFT_ASYNC_CONTEXT;
+    default: __builtin_unreachable();
   }
 }
 
 ParenLocsOffsets FromPasta(pasta::ParenLocsOffsets e) {
-  switch (e) {
-    case pasta::ParenLocsOffsets::kLParen: return ParenLocsOffsets::L_PAREN;
-    case pasta::ParenLocsOffsets::kRParen: return ParenLocsOffsets::R_PAREN;
-    case pasta::ParenLocsOffsets::kTotal: return ParenLocsOffsets::TOTAL;
+  switch (static_cast<int>(e)) {
+    case 0: return ParenLocsOffsets::L_PAREN;
+    case 1: return ParenLocsOffsets::R_PAREN;
+    case 2: return ParenLocsOffsets::TOTAL;
+    default: __builtin_unreachable();
   }
 }
 
 PragmaFloatControlKind FromPasta(pasta::PragmaFloatControlKind e) {
-  switch (e) {
-    case pasta::PragmaFloatControlKind::kUnknown: return PragmaFloatControlKind::UNKNOWN;
-    case pasta::PragmaFloatControlKind::kPrecise: return PragmaFloatControlKind::PRECISE;
-    case pasta::PragmaFloatControlKind::kNoPrecise: return PragmaFloatControlKind::NO_PRECISE;
-    case pasta::PragmaFloatControlKind::kExcept: return PragmaFloatControlKind::EXCEPT;
-    case pasta::PragmaFloatControlKind::kNoExcept: return PragmaFloatControlKind::NO_EXCEPT;
-    case pasta::PragmaFloatControlKind::kPush: return PragmaFloatControlKind::PUSH;
-    case pasta::PragmaFloatControlKind::kPop: return PragmaFloatControlKind::POP;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PragmaFloatControlKind::UNKNOWN;
+    case 1: return PragmaFloatControlKind::PRECISE;
+    case 2: return PragmaFloatControlKind::NO_PRECISE;
+    case 3: return PragmaFloatControlKind::EXCEPT;
+    case 4: return PragmaFloatControlKind::NO_EXCEPT;
+    case 5: return PragmaFloatControlKind::PUSH;
+    case 6: return PragmaFloatControlKind::POP;
+    default: __builtin_unreachable();
   }
 }
 
 PragmaMSCommentKind FromPasta(pasta::PragmaMSCommentKind e) {
-  switch (e) {
-    case pasta::PragmaMSCommentKind::kUnknown: return PragmaMSCommentKind::UNKNOWN;
-    case pasta::PragmaMSCommentKind::kLinker: return PragmaMSCommentKind::LINKER;
-    case pasta::PragmaMSCommentKind::kLib: return PragmaMSCommentKind::LIB;
-    case pasta::PragmaMSCommentKind::kCompiler: return PragmaMSCommentKind::COMPILER;
-    case pasta::PragmaMSCommentKind::kExeString: return PragmaMSCommentKind::EXE_STRING;
-    case pasta::PragmaMSCommentKind::kUser: return PragmaMSCommentKind::USER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PragmaMSCommentKind::UNKNOWN;
+    case 1: return PragmaMSCommentKind::LINKER;
+    case 2: return PragmaMSCommentKind::LIB;
+    case 3: return PragmaMSCommentKind::COMPILER;
+    case 4: return PragmaMSCommentKind::EXE_STRING;
+    case 5: return PragmaMSCommentKind::USER;
+    default: __builtin_unreachable();
   }
 }
 
 PragmaMSPointersToMembersKind FromPasta(pasta::PragmaMSPointersToMembersKind e) {
-  switch (e) {
-    case pasta::PragmaMSPointersToMembersKind::kBestCase: return PragmaMSPointersToMembersKind::BEST_CASE;
-    case pasta::PragmaMSPointersToMembersKind::kFullGeneralitySingleInheritance: return PragmaMSPointersToMembersKind::FULL_GENERALITY_SINGLE_INHERITANCE;
-    case pasta::PragmaMSPointersToMembersKind::kFullGeneralityMultipleInheritance: return PragmaMSPointersToMembersKind::FULL_GENERALITY_MULTIPLE_INHERITANCE;
-    case pasta::PragmaMSPointersToMembersKind::kFullGeneralityVirtualInheritance: return PragmaMSPointersToMembersKind::FULL_GENERALITY_VIRTUAL_INHERITANCE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PragmaMSPointersToMembersKind::BEST_CASE;
+    case 1: return PragmaMSPointersToMembersKind::FULL_GENERALITY_SINGLE_INHERITANCE;
+    case 2: return PragmaMSPointersToMembersKind::FULL_GENERALITY_MULTIPLE_INHERITANCE;
+    case 3: return PragmaMSPointersToMembersKind::FULL_GENERALITY_VIRTUAL_INHERITANCE;
+    default: __builtin_unreachable();
   }
 }
 
 PragmaMSStructKind FromPasta(pasta::PragmaMSStructKind e) {
-  switch (e) {
-    case pasta::PragmaMSStructKind::kOFF: return PragmaMSStructKind::OFF;
-    case pasta::PragmaMSStructKind::kON: return PragmaMSStructKind::ON;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PragmaMSStructKind::OFF;
+    case 1: return PragmaMSStructKind::ON;
+    default: __builtin_unreachable();
   }
 }
 
 PragmaSectionFlag FromPasta(pasta::PragmaSectionFlag e) {
-  switch (e) {
-    case pasta::PragmaSectionFlag::kNone: return PragmaSectionFlag::NONE;
-    case pasta::PragmaSectionFlag::kRead: return PragmaSectionFlag::READ;
-    case pasta::PragmaSectionFlag::kWrite: return PragmaSectionFlag::WRITE;
-    case pasta::PragmaSectionFlag::kExecute: return PragmaSectionFlag::EXECUTE;
-    case pasta::PragmaSectionFlag::kImplicit: return PragmaSectionFlag::IMPLICIT;
-    case pasta::PragmaSectionFlag::kZeroInitializer: return PragmaSectionFlag::ZERO_INITIALIZER;
-    case pasta::PragmaSectionFlag::kInvalid: return PragmaSectionFlag::INVALID;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PragmaSectionFlag::NONE;
+    case 1: return PragmaSectionFlag::READ;
+    case 2: return PragmaSectionFlag::WRITE;
+    case 4: return PragmaSectionFlag::EXECUTE;
+    case 8: return PragmaSectionFlag::IMPLICIT;
+    case 16: return PragmaSectionFlag::ZERO_INITIALIZER;
+    case 2147483648: return PragmaSectionFlag::INVALID;
+    default: __builtin_unreachable();
   }
 }
 
 ProfileInstrKind FromPasta(pasta::ProfileInstrKind e) {
-  switch (e) {
-    case pasta::ProfileInstrKind::kProfileNone: return ProfileInstrKind::PROFILE_NONE;
-    case pasta::ProfileInstrKind::kProfileClangInstr: return ProfileInstrKind::PROFILE_CLANG_INSTR;
-    case pasta::ProfileInstrKind::kProfileIRInstr: return ProfileInstrKind::PROFILE_IR_INSTR;
-    case pasta::ProfileInstrKind::kProfileCSIRInstr: return ProfileInstrKind::PROFILE_CSIR_INSTR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ProfileInstrKind::PROFILE_NONE;
+    case 1: return ProfileInstrKind::PROFILE_CLANG_INSTR;
+    case 2: return ProfileInstrKind::PROFILE_IR_INSTR;
+    case 3: return ProfileInstrKind::PROFILE_CSIR_INSTR;
+    default: __builtin_unreachable();
   }
 }
 
 RangeExprOffset FromPasta(pasta::RangeExprOffset e) {
-  switch (e) {
-    case pasta::RangeExprOffset::kBegin: return RangeExprOffset::BEGIN;
-    case pasta::RangeExprOffset::kEnd: return RangeExprOffset::END;
-    case pasta::RangeExprOffset::kStep: return RangeExprOffset::STEP;
-    case pasta::RangeExprOffset::kTotal: return RangeExprOffset::TOTAL;
+  switch (static_cast<int>(e)) {
+    case 0: return RangeExprOffset::BEGIN;
+    case 1: return RangeExprOffset::END;
+    case 2: return RangeExprOffset::STEP;
+    case 3: return RangeExprOffset::TOTAL;
+    default: __builtin_unreachable();
   }
 }
 
 RangeLocOffset FromPasta(pasta::RangeLocOffset e) {
-  switch (e) {
-    case pasta::RangeLocOffset::kAssignToken: return RangeLocOffset::ASSIGN_TOKEN;
-    case pasta::RangeLocOffset::kSecondColonToken: return RangeLocOffset::SECOND_COLON_TOKEN;
-    case pasta::RangeLocOffset::kTotal: return RangeLocOffset::TOTAL;
+  switch (static_cast<int>(e)) {
+    case 0: return RangeLocOffset::ASSIGN_TOKEN;
+    case 2: return RangeLocOffset::SECOND_COLON_TOKEN;
+    case 3: return RangeLocOffset::TOTAL;
+    default: __builtin_unreachable();
   }
 }
 
 RefQualifierKind FromPasta(pasta::RefQualifierKind e) {
-  switch (e) {
-    case pasta::RefQualifierKind::kNone: return RefQualifierKind::NONE;
-    case pasta::RefQualifierKind::kLValue: return RefQualifierKind::L_VALUE;
-    case pasta::RefQualifierKind::kRValue: return RefQualifierKind::R_VALUE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RefQualifierKind::NONE;
+    case 1: return RefQualifierKind::L_VALUE;
+    case 2: return RefQualifierKind::R_VALUE;
+    default: __builtin_unreachable();
   }
 }
 
 RemarkKind FromPasta(pasta::RemarkKind e) {
-  switch (e) {
-    case pasta::RemarkKind::kMissing: return RemarkKind::MISSING;
-    case pasta::RemarkKind::kEnabled: return RemarkKind::ENABLED;
-    case pasta::RemarkKind::kEnabledEverything: return RemarkKind::ENABLED_EVERYTHING;
-    case pasta::RemarkKind::kDisabled: return RemarkKind::DISABLED;
-    case pasta::RemarkKind::kDisabledEverything: return RemarkKind::DISABLED_EVERYTHING;
-    case pasta::RemarkKind::kWithPattern: return RemarkKind::WITH_PATTERN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RemarkKind::MISSING;
+    case 1: return RemarkKind::ENABLED;
+    case 2: return RemarkKind::ENABLED_EVERYTHING;
+    case 3: return RemarkKind::DISABLED;
+    case 4: return RemarkKind::DISABLED_EVERYTHING;
+    case 5: return RemarkKind::WITH_PATTERN;
+    default: __builtin_unreachable();
   }
 }
 
 ReservedIdentifierStatus FromPasta(pasta::ReservedIdentifierStatus e) {
-  switch (e) {
-    case pasta::ReservedIdentifierStatus::kNotReserved: return ReservedIdentifierStatus::NOT_RESERVED;
-    case pasta::ReservedIdentifierStatus::kStartsWithUnderscoreAtGlobalScope: return ReservedIdentifierStatus::STARTS_WITH_UNDERSCORE_AT_GLOBAL_SCOPE;
-    case pasta::ReservedIdentifierStatus::kStartsWithDoubleUnderscore: return ReservedIdentifierStatus::STARTS_WITH_DOUBLE_UNDERSCORE;
-    case pasta::ReservedIdentifierStatus::kStartsWithUnderscoreFollowedByCapitalLetter: return ReservedIdentifierStatus::STARTS_WITH_UNDERSCORE_FOLLOWED_BY_CAPITAL_LETTER;
-    case pasta::ReservedIdentifierStatus::kContainsDoubleUnderscore: return ReservedIdentifierStatus::CONTAINS_DOUBLE_UNDERSCORE;
+  switch (static_cast<int>(e)) {
+    case 0: return ReservedIdentifierStatus::NOT_RESERVED;
+    case 1: return ReservedIdentifierStatus::STARTS_WITH_UNDERSCORE_AT_GLOBAL_SCOPE;
+    case 2: return ReservedIdentifierStatus::STARTS_WITH_DOUBLE_UNDERSCORE;
+    case 3: return ReservedIdentifierStatus::STARTS_WITH_UNDERSCORE_FOLLOWED_BY_CAPITAL_LETTER;
+    case 4: return ReservedIdentifierStatus::CONTAINS_DOUBLE_UNDERSCORE;
+    default: __builtin_unreachable();
   }
 }
 
 SFINAEResponse FromPasta(pasta::SFINAEResponse e) {
-  switch (e) {
-    case pasta::SFINAEResponse::kSubstitutionFailure: return SFINAEResponse::SUBSTITUTION_FAILURE;
-    case pasta::SFINAEResponse::kSuppress: return SFINAEResponse::SUPPRESS;
-    case pasta::SFINAEResponse::kReport: return SFINAEResponse::REPORT;
-    case pasta::SFINAEResponse::kAccessControl: return SFINAEResponse::ACCESS_CONTROL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SFINAEResponse::SUBSTITUTION_FAILURE;
+    case 1: return SFINAEResponse::SUPPRESS;
+    case 2: return SFINAEResponse::REPORT;
+    case 3: return SFINAEResponse::ACCESS_CONTROL;
+    default: __builtin_unreachable();
   }
 }
 
 SYCLMajorVersion FromPasta(pasta::SYCLMajorVersion e) {
-  switch (e) {
-    case pasta::SYCLMajorVersion::kNone: return SYCLMajorVersion::VERSION_NONE;
-    case pasta::SYCLMajorVersion::k2017: return SYCLMajorVersion::VERSION2017;
-    case pasta::SYCLMajorVersion::k2020: return SYCLMajorVersion::VERSION2020;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SYCLMajorVersion::VERSION_NONE;
+    case 1: return SYCLMajorVersion::VERSION2017;
+    case 2: return SYCLMajorVersion::VERSION2020;
+    default: __builtin_unreachable();
   }
 }
 
 SanitizerOrdinal FromPasta(pasta::SanitizerOrdinal e) {
-  switch (e) {
-    case pasta::SanitizerOrdinal::kAddress: return SanitizerOrdinal::ADDRESS;
-    case pasta::SanitizerOrdinal::kPointerCompare: return SanitizerOrdinal::POINTER_COMPARE;
-    case pasta::SanitizerOrdinal::kPointerSubtract: return SanitizerOrdinal::POINTER_SUBTRACT;
-    case pasta::SanitizerOrdinal::kKernelAddress: return SanitizerOrdinal::KERNEL_ADDRESS;
-    case pasta::SanitizerOrdinal::kHWAddress: return SanitizerOrdinal::HW_ADDRESS;
-    case pasta::SanitizerOrdinal::kKernelHWAddress: return SanitizerOrdinal::KERNEL_HW_ADDRESS;
-    case pasta::SanitizerOrdinal::kMemoryTag: return SanitizerOrdinal::MEMORY_TAG;
-    case pasta::SanitizerOrdinal::kMemory: return SanitizerOrdinal::MEMORY;
-    case pasta::SanitizerOrdinal::kKernelMemory: return SanitizerOrdinal::KERNEL_MEMORY;
-    case pasta::SanitizerOrdinal::kFuzzer: return SanitizerOrdinal::FUZZER;
-    case pasta::SanitizerOrdinal::kFuzzerNoLink: return SanitizerOrdinal::FUZZER_NO_LINK;
-    case pasta::SanitizerOrdinal::kThread: return SanitizerOrdinal::THREAD;
-    case pasta::SanitizerOrdinal::kLeak: return SanitizerOrdinal::LEAK;
-    case pasta::SanitizerOrdinal::kAlignment: return SanitizerOrdinal::ALIGNMENT;
-    case pasta::SanitizerOrdinal::kArrayBounds: return SanitizerOrdinal::ARRAY_BOUNDS;
-    case pasta::SanitizerOrdinal::kBoolean: return SanitizerOrdinal::BOOLEAN;
-    case pasta::SanitizerOrdinal::kBuiltin: return SanitizerOrdinal::BUILTIN;
-    case pasta::SanitizerOrdinal::kEnum: return SanitizerOrdinal::ENUM;
-    case pasta::SanitizerOrdinal::kFloatCastOverflow: return SanitizerOrdinal::FLOAT_CAST_OVERFLOW;
-    case pasta::SanitizerOrdinal::kFloatDivideByZero: return SanitizerOrdinal::FLOAT_DIVIDE_BY_ZERO;
-    case pasta::SanitizerOrdinal::kFunction: return SanitizerOrdinal::FUNCTION;
-    case pasta::SanitizerOrdinal::kIntegerDivideByZero: return SanitizerOrdinal::INTEGER_DIVIDE_BY_ZERO;
-    case pasta::SanitizerOrdinal::kNonnullAttribute: return SanitizerOrdinal::NONNULL_ATTRIBUTE;
-    case pasta::SanitizerOrdinal::kNull: return SanitizerOrdinal::NULL__;
-    case pasta::SanitizerOrdinal::kNullabilityArgument: return SanitizerOrdinal::NULLABILITY_ARGUMENT;
-    case pasta::SanitizerOrdinal::kNullabilityAssign: return SanitizerOrdinal::NULLABILITY_ASSIGN;
-    case pasta::SanitizerOrdinal::kNullabilityReturn: return SanitizerOrdinal::NULLABILITY_RETURN;
-    case pasta::SanitizerOrdinal::kNullabilityGroup: return SanitizerOrdinal::NULLABILITY_GROUP;
-    case pasta::SanitizerOrdinal::kObjectSize: return SanitizerOrdinal::OBJECT_SIZE;
-    case pasta::SanitizerOrdinal::kPointerOverflow: return SanitizerOrdinal::POINTER_OVERFLOW;
-    case pasta::SanitizerOrdinal::kReturn: return SanitizerOrdinal::RETURN;
-    case pasta::SanitizerOrdinal::kReturnsNonnullAttribute: return SanitizerOrdinal::RETURNS_NONNULL_ATTRIBUTE;
-    case pasta::SanitizerOrdinal::kShiftBase: return SanitizerOrdinal::SHIFT_BASE;
-    case pasta::SanitizerOrdinal::kShiftExponent: return SanitizerOrdinal::SHIFT_EXPONENT;
-    case pasta::SanitizerOrdinal::kShiftGroup: return SanitizerOrdinal::SHIFT_GROUP;
-    case pasta::SanitizerOrdinal::kSignedIntegerOverflow: return SanitizerOrdinal::SIGNED_INTEGER_OVERFLOW;
-    case pasta::SanitizerOrdinal::kUnreachable: return SanitizerOrdinal::UNREACHABLE;
-    case pasta::SanitizerOrdinal::kVLABound: return SanitizerOrdinal::VLA_BOUND;
-    case pasta::SanitizerOrdinal::kVptr: return SanitizerOrdinal::VPTR;
-    case pasta::SanitizerOrdinal::kUnsignedIntegerOverflow: return SanitizerOrdinal::UNSIGNED_INTEGER_OVERFLOW;
-    case pasta::SanitizerOrdinal::kUnsignedShiftBase: return SanitizerOrdinal::UNSIGNED_SHIFT_BASE;
-    case pasta::SanitizerOrdinal::kDataFlow: return SanitizerOrdinal::DATA_FLOW;
-    case pasta::SanitizerOrdinal::kCFICastStrict: return SanitizerOrdinal::CFI_CAST_STRICT;
-    case pasta::SanitizerOrdinal::kCFIDerivedCast: return SanitizerOrdinal::CFI_DERIVED_CAST;
-    case pasta::SanitizerOrdinal::kCFIICall: return SanitizerOrdinal::CFII_CALL;
-    case pasta::SanitizerOrdinal::kCFIMFCall: return SanitizerOrdinal::CFIMF_CALL;
-    case pasta::SanitizerOrdinal::kCFIUnrelatedCast: return SanitizerOrdinal::CFI_UNRELATED_CAST;
-    case pasta::SanitizerOrdinal::kCFINVCall: return SanitizerOrdinal::CFINV_CALL;
-    case pasta::SanitizerOrdinal::kCFIVCall: return SanitizerOrdinal::CFIV_CALL;
-    case pasta::SanitizerOrdinal::kCFIGroup: return SanitizerOrdinal::CFI_GROUP;
-    case pasta::SanitizerOrdinal::kSafeStack: return SanitizerOrdinal::SAFE_STACK;
-    case pasta::SanitizerOrdinal::kShadowCallStack: return SanitizerOrdinal::SHADOW_CALL_STACK;
-    case pasta::SanitizerOrdinal::kUndefinedGroup: return SanitizerOrdinal::UNDEFINED_GROUP;
-    case pasta::SanitizerOrdinal::kUndefinedTrapGroup: return SanitizerOrdinal::UNDEFINED_TRAP_GROUP;
-    case pasta::SanitizerOrdinal::kImplicitUnsignedIntegerTruncation: return SanitizerOrdinal::IMPLICIT_UNSIGNED_INTEGER_TRUNCATION;
-    case pasta::SanitizerOrdinal::kImplicitSignedIntegerTruncation: return SanitizerOrdinal::IMPLICIT_SIGNED_INTEGER_TRUNCATION;
-    case pasta::SanitizerOrdinal::kImplicitIntegerTruncationGroup: return SanitizerOrdinal::IMPLICIT_INTEGER_TRUNCATION_GROUP;
-    case pasta::SanitizerOrdinal::kImplicitIntegerSignChange: return SanitizerOrdinal::IMPLICIT_INTEGER_SIGN_CHANGE;
-    case pasta::SanitizerOrdinal::kImplicitIntegerArithmeticValueChangeGroup: return SanitizerOrdinal::IMPLICIT_INTEGER_ARITHMETIC_VALUE_CHANGE_GROUP;
-    case pasta::SanitizerOrdinal::kObjCCast: return SanitizerOrdinal::OBJ_C_CAST;
-    case pasta::SanitizerOrdinal::kImplicitConversionGroup: return SanitizerOrdinal::IMPLICIT_CONVERSION_GROUP;
-    case pasta::SanitizerOrdinal::kIntegerGroup: return SanitizerOrdinal::INTEGER_GROUP;
-    case pasta::SanitizerOrdinal::kLocalBounds: return SanitizerOrdinal::LOCAL_BOUNDS;
-    case pasta::SanitizerOrdinal::kBoundsGroup: return SanitizerOrdinal::BOUNDS_GROUP;
-    case pasta::SanitizerOrdinal::kScudo: return SanitizerOrdinal::SCUDO;
-    case pasta::SanitizerOrdinal::kAllGroup: return SanitizerOrdinal::ALL_GROUP;
-    case pasta::SanitizerOrdinal::kCount: return SanitizerOrdinal::COUNT;
+  switch (static_cast<uint64_t>(e)) {
+    case 0: return SanitizerOrdinal::ADDRESS;
+    case 1: return SanitizerOrdinal::POINTER_COMPARE;
+    case 2: return SanitizerOrdinal::POINTER_SUBTRACT;
+    case 3: return SanitizerOrdinal::KERNEL_ADDRESS;
+    case 4: return SanitizerOrdinal::HW_ADDRESS;
+    case 5: return SanitizerOrdinal::KERNEL_HW_ADDRESS;
+    case 6: return SanitizerOrdinal::MEMORY_TAG;
+    case 7: return SanitizerOrdinal::MEMORY;
+    case 8: return SanitizerOrdinal::KERNEL_MEMORY;
+    case 9: return SanitizerOrdinal::FUZZER;
+    case 10: return SanitizerOrdinal::FUZZER_NO_LINK;
+    case 11: return SanitizerOrdinal::THREAD;
+    case 12: return SanitizerOrdinal::LEAK;
+    case 13: return SanitizerOrdinal::ALIGNMENT;
+    case 14: return SanitizerOrdinal::ARRAY_BOUNDS;
+    case 15: return SanitizerOrdinal::BOOLEAN;
+    case 16: return SanitizerOrdinal::BUILTIN;
+    case 17: return SanitizerOrdinal::ENUM;
+    case 18: return SanitizerOrdinal::FLOAT_CAST_OVERFLOW;
+    case 19: return SanitizerOrdinal::FLOAT_DIVIDE_BY_ZERO;
+    case 20: return SanitizerOrdinal::FUNCTION;
+    case 21: return SanitizerOrdinal::INTEGER_DIVIDE_BY_ZERO;
+    case 22: return SanitizerOrdinal::NONNULL_ATTRIBUTE;
+    case 23: return SanitizerOrdinal::NULL__;
+    case 24: return SanitizerOrdinal::NULLABILITY_ARGUMENT;
+    case 25: return SanitizerOrdinal::NULLABILITY_ASSIGN;
+    case 26: return SanitizerOrdinal::NULLABILITY_RETURN;
+    case 27: return SanitizerOrdinal::NULLABILITY_GROUP;
+    case 28: return SanitizerOrdinal::OBJECT_SIZE;
+    case 29: return SanitizerOrdinal::POINTER_OVERFLOW;
+    case 30: return SanitizerOrdinal::RETURN;
+    case 31: return SanitizerOrdinal::RETURNS_NONNULL_ATTRIBUTE;
+    case 32: return SanitizerOrdinal::SHIFT_BASE;
+    case 33: return SanitizerOrdinal::SHIFT_EXPONENT;
+    case 34: return SanitizerOrdinal::SHIFT_GROUP;
+    case 35: return SanitizerOrdinal::SIGNED_INTEGER_OVERFLOW;
+    case 36: return SanitizerOrdinal::UNREACHABLE;
+    case 37: return SanitizerOrdinal::VLA_BOUND;
+    case 38: return SanitizerOrdinal::VPTR;
+    case 39: return SanitizerOrdinal::UNSIGNED_INTEGER_OVERFLOW;
+    case 40: return SanitizerOrdinal::UNSIGNED_SHIFT_BASE;
+    case 41: return SanitizerOrdinal::DATA_FLOW;
+    case 42: return SanitizerOrdinal::CFI_CAST_STRICT;
+    case 43: return SanitizerOrdinal::CFI_DERIVED_CAST;
+    case 44: return SanitizerOrdinal::CFII_CALL;
+    case 45: return SanitizerOrdinal::CFIMF_CALL;
+    case 46: return SanitizerOrdinal::CFI_UNRELATED_CAST;
+    case 47: return SanitizerOrdinal::CFINV_CALL;
+    case 48: return SanitizerOrdinal::CFIV_CALL;
+    case 49: return SanitizerOrdinal::CFI_GROUP;
+    case 50: return SanitizerOrdinal::SAFE_STACK;
+    case 51: return SanitizerOrdinal::SHADOW_CALL_STACK;
+    case 52: return SanitizerOrdinal::UNDEFINED_GROUP;
+    case 53: return SanitizerOrdinal::UNDEFINED_TRAP_GROUP;
+    case 54: return SanitizerOrdinal::IMPLICIT_UNSIGNED_INTEGER_TRUNCATION;
+    case 55: return SanitizerOrdinal::IMPLICIT_SIGNED_INTEGER_TRUNCATION;
+    case 56: return SanitizerOrdinal::IMPLICIT_INTEGER_TRUNCATION_GROUP;
+    case 57: return SanitizerOrdinal::IMPLICIT_INTEGER_SIGN_CHANGE;
+    case 58: return SanitizerOrdinal::IMPLICIT_INTEGER_ARITHMETIC_VALUE_CHANGE_GROUP;
+    case 59: return SanitizerOrdinal::OBJ_C_CAST;
+    case 60: return SanitizerOrdinal::IMPLICIT_CONVERSION_GROUP;
+    case 61: return SanitizerOrdinal::INTEGER_GROUP;
+    case 62: return SanitizerOrdinal::LOCAL_BOUNDS;
+    case 63: return SanitizerOrdinal::BOUNDS_GROUP;
+    case 64: return SanitizerOrdinal::SCUDO;
+    case 65: return SanitizerOrdinal::ALL_GROUP;
+    case 66: return SanitizerOrdinal::COUNT;
+    default: __builtin_unreachable();
   }
 }
 
 SelectorLocationsKind FromPasta(pasta::SelectorLocationsKind e) {
-  switch (e) {
-    case pasta::SelectorLocationsKind::kNonStandard: return SelectorLocationsKind::NON_STANDARD;
-    case pasta::SelectorLocationsKind::kStandardNoSpace: return SelectorLocationsKind::STANDARD_NO_SPACE;
-    case pasta::SelectorLocationsKind::kStandardWithSpace: return SelectorLocationsKind::STANDARD_WITH_SPACE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SelectorLocationsKind::NON_STANDARD;
+    case 1: return SelectorLocationsKind::STANDARD_NO_SPACE;
+    case 2: return SelectorLocationsKind::STANDARD_WITH_SPACE;
+    default: __builtin_unreachable();
   }
 }
 
 SignReturnAddressKeyKind FromPasta(pasta::SignReturnAddressKeyKind e) {
-  switch (e) {
-    case pasta::SignReturnAddressKeyKind::kAKey: return SignReturnAddressKeyKind::A_KEY;
-    case pasta::SignReturnAddressKeyKind::kBKey: return SignReturnAddressKeyKind::B_KEY;
+  switch (static_cast<int>(e)) {
+    case 0: return SignReturnAddressKeyKind::A_KEY;
+    case 1: return SignReturnAddressKeyKind::B_KEY;
+    default: __builtin_unreachable();
   }
 }
 
 SignReturnAddressScopeKind FromPasta(pasta::SignReturnAddressScopeKind e) {
-  switch (e) {
-    case pasta::SignReturnAddressScopeKind::kNone: return SignReturnAddressScopeKind::NONE;
-    case pasta::SignReturnAddressScopeKind::kNonLeaf: return SignReturnAddressScopeKind::NON_LEAF;
-    case pasta::SignReturnAddressScopeKind::kAll: return SignReturnAddressScopeKind::ALL;
+  switch (static_cast<int>(e)) {
+    case 0: return SignReturnAddressScopeKind::NONE;
+    case 1: return SignReturnAddressScopeKind::NON_LEAF;
+    case 2: return SignReturnAddressScopeKind::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 SignedOverflowBehaviorTy FromPasta(pasta::SignedOverflowBehaviorTy e) {
-  switch (e) {
-    case pasta::SignedOverflowBehaviorTy::kUndefined: return SignedOverflowBehaviorTy::UNDEFINED;
-    case pasta::SignedOverflowBehaviorTy::kDefined: return SignedOverflowBehaviorTy::DEFINED;
-    case pasta::SignedOverflowBehaviorTy::kTrapping: return SignedOverflowBehaviorTy::TRAPPING;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SignedOverflowBehaviorTy::UNDEFINED;
+    case 1: return SignedOverflowBehaviorTy::DEFINED;
+    case 2: return SignedOverflowBehaviorTy::TRAPPING;
+    default: __builtin_unreachable();
   }
 }
 
 SpecialMemberFlags FromPasta(pasta::SpecialMemberFlags e) {
-  switch (e) {
-    case pasta::SpecialMemberFlags::kDefaultConstructor: return SpecialMemberFlags::DEFAULT_CONSTRUCTOR;
-    case pasta::SpecialMemberFlags::kCopyConstructor: return SpecialMemberFlags::COPY_CONSTRUCTOR;
-    case pasta::SpecialMemberFlags::kMoveConstructor: return SpecialMemberFlags::MOVE_CONSTRUCTOR;
-    case pasta::SpecialMemberFlags::kCopyAssignment: return SpecialMemberFlags::COPY_ASSIGNMENT;
-    case pasta::SpecialMemberFlags::kMoveAssignment: return SpecialMemberFlags::MOVE_ASSIGNMENT;
-    case pasta::SpecialMemberFlags::kDestructor: return SpecialMemberFlags::DESTRUCTOR;
-    case pasta::SpecialMemberFlags::kAll: return SpecialMemberFlags::ALL;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return SpecialMemberFlags::DEFAULT_CONSTRUCTOR;
+    case 2: return SpecialMemberFlags::COPY_CONSTRUCTOR;
+    case 4: return SpecialMemberFlags::MOVE_CONSTRUCTOR;
+    case 8: return SpecialMemberFlags::COPY_ASSIGNMENT;
+    case 16: return SpecialMemberFlags::MOVE_ASSIGNMENT;
+    case 32: return SpecialMemberFlags::DESTRUCTOR;
+    case 63: return SpecialMemberFlags::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 SpecifierKind FromPasta(pasta::SpecifierKind e) {
-  switch (e) {
-    case pasta::SpecifierKind::kIdentifier: return SpecifierKind::IDENTIFIER;
-    case pasta::SpecifierKind::kNamespace: return SpecifierKind::NAMESPACE;
-    case pasta::SpecifierKind::kNamespaceAlias: return SpecifierKind::NAMESPACE_ALIAS;
-    case pasta::SpecifierKind::kTypeSpec: return SpecifierKind::TYPE_SPEC;
-    case pasta::SpecifierKind::kTypeSpecWithTemplate: return SpecifierKind::TYPE_SPEC_WITH_TEMPLATE;
-    case pasta::SpecifierKind::kGlobal: return SpecifierKind::GLOBAL;
-    case pasta::SpecifierKind::kSuper: return SpecifierKind::SUPER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SpecifierKind::IDENTIFIER;
+    case 1: return SpecifierKind::NAMESPACE;
+    case 2: return SpecifierKind::NAMESPACE_ALIAS;
+    case 3: return SpecifierKind::TYPE_SPEC;
+    case 4: return SpecifierKind::TYPE_SPEC_WITH_TEMPLATE;
+    case 5: return SpecifierKind::GLOBAL;
+    case 6: return SpecifierKind::SUPER;
+    default: __builtin_unreachable();
   }
 }
 
 Spelling FromPasta(pasta::Spelling e) {
-  switch (e) {
-    case pasta::Spelling::kGNUAarch64VectorPcs: return Spelling::GNU_AARCH64_VECTOR_PCS;
-    case pasta::Spelling::kCXX11ClangAarch64VectorPcs: return Spelling::CX_X11_CLANG_AARCH64_VECTOR_PCS;
-    case pasta::Spelling::kC2xClangAarch64VectorPcs: return Spelling::C2_XCLANG_AARCH64_VECTOR_PCS;
-    case pasta::Spelling::kSpellingNotCalculated: return Spelling::SPELLING_NOT_CALCULATED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return Spelling::GNU_AARCH64_VECTOR_PCS;
+    case 1: return Spelling::CX_X11_CLANG_AARCH64_VECTOR_PCS;
+    case 2: return Spelling::C2_XCLANG_AARCH64_VECTOR_PCS;
+    case 15: return Spelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
   }
 }
 
 StackProtectorMode FromPasta(pasta::StackProtectorMode e) {
-  switch (e) {
-    case pasta::StackProtectorMode::kOff: return StackProtectorMode::OFF;
-    case pasta::StackProtectorMode::kOn: return StackProtectorMode::ON;
-    case pasta::StackProtectorMode::kStrong: return StackProtectorMode::STRONG;
-    case pasta::StackProtectorMode::kReq: return StackProtectorMode::REQ;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StackProtectorMode::OFF;
+    case 1: return StackProtectorMode::ON;
+    case 2: return StackProtectorMode::STRONG;
+    case 3: return StackProtectorMode::REQ;
+    default: __builtin_unreachable();
   }
 }
 
 StorageClass FromPasta(pasta::StorageClass e) {
-  switch (e) {
-    case pasta::StorageClass::kNone: return StorageClass::NONE;
-    case pasta::StorageClass::kExtern: return StorageClass::EXTERN;
-    case pasta::StorageClass::kStatic: return StorageClass::STATIC;
-    case pasta::StorageClass::kPrivateExtern: return StorageClass::PRIVATE_EXTERN;
-    case pasta::StorageClass::kAuto: return StorageClass::AUTO;
-    case pasta::StorageClass::kRegister: return StorageClass::REGISTER;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StorageClass::NONE;
+    case 1: return StorageClass::EXTERN;
+    case 2: return StorageClass::STATIC;
+    case 3: return StorageClass::PRIVATE_EXTERN;
+    case 4: return StorageClass::AUTO;
+    case 5: return StorageClass::REGISTER;
+    default: __builtin_unreachable();
   }
 }
 
 StorageDuration FromPasta(pasta::StorageDuration e) {
-  switch (e) {
-    case pasta::StorageDuration::kFullExpression: return StorageDuration::FULL_EXPRESSION;
-    case pasta::StorageDuration::kAutomatic: return StorageDuration::AUTOMATIC;
-    case pasta::StorageDuration::kThread: return StorageDuration::THREAD;
-    case pasta::StorageDuration::kStatic: return StorageDuration::STATIC;
-    case pasta::StorageDuration::kDynamic: return StorageDuration::DYNAMIC;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StorageDuration::FULL_EXPRESSION;
+    case 1: return StorageDuration::AUTOMATIC;
+    case 2: return StorageDuration::THREAD;
+    case 3: return StorageDuration::STATIC;
+    case 4: return StorageDuration::DYNAMIC;
+    default: __builtin_unreachable();
   }
 }
 
 StoredNameKind FromPasta(pasta::StoredNameKind e) {
-  switch (e) {
-    case pasta::StoredNameKind::kStoredIdentifier: return StoredNameKind::STORED_IDENTIFIER;
-    case pasta::StoredNameKind::kStoredObjCZeroArgumentSelector: return StoredNameKind::STORED_OBJ_C_ZERO_ARGUMENT_SELECTOR;
-    case pasta::StoredNameKind::kStoredObjCOneArgumentSelector: return StoredNameKind::STORED_OBJ_C_ONE_ARGUMENT_SELECTOR;
-    case pasta::StoredNameKind::kStoredCXXConstructorName: return StoredNameKind::STORED_CXX_CONSTRUCTOR_NAME;
-    case pasta::StoredNameKind::kStoredCXXDestructorName: return StoredNameKind::STORED_CXX_DESTRUCTOR_NAME;
-    case pasta::StoredNameKind::kStoredCXXConversionFunctionName: return StoredNameKind::STORED_CXX_CONVERSION_FUNCTION_NAME;
-    case pasta::StoredNameKind::kStoredCXXOperatorName: return StoredNameKind::STORED_CXX_OPERATOR_NAME;
-    case pasta::StoredNameKind::kStoredDeclarationNameExtra: return StoredNameKind::STORED_DECLARATION_NAME_EXTRA;
-    case pasta::StoredNameKind::kUncommonNameKindOffset: return StoredNameKind::UNCOMMON_NAME_KIND_OFFSET;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StoredNameKind::STORED_IDENTIFIER;
+    case 1: return StoredNameKind::STORED_OBJ_C_ZERO_ARGUMENT_SELECTOR;
+    case 2: return StoredNameKind::STORED_OBJ_C_ONE_ARGUMENT_SELECTOR;
+    case 3: return StoredNameKind::STORED_CXX_CONSTRUCTOR_NAME;
+    case 4: return StoredNameKind::STORED_CXX_DESTRUCTOR_NAME;
+    case 5: return StoredNameKind::STORED_CXX_CONVERSION_FUNCTION_NAME;
+    case 6: return StoredNameKind::STORED_CXX_OPERATOR_NAME;
+    case 7: return StoredNameKind::STORED_DECLARATION_NAME_EXTRA;
+    case 8: return StoredNameKind::UNCOMMON_NAME_KIND_OFFSET;
+    default: __builtin_unreachable();
   }
 }
 
 StoredSpecifierKind FromPasta(pasta::StoredSpecifierKind e) {
-  switch (e) {
-    case pasta::StoredSpecifierKind::kStoredIdentifier: return StoredSpecifierKind::STORED_IDENTIFIER;
-    case pasta::StoredSpecifierKind::kStoredDeclaration: return StoredSpecifierKind::STORED_DECLARATION;
-    case pasta::StoredSpecifierKind::kStoredTypeSpec: return StoredSpecifierKind::STORED_TYPE_SPEC;
-    case pasta::StoredSpecifierKind::kStoredTypeSpecWithTemplate: return StoredSpecifierKind::STORED_TYPE_SPEC_WITH_TEMPLATE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StoredSpecifierKind::STORED_IDENTIFIER;
+    case 1: return StoredSpecifierKind::STORED_DECLARATION;
+    case 2: return StoredSpecifierKind::STORED_TYPE_SPEC;
+    case 3: return StoredSpecifierKind::STORED_TYPE_SPEC_WITH_TEMPLATE;
+    default: __builtin_unreachable();
   }
 }
 
 StructReturnConventionKind FromPasta(pasta::StructReturnConventionKind e) {
-  switch (e) {
-    case pasta::StructReturnConventionKind::kDefault: return StructReturnConventionKind::DEFAULT;
-    case pasta::StructReturnConventionKind::kOnStack: return StructReturnConventionKind::ON_STACK;
-    case pasta::StructReturnConventionKind::kInRegs: return StructReturnConventionKind::IN_REGS;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StructReturnConventionKind::DEFAULT;
+    case 1: return StructReturnConventionKind::ON_STACK;
+    case 2: return StructReturnConventionKind::IN_REGS;
+    default: __builtin_unreachable();
   }
 }
 
 SubExpr FromPasta(pasta::SubExpr e) {
-  switch (e) {
-    case pasta::SubExpr::kCallee: return SubExpr::CALLEE;
-    case pasta::SubExpr::kLHS: return SubExpr::LHS;
-    case pasta::SubExpr::kRHS: return SubExpr::RHS;
-    case pasta::SubExpr::kCount: return SubExpr::COUNT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SubExpr::CALLEE;
+    case 1: return SubExpr::LHS;
+    case 2: return SubExpr::RHS;
+    case 3: return SubExpr::COUNT;
+    default: __builtin_unreachable();
   }
 }
 
 SubStmt FromPasta(pasta::SubStmt e) {
-  switch (e) {
-    case pasta::SubStmt::kBody: return SubStmt::BODY;
-    case pasta::SubStmt::kPromise: return SubStmt::PROMISE;
-    case pasta::SubStmt::kInitializerSuspend: return SubStmt::INITIALIZER_SUSPEND;
-    case pasta::SubStmt::kFinalSuspend: return SubStmt::FINAL_SUSPEND;
-    case pasta::SubStmt::kOnException: return SubStmt::ON_EXCEPTION;
-    case pasta::SubStmt::kOnFallthrough: return SubStmt::ON_FALLTHROUGH;
-    case pasta::SubStmt::kAllocate: return SubStmt::ALLOCATE;
-    case pasta::SubStmt::kDeallocate: return SubStmt::DEALLOCATE;
-    case pasta::SubStmt::kReturnValue: return SubStmt::RETURN_VALUE;
-    case pasta::SubStmt::kResultDeclaration: return SubStmt::RESULT_DECLARATION;
-    case pasta::SubStmt::kReturnStatement: return SubStmt::RETURN_STATEMENT;
-    case pasta::SubStmt::kReturnStatementOnAllocFailure: return SubStmt::RETURN_STATEMENT_ON_ALLOC_FAILURE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SubStmt::BODY;
+    case 1: return SubStmt::PROMISE;
+    case 2: return SubStmt::INITIALIZER_SUSPEND;
+    case 3: return SubStmt::FINAL_SUSPEND;
+    case 4: return SubStmt::ON_EXCEPTION;
+    case 5: return SubStmt::ON_FALLTHROUGH;
+    case 6: return SubStmt::ALLOCATE;
+    case 7: return SubStmt::DEALLOCATE;
+    case 8: return SubStmt::RETURN_VALUE;
+    case 9: return SubStmt::RESULT_DECLARATION;
+    case 10: return SubStmt::RETURN_STATEMENT;
+    case 11: return SubStmt::RETURN_STATEMENT_ON_ALLOC_FAILURE;
+    default: __builtin_unreachable();
   }
 }
 
 SyncScope FromPasta(pasta::SyncScope e) {
-  switch (e) {
-    case pasta::SyncScope::kOpenCLWorkGroup: return SyncScope::OPEN_CL_WORK_GROUP;
-    case pasta::SyncScope::kOpenCLDevice: return SyncScope::OPEN_CL_DEVICE;
-    case pasta::SyncScope::kOpenCLAllSVMDevices: return SyncScope::OPEN_CL_ALL_SVM_DEVICES;
-    case pasta::SyncScope::kOpenCLSubGroup: return SyncScope::OPEN_CL_SUB_GROUP;
+  switch (static_cast<int>(e)) {
+    case 0: return SyncScope::OPEN_CL_WORK_GROUP;
+    case 1: return SyncScope::OPEN_CL_DEVICE;
+    case 2: return SyncScope::OPEN_CL_ALL_SVM_DEVICES;
+    case 3: return SyncScope::OPEN_CL_SUB_GROUP;
+    default: __builtin_unreachable();
   }
 }
 
 Syntax FromPasta(pasta::Syntax e) {
-  switch (e) {
-    case pasta::Syntax::kGNU: return Syntax::GNU;
-    case pasta::Syntax::kCXX11: return Syntax::CX_X11;
-    case pasta::Syntax::kC2x: return Syntax::C2_X;
-    case pasta::Syntax::kDeclspec: return Syntax::DECLSPEC;
-    case pasta::Syntax::kMicrosoft: return Syntax::MICROSOFT;
-    case pasta::Syntax::kKeyword: return Syntax::KEYWORD;
-    case pasta::Syntax::kPragma: return Syntax::PRAGMA;
-    case pasta::Syntax::kContextSensitiveKeyword: return Syntax::CONTEXT_SENSITIVE_KEYWORD;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return Syntax::GNU;
+    case 1: return Syntax::CX_X11;
+    case 2: return Syntax::C2_X;
+    case 3: return Syntax::DECLSPEC;
+    case 4: return Syntax::MICROSOFT;
+    case 5: return Syntax::KEYWORD;
+    case 6: return Syntax::PRAGMA;
+    case 7: return Syntax::CONTEXT_SENSITIVE_KEYWORD;
+    default: __builtin_unreachable();
   }
 }
 
 TLSModel FromPasta(pasta::TLSModel e) {
-  switch (e) {
-    case pasta::TLSModel::kGeneralDynamicTLSModel: return TLSModel::GENERAL_DYNAMIC_TLS_MODEL;
-    case pasta::TLSModel::kLocalDynamicTLSModel: return TLSModel::LOCAL_DYNAMIC_TLS_MODEL;
-    case pasta::TLSModel::kInitialExecTLSModel: return TLSModel::INITIAL_EXEC_TLS_MODEL;
-    case pasta::TLSModel::kLocalExecTLSModel: return TLSModel::LOCAL_EXEC_TLS_MODEL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TLSModel::GENERAL_DYNAMIC_TLS_MODEL;
+    case 1: return TLSModel::LOCAL_DYNAMIC_TLS_MODEL;
+    case 2: return TLSModel::INITIAL_EXEC_TLS_MODEL;
+    case 3: return TLSModel::LOCAL_EXEC_TLS_MODEL;
+    default: __builtin_unreachable();
   }
 }
 
 TQ FromPasta(pasta::TQ e) {
-  switch (e) {
-    case pasta::TQ::kConst: return TQ::CONST;
-    case pasta::TQ::kRestrict: return TQ::RESTRICT;
-    case pasta::TQ::kVolatile: return TQ::VOLATILE;
-    case pasta::TQ::kCVRMask: return TQ::CVR_MASK;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return TQ::CONST;
+    case 2: return TQ::RESTRICT;
+    case 4: return TQ::VOLATILE;
+    case 7: return TQ::CVR_MASK;
+    default: __builtin_unreachable();
   }
 }
 
 TagTypeKind FromPasta(pasta::TagTypeKind e) {
-  switch (e) {
-    case pasta::TagTypeKind::kStruct: return TagTypeKind::STRUCT;
-    case pasta::TagTypeKind::kInterface: return TagTypeKind::INTERFACE;
-    case pasta::TagTypeKind::kUnion: return TagTypeKind::UNION;
-    case pasta::TagTypeKind::kClass: return TagTypeKind::CLASS;
-    case pasta::TagTypeKind::kEnum: return TagTypeKind::ENUM;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TagTypeKind::STRUCT;
+    case 1: return TagTypeKind::INTERFACE;
+    case 2: return TagTypeKind::UNION;
+    case 3: return TagTypeKind::CLASS;
+    case 4: return TagTypeKind::ENUM;
+    default: __builtin_unreachable();
   }
 }
 
 TailPaddingUseRules FromPasta(pasta::TailPaddingUseRules e) {
-  switch (e) {
-    case pasta::TailPaddingUseRules::kAlwaysUseTailPadding: return TailPaddingUseRules::ALWAYS_USE_TAIL_PADDING;
-    case pasta::TailPaddingUseRules::kUseTailPaddingUnlessPOD03: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_PO_D03;
-    case pasta::TailPaddingUseRules::kUseTailPaddingUnlessPOD11: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_PO_D11;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TailPaddingUseRules::ALWAYS_USE_TAIL_PADDING;
+    case 1: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_PO_D03;
+    case 2: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_PO_D11;
+    default: __builtin_unreachable();
   }
 }
 
 TemplateArgumentDependence FromPasta(pasta::TemplateArgumentDependence e) {
-  switch (e) {
-    case pasta::TemplateArgumentDependence::kUnexpandedPack: return TemplateArgumentDependence::UNEXPANDED_PACK;
-    case pasta::TemplateArgumentDependence::kInstantiation: return TemplateArgumentDependence::INSTANTIATION;
-    case pasta::TemplateArgumentDependence::kDependent: return TemplateArgumentDependence::DEPENDENT;
-    case pasta::TemplateArgumentDependence::kError: return TemplateArgumentDependence::ERROR;
-    case pasta::TemplateArgumentDependence::kNone: return TemplateArgumentDependence::NONE;
-    case pasta::TemplateArgumentDependence::kDependentInstantiation: return TemplateArgumentDependence::DEPENDENT_INSTANTIATION;
-    case pasta::TemplateArgumentDependence::kAll: return TemplateArgumentDependence::ALL;
+  switch (static_cast<unsigned char>(e)) {
+    case 1: return TemplateArgumentDependence::UNEXPANDED_PACK;
+    case 2: return TemplateArgumentDependence::INSTANTIATION;
+    case 4: return TemplateArgumentDependence::DEPENDENT;
+    case 8: return TemplateArgumentDependence::ERROR;
+    case 0: return TemplateArgumentDependence::NONE;
+    case 6: return TemplateArgumentDependence::DEPENDENT_INSTANTIATION;
+    case 15: return TemplateArgumentDependence::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 TemplateNameDependence FromPasta(pasta::TemplateNameDependence e) {
-  switch (e) {
-    case pasta::TemplateNameDependence::kUnexpandedPack: return TemplateNameDependence::UNEXPANDED_PACK;
-    case pasta::TemplateNameDependence::kInstantiation: return TemplateNameDependence::INSTANTIATION;
-    case pasta::TemplateNameDependence::kDependent: return TemplateNameDependence::DEPENDENT;
-    case pasta::TemplateNameDependence::kError: return TemplateNameDependence::ERROR;
-    case pasta::TemplateNameDependence::kNone: return TemplateNameDependence::NONE;
-    case pasta::TemplateNameDependence::kDependentInstantiation: return TemplateNameDependence::DEPENDENT_INSTANTIATION;
-    case pasta::TemplateNameDependence::kAll: return TemplateNameDependence::ALL;
+  switch (static_cast<unsigned char>(e)) {
+    case 1: return TemplateNameDependence::UNEXPANDED_PACK;
+    case 2: return TemplateNameDependence::INSTANTIATION;
+    case 4: return TemplateNameDependence::DEPENDENT;
+    case 8: return TemplateNameDependence::ERROR;
+    case 0: return TemplateNameDependence::NONE;
+    case 6: return TemplateNameDependence::DEPENDENT_INSTANTIATION;
+    case 15: return TemplateNameDependence::ALL;
+    default: __builtin_unreachable();
   }
 }
 
 TemplateSpecializationKind FromPasta(pasta::TemplateSpecializationKind e) {
-  switch (e) {
-    case pasta::TemplateSpecializationKind::kUndeclared: return TemplateSpecializationKind::UNDECLARED;
-    case pasta::TemplateSpecializationKind::kImplicitInstantiation: return TemplateSpecializationKind::IMPLICIT_INSTANTIATION;
-    case pasta::TemplateSpecializationKind::kExplicitSpecialization: return TemplateSpecializationKind::EXPLICIT_SPECIALIZATION;
-    case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration: return TemplateSpecializationKind::EXPLICIT_INSTANTIATION_DECLARATION;
-    case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition: return TemplateSpecializationKind::EXPLICIT_INSTANTIATION_DEFINITION;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TemplateSpecializationKind::UNDECLARED;
+    case 1: return TemplateSpecializationKind::IMPLICIT_INSTANTIATION;
+    case 2: return TemplateSpecializationKind::EXPLICIT_SPECIALIZATION;
+    case 3: return TemplateSpecializationKind::EXPLICIT_INSTANTIATION_DECLARATION;
+    case 4: return TemplateSpecializationKind::EXPLICIT_INSTANTIATION_DEFINITION;
+    default: __builtin_unreachable();
   }
 }
 
 TextDiagnosticFormat FromPasta(pasta::TextDiagnosticFormat e) {
-  switch (e) {
-    case pasta::TextDiagnosticFormat::kClang: return TextDiagnosticFormat::CLANG;
-    case pasta::TextDiagnosticFormat::kMSVC: return TextDiagnosticFormat::MSVC;
-    case pasta::TextDiagnosticFormat::kVi: return TextDiagnosticFormat::VI;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TextDiagnosticFormat::CLANG;
+    case 1: return TextDiagnosticFormat::MSVC;
+    case 2: return TextDiagnosticFormat::VI;
+    default: __builtin_unreachable();
   }
 }
 
 ThreadModelKind FromPasta(pasta::ThreadModelKind e) {
-  switch (e) {
-    case pasta::ThreadModelKind::kPOSIX: return ThreadModelKind::POSIX;
-    case pasta::ThreadModelKind::kSingle: return ThreadModelKind::SINGLE;
+  switch (static_cast<int>(e)) {
+    case 0: return ThreadModelKind::POSIX;
+    case 1: return ThreadModelKind::SINGLE;
+    default: __builtin_unreachable();
   }
 }
 
 ThreadStorageClassSpecifier FromPasta(pasta::ThreadStorageClassSpecifier e) {
-  switch (e) {
-    case pasta::ThreadStorageClassSpecifier::kUnspecified: return ThreadStorageClassSpecifier::UNSPECIFIED;
-    case pasta::ThreadStorageClassSpecifier::k__Thread: return ThreadStorageClassSpecifier::__THREAD;
-    case pasta::ThreadStorageClassSpecifier::kThreadLocal: return ThreadStorageClassSpecifier::THREAD_LOCAL;
-    case pasta::ThreadStorageClassSpecifier::k_ThreadLocal: return ThreadStorageClassSpecifier::_THREAD_LOCAL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ThreadStorageClassSpecifier::UNSPECIFIED;
+    case 1: return ThreadStorageClassSpecifier::__THREAD;
+    case 2: return ThreadStorageClassSpecifier::THREAD_LOCAL;
+    case 3: return ThreadStorageClassSpecifier::_THREAD_LOCAL;
+    default: __builtin_unreachable();
   }
 }
 
 TokenKind FromPasta(pasta::TokenKind e) {
-  switch (e) {
-    case pasta::TokenKind::kUnknown: return TokenKind::UNKNOWN;
-    case pasta::TokenKind::kEndOfFile: return TokenKind::END_OF_FILE;
-    case pasta::TokenKind::kEndOfDirective: return TokenKind::END_OF_DIRECTIVE;
-    case pasta::TokenKind::kCodeCompletion: return TokenKind::CODE_COMPLETION;
-    case pasta::TokenKind::kComment: return TokenKind::COMMENT;
-    case pasta::TokenKind::kIdentifier: return TokenKind::IDENTIFIER;
-    case pasta::TokenKind::kRawIdentifier: return TokenKind::IDENTIFIER;
-    case pasta::TokenKind::kNumericConstant: return TokenKind::NUMERIC_CONSTANT;
-    case pasta::TokenKind::kCharacterConstant: return TokenKind::CHARACTER_CONSTANT;
-    case pasta::TokenKind::kWideCharacterConstant: return TokenKind::WIDE_CHARACTER_CONSTANT;
-    case pasta::TokenKind::kUtf8CharacterConstant: return TokenKind::UTF8_CHARACTER_CONSTANT;
-    case pasta::TokenKind::kUtf16CharacterConstant: return TokenKind::UTF16_CHARACTER_CONSTANT;
-    case pasta::TokenKind::kUtf32CharacterConstant: return TokenKind::UTF32_CHARACTER_CONSTANT;
-    case pasta::TokenKind::kStringLiteral: return TokenKind::STRING_LITERAL;
-    case pasta::TokenKind::kWideStringLiteral: return TokenKind::WIDE_STRING_LITERAL;
-    case pasta::TokenKind::kHeaderName: return TokenKind::HEADER_NAME;
-    case pasta::TokenKind::kUtf8StringLiteral: return TokenKind::UTF8_STRING_LITERAL;
-    case pasta::TokenKind::kUtf16StringLiteral: return TokenKind::UTF16_STRING_LITERAL;
-    case pasta::TokenKind::kUtf32StringLiteral: return TokenKind::UTF32_STRING_LITERAL;
-    case pasta::TokenKind::kLSquare: return TokenKind::L_SQUARE;
-    case pasta::TokenKind::kRSquare: return TokenKind::R_SQUARE;
-    case pasta::TokenKind::kLParenthesis: return TokenKind::L_PARENTHESIS;
-    case pasta::TokenKind::kRParenthesis: return TokenKind::R_PARENTHESIS;
-    case pasta::TokenKind::kLBrace: return TokenKind::L_BRACE;
-    case pasta::TokenKind::kRBrace: return TokenKind::R_BRACE;
-    case pasta::TokenKind::kPeriod: return TokenKind::PERIOD;
-    case pasta::TokenKind::kEllipsis: return TokenKind::ELLIPSIS;
-    case pasta::TokenKind::kAmp: return TokenKind::AMP;
-    case pasta::TokenKind::kAmpAmp: return TokenKind::AMP_AMP;
-    case pasta::TokenKind::kAmpEqual: return TokenKind::AMP_EQUAL;
-    case pasta::TokenKind::kStar: return TokenKind::STAR;
-    case pasta::TokenKind::kStarEqual: return TokenKind::STAR_EQUAL;
-    case pasta::TokenKind::kPlus: return TokenKind::PLUS;
-    case pasta::TokenKind::kPlusPlus: return TokenKind::PLUS_PLUS;
-    case pasta::TokenKind::kPlusEqual: return TokenKind::PLUS_EQUAL;
-    case pasta::TokenKind::kMinus: return TokenKind::MINUS;
-    case pasta::TokenKind::kArrow: return TokenKind::ARROW;
-    case pasta::TokenKind::kMinusMinus: return TokenKind::MINUS_MINUS;
-    case pasta::TokenKind::kMinusEqual: return TokenKind::MINUS_EQUAL;
-    case pasta::TokenKind::kTilde: return TokenKind::TILDE;
-    case pasta::TokenKind::kExclaim: return TokenKind::EXCLAIM;
-    case pasta::TokenKind::kExclaimEqual: return TokenKind::EXCLAIM_EQUAL;
-    case pasta::TokenKind::kSlash: return TokenKind::SLASH;
-    case pasta::TokenKind::kSlashEqual: return TokenKind::SLASH_EQUAL;
-    case pasta::TokenKind::kPercent: return TokenKind::PERCENT;
-    case pasta::TokenKind::kPercentEqual: return TokenKind::PERCENT_EQUAL;
-    case pasta::TokenKind::kLess: return TokenKind::LESS;
-    case pasta::TokenKind::kLessLess: return TokenKind::LESS_LESS;
-    case pasta::TokenKind::kLessEqual: return TokenKind::LESS_EQUAL;
-    case pasta::TokenKind::kLessLessEqual: return TokenKind::LESS_LESS_EQUAL;
-    case pasta::TokenKind::kSpaceship: return TokenKind::SPACESHIP;
-    case pasta::TokenKind::kGreater: return TokenKind::GREATER;
-    case pasta::TokenKind::kGreaterGreater: return TokenKind::GREATER_GREATER;
-    case pasta::TokenKind::kGreaterEqual: return TokenKind::GREATER_EQUAL;
-    case pasta::TokenKind::kGreaterGreaterEqual: return TokenKind::GREATER_GREATER_EQUAL;
-    case pasta::TokenKind::kCaret: return TokenKind::CARET;
-    case pasta::TokenKind::kCaretEqual: return TokenKind::CARET_EQUAL;
-    case pasta::TokenKind::kPipe: return TokenKind::PIPE;
-    case pasta::TokenKind::kPipePipe: return TokenKind::PIPE_PIPE;
-    case pasta::TokenKind::kPipeEqual: return TokenKind::PIPE_EQUAL;
-    case pasta::TokenKind::kQuestion: return TokenKind::QUESTION;
-    case pasta::TokenKind::kColon: return TokenKind::COLON;
-    case pasta::TokenKind::kSemi: return TokenKind::SEMI;
-    case pasta::TokenKind::kEqual: return TokenKind::EQUAL;
-    case pasta::TokenKind::kEqualEqual: return TokenKind::EQUAL_EQUAL;
-    case pasta::TokenKind::kComma: return TokenKind::COMMA;
-    case pasta::TokenKind::kHash: return TokenKind::HASH;
-    case pasta::TokenKind::kHashHash: return TokenKind::HASH_HASH;
-    case pasta::TokenKind::kHashat: return TokenKind::HASHAT;
-    case pasta::TokenKind::kPeriodStar: return TokenKind::PERIOD_STAR;
-    case pasta::TokenKind::kArrowStar: return TokenKind::ARROW_STAR;
-    case pasta::TokenKind::kColonColon: return TokenKind::COLON_COLON;
-    case pasta::TokenKind::kAt: return TokenKind::AT;
-    case pasta::TokenKind::kLessLessLess: return TokenKind::LESS_LESS_LESS;
-    case pasta::TokenKind::kGreaterGreaterGreater: return TokenKind::GREATER_GREATER_GREATER;
-    case pasta::TokenKind::kCaretcaret: return TokenKind::CARETCARET;
-    case pasta::TokenKind::kKeywordAuto: return TokenKind::KEYWORD_AUTO;
-    case pasta::TokenKind::kKeywordBreak: return TokenKind::KEYWORD_BREAK;
-    case pasta::TokenKind::kKeywordCase: return TokenKind::KEYWORD_CASE;
-    case pasta::TokenKind::kKeywordCharacter: return TokenKind::KEYWORD_CHARACTER;
-    case pasta::TokenKind::kKeywordConst: return TokenKind::KEYWORD_CONST;
-    case pasta::TokenKind::kKeywordContinue: return TokenKind::KEYWORD_CONTINUE;
-    case pasta::TokenKind::kKeywordDefault: return TokenKind::KEYWORD_DEFAULT;
-    case pasta::TokenKind::kKeywordDo: return TokenKind::KEYWORD_DO;
-    case pasta::TokenKind::kKeywordDouble: return TokenKind::KEYWORD_DOUBLE;
-    case pasta::TokenKind::kKeywordElse: return TokenKind::KEYWORD_ELSE;
-    case pasta::TokenKind::kKeywordEnum: return TokenKind::KEYWORD_ENUM;
-    case pasta::TokenKind::kKeywordExtern: return TokenKind::KEYWORD_EXTERN;
-    case pasta::TokenKind::kKeywordFloat: return TokenKind::KEYWORD_FLOAT;
-    case pasta::TokenKind::kKeywordFor: return TokenKind::KEYWORD_FOR;
-    case pasta::TokenKind::kKeywordGoto: return TokenKind::KEYWORD_GOTO;
-    case pasta::TokenKind::kKeywordIf: return TokenKind::KEYWORD_IF;
-    case pasta::TokenKind::kKeywordInline: return TokenKind::KEYWORD_INLINE;
-    case pasta::TokenKind::kKeywordInt: return TokenKind::KEYWORD_INT;
-    case pasta::TokenKind::kKeyword_ExtInt: return TokenKind::KEYWORD__EXT_INT;
-    case pasta::TokenKind::kKeywordLong: return TokenKind::KEYWORD_LONG;
-    case pasta::TokenKind::kKeywordRegister: return TokenKind::KEYWORD_REGISTER;
-    case pasta::TokenKind::kKeywordRestrict: return TokenKind::KEYWORD_RESTRICT;
-    case pasta::TokenKind::kKeywordReturn: return TokenKind::KEYWORD_RETURN;
-    case pasta::TokenKind::kKeywordShort: return TokenKind::KEYWORD_SHORT;
-    case pasta::TokenKind::kKeywordSigned: return TokenKind::KEYWORD_SIGNED;
-    case pasta::TokenKind::kKeywordSizeof: return TokenKind::KEYWORD_SIZEOF;
-    case pasta::TokenKind::kKeywordStatic: return TokenKind::KEYWORD_STATIC;
-    case pasta::TokenKind::kKeywordStruct: return TokenKind::KEYWORD_STRUCT;
-    case pasta::TokenKind::kKeywordSwitch: return TokenKind::KEYWORD_SWITCH;
-    case pasta::TokenKind::kKeywordTypedef: return TokenKind::KEYWORD_TYPEDEF;
-    case pasta::TokenKind::kKeywordUnion: return TokenKind::KEYWORD_UNION;
-    case pasta::TokenKind::kKeywordUnsigned: return TokenKind::KEYWORD_UNSIGNED;
-    case pasta::TokenKind::kKeywordVoid: return TokenKind::KEYWORD_VOID;
-    case pasta::TokenKind::kKeywordVolatile: return TokenKind::KEYWORD_VOLATILE;
-    case pasta::TokenKind::kKeywordWhile: return TokenKind::KEYWORD_WHILE;
-    case pasta::TokenKind::kKeyword_Alignas: return TokenKind::KEYWORD__ALIGNAS;
-    case pasta::TokenKind::kKeyword_Alignof: return TokenKind::KEYWORD__ALIGNOF;
-    case pasta::TokenKind::kKeyword_Atomic: return TokenKind::KEYWORD__ATOMIC;
-    case pasta::TokenKind::kKeyword_Boolean: return TokenKind::KEYWORD__BOOLEAN;
-    case pasta::TokenKind::kKeyword_Complex: return TokenKind::KEYWORD__COMPLEX;
-    case pasta::TokenKind::kKeyword_Generic: return TokenKind::KEYWORD__GENERIC;
-    case pasta::TokenKind::kKeyword_Imaginary: return TokenKind::KEYWORD__IMAGINARY;
-    case pasta::TokenKind::kKeyword_Noreturn: return TokenKind::KEYWORD__NORETURN;
-    case pasta::TokenKind::kKeyword_StaticAssert: return TokenKind::KEYWORD__STATIC_ASSERT;
-    case pasta::TokenKind::kKeyword_ThreadLocal: return TokenKind::KEYWORD__THREAD_LOCAL;
-    case pasta::TokenKind::kKeyword__Func__: return TokenKind::KEYWORD___FUNC__;
-    case pasta::TokenKind::kKeyword__ObjcYes: return TokenKind::KEYWORD___OBJC_YES;
-    case pasta::TokenKind::kKeyword__ObjcNo: return TokenKind::KEYWORD___OBJC_NO;
-    case pasta::TokenKind::kKeywordAssembly: return TokenKind::KEYWORD_ASSEMBLY;
-    case pasta::TokenKind::kKeywordBoolean: return TokenKind::KEYWORD_BOOLEAN;
-    case pasta::TokenKind::kKeywordCatch: return TokenKind::KEYWORD_CATCH;
-    case pasta::TokenKind::kKeywordClass: return TokenKind::KEYWORD_CLASS;
-    case pasta::TokenKind::kKeywordConstCast: return TokenKind::KEYWORD_CONST_CAST;
-    case pasta::TokenKind::kKeywordDelete: return TokenKind::KEYWORD_DELETE;
-    case pasta::TokenKind::kKeywordDynamicCast: return TokenKind::KEYWORD_DYNAMIC_CAST;
-    case pasta::TokenKind::kKeywordExplicit: return TokenKind::KEYWORD_EXPLICIT;
-    case pasta::TokenKind::kKeywordExport: return TokenKind::KEYWORD_EXPORT;
-    case pasta::TokenKind::kKeywordFalse: return TokenKind::KEYWORD_FALSE;
-    case pasta::TokenKind::kKeywordFriend: return TokenKind::KEYWORD_FRIEND;
-    case pasta::TokenKind::kKeywordMutable: return TokenKind::KEYWORD_MUTABLE;
-    case pasta::TokenKind::kKeywordNamespace: return TokenKind::KEYWORD_NAMESPACE;
-    case pasta::TokenKind::kKeywordNew: return TokenKind::KEYWORD_NEW;
-    case pasta::TokenKind::kKeywordOperator: return TokenKind::KEYWORD_OPERATOR;
-    case pasta::TokenKind::kKeywordPrivate: return TokenKind::KEYWORD_PRIVATE;
-    case pasta::TokenKind::kKeywordProtected: return TokenKind::KEYWORD_PROTECTED;
-    case pasta::TokenKind::kKeywordPublic: return TokenKind::KEYWORD_PUBLIC;
-    case pasta::TokenKind::kKeywordReinterpretCast: return TokenKind::KEYWORD_REINTERPRET_CAST;
-    case pasta::TokenKind::kKeywordStaticCast: return TokenKind::KEYWORD_STATIC_CAST;
-    case pasta::TokenKind::kKeywordTemplate: return TokenKind::KEYWORD_TEMPLATE;
-    case pasta::TokenKind::kKeywordThis: return TokenKind::KEYWORD_THIS;
-    case pasta::TokenKind::kKeywordThrow: return TokenKind::KEYWORD_THROW;
-    case pasta::TokenKind::kKeywordTrue: return TokenKind::KEYWORD_TRUE;
-    case pasta::TokenKind::kKeywordTry: return TokenKind::KEYWORD_TRY;
-    case pasta::TokenKind::kKeywordTypename: return TokenKind::KEYWORD_TYPENAME;
-    case pasta::TokenKind::kKeywordTypeid: return TokenKind::KEYWORD_TYPEID;
-    case pasta::TokenKind::kKeywordUsing: return TokenKind::KEYWORD_USING;
-    case pasta::TokenKind::kKeywordVirtual: return TokenKind::KEYWORD_VIRTUAL;
-    case pasta::TokenKind::kKeywordWcharT: return TokenKind::KEYWORD_WCHAR_T;
-    case pasta::TokenKind::kKeywordAlignas: return TokenKind::KEYWORD_ALIGNAS;
-    case pasta::TokenKind::kKeywordAlignof: return TokenKind::KEYWORD_ALIGNOF;
-    case pasta::TokenKind::kKeywordChar16T: return TokenKind::KEYWORD_CHAR16_T;
-    case pasta::TokenKind::kKeywordChar32T: return TokenKind::KEYWORD_CHAR32_T;
-    case pasta::TokenKind::kKeywordConstexpr: return TokenKind::KEYWORD_CONSTEXPR;
-    case pasta::TokenKind::kKeywordDecltype: return TokenKind::KEYWORD_DECLTYPE;
-    case pasta::TokenKind::kKeywordNoexcept: return TokenKind::KEYWORD_NOEXCEPT;
-    case pasta::TokenKind::kKeywordNullptr: return TokenKind::KEYWORD_NULLPTR;
-    case pasta::TokenKind::kKeywordStaticAssert: return TokenKind::KEYWORD_STATIC_ASSERT;
-    case pasta::TokenKind::kKeywordThreadLocal: return TokenKind::KEYWORD_THREAD_LOCAL;
-    case pasta::TokenKind::kKeywordConcept: return TokenKind::KEYWORD_CONCEPT;
-    case pasta::TokenKind::kKeywordRequires: return TokenKind::KEYWORD_REQUIRES;
-    case pasta::TokenKind::kKeywordCoAwait: return TokenKind::KEYWORD_CO_AWAIT;
-    case pasta::TokenKind::kKeywordCoReturn: return TokenKind::KEYWORD_CO_RETURN;
-    case pasta::TokenKind::kKeywordCoYield: return TokenKind::KEYWORD_CO_YIELD;
-    case pasta::TokenKind::kKeywordModule: return TokenKind::KEYWORD_MODULE;
-    case pasta::TokenKind::kKeywordImport: return TokenKind::KEYWORD_IMPORT;
-    case pasta::TokenKind::kKeywordConsteval: return TokenKind::KEYWORD_CONSTEVAL;
-    case pasta::TokenKind::kKeywordConstinit: return TokenKind::KEYWORD_CONSTINIT;
-    case pasta::TokenKind::kKeywordChar8T: return TokenKind::KEYWORD_CHAR8_T;
-    case pasta::TokenKind::kKeyword_Float16: return TokenKind::KEYWORD__FLOAT16;
-    case pasta::TokenKind::kKeyword_Accum: return TokenKind::KEYWORD__ACCUM;
-    case pasta::TokenKind::kKeyword_Fract: return TokenKind::KEYWORD__FRACT;
-    case pasta::TokenKind::kKeyword_Sat: return TokenKind::KEYWORD__SAT;
-    case pasta::TokenKind::kKeyword_Decimal32: return TokenKind::KEYWORD__DECIMAL32;
-    case pasta::TokenKind::kKeyword_Decimal64: return TokenKind::KEYWORD__DECIMAL64;
-    case pasta::TokenKind::kKeyword_Decimal128: return TokenKind::KEYWORD__DECIMAL128;
-    case pasta::TokenKind::kKeyword__Null: return TokenKind::KEYWORD___NULL;
-    case pasta::TokenKind::kKeyword__Alignof: return TokenKind::KEYWORD___ALIGNOF;
-    case pasta::TokenKind::kKeyword__Attribute: return TokenKind::KEYWORD___ATTRIBUTE;
-    case pasta::TokenKind::kKeyword__BuiltinChooseExpression: return TokenKind::KEYWORD___BUILTIN_CHOOSE_EXPRESSION;
-    case pasta::TokenKind::kKeyword__BuiltinOffsetof: return TokenKind::KEYWORD___BUILTIN_OFFSETOF;
-    case pasta::TokenKind::kKeyword__BuiltinFILE: return TokenKind::KEYWORD___BUILTIN_FILE;
-    case pasta::TokenKind::kKeyword__BuiltinFUNCTION: return TokenKind::KEYWORD___BUILTIN_FUNCTION;
-    case pasta::TokenKind::kKeyword__BuiltinLINE: return TokenKind::KEYWORD___BUILTIN_LINE;
-    case pasta::TokenKind::kKeyword__BuiltinCOLUMN: return TokenKind::KEYWORD___BUILTIN_COLUMN;
-    case pasta::TokenKind::kKeyword__BuiltinTypesCompatibleP: return TokenKind::KEYWORD___BUILTIN_TYPES_COMPATIBLE_P;
-    case pasta::TokenKind::kKeyword__BuiltinVaArgument: return TokenKind::KEYWORD___BUILTIN_VA_ARGUMENT;
-    case pasta::TokenKind::kKeyword__Extension__: return TokenKind::KEYWORD___EXTENSION__;
-    case pasta::TokenKind::kKeyword__Float128: return TokenKind::KEYWORD___FLOAT128;
-    case pasta::TokenKind::kKeyword__Imag: return TokenKind::KEYWORD___IMAG;
-    case pasta::TokenKind::kKeyword__Int128: return TokenKind::KEYWORD___INT128;
-    case pasta::TokenKind::kKeyword__Label__: return TokenKind::KEYWORD___LABEL__;
-    case pasta::TokenKind::kKeyword__Real: return TokenKind::KEYWORD___REAL;
-    case pasta::TokenKind::kKeyword__Thread: return TokenKind::KEYWORD___THREAD;
-    case pasta::TokenKind::kKeyword__FUNCTION__: return TokenKind::KEYWORD___FUNCTION__;
-    case pasta::TokenKind::kKeyword__PRETTYFUNCTION__: return TokenKind::KEYWORD___PRETTYFUNCTION__;
-    case pasta::TokenKind::kKeyword__AutoType: return TokenKind::KEYWORD___AUTO_TYPE;
-    case pasta::TokenKind::kKeywordTypeof: return TokenKind::KEYWORD_TYPEOF;
-    case pasta::TokenKind::kKeyword__FUNCDNAME__: return TokenKind::KEYWORD___FUNCDNAME__;
-    case pasta::TokenKind::kKeyword__FUNCSIG__: return TokenKind::KEYWORD___FUNCSIG__;
-    case pasta::TokenKind::kKeywordLFUNCTION__: return TokenKind::KEYWORD_LFUNCTION__;
-    case pasta::TokenKind::kKeywordLFUNCSIG__: return TokenKind::KEYWORD_LFUNCSIG__;
-    case pasta::TokenKind::kKeyword__IsInterfaceClass: return TokenKind::KEYWORD___IS_INTERFACE_CLASS;
-    case pasta::TokenKind::kKeyword__IsSealed: return TokenKind::KEYWORD___IS_SEALED;
-    case pasta::TokenKind::kKeyword__IsDestructible: return TokenKind::KEYWORD___IS_DESTRUCTIBLE;
-    case pasta::TokenKind::kKeyword__IsTriviallyDestructible: return TokenKind::KEYWORD___IS_TRIVIALLY_DESTRUCTIBLE;
-    case pasta::TokenKind::kKeyword__IsNothrowDestructible: return TokenKind::KEYWORD___IS_NOTHROW_DESTRUCTIBLE;
-    case pasta::TokenKind::kKeyword__IsNothrowAssignable: return TokenKind::KEYWORD___IS_NOTHROW_ASSIGNABLE;
-    case pasta::TokenKind::kKeyword__IsConstructible: return TokenKind::KEYWORD___IS_CONSTRUCTIBLE;
-    case pasta::TokenKind::kKeyword__IsNothrowConstructible: return TokenKind::KEYWORD___IS_NOTHROW_CONSTRUCTIBLE;
-    case pasta::TokenKind::kKeyword__IsAssignable: return TokenKind::KEYWORD___IS_ASSIGNABLE;
-    case pasta::TokenKind::kKeyword__HasNothrowMoveAssign: return TokenKind::KEYWORD___HAS_NOTHROW_MOVE_ASSIGN;
-    case pasta::TokenKind::kKeyword__HasTrivialMoveAssign: return TokenKind::KEYWORD___HAS_TRIVIAL_MOVE_ASSIGN;
-    case pasta::TokenKind::kKeyword__HasTrivialMoveConstructor: return TokenKind::KEYWORD___HAS_TRIVIAL_MOVE_CONSTRUCTOR;
-    case pasta::TokenKind::kKeyword__HasNothrowAssign: return TokenKind::KEYWORD___HAS_NOTHROW_ASSIGN;
-    case pasta::TokenKind::kKeyword__HasNothrowCopy: return TokenKind::KEYWORD___HAS_NOTHROW_COPY;
-    case pasta::TokenKind::kKeyword__HasNothrowConstructor: return TokenKind::KEYWORD___HAS_NOTHROW_CONSTRUCTOR;
-    case pasta::TokenKind::kKeyword__HasTrivialAssign: return TokenKind::KEYWORD___HAS_TRIVIAL_ASSIGN;
-    case pasta::TokenKind::kKeyword__HasTrivialCopy: return TokenKind::KEYWORD___HAS_TRIVIAL_COPY;
-    case pasta::TokenKind::kKeyword__HasTrivialConstructor: return TokenKind::KEYWORD___HAS_TRIVIAL_CONSTRUCTOR;
-    case pasta::TokenKind::kKeyword__HasTrivialDestructor: return TokenKind::KEYWORD___HAS_TRIVIAL_DESTRUCTOR;
-    case pasta::TokenKind::kKeyword__HasVirtualDestructor: return TokenKind::KEYWORD___HAS_VIRTUAL_DESTRUCTOR;
-    case pasta::TokenKind::kKeyword__IsAbstract: return TokenKind::KEYWORD___IS_ABSTRACT;
-    case pasta::TokenKind::kKeyword__IsAggregate: return TokenKind::KEYWORD___IS_AGGREGATE;
-    case pasta::TokenKind::kKeyword__IsBaseOf: return TokenKind::KEYWORD___IS_BASE_OF;
-    case pasta::TokenKind::kKeyword__IsClass: return TokenKind::KEYWORD___IS_CLASS;
-    case pasta::TokenKind::kKeyword__IsConvertibleTo: return TokenKind::KEYWORD___IS_CONVERTIBLE_TO;
-    case pasta::TokenKind::kKeyword__IsEmpty: return TokenKind::KEYWORD___IS_EMPTY;
-    case pasta::TokenKind::kKeyword__IsEnum: return TokenKind::KEYWORD___IS_ENUM;
-    case pasta::TokenKind::kKeyword__IsFinal: return TokenKind::KEYWORD___IS_FINAL;
-    case pasta::TokenKind::kKeyword__IsLiteral: return TokenKind::KEYWORD___IS_LITERAL;
-    case pasta::TokenKind::kKeyword__IsPod: return TokenKind::KEYWORD___IS_POD;
-    case pasta::TokenKind::kKeyword__IsPolymorphic: return TokenKind::KEYWORD___IS_POLYMORPHIC;
-    case pasta::TokenKind::kKeyword__IsStandardLayout: return TokenKind::KEYWORD___IS_STANDARD_LAYOUT;
-    case pasta::TokenKind::kKeyword__IsTrivial: return TokenKind::KEYWORD___IS_TRIVIAL;
-    case pasta::TokenKind::kKeyword__IsTriviallyAssignable: return TokenKind::KEYWORD___IS_TRIVIALLY_ASSIGNABLE;
-    case pasta::TokenKind::kKeyword__IsTriviallyConstructible: return TokenKind::KEYWORD___IS_TRIVIALLY_CONSTRUCTIBLE;
-    case pasta::TokenKind::kKeyword__IsTriviallyCopyable: return TokenKind::KEYWORD___IS_TRIVIALLY_COPYABLE;
-    case pasta::TokenKind::kKeyword__IsUnion: return TokenKind::KEYWORD___IS_UNION;
-    case pasta::TokenKind::kKeyword__HasUniqueObjectRepresentations: return TokenKind::KEYWORD___HAS_UNIQUE_OBJECT_REPRESENTATIONS;
-    case pasta::TokenKind::kKeyword__UnderlyingType: return TokenKind::KEYWORD___UNDERLYING_TYPE;
-    case pasta::TokenKind::kKeyword__ReferenceBindsToTemporary: return TokenKind::KEYWORD___REFERENCE_BINDS_TO_TEMPORARY;
-    case pasta::TokenKind::kKeyword__IsLvalueExpression: return TokenKind::KEYWORD___IS_LVALUE_EXPRESSION;
-    case pasta::TokenKind::kKeyword__IsRvalueExpression: return TokenKind::KEYWORD___IS_RVALUE_EXPRESSION;
-    case pasta::TokenKind::kKeyword__IsArithmetic: return TokenKind::KEYWORD___IS_ARITHMETIC;
-    case pasta::TokenKind::kKeyword__IsFloatingPoint: return TokenKind::KEYWORD___IS_FLOATING_POINT;
-    case pasta::TokenKind::kKeyword__IsIntegral: return TokenKind::KEYWORD___IS_INTEGRAL;
-    case pasta::TokenKind::kKeyword__IsCompleteType: return TokenKind::KEYWORD___IS_COMPLETE_TYPE;
-    case pasta::TokenKind::kKeyword__IsVoid: return TokenKind::KEYWORD___IS_VOID;
-    case pasta::TokenKind::kKeyword__IsArray: return TokenKind::KEYWORD___IS_ARRAY;
-    case pasta::TokenKind::kKeyword__IsFunction: return TokenKind::KEYWORD___IS_FUNCTION;
-    case pasta::TokenKind::kKeyword__IsReference: return TokenKind::KEYWORD___IS_REFERENCE;
-    case pasta::TokenKind::kKeyword__IsLvalueReference: return TokenKind::KEYWORD___IS_LVALUE_REFERENCE;
-    case pasta::TokenKind::kKeyword__IsRvalueReference: return TokenKind::KEYWORD___IS_RVALUE_REFERENCE;
-    case pasta::TokenKind::kKeyword__IsFundamental: return TokenKind::KEYWORD___IS_FUNDAMENTAL;
-    case pasta::TokenKind::kKeyword__IsObject: return TokenKind::KEYWORD___IS_OBJECT;
-    case pasta::TokenKind::kKeyword__IsScalar: return TokenKind::KEYWORD___IS_SCALAR;
-    case pasta::TokenKind::kKeyword__IsCompound: return TokenKind::KEYWORD___IS_COMPOUND;
-    case pasta::TokenKind::kKeyword__IsPointer: return TokenKind::KEYWORD___IS_POINTER;
-    case pasta::TokenKind::kKeyword__IsMemberObjectPointer: return TokenKind::KEYWORD___IS_MEMBER_OBJECT_POINTER;
-    case pasta::TokenKind::kKeyword__IsMemberFunctionPointer: return TokenKind::KEYWORD___IS_MEMBER_FUNCTION_POINTER;
-    case pasta::TokenKind::kKeyword__IsMemberPointer: return TokenKind::KEYWORD___IS_MEMBER_POINTER;
-    case pasta::TokenKind::kKeyword__IsConst: return TokenKind::KEYWORD___IS_CONST;
-    case pasta::TokenKind::kKeyword__IsVolatile: return TokenKind::KEYWORD___IS_VOLATILE;
-    case pasta::TokenKind::kKeyword__IsSigned: return TokenKind::KEYWORD___IS_SIGNED;
-    case pasta::TokenKind::kKeyword__IsUnsigned: return TokenKind::KEYWORD___IS_UNSIGNED;
-    case pasta::TokenKind::kKeyword__IsSame: return TokenKind::KEYWORD___IS_SAME;
-    case pasta::TokenKind::kKeyword__IsConvertible: return TokenKind::KEYWORD___IS_CONVERTIBLE;
-    case pasta::TokenKind::kKeyword__ArrayRank: return TokenKind::KEYWORD___ARRAY_RANK;
-    case pasta::TokenKind::kKeyword__ArrayExtent: return TokenKind::KEYWORD___ARRAY_EXTENT;
-    case pasta::TokenKind::kKeyword__PrivateExtern__: return TokenKind::KEYWORD___PRIVATE_EXTERN__;
-    case pasta::TokenKind::kKeyword__ModulePrivate__: return TokenKind::KEYWORD___MODULE_PRIVATE__;
-    case pasta::TokenKind::kKeyword__Declspec: return TokenKind::KEYWORD___DECLSPEC;
-    case pasta::TokenKind::kKeyword__Cdecl: return TokenKind::KEYWORD___CDECL;
-    case pasta::TokenKind::kKeyword__Stdcall: return TokenKind::KEYWORD___STDCALL;
-    case pasta::TokenKind::kKeyword__Fastcall: return TokenKind::KEYWORD___FASTCALL;
-    case pasta::TokenKind::kKeyword__Thiscall: return TokenKind::KEYWORD___THISCALL;
-    case pasta::TokenKind::kKeyword__Regcall: return TokenKind::KEYWORD___REGCALL;
-    case pasta::TokenKind::kKeyword__Vectorcall: return TokenKind::KEYWORD___VECTORCALL;
-    case pasta::TokenKind::kKeyword__Forceinline: return TokenKind::KEYWORD___FORCEINLINE;
-    case pasta::TokenKind::kKeyword__Unaligned: return TokenKind::KEYWORD___UNALIGNED;
-    case pasta::TokenKind::kKeyword__Super: return TokenKind::KEYWORD___SUPER;
-    case pasta::TokenKind::kKeyword__Global: return TokenKind::KEYWORD___GLOBAL;
-    case pasta::TokenKind::kKeyword__Local: return TokenKind::KEYWORD___LOCAL;
-    case pasta::TokenKind::kKeyword__Constant: return TokenKind::KEYWORD___CONSTANT;
-    case pasta::TokenKind::kKeyword__Private: return TokenKind::KEYWORD___PRIVATE;
-    case pasta::TokenKind::kKeyword__Generic: return TokenKind::KEYWORD___GENERIC;
-    case pasta::TokenKind::kKeyword__Kernel: return TokenKind::KEYWORD___KERNEL;
-    case pasta::TokenKind::kKeyword__ReadOnly: return TokenKind::KEYWORD___READ_ONLY;
-    case pasta::TokenKind::kKeyword__WriteOnly: return TokenKind::KEYWORD___WRITE_ONLY;
-    case pasta::TokenKind::kKeyword__ReadWrite: return TokenKind::KEYWORD___READ_WRITE;
-    case pasta::TokenKind::kKeyword__BuiltinAstype: return TokenKind::KEYWORD___BUILTIN_ASTYPE;
-    case pasta::TokenKind::kKeywordVecStep: return TokenKind::KEYWORD_VEC_STEP;
-    case pasta::TokenKind::kKeywordImage1dT: return TokenKind::KEYWORD_IMAGE1_DT;
-    case pasta::TokenKind::kKeywordImage1dArrayT: return TokenKind::KEYWORD_IMAGE1_DARRAY_T;
-    case pasta::TokenKind::kKeywordImage1dBufferT: return TokenKind::KEYWORD_IMAGE1_DBUFFER_T;
-    case pasta::TokenKind::kKeywordImage2dT: return TokenKind::KEYWORD_IMAGE2_DT;
-    case pasta::TokenKind::kKeywordImage2dArrayT: return TokenKind::KEYWORD_IMAGE2_DARRAY_T;
-    case pasta::TokenKind::kKeywordImage2dDepthT: return TokenKind::KEYWORD_IMAGE2_DDEPTH_T;
-    case pasta::TokenKind::kKeywordImage2dArrayDepthT: return TokenKind::KEYWORD_IMAGE2_DARRAY_DEPTH_T;
-    case pasta::TokenKind::kKeywordImage2dMsaaT: return TokenKind::KEYWORD_IMAGE2_DMSAA_T;
-    case pasta::TokenKind::kKeywordImage2dArrayMsaaT: return TokenKind::KEYWORD_IMAGE2_DARRAY_MSAA_T;
-    case pasta::TokenKind::kKeywordImage2dMsaaDepthT: return TokenKind::KEYWORD_IMAGE2_DMSAA_DEPTH_T;
-    case pasta::TokenKind::kKeywordImage2dArrayMsaaDepthT: return TokenKind::KEYWORD_IMAGE2_DARRAY_MSAA_DEPTH_T;
-    case pasta::TokenKind::kKeywordImage3dT: return TokenKind::KEYWORD_IMAGE3_DT;
-    case pasta::TokenKind::kKeywordPipe: return TokenKind::KEYWORD_PIPE;
-    case pasta::TokenKind::kKeywordAddrspaceCast: return TokenKind::KEYWORD_ADDRSPACE_CAST;
-    case pasta::TokenKind::kKeyword__BuiltinOmpRequiredSimdAlign: return TokenKind::KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN;
-    case pasta::TokenKind::kKeyword__Pascal: return TokenKind::KEYWORD___PASCAL;
-    case pasta::TokenKind::kKeyword__Vector: return TokenKind::KEYWORD___VECTOR;
-    case pasta::TokenKind::kKeyword__Pixel: return TokenKind::KEYWORD___PIXEL;
-    case pasta::TokenKind::kKeyword__Boolean: return TokenKind::KEYWORD___BOOLEAN;
-    case pasta::TokenKind::kKeyword__Bf16: return TokenKind::KEYWORD___BF16;
-    case pasta::TokenKind::kKeywordHalf: return TokenKind::KEYWORD_HALF;
-    case pasta::TokenKind::kKeyword__Bridge: return TokenKind::KEYWORD___BRIDGE;
-    case pasta::TokenKind::kKeyword__BridgeTransfer: return TokenKind::KEYWORD___BRIDGE_TRANSFER;
-    case pasta::TokenKind::kKeyword__BridgeRetained: return TokenKind::KEYWORD___BRIDGE_RETAINED;
-    case pasta::TokenKind::kKeyword__BridgeRetain: return TokenKind::KEYWORD___BRIDGE_RETAIN;
-    case pasta::TokenKind::kKeyword__Covariant: return TokenKind::KEYWORD___COVARIANT;
-    case pasta::TokenKind::kKeyword__Contravariant: return TokenKind::KEYWORD___CONTRAVARIANT;
-    case pasta::TokenKind::kKeyword__Kindof: return TokenKind::KEYWORD___KINDOF;
-    case pasta::TokenKind::kKeyword_Nonnull: return TokenKind::KEYWORD__NONNULL;
-    case pasta::TokenKind::kKeyword_Nullable: return TokenKind::KEYWORD__NULLABLE;
-    case pasta::TokenKind::kKeyword_NullableResult: return TokenKind::KEYWORD__NULLABLE_RESULT;
-    case pasta::TokenKind::kKeyword_NullUnspecified: return TokenKind::KEYWORD__NULL_UNSPECIFIED;
-    case pasta::TokenKind::kKeyword__Ptr64: return TokenKind::KEYWORD___PTR64;
-    case pasta::TokenKind::kKeyword__Ptr32: return TokenKind::KEYWORD___PTR32;
-    case pasta::TokenKind::kKeyword__Sptr: return TokenKind::KEYWORD___SPTR;
-    case pasta::TokenKind::kKeyword__Uptr: return TokenKind::KEYWORD___UPTR;
-    case pasta::TokenKind::kKeyword__W64: return TokenKind::KEYWORD___W64;
-    case pasta::TokenKind::kKeyword__Uuidof: return TokenKind::KEYWORD___UUIDOF;
-    case pasta::TokenKind::kKeyword__Try: return TokenKind::KEYWORD___TRY;
-    case pasta::TokenKind::kKeyword__Finally: return TokenKind::KEYWORD___FINALLY;
-    case pasta::TokenKind::kKeyword__Leave: return TokenKind::KEYWORD___LEAVE;
-    case pasta::TokenKind::kKeyword__Int64: return TokenKind::KEYWORD___INT64;
-    case pasta::TokenKind::kKeyword__IfExists: return TokenKind::KEYWORD___IF_EXISTS;
-    case pasta::TokenKind::kKeyword__IfNotExists: return TokenKind::KEYWORD___IF_NOT_EXISTS;
-    case pasta::TokenKind::kKeyword__SingleInheritance: return TokenKind::KEYWORD___SINGLE_INHERITANCE;
-    case pasta::TokenKind::kKeyword__MultipleInheritance: return TokenKind::KEYWORD___MULTIPLE_INHERITANCE;
-    case pasta::TokenKind::kKeyword__VirtualInheritance: return TokenKind::KEYWORD___VIRTUAL_INHERITANCE;
-    case pasta::TokenKind::kKeyword__Interface: return TokenKind::KEYWORD___INTERFACE;
-    case pasta::TokenKind::kKeyword__BuiltinConvertvector: return TokenKind::KEYWORD___BUILTIN_CONVERTVECTOR;
-    case pasta::TokenKind::kKeyword__BuiltinBitCast: return TokenKind::KEYWORD___BUILTIN_BIT_CAST;
-    case pasta::TokenKind::kKeyword__BuiltinAvailable: return TokenKind::KEYWORD___BUILTIN_AVAILABLE;
-    case pasta::TokenKind::kKeyword__BuiltinSyclUniqueStableName: return TokenKind::KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME;
-    case pasta::TokenKind::kKeyword__UnknownAnytype: return TokenKind::KEYWORD___UNKNOWN_ANYTYPE;
-    case pasta::TokenKind::kAnnotCxxscope: return TokenKind::ANNOT_CXXSCOPE;
-    case pasta::TokenKind::kAnnotTypename: return TokenKind::ANNOT_TYPENAME;
-    case pasta::TokenKind::kAnnotTemplateId: return TokenKind::ANNOT_TEMPLATE_ID;
-    case pasta::TokenKind::kAnnotNonType: return TokenKind::ANNOT_NON_TYPE;
-    case pasta::TokenKind::kAnnotNonTypeUndeclared: return TokenKind::ANNOT_NON_TYPE_UNDECLARED;
-    case pasta::TokenKind::kAnnotNonTypeDependent: return TokenKind::ANNOT_NON_TYPE_DEPENDENT;
-    case pasta::TokenKind::kAnnotOverload: return TokenKind::ANNOT_OVERLOAD;
-    case pasta::TokenKind::kAnnotPrimaryExpression: return TokenKind::ANNOT_PRIMARY_EXPRESSION;
-    case pasta::TokenKind::kAnnotDecltype: return TokenKind::ANNOT_DECLTYPE;
-    case pasta::TokenKind::kAnnotPragmaUnused: return TokenKind::ANNOT_PRAGMA_UNUSED;
-    case pasta::TokenKind::kAnnotPragmaVis: return TokenKind::ANNOT_PRAGMA_VIS;
-    case pasta::TokenKind::kAnnotPragmaPack: return TokenKind::ANNOT_PRAGMA_PACK;
-    case pasta::TokenKind::kAnnotPragmaParserCrash: return TokenKind::ANNOT_PRAGMA_PARSER_CRASH;
-    case pasta::TokenKind::kAnnotPragmaCaptured: return TokenKind::ANNOT_PRAGMA_CAPTURED;
-    case pasta::TokenKind::kAnnotPragmaDump: return TokenKind::ANNOT_PRAGMA_DUMP;
-    case pasta::TokenKind::kAnnotPragmaMsstruct: return TokenKind::ANNOT_PRAGMA_MSSTRUCT;
-    case pasta::TokenKind::kAnnotPragmaAlign: return TokenKind::ANNOT_PRAGMA_ALIGN;
-    case pasta::TokenKind::kAnnotPragmaWeak: return TokenKind::ANNOT_PRAGMA_WEAK;
-    case pasta::TokenKind::kAnnotPragmaWeakalias: return TokenKind::ANNOT_PRAGMA_WEAKALIAS;
-    case pasta::TokenKind::kAnnotPragmaRedefineExtname: return TokenKind::ANNOT_PRAGMA_REDEFINE_EXTNAME;
-    case pasta::TokenKind::kAnnotPragmaFpContract: return TokenKind::ANNOT_PRAGMA_FP_CONTRACT;
-    case pasta::TokenKind::kAnnotPragmaFenvAccess: return TokenKind::ANNOT_PRAGMA_FENV_ACCESS;
-    case pasta::TokenKind::kAnnotPragmaFenvRound: return TokenKind::ANNOT_PRAGMA_FENV_ROUND;
-    case pasta::TokenKind::kAnnotPragmaFloatControl: return TokenKind::ANNOT_PRAGMA_FLOAT_CONTROL;
-    case pasta::TokenKind::kAnnotPragmaMsPointersToMembers: return TokenKind::ANNOT_PRAGMA_MS_POINTERS_TO_MEMBERS;
-    case pasta::TokenKind::kAnnotPragmaMsVtordisp: return TokenKind::ANNOT_PRAGMA_MS_VTORDISP;
-    case pasta::TokenKind::kAnnotPragmaMsPragma: return TokenKind::ANNOT_PRAGMA_MS_PRAGMA;
-    case pasta::TokenKind::kAnnotPragmaOpenclExtension: return TokenKind::ANNOT_PRAGMA_OPENCL_EXTENSION;
-    case pasta::TokenKind::kAnnotAttributeOpenmp: return TokenKind::ANNOT_ATTRIBUTE_OPENMP;
-    case pasta::TokenKind::kAnnotPragmaOpenmp: return TokenKind::ANNOT_PRAGMA_OPENMP;
-    case pasta::TokenKind::kAnnotPragmaOpenmpEnd: return TokenKind::ANNOT_PRAGMA_OPENMP_END;
-    case pasta::TokenKind::kAnnotPragmaLoopHint: return TokenKind::ANNOT_PRAGMA_LOOP_HINT;
-    case pasta::TokenKind::kAnnotPragmaFp: return TokenKind::ANNOT_PRAGMA_FP;
-    case pasta::TokenKind::kAnnotPragmaAttribute: return TokenKind::ANNOT_PRAGMA_ATTRIBUTE;
-    case pasta::TokenKind::kAnnotModuleInclude: return TokenKind::ANNOT_MODULE_INCLUDE;
-    case pasta::TokenKind::kAnnotModuleBegin: return TokenKind::ANNOT_MODULE_BEGIN;
-    case pasta::TokenKind::kAnnotModuleEnd: return TokenKind::ANNOT_MODULE_END;
-    case pasta::TokenKind::kAnnotHeaderUnit: return TokenKind::ANNOT_HEADER_UNIT;
+  switch (static_cast<unsigned short>(e)) {
+    case 0: return TokenKind::UNKNOWN;
+    case 1: return TokenKind::END_OF_FILE;
+    case 2: return TokenKind::END_OF_DIRECTIVE;
+    case 3: return TokenKind::CODE_COMPLETION;
+    case 4: return TokenKind::COMMENT;
+    case 5: return TokenKind::IDENTIFIER;
+    case 6: return TokenKind::IDENTIFIER;
+    case 7: return TokenKind::NUMERIC_CONSTANT;
+    case 8: return TokenKind::CHARACTER_CONSTANT;
+    case 9: return TokenKind::WIDE_CHARACTER_CONSTANT;
+    case 10: return TokenKind::UTF8_CHARACTER_CONSTANT;
+    case 11: return TokenKind::UTF16_CHARACTER_CONSTANT;
+    case 12: return TokenKind::UTF32_CHARACTER_CONSTANT;
+    case 13: return TokenKind::STRING_LITERAL;
+    case 14: return TokenKind::WIDE_STRING_LITERAL;
+    case 15: return TokenKind::HEADER_NAME;
+    case 16: return TokenKind::UTF8_STRING_LITERAL;
+    case 17: return TokenKind::UTF16_STRING_LITERAL;
+    case 18: return TokenKind::UTF32_STRING_LITERAL;
+    case 19: return TokenKind::L_SQUARE;
+    case 20: return TokenKind::R_SQUARE;
+    case 21: return TokenKind::L_PARENTHESIS;
+    case 22: return TokenKind::R_PARENTHESIS;
+    case 23: return TokenKind::L_BRACE;
+    case 24: return TokenKind::R_BRACE;
+    case 25: return TokenKind::PERIOD;
+    case 26: return TokenKind::ELLIPSIS;
+    case 27: return TokenKind::AMP;
+    case 28: return TokenKind::AMP_AMP;
+    case 29: return TokenKind::AMP_EQUAL;
+    case 30: return TokenKind::STAR;
+    case 31: return TokenKind::STAR_EQUAL;
+    case 32: return TokenKind::PLUS;
+    case 33: return TokenKind::PLUS_PLUS;
+    case 34: return TokenKind::PLUS_EQUAL;
+    case 35: return TokenKind::MINUS;
+    case 36: return TokenKind::ARROW;
+    case 37: return TokenKind::MINUS_MINUS;
+    case 38: return TokenKind::MINUS_EQUAL;
+    case 39: return TokenKind::TILDE;
+    case 40: return TokenKind::EXCLAIM;
+    case 41: return TokenKind::EXCLAIM_EQUAL;
+    case 42: return TokenKind::SLASH;
+    case 43: return TokenKind::SLASH_EQUAL;
+    case 44: return TokenKind::PERCENT;
+    case 45: return TokenKind::PERCENT_EQUAL;
+    case 46: return TokenKind::LESS;
+    case 47: return TokenKind::LESS_LESS;
+    case 48: return TokenKind::LESS_EQUAL;
+    case 49: return TokenKind::LESS_LESS_EQUAL;
+    case 50: return TokenKind::SPACESHIP;
+    case 51: return TokenKind::GREATER;
+    case 52: return TokenKind::GREATER_GREATER;
+    case 53: return TokenKind::GREATER_EQUAL;
+    case 54: return TokenKind::GREATER_GREATER_EQUAL;
+    case 55: return TokenKind::CARET;
+    case 56: return TokenKind::CARET_EQUAL;
+    case 57: return TokenKind::PIPE;
+    case 58: return TokenKind::PIPE_PIPE;
+    case 59: return TokenKind::PIPE_EQUAL;
+    case 60: return TokenKind::QUESTION;
+    case 61: return TokenKind::COLON;
+    case 62: return TokenKind::SEMI;
+    case 63: return TokenKind::EQUAL;
+    case 64: return TokenKind::EQUAL_EQUAL;
+    case 65: return TokenKind::COMMA;
+    case 66: return TokenKind::HASH;
+    case 67: return TokenKind::HASH_HASH;
+    case 68: return TokenKind::HASHAT;
+    case 69: return TokenKind::PERIOD_STAR;
+    case 70: return TokenKind::ARROW_STAR;
+    case 71: return TokenKind::COLON_COLON;
+    case 72: return TokenKind::AT;
+    case 73: return TokenKind::LESS_LESS_LESS;
+    case 74: return TokenKind::GREATER_GREATER_GREATER;
+    case 75: return TokenKind::CARETCARET;
+    case 76: return TokenKind::KEYWORD_AUTO;
+    case 77: return TokenKind::KEYWORD_BREAK;
+    case 78: return TokenKind::KEYWORD_CASE;
+    case 79: return TokenKind::KEYWORD_CHARACTER;
+    case 80: return TokenKind::KEYWORD_CONST;
+    case 81: return TokenKind::KEYWORD_CONTINUE;
+    case 82: return TokenKind::KEYWORD_DEFAULT;
+    case 83: return TokenKind::KEYWORD_DO;
+    case 84: return TokenKind::KEYWORD_DOUBLE;
+    case 85: return TokenKind::KEYWORD_ELSE;
+    case 86: return TokenKind::KEYWORD_ENUM;
+    case 87: return TokenKind::KEYWORD_EXTERN;
+    case 88: return TokenKind::KEYWORD_FLOAT;
+    case 89: return TokenKind::KEYWORD_FOR;
+    case 90: return TokenKind::KEYWORD_GOTO;
+    case 91: return TokenKind::KEYWORD_IF;
+    case 92: return TokenKind::KEYWORD_INLINE;
+    case 93: return TokenKind::KEYWORD_INT;
+    case 94: return TokenKind::KEYWORD__EXT_INT;
+    case 95: return TokenKind::KEYWORD_LONG;
+    case 96: return TokenKind::KEYWORD_REGISTER;
+    case 97: return TokenKind::KEYWORD_RESTRICT;
+    case 98: return TokenKind::KEYWORD_RETURN;
+    case 99: return TokenKind::KEYWORD_SHORT;
+    case 100: return TokenKind::KEYWORD_SIGNED;
+    case 101: return TokenKind::KEYWORD_SIZEOF;
+    case 102: return TokenKind::KEYWORD_STATIC;
+    case 103: return TokenKind::KEYWORD_STRUCT;
+    case 104: return TokenKind::KEYWORD_SWITCH;
+    case 105: return TokenKind::KEYWORD_TYPEDEF;
+    case 106: return TokenKind::KEYWORD_UNION;
+    case 107: return TokenKind::KEYWORD_UNSIGNED;
+    case 108: return TokenKind::KEYWORD_VOID;
+    case 109: return TokenKind::KEYWORD_VOLATILE;
+    case 110: return TokenKind::KEYWORD_WHILE;
+    case 111: return TokenKind::KEYWORD__ALIGNAS;
+    case 112: return TokenKind::KEYWORD__ALIGNOF;
+    case 113: return TokenKind::KEYWORD__ATOMIC;
+    case 114: return TokenKind::KEYWORD__BOOLEAN;
+    case 115: return TokenKind::KEYWORD__COMPLEX;
+    case 116: return TokenKind::KEYWORD__GENERIC;
+    case 117: return TokenKind::KEYWORD__IMAGINARY;
+    case 118: return TokenKind::KEYWORD__NORETURN;
+    case 119: return TokenKind::KEYWORD__STATIC_ASSERT;
+    case 120: return TokenKind::KEYWORD__THREAD_LOCAL;
+    case 121: return TokenKind::KEYWORD___FUNC__;
+    case 122: return TokenKind::KEYWORD___OBJC_YES;
+    case 123: return TokenKind::KEYWORD___OBJC_NO;
+    case 124: return TokenKind::KEYWORD_ASSEMBLY;
+    case 125: return TokenKind::KEYWORD_BOOLEAN;
+    case 126: return TokenKind::KEYWORD_CATCH;
+    case 127: return TokenKind::KEYWORD_CLASS;
+    case 128: return TokenKind::KEYWORD_CONST_CAST;
+    case 129: return TokenKind::KEYWORD_DELETE;
+    case 130: return TokenKind::KEYWORD_DYNAMIC_CAST;
+    case 131: return TokenKind::KEYWORD_EXPLICIT;
+    case 132: return TokenKind::KEYWORD_EXPORT;
+    case 133: return TokenKind::KEYWORD_FALSE;
+    case 134: return TokenKind::KEYWORD_FRIEND;
+    case 135: return TokenKind::KEYWORD_MUTABLE;
+    case 136: return TokenKind::KEYWORD_NAMESPACE;
+    case 137: return TokenKind::KEYWORD_NEW;
+    case 138: return TokenKind::KEYWORD_OPERATOR;
+    case 139: return TokenKind::KEYWORD_PRIVATE;
+    case 140: return TokenKind::KEYWORD_PROTECTED;
+    case 141: return TokenKind::KEYWORD_PUBLIC;
+    case 142: return TokenKind::KEYWORD_REINTERPRET_CAST;
+    case 143: return TokenKind::KEYWORD_STATIC_CAST;
+    case 144: return TokenKind::KEYWORD_TEMPLATE;
+    case 145: return TokenKind::KEYWORD_THIS;
+    case 146: return TokenKind::KEYWORD_THROW;
+    case 147: return TokenKind::KEYWORD_TRUE;
+    case 148: return TokenKind::KEYWORD_TRY;
+    case 149: return TokenKind::KEYWORD_TYPENAME;
+    case 150: return TokenKind::KEYWORD_TYPEID;
+    case 151: return TokenKind::KEYWORD_USING;
+    case 152: return TokenKind::KEYWORD_VIRTUAL;
+    case 153: return TokenKind::KEYWORD_WCHAR_T;
+    case 154: return TokenKind::KEYWORD_ALIGNAS;
+    case 155: return TokenKind::KEYWORD_ALIGNOF;
+    case 156: return TokenKind::KEYWORD_CHAR16_T;
+    case 157: return TokenKind::KEYWORD_CHAR32_T;
+    case 158: return TokenKind::KEYWORD_CONSTEXPR;
+    case 159: return TokenKind::KEYWORD_DECLTYPE;
+    case 160: return TokenKind::KEYWORD_NOEXCEPT;
+    case 161: return TokenKind::KEYWORD_NULLPTR;
+    case 162: return TokenKind::KEYWORD_STATIC_ASSERT;
+    case 163: return TokenKind::KEYWORD_THREAD_LOCAL;
+    case 164: return TokenKind::KEYWORD_CONCEPT;
+    case 165: return TokenKind::KEYWORD_REQUIRES;
+    case 166: return TokenKind::KEYWORD_CO_AWAIT;
+    case 167: return TokenKind::KEYWORD_CO_RETURN;
+    case 168: return TokenKind::KEYWORD_CO_YIELD;
+    case 169: return TokenKind::KEYWORD_MODULE;
+    case 170: return TokenKind::KEYWORD_IMPORT;
+    case 171: return TokenKind::KEYWORD_CONSTEVAL;
+    case 172: return TokenKind::KEYWORD_CONSTINIT;
+    case 173: return TokenKind::KEYWORD_CHAR8_T;
+    case 174: return TokenKind::KEYWORD__FLOAT16;
+    case 175: return TokenKind::KEYWORD__ACCUM;
+    case 176: return TokenKind::KEYWORD__FRACT;
+    case 177: return TokenKind::KEYWORD__SAT;
+    case 178: return TokenKind::KEYWORD__DECIMAL32;
+    case 179: return TokenKind::KEYWORD__DECIMAL64;
+    case 180: return TokenKind::KEYWORD__DECIMAL128;
+    case 181: return TokenKind::KEYWORD___NULL;
+    case 182: return TokenKind::KEYWORD___ALIGNOF;
+    case 183: return TokenKind::KEYWORD___ATTRIBUTE;
+    case 184: return TokenKind::KEYWORD___BUILTIN_CHOOSE_EXPRESSION;
+    case 185: return TokenKind::KEYWORD___BUILTIN_OFFSETOF;
+    case 186: return TokenKind::KEYWORD___BUILTIN_FILE;
+    case 187: return TokenKind::KEYWORD___BUILTIN_FUNCTION;
+    case 188: return TokenKind::KEYWORD___BUILTIN_LINE;
+    case 189: return TokenKind::KEYWORD___BUILTIN_COLUMN;
+    case 190: return TokenKind::KEYWORD___BUILTIN_TYPES_COMPATIBLE_P;
+    case 191: return TokenKind::KEYWORD___BUILTIN_VA_ARGUMENT;
+    case 192: return TokenKind::KEYWORD___EXTENSION__;
+    case 193: return TokenKind::KEYWORD___FLOAT128;
+    case 194: return TokenKind::KEYWORD___IMAG;
+    case 195: return TokenKind::KEYWORD___INT128;
+    case 196: return TokenKind::KEYWORD___LABEL__;
+    case 197: return TokenKind::KEYWORD___REAL;
+    case 198: return TokenKind::KEYWORD___THREAD;
+    case 199: return TokenKind::KEYWORD___FUNCTION__;
+    case 200: return TokenKind::KEYWORD___PRETTYFUNCTION__;
+    case 201: return TokenKind::KEYWORD___AUTO_TYPE;
+    case 202: return TokenKind::KEYWORD_TYPEOF;
+    case 203: return TokenKind::KEYWORD___FUNCDNAME__;
+    case 204: return TokenKind::KEYWORD___FUNCSIG__;
+    case 205: return TokenKind::KEYWORD_LFUNCTION__;
+    case 206: return TokenKind::KEYWORD_LFUNCSIG__;
+    case 207: return TokenKind::KEYWORD___IS_INTERFACE_CLASS;
+    case 208: return TokenKind::KEYWORD___IS_SEALED;
+    case 209: return TokenKind::KEYWORD___IS_DESTRUCTIBLE;
+    case 210: return TokenKind::KEYWORD___IS_TRIVIALLY_DESTRUCTIBLE;
+    case 211: return TokenKind::KEYWORD___IS_NOTHROW_DESTRUCTIBLE;
+    case 212: return TokenKind::KEYWORD___IS_NOTHROW_ASSIGNABLE;
+    case 213: return TokenKind::KEYWORD___IS_CONSTRUCTIBLE;
+    case 214: return TokenKind::KEYWORD___IS_NOTHROW_CONSTRUCTIBLE;
+    case 215: return TokenKind::KEYWORD___IS_ASSIGNABLE;
+    case 216: return TokenKind::KEYWORD___HAS_NOTHROW_MOVE_ASSIGN;
+    case 217: return TokenKind::KEYWORD___HAS_TRIVIAL_MOVE_ASSIGN;
+    case 218: return TokenKind::KEYWORD___HAS_TRIVIAL_MOVE_CONSTRUCTOR;
+    case 219: return TokenKind::KEYWORD___HAS_NOTHROW_ASSIGN;
+    case 220: return TokenKind::KEYWORD___HAS_NOTHROW_COPY;
+    case 221: return TokenKind::KEYWORD___HAS_NOTHROW_CONSTRUCTOR;
+    case 222: return TokenKind::KEYWORD___HAS_TRIVIAL_ASSIGN;
+    case 223: return TokenKind::KEYWORD___HAS_TRIVIAL_COPY;
+    case 224: return TokenKind::KEYWORD___HAS_TRIVIAL_CONSTRUCTOR;
+    case 225: return TokenKind::KEYWORD___HAS_TRIVIAL_DESTRUCTOR;
+    case 226: return TokenKind::KEYWORD___HAS_VIRTUAL_DESTRUCTOR;
+    case 227: return TokenKind::KEYWORD___IS_ABSTRACT;
+    case 228: return TokenKind::KEYWORD___IS_AGGREGATE;
+    case 229: return TokenKind::KEYWORD___IS_BASE_OF;
+    case 230: return TokenKind::KEYWORD___IS_CLASS;
+    case 231: return TokenKind::KEYWORD___IS_CONVERTIBLE_TO;
+    case 232: return TokenKind::KEYWORD___IS_EMPTY;
+    case 233: return TokenKind::KEYWORD___IS_ENUM;
+    case 234: return TokenKind::KEYWORD___IS_FINAL;
+    case 235: return TokenKind::KEYWORD___IS_LITERAL;
+    case 236: return TokenKind::KEYWORD___IS_POD;
+    case 237: return TokenKind::KEYWORD___IS_POLYMORPHIC;
+    case 238: return TokenKind::KEYWORD___IS_STANDARD_LAYOUT;
+    case 239: return TokenKind::KEYWORD___IS_TRIVIAL;
+    case 240: return TokenKind::KEYWORD___IS_TRIVIALLY_ASSIGNABLE;
+    case 241: return TokenKind::KEYWORD___IS_TRIVIALLY_CONSTRUCTIBLE;
+    case 242: return TokenKind::KEYWORD___IS_TRIVIALLY_COPYABLE;
+    case 243: return TokenKind::KEYWORD___IS_UNION;
+    case 244: return TokenKind::KEYWORD___HAS_UNIQUE_OBJECT_REPRESENTATIONS;
+    case 245: return TokenKind::KEYWORD___UNDERLYING_TYPE;
+    case 246: return TokenKind::KEYWORD___REFERENCE_BINDS_TO_TEMPORARY;
+    case 247: return TokenKind::KEYWORD___IS_LVALUE_EXPRESSION;
+    case 248: return TokenKind::KEYWORD___IS_RVALUE_EXPRESSION;
+    case 249: return TokenKind::KEYWORD___IS_ARITHMETIC;
+    case 250: return TokenKind::KEYWORD___IS_FLOATING_POINT;
+    case 251: return TokenKind::KEYWORD___IS_INTEGRAL;
+    case 252: return TokenKind::KEYWORD___IS_COMPLETE_TYPE;
+    case 253: return TokenKind::KEYWORD___IS_VOID;
+    case 254: return TokenKind::KEYWORD___IS_ARRAY;
+    case 255: return TokenKind::KEYWORD___IS_FUNCTION;
+    case 256: return TokenKind::KEYWORD___IS_REFERENCE;
+    case 257: return TokenKind::KEYWORD___IS_LVALUE_REFERENCE;
+    case 258: return TokenKind::KEYWORD___IS_RVALUE_REFERENCE;
+    case 259: return TokenKind::KEYWORD___IS_FUNDAMENTAL;
+    case 260: return TokenKind::KEYWORD___IS_OBJECT;
+    case 261: return TokenKind::KEYWORD___IS_SCALAR;
+    case 262: return TokenKind::KEYWORD___IS_COMPOUND;
+    case 263: return TokenKind::KEYWORD___IS_POINTER;
+    case 264: return TokenKind::KEYWORD___IS_MEMBER_OBJECT_POINTER;
+    case 265: return TokenKind::KEYWORD___IS_MEMBER_FUNCTION_POINTER;
+    case 266: return TokenKind::KEYWORD___IS_MEMBER_POINTER;
+    case 267: return TokenKind::KEYWORD___IS_CONST;
+    case 268: return TokenKind::KEYWORD___IS_VOLATILE;
+    case 269: return TokenKind::KEYWORD___IS_SIGNED;
+    case 270: return TokenKind::KEYWORD___IS_UNSIGNED;
+    case 271: return TokenKind::KEYWORD___IS_SAME;
+    case 272: return TokenKind::KEYWORD___IS_CONVERTIBLE;
+    case 273: return TokenKind::KEYWORD___ARRAY_RANK;
+    case 274: return TokenKind::KEYWORD___ARRAY_EXTENT;
+    case 275: return TokenKind::KEYWORD___PRIVATE_EXTERN__;
+    case 276: return TokenKind::KEYWORD___MODULE_PRIVATE__;
+    case 277: return TokenKind::KEYWORD___DECLSPEC;
+    case 278: return TokenKind::KEYWORD___CDECL;
+    case 279: return TokenKind::KEYWORD___STDCALL;
+    case 280: return TokenKind::KEYWORD___FASTCALL;
+    case 281: return TokenKind::KEYWORD___THISCALL;
+    case 282: return TokenKind::KEYWORD___REGCALL;
+    case 283: return TokenKind::KEYWORD___VECTORCALL;
+    case 284: return TokenKind::KEYWORD___FORCEINLINE;
+    case 285: return TokenKind::KEYWORD___UNALIGNED;
+    case 286: return TokenKind::KEYWORD___SUPER;
+    case 287: return TokenKind::KEYWORD___GLOBAL;
+    case 288: return TokenKind::KEYWORD___LOCAL;
+    case 289: return TokenKind::KEYWORD___CONSTANT;
+    case 290: return TokenKind::KEYWORD___PRIVATE;
+    case 291: return TokenKind::KEYWORD___GENERIC;
+    case 292: return TokenKind::KEYWORD___KERNEL;
+    case 293: return TokenKind::KEYWORD___READ_ONLY;
+    case 294: return TokenKind::KEYWORD___WRITE_ONLY;
+    case 295: return TokenKind::KEYWORD___READ_WRITE;
+    case 296: return TokenKind::KEYWORD___BUILTIN_ASTYPE;
+    case 297: return TokenKind::KEYWORD_VEC_STEP;
+    case 298: return TokenKind::KEYWORD_IMAGE1_DT;
+    case 299: return TokenKind::KEYWORD_IMAGE1_DARRAY_T;
+    case 300: return TokenKind::KEYWORD_IMAGE1_DBUFFER_T;
+    case 301: return TokenKind::KEYWORD_IMAGE2_DT;
+    case 302: return TokenKind::KEYWORD_IMAGE2_DARRAY_T;
+    case 303: return TokenKind::KEYWORD_IMAGE2_DDEPTH_T;
+    case 304: return TokenKind::KEYWORD_IMAGE2_DARRAY_DEPTH_T;
+    case 305: return TokenKind::KEYWORD_IMAGE2_DMSAA_T;
+    case 306: return TokenKind::KEYWORD_IMAGE2_DARRAY_MSAA_T;
+    case 307: return TokenKind::KEYWORD_IMAGE2_DMSAA_DEPTH_T;
+    case 308: return TokenKind::KEYWORD_IMAGE2_DARRAY_MSAA_DEPTH_T;
+    case 309: return TokenKind::KEYWORD_IMAGE3_DT;
+    case 310: return TokenKind::KEYWORD_PIPE;
+    case 311: return TokenKind::KEYWORD_ADDRSPACE_CAST;
+    case 312: return TokenKind::KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN;
+    case 313: return TokenKind::KEYWORD___PASCAL;
+    case 314: return TokenKind::KEYWORD___VECTOR;
+    case 315: return TokenKind::KEYWORD___PIXEL;
+    case 316: return TokenKind::KEYWORD___BOOLEAN;
+    case 317: return TokenKind::KEYWORD___BF16;
+    case 318: return TokenKind::KEYWORD_HALF;
+    case 319: return TokenKind::KEYWORD___BRIDGE;
+    case 320: return TokenKind::KEYWORD___BRIDGE_TRANSFER;
+    case 321: return TokenKind::KEYWORD___BRIDGE_RETAINED;
+    case 322: return TokenKind::KEYWORD___BRIDGE_RETAIN;
+    case 323: return TokenKind::KEYWORD___COVARIANT;
+    case 324: return TokenKind::KEYWORD___CONTRAVARIANT;
+    case 325: return TokenKind::KEYWORD___KINDOF;
+    case 326: return TokenKind::KEYWORD__NONNULL;
+    case 327: return TokenKind::KEYWORD__NULLABLE;
+    case 328: return TokenKind::KEYWORD__NULLABLE_RESULT;
+    case 329: return TokenKind::KEYWORD__NULL_UNSPECIFIED;
+    case 330: return TokenKind::KEYWORD___PTR64;
+    case 331: return TokenKind::KEYWORD___PTR32;
+    case 332: return TokenKind::KEYWORD___SPTR;
+    case 333: return TokenKind::KEYWORD___UPTR;
+    case 334: return TokenKind::KEYWORD___W64;
+    case 335: return TokenKind::KEYWORD___UUIDOF;
+    case 336: return TokenKind::KEYWORD___TRY;
+    case 337: return TokenKind::KEYWORD___FINALLY;
+    case 338: return TokenKind::KEYWORD___LEAVE;
+    case 339: return TokenKind::KEYWORD___INT64;
+    case 340: return TokenKind::KEYWORD___IF_EXISTS;
+    case 341: return TokenKind::KEYWORD___IF_NOT_EXISTS;
+    case 342: return TokenKind::KEYWORD___SINGLE_INHERITANCE;
+    case 343: return TokenKind::KEYWORD___MULTIPLE_INHERITANCE;
+    case 344: return TokenKind::KEYWORD___VIRTUAL_INHERITANCE;
+    case 345: return TokenKind::KEYWORD___INTERFACE;
+    case 346: return TokenKind::KEYWORD___BUILTIN_CONVERTVECTOR;
+    case 347: return TokenKind::KEYWORD___BUILTIN_BIT_CAST;
+    case 348: return TokenKind::KEYWORD___BUILTIN_AVAILABLE;
+    case 349: return TokenKind::KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME;
+    case 350: return TokenKind::KEYWORD___UNKNOWN_ANYTYPE;
+    case 351: return TokenKind::ANNOT_CXXSCOPE;
+    case 352: return TokenKind::ANNOT_TYPENAME;
+    case 353: return TokenKind::ANNOT_TEMPLATE_ID;
+    case 354: return TokenKind::ANNOT_NON_TYPE;
+    case 355: return TokenKind::ANNOT_NON_TYPE_UNDECLARED;
+    case 356: return TokenKind::ANNOT_NON_TYPE_DEPENDENT;
+    case 357: return TokenKind::ANNOT_OVERLOAD;
+    case 358: return TokenKind::ANNOT_PRIMARY_EXPRESSION;
+    case 359: return TokenKind::ANNOT_DECLTYPE;
+    case 360: return TokenKind::ANNOT_PRAGMA_UNUSED;
+    case 361: return TokenKind::ANNOT_PRAGMA_VIS;
+    case 362: return TokenKind::ANNOT_PRAGMA_PACK;
+    case 363: return TokenKind::ANNOT_PRAGMA_PARSER_CRASH;
+    case 364: return TokenKind::ANNOT_PRAGMA_CAPTURED;
+    case 365: return TokenKind::ANNOT_PRAGMA_DUMP;
+    case 366: return TokenKind::ANNOT_PRAGMA_MSSTRUCT;
+    case 367: return TokenKind::ANNOT_PRAGMA_ALIGN;
+    case 368: return TokenKind::ANNOT_PRAGMA_WEAK;
+    case 369: return TokenKind::ANNOT_PRAGMA_WEAKALIAS;
+    case 370: return TokenKind::ANNOT_PRAGMA_REDEFINE_EXTNAME;
+    case 371: return TokenKind::ANNOT_PRAGMA_FP_CONTRACT;
+    case 372: return TokenKind::ANNOT_PRAGMA_FENV_ACCESS;
+    case 373: return TokenKind::ANNOT_PRAGMA_FENV_ROUND;
+    case 374: return TokenKind::ANNOT_PRAGMA_FLOAT_CONTROL;
+    case 375: return TokenKind::ANNOT_PRAGMA_MS_POINTERS_TO_MEMBERS;
+    case 376: return TokenKind::ANNOT_PRAGMA_MS_VTORDISP;
+    case 377: return TokenKind::ANNOT_PRAGMA_MS_PRAGMA;
+    case 378: return TokenKind::ANNOT_PRAGMA_OPENCL_EXTENSION;
+    case 379: return TokenKind::ANNOT_ATTRIBUTE_OPENMP;
+    case 380: return TokenKind::ANNOT_PRAGMA_OPENMP;
+    case 381: return TokenKind::ANNOT_PRAGMA_OPENMP_END;
+    case 382: return TokenKind::ANNOT_PRAGMA_LOOP_HINT;
+    case 383: return TokenKind::ANNOT_PRAGMA_FP;
+    case 384: return TokenKind::ANNOT_PRAGMA_ATTRIBUTE;
+    case 385: return TokenKind::ANNOT_MODULE_INCLUDE;
+    case 386: return TokenKind::ANNOT_MODULE_BEGIN;
+    case 387: return TokenKind::ANNOT_MODULE_END;
+    case 388: return TokenKind::ANNOT_HEADER_UNIT;
+    default: __builtin_unreachable();
   }
 }
 
 TrailingAllocKind FromPasta(pasta::TrailingAllocKind e) {
-  switch (e) {
-    case pasta::TrailingAllocKind::kTAKInheritsConstructor: return TrailingAllocKind::TAK_INHERITS_CONSTRUCTOR;
-    case pasta::TrailingAllocKind::kTAKHasTailExplicit: return TrailingAllocKind::TAK_HAS_TAIL_EXPLICIT;
+  switch (static_cast<unsigned>(e)) {
+    case 1: return TrailingAllocKind::TAK_INHERITS_CONSTRUCTOR;
+    case 2: return TrailingAllocKind::TAK_HAS_TAIL_EXPLICIT;
+    default: __builtin_unreachable();
   }
 }
 
 TranslationUnitKind FromPasta(pasta::TranslationUnitKind e) {
-  switch (e) {
-    case pasta::TranslationUnitKind::kComplete: return TranslationUnitKind::COMPLETE;
-    case pasta::TranslationUnitKind::kPrefix: return TranslationUnitKind::PREFIX;
-    case pasta::TranslationUnitKind::kModule: return TranslationUnitKind::MODULE;
-    case pasta::TranslationUnitKind::kIncremental: return TranslationUnitKind::INCREMENTAL;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TranslationUnitKind::COMPLETE;
+    case 1: return TranslationUnitKind::PREFIX;
+    case 2: return TranslationUnitKind::MODULE;
+    case 3: return TranslationUnitKind::INCREMENTAL;
+    default: __builtin_unreachable();
   }
 }
 
 TrivialAutoVarInitKind FromPasta(pasta::TrivialAutoVarInitKind e) {
-  switch (e) {
-    case pasta::TrivialAutoVarInitKind::kUninitialized: return TrivialAutoVarInitKind::UNINITIALIZED;
-    case pasta::TrivialAutoVarInitKind::kZero: return TrivialAutoVarInitKind::ZERO;
-    case pasta::TrivialAutoVarInitKind::kPattern: return TrivialAutoVarInitKind::PATTERN;
+  switch (static_cast<int>(e)) {
+    case 0: return TrivialAutoVarInitKind::UNINITIALIZED;
+    case 1: return TrivialAutoVarInitKind::ZERO;
+    case 2: return TrivialAutoVarInitKind::PATTERN;
+    default: __builtin_unreachable();
   }
 }
 
 TypeDependence FromPasta(pasta::TypeDependence e) {
-  switch (e) {
-    case pasta::TypeDependence::kUnexpandedPack: return TypeDependence::UNEXPANDED_PACK;
-    case pasta::TypeDependence::kInstantiation: return TypeDependence::INSTANTIATION;
-    case pasta::TypeDependence::kDependent: return TypeDependence::DEPENDENT;
-    case pasta::TypeDependence::kVariablyModified: return TypeDependence::VARIABLY_MODIFIED;
-    case pasta::TypeDependence::kError: return TypeDependence::ERROR;
-    case pasta::TypeDependence::kNone: return TypeDependence::NONE;
-    case pasta::TypeDependence::kAll: return TypeDependence::ALL;
-    case pasta::TypeDependence::kDependentInstantiation: return TypeDependence::DEPENDENT_INSTANTIATION;
+  switch (static_cast<unsigned char>(e)) {
+    case 1: return TypeDependence::UNEXPANDED_PACK;
+    case 2: return TypeDependence::INSTANTIATION;
+    case 4: return TypeDependence::DEPENDENT;
+    case 8: return TypeDependence::VARIABLY_MODIFIED;
+    case 16: return TypeDependence::ERROR;
+    case 0: return TypeDependence::NONE;
+    case 31: return TypeDependence::ALL;
+    case 6: return TypeDependence::DEPENDENT_INSTANTIATION;
+    default: __builtin_unreachable();
   }
 }
 
 TypeLocClass FromPasta(pasta::TypeLocClass e) {
-  switch (e) {
-    case pasta::TypeLocClass::kAdjusted: return TypeLocClass::ADJUSTED;
-    case pasta::TypeLocClass::kDecayed: return TypeLocClass::DECAYED;
-    case pasta::TypeLocClass::kConstantArray: return TypeLocClass::CONSTANT_ARRAY;
-    case pasta::TypeLocClass::kDependentSizedArray: return TypeLocClass::DEPENDENT_SIZED_ARRAY;
-    case pasta::TypeLocClass::kIncompleteArray: return TypeLocClass::INCOMPLETE_ARRAY;
-    case pasta::TypeLocClass::kVariableArray: return TypeLocClass::VARIABLE_ARRAY;
-    case pasta::TypeLocClass::kAtomic: return TypeLocClass::ATOMIC;
-    case pasta::TypeLocClass::kAttributed: return TypeLocClass::ATTRIBUTED;
-    case pasta::TypeLocClass::kBlockPointer: return TypeLocClass::BLOCK_POINTER;
-    case pasta::TypeLocClass::kBuiltin: return TypeLocClass::BUILTIN;
-    case pasta::TypeLocClass::kComplex: return TypeLocClass::COMPLEX;
-    case pasta::TypeLocClass::kDecltype: return TypeLocClass::DECLTYPE;
-    case pasta::TypeLocClass::kAuto: return TypeLocClass::AUTO;
-    case pasta::TypeLocClass::kDeducedTemplateSpecialization: return TypeLocClass::DEDUCED_TEMPLATE_SPECIALIZATION;
-    case pasta::TypeLocClass::kDependentAddressSpace: return TypeLocClass::DEPENDENT_ADDRESS_SPACE;
-    case pasta::TypeLocClass::kDependentExtInt: return TypeLocClass::DEPENDENT_EXT_INT;
-    case pasta::TypeLocClass::kDependentName: return TypeLocClass::DEPENDENT_NAME;
-    case pasta::TypeLocClass::kDependentSizedExtVector: return TypeLocClass::DEPENDENT_SIZED_EXT_VECTOR;
-    case pasta::TypeLocClass::kDependentTemplateSpecialization: return TypeLocClass::DEPENDENT_TEMPLATE_SPECIALIZATION;
-    case pasta::TypeLocClass::kDependentVector: return TypeLocClass::DEPENDENT_VECTOR;
-    case pasta::TypeLocClass::kElaborated: return TypeLocClass::ELABORATED;
-    case pasta::TypeLocClass::kExtInt: return TypeLocClass::EXT_INT;
-    case pasta::TypeLocClass::kFunctionNoProto: return TypeLocClass::FUNCTION_NO_PROTO;
-    case pasta::TypeLocClass::kFunctionProto: return TypeLocClass::FUNCTION_PROTO;
-    case pasta::TypeLocClass::kInjectedClassName: return TypeLocClass::INJECTED_CLASS_NAME;
-    case pasta::TypeLocClass::kMacroQualified: return TypeLocClass::MACRO_QUALIFIED;
-    case pasta::TypeLocClass::kConstantMatrix: return TypeLocClass::CONSTANT_MATRIX;
-    case pasta::TypeLocClass::kDependentSizedMatrix: return TypeLocClass::DEPENDENT_SIZED_MATRIX;
-    case pasta::TypeLocClass::kMemberPointer: return TypeLocClass::MEMBER_POINTER;
-    case pasta::TypeLocClass::kObjCObjectPointer: return TypeLocClass::OBJ_C_OBJECT_POINTER;
-    case pasta::TypeLocClass::kObjCObject: return TypeLocClass::OBJ_C_OBJECT;
-    case pasta::TypeLocClass::kObjCInterface: return TypeLocClass::OBJ_C_INTERFACE;
-    case pasta::TypeLocClass::kObjCTypeParam: return TypeLocClass::OBJ_C_TYPE_PARAM;
-    case pasta::TypeLocClass::kPackExpansion: return TypeLocClass::PACK_EXPANSION;
-    case pasta::TypeLocClass::kParenthesis: return TypeLocClass::PARENTHESIS;
-    case pasta::TypeLocClass::kPipe: return TypeLocClass::PIPE;
-    case pasta::TypeLocClass::kPointer: return TypeLocClass::POINTER;
-    case pasta::TypeLocClass::kLValueReference: return TypeLocClass::L_VALUE_REFERENCE;
-    case pasta::TypeLocClass::kRValueReference: return TypeLocClass::R_VALUE_REFERENCE;
-    case pasta::TypeLocClass::kSubstTemplateTypeParmPack: return TypeLocClass::SUBST_TEMPLATE_TYPE_PARM_PACK;
-    case pasta::TypeLocClass::kSubstTemplateTypeParm: return TypeLocClass::SUBST_TEMPLATE_TYPE_PARM;
-    case pasta::TypeLocClass::kEnum: return TypeLocClass::ENUM;
-    case pasta::TypeLocClass::kRecord: return TypeLocClass::RECORD;
-    case pasta::TypeLocClass::kTemplateSpecialization: return TypeLocClass::TEMPLATE_SPECIALIZATION;
-    case pasta::TypeLocClass::kTemplateTypeParm: return TypeLocClass::TEMPLATE_TYPE_PARM;
-    case pasta::TypeLocClass::kTypeOfExpression: return TypeLocClass::TYPE_OF_EXPRESSION;
-    case pasta::TypeLocClass::kTypeOf: return TypeLocClass::TYPE_OF;
-    case pasta::TypeLocClass::kTypedef: return TypeLocClass::TYPEDEF;
-    case pasta::TypeLocClass::kUnaryTransform: return TypeLocClass::UNARY_TRANSFORM;
-    case pasta::TypeLocClass::kUnresolvedUsing: return TypeLocClass::UNRESOLVED_USING;
-    case pasta::TypeLocClass::kVector: return TypeLocClass::VECTOR;
-    case pasta::TypeLocClass::kExtVector: return TypeLocClass::EXT_VECTOR;
-    case pasta::TypeLocClass::kQualified: return TypeLocClass::QUALIFIED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeLocClass::ADJUSTED;
+    case 1: return TypeLocClass::DECAYED;
+    case 2: return TypeLocClass::CONSTANT_ARRAY;
+    case 3: return TypeLocClass::DEPENDENT_SIZED_ARRAY;
+    case 4: return TypeLocClass::INCOMPLETE_ARRAY;
+    case 5: return TypeLocClass::VARIABLE_ARRAY;
+    case 6: return TypeLocClass::ATOMIC;
+    case 7: return TypeLocClass::ATTRIBUTED;
+    case 8: return TypeLocClass::BLOCK_POINTER;
+    case 9: return TypeLocClass::BUILTIN;
+    case 10: return TypeLocClass::COMPLEX;
+    case 11: return TypeLocClass::DECLTYPE;
+    case 12: return TypeLocClass::AUTO;
+    case 13: return TypeLocClass::DEDUCED_TEMPLATE_SPECIALIZATION;
+    case 14: return TypeLocClass::DEPENDENT_ADDRESS_SPACE;
+    case 15: return TypeLocClass::DEPENDENT_EXT_INT;
+    case 16: return TypeLocClass::DEPENDENT_NAME;
+    case 17: return TypeLocClass::DEPENDENT_SIZED_EXT_VECTOR;
+    case 18: return TypeLocClass::DEPENDENT_TEMPLATE_SPECIALIZATION;
+    case 19: return TypeLocClass::DEPENDENT_VECTOR;
+    case 20: return TypeLocClass::ELABORATED;
+    case 21: return TypeLocClass::EXT_INT;
+    case 22: return TypeLocClass::FUNCTION_NO_PROTO;
+    case 23: return TypeLocClass::FUNCTION_PROTO;
+    case 24: return TypeLocClass::INJECTED_CLASS_NAME;
+    case 25: return TypeLocClass::MACRO_QUALIFIED;
+    case 26: return TypeLocClass::CONSTANT_MATRIX;
+    case 27: return TypeLocClass::DEPENDENT_SIZED_MATRIX;
+    case 28: return TypeLocClass::MEMBER_POINTER;
+    case 29: return TypeLocClass::OBJ_C_OBJECT_POINTER;
+    case 30: return TypeLocClass::OBJ_C_OBJECT;
+    case 31: return TypeLocClass::OBJ_C_INTERFACE;
+    case 32: return TypeLocClass::OBJ_C_TYPE_PARAM;
+    case 33: return TypeLocClass::PACK_EXPANSION;
+    case 34: return TypeLocClass::PARENTHESIS;
+    case 35: return TypeLocClass::PIPE;
+    case 36: return TypeLocClass::POINTER;
+    case 37: return TypeLocClass::L_VALUE_REFERENCE;
+    case 38: return TypeLocClass::R_VALUE_REFERENCE;
+    case 39: return TypeLocClass::SUBST_TEMPLATE_TYPE_PARM_PACK;
+    case 40: return TypeLocClass::SUBST_TEMPLATE_TYPE_PARM;
+    case 41: return TypeLocClass::ENUM;
+    case 42: return TypeLocClass::RECORD;
+    case 43: return TypeLocClass::TEMPLATE_SPECIALIZATION;
+    case 44: return TypeLocClass::TEMPLATE_TYPE_PARM;
+    case 45: return TypeLocClass::TYPE_OF_EXPRESSION;
+    case 46: return TypeLocClass::TYPE_OF;
+    case 47: return TypeLocClass::TYPEDEF;
+    case 48: return TypeLocClass::UNARY_TRANSFORM;
+    case 49: return TypeLocClass::UNRESOLVED_USING;
+    case 50: return TypeLocClass::VECTOR;
+    case 51: return TypeLocClass::EXT_VECTOR;
+    case 52: return TypeLocClass::QUALIFIED;
+    default: __builtin_unreachable();
   }
 }
 
 TypeSpecifierSign FromPasta(pasta::TypeSpecifierSign e) {
-  switch (e) {
-    case pasta::TypeSpecifierSign::kUnspecified: return TypeSpecifierSign::UNSPECIFIED;
-    case pasta::TypeSpecifierSign::kSigned: return TypeSpecifierSign::SIGNED;
-    case pasta::TypeSpecifierSign::kUnsigned: return TypeSpecifierSign::UNSIGNED;
+  switch (static_cast<int>(e)) {
+    case 0: return TypeSpecifierSign::UNSPECIFIED;
+    case 1: return TypeSpecifierSign::SIGNED;
+    case 2: return TypeSpecifierSign::UNSIGNED;
+    default: __builtin_unreachable();
   }
 }
 
 TypeSpecifierType FromPasta(pasta::TypeSpecifierType e) {
-  switch (e) {
-    case pasta::TypeSpecifierType::kUnspecified: return TypeSpecifierType::UNSPECIFIED;
-    case pasta::TypeSpecifierType::kVoid: return TypeSpecifierType::VOID;
-    case pasta::TypeSpecifierType::kCharacter: return TypeSpecifierType::CHARACTER;
-    case pasta::TypeSpecifierType::kWchar: return TypeSpecifierType::WCHAR;
-    case pasta::TypeSpecifierType::kChar8: return TypeSpecifierType::CHAR8;
-    case pasta::TypeSpecifierType::kChar16: return TypeSpecifierType::CHAR16;
-    case pasta::TypeSpecifierType::kChar32: return TypeSpecifierType::CHAR32;
-    case pasta::TypeSpecifierType::kInt: return TypeSpecifierType::INT;
-    case pasta::TypeSpecifierType::kInt128: return TypeSpecifierType::INT128;
-    case pasta::TypeSpecifierType::kExtint: return TypeSpecifierType::EXTINT;
-    case pasta::TypeSpecifierType::kHalf: return TypeSpecifierType::HALF;
-    case pasta::TypeSpecifierType::kFloat16: return TypeSpecifierType::FLOAT16;
-    case pasta::TypeSpecifierType::kAccum: return TypeSpecifierType::ACCUM;
-    case pasta::TypeSpecifierType::kFract: return TypeSpecifierType::FRACT;
-    case pasta::TypeSpecifierType::kBFloat16: return TypeSpecifierType::B_FLOAT16;
-    case pasta::TypeSpecifierType::kFloat: return TypeSpecifierType::FLOAT;
-    case pasta::TypeSpecifierType::kDouble: return TypeSpecifierType::DOUBLE;
-    case pasta::TypeSpecifierType::kFloat128: return TypeSpecifierType::FLOAT128;
-    case pasta::TypeSpecifierType::kBoolean: return TypeSpecifierType::BOOLEAN;
-    case pasta::TypeSpecifierType::kDecimal32: return TypeSpecifierType::DECIMAL32;
-    case pasta::TypeSpecifierType::kDecimal64: return TypeSpecifierType::DECIMAL64;
-    case pasta::TypeSpecifierType::kDecimal128: return TypeSpecifierType::DECIMAL128;
-    case pasta::TypeSpecifierType::kEnum: return TypeSpecifierType::ENUM;
-    case pasta::TypeSpecifierType::kUnion: return TypeSpecifierType::UNION;
-    case pasta::TypeSpecifierType::kStruct: return TypeSpecifierType::STRUCT;
-    case pasta::TypeSpecifierType::kClass: return TypeSpecifierType::CLASS;
-    case pasta::TypeSpecifierType::kInterface: return TypeSpecifierType::INTERFACE;
-    case pasta::TypeSpecifierType::kTypename: return TypeSpecifierType::TYPENAME;
-    case pasta::TypeSpecifierType::kTypeofType: return TypeSpecifierType::TYPEOF_TYPE;
-    case pasta::TypeSpecifierType::kTypeofExpression: return TypeSpecifierType::TYPEOF_EXPRESSION;
-    case pasta::TypeSpecifierType::kDecltype: return TypeSpecifierType::DECLTYPE;
-    case pasta::TypeSpecifierType::kUnderlyingType: return TypeSpecifierType::UNDERLYING_TYPE;
-    case pasta::TypeSpecifierType::kAuto: return TypeSpecifierType::AUTO;
-    case pasta::TypeSpecifierType::kDecltypeAuto: return TypeSpecifierType::DECLTYPE_AUTO;
-    case pasta::TypeSpecifierType::kAutoType: return TypeSpecifierType::AUTO_TYPE;
-    case pasta::TypeSpecifierType::kUnknownAnytype: return TypeSpecifierType::UNKNOWN_ANYTYPE;
-    case pasta::TypeSpecifierType::kAtomic: return TypeSpecifierType::ATOMIC;
-    case pasta::TypeSpecifierType::kImage1dT: return TypeSpecifierType::IMAGE1_DT;
-    case pasta::TypeSpecifierType::kImage1dArrayT: return TypeSpecifierType::IMAGE1_DARRAY_T;
-    case pasta::TypeSpecifierType::kImage1dBufferT: return TypeSpecifierType::IMAGE1_DBUFFER_T;
-    case pasta::TypeSpecifierType::kImage2dT: return TypeSpecifierType::IMAGE2_DT;
-    case pasta::TypeSpecifierType::kImage2dArrayT: return TypeSpecifierType::IMAGE2_DARRAY_T;
-    case pasta::TypeSpecifierType::kImage2dDepthT: return TypeSpecifierType::IMAGE2_DDEPTH_T;
-    case pasta::TypeSpecifierType::kImage2dArrayDepthT: return TypeSpecifierType::IMAGE2_DARRAY_DEPTH_T;
-    case pasta::TypeSpecifierType::kImage2dMsaaT: return TypeSpecifierType::IMAGE2_DMSAA_T;
-    case pasta::TypeSpecifierType::kImage2dArrayMsaaT: return TypeSpecifierType::IMAGE2_DARRAY_MSAA_T;
-    case pasta::TypeSpecifierType::kImage2dMsaaDepthT: return TypeSpecifierType::IMAGE2_DMSAA_DEPTH_T;
-    case pasta::TypeSpecifierType::kImage2dArrayMsaaDepthT: return TypeSpecifierType::IMAGE2_DARRAY_MSAA_DEPTH_T;
-    case pasta::TypeSpecifierType::kImage3dT: return TypeSpecifierType::IMAGE3_DT;
-    case pasta::TypeSpecifierType::kError: return TypeSpecifierType::ERROR;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeSpecifierType::UNSPECIFIED;
+    case 1: return TypeSpecifierType::VOID;
+    case 2: return TypeSpecifierType::CHARACTER;
+    case 3: return TypeSpecifierType::WCHAR;
+    case 4: return TypeSpecifierType::CHAR8;
+    case 5: return TypeSpecifierType::CHAR16;
+    case 6: return TypeSpecifierType::CHAR32;
+    case 7: return TypeSpecifierType::INT;
+    case 8: return TypeSpecifierType::INT128;
+    case 9: return TypeSpecifierType::EXTINT;
+    case 10: return TypeSpecifierType::HALF;
+    case 11: return TypeSpecifierType::FLOAT16;
+    case 12: return TypeSpecifierType::ACCUM;
+    case 13: return TypeSpecifierType::FRACT;
+    case 14: return TypeSpecifierType::B_FLOAT16;
+    case 15: return TypeSpecifierType::FLOAT;
+    case 16: return TypeSpecifierType::DOUBLE;
+    case 17: return TypeSpecifierType::FLOAT128;
+    case 18: return TypeSpecifierType::BOOLEAN;
+    case 19: return TypeSpecifierType::DECIMAL32;
+    case 20: return TypeSpecifierType::DECIMAL64;
+    case 21: return TypeSpecifierType::DECIMAL128;
+    case 22: return TypeSpecifierType::ENUM;
+    case 23: return TypeSpecifierType::UNION;
+    case 24: return TypeSpecifierType::STRUCT;
+    case 25: return TypeSpecifierType::CLASS;
+    case 26: return TypeSpecifierType::INTERFACE;
+    case 27: return TypeSpecifierType::TYPENAME;
+    case 28: return TypeSpecifierType::TYPEOF_TYPE;
+    case 29: return TypeSpecifierType::TYPEOF_EXPRESSION;
+    case 30: return TypeSpecifierType::DECLTYPE;
+    case 31: return TypeSpecifierType::UNDERLYING_TYPE;
+    case 32: return TypeSpecifierType::AUTO;
+    case 33: return TypeSpecifierType::DECLTYPE_AUTO;
+    case 34: return TypeSpecifierType::AUTO_TYPE;
+    case 35: return TypeSpecifierType::UNKNOWN_ANYTYPE;
+    case 36: return TypeSpecifierType::ATOMIC;
+    case 37: return TypeSpecifierType::IMAGE1_DT;
+    case 38: return TypeSpecifierType::IMAGE1_DARRAY_T;
+    case 39: return TypeSpecifierType::IMAGE1_DBUFFER_T;
+    case 40: return TypeSpecifierType::IMAGE2_DT;
+    case 41: return TypeSpecifierType::IMAGE2_DARRAY_T;
+    case 42: return TypeSpecifierType::IMAGE2_DDEPTH_T;
+    case 43: return TypeSpecifierType::IMAGE2_DARRAY_DEPTH_T;
+    case 44: return TypeSpecifierType::IMAGE2_DMSAA_T;
+    case 45: return TypeSpecifierType::IMAGE2_DARRAY_MSAA_T;
+    case 46: return TypeSpecifierType::IMAGE2_DMSAA_DEPTH_T;
+    case 47: return TypeSpecifierType::IMAGE2_DARRAY_MSAA_DEPTH_T;
+    case 48: return TypeSpecifierType::IMAGE3_DT;
+    case 49: return TypeSpecifierType::ERROR;
+    default: __builtin_unreachable();
   }
 }
 
 TypeSpecifierWidth FromPasta(pasta::TypeSpecifierWidth e) {
-  switch (e) {
-    case pasta::TypeSpecifierWidth::kUnspecified: return TypeSpecifierWidth::UNSPECIFIED;
-    case pasta::TypeSpecifierWidth::kShort: return TypeSpecifierWidth::SHORT;
-    case pasta::TypeSpecifierWidth::kLong: return TypeSpecifierWidth::LONG;
-    case pasta::TypeSpecifierWidth::kLongLong: return TypeSpecifierWidth::LONG_LONG;
+  switch (static_cast<int>(e)) {
+    case 0: return TypeSpecifierWidth::UNSPECIFIED;
+    case 1: return TypeSpecifierWidth::SHORT;
+    case 2: return TypeSpecifierWidth::LONG;
+    case 3: return TypeSpecifierWidth::LONG_LONG;
+    default: __builtin_unreachable();
   }
 }
 
 TypeSpecifiersPipe FromPasta(pasta::TypeSpecifiersPipe e) {
-  switch (e) {
-    case pasta::TypeSpecifiersPipe::kUnspecified: return TypeSpecifiersPipe::UNSPECIFIED;
-    case pasta::TypeSpecifiersPipe::kPipe: return TypeSpecifiersPipe::PIPE;
+  switch (static_cast<int>(e)) {
+    case 0: return TypeSpecifiersPipe::UNSPECIFIED;
+    case 1: return TypeSpecifiersPipe::PIPE;
+    default: __builtin_unreachable();
   }
 }
 
 TypeTrait FromPasta(pasta::TypeTrait e) {
-  switch (e) {
-    case pasta::TypeTrait::kIsInterfaceClass: return TypeTrait::IS_INTERFACE_CLASS;
-    case pasta::TypeTrait::kIsSealed: return TypeTrait::IS_SEALED;
-    case pasta::TypeTrait::kIsDestructible: return TypeTrait::IS_DESTRUCTIBLE;
-    case pasta::TypeTrait::kIsTriviallyDestructible: return TypeTrait::IS_TRIVIALLY_DESTRUCTIBLE;
-    case pasta::TypeTrait::kIsNothrowDestructible: return TypeTrait::IS_NOTHROW_DESTRUCTIBLE;
-    case pasta::TypeTrait::kHasNothrowMoveAssign: return TypeTrait::HAS_NOTHROW_MOVE_ASSIGN;
-    case pasta::TypeTrait::kHasTrivialMoveAssign: return TypeTrait::HAS_TRIVIAL_MOVE_ASSIGN;
-    case pasta::TypeTrait::kHasTrivialMoveConstructor: return TypeTrait::HAS_TRIVIAL_MOVE_CONSTRUCTOR;
-    case pasta::TypeTrait::kHasNothrowAssign: return TypeTrait::HAS_NOTHROW_ASSIGN;
-    case pasta::TypeTrait::kHasNothrowCopy: return TypeTrait::HAS_NOTHROW_COPY;
-    case pasta::TypeTrait::kHasNothrowConstructor: return TypeTrait::HAS_NOTHROW_CONSTRUCTOR;
-    case pasta::TypeTrait::kHasTrivialAssign: return TypeTrait::HAS_TRIVIAL_ASSIGN;
-    case pasta::TypeTrait::kHasTrivialCopy: return TypeTrait::HAS_TRIVIAL_COPY;
-    case pasta::TypeTrait::kHasTrivialDefaultConstructor: return TypeTrait::HAS_TRIVIAL_DEFAULT_CONSTRUCTOR;
-    case pasta::TypeTrait::kHasTrivialDestructor: return TypeTrait::HAS_TRIVIAL_DESTRUCTOR;
-    case pasta::TypeTrait::kHasVirtualDestructor: return TypeTrait::HAS_VIRTUAL_DESTRUCTOR;
-    case pasta::TypeTrait::kIsAbstract: return TypeTrait::IS_ABSTRACT;
-    case pasta::TypeTrait::kIsAggregate: return TypeTrait::IS_AGGREGATE;
-    case pasta::TypeTrait::kIsClass: return TypeTrait::IS_CLASS;
-    case pasta::TypeTrait::kIsEmpty: return TypeTrait::IS_EMPTY;
-    case pasta::TypeTrait::kIsEnum: return TypeTrait::IS_ENUM;
-    case pasta::TypeTrait::kIsFinal: return TypeTrait::IS_FINAL;
-    case pasta::TypeTrait::kIsLiteral: return TypeTrait::IS_LITERAL;
-    case pasta::TypeTrait::kIsPOD: return TypeTrait::IS_POD;
-    case pasta::TypeTrait::kIsPolymorphic: return TypeTrait::IS_POLYMORPHIC;
-    case pasta::TypeTrait::kIsStandardLayout: return TypeTrait::IS_STANDARD_LAYOUT;
-    case pasta::TypeTrait::kIsTrivial: return TypeTrait::IS_TRIVIAL;
-    case pasta::TypeTrait::kIsTriviallyCopyable: return TypeTrait::IS_TRIVIALLY_COPYABLE;
-    case pasta::TypeTrait::kIsUnion: return TypeTrait::IS_UNION;
-    case pasta::TypeTrait::kHasUniqueObjectRepresentations: return TypeTrait::HAS_UNIQUE_OBJECT_REPRESENTATIONS;
-    case pasta::TypeTrait::kIsArithmetic: return TypeTrait::IS_ARITHMETIC;
-    case pasta::TypeTrait::kIsFloatingPoint: return TypeTrait::IS_FLOATING_POINT;
-    case pasta::TypeTrait::kIsIntegral: return TypeTrait::IS_INTEGRAL;
-    case pasta::TypeTrait::kIsCompleteType: return TypeTrait::IS_COMPLETE_TYPE;
-    case pasta::TypeTrait::kIsVoid: return TypeTrait::IS_VOID;
-    case pasta::TypeTrait::kIsArray: return TypeTrait::IS_ARRAY;
-    case pasta::TypeTrait::kIsFunction: return TypeTrait::IS_FUNCTION;
-    case pasta::TypeTrait::kIsReference: return TypeTrait::IS_REFERENCE;
-    case pasta::TypeTrait::kIsLvalueReference: return TypeTrait::IS_LVALUE_REFERENCE;
-    case pasta::TypeTrait::kIsRvalueReference: return TypeTrait::IS_RVALUE_REFERENCE;
-    case pasta::TypeTrait::kIsFundamental: return TypeTrait::IS_FUNDAMENTAL;
-    case pasta::TypeTrait::kIsObject: return TypeTrait::IS_OBJECT;
-    case pasta::TypeTrait::kIsScalar: return TypeTrait::IS_SCALAR;
-    case pasta::TypeTrait::kIsCompound: return TypeTrait::IS_COMPOUND;
-    case pasta::TypeTrait::kIsPointer: return TypeTrait::IS_POINTER;
-    case pasta::TypeTrait::kIsMemberObjectPointer: return TypeTrait::IS_MEMBER_OBJECT_POINTER;
-    case pasta::TypeTrait::kIsMemberFunctionPointer: return TypeTrait::IS_MEMBER_FUNCTION_POINTER;
-    case pasta::TypeTrait::kIsMemberPointer: return TypeTrait::IS_MEMBER_POINTER;
-    case pasta::TypeTrait::kIsConst: return TypeTrait::IS_CONST;
-    case pasta::TypeTrait::kIsVolatile: return TypeTrait::IS_VOLATILE;
-    case pasta::TypeTrait::kIsSigned: return TypeTrait::IS_SIGNED;
-    case pasta::TypeTrait::kIsUnsigned: return TypeTrait::IS_UNSIGNED;
-    case pasta::TypeTrait::kTypeCompatible: return TypeTrait::TYPE_COMPATIBLE;
-    case pasta::TypeTrait::kIsNothrowAssignable: return TypeTrait::IS_NOTHROW_ASSIGNABLE;
-    case pasta::TypeTrait::kIsAssignable: return TypeTrait::IS_ASSIGNABLE;
-    case pasta::TypeTrait::kIsBaseOf: return TypeTrait::IS_BASE_OF;
-    case pasta::TypeTrait::kIsConvertibleTo: return TypeTrait::IS_CONVERTIBLE_TO;
-    case pasta::TypeTrait::kIsTriviallyAssignable: return TypeTrait::IS_TRIVIALLY_ASSIGNABLE;
-    case pasta::TypeTrait::kReferenceBindsToTemporary: return TypeTrait::REFERENCE_BINDS_TO_TEMPORARY;
-    case pasta::TypeTrait::kIsSame: return TypeTrait::IS_SAME;
-    case pasta::TypeTrait::kIsConvertible: return TypeTrait::IS_CONVERTIBLE;
-    case pasta::TypeTrait::kIsConstructible: return TypeTrait::IS_CONSTRUCTIBLE;
-    case pasta::TypeTrait::kIsNothrowConstructible: return TypeTrait::IS_NOTHROW_CONSTRUCTIBLE;
-    case pasta::TypeTrait::kIsTriviallyConstructible: return TypeTrait::IS_TRIVIALLY_CONSTRUCTIBLE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeTrait::IS_INTERFACE_CLASS;
+    case 1: return TypeTrait::IS_SEALED;
+    case 2: return TypeTrait::IS_DESTRUCTIBLE;
+    case 3: return TypeTrait::IS_TRIVIALLY_DESTRUCTIBLE;
+    case 4: return TypeTrait::IS_NOTHROW_DESTRUCTIBLE;
+    case 5: return TypeTrait::HAS_NOTHROW_MOVE_ASSIGN;
+    case 6: return TypeTrait::HAS_TRIVIAL_MOVE_ASSIGN;
+    case 7: return TypeTrait::HAS_TRIVIAL_MOVE_CONSTRUCTOR;
+    case 8: return TypeTrait::HAS_NOTHROW_ASSIGN;
+    case 9: return TypeTrait::HAS_NOTHROW_COPY;
+    case 10: return TypeTrait::HAS_NOTHROW_CONSTRUCTOR;
+    case 11: return TypeTrait::HAS_TRIVIAL_ASSIGN;
+    case 12: return TypeTrait::HAS_TRIVIAL_COPY;
+    case 13: return TypeTrait::HAS_TRIVIAL_DEFAULT_CONSTRUCTOR;
+    case 14: return TypeTrait::HAS_TRIVIAL_DESTRUCTOR;
+    case 15: return TypeTrait::HAS_VIRTUAL_DESTRUCTOR;
+    case 16: return TypeTrait::IS_ABSTRACT;
+    case 17: return TypeTrait::IS_AGGREGATE;
+    case 18: return TypeTrait::IS_CLASS;
+    case 19: return TypeTrait::IS_EMPTY;
+    case 20: return TypeTrait::IS_ENUM;
+    case 21: return TypeTrait::IS_FINAL;
+    case 22: return TypeTrait::IS_LITERAL;
+    case 23: return TypeTrait::IS_POD;
+    case 24: return TypeTrait::IS_POLYMORPHIC;
+    case 25: return TypeTrait::IS_STANDARD_LAYOUT;
+    case 26: return TypeTrait::IS_TRIVIAL;
+    case 27: return TypeTrait::IS_TRIVIALLY_COPYABLE;
+    case 28: return TypeTrait::IS_UNION;
+    case 29: return TypeTrait::HAS_UNIQUE_OBJECT_REPRESENTATIONS;
+    case 30: return TypeTrait::IS_ARITHMETIC;
+    case 31: return TypeTrait::IS_FLOATING_POINT;
+    case 32: return TypeTrait::IS_INTEGRAL;
+    case 33: return TypeTrait::IS_COMPLETE_TYPE;
+    case 34: return TypeTrait::IS_VOID;
+    case 35: return TypeTrait::IS_ARRAY;
+    case 36: return TypeTrait::IS_FUNCTION;
+    case 37: return TypeTrait::IS_REFERENCE;
+    case 38: return TypeTrait::IS_LVALUE_REFERENCE;
+    case 39: return TypeTrait::IS_RVALUE_REFERENCE;
+    case 40: return TypeTrait::IS_FUNDAMENTAL;
+    case 41: return TypeTrait::IS_OBJECT;
+    case 42: return TypeTrait::IS_SCALAR;
+    case 43: return TypeTrait::IS_COMPOUND;
+    case 44: return TypeTrait::IS_POINTER;
+    case 45: return TypeTrait::IS_MEMBER_OBJECT_POINTER;
+    case 46: return TypeTrait::IS_MEMBER_FUNCTION_POINTER;
+    case 47: return TypeTrait::IS_MEMBER_POINTER;
+    case 48: return TypeTrait::IS_CONST;
+    case 49: return TypeTrait::IS_VOLATILE;
+    case 50: return TypeTrait::IS_SIGNED;
+    case 51: return TypeTrait::IS_UNSIGNED;
+    case 52: return TypeTrait::TYPE_COMPATIBLE;
+    case 53: return TypeTrait::IS_NOTHROW_ASSIGNABLE;
+    case 54: return TypeTrait::IS_ASSIGNABLE;
+    case 55: return TypeTrait::IS_BASE_OF;
+    case 56: return TypeTrait::IS_CONVERTIBLE_TO;
+    case 57: return TypeTrait::IS_TRIVIALLY_ASSIGNABLE;
+    case 58: return TypeTrait::REFERENCE_BINDS_TO_TEMPORARY;
+    case 59: return TypeTrait::IS_SAME;
+    case 60: return TypeTrait::IS_CONVERTIBLE;
+    case 61: return TypeTrait::IS_CONSTRUCTIBLE;
+    case 62: return TypeTrait::IS_NOTHROW_CONSTRUCTIBLE;
+    case 63: return TypeTrait::IS_TRIVIALLY_CONSTRUCTIBLE;
+    default: __builtin_unreachable();
   }
 }
 
 UnaryExprOrTypeTrait FromPasta(pasta::UnaryExprOrTypeTrait e) {
-  switch (e) {
-    case pasta::UnaryExprOrTypeTrait::kSizeOf: return UnaryExprOrTypeTrait::SIZE_OF;
-    case pasta::UnaryExprOrTypeTrait::kAlignOf: return UnaryExprOrTypeTrait::ALIGN_OF;
-    case pasta::UnaryExprOrTypeTrait::kPreferredAlignOf: return UnaryExprOrTypeTrait::PREFERRED_ALIGN_OF;
-    case pasta::UnaryExprOrTypeTrait::kVecStep: return UnaryExprOrTypeTrait::VEC_STEP;
-    case pasta::UnaryExprOrTypeTrait::kOpenMPRequiredSimdAlign: return UnaryExprOrTypeTrait::OPEN_MP_REQUIRED_SIMD_ALIGN;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UnaryExprOrTypeTrait::SIZE_OF;
+    case 1: return UnaryExprOrTypeTrait::ALIGN_OF;
+    case 2: return UnaryExprOrTypeTrait::PREFERRED_ALIGN_OF;
+    case 3: return UnaryExprOrTypeTrait::VEC_STEP;
+    case 4: return UnaryExprOrTypeTrait::OPEN_MP_REQUIRED_SIMD_ALIGN;
+    default: __builtin_unreachable();
   }
 }
 
 UnaryOperatorKind FromPasta(pasta::UnaryOperatorKind e) {
-  switch (e) {
-    case pasta::UnaryOperatorKind::kPostIncrement: return UnaryOperatorKind::POST_INCREMENT;
-    case pasta::UnaryOperatorKind::kPostDec: return UnaryOperatorKind::POST_DEC;
-    case pasta::UnaryOperatorKind::kPreIncrement: return UnaryOperatorKind::PRE_INCREMENT;
-    case pasta::UnaryOperatorKind::kPreDec: return UnaryOperatorKind::PRE_DEC;
-    case pasta::UnaryOperatorKind::kAddrOf: return UnaryOperatorKind::ADDR_OF;
-    case pasta::UnaryOperatorKind::kDeref: return UnaryOperatorKind::DEREF;
-    case pasta::UnaryOperatorKind::kPlus: return UnaryOperatorKind::PLUS;
-    case pasta::UnaryOperatorKind::kMinus: return UnaryOperatorKind::MINUS;
-    case pasta::UnaryOperatorKind::kNot: return UnaryOperatorKind::NOT;
-    case pasta::UnaryOperatorKind::kLNot: return UnaryOperatorKind::L_NOT;
-    case pasta::UnaryOperatorKind::kReal: return UnaryOperatorKind::REAL;
-    case pasta::UnaryOperatorKind::kImag: return UnaryOperatorKind::IMAG;
-    case pasta::UnaryOperatorKind::kExtension: return UnaryOperatorKind::EXTENSION;
-    case pasta::UnaryOperatorKind::kCoawait: return UnaryOperatorKind::COAWAIT;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UnaryOperatorKind::POST_INCREMENT;
+    case 1: return UnaryOperatorKind::POST_DEC;
+    case 2: return UnaryOperatorKind::PRE_INCREMENT;
+    case 3: return UnaryOperatorKind::PRE_DEC;
+    case 4: return UnaryOperatorKind::ADDR_OF;
+    case 5: return UnaryOperatorKind::DEREF;
+    case 6: return UnaryOperatorKind::PLUS;
+    case 7: return UnaryOperatorKind::MINUS;
+    case 8: return UnaryOperatorKind::NOT;
+    case 9: return UnaryOperatorKind::L_NOT;
+    case 10: return UnaryOperatorKind::REAL;
+    case 11: return UnaryOperatorKind::IMAG;
+    case 12: return UnaryOperatorKind::EXTENSION;
+    case 13: return UnaryOperatorKind::COAWAIT;
+    default: __builtin_unreachable();
   }
 }
 
 APValueKind FromPasta(pasta::APValueKind e) {
-  switch (e) {
-    case pasta::APValueKind::kNone: return APValueKind::NONE;
-    case pasta::APValueKind::kIndeterminate: return APValueKind::INDETERMINATE;
-    case pasta::APValueKind::kInt: return APValueKind::INT;
-    case pasta::APValueKind::kFloat: return APValueKind::FLOAT;
-    case pasta::APValueKind::kFixedPoint: return APValueKind::FIXED_POINT;
-    case pasta::APValueKind::kComplexInt: return APValueKind::COMPLEX_INT;
-    case pasta::APValueKind::kComplexFloat: return APValueKind::COMPLEX_FLOAT;
-    case pasta::APValueKind::kLValue: return APValueKind::L_VALUE;
-    case pasta::APValueKind::kVector: return APValueKind::VECTOR;
-    case pasta::APValueKind::kArray: return APValueKind::ARRAY;
-    case pasta::APValueKind::kStruct: return APValueKind::STRUCT;
-    case pasta::APValueKind::kUnion: return APValueKind::UNION;
-    case pasta::APValueKind::kMemberPointer: return APValueKind::MEMBER_POINTER;
-    case pasta::APValueKind::kAddrLabelDiff: return APValueKind::ADDR_LABEL_DIFF;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return APValueKind::NONE;
+    case 1: return APValueKind::INDETERMINATE;
+    case 2: return APValueKind::INT;
+    case 3: return APValueKind::FLOAT;
+    case 4: return APValueKind::FIXED_POINT;
+    case 5: return APValueKind::COMPLEX_INT;
+    case 6: return APValueKind::COMPLEX_FLOAT;
+    case 7: return APValueKind::L_VALUE;
+    case 8: return APValueKind::VECTOR;
+    case 9: return APValueKind::ARRAY;
+    case 10: return APValueKind::STRUCT;
+    case 11: return APValueKind::UNION;
+    case 12: return APValueKind::MEMBER_POINTER;
+    case 13: return APValueKind::ADDR_LABEL_DIFF;
+    default: __builtin_unreachable();
   }
 }
 
 VectorLibrary FromPasta(pasta::VectorLibrary e) {
-  switch (e) {
-    case pasta::VectorLibrary::kNoLibrary: return VectorLibrary::NO_LIBRARY;
-    case pasta::VectorLibrary::kAccelerate: return VectorLibrary::ACCELERATE;
-    case pasta::VectorLibrary::kLIBMVEC: return VectorLibrary::LIBMVEC;
-    case pasta::VectorLibrary::kMASSV: return VectorLibrary::MASSV;
-    case pasta::VectorLibrary::kSVML: return VectorLibrary::SVML;
-    case pasta::VectorLibrary::kDarwinLibsystemM: return VectorLibrary::DARWIN_LIBSYSTEM_M;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VectorLibrary::NO_LIBRARY;
+    case 1: return VectorLibrary::ACCELERATE;
+    case 2: return VectorLibrary::LIBMVEC;
+    case 3: return VectorLibrary::MASSV;
+    case 4: return VectorLibrary::SVML;
+    case 5: return VectorLibrary::DARWIN_LIBSYSTEM_M;
+    default: __builtin_unreachable();
   }
 }
 
 Visibility FromPasta(pasta::Visibility e) {
-  switch (e) {
-    case pasta::Visibility::kHiddenVisibility: return Visibility::HIDDEN_VISIBILITY;
-    case pasta::Visibility::kProtectedVisibility: return Visibility::PROTECTED_VISIBILITY;
-    case pasta::Visibility::kDefaultVisibility: return Visibility::DEFAULT_VISIBILITY;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return Visibility::HIDDEN_VISIBILITY;
+    case 1: return Visibility::PROTECTED_VISIBILITY;
+    case 2: return Visibility::DEFAULT_VISIBILITY;
+    default: __builtin_unreachable();
   }
 }
 
 VisibilityType FromPasta(pasta::VisibilityType e) {
-  switch (e) {
-    case pasta::VisibilityType::kDefault: return VisibilityType::DEFAULT;
-    case pasta::VisibilityType::kHidden: return VisibilityType::HIDDEN;
-    case pasta::VisibilityType::kProtected: return VisibilityType::PROTECTED;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VisibilityType::DEFAULT;
+    case 1: return VisibilityType::HIDDEN;
+    case 2: return VisibilityType::PROTECTED;
+    default: __builtin_unreachable();
   }
 }
 
 PathKind FromPasta(pasta::PathKind e) {
-  switch (e) {
-    case pasta::PathKind::kUnix: return PathKind::UNIX;
-    case pasta::PathKind::kWindows: return PathKind::WINDOWS;
+  switch (static_cast<signed char>(e)) {
+    case 47: return PathKind::UNIX;
+    case 92: return PathKind::WINDOWS;
+    default: __builtin_unreachable();
   }
 }
 
 FileType FromPasta(pasta::FileType e) {
-  switch (e) {
-    case pasta::FileType::kNone: return FileType::NONE;
-    case pasta::FileType::kNotFound: return FileType::NOT_FOUND;
-    case pasta::FileType::kRegular: return FileType::REGULAR;
-    case pasta::FileType::kDirectory: return FileType::DIRECTORY;
-    case pasta::FileType::kSymbolicLink: return FileType::SYMBOLIC_LINK;
-    case pasta::FileType::kBlock: return FileType::BLOCK;
-    case pasta::FileType::kCharacter: return FileType::CHARACTER;
-    case pasta::FileType::kFirstInFirstOut: return FileType::FIRST_IN_FIRST_OUT;
-    case pasta::FileType::kSocket: return FileType::SOCKET;
-    case pasta::FileType::kKnknown: return FileType::KNKNOWN;
+  switch (static_cast<signed char>(e)) {
+    case 0: return FileType::NONE;
+    case -1: return FileType::NOT_FOUND;
+    case 1: return FileType::REGULAR;
+    case 2: return FileType::DIRECTORY;
+    case 3: return FileType::SYMBOLIC_LINK;
+    case 4: return FileType::BLOCK;
+    case 5: return FileType::CHARACTER;
+    case 6: return FileType::FIRST_IN_FIRST_OUT;
+    case 7: return FileType::SOCKET;
+    case 8: return FileType::KNKNOWN;
+    default: __builtin_unreachable();
   }
 }
 
 CompilerName FromPasta(pasta::CompilerName e) {
-  switch (e) {
-    case pasta::CompilerName::kUnknown: return CompilerName::UNKNOWN;
-    case pasta::CompilerName::kClang: return CompilerName::CLANG;
-    case pasta::CompilerName::kAppleClang: return CompilerName::APPLE_CLANG;
-    case pasta::CompilerName::kClangCL: return CompilerName::CLANG_CL;
-    case pasta::CompilerName::kCL: return CompilerName::CL;
-    case pasta::CompilerName::kGNU: return CompilerName::GNU;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CompilerName::UNKNOWN;
+    case 1: return CompilerName::CLANG;
+    case 2: return CompilerName::APPLE_CLANG;
+    case 3: return CompilerName::CLANG_CL;
+    case 4: return CompilerName::CL;
+    case 5: return CompilerName::GNU;
+    default: __builtin_unreachable();
   }
 }
 
 IncludePathLocation FromPasta(pasta::IncludePathLocation e) {
-  switch (e) {
-    case pasta::IncludePathLocation::kAbsolute: return IncludePathLocation::ABSOLUTE;
-    case pasta::IncludePathLocation::kSysrootRelative: return IncludePathLocation::SYSROOT_RELATIVE;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return IncludePathLocation::ABSOLUTE;
+    case 1: return IncludePathLocation::SYSROOT_RELATIVE;
+    default: __builtin_unreachable();
   }
 }
 
 TargetLanguage FromPasta(pasta::TargetLanguage e) {
-  switch (e) {
-    case pasta::TargetLanguage::kC: return TargetLanguage::C;
-    case pasta::TargetLanguage::kCXX: return TargetLanguage::CXX;
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TargetLanguage::C;
+    case 1: return TargetLanguage::CXX;
+    default: __builtin_unreachable();
   }
 }
 

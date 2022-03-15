@@ -24,8 +24,6 @@
 #include <unistd.h>
 #include <poll.h>
 
-#include <pasta/Util/ArgumentVector.h>
-
 namespace mx {
 namespace {
 
@@ -39,7 +37,7 @@ class NullBuffer : public std::streambuf {
 // Execute the command specified in `args` with the ability to feed the
 // command input and capture output. Passing `nullptr` to any of `input`,
 // `output`, or `error` is acceptable.
-int Subprocess::Execute(const pasta::ArgumentVector &cmd,
+int Subprocess::Execute(const std::vector<std::string> &cmd,
                         const std::unordered_map<std::string, std::string> *env,
                         std::istream *input, std::ostream *output,
                         std::ostream *error) {
@@ -47,6 +45,12 @@ int Subprocess::Execute(const pasta::ArgumentVector &cmd,
     kRead = 0,
     kWrite = 1
   };
+
+  std::vector<char *> args;
+  args.reserve(cmd.size());
+  for (const auto &arg : cmd) {
+    args.push_back(const_cast<char *>(arg.c_str()));
+  }
 
   int input_pipe[2] = {-1, -1};
   int output_pipe[2] = {-1, -1};
@@ -84,7 +88,17 @@ int Subprocess::Execute(const pasta::ArgumentVector &cmd,
   }
   env_array.push_back(nullptr);
 
-  LOG(INFO) << "Executing command: " << cmd.Join();
+  auto join_command = [&cmd] (void) {
+    std::stringstream ss;
+    auto sep = "";
+    for (const auto &arg : cmd) {
+      ss << sep << arg;
+      sep = " ";
+    }
+    return ss.str();
+  };
+
+  DLOG(INFO) << "Executing command: " << join_command();
 
   auto has_error = false;
   if (-1 == pipe(input_pipe)) {
@@ -153,9 +167,7 @@ int Subprocess::Execute(const pasta::ArgumentVector &cmd,
     close(output_pipe[kWrite]);
     close(error_pipe[kRead]);
     close(error_pipe[kWrite]);
-
-    execve(cmd[0], const_cast<char * const *>(cmd.Argv()),
-           env_array.data());
+    execve(args[0], args.data(), env_array.data());
     exit(EXIT_FAILURE);
   }
 

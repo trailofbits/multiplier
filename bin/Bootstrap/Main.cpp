@@ -314,6 +314,8 @@ class CodeGenerator {
   std::ofstream lib_h_os;
   std::ofstream lib_cpp_os;
   std::ofstream include_h_os;
+  std::ofstream serialize_h_os;
+  std::ofstream serialize_cpp_os;
 
   std::vector<pasta::NamespaceDecl> pastas;
 
@@ -343,7 +345,8 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   include_h_os << "enum class " << enum_name << " : unsigned short {\n";
   lib_cpp_os
       << enum_name << " FromPasta(pasta::" << enum_name << " e) {\n"
-      << "  switch (e) {\n";
+      << "  switch (static_cast<" << CxxIntType(enum_decl.IntegerType())
+      << ">(e)) {\n";
 
   std::unordered_set<std::string> seen_initializers;
   std::string initializer;
@@ -351,6 +354,8 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
   auto i = 0u;
   for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
+    initializer.clear();
+
     auto val_name = val.Name();
     auto orig_val_name = val_name;
 
@@ -358,7 +363,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     auto ap_val = val.InitializerVal();
     ap_val.print(initializer_ss, ap_val.isSigned());
     initializer_ss.flush();
-    if (!seen_initializers.emplace(std::move(initializer)).second) {
+    if (!seen_initializers.emplace(initializer).second) {
       schema_os << "  # Skipped repeat pasta::" << orig_val_name << "\n";
       include_h_os << "  // Skipped repeat pasta::" << orig_val_name << "\n";
       continue;
@@ -389,11 +394,11 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       enum_case = "WHITESPACE";
 
       lib_cpp_os
-          << "    case pasta::TokenKind::kRawIdentifier: return TokenKind::IDENTIFIER;\n";
+          << "    case " << initializer << ": return TokenKind::IDENTIFIER;\n";
     } else {
       lib_cpp_os
-          << "    case pasta::" << enum_name << "::" << orig_val_name
-          << ": return " << enum_name << "::" << enum_case << ";\n";
+          << "    case " << initializer << ": return "
+          << enum_name << "::" << enum_case << ";\n";
     }
 
     schema_os
@@ -405,7 +410,9 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     ++i;
   }
 
+
   lib_cpp_os
+      << "    default: __builtin_unreachable();\n"
       << "  }\n"  // End of `switch`.
       << "}\n\n";  // End of `FromPasta`.
 
@@ -599,13 +606,6 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
       << "#include <multiplier/AST.h>\n\n"
-      << "#include <pasta/AST/Decl.h>\n"
-      << "#include <pasta/AST/Forward.h>\n"
-      << "#include <pasta/AST/Stmt.h>\n"
-      << "#include <pasta/AST/Token.h>\n"
-      << "#include <pasta/AST/Type.h>\n\n"
-      << "#include <pasta/Compile/Compiler.h>\n"
-      << "#include <pasta/Util/FileSystem.h>\n\n"
       << "#include \"AST.capnp.h\"\n\n"
       << "namespace mx {\n";
 
@@ -618,6 +618,28 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// Auto-generated file; do not modify!\n\n"
       << "#include \"AST.h\"\n\n"
       << "namespace mx {\n";
+
+  serialize_h_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
+      << "#include <multiplier/AST.h>\n"
+      << "#include <multiplier/AST.capnp.h>\n\n"
+      << "namespace pasta {\n";
+
+  serialize_cpp_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#include \"Serialize.h\"\n\n"
+      << "namespace indexer {\n";
 
   // Buffers the struct output so that we can output tag types on an as-
   // needed basis.
@@ -649,22 +671,26 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {
-    include_h_os << "class " << record.Name() << ";\n";
+    serialize_h_os << "class " << record.Name() << ";\n";
   }
   for (const pasta::CXXRecordDecl &record : stmts) {
-    include_h_os << "class " << record.Name() << ";\n";
+    serialize_h_os << "class " << record.Name() << ";\n";
   }
   for (const pasta::CXXRecordDecl &record : types) {
-    include_h_os << "class " << record.Name() << ";\n";
+    serialize_h_os << "class " << record.Name() << ";\n";
   }
   for (const pasta::CXXRecordDecl &record : tokens) {
-    include_h_os << "class " << record.Name() << ";\n";
+    serialize_h_os << "class " << record.Name() << ";\n";
   }
   for (const pasta::EnumDecl &tag : enums) {
     if (auto itype = CxxIntType(tag.IntegerType())) {
+      serialize_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
       include_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
     }
   }
+  serialize_h_os
+      << "}  // namespace pasta\n"
+      << "namespace indexer {\n";
   include_h_os
       << "}  // namespace pasta\n"
       << "namespace mx {\n";
@@ -695,6 +721,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   schema_os << "struct EntityList @0xf26db0d046aab9c9 {\n";
   auto i = 0u;
   for (const auto &class_name : class_names) {
+    if (gNotReferenceTypes.count(class_name)) {
+      continue;
+    }
+
     auto snake_name = CapitalCaseToSnakeCase(class_name);
     auto camel_name = SnakeCaseToCamelCase(snake_name);
     schema_os
@@ -707,6 +737,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   lib_cpp_os << "}  // namespace mx\n";
   lib_h_os << "}  // namespace mx\n";
   include_h_os << "}  // namespace mx\n";
+  serialize_h_os << "}  // namespace indexer\n";
+  serialize_cpp_os << "}  // namespace indexer\n";
 
   return EXIT_SUCCESS;
 }
@@ -785,10 +817,12 @@ CodeGenerator::CodeGenerator(char *argv[])
     : schema_os(argv[3], std::ios::trunc | std::ios::out),
       lib_h_os(argv[4], std::ios::trunc | std::ios::out),
       lib_cpp_os(argv[5], std::ios::trunc | std::ios::out),
-      include_h_os(argv[6], std::ios::trunc | std::ios::out) {}
+      include_h_os(argv[6], std::ios::trunc | std::ios::out),
+      serialize_h_os(argv[7], std::ios::trunc | std::ios::out),
+      serialize_cpp_os(argv[8], std::ios::trunc | std::ios::out) {}
 
 int main(int argc, char *argv[]) {
-  if (7 != argc) {
+  if (9 != argc) {
     std::cerr
         << "Usage: " << argv[0]
         << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_CAPNP LIB_H LIB_CPP INCLUDE_H"

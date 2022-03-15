@@ -18,19 +18,22 @@ add_executable("${exe_name}"
     "Main.cpp"
     "PrintTokenGraph.cpp"
     "PrintTokenGraph.h"
+    "Serialize.cpp"
+    "Serialize.h"
     "Server.cpp"
     "Server.h"
-#    "Storage.cpp"
-#    "Storage.h"
     "TokenizeFile.cpp"
     "TokenizeFile.h"
     "TokenTree.cpp"
     "TokenTree.h"
+    "Util.cpp"
+    "Util.h"
 )
 
 target_link_libraries("${exe_name}"
   PRIVATE
     "util"
+    pasta::pasta
 )
 
 add_executable("${PROJECT_NAME}::${exe_name}" ALIAS "${exe_name}")

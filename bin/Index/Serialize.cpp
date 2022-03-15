@@ -6,11 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#pragma once
+#include "Serialize.h"
 
-#include <multiplier/AST.h>
-
-#include "AST.capnp.h"
-
-namespace mx {
-}  // namespace mx
+namespace indexer {
+}  // namespace indexer
