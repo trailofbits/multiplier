@@ -437,7 +437,7 @@ CXXNewExprInitializationStyle FromPasta(pasta::CXXNewExprInitializationStyle e) 
 }
 
 CallExprADLCallKind FromPasta(pasta::CallExprADLCallKind e) {
-  switch (static_cast<bool>(e)) {
+  switch (static_cast<int>(e)) {
     case 0: return CallExprADLCallKind::NOT_ADL;
     case 1: return CallExprADLCallKind::USES_ADL;
     default: __builtin_unreachable();

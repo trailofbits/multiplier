@@ -5395,6 +5395,24 @@ struct AccessSpecDecl @0xe671324616f83d3c {
   colonToken @2 :Ref(Token);
 }
 
+struct OMPDeclarativeDirectiveDecl @0xfdc732b6f8da601e {
+  decl @0:Decl;
+}
+
+struct OMPThreadPrivateDecl @0xa91fd10d3da452b5 {
+  ompDeclarativeDirectiveDecl @0:OMPDeclarativeDirectiveDecl;
+  varlists @1 :List(Ref(Expr));
+}
+
+struct OMPRequiresDecl @0xd5d3ec3fbc91423c {
+  ompDeclarativeDirectiveDecl @0:OMPDeclarativeDirectiveDecl;
+}
+
+struct OMPAllocateDecl @0xe7eb4cee19c86540 {
+  ompDeclarativeDirectiveDecl @0:OMPDeclarativeDirectiveDecl;
+  varlists @1 :List(Ref(Expr));
+}
+
 struct TranslationUnitDecl @0x84ba694d5be7caa3 {
   decl @0:Decl;
   anonymousNamespace @1 :Ref(NamespaceDecl);
@@ -5741,12 +5759,11 @@ struct CXXConversionDecl @0xac531836739115b2 {
 struct CXXConstructorDecl @0xc6bfa2c4650464b8 {
   cxxMethodDecl @0:CXXMethodDecl;
   targetConstructor @1 :Ref(CXXConstructorDecl);
-  isConvertingConstructor @2 :Bool;
-  isDefaultConstructor @3 :Bool;
-  isDelegatingConstructor @4 :Bool;
-  isExplicit @5 :Bool;
-  isInheritingConstructor @6 :Bool;
-  isSpecializationCopyingObject @7 :Bool;
+  isDefaultConstructor @2 :Bool;
+  isDelegatingConstructor @3 :Bool;
+  isExplicit @4 :Bool;
+  isInheritingConstructor @5 :Bool;
+  isSpecializationCopyingObject @6 :Bool;
 }
 
 struct CXXDeductionGuideDecl @0xca6c78b5c1634d9d {
@@ -5788,6 +5805,15 @@ struct BindingDecl @0xe77651068f3e1703 {
   valueDecl @0:ValueDecl;
   decomposedDeclaration @1 :Ref(ValueDecl);
   holdingVariable @2 :Ref(VarDecl);
+}
+
+struct OMPDeclarativeDirectiveValueDecl @0xc2c7acb8e7dbee6f {
+  valueDecl @0:ValueDecl;
+}
+
+struct OMPDeclareMapperDecl @0xa1fda623202f7e38 {
+  ompDeclarativeDirectiveValueDecl @0:OMPDeclarativeDirectiveValueDecl;
+  prevDeclarationInScope @1 :Ref(OMPDeclareMapperDecl);
 }
 
 struct UsingShadowDecl @0xef25bc2e71e7534e {
@@ -6581,90 +6607,94 @@ struct EntityList @0xf26db0d046aab9c9 {
   capturedDecl @224 :List(CapturedDecl);
   blockDecl @225 :List(BlockDecl);
   accessSpecDecl @226 :List(AccessSpecDecl);
-  translationUnitDecl @227 :List(TranslationUnitDecl);
-  staticAssertDecl @228 :List(StaticAssertDecl);
-  requiresExprBodyDecl @229 :List(RequiresExprBodyDecl);
-  pragmaDetectMismatchDecl @230 :List(PragmaDetectMismatchDecl);
-  pragmaCommentDecl @231 :List(PragmaCommentDecl);
-  objCPropertyImplDecl @232 :List(ObjCPropertyImplDecl);
-  namedDecl @233 :List(NamedDecl);
-  labelDecl @234 :List(LabelDecl);
-  baseUsingDecl @235 :List(BaseUsingDecl);
-  usingEnumDecl @236 :List(UsingEnumDecl);
-  usingDecl @237 :List(UsingDecl);
-  valueDecl @238 :List(ValueDecl);
-  unresolvedUsingValueDecl @239 :List(UnresolvedUsingValueDecl);
-  templateParamObjectDecl @240 :List(TemplateParamObjectDecl);
-  ompDeclareReductionDecl @241 :List(OMPDeclareReductionDecl);
-  msGuidDecl @242 :List(MSGuidDecl);
-  indirectFieldDecl @243 :List(IndirectFieldDecl);
-  enumConstantDecl @244 :List(EnumConstantDecl);
-  declaratorDecl @245 :List(DeclaratorDecl);
-  varDecl @246 :List(VarDecl);
-  parmVarDecl @247 :List(ParmVarDecl);
-  ompCapturedExprDecl @248 :List(OMPCapturedExprDecl);
-  implicitParamDecl @249 :List(ImplicitParamDecl);
-  decompositionDecl @250 :List(DecompositionDecl);
-  varTemplateSpecializationDecl @251 :List(VarTemplateSpecializationDecl);
-  varTemplatePartialSpecializationDecl @252 :List(VarTemplatePartialSpecializationDecl);
-  nonTypeTemplateParmDecl @253 :List(NonTypeTemplateParmDecl);
-  msPropertyDecl @254 :List(MSPropertyDecl);
-  functionDecl @255 :List(FunctionDecl);
-  cxxMethodDecl @256 :List(CXXMethodDecl);
-  cxxDestructorDecl @257 :List(CXXDestructorDecl);
-  cxxConversionDecl @258 :List(CXXConversionDecl);
-  cxxConstructorDecl @259 :List(CXXConstructorDecl);
-  cxxDeductionGuideDecl @260 :List(CXXDeductionGuideDecl);
-  fieldDecl @261 :List(FieldDecl);
-  objCIvarDecl @262 :List(ObjCIvarDecl);
-  objCAtDefsFieldDecl @263 :List(ObjCAtDefsFieldDecl);
-  bindingDecl @264 :List(BindingDecl);
-  usingShadowDecl @265 :List(UsingShadowDecl);
-  constructorUsingShadowDecl @266 :List(ConstructorUsingShadowDecl);
-  usingPackDecl @267 :List(UsingPackDecl);
-  usingDirectiveDecl @268 :List(UsingDirectiveDecl);
-  unresolvedUsingIfExistsDecl @269 :List(UnresolvedUsingIfExistsDecl);
-  typeDecl @270 :List(TypeDecl);
-  templateTypeParmDecl @271 :List(TemplateTypeParmDecl);
-  tagDecl @272 :List(TagDecl);
-  recordDecl @273 :List(RecordDecl);
-  cxxRecordDecl @274 :List(CXXRecordDecl);
-  classTemplateSpecializationDecl @275 :List(ClassTemplateSpecializationDecl);
-  classTemplatePartialSpecializationDecl @276 :List(ClassTemplatePartialSpecializationDecl);
-  enumDecl @277 :List(EnumDecl);
-  unresolvedUsingTypenameDecl @278 :List(UnresolvedUsingTypenameDecl);
-  typedefNameDecl @279 :List(TypedefNameDecl);
-  typedefDecl @280 :List(TypedefDecl);
-  typeAliasDecl @281 :List(TypeAliasDecl);
-  objCTypeParamDecl @282 :List(ObjCTypeParamDecl);
-  templateDecl @283 :List(TemplateDecl);
-  redeclarableTemplateDecl @284 :List(RedeclarableTemplateDecl);
-  functionTemplateDecl @285 :List(FunctionTemplateDecl);
-  classTemplateDecl @286 :List(ClassTemplateDecl);
-  varTemplateDecl @287 :List(VarTemplateDecl);
-  typeAliasTemplateDecl @288 :List(TypeAliasTemplateDecl);
-  conceptDecl @289 :List(ConceptDecl);
-  builtinTemplateDecl @290 :List(BuiltinTemplateDecl);
-  templateTemplateParmDecl @291 :List(TemplateTemplateParmDecl);
-  objCPropertyDecl @292 :List(ObjCPropertyDecl);
-  objCMethodDecl @293 :List(ObjCMethodDecl);
-  objCContainerDecl @294 :List(ObjCContainerDecl);
-  objCCategoryDecl @295 :List(ObjCCategoryDecl);
-  objCProtocolDecl @296 :List(ObjCProtocolDecl);
-  objCInterfaceDecl @297 :List(ObjCInterfaceDecl);
-  objCImplDecl @298 :List(ObjCImplDecl);
-  objCCategoryImplDecl @299 :List(ObjCCategoryImplDecl);
-  objCImplementationDecl @300 :List(ObjCImplementationDecl);
-  objCCompatibleAliasDecl @301 :List(ObjCCompatibleAliasDecl);
-  namespaceDecl @302 :List(NamespaceDecl);
-  namespaceAliasDecl @303 :List(NamespaceAliasDecl);
-  linkageSpecDecl @304 :List(LinkageSpecDecl);
-  lifetimeExtendedTemporaryDecl @305 :List(LifetimeExtendedTemporaryDecl);
-  importDecl @306 :List(ImportDecl);
-  friendTemplateDecl @307 :List(FriendTemplateDecl);
-  friendDecl @308 :List(FriendDecl);
-  fileScopeAsmDecl @309 :List(FileScopeAsmDecl);
-  externCContextDecl @310 :List(ExternCContextDecl);
-  exportDecl @311 :List(ExportDecl);
-  emptyDecl @312 :List(EmptyDecl);
+  ompThreadPrivateDecl @227 :List(OMPThreadPrivateDecl);
+  ompRequiresDecl @228 :List(OMPRequiresDecl);
+  ompAllocateDecl @229 :List(OMPAllocateDecl);
+  translationUnitDecl @230 :List(TranslationUnitDecl);
+  staticAssertDecl @231 :List(StaticAssertDecl);
+  requiresExprBodyDecl @232 :List(RequiresExprBodyDecl);
+  pragmaDetectMismatchDecl @233 :List(PragmaDetectMismatchDecl);
+  pragmaCommentDecl @234 :List(PragmaCommentDecl);
+  objCPropertyImplDecl @235 :List(ObjCPropertyImplDecl);
+  namedDecl @236 :List(NamedDecl);
+  labelDecl @237 :List(LabelDecl);
+  baseUsingDecl @238 :List(BaseUsingDecl);
+  usingEnumDecl @239 :List(UsingEnumDecl);
+  usingDecl @240 :List(UsingDecl);
+  valueDecl @241 :List(ValueDecl);
+  unresolvedUsingValueDecl @242 :List(UnresolvedUsingValueDecl);
+  templateParamObjectDecl @243 :List(TemplateParamObjectDecl);
+  ompDeclareReductionDecl @244 :List(OMPDeclareReductionDecl);
+  msGuidDecl @245 :List(MSGuidDecl);
+  indirectFieldDecl @246 :List(IndirectFieldDecl);
+  enumConstantDecl @247 :List(EnumConstantDecl);
+  declaratorDecl @248 :List(DeclaratorDecl);
+  varDecl @249 :List(VarDecl);
+  parmVarDecl @250 :List(ParmVarDecl);
+  ompCapturedExprDecl @251 :List(OMPCapturedExprDecl);
+  implicitParamDecl @252 :List(ImplicitParamDecl);
+  decompositionDecl @253 :List(DecompositionDecl);
+  varTemplateSpecializationDecl @254 :List(VarTemplateSpecializationDecl);
+  varTemplatePartialSpecializationDecl @255 :List(VarTemplatePartialSpecializationDecl);
+  nonTypeTemplateParmDecl @256 :List(NonTypeTemplateParmDecl);
+  msPropertyDecl @257 :List(MSPropertyDecl);
+  functionDecl @258 :List(FunctionDecl);
+  cxxMethodDecl @259 :List(CXXMethodDecl);
+  cxxDestructorDecl @260 :List(CXXDestructorDecl);
+  cxxConversionDecl @261 :List(CXXConversionDecl);
+  cxxConstructorDecl @262 :List(CXXConstructorDecl);
+  cxxDeductionGuideDecl @263 :List(CXXDeductionGuideDecl);
+  fieldDecl @264 :List(FieldDecl);
+  objCIvarDecl @265 :List(ObjCIvarDecl);
+  objCAtDefsFieldDecl @266 :List(ObjCAtDefsFieldDecl);
+  bindingDecl @267 :List(BindingDecl);
+  ompDeclareMapperDecl @268 :List(OMPDeclareMapperDecl);
+  usingShadowDecl @269 :List(UsingShadowDecl);
+  constructorUsingShadowDecl @270 :List(ConstructorUsingShadowDecl);
+  usingPackDecl @271 :List(UsingPackDecl);
+  usingDirectiveDecl @272 :List(UsingDirectiveDecl);
+  unresolvedUsingIfExistsDecl @273 :List(UnresolvedUsingIfExistsDecl);
+  typeDecl @274 :List(TypeDecl);
+  templateTypeParmDecl @275 :List(TemplateTypeParmDecl);
+  tagDecl @276 :List(TagDecl);
+  recordDecl @277 :List(RecordDecl);
+  cxxRecordDecl @278 :List(CXXRecordDecl);
+  classTemplateSpecializationDecl @279 :List(ClassTemplateSpecializationDecl);
+  classTemplatePartialSpecializationDecl @280 :List(ClassTemplatePartialSpecializationDecl);
+  enumDecl @281 :List(EnumDecl);
+  unresolvedUsingTypenameDecl @282 :List(UnresolvedUsingTypenameDecl);
+  typedefNameDecl @283 :List(TypedefNameDecl);
+  typedefDecl @284 :List(TypedefDecl);
+  typeAliasDecl @285 :List(TypeAliasDecl);
+  objCTypeParamDecl @286 :List(ObjCTypeParamDecl);
+  templateDecl @287 :List(TemplateDecl);
+  redeclarableTemplateDecl @288 :List(RedeclarableTemplateDecl);
+  functionTemplateDecl @289 :List(FunctionTemplateDecl);
+  classTemplateDecl @290 :List(ClassTemplateDecl);
+  varTemplateDecl @291 :List(VarTemplateDecl);
+  typeAliasTemplateDecl @292 :List(TypeAliasTemplateDecl);
+  conceptDecl @293 :List(ConceptDecl);
+  builtinTemplateDecl @294 :List(BuiltinTemplateDecl);
+  templateTemplateParmDecl @295 :List(TemplateTemplateParmDecl);
+  objCPropertyDecl @296 :List(ObjCPropertyDecl);
+  objCMethodDecl @297 :List(ObjCMethodDecl);
+  objCContainerDecl @298 :List(ObjCContainerDecl);
+  objCCategoryDecl @299 :List(ObjCCategoryDecl);
+  objCProtocolDecl @300 :List(ObjCProtocolDecl);
+  objCInterfaceDecl @301 :List(ObjCInterfaceDecl);
+  objCImplDecl @302 :List(ObjCImplDecl);
+  objCCategoryImplDecl @303 :List(ObjCCategoryImplDecl);
+  objCImplementationDecl @304 :List(ObjCImplementationDecl);
+  objCCompatibleAliasDecl @305 :List(ObjCCompatibleAliasDecl);
+  namespaceDecl @306 :List(NamespaceDecl);
+  namespaceAliasDecl @307 :List(NamespaceAliasDecl);
+  linkageSpecDecl @308 :List(LinkageSpecDecl);
+  lifetimeExtendedTemporaryDecl @309 :List(LifetimeExtendedTemporaryDecl);
+  importDecl @310 :List(ImportDecl);
+  friendTemplateDecl @311 :List(FriendTemplateDecl);
+  friendDecl @312 :List(FriendDecl);
+  fileScopeAsmDecl @313 :List(FileScopeAsmDecl);
+  externCContextDecl @314 :List(ExternCContextDecl);
+  exportDecl @315 :List(ExportDecl);
+  emptyDecl @316 :List(EmptyDecl);
 }

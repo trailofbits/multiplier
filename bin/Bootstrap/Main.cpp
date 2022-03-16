@@ -115,6 +115,11 @@ static void BuildHierarchy(
   }
 }
 
+static std::string Capitalize(std::string name) {
+  name[0] = static_cast<char>(std::toupper(name[0]));
+  return name;
+}
+
 // Convert a `CapitalCase` name into a `snake_case` name.
 static std::string CapitalCaseToSnakeCase(std::string_view name) {
   std::stringstream ss;
@@ -341,12 +346,18 @@ class CodeGenerator {
 
 void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   auto enum_name = enum_decl.Name();
+  auto itype = CxxIntType(enum_decl.IntegerType());
   schema_os << NameAndHash("enum " + enum_name) << " {\n";
   include_h_os << "enum class " << enum_name << " : unsigned short {\n";
   lib_cpp_os
       << enum_name << " FromPasta(pasta::" << enum_name << " e) {\n"
-      << "  switch (static_cast<" << CxxIntType(enum_decl.IntegerType())
-      << ">(e)) {\n";
+      << "  switch (static_cast<";
+  if (!strcmp(itype, "bool")) {
+    lib_cpp_os << "int";  // Avoid switching on `bool` types.
+  } else {
+    lib_cpp_os << itype;
+  }
+  lib_cpp_os << ">(e)) {\n";
 
   std::unordered_set<std::string> seen_initializers;
   std::string initializer;
@@ -410,7 +421,6 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     ++i;
   }
 
-
   lib_cpp_os
       << "    default: __builtin_unreachable();\n"
       << "  }\n"  // End of `switch`.
@@ -437,20 +447,33 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
+  serialize_cpp_os
+      << "void Serialize" << class_name << "(EntitySerializer &es, mx::ast::"
+      << class_name << "::Builder b, const pasta::" << class_name << " &e) {\n";
+
   schema_os << NameAndHash("struct " + class_name) << " {\n";
   auto i = 0u;
 
   if (cls->base) {
-    auto base_name = cls->base->record.Name();
-    auto snake_name = CapitalCaseToSnakeCase(base_name);
-    auto camel_name = SnakeCaseToCamelCase(snake_name);
+    std::string base_name = cls->base->record.Name();
+    std::string snake_name = CapitalCaseToSnakeCase(base_name);
+    std::string camel_name = SnakeCaseToCamelCase(snake_name);
+    std::string init_name = "init" + Capitalize(camel_name);
     schema_os
         << "  " << camel_name << " @" << i << ":"
         << base_name << ";\n";
+
+    // Parent class serialization.
+    serialize_cpp_os
+        << "  Serialize" << base_name << "(es, b." << init_name << "(), e);\n";
+
     ++i;
   }
 
   for (pasta::CXXMethodDecl method : cls->record.Methods()) {
+    if (method.NumParams()) {
+      continue;  // Skip methods with parameters.
+    }
     auto method_name = method.Name();
     llvm::StringRef method_name_ref(method_name);
     if (method_name == "KindName" ||
@@ -462,15 +485,17 @@ MethodListPtr CodeGenerator::RunOnClass(
       continue;
     }
 
-    auto snake_name = CapitalCaseToSnakeCase(method_name);
-    auto camel_name = SnakeCaseToCamelCase(snake_name);
+    std::string snake_name = CapitalCaseToSnakeCase(method_name);
+    std::string camel_name = SnakeCaseToCamelCase(snake_name);
+    std::string setter_name = "set" + Capitalize(camel_name);
+    std::string init_name = "init" + Capitalize(camel_name);
     auto return_type = method.ReturnType().UnqualifiedType();
     if (auto return_type_ref = pasta::ReferenceType::From(return_type)) {
       return_type = return_type_ref->PointeeType().UnqualifiedType();
     }
 
     if (auto record = return_type.AsRecordDeclaration()) {
-      auto record_name = record->Name();
+      std::string record_name = record->Name();
 
       // Handle `pasta::Token`.
       if (record_name == "Token") {
@@ -482,20 +507,47 @@ MethodListPtr CodeGenerator::RunOnClass(
         schema_os << "  " << camel_name << " @" << i << " :Ref(TokenRange);\n";
         ++i;
 
-      // Handle `std::string` and `std::string_view`.
-      } else if (record_name == "string" || record_name == "basic_string" ||
-                 record_name == "string_view" ||
+      // Handle `std::string`
+      } else if (record_name == "string" || record_name == "basic_string") {
+        serialize_cpp_os
+            << "  b." << setter_name << "(e." << method_name << "());\n";
+
+        schema_os << "  " << camel_name << " @" << i << " :Text;\n";
+        ++i;
+
+      // Handle `std::string_view`. Cap'n Proto requires that `:Text` fields
+      // are `NUL`-terminated, so we convert the string view into a
+      // `std::string`.
+      } else if (record_name == "string_view" ||
                  record_name == "basic_string_view") {
+        serialize_cpp_os
+            << "  auto v" << i << " = e." << method_name << "();\n"
+            << "  std::string s" << i << "(v" << i << ".data(), v"
+            << i << ".size());\n  b." << setter_name << "(s" << i << ");\n";
+
         schema_os << "  " << camel_name << " @" << i << " :Text;\n";
         ++i;
 
       // In pasta.
       } else if (record_name == "ArgumentVector") {
+
+        serialize_cpp_os
+            << "  const auto &v" << i << " = e." << method_name << "();\n"
+            << "  auto b" << i << " = b." << init_name
+            << "(static_cast<unsigned>(v" << i << ".Size()));\n"
+            << "  auto i" << i << " = 0u;\n"
+            << "  for (const auto &arg : v" << i << ") {\n"
+            << "    b" << i << ".set(i" << i << "++, arg);\n"
+            << "  }\n";
+
         schema_os << "  " << camel_name << " @" << i << " :List(Text);\n";
         ++i;
 
       // Probably `std::filesystem::path`.
       } else if (record_name == "path") {
+        serialize_cpp_os
+            << "  b." << setter_name << "(e." << method_name << "().generic_string());\n";
+
         schema_os << "  " << camel_name << " @" << i << " :Text;\n";
         ++i;
 
@@ -559,21 +611,29 @@ MethodListPtr CodeGenerator::RunOnClass(
     // Handle enumerations return types.
     } else if (auto tag = return_type.AsTagDeclaration()) {
       if (auto enum_decl = pasta::EnumDecl::From(*tag)) {
+        auto enum_name = enum_decl->Name();
+        serialize_cpp_os
+            << "  b." << setter_name << "(static_cast<mx::ast::"
+            << enum_name << ">(mx::FromPasta(e." << method_name << "())));\n";
+
         schema_os
-            << "  " << camel_name << " @" << i << " :" << enum_decl->Name()
+            << "  " << camel_name << " @" << i << " :" << enum_name
             << ";\n";
         ++i;
       }
 
     // Handle integral return types.
     } else if (auto int_type = SchemaIntType(return_type)) {
+      serialize_cpp_os
+          << "  b." << setter_name << "(e." << method_name << "());\n";
+
       schema_os
           << "  " << camel_name << " @" << i << " :" << int_type
           << ";\n";
       ++i;
     }
   }
-
+  serialize_cpp_os << "}\n\n";
   schema_os << "}\n\n";
   return seen_methods;
 }
@@ -639,6 +699,13 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include \"Serialize.h\"\n\n"
+      << "#include <pasta/AST/Decl.h>\n"
+      << "#include <pasta/AST/Stmt.h>\n"
+      << "#include <pasta/AST/Type.h>\n"
+      << "#include <pasta/Compile/Command.h>\n"
+      << "#include <pasta/Compile/Compiler.h>\n"
+      << "#include <pasta/Compile/Job.h>\n"
+      << "#include <pasta/Util/ArgumentVector.h>\n\n"
       << "namespace indexer {\n";
 
   // Buffers the struct output so that we can output tag types on an as-
@@ -703,6 +770,36 @@ int CodeGenerator::RunOnClassHierarchies(void) {
     }
   }
 
+  serialize_h_os << "class EntitySerializer;\n\n";
+
+  // Forward declarations.
+  for (const pasta::CXXRecordDecl &record : decls) {
+    auto name = record.Name();
+    serialize_h_os
+        << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
+        << name << "::Builder, const pasta::" << name << " &);\n";
+  }
+  for (const pasta::CXXRecordDecl &record : stmts) {
+    auto name = record.Name();
+    serialize_h_os
+        << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
+        << name << "::Builder, const pasta::" << name << " &);\n";
+  }
+  for (const pasta::CXXRecordDecl &record : types) {
+    auto name = record.Name();
+    serialize_h_os
+        << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
+        << name << "::Builder, const pasta::" << name << " &);\n";
+  }
+  for (const pasta::CXXRecordDecl &record : tokens) {
+    auto name = record.Name();
+    if (name != "Token" && name != "TokenRange") {
+      serialize_h_os
+          << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
+          << name << "::Builder, const pasta::" << name << " &);\n";
+    }
+  }
+
   while (!work_list.empty()) {
     auto [cls, parent_methods] = work_list.back();
     work_list.pop_back();
@@ -711,6 +808,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       work_list.emplace_back(derived_cls, seen_methods);
     }
 
+    // Collect class names for `EntityList`.
     auto class_name = cls->record.Name();
     if (gConcreteClassNames.count(class_name)) {
       class_names.emplace_back(std::move(class_name));
