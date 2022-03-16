@@ -335,7 +335,7 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
 }
 
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
-                     PendingFragment code_chunk) {
+                     PendingFragment code_chunk, std::string mlir) {
 
   const mx::FragmentId code_id = code_chunk.fragment_id;
   const pasta::Decl &leader_decl = code_chunk.decls[0];
@@ -375,6 +375,7 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   builder.setFileTokenId(serializer.EntityId(min_token));
   builder.setFirstLine(min_token.Line());
   builder.setLastLine(max_token.Line());
+  builder.setMlir(mlir);
 
   auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
   auto tlds = builder.initTopLevelDeclarations(num_tlds);

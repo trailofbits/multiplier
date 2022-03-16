@@ -26,6 +26,7 @@
 
 #include "Context.h"
 #include "IndexCompileJob.h"
+#include "SearchAction.h"
 
 namespace indexer {
 namespace {
@@ -54,10 +55,16 @@ class ServerImpl final {
   // Should we show progress bars?
   const bool show_progress_bars;
 
+  // Should generate source IR?
+  const bool generate_sourceir;
+
   ServerContext server_context;
 
   std::mutex indexing_context_lock;
   std::weak_ptr<IndexingContext> indexing_context;
+
+  std::mutex searching_context_lock;
+  std::weak_ptr<SearchingContext> searching_context;
 
   // Native file system.
   //
@@ -73,6 +80,8 @@ class ServerImpl final {
   // jobs underway then they'll share the same context. When they're all done
   // the context will go away as well.
   std::shared_ptr<IndexingContext> GetOrCreateIndexingContext(void);
+
+  std::shared_ptr<SearchingContext> GetOrCreateSearchingContext(void);
 };
 
 // Initialize the server.
@@ -80,6 +89,7 @@ ServerImpl::ServerImpl(ServerOptions &options)
     : executor(options.executor_options),
       workspace_dir(options.workspace_dir),
       show_progress_bars(options.show_progress_bars),
+      generate_sourceir(options.generate_sourceir),
       server_context(options.workspace_dir),
       native_file_system(pasta::FileSystem::CreateNative()) {}
 
@@ -97,8 +107,23 @@ ServerImpl::GetOrCreateIndexingContext(void) {
     if (show_progress_bars) {
       ic->InitializeProgressBars();
     }
+    if (generate_sourceir) {
+      ic->InitializeCodeGenerator();
+    }
     indexing_context = ic;
     return ic;
+  }
+}
+
+std::shared_ptr<SearchingContext>
+ServerImpl::GetOrCreateSearchingContext(void) {
+  auto sc = searching_context.lock();
+  if (sc) {
+    return sc;
+  } else {
+    sc = std::make_shared<SearchingContext>(server_context, executor);
+    searching_context = sc;
+    return sc;
   }
 }
 
@@ -165,6 +190,7 @@ kj::Promise<void> Server::indexCompileCommands(
   auto ic = d->GetOrCreateIndexingContext();
   for (mx::rpc::CompileCommand::Reader command : params.getCommands()) {
     mx::ProgressBarWork command_progress(ic->command_progress.get());
+    IndexingCounterRes(ic->stat, kStatCompileCommand);
 
     auto argv = GetArguments(command);
 
@@ -299,6 +325,34 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   results.setFragment(kj::arrayPtr(
       reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
       maybe_contents.value().size()));
+
+  return kj::READY_NOW;
+}
+
+kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
+
+  // Get params and result context
+  mx::rpc::Multiplier::SyntaxQueryParams::Reader params =
+      context.getParams();
+
+  std::string_view query_string =
+      std::string_view(params.getQuery().cStr(), params.getQuery().size());
+
+  auto sc = d->GetOrCreateSearchingContext();
+
+  pasta::FileManager fm(d->native_file_system);
+  d->executor.EmplaceAction<SearchAction>(sc, fm, std::move(query_string));
+  d->executor.Wait();
+
+  std::cerr << "Number of fragments in results " << sc->fragments_result.size() << "\n";
+
+  auto results = context.initResults();
+  auto num_fragments = static_cast<unsigned>(sc->fragments_result.size());
+  auto fragments = results.initFragments(num_fragments);
+  auto index = 0u;
+  for (auto [file_id, fragment]: sc->fragments_result) {
+    fragments.set(index++, fragment);
+  }
 
   return kj::READY_NOW;
 }

@@ -533,6 +533,9 @@ class Fragment {
   // Return the list of top-level declarations in this fragment.
   std::vector<Decl> top_level_declarations(void) const;
 
+  // Returns source IR for the fragments
+  std::optional<std::string_view> source_ir(void) const noexcept;
+
   inline bool operator==(const Fragment &that) const noexcept {
     return id() == that.id();
   }
@@ -586,6 +589,8 @@ class EntityProvider {
   // Download a fragment by its unique ID.
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, FragmentId id) = 0;
+
+  virtual void SyntaxQuery(const Ptr &, std::string query) = 0;
 };
 
 // Access to the indexed code.
@@ -615,6 +620,8 @@ class Index {
 
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
+
+  void syntax_query(std::string query) const;
 };
 
 class FileManager {

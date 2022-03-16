@@ -48,6 +48,9 @@ class VariableManager(object):
 
     def __init__(self):
         self._vars: Dict[str, Any] = {}
+ 
+    def keys(self):
+        return self._vars.keys()
 
     def add(self, name: str, value: Any):
         assert "%" not in name
@@ -133,11 +136,12 @@ class Config(object):
     formatted configuration
     """
 
-    def __init__(self, spec):
+    def __init__(self, spec, workspace=None):
         self._spec = AttrDict(spec)
         self._vars = VariableManager()
         self._envs = {}
         self._init_meta_variables()
+        self._workspace = workspace
 
     def _init_meta_variables(self):
         self._vars["root"] = "/"
@@ -169,7 +173,10 @@ class Config(object):
     @property
     def workspace(self) -> str:
         try:
-            cwd = self._vars.substitute_path(self._spec.workspace)
+            if self._workspace is not None:
+                cwd = self._workspace
+            else:
+                cwd = self._vars.substitute_path(self._spec.workspace)
             self._vars["workspace"] = cwd
             return cwd
         except AttributeError:

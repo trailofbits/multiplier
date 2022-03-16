@@ -11,6 +11,8 @@ set(exe_name "mx-index")
 add_executable("${exe_name}"
   "Compress.cpp"
   "Compress.h"
+  "Codegen.cpp"
+  "Codegen.h"
   "Context.cpp"
   "Context.h"
   "Hash.cpp"
@@ -24,6 +26,8 @@ add_executable("${exe_name}"
   "Persist.h"
   "PrintTokenGraph.cpp"
   "PrintTokenGraph.h"
+  "SearchAction.cpp"
+  "SearchAction.h"
   "Serialize.cpp"
   "Serialize.h"
   "Serializer.cpp"
@@ -42,6 +46,10 @@ target_link_libraries("${exe_name}"
   PRIVATE
     "mx-util"
     pasta::pasta
+    vast::vast
+    MLIRDLTI
+    MLIRStandard
+    MLIRLLVMIR
 )
 
 add_executable("${PROJECT_NAME}::${exe_name}" ALIAS "${exe_name}")

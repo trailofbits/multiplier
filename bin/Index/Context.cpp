@@ -15,6 +15,8 @@
 #include <string>
 #include <system_error>
 
+#include "Codegen.h"
+
 namespace indexer {
 
 ServerContext::ServerContext(std::filesystem::path workspace_dir_)
@@ -27,7 +29,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       file_hash_to_file_id(workspace_dir),
       file_path_to_file_id(workspace_dir),
       code_hash_to_fragment_id(workspace_dir),
-      fragment_id_to_serialized_fragment(workspace_dir) {
+      fragment_id_to_serialized_fragment(workspace_dir),
+      code_id_to_source_ir(workspace_dir) {
 
   next_file_id.store(meta_to_id.GetOrSet(
       MetadataName::kNextFileId, mx::kMinEntityIdIncrement));
@@ -47,13 +50,33 @@ void ServerContext::Flush(void) {
   meta_to_id.Set(MetadataName::kNextBigCodeId, next_big_fragment_id.load());
 }
 
+void IndexingCounter::ResetAll(void) {
+  for(auto id = 0u; id < kStatSourceIRFragment + 1; id++) {
+    counter[id].store(mx::kInvalidEntityId);
+  }
+}
+
+void IndexingCounter::PrintAll(void) {
+  const char *id_name[6] = {
+      "StatCompileCommand", "StatCompileJob", "StatAST",
+      "StatCodeFragment", "StatUniqueCodeFragment",
+      "StatSourceIRFragment"
+  };
+  for(auto id = 0u; id < kStatSourceIRFragment + 1; id++) {
+    std::cerr << id_name[id] << " : " <<  counter[id].load() << "\n";
+  }
+}
+
+
+
 IndexingContext::IndexingContext(ServerContext &server_context_,
                                  const mx::Executor &exe_)
     : server_context(server_context_),
       num_workers(exe_.NumWorkers()),
       local_next_file_id(num_workers),
       local_next_small_fragment_id(num_workers),
-      local_next_big_fragment_id(num_workers) {}
+      local_next_big_fragment_id(num_workers),
+      codegen(nullptr) {}
 
 IndexingContext::~IndexingContext(void) {
   server_context.Flush();
@@ -72,10 +95,16 @@ void IndexingContext::InitializeProgressBars(void) {
                                               std::chrono::seconds(1)));
   file_progress.reset(new mx::ProgressBar("3) File serialization",
                                           std::chrono::seconds(1)));
+
   command_progress->SetNumWorkers(num_workers);
   ast_progress->SetNumWorkers(num_workers);
   file_progress->SetNumWorkers(num_workers);
 }
+
+void IndexingContext::InitializeCodeGenerator(void) {
+  codegen = std::make_unique<CodeGenerator>();
+}
+
 
 // Get or create a file ID for the file at `file_path` with contents
 // `contents_hash`.
@@ -211,5 +240,50 @@ void IndexingContext::PutFragmentLineCoverage(
     server_context.file_fragment_lines.Insert(file_id, i, fragment_id);
   }
 }
+
+// Save the source IRs for top-level decl.
+void IndexingContext::PutSourceIRs(
+    mx::FragmentId code_id, std::string source_ir) {
+  server_context.code_id_to_source_ir.Set(code_id, source_ir);
+}
+
+SearchingContext::SearchingContext(ServerContext &server_context_,
+                                 const mx::Executor &exe_)
+    : server_context(server_context_),
+      num_workers(exe_.NumWorkers()){
+  local_next_file_id.store(mx::kMinEntityIdIncrement);
+}
+
+SearchingContext::~SearchingContext(void) {
+  server_context.Flush();
+}
+
+std::pair<mx::FileId, bool> SearchingContext::GetNextFileId(void) {
+  if (local_next_file_id < server_context.next_file_id) {
+    auto next_file_id = local_next_file_id.fetch_add(1ull);
+    return {next_file_id, true};
+  }
+
+  return {0, false};
+}
+
+std::optional<mx::FileId> SearchingContext::GetMaxFileId(void) {
+  auto file_id = server_context.next_file_id.load();
+  if (file_id > 1) {
+    return file_id -1;
+  }
+  return std::nullopt;
+}
+
+std::optional<std::string>
+SearchingContext::GetSerializedFile(mx::FileId file_id) {
+  return server_context.file_id_to_serialized_file.TryGet(file_id);
+}
+
+std::optional<std::string>
+SearchingContext::GetSerializedFragment(mx::FragmentId fragment_id) {
+  return server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
+}
+
 
 }  // namespace indexer

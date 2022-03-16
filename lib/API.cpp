@@ -363,6 +363,13 @@ PseudoReader PackedFragmentImpl::NthPseudo(unsigned offset) const {
   return reader.getOthers()[offset];
 }
 
+std::string_view PackedFragmentImpl::SourceIR(void) const {
+  if (reader.hasMlir()) {
+    return std::string_view(reader.getMlir().cStr(), reader.getMlir().size());
+  }
+  return {};
+}
+
 EntityProvider::~EntityProvider(void) noexcept {}
 
 RemoteEntityProvider::ClientConnection::ClientConnection(const std::string &hp)
@@ -481,6 +488,19 @@ FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(const Ptr &self, FragmentId 
   }
 }
 
+void RemoteEntityProvider::SyntaxQuery(const Ptr &self, std::string query) {
+  ClientConnection &cc = Connection();
+  capnp::Request<mx::rpc::Multiplier::SyntaxQueryParams,
+                 mx::rpc::Multiplier::SyntaxQueryResults>
+      request = cc.client.syntaxQueryRequest();
+  request.setQuery(query);
+  try {
+
+  } catch (...) {
+
+  }
+}
+
 InvalidEntityProvider::~InvalidEntityProvider(void) noexcept {}
 
 // Get the current list of parsed files, where the minimum ID
@@ -498,6 +518,8 @@ FileImpl::Ptr InvalidEntityProvider::FileFor(const Ptr &, FileId) {
 FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(const Ptr &, FragmentId) {
   return {};
 }
+
+void InvalidEntityProvider::SyntaxQuery(const Ptr &, std::string query) {}
 
 Token::Token(void)
     : impl(kInvalidTokenReader),
@@ -780,6 +802,10 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
   }
 }
 
+void Index::syntax_query(std::string query) const {
+  impl->SyntaxQuery(impl, query);
+}
+
 FileListImpl::FileListImpl(EntityProvider::Ptr ep_)
     : ep(std::move(ep_)) {
 
@@ -933,6 +959,14 @@ std::optional<TokenContext> TokenContext::parent(void) const {
   } else {
     return std::nullopt;
   }
+}
+
+std::optional<std::string_view> Fragment::source_ir() const noexcept {
+  auto mlir = impl->SourceIR();
+  if (!mlir.empty()) {
+    return mlir;
+  }
+  return std::nullopt;
 }
 
 }  // namespace mx
