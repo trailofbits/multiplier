@@ -7,11 +7,14 @@
 #include "IndexCompileJob.h"
 
 #include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
 #include <map>
+#include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
+#include <multiplier/Types.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
@@ -156,23 +159,23 @@ class EntityLabeller final : protected pasta::DeclVisitor,
                              protected pasta::StmtVisitor,
                              protected pasta::TypeVisitor {
  private:
-  mx::CodeId code_id{0u};
-  std::unordered_map<const void *, mx::EntityId> entity_id;
+  CodeChunk code;
+  EntityIdMap entity_id;
   std::map<std::pair<mx::CodeId, pasta::DeclKind>, uint32_t> next_decl_offset;
   std::map<std::pair<mx::CodeId, pasta::StmtKind>, uint32_t> next_stmt_offset;
 //  std::map<std::pair<mx::CodeId, pasta::TypeKind>, uint32_t> next_type_offset;
 
   bool Label(const pasta::Decl &entity) {
     auto kind = entity.Kind();
-    auto &next_offset = next_decl_offset[{code_id, kind}];
-    mx::EntityId id{
-        code_id,
-        next_offset,
-        mx::EntityKind::kDeclaration,
-        static_cast<uint16_t>(kind)};
+    auto &next_offset = next_decl_offset[{code.code_id, kind}];
+    mx::DeclarationId id;
+    id.code_id = code.code_id;
+    id.offset = next_offset;
+    id.kind = mx::FromPasta(kind);
 
     if (entity_id.emplace(entity.RawDecl(), id).second) {
       ++next_offset;
+      code.num_decls_of_kind[kind] = next_offset;
       return true;
     } else {
       return false;
@@ -181,15 +184,32 @@ class EntityLabeller final : protected pasta::DeclVisitor,
 
   bool Label(const pasta::Stmt &entity) {
     auto kind = entity.Kind();
-    auto &next_offset = next_stmt_offset[{code_id, kind}];
-    mx::EntityId id{
-        code_id,
-        next_offset,
-        mx::EntityKind::kStatement,
-        static_cast<uint16_t>(kind)};
+    auto &next_offset = next_stmt_offset[{code.code_id, kind}];
+    mx::StatementId id;
+    id.code_id = code.code_id;
+    id.offset = next_offset;
+    id.kind = mx::FromPasta(kind);
 
     if (entity_id.emplace(entity.RawStmt(), id).second) {
       ++next_offset;
+      code.num_stmts_of_kind[kind] = next_offset;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool Label(const pasta::Token &entity) {
+    auto kind = entity.Kind();
+    auto index = entity.Index();
+    assert(code.begin_index <= index);
+    assert(index <= code.end_index);
+    mx::TokenId id;
+    id.code_id = code.code_id;
+    id.offset = static_cast<uint32_t>(index - code.begin_index);
+    id.kind = mx::FromPasta(kind);
+
+    if (entity_id.emplace(entity.RawToken(), id).second) {
       return true;
     } else {
       return false;
@@ -389,11 +409,22 @@ class EntityLabeller final : protected pasta::DeclVisitor,
  public:
   virtual ~EntityLabeller(void) = default;
 
-  void EnterCode(mx::CodeId code_id_, const std::vector<pasta::Decl> &tlds) {
-    code_id = code_id_;
+  CodeChunk EnterCode(mx::CodeId code_id_, std::vector<pasta::Decl> tlds,
+                      const pasta::TokenRange &range,
+                      uint64_t begin_index_, uint64_t end_index_) {
+    code.code_id = code_id_;
+    code.begin_index = begin_index_;
+    code.end_index = end_index_;
+    code.decls = std::move(tlds);
+
+    for (auto i = begin_index_; i <= end_index_; ++i) {
+      Label(range[i]);
+    }
     for (const pasta::Decl &tld : tlds) {
       this->DeclVisitor::Accept(tld);
     }
+
+    return std::move(code);
   }
 };
 
@@ -676,7 +707,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     return;
   }
 
-  auto ast = maybe_ast.TakeValue();
+  pasta::AST ast = maybe_ast.TakeValue();
   for (pasta::File file : ast.ParsedFiles()) {
     MaybeTokenizeFile(exe, std::move(file));
   }
@@ -687,13 +718,13 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
   pasta::TokenRange tok_range = ast.Tokens();
-  auto tlds = FindTLDs(ast.TranslationUnit());
+  std::vector<pasta::Decl> tlds = FindTLDs(ast.TranslationUnit());
   for (pasta::Decl decl : tlds) {
     if (decl.Kind() == pasta::DeclKind::kEmpty) {
       continue;
     }
 
-    auto tok = decl.Token();
+    pasta::Token tok = decl.Token();
 
     // These are probably part of the preamble of compiler-provided builtin
     // declarations.
@@ -757,20 +788,6 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   EntityLabeller labeller;
 
-  // Summary information about a group of top-level declarations that are
-  // somehow lexically/syntactically "stuck together" and thus serialized
-  // together. For example, `int optind, opterr, optopt;` is one example of
-  // being syntactically stuck together. Another example would be a C macro
-  // that expands into two separate top-level declarations. We don't want to
-  // break this macro expansion into two, as in the original source file it
-  // represents a single logical thing.
-  struct CodeChunk {
-    mx::CodeId code_id;
-    std::vector<pasta::Decl> decls;
-    uint64_t begin_index;
-    uint64_t end_index;
-  };
-
   std::vector<pasta::Decl> decls_for_chunk;
   std::vector<CodeChunk> code_chunks;
 
@@ -816,7 +833,8 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     // means it's already been indexed.
     auto [code_id, is_new] = context->GetOrCreateCodeId(
         CodeHash(file_hashes, decls_for_chunk, tok_range,
-                 begin_index, end_index));
+                 begin_index, end_index),
+        end_index - begin_index + 1u);
 
     // We always need to enter the code for a chunk, regardless of if it
     // `is_new`. This is because each chunk might have arbitrary references to
@@ -825,24 +843,19 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     // (decls, statements, etc.) in a uniform and deterministic way so that
     // other threads doing similar indexing will form identically labelled
     // chunks for the same logical entities.
-    labeller.EnterCode(code_id, decls_for_chunk);
+    CodeChunk code_chunk = labeller.EnterCode(
+        code_id, std::move(decls_for_chunk), tok_range, begin_index, end_index);
 
     if (is_new) {
-      CodeChunk tree;
-      tree.code_id = code_id;
-      tree.decls = std::move(decls_for_chunk);
-      tree.begin_index = begin_index;
-      tree.end_index = end_index;
-      code_chunks.emplace_back(std::move(tree));
+      code_chunks.emplace_back(std::move(code_chunk));
     }
   }
 
   // Serialize the new code chunks.
-  for (const CodeChunk &chunk : code_chunks) {
-    const auto &[code_id, decls, begin_index, end_index] = chunk;
-    const pasta::Decl &leader_decl = decls[0];
+  for (const CodeChunk &code_chunk : code_chunks) {
+    const pasta::Decl &leader_decl = code_chunk.decls[0];
     mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-        tok_range, begin_index, end_index);
+        tok_range, code_chunk.begin_index, code_chunk.end_index);
     if (maybe_tt.Succeeded()) {
 
     } else {

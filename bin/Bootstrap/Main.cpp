@@ -719,10 +719,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "  endOffset @1 :UInt32 $Cxx.name(\"end_offset\");  # Inclusive.\n"
       << "}\n\n"
       << "struct Ref(Entity) {\n"  // NOTE(pag): generic types don't have hashes.
-      << "  a @0 :UInt64;\n"
-      << "  b @1 :UInt32;\n"
-      << "  c @2 :UInt16;\n"
-      << "  d @3 :UInt16;\n"
+      << "  id @0 :UInt64;\n"  // This is an `mx::EntityId`.
       << "}\n\n";
 
   include_h_os

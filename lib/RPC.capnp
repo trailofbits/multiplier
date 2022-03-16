@@ -35,13 +35,13 @@ struct File @0x987f05f6a48636d5 {
 
 struct IndexedCode @0xe5f27760091f9a3a {
   # The unique identifier for this top-level declaration.
-  topLevelDeclListId @0 :UInt64;
+  codeId @0 :UInt64;
   
-  # The ID of the translation unit containing these declarations.
-  translationUnitId @1 :UInt64;
+  # # The ID of the translation unit containing these declarations.
+  # translationUnitId @1 :UInt64;
   
   # Entities embedded in this code sequence.
-  entities @2 :AST.EntityList;
+  entities @1 :AST.EntityList;
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {

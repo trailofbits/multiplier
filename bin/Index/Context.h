@@ -39,7 +39,8 @@ enum : char {
 
 enum MetadataName : char {
   kNextFileId,
-  kNextCodeId,
+  kNextSmallCodeId,
+  kNextBigCodeId
 };
 
 class IndexingContext;
@@ -55,7 +56,8 @@ class ServerContext {
   mx::PersistentMap<kMetaNameToId, MetadataName, uint64_t> meta_to_id;
 
   std::atomic<mx::FileId> next_file_id;
-  std::atomic<mx::CodeId> next_code_id;
+  std::atomic<mx::CodeId> next_small_code_id;
+  std::atomic<mx::CodeId> next_big_code_id;
 
   // Maps file IDs to their absolute path, as well as to their token lists.
   mx::PersistentMap<kFileIdToPath, mx::FileId, std::string> file_id_to_path;
@@ -83,8 +85,11 @@ class ServerContext {
   mx::PersistentMap<kCodeHashToCodeId, std::string, mx::CodeId>
       code_hash_to_code_id;
 
+  void Flush(void);
+
  public:
   ~ServerContext(void);
+
   explicit ServerContext(std::filesystem::path workspace_dir_);
 };
 
@@ -112,7 +117,8 @@ class IndexingContext {
 
   // Get or create a code ID for the top-level declarations that hash to
   // `code_hash`.
-  std::pair<mx::CodeId, bool> GetOrCreateCodeId(const std::string &code_hash);
+  std::pair<mx::CodeId, bool> GetOrCreateCodeId(const std::string &code_hash,
+                                                uint64_t num_tokens);
 
   // Save the tokenized contents of a file.
   void PutFileTokens(mx::FileId file_id, kj::Array<capnp::word> tokens);

@@ -38,15 +38,18 @@ set(generated_files
 )
 
 # Run `mx-bootstrap` to auto-generate the files.
-add_custom_command(TARGET "${exe_name}"
-  POST_BUILD
+add_custom_command(
+  OUTPUT
+    ${generated_files}
   COMMAND
     "${exe_name}"
     "${install_include_dir}"
     "${dependencies_include_dir}"
     ${generated_files}
+  MAIN_DEPENDENCY
+    "${exe_name}"
+  DEPENDS
+    "${exe_name}"
   COMMENT
     "Bootstrapping Multiplier"
-  BYPRODUCTS
-    ${generated_files}
 )

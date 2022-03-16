@@ -6,10 +6,6 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(MX_ENABLE_BOOTSTRAP)
-  add_subdirectory("Bootstrap")
-endif()
-
 add_subdirectory("Import")
 add_subdirectory("Index")
   
