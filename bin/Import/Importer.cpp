@@ -14,6 +14,7 @@
 #include <system_error>
 #include <unordered_map>
 #include <vector>
+#include <mutex>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
