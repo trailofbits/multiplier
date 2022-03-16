@@ -77,6 +77,26 @@ llvm::json::Object UnparsedSubstitution(mx::TokenSubstitution sub) {
   return obj;
 }
 
+static void OutputSourceIR(const mx::Fragment &frag, const std::filesystem::path &output_dir) {
+  if (auto mlir = frag.source_ir(); mlir) {
+    llvm::json::Object obj;
+    obj["id"] = static_cast<uint64_t>(frag.id());
+    obj["first_line"] = frag.first_line();
+    obj["last_line"] = frag.last_line();
+    obj["source_ir"] = llvm::StringRef(mlir->data(), mlir->size());
+
+    std::string file_name = "mlir.fragment." + std::to_string(frag.id()) + ".json";
+    llvm::json::Value val(std::move(obj));
+    std::ofstream file_os((output_dir / file_name).generic_string(),
+                          std::ios::trunc | std::ios::out);
+
+    std::string file_data;
+    llvm::raw_string_ostream file_data_os(file_data);
+    file_data_os << std::move(val);
+    file_os << file_data;
+  }
+}
+
 static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
   std::filesystem::path output_dir =
       FLAGS_output_dir + "/." + file_path.generic_string();
@@ -107,6 +127,7 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
       tokens.emplace_back(std::move(tok));
     }
 
+
     llvm::json::Object obj;
     obj["id"] = static_cast<uint64_t>(frag.id());
     obj["first_line"] = frag.first_line();
@@ -114,7 +135,7 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
     obj["tokens"] = std::move(tokens);
     obj["unparsed_tokens"] = UnparsedTokens(frag.unparsed_tokens());
 
-    std::string file_name = "fragment." + std::to_string(frag.id()) + ".json";
+    std::string file_name = "source.fragment." + std::to_string(frag.id()) + ".json";
 
     llvm::json::Value val(std::move(obj));
     std::ofstream file_os((output_dir / file_name).generic_string(),
@@ -124,6 +145,8 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
     llvm::raw_string_ostream file_data_os(file_data);
     file_data_os << std::move(val);
     file_os << file_data;
+
+    OutputSourceIR(frag, output_dir);
   }
 
   for (mx::Token token : mx::Token::in(file)) {

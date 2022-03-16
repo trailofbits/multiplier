@@ -82,6 +82,7 @@ add_library("mx-api"
     "API.cpp"
     "Compress.cpp"
     "Types.cpp"
+    "Weggli.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -108,6 +109,7 @@ target_link_libraries("mx-api"
   PRIVATE
     CapnProto::capnp-rpc
     ZLIB::ZLIB
+    $<BUILD_INTERFACE:weggli_native>
 )
 
 set_target_properties("mx-api"
@@ -181,6 +183,7 @@ add_library("mx-util"
     "Subprocess.cpp"
     "Types.cpp"
     "WorkerPool.cpp"
+    "Weggli.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -208,6 +211,7 @@ target_link_libraries("mx-util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
+    $<BUILD_INTERFACE:weggli_native>
     RocksDB::rocksdb
     ZLIB::ZLIB
   PUBLIC

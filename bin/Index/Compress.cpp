@@ -10,6 +10,7 @@
 #include <glog/logging.h>
 #include <kj/io.h>
 #include <multiplier/Compress.h>
+#include <iostream>
 
 namespace indexer {
 
@@ -52,7 +53,7 @@ void WithUncompressedMessageImpl(
     const char *what, std::string data,
     std::function<void(capnp::PackedMessageReader &)> cb) {
   CHECK(!data.empty());
-  auto begin = reinterpret_cast<const char *>(data[0]);
+  auto begin = reinterpret_cast<const char *>(data.c_str());
   auto tag = data.back();
   data.pop_back();
   std::string_view untagged_data(begin, data.size());

@@ -13,6 +13,7 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <iostream>
 
 #include "AST.h"
 #include "Iterator.h"
@@ -30,6 +31,9 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class RemoteEntityProvider;
+class InvalidEntityProvider;
+class SyntaxQueryResultImpl;
+class SyntaxQueryResult;
 class Token;
 class TokenList;
 class TokenListIterator;
@@ -506,6 +510,7 @@ class Fragment {
   friend class Stmt;
   friend class Token;
   friend class TokenSubstitutionListIterator;
+  friend class SyntaxQueryResultImpl;
 
   std::shared_ptr<const FragmentImpl> impl;
 
@@ -533,12 +538,98 @@ class Fragment {
   // Return the list of top-level declarations in this fragment.
   std::vector<Decl> top_level_declarations(void) const;
 
+  // Returns source IR for the fragments
+  std::optional<std::string_view> source_ir(void) const noexcept;
+
   inline bool operator==(const Fragment &that) const noexcept {
     return id() == that.id();
   }
 
   inline bool operator!=(const Fragment &that) const noexcept {
     return id() != that.id();
+  }
+};
+
+class SyntaxQueryResultEnd {};
+
+class QueryData {
+ private:
+  friend class SyntaxQueryResult;
+  friend class SyntaxQueryResultImpl;
+
+  inline QueryData(Fragment fragment_) :
+      fragment(fragment_) {}
+
+ public:
+  virtual ~QueryData(){};
+
+  Fragment fragment;
+
+  std::vector<TokenRange> captures;
+
+  std::vector<std::tuple<std::string, TokenRange>> variables;
+};
+
+class SyntaxQueryResultIterator {
+ private:
+   friend class SyntaxQueryResult;
+
+   std::shared_ptr<const SyntaxQueryResultImpl> impl;
+   unsigned index;
+   unsigned num_fragments;
+
+   inline SyntaxQueryResultIterator(std::shared_ptr<const SyntaxQueryResultImpl> impl_,
+                                   unsigned index_, unsigned num_fragments_)
+       : impl(std::move(impl_)),
+         index(index_),
+         num_fragments(num_fragments_) {}
+
+  public:
+   QueryData operator*(void) const noexcept;
+
+   inline bool operator==(SyntaxQueryResultEnd) const noexcept {
+     return index >= num_fragments;
+   }
+
+   inline bool operator!=(SyntaxQueryResultEnd) const noexcept {
+     return index < num_fragments;
+   }
+
+   // Pre-increment.
+   inline SyntaxQueryResultIterator &operator++(void) noexcept {
+     ++index;
+     return *this;
+   }
+
+   // Post-increment.
+   inline SyntaxQueryResultIterator operator++(int) noexcept {
+     return SyntaxQueryResultIterator(impl, index++, num_fragments);
+   }
+};
+
+class SyntaxQueryResult {
+ private:
+
+  using Ptr = std::shared_ptr<const SyntaxQueryResult>;
+
+  friend class EntityProvider;
+  friend class RemoteEntityProvider;
+  friend class InvalidEntityProvider;
+  friend class SyntaxQueryResultIterator;
+
+  std::shared_ptr<const SyntaxQueryResultImpl> impl;
+  unsigned num_fragments;
+
+ public:
+  SyntaxQueryResult(std::shared_ptr<const SyntaxQueryResultImpl> impl_);
+
+  // Return an iterator pointing at the first token in this list.
+  inline SyntaxQueryResultIterator begin(void) const noexcept {
+    return SyntaxQueryResultIterator(impl, 0, num_fragments);
+  }
+
+  inline SyntaxQueryResultEnd end(void) const noexcept {
+    return {};
   }
 };
 
@@ -574,6 +665,7 @@ class EntityProvider {
   friend class FragmentImpl;
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
+  friend class SyntaxQueryResultImpl;
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
@@ -586,6 +678,9 @@ class EntityProvider {
   // Download a fragment by its unique ID.
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, FragmentId id) = 0;
+
+  virtual std::shared_ptr<const SyntaxQueryResultImpl>
+  SyntaxQuery(const Ptr &, std::string query) = 0;
 };
 
 // Access to the indexed code.
@@ -615,6 +710,8 @@ class Index {
 
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
+
+  SyntaxQueryResult syntax_query(std::string query) const;
 };
 
 class FileManager {

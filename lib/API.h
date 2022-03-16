@@ -7,6 +7,7 @@
 #pragma once
 
 #include <multiplier/API.h>
+#include <multiplier/Weggli.h>
 
 #include <capnp/ez-rpc.h>
 #include <capnp/message.h>
@@ -15,6 +16,7 @@
 #include <kj/async.h>
 #include <kj/io.h>
 #include <optional>
+#include <map>
 
 #include "AST.capnp.h"
 #include "RPC.capnp.h"
@@ -23,7 +25,7 @@ namespace mx {
 
 using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
-                                             capnp::Kind::STRUCT>::Reader;
+				     capnp::Kind::STRUCT>::Reader;
 using FragmentReader = rpc::Fragment::Reader;
 using DeclReader = ast::Decl::Reader;
 using StmtReader = ast::Stmt::Reader;
@@ -51,84 +53,84 @@ struct PackedReaderState {
 };
 
 class TokenReader {
- public:
-  using Ptr = std::shared_ptr<const TokenReader>;
+public:
+using Ptr = std::shared_ptr<const TokenReader>;
 
-  virtual ~TokenReader(void) noexcept;
+virtual ~TokenReader(void) noexcept;
 
-  // Return the number of tokens accessible to this reader.
-  virtual unsigned NumTokens(void) const = 0;
+// Return the number of tokens accessible to this reader.
+virtual unsigned NumTokens(void) const = 0;
 
-  // Return the kind of the Nth token.
-  virtual TokenKind NthTokenKind(unsigned token_index) const = 0;
+// Return the kind of the Nth token.
+virtual TokenKind NthTokenKind(unsigned token_index) const = 0;
 
-  // Return the data of the Nth token.
-  virtual std::string_view NthTokenData(unsigned token_index) const = 0;
+// Return the data of the Nth token.
+virtual std::string_view NthTokenData(unsigned token_index) const = 0;
 
-  // Return the id of the Nth token.
-  virtual EntityId NthTokenId(unsigned token_index) const = 0;
+// Return the id of the Nth token.
+virtual EntityId NthTokenId(unsigned token_index) const = 0;
 };
 
 struct BeforeTag {};
 struct AfterTag {};
 
 class TokenSubstitutionListImpl {
- public:
-  const std::shared_ptr<const FragmentImpl> fragment;
-  const NodeReader nodes;
+public:
+const std::shared_ptr<const FragmentImpl> fragment;
+const NodeReader nodes;
 
-  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_);
+TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_);
 
-  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
-                            unsigned offset, BeforeTag);
+TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+		    unsigned offset, BeforeTag);
 
-  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
-                            unsigned offset, AfterTag);
+TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+		    unsigned offset, AfterTag);
 };
 
 // Used for invalid tokens.
 class InvalidTokenReader final : public TokenReader {
- public:
-  virtual ~InvalidTokenReader(void) noexcept;
+public:
+virtual ~InvalidTokenReader(void) noexcept;
 
-  // Return the number of tokens accessible to this reader.
-  unsigned NumTokens(void) const final;
+// Return the number of tokens accessible to this reader.
+unsigned NumTokens(void) const final;
 
-  // Return the kind of the Nth token.
-  TokenKind NthTokenKind(unsigned) const final;
+// Return the kind of the Nth token.
+TokenKind NthTokenKind(unsigned) const final;
 
-  // Return the data of the Nth token.
-  std::string_view NthTokenData(unsigned) const final;
+// Return the data of the Nth token.
+std::string_view NthTokenData(unsigned) const final;
 
-  // Return the id of the Nth token.
-  EntityId NthTokenId(unsigned token_index) const final;
+// Return the id of the Nth token.
+EntityId NthTokenId(unsigned token_index) const final;
 };
 
 // Interface for accessing the tokens of a file.
 class FileImpl {
- public:
-  using Ptr = std::shared_ptr<const FileImpl>;
-  using WeakPtr = std::weak_ptr<const FileImpl>;
+public:
+using Ptr = std::shared_ptr<const FileImpl>;
+using WeakPtr = std::weak_ptr<const FileImpl>;
 
-  const FileId id;
+const FileId id;
 
-  // Needed for us to be able to look up the file containing this fragment,
-  // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
+// Needed for us to be able to look up the file containing this fragment,
+// or look up entities related to other fragments.
+const EntityProvider::Ptr ep;
 
-  // List of fragments in this file.
-  mutable std::vector<std::pair<mx::FragmentId,
-                                std::weak_ptr<const FragmentImpl>>>
-      fragments;
+// List of fragments in this file.
+mutable std::vector<std::pair<mx::FragmentId,
+			std::weak_ptr<const FragmentImpl>>>
+fragments;
 
-  virtual ~FileImpl(void) noexcept;
+virtual ~FileImpl(void) noexcept;
 
-  inline FileImpl(FileId id_, EntityProvider::Ptr ep_)
-      : id(id_),
-        ep(std::move(ep_)) {}
+inline FileImpl(FileId id_, EntityProvider::Ptr ep_)
+: id(id_),
+ep(std::move(ep_)) {}
 
-  // Return a reader for the tokens in the file.
-  virtual TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
+// Return a reader for the tokens in the file.
+virtual TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
 };
 
 // A file downloaded as a result of a making an RPC.
@@ -179,8 +181,8 @@ class FragmentImpl {
   virtual ~FragmentImpl(void) noexcept;
 
   inline FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_)
-      : id(id_),
-        ep(std::move(ep_)) {}
+  : id(id_),
+    ep(std::move(ep_)) {}
 
   // Return the ID of the file containing the first token.
   virtual FileId FileContaingFirstToken(void) const = 0;
@@ -197,6 +199,8 @@ class FragmentImpl {
   virtual StmtReader NthStmt(unsigned offset) const = 0;
   virtual PseudoReader NthPseudo(unsigned offset) const = 0;
 
+  virtual std::string_view SourceIR(void) const = 0;
+
   // Return the token associated with a specific entity ID.
   Token TokenFor(const FragmentImpl::Ptr &, EntityId id,
                  bool can_fail=false) const;
@@ -210,11 +214,14 @@ class FragmentImpl {
 
   // Return the statement associated with a specific entity ID.
   Stmt StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
+
+
 };
 
 // A packed fragment of code.
 class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
  public:
+  using Ptr = std::shared_ptr<const PackedFragmentImpl>;
   using Response = capnp::Response<
       mx::rpc::Multiplier::DownloadFragmentResults>;
 
@@ -252,6 +259,42 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   DeclReader NthDecl(unsigned offset) const final;
   StmtReader NthStmt(unsigned offset) const final;
   PseudoReader NthPseudo(unsigned offset) const final;
+
+  std::string_view SourceIR(void) const final;
+};
+
+class SyntaxQueryResultImpl {
+public:
+  using Response = capnp::Response<mx::rpc::Multiplier::SyntaxQueryResults>;
+  const Response response;
+  const rpc::File::Reader reader;
+
+  using Ptr = std::shared_ptr<const SyntaxQueryResultImpl>;
+
+  virtual ~SyntaxQueryResultImpl(void) noexcept;
+
+  SyntaxQueryResultImpl(std::string syntax_, EntityProvider::Ptr ep_, Response response_);
+
+  const std::string syntax;
+
+  // Needed for us to be able to look up the file containing this fragment,
+  // or look up entities related to other fragments.
+  const EntityProvider::Ptr ep;
+
+  WeggliQuery::Ptr query_ptr;
+
+  // List of fragments in this file.
+  mutable std::vector<std::pair<mx::FragmentId,
+    std::weak_ptr<const FragmentImpl>>> fragments;
+
+  Fragment GetResultImpl(unsigned fragment_id) const;
+
+  QueryData GetResult(unsigned fragment_id) const;
+
+  void GetUnparsedTokens(
+      std::string &contents,
+      std::map<unsigned, Token, std::less<unsigned>> &offset,
+      TokenSubstitutionList nodes) const;
 };
 
 // Provides entities from a remote source, i.e. a remote
@@ -292,6 +335,8 @@ class RemoteEntityProvider final : public EntityProvider {
 
   // Download a fragment by its unique ID.
   FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
+
+  SyntaxQueryResultImpl::Ptr SyntaxQuery(const Ptr &, std::string query) final;
 };
 
 class InvalidEntityProvider final : public EntityProvider {
@@ -307,6 +352,8 @@ class InvalidEntityProvider final : public EntityProvider {
 
   // Download a fragment by its unique ID.
   FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
+
+  SyntaxQueryResultImpl::Ptr SyntaxQuery(const Ptr &, std::string query) final;
 };
 
 class FileListImpl {

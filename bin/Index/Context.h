@@ -19,6 +19,8 @@
 #include <pasta/Util/FileManager.h>
 #include <string>
 #include <unordered_map>
+#include <iostream>
+#include<set>
 
 namespace mx {
 class Executor;
@@ -38,6 +40,7 @@ enum : char {
   kFilePathToFileId,
   kFragmentHashToFragmentId,
   kFragmentIdToSerializedFragment,
+  kFragmentIdtoSourceIR
 };
 
 enum MetadataName : char {
@@ -46,7 +49,17 @@ enum MetadataName : char {
   kNextBigCodeId
 };
 
+enum CounterType : unsigned {
+  kStatCompileCommand = 0u,
+  kStatCompileJob,
+  kStatAST,
+  kStatCodeFragment,
+  kStatUniqueCodeFragment,
+  kStatSourceIRFragment
+};
+
 class IndexingContext;
+class CodeGenerator;
 
 template <typename T>
 struct alignas(64) NextId {
@@ -122,6 +135,10 @@ class ServerContext {
 
   void Flush(void);
 
+  mx::PersistentMap<kFragmentIdtoSourceIR, mx::FragmentId, std::string>
+      code_id_to_source_ir;
+
+ public:
   ~ServerContext(void);
 
   explicit ServerContext(std::filesystem::path workspace_dir_);
@@ -131,11 +148,54 @@ template <typename K, typename V>
 struct alignas(64) AtomicMap
     : public std::unordered_map<K, V>, public std::mutex {};
 
+// Indexing Context counter
+class IndexingCounter {
+ public:
+  virtual ~IndexingCounter() {
+    PrintAll();
+  }
+
+  explicit IndexingCounter(void) {
+    ResetAll();
+  }
+
+  uint64_t Increament(CounterType id) {
+    if (id < kStatSourceIRFragment + 1) {
+      return counter[id].fetch_add(mx::kMinEntityIdIncrement);
+    }
+    return 0ull;
+  }
+
+  uint64_t Decrement(CounterType id) {
+    if (id < kStatSourceIRFragment + 1) {
+      return counter[id].fetch_sub(mx::kMinEntityIdIncrement);
+    }
+    return 0ull;
+  }
+
+  private :
+
+  void ResetAll(void);
+  void PrintAll(void);
+
+  std::atomic<uint64_t> counter[kStatSourceIRFragment + 1];
+};
+
+class IndexingCounterRes {
+ public:
+  inline explicit IndexingCounterRes(
+      IndexingCounter &stat_, CounterType id) {
+    stat_.Increament(id);
+  }
+};
+
 // State that needs to live only as long as there are active indexing jobs
 // underway.
 class IndexingContext {
  public:
   ServerContext &server_context;
+
+  IndexingCounter stat;
 
   // Tracks progress in parsing compile commands and turning them into compile
   // jobs.
@@ -173,12 +233,16 @@ class IndexingContext {
   std::vector<NextId<mx::FragmentId>> local_next_small_fragment_id;
   std::vector<NextId<mx::FragmentId>> local_next_big_fragment_id;
 
+  std::unique_ptr<CodeGenerator> codegen;
+
   explicit IndexingContext(ServerContext &server_context_,
                            const mx::Executor &exe_);
 
   ~IndexingContext(void);
 
   void InitializeProgressBars(void);
+
+  void InitializeCodeGenerator(void);
 
   // Get or create a file ID for the file at `file_path` with contents
   // `contents_hash`.
@@ -203,6 +267,43 @@ class IndexingContext {
   // which fragments overlap which lines.
   void PutFragmentLineCoverage(mx::FileId file_id, mx::FragmentId fragment_id,
                                unsigned start_line, unsigned end_line);
+
+  // Save the source ir contents for tlds
+  void PutSourceIRs(mx::FragmentId code_id, std::string source_ir);
+
+};
+
+class SearchingContext {
+ public:
+  ServerContext &server_context;
+
+  explicit SearchingContext(ServerContext &server_context_,
+                            const mx::Executor &exe_);
+  virtual ~SearchingContext(void);
+
+  const unsigned num_workers;
+
+  std::atomic<mx::FileId> local_next_file_id;
+
+  std::set<std::tuple<mx::FileId, mx::FragmentId>> fragments_result;
+
+  std::optional<mx::FileId> GetMaxFileId(void);
+
+  void ForEachFile(
+      std::string syntax, std::function<void(std::string, mx::FileId)> cb);
+
+
+  std::optional<std::string>
+  GetSerializedFile(mx::FileId file_id);
+
+  std::optional<std::string>
+  GetSerializedFragment(mx::FragmentId fragment_id);
+
+  template <typename P, typename C>
+  void ScanFilePrefix(P prefix, C callback) const {
+    server_context.file_fragment_ids.ScanPrefix(prefix, callback);
+  }
+
 };
 
 }  // namespace indexer
