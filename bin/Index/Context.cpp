@@ -63,7 +63,8 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
   mx::FileId file_id = server_context->file_hash_to_file_id.LazyGetOrSet(
       contents_hash,
       [this, &created_id] (void) -> mx::FileId {
-        created_id = server_context->next_file_id.fetch_add(1u);
+        created_id = server_context->next_file_id.fetch_add(
+            mx::kMinEntityIdIncrement);
         return created_id;
       });
 
@@ -83,7 +84,8 @@ std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
   mx::CodeId decl_id = server_context->code_hash_to_code_id.LazyGetOrSet(
       code_hash,
       [this, &created_id] (void) -> mx::CodeId {
-        created_id = server_context->next_code_id.fetch_add(1u);
+        created_id = server_context->next_code_id.fetch_add(
+            mx::kMinEntityIdIncrement);
         return created_id;
       });
 

@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "Hash.h"
 #include "PrintTokenGraph.h"
+#include "Serializer.h"
 #include "TokenizeFile.h"
 #include "TokenTree.h"
 #include "Util.h"
@@ -136,19 +137,6 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 };
 
-enum class EntityKind : uint16_t {
-  kDeclaration,
-  kStatement,
-  kType
-};
-
-struct EntityId {
-  mx::CodeId code_id;
-  uint32_t entity_offset;  // In a list.
-  uint16_t entity_kind;
-  uint16_t entity_sub_kind;
-};
-
 // Labels entities (decls, stmts, types, tokens). The idea here is that in
 // `ast::EntityList`, which is derived from a Cap'n Proto schema, we have a
 // bunch of lists of different types of entities (decls, stmts, etc.). We index
@@ -169,7 +157,7 @@ class EntityLabeller final : protected pasta::DeclVisitor,
                              protected pasta::TypeVisitor {
  private:
   mx::CodeId code_id{0u};
-  std::unordered_map<const void *, EntityId> entity_id;
+  std::unordered_map<const void *, mx::EntityId> entity_id;
   std::map<std::pair<mx::CodeId, pasta::DeclKind>, uint32_t> next_decl_offset;
   std::map<std::pair<mx::CodeId, pasta::StmtKind>, uint32_t> next_stmt_offset;
 //  std::map<std::pair<mx::CodeId, pasta::TypeKind>, uint32_t> next_type_offset;
@@ -177,10 +165,10 @@ class EntityLabeller final : protected pasta::DeclVisitor,
   bool Label(const pasta::Decl &entity) {
     auto kind = entity.Kind();
     auto &next_offset = next_decl_offset[{code_id, kind}];
-    EntityId id{
+    mx::EntityId id{
         code_id,
         next_offset,
-        static_cast<uint16_t>(EntityKind::kDeclaration),
+        mx::EntityKind::kDeclaration,
         static_cast<uint16_t>(kind)};
 
     if (entity_id.emplace(entity.RawDecl(), id).second) {
@@ -194,10 +182,10 @@ class EntityLabeller final : protected pasta::DeclVisitor,
   bool Label(const pasta::Stmt &entity) {
     auto kind = entity.Kind();
     auto &next_offset = next_stmt_offset[{code_id, kind}];
-    EntityId id{
+    mx::EntityId id{
         code_id,
         next_offset,
-        static_cast<uint16_t>(EntityKind::kStatement),
+        mx::EntityKind::kStatement,
         static_cast<uint16_t>(kind)};
 
     if (entity_id.emplace(entity.RawStmt(), id).second) {

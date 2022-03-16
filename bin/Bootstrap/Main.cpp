@@ -770,7 +770,9 @@ int CodeGenerator::RunOnClassHierarchies(void) {
     }
   }
 
-  serialize_h_os << "class EntitySerializer;\n\n";
+  serialize_h_os
+      << "class EntitySerializer;\n"
+      << "void Serialize(EntitySerializer &, const pasta::Decl &);\n";
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {

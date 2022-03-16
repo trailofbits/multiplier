@@ -596,7 +596,7 @@ enum class TargetLanguage : unsigned;
 }  // namespace pasta
 namespace indexer {
 class EntitySerializer;
-
+void Serialize(EntitySerializer &, const pasta::Decl &);
 void SerializeDecl(EntitySerializer &, mx::ast::Decl::Builder, const pasta::Decl &);
 void SerializeEmptyDecl(EntitySerializer &, mx::ast::EmptyDecl::Builder, const pasta::EmptyDecl &);
 void SerializeExportDecl(EntitySerializer &, mx::ast::ExportDecl::Builder, const pasta::ExportDecl &);
