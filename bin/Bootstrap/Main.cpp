@@ -262,10 +262,10 @@ static const char *CxxIntType(pasta::Type type) {
       case pasta::BuiltinTypeKind::kUShort: return "unsigned short";
       case pasta::BuiltinTypeKind::kInt: return "int";
       case pasta::BuiltinTypeKind::kUInt: return "unsigned";
-      case pasta::BuiltinTypeKind::kLong: return "int64_t";
-      case pasta::BuiltinTypeKind::kULong: return "uint64_t";
-      case pasta::BuiltinTypeKind::kLongLong: return "int64_t";
-      case pasta::BuiltinTypeKind::kULongLong: return "uint64_t";
+      case pasta::BuiltinTypeKind::kLong: return "long";
+      case pasta::BuiltinTypeKind::kULong: return "unsigned long";
+      case pasta::BuiltinTypeKind::kLongLong: return "long long";
+      case pasta::BuiltinTypeKind::kULongLong: return "unsigned long long";
       default: break;
     }
   } else if (type.IsTypedefNameType()) {

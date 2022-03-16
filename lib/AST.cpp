@@ -3201,7 +3201,7 @@ SYCLMajorVersion FromPasta(pasta::SYCLMajorVersion e) {
 }
 
 SanitizerOrdinal FromPasta(pasta::SanitizerOrdinal e) {
-  switch (static_cast<uint64_t>(e)) {
+  switch (static_cast<unsigned long long>(e)) {
     case 0: return SanitizerOrdinal::ADDRESS;
     case 1: return SanitizerOrdinal::POINTER_COMPARE;
     case 2: return SanitizerOrdinal::POINTER_SUBTRACT;
