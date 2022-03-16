@@ -200,7 +200,7 @@ enum class RemarkKind : unsigned;
 enum class ReservedIdentifierStatus : int;
 enum class SFINAEResponse : unsigned;
 enum class SYCLMajorVersion : unsigned;
-enum class SanitizerOrdinal : uint64_t;
+enum class SanitizerOrdinal : unsigned long long;
 enum class SelectorLocationsKind : unsigned;
 enum class SignReturnAddressKeyKind : int;
 enum class SignReturnAddressScopeKind : int;
