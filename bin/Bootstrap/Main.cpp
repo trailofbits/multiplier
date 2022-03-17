@@ -75,11 +75,20 @@ static const std::unordered_set<std::string> gEntityClassNames{
 };
 
 // These methods can trigger asserts deep in their internals that are hard
-// to design around in PASTA.
+// to design around in PASTA. The auto-generated serialization code tries to
+// call most methods, and we don't want to call a method that will crash the
+// process with an assertion failure. So we just blacklist those methods here.
+//
+// Sometimes, those methods can be handled because their assertions are
+// "shallow" and appear in the method body itself (and not inside of an
+// internally called method), and in those cases, we can often modify PASTA
+// itself (`pasta/bin/BootstrapTypes/Globals.cpp`, `kConditionalNullptr`)
+// to check the conditions that would be asserted, and if those conditions
+// aren't satisfied, then return `std::nullopt`.
 static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Expr", "ClassifyLValue"},  // Calls `clang::Expr::ClassifyImpl`.
-  {"Expr", "IsBoundMemberFunction"},   // Calls `clang::Expr::ClassifyImpl`.
-  {"Expr", "IsModifiableLvalue"},
+  {"Expr", "IsBoundMemberFunction"},  // Calls `clang::Expr::ClassifyImpl`.
+  {"Expr", "IsModifiableLvalue"},  // Calls `clang::Expr::ClassifyImpl`.
 };
 
 struct ClassHierarchy {
@@ -453,6 +462,22 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
 }
 
+static std::optional<std::string> GetFirstTemplateParameterType(
+    const std::optional<pasta::RecordDecl> &record) {
+  if (record) {
+    if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
+      for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
+        if (auto arg_type = arg.AsType()) {
+          if (auto arg_record = arg_type->AsRecordDeclaration()) {
+            return arg_record->Name();
+          }
+        }
+      }
+    }
+  }
+  return std::nullopt;
+}
+
 MethodListPtr CodeGenerator::RunOnClass(
     ClassHierarchy *cls, MethodListPtr parent_methods) {
   auto seen_methods = std::make_shared<MethodList>(*parent_methods);
@@ -520,12 +545,27 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Handle `pasta::Token`.
       if (record_name == "Token") {
+        serialize_cpp_os
+            << "  b." << setter_name << "(es.EntityId(e."
+            << method_name << "()));\n";
+
         schema_os
             << "  " << camel_name << " @" << i << " :UInt64;\n";  // Reference.
         ++i;
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
+        serialize_cpp_os
+            << "  auto sr" << i << " = b." << init_name << "();\n"
+            << "  if (auto r" << i << " = e." << method_name << "(); auto rs"
+            << i << " = r" << i << ".Size()) {\n"
+            << "    sr" << i << ".setBeginId(es.EntityId(r" << i << "[0]));\n"
+            << "    sr" << i << ".setEndId(es.EntityId(r" << i << "[rs" << i << " - 1u]));\n"
+            << "  } else {\n"
+            << "    sr" << i << ".setBeginId(0);\n"
+            << "    sr" << i << ".setEndId(0);\n"
+            << "  }\n";
+
         schema_os << "  " << camel_name << " @" << i << " :TokenRange;\n";
         ++i;
 
@@ -575,44 +615,105 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // TODO(pag): Figure out optionals in Cap'n Proto.
       } else if (record_name == "optional") {
+//        std::optional<std::string> element_name =
+//            GetFirstTemplateParameterType(record);
+//        std::string capn_element_name;
+//        if (!element_name) {
+//
+//        } else if (*element_name == "string" ||
+//                   *element_name == "basic_string" ||
+//                   *element_name == "string_view" ||
+//                   *element_name == "basic_string_view" ||
+//                   *element_name == "path") {
+//          capn_element_name = "Text";
+//
+//        } else if (gNotReferenceTypes.count(*element_name)) {
+//          capn_element_name = element_name.value();
+//
+//        } else if (gEntityClassNames.count(*element_name)) {
+//          capn_element_name = "UInt64";  // Reference.
+//        }
+//
+//        if (!capn_element_name.empty()) {
+//          schema_os
+//              << "  " << camel_name << " @" << i << " :List("
+//              << capn_element_name << ");\n";
+//          ++i;
+//        }
 
       // List of things; figure out what.
       } else if (record_name == "vector") {
-        if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
-          std::optional<std::string> element_name;
-          for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
-            if (auto arg_type = arg.AsType()) {
-              if (auto arg_record = arg_type->AsRecordDeclaration()) {
-                element_name = arg_record->Name();
-                break;
-              }
-            }
-          }
+        std::optional<std::string> element_name =
+            GetFirstTemplateParameterType(record);
+        std::string capn_element_name;
+        if (!element_name) {
 
-          std::string capn_element_name;
-          if (!element_name) {
+        } else if (*element_name == "string" ||
+                   *element_name == "basic_string" ||
+                   *element_name == "string_view" ||
+                   *element_name == "basic_string_view" ||
+                   *element_name == "path") {
+          capn_element_name = "Text";
 
-          } else if (*element_name == "string" ||
-                     *element_name == "basic_string" ||
-                     *element_name == "string_view" ||
-                     *element_name == "basic_string_view" ||
-                     *element_name == "path") {
-            capn_element_name = "Text";
+        } else if (gEntityClassNames.count(*element_name)) {
+          capn_element_name = "UInt64";  // Reference.
 
-          } else if (gNotReferenceTypes.count(*element_name)) {
-            capn_element_name = element_name.value();
-
-          } else if (gEntityClassNames.count(*element_name)) {
-            capn_element_name = "UInt64";  // Reference.
-          }
-
-          if (!capn_element_name.empty()) {
-            schema_os
-                << "  " << camel_name << " @" << i << " :List("
-                << capn_element_name << ");\n";
-            ++i;
-          }
+        } else if (gNotReferenceTypes.count(*element_name)) {
+          capn_element_name = element_name.value();
         }
+
+        if (capn_element_name.empty()) {
+          continue;
+        }
+
+        serialize_cpp_os
+            << "  auto v" << i << " = e." << method_name << "();\n"
+            << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
+            << i << ".size()));\n"
+            << "  auto i" << i << " = 0u;\n"
+            << "  for (const auto &e" << i << " : v" << i << ") {\n";
+
+
+        if (*element_name == "string" || *element_name == "basic_string") {
+          serialize_cpp_os
+              << "    sv" << i << ".set(i" << i << ", e" << i << ");\n";
+
+        // String views need to be converted to `std::string` because Cap'n
+        // Proto requires `:Text` fields to be `NUL`-terminated.
+        } else if (*element_name == "string_view" ||
+                   *element_name == "basic_string_view") {
+          serialize_cpp_os
+              << "    std::string se" << i << "(e" << i << ".data(), e"
+              << i << ".size());\n"
+              << "    sv" << i << ".set(i" << i << ", se" << i << ");\n";
+
+        // Filesystem paths.
+        } else if (*element_name == "path") {
+          serialize_cpp_os
+              << "    sv" << i << ".set(i" << i << ", e" << i
+              << ".generic_string());\n";
+
+        // Reference types.
+        } else if (gEntityClassNames.count(*element_name)) {
+          serialize_cpp_os
+              << "    sv" << i << ".set(i" << i << ", es.EntityId(e" << i
+              << "));\n";
+
+        // Not reference types.
+        } else {
+          serialize_cpp_os
+              << "    Serialize" << (*element_name)
+              << "(es, sv" << i << "[i" << i << "], e" << i << ");\n";
+        }
+
+        serialize_cpp_os
+            << "    ++i" << i << ";\n"
+            << "  }\n";
+
+        schema_os
+            << "  " << camel_name << " @" << i << " :List("
+            << capn_element_name << ");\n";
+        ++i;
 
       } else if (gNotReferenceTypes.count(record_name)) {
         schema_os
@@ -740,12 +841,12 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   // needed basis.
   schema_os
       << NameAndHash("struct Token") << " {\n"
-      << "  kind @0 :TokenKind $Cxx.name(\"kind\");\n"
-      << "  data @1 :Text $Cxx.name(\"data\");\n"
+      << "  kind @0 :TokenKind;\n"
+      << "  data @1 :Text;\n"
       << "}\n\n"
       << NameAndHash("struct TokenRange") << " {\n"
-      << "  beginId @0 :UInt64 $Cxx.name(\"begin_id\");\n"  // References.
-      << "  endId @1 :UInt64 $Cxx.name(\"end_id\");  # Inclusive.\n"
+      << "  beginId @0 :UInt64;\n"  // References.
+      << "  endId @1 :UInt64;  # Inclusive.\n"
       << "}\n\n";
 
   include_h_os

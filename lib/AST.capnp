@@ -12,13 +12,13 @@ using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("mx::ast");
 
 struct Token @0xdf7bccc629d6dcf9 {
-  kind @0 :TokenKind $Cxx.name("kind");
-  data @1 :Text $Cxx.name("data");
+  kind @0 :TokenKind;
+  data @1 :Text;
 }
 
 struct TokenRange @0xfaaa666ba10b6696 {
-  beginId @0 :UInt64 $Cxx.name("begin_id");
-  endId @1 :UInt64 $Cxx.name("end_id");  # Inclusive.
+  beginId @0 :UInt64;
+  endId @1 :UInt64;  # Inclusive.
 }
 
 enum DeclKind @0x96ac187aac5afe4d {

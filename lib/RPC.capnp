@@ -37,11 +37,11 @@ struct IndexedCode @0xe5f27760091f9a3a {
   # The unique identifier for this top-level declaration.
   codeId @0 :UInt64;
   
-  # # The ID of the translation unit containing these declarations.
-  # translationUnitId @1 :UInt64;
-  
   # Entities embedded in this code sequence.
   entities @1 :AST.EntityList;
+  
+  # List of top-level declarations in this code chunk.
+  topLevelDeclarations @2 :List(UInt64);
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {

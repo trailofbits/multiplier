@@ -34,6 +34,11 @@ static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
 struct DeclarationId {
   CodeId code_id;
   DeclKind kind;
+
+  // Offset of this where this declaration is stored inside of a `kind`-specific
+  // list in `ast::EntityList`. For example, if `kind` is `DeclKind::CXX_METHOD`
+  // then `offset` represents an index inside of
+  // `ast::EntityList::cxxMethodDecl`.
   uint32_t offset;
 
   bool operator==(const DeclarationId &) const noexcept = default;
@@ -43,6 +48,9 @@ struct DeclarationId {
 struct StatementId {
   CodeId code_id;
   StmtKind kind;
+
+  // Offset of this where this declaration is stored inside of a `kind`-specific
+  // list in `ast::EntityList`.
   uint32_t offset;
 
   bool operator==(const StatementId &) const noexcept = default;
@@ -52,6 +60,9 @@ struct StatementId {
 struct TokenId {
   CodeId code_id;
   TokenKind kind;
+
+  // Offset of this where this declaration is stored inside of a `kind`-specific
+  // list in `ast::EntityList`.
   uint32_t offset;
 
   bool operator==(const TokenId &) const noexcept = default;
@@ -61,6 +72,9 @@ struct TokenId {
 struct FileTokenId {
   FileId file_id;
   TokenKind kind;
+
+  // Offset of this where this declaration is stored inside of a `kind`-specific
+  // list in `rpc::File::Tokens`.
   uint32_t offset;
 
   bool operator==(const FileTokenId &) const noexcept = default;

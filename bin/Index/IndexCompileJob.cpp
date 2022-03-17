@@ -575,6 +575,11 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     capnp::MallocMessageBuilder message;
     auto builder = message.initRoot<mx::rpc::IndexedCode>();
     builder.setCodeId(code_chunk.code_id);
+    auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
+    auto tlds = builder.initTopLevelDeclarations(num_tlds);
+    for (auto i = 0u; i < num_tlds; ++i) {
+      tlds.set(i, serializer.EntityId(code_chunk.decls[i]));
+    }
     serializer.SerializeCodeEntities(std::move(code_chunk),
                                      builder.initEntities());
 
