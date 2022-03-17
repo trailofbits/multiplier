@@ -66,6 +66,12 @@ static const std::unordered_set<std::string> gConcreteClassNames{
 //  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, PASTA_IGNORE_ABSTRACT)
 };
 
+static const std::unordered_set<std::string> gEntityClassNames{
+  "Token",
+  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, PASTA_IGNORE_ABSTRACT)
+  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, PASTA_IGNORE_ABSTRACT)
+};
+
 struct ClassHierarchy {
   const pasta::CXXRecordDecl record;
   ClassHierarchy *base{nullptr};
@@ -706,17 +712,28 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <pasta/Compile/Compiler.h>\n"
       << "#include <pasta/Compile/Job.h>\n"
       << "#include <pasta/Util/ArgumentVector.h>\n\n"
-      << "namespace indexer {\n";
+      << "#include \"Serializer.h\"\n\n"
+      << "namespace indexer {\n\n"
+      << "void EntitySerializer::SerializeCodeEntities(\n"
+      << "    CodeChunk code, mx::ast::EntityList::Builder builder) {\n"
+      << "  serialized_entities.clear();\n"
+      << "  code_id = code.code_id;\n"
+      << "  auto tokens_builder = builder.initToken(\n"
+      << "      static_cast<unsigned>(code.end_index - code.begin_index + 1u));\n"
+      << "  for (auto i = code.begin_index; i <= code.end_index; ++i) {\n"
+      << "    Serialize(tokens_builder[static_cast<unsigned>(i - code.begin_index)], range[i]);\n"
+      << "  }\n";
 
   // Buffers the struct output so that we can output tag types on an as-
   // needed basis.
   schema_os
       << NameAndHash("struct Token") << " {\n"
-      << "  offset @0 :UInt32 $Cxx.name(\"offset\");\n"
+      << "  kind @0 :TokenKind $Cxx.name(\"kind\");\n"
+      << "  data @1 :Text $Cxx.name(\"data\");\n"
       << "}\n\n"
       << NameAndHash("struct TokenRange") << " {\n"
-      << "  beginOffset @0 :UInt32 $Cxx.name(\"begin_offset\");\n"
-      << "  endOffset @1 :UInt32 $Cxx.name(\"end_offset\");  # Inclusive.\n"
+      << "  beginId @0 :UInt64 $Cxx.name(\"begin_id\");\n"
+      << "  endId @1 :UInt64 $Cxx.name(\"end_id\");  # Inclusive.\n"
       << "}\n\n"
       << "struct Ref(Entity) {\n"  // NOTE(pag): generic types don't have hashes.
       << "  id @0 :UInt64;\n"  // This is an `mx::EntityId`.
@@ -735,10 +752,32 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {
-    serialize_h_os << "class " << record.Name() << ";\n";
+    std::string name = record.Name();
+    serialize_h_os << "class " << name << ";\n";
+
+    if (gEntityClassNames.count(name)) {
+      std::string snake_name = CapitalCaseToSnakeCase(name);
+      std::string camel_name = SnakeCaseToCamelCase(snake_name);
+      std::string init_name = "init" + Capitalize(camel_name);
+      serialize_cpp_os
+          << "  " << name << "_builder = builder." << init_name
+          << "(code.num_decls_of_kind[pasta::DeclKind::k"
+          << name.substr(0, name.size() - 4) << "]);\n";
+    }
   }
   for (const pasta::CXXRecordDecl &record : stmts) {
-    serialize_h_os << "class " << record.Name() << ";\n";
+    std::string name = record.Name();
+    serialize_h_os << "class " << name << ";\n";
+
+    if (gEntityClassNames.count(name)) {
+      std::string snake_name = CapitalCaseToSnakeCase(name);
+      std::string camel_name = SnakeCaseToCamelCase(snake_name);
+      std::string init_name = "init" + Capitalize(camel_name);
+      serialize_cpp_os
+          << "  " << name << "_builder = builder." << init_name
+          << "(code.num_stmts_of_kind[pasta::StmtKind::k"
+          << name << "]);\n";
+    }
   }
   for (const pasta::CXXRecordDecl &record : types) {
     serialize_h_os << "class " << record.Name() << ";\n";
@@ -773,17 +812,44 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {
-    auto name = record.Name();
+    std::string name = record.Name();
     serialize_h_os
         << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
         << name << "::Builder, const pasta::" << name << " &);\n";
+
+//    if (gEntityClassNames.count(name)) {
+//      std::string snake_name = CapitalCaseToSnakeCase(name);
+//      std::string camel_name = SnakeCaseToCamelCase(snake_name);
+//      std::string init_name = "init" + Capitalize(camel_name);
+//      serialize_cpp_os
+//          << "  Serialize" << name << "(*this, _builder = builder." << init_name
+//          << "(code.num_decls_of_kind[pasta::DeclKind::k"
+//          << name.substr(0, name.size() - 4) << "]);\n";
+//    }
   }
   for (const pasta::CXXRecordDecl &record : stmts) {
     auto name = record.Name();
     serialize_h_os
         << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
         << name << "::Builder, const pasta::" << name << " &);\n";
+
+//    if (gEntityClassNames.count(name)) {
+//      std::string snake_name = CapitalCaseToSnakeCase(name);
+//      std::string camel_name = SnakeCaseToCamelCase(snake_name);
+//      std::string init_name = "init" + Capitalize(camel_name);
+////      serialize_cpp_os
+////          << "  " << name << "_builder = builder." << init_name
+////          << "(code.num_stmts_of_kind[pasta::StmtKind::k"
+////          << name << "]);\n";
+//    }
   }
+
+  serialize_cpp_os
+      << "  for (const pasta::Decl &decl : code.decls) {\n"
+      << "    this->DeclVisitor::Accept(decl);\n"
+      << "  }\n"
+      << "}\n\n";
+
   for (const pasta::CXXRecordDecl &record : types) {
     auto name = record.Name();
     serialize_h_os
@@ -809,21 +875,14 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
     // Collect class names for `EntityList`.
     auto class_name = cls->record.Name();
-    if (gConcreteClassNames.count(class_name)) {
-      class_names.emplace_back(std::move(class_name));
-    }
   }
 
   // The entity list is a storage for zero-or-more entities.
   schema_os << "struct EntityList @0xf26db0d046aab9c9 {\n";
   auto i = 0u;
-  for (const auto &class_name : class_names) {
-    if (gNotReferenceTypes.count(class_name)) {
-      continue;
-    }
-
-    auto snake_name = CapitalCaseToSnakeCase(class_name);
-    auto camel_name = SnakeCaseToCamelCase(snake_name);
+  for (const auto &class_name : gEntityClassNames) {
+    std::string snake_name = CapitalCaseToSnakeCase(class_name);
+    std::string camel_name = SnakeCaseToCamelCase(snake_name);
     schema_os
         << "  " << camel_name << " @" << i
         << " :List(" << class_name << ");\n";

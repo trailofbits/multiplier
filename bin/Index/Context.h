@@ -35,6 +35,7 @@ enum : char {
   kFileHashToFileId,
   kFilePathToFileId,
   kCodeHashToCodeId,
+  kCodeIdToIndexedCode,
 };
 
 enum MetadataName : char {
@@ -85,6 +86,10 @@ class ServerContext {
   mx::PersistentMap<kCodeHashToCodeId, std::string, mx::CodeId>
       code_hash_to_code_id;
 
+  // Maps a code ID to the serialized `rpc::IndexedCode` data structure.
+  mx::PersistentMap<kCodeIdToIndexedCode, mx::CodeId, kj::Array<capnp::word>>
+      code_id_to_indexed_code;
+
   void Flush(void);
 
  public:
@@ -120,8 +125,11 @@ class IndexingContext {
   std::pair<mx::CodeId, bool> GetOrCreateCodeId(const std::string &code_hash,
                                                 uint64_t num_tokens);
 
-  // Save the tokenized contents of a file.
+  // Save the serialized contents of a file as a token list.
   void PutFileTokens(mx::FileId file_id, kj::Array<capnp::word> tokens);
+
+  // Save the serialized top-level entities and the parsed tokens.
+  void PutIndexedCode(mx::CodeId code_id, kj::Array<capnp::word> code);
 };
 
 }  // namespace indexer

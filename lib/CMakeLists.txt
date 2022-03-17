@@ -30,7 +30,7 @@ set(copy_headers_commands "")
 foreach(capnp_header_path ${MX_RPC_HEADERS} ${MX_AST_HEADERS})
   get_filename_component(header_name "${capnp_header_path}" NAME)
   set(output_header_path "${binary_include_dir}/${header_name}")
-  list(APPEND copied_headers "${output_header_path}")
+  list(APPEND copied_headers $<BUILD_INTERFACE:${output_header_path}>)
   list(APPEND copy_headers_commands
     COMMAND
     "${CMAKE_COMMAND}"

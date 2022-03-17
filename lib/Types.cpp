@@ -13,7 +13,7 @@ namespace mx {
 namespace {
 
 enum EntityKind : uint64_t {
-  kInvalid,
+  kFileToken,
 
   kBigCodeDeclaration,
   kBigCodeStatement,
@@ -110,6 +110,14 @@ union PackedEntityId {
                            kBigCodeIdNumBits));
   } __attribute__((packed)) big_token;
 
+  struct {
+    uint64_t entity_kind:kEntityKindNumBits;
+    uint64_t token_kind:kTokenKindNumBits;
+    uint64_t file_id:kFileIdNumBits;
+    uint64_t offset:(64 - (kEntityKindNumBits + kTokenKindNumBits +
+                           kFileIdNumBits));
+  } __attribute__((packed)) file_token;
+
 } __attribute__((packed));
 
 static_assert(sizeof(PackedEntityId) == sizeof(uint64_t));
@@ -168,12 +176,12 @@ EntityId::EntityId(TokenId id) {
     PackedEntityId packed = {};
     if (id.code_id >= kMaxBigCodeId) {
       packed.small_token.code_id = id.code_id;
-      packed.small_token.entity_kind = static_cast<uint64_t>(kSmallCodeStatement);
+      packed.small_token.entity_kind = static_cast<uint64_t>(kSmallCodeToken);
       packed.small_token.token_kind = static_cast<uint64_t>(id.kind);
       packed.small_token.offset = id.offset;
     } else {
       packed.big_token.code_id = id.code_id;
-      packed.big_token.entity_kind = static_cast<uint64_t>(kBigCodeStatement);
+      packed.big_token.entity_kind = static_cast<uint64_t>(kBigCodeToken);
       packed.big_token.token_kind = static_cast<uint64_t>(id.kind);
       packed.big_token.offset = id.offset;
     }
@@ -187,11 +195,35 @@ EntityId::EntityId(TokenId id) {
   }
 }
 
+EntityId::EntityId(FileTokenId id) {
+  if (id.file_id) {
+    PackedEntityId packed = {};
+    packed.file_token.file_id = id.file_id;
+    packed.file_token.entity_kind = static_cast<uint64_t>(kFileToken);
+    packed.file_token.token_kind = static_cast<uint64_t>(id.kind);
+    packed.file_token.offset = id.offset;
+    opaque = packed.opaque;
+
+#ifndef NDEBUG
+    auto unpacked = Unpack();
+    assert(std::holds_alternative<FileTokenId>(unpacked));
+    assert(std::get<FileTokenId>(unpacked) == id);
+#endif
+  }
+}
+
 // Unpack this entity ID into a concrete type.
 VariantId EntityId::Unpack(void) const noexcept {
   PackedEntityId packed = {};
   packed.opaque = opaque;
   switch (static_cast<EntityKind>(packed.sel.entity_kind)) {
+    case EntityKind::kFileToken: {
+      FileTokenId id;
+      id.file_id = packed.file_token.file_id;
+      id.kind = static_cast<TokenKind>(packed.file_token.token_kind);
+      id.offset = packed.file_token.offset;
+      return id;
+    }
     case EntityKind::kBigCodeDeclaration: {
       DeclarationId id;
       id.code_id = packed.big_decl.code_id;

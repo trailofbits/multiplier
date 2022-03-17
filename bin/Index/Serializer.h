@@ -41,10 +41,9 @@ class EntitySerializer final : protected pasta::DeclVisitor,
   const EntityIdMap entity_ids;
   mx::CodeId code_id;
   std::unordered_set<uint64_t> serialized_entities;
-  mx::ast::EntityList::Builder *builder{nullptr};
 
 #define MX_DECLARE_DECL_LIST_BUILDER(decl) \
-    ::capnp::List<::mx::ast::decl ## Decl, ::capnp::Kind::STRUCT>::Builder decl ## _builder;
+    ::capnp::List<::mx::ast::decl ## Decl, ::capnp::Kind::STRUCT>::Builder decl ## Decl_builder;
 
 #define MX_DECLARE_STMT_LIST_BUILDER(stmt) \
     ::capnp::List<::mx::ast::stmt, ::capnp::Kind::STRUCT>::Builder stmt ## _builder;
@@ -87,6 +86,8 @@ class EntitySerializer final : protected pasta::DeclVisitor,
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
 
+  void Serialize(mx::ast::Token::Builder token, const pasta::Token &entity);
+
  public:
   inline EntitySerializer(pasta::TokenRange range_, EntityIdMap entity_ids_)
       : range(std::move(range_)),
@@ -94,7 +95,7 @@ class EntitySerializer final : protected pasta::DeclVisitor,
         code_id(mx::kInvalidEntityId) {}
 
   void SerializeCodeEntities(
-      const CodeChunk &code, mx::ast::EntityList::Builder entities);
+      CodeChunk code, mx::ast::EntityList::Builder entities);
 
   uint64_t EntityId(const pasta::Decl &entity) const;
   uint64_t EntityId(const pasta::Stmt &entity) const;
@@ -102,7 +103,6 @@ class EntitySerializer final : protected pasta::DeclVisitor,
 
   bool Serialize(const pasta::Decl &entity);
   bool Serialize(const pasta::Stmt &entity);
-  bool Serialize(const pasta::Token &entity);
 };
 
 }  // namespace indexer

@@ -18,15 +18,18 @@ enum class DeclKind : unsigned short;
 enum class StmtKind : unsigned short;
 enum class TokenKind : unsigned short;
 
-static constexpr uint64_t kInvalidEntityId = 0u;
-static constexpr uint64_t kMinEntityIdIncrement = 1u;
+static constexpr uint64_t kInvalidEntityId = 0ull;
+static constexpr uint64_t kMinEntityIdIncrement = 1ull;
 
 // If we have more than 2^16 tokens in a given code chunk, then we consider
 // this a "big code" chunk. We assume that we'll have few of these, i.e. less
 // than 2^16 of them.
 static constexpr unsigned kBigCodeIdNumBits = 16u;
-static constexpr uint64_t kMaxBigCodeId = 1ul << kBigCodeIdNumBits;
-static constexpr uint64_t kNumTokensInBigCode = 1ul << kBigCodeIdNumBits;
+static constexpr CodeId kMaxBigCodeId = 1ull << kBigCodeIdNumBits;
+static constexpr uint64_t kNumTokensInBigCode = 1ull << kBigCodeIdNumBits;
+
+static constexpr unsigned kFileIdNumBits = 20u;
+static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
 
 struct DeclarationId {
   CodeId code_id;
@@ -55,10 +58,19 @@ struct TokenId {
   bool operator!=(const TokenId &) const noexcept = default;
 };
 
+struct FileTokenId {
+  FileId file_id;
+  TokenKind kind;
+  uint32_t offset;
+
+  bool operator==(const FileTokenId &) const noexcept = default;
+  bool operator!=(const FileTokenId &) const noexcept = default;
+};
+
 // A tag type representing an invalid entity id.
 struct InvalidId {};
 
-using VariantId = std::variant<InvalidId, DeclarationId, StatementId, TokenId>;
+using VariantId = std::variant<InvalidId, DeclarationId, StatementId, TokenId, FileTokenId>;
 
 // An opaque, compressed entity id.
 class EntityId {
@@ -76,6 +88,7 @@ class EntityId {
   explicit EntityId(DeclarationId id);
   explicit EntityId(StatementId id);
   explicit EntityId(TokenId id);
+  explicit EntityId(FileTokenId id);
 
   // Unpack this entity ID into a concrete type.
   VariantId Unpack(void) const noexcept;

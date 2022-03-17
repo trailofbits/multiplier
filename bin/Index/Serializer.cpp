@@ -224,17 +224,6 @@ uint64_t EntitySerializer::EntityId(const pasta::Token &entity) const {
   }
 }
 
-void EntitySerializer::SerializeCodeEntities(
-    const CodeChunk &code, mx::ast::EntityList::Builder entities) {
-  serialized_entities.clear();
-  code_id = code.code_id;
-  builder = &entities;
-
-  for (const pasta::Decl &decl : code.decls) {
-    this->DeclVisitor::Accept(decl);
-  }
-}
-
 bool EntitySerializer::Serialize(const pasta::Decl &entity) {
 
   // Only serialize if we have a valid entity ID for this.
@@ -265,7 +254,7 @@ bool EntitySerializer::Serialize(const pasta::Decl &entity) {
   switch (entity.Kind()) {
 #define MX_SERIALIZE_DECL(decl) \
     case pasta::DeclKind::k ## decl: { \
-      Serialize ## decl ## Decl(*this, decl ## _builder[offset], pasta::decl ## Decl::From(entity).value()); \
+      Serialize ## decl ## Decl(*this, decl ## Decl_builder[offset], pasta::decl ## Decl::From(entity).value()); \
       return true; \
     }
 
@@ -278,18 +267,55 @@ bool EntitySerializer::Serialize(const pasta::Decl &entity) {
 }
 
 bool EntitySerializer::Serialize(const pasta::Stmt &entity) {
-//  if (auto id = EntityId(entity)) {
-//    if (serialized_entities.emplace(id).second) {
-//      switch (entity.Kind()) {
-//
-//      }
-//    }
-//  }
-  return false;
+
+  // Only serialize if we have a valid entity ID for this.
+  const uint64_t id = EntityId(entity);
+  if (!id) {
+    return false;
+  }
+
+  // Don't re-serialize if we've done it already.
+  if (!serialized_entities.emplace(id).second) {
+    return false;
+  }
+
+  mx::EntityId ent_id(id);
+  mx::VariantId unpacked_id = ent_id.Unpack();
+  CHECK(std::holds_alternative<mx::StatementId>(unpacked_id));
+  mx::StatementId stmt_id = std::get<mx::StatementId>(unpacked_id);
+
+  // This entity doesn't belong in this code chunk. Not sure if/when this will
+  // happen.
+  if (stmt_id.code_id != code_id) {
+    DLOG(ERROR)
+        << "Attempting to serialize into wrong entity list";
+    return false;
+  }
+
+  auto offset = stmt_id.offset;
+  switch (entity.Kind()) {
+#define MX_SERIALIZE_STMT(stmt) \
+    case pasta::StmtKind::k ## stmt: { \
+      Serialize ## stmt(*this, stmt ## _builder[offset], pasta::stmt::From(entity).value()); \
+      return true; \
+    }
+    PASTA_FOR_EACH_STMT_IMPL(MX_SERIALIZE_STMT,
+                             MX_SERIALIZE_STMT,
+                             MX_SERIALIZE_STMT,
+                             MX_SERIALIZE_STMT,
+                             MX_SERIALIZE_STMT,
+                             PASTA_IGNORE_ABSTRACT)
+#undef MX_SERIALIZE_STMT
+    default:
+      return false;
+  }
 }
 
-bool EntitySerializer::Serialize(const pasta::Token &entity) {
-  return false;
+void EntitySerializer::Serialize(mx::ast::Token::Builder token,
+                                 const pasta::Token &entity) {
+  std::string data(entity.Data().data(), entity.Data().size());
+  token.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(entity.Kind())));
+  token.setData(data);
 }
 
 }  // namespace indexer

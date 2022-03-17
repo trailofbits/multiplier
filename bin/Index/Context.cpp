@@ -7,6 +7,7 @@
 #include "Context.h"
 
 #include <chrono>
+#include <glog/logging.h>
 #include <multiplier/Executor.h>
 #include <multiplier/ProgressBar.h>
 #include <pasta/Util/File.h>
@@ -24,7 +25,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       file_id_to_tokens(workspace_dir),
       file_hash_to_file_id(workspace_dir),
       file_path_to_file_id(workspace_dir),
-      code_hash_to_code_id(workspace_dir) {
+      code_hash_to_code_id(workspace_dir),
+      code_id_to_indexed_code(workspace_dir) {
 
   next_file_id.store(meta_to_id.GetOrSet(MetadataName::kNextFileId,
                                          mx::kMinEntityIdIncrement));
@@ -79,12 +81,10 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
         return created_id;
       });
 
-  if (file_id != created_id) {
-    return {file_id, false};
-  }
+  CHECK_LT(file_id, mx::kMaxFileId);
 
   server_context->file_path_to_file_id.Set(file_path.generic_string(), file_id);
-  return {file_id, true};
+  return {file_id, file_id == created_id};
 }
 
 // Get or create a code ID for the top-level declarations that hash to
@@ -105,7 +105,7 @@ std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
           return created_id;
         });
 
-    assert(code_id <= mx::kMaxBigCodeId);
+    CHECK_LT(code_id, mx::kMaxBigCodeId);
 
   // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigCodeChunks, ...)`.
   } else {
@@ -116,6 +116,8 @@ std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
               mx::kMinEntityIdIncrement);
           return created_id;
         });
+
+    CHECK_GE(code_id, mx::kMaxBigCodeId);
   }
 
   return {code_id, code_id == created_id};
@@ -125,6 +127,12 @@ std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
 void IndexingContext::PutFileTokens(
     mx::FileId file_id, kj::Array<capnp::word> tokens) {
   server_context->file_id_to_tokens.Set(file_id, kj::mv(tokens));
+}
+
+// Save the serialized top-level entities and the parsed tokens.
+void IndexingContext::PutIndexedCode(mx::CodeId code_id,
+                                     kj::Array<capnp::word> code) {
+  server_context->code_id_to_indexed_code.Set(code_id, kj::mv(code));
 }
 
 }  // namespace indexer

@@ -7,6 +7,8 @@
 #include "IndexCompileJob.h"
 
 #include <algorithm>
+#include <capnp/message.h>
+#include <capnp/serialize.h>
 #include <cassert>
 #include <fstream>
 #include <glog/logging.h>
@@ -14,6 +16,7 @@
 #include <map>
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
+#include <multiplier/RPC.capnp.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
@@ -158,9 +161,10 @@ class TLDFinder final : public pasta::DeclVisitor {
 class EntityLabeller final : protected pasta::DeclVisitor,
                              protected pasta::StmtVisitor,
                              protected pasta::TypeVisitor {
+ public:
+  EntityIdMap entity_id;
  private:
   CodeChunk code;
-  EntityIdMap entity_id;
   std::map<std::pair<mx::CodeId, pasta::DeclKind>, uint32_t> next_decl_offset;
   std::map<std::pair<mx::CodeId, pasta::StmtKind>, uint32_t> next_stmt_offset;
 //  std::map<std::pair<mx::CodeId, pasta::TypeKind>, uint32_t> next_type_offset;
@@ -851,20 +855,32 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     }
   }
 
-  // Serialize the new code chunks.
-  for (const CodeChunk &code_chunk : code_chunks) {
-    const pasta::Decl &leader_decl = code_chunk.decls[0];
-    mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-        tok_range, code_chunk.begin_index, code_chunk.end_index);
-    if (maybe_tt.Succeeded()) {
+  EntitySerializer serializer(std::move(tok_range),
+                              std::move(labeller.entity_id));
 
-    } else {
-      LOG(ERROR)
-          << maybe_tt.TakeError() << " for top-level declaration "
-          << DeclToString(leader_decl)
-          << PrefixedLocation(leader_decl, " at or near ")
-          << " on main job file " << main_file_path;
-    }
+  // Serialize the new code chunks.
+  for (CodeChunk &code_chunk : code_chunks) {
+    const mx::CodeId code_id = code_chunk.code_id;
+    capnp::MallocMessageBuilder message;
+    auto builder = message.initRoot<mx::rpc::IndexedCode>();
+    builder.setCodeId(code_chunk.code_id);
+    serializer.SerializeCodeEntities(std::move(code_chunk),
+                                     builder.initEntities());
+
+    context->PutIndexedCode(code_id, capnp::messageToFlatArray(message));
+
+//    const pasta::Decl &leader_decl = code_chunk.decls[0];
+//    mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
+//        tok_range, code_chunk.begin_index, code_chunk.end_index);
+//    if (maybe_tt.Succeeded()) {
+//
+//    } else {
+//      LOG(ERROR)
+//          << maybe_tt.TakeError() << " for top-level declaration "
+//          << DeclToString(leader_decl)
+//          << PrefixedLocation(leader_decl, " at or near ")
+//          << " on main job file " << main_file_path;
+//    }
   }
 }
 
