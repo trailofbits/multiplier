@@ -458,9 +458,9 @@ CharacterLiteralCharacterKind FromPasta(pasta::CharacterLiteralCharacterKind e) 
   switch (static_cast<unsigned>(e)) {
     case 0: return CharacterLiteralCharacterKind::ASCII;
     case 1: return CharacterLiteralCharacterKind::WIDE;
-    case 2: return CharacterLiteralCharacterKind::UT_F8;
-    case 3: return CharacterLiteralCharacterKind::UT_F16;
-    case 4: return CharacterLiteralCharacterKind::UT_F32;
+    case 2: return CharacterLiteralCharacterKind::UTF8;
+    case 3: return CharacterLiteralCharacterKind::UTF16;
+    case 4: return CharacterLiteralCharacterKind::UTF32;
     default: __builtin_unreachable();
   }
 }
@@ -558,7 +558,7 @@ ExprNullPointerConstantKind FromPasta(pasta::ExprNullPointerConstantKind e) {
     case 0: return ExprNullPointerConstantKind::NOT_NULL;
     case 1: return ExprNullPointerConstantKind::ZERO_EXPRESSION;
     case 2: return ExprNullPointerConstantKind::ZERO_LITERAL;
-    case 3: return ExprNullPointerConstantKind::CX_X11_NULLPTR;
+    case 3: return ExprNullPointerConstantKind::CXX11_NULLPTR;
     case 4: return ExprNullPointerConstantKind::GNU_NULL;
     default: __builtin_unreachable();
   }
@@ -1021,9 +1021,9 @@ StringLiteralStringKind FromPasta(pasta::StringLiteralStringKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return StringLiteralStringKind::ASCII;
     case 1: return StringLiteralStringKind::WIDE;
-    case 2: return StringLiteralStringKind::UT_F8;
-    case 3: return StringLiteralStringKind::UT_F16;
-    case 4: return StringLiteralStringKind::UT_F32;
+    case 2: return StringLiteralStringKind::UTF8;
+    case 3: return StringLiteralStringKind::UTF16;
+    case 4: return StringLiteralStringKind::UTF32;
     default: __builtin_unreachable();
   }
 }
@@ -1383,7 +1383,7 @@ AttributeKind FromPasta(pasta::AttributeKind e) {
     case 112: return AttributeKind::CUDA_INVALID_TARGET;
     case 113: return AttributeKind::CUDA_LAUNCH_BOUNDS;
     case 114: return AttributeKind::CUDA_SHARED;
-    case 115: return AttributeKind::CX_X11_NO_RETURN;
+    case 115: return AttributeKind::CXX11_NO_RETURN;
     case 116: return AttributeKind::CALLABLE_WHEN;
     case 117: return AttributeKind::CALLBACK;
     case 118: return AttributeKind::CAPABILITY;
@@ -1441,7 +1441,7 @@ AttributeKind FromPasta(pasta::AttributeKind e) {
     case 170: return AttributeKind::MS_ALLOCATOR;
     case 171: return AttributeKind::MS_INHERITANCE;
     case 172: return AttributeKind::MS_NO_V_TABLE;
-    case 173: return AttributeKind::MS_P430_INTERRUPT;
+    case 173: return AttributeKind::MSP430_INTERRUPT;
     case 174: return AttributeKind::MS_STRUCT;
     case 175: return AttributeKind::MS_VTOR_DISP;
     case 176: return AttributeKind::MAX_FIELD_ALIGNMENT;
@@ -2221,7 +2221,7 @@ ImbueAttribute FromPasta(pasta::ImbueAttribute e) {
     case 0: return ImbueAttribute::NONE;
     case 1: return ImbueAttribute::ALWAYS;
     case 2: return ImbueAttribute::NEVER;
-    case 3: return ImbueAttribute::ALWAYSAR_G1;
+    case 3: return ImbueAttribute::ALWAYSARG1;
     default: __builtin_unreachable();
   }
 }
@@ -2468,15 +2468,15 @@ MSInheritanceModel FromPasta(pasta::MSInheritanceModel e) {
 
 MSVCMajorVersion FromPasta(pasta::MSVCMajorVersion e) {
   switch (static_cast<unsigned>(e)) {
-    case 1600: return MSVCMajorVersion::MSV_C2010;
-    case 1700: return MSVCMajorVersion::MSV_C2012;
-    case 1800: return MSVCMajorVersion::MSV_C2013;
-    case 1900: return MSVCMajorVersion::MSV_C2015;
-    case 1910: return MSVCMajorVersion::MSV_C2017;
-    case 1912: return MSVCMajorVersion::MSV_C20175;
-    case 1914: return MSVCMajorVersion::MSV_C20177;
-    case 1920: return MSVCMajorVersion::MSV_C2019;
-    case 1928: return MSVCMajorVersion::MSV_C20198;
+    case 1600: return MSVCMajorVersion::MSVC2010;
+    case 1700: return MSVCMajorVersion::MSVC2012;
+    case 1800: return MSVCMajorVersion::MSVC2013;
+    case 1900: return MSVCMajorVersion::MSVC2015;
+    case 1910: return MSVCMajorVersion::MSVC2017;
+    case 1912: return MSVCMajorVersion::MSVC20175;
+    case 1914: return MSVCMajorVersion::MSVC20177;
+    case 1920: return MSVCMajorVersion::MSVC2019;
+    case 1928: return MSVCMajorVersion::MSVC20198;
     default: __builtin_unreachable();
   }
 }
@@ -3337,7 +3337,7 @@ SpecifierKind FromPasta(pasta::SpecifierKind e) {
 Spelling FromPasta(pasta::Spelling e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return Spelling::GNU_AARCH64_VECTOR_PCS;
-    case 1: return Spelling::CX_X11_CLANG_AARCH64_VECTOR_PCS;
+    case 1: return Spelling::CXX11_CLANG_AARCH64_VECTOR_PCS;
     case 2: return Spelling::C2_XCLANG_AARCH64_VECTOR_PCS;
     case 15: return Spelling::SPELLING_NOT_CALCULATED;
     default: __builtin_unreachable();
@@ -3452,7 +3452,7 @@ SyncScope FromPasta(pasta::SyncScope e) {
 Syntax FromPasta(pasta::Syntax e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return Syntax::GNU;
-    case 1: return Syntax::CX_X11;
+    case 1: return Syntax::CXX11;
     case 2: return Syntax::C2_X;
     case 3: return Syntax::DECLSPEC;
     case 4: return Syntax::MICROSOFT;
@@ -3497,8 +3497,8 @@ TagTypeKind FromPasta(pasta::TagTypeKind e) {
 TailPaddingUseRules FromPasta(pasta::TailPaddingUseRules e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return TailPaddingUseRules::ALWAYS_USE_TAIL_PADDING;
-    case 1: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_PO_D03;
-    case 2: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_PO_D11;
+    case 1: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_POD03;
+    case 2: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_POD11;
     default: __builtin_unreachable();
   }
 }

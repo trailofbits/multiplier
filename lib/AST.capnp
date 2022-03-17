@@ -445,9 +445,9 @@ enum CapturedStmtVariableCaptureKind @0x9c79628470fad762 {
 enum CharacterLiteralCharacterKind @0xc0c13e28937e938c {
   ascii @0 $Cxx.name("ascii");
   wide @1 $Cxx.name("wide");
-  utF8 @2 $Cxx.name("ut_f8");
-  utF16 @3 $Cxx.name("ut_f16");
-  utF32 @4 $Cxx.name("ut_f32");
+  utf8 @2 $Cxx.name("utf8");
+  utf16 @3 $Cxx.name("utf16");
+  utf32 @4 $Cxx.name("utf32");
 }
 
 enum ConstantExprResultStorageKind @0xc4786f8c026b3e39 {
@@ -521,7 +521,7 @@ enum ExprNullPointerConstantKind @0xf1f8486254f579e2 {
   notNull @0 $Cxx.name("not_null");
   zeroExpression @1 $Cxx.name("zero_expression");
   zeroLiteral @2 $Cxx.name("zero_literal");
-  cxX11Nullptr @3 $Cxx.name("cx_x11_nullptr");
+  cxx11Nullptr @3 $Cxx.name("cxx11_nullptr");
   gnuNull @4 $Cxx.name("gnu_null");
 }
 
@@ -912,9 +912,9 @@ enum StmtKind @0xc9755b9a053563b9 {
 enum StringLiteralStringKind @0xbde9cca58b227666 {
   ascii @0 $Cxx.name("ascii");
   wide @1 $Cxx.name("wide");
-  utF8 @2 $Cxx.name("ut_f8");
-  utF16 @3 $Cxx.name("ut_f16");
-  utF32 @4 $Cxx.name("ut_f32");
+  utf8 @2 $Cxx.name("utf8");
+  utf16 @3 $Cxx.name("utf16");
+  utf32 @4 $Cxx.name("utf32");
 }
 
 enum TemplateArgumentKind @0xf54459e1b953e2aa {
@@ -1221,7 +1221,7 @@ enum AttributeKind @0xea12979c4469acdf {
   cudaInvalidTarget @112 $Cxx.name("cuda_invalid_target");
   cudaLaunchBounds @113 $Cxx.name("cuda_launch_bounds");
   cudaShared @114 $Cxx.name("cuda_shared");
-  cxX11NoReturn @115 $Cxx.name("cx_x11_no_return");
+  cxx11NoReturn @115 $Cxx.name("cxx11_no_return");
   callableWhen @116 $Cxx.name("callable_when");
   callback @117 $Cxx.name("callback");
   capability @118 $Cxx.name("capability");
@@ -1279,7 +1279,7 @@ enum AttributeKind @0xea12979c4469acdf {
   msAllocator @170 $Cxx.name("ms_allocator");
   msInheritance @171 $Cxx.name("ms_inheritance");
   msNoVTable @172 $Cxx.name("ms_no_v_table");
-  msP430Interrupt @173 $Cxx.name("ms_p430_interrupt");
+  msp430Interrupt @173 $Cxx.name("msp430_interrupt");
   msStruct @174 $Cxx.name("ms_struct");
   msVtorDisp @175 $Cxx.name("ms_vtor_disp");
   maxFieldAlignment @176 $Cxx.name("max_field_alignment");
@@ -1913,7 +1913,7 @@ enum ImbueAttribute @0xdd8ae71e2c4749bf {
   none @0 $Cxx.name("none");
   always @1 $Cxx.name("always");
   never @2 $Cxx.name("never");
-  alwaysarG1 @3 $Cxx.name("alwaysar_g1");
+  alwaysarg1 @3 $Cxx.name("alwaysarg1");
 }
 
 enum ImplicitReason @0x89f711fa7c0ef6d0 {
@@ -2100,15 +2100,15 @@ enum MSInheritanceModel @0x9e63c392cec08405 {
 }
 
 enum MSVCMajorVersion @0x95c4e85c8b049651 {
-  msvC2010 @0 $Cxx.name("msv_c2010");
-  msvC2012 @1 $Cxx.name("msv_c2012");
-  msvC2013 @2 $Cxx.name("msv_c2013");
-  msvC2015 @3 $Cxx.name("msv_c2015");
-  msvC2017 @4 $Cxx.name("msv_c2017");
-  msvC20175 @5 $Cxx.name("msv_c20175");
-  msvC20177 @6 $Cxx.name("msv_c20177");
-  msvC2019 @7 $Cxx.name("msv_c2019");
-  msvC20198 @8 $Cxx.name("msv_c20198");
+  msvc2010 @0 $Cxx.name("msvc2010");
+  msvc2012 @1 $Cxx.name("msvc2012");
+  msvc2013 @2 $Cxx.name("msvc2013");
+  msvc2015 @3 $Cxx.name("msvc2015");
+  msvc2017 @4 $Cxx.name("msvc2017");
+  msvc20175 @5 $Cxx.name("msvc20175");
+  msvc20177 @6 $Cxx.name("msvc20177");
+  msvc2019 @7 $Cxx.name("msvc2019");
+  msvc20198 @8 $Cxx.name("msvc20198");
 }
 
 enum MSVtorDispMode @0xd30e950dab28014f {
@@ -2763,7 +2763,7 @@ enum SpecifierKind @0xa0dfdbbf2ab2d652 {
 
 enum Spelling @0xf75ee4f457170972 {
   gnuAarch64VectorPcs @0 $Cxx.name("gnu_aarch64_vector_pcs");
-  cxX11ClangAarch64VectorPcs @1 $Cxx.name("cx_x11_clang_aarch64_vector_pcs");
+  cxx11ClangAarch64VectorPcs @1 $Cxx.name("cxx11_clang_aarch64_vector_pcs");
   c2XclangAarch64VectorPcs @2 $Cxx.name("c2_xclang_aarch64_vector_pcs");
   spellingNotCalculated @3 $Cxx.name("spelling_not_calculated");
 }
@@ -2849,7 +2849,7 @@ enum SyncScope @0xa360f2801c53e118 {
 
 enum Syntax @0xfabc370c94a4c08b {
   gnu @0 $Cxx.name("gnu");
-  cxX11 @1 $Cxx.name("cx_x11");
+  cxx11 @1 $Cxx.name("cxx11");
   c2UcX @2 $Cxx.name("c2_x");
   declspec @3 $Cxx.name("declspec");
   microsoft @4 $Cxx.name("microsoft");
@@ -2882,8 +2882,8 @@ enum TagTypeKind @0xbfa845fcdbd00864 {
 
 enum TailPaddingUseRules @0xde3a19dc88518d95 {
   alwaysUseTailPadding @0 $Cxx.name("always_use_tail_padding");
-  useTailPaddingUnlessPoD03 @1 $Cxx.name("use_tail_padding_unless_po_d03");
-  useTailPaddingUnlessPoD11 @2 $Cxx.name("use_tail_padding_unless_po_d11");
+  useTailPaddingUnlessPod03 @1 $Cxx.name("use_tail_padding_unless_pod03");
+  useTailPaddingUnlessPod11 @2 $Cxx.name("use_tail_padding_unless_pod11");
 }
 
 enum TemplateArgumentDependence @0x97cee4d7054bd6cf {
@@ -4264,41 +4264,34 @@ struct LabelStmt @0xed2b87febf6a7cc9 {
 
 struct Expr @0x9e4316b5a505b8d6 {
   valueStmt @0:ValueStmt;
-  classifyLValue @1 :ExprLValueClassification;
-  hasSideEffects @2 :Bool;
-  containsErrors @3 :Bool;
-  containsUnexpandedParameterPack @4 :Bool;
-  bestDynamicClassType @5 :UInt64;
-  expressionToken @6 :UInt64;
-  objCProperty @7 :UInt64;
-  objectKind @8 :ExprObjectKind;
-  sourceBitField @9 :UInt64;
-  valueKind @10 :ExprValueKind;
-  hasNonTrivialCall @11 :Bool;
-  isBoundMemberFunction @12 :Bool;
-  isCxX11ConstantExpression @13 :Bool;
-  isCxX98IntegralConstantExpression @14 :Bool;
-  isDefaultArgument @15 :Bool;
-  isEvaluatable @16 :Bool;
-  isGlValue @17 :Bool;
-  isImplicitCxxThis @18 :Bool;
-  isInstantiationDependent @19 :Bool;
-  isIntegerConstantExpression @20 :Bool;
-  isKnownToHaveBooleanValue @21 :Bool;
-  isLValue @22 :Bool;
-  isModifiableLvalue @23 :ExprisModifiableLvalueResult;
-  isObjcgcCandidate @24 :Bool;
-  isObjCSelfExpression @25 :Bool;
-  isOrdinaryOrBitFieldObject @26 :Bool;
-  isPrValue @27 :Bool;
-  isReadIfDiscardedInCPlusPlus11 @28 :Bool;
-  isTypeDependent @29 :Bool;
-  isValueDependent @30 :Bool;
-  isXValue @31 :Bool;
-  refersToBitField @32 :Bool;
-  refersToGlobalRegisterVariable @33 :Bool;
-  refersToMatrixElement @34 :Bool;
-  refersToVectorElement @35 :Bool;
+  hasSideEffects @1 :Bool;
+  containsErrors @2 :Bool;
+  containsUnexpandedParameterPack @3 :Bool;
+  bestDynamicClassType @4 :UInt64;
+  expressionToken @5 :UInt64;
+  objCProperty @6 :UInt64;
+  objectKind @7 :ExprObjectKind;
+  sourceBitField @8 :UInt64;
+  valueKind @9 :ExprValueKind;
+  hasNonTrivialCall @10 :Bool;
+  isDefaultArgument @11 :Bool;
+  isGlValue @12 :Bool;
+  isImplicitCxxThis @13 :Bool;
+  isInstantiationDependent @14 :Bool;
+  isKnownToHaveBooleanValue @15 :Bool;
+  isLValue @16 :Bool;
+  isObjcgcCandidate @17 :Bool;
+  isObjCSelfExpression @18 :Bool;
+  isOrdinaryOrBitFieldObject @19 :Bool;
+  isPrValue @20 :Bool;
+  isReadIfDiscardedInCPlusPlus11 @21 :Bool;
+  isTypeDependent @22 :Bool;
+  isValueDependent @23 :Bool;
+  isXValue @24 :Bool;
+  refersToBitField @25 :Bool;
+  refersToGlobalRegisterVariable @26 :Bool;
+  refersToMatrixElement @27 :Bool;
+  refersToVectorElement @28 :Bool;
 }
 
 struct DesignatedInitUpdateExpr @0xaa6c77a8da7c4fba {
@@ -4820,9 +4813,9 @@ struct StringLiteral @0xd0cec44e02f59cf2 {
   string @4 :Text;
   isAscii @5 :Bool;
   isPascal @6 :Bool;
-  isUtF16 @7 :Bool;
-  isUtF32 @8 :Bool;
-  isUtF8 @9 :Bool;
+  isUtf16 @7 :Bool;
+  isUtf32 @8 :Bool;
+  isUtf8 @9 :Bool;
   isWide @10 :Bool;
 }
 
@@ -5954,7 +5947,7 @@ struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
   isAggregate @81 :Bool;
   isAnyDestructorNoReturn @82 :Bool;
   isCLike @83 :Bool;
-  isCxX11StandardLayout @84 :Bool;
+  isCxx11StandardLayout @84 :Bool;
   isDependentLambda @85 :Bool;
   isDynamicClass @86 :Bool;
   isEffectivelyFinal @87 :Bool;

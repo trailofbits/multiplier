@@ -875,25 +875,18 @@ void SerializeLabelStmt(EntitySerializer &es, mx::ast::LabelStmt::Builder b, con
 
 void SerializeExpr(EntitySerializer &es, mx::ast::Expr::Builder b, const pasta::Expr &e) {
   SerializeValueStmt(es, b.initValueStmt(), e);
-  b.setClassifyLValue(static_cast<mx::ast::ExprLValueClassification>(mx::FromPasta(e.ClassifyLValue())));
   b.setHasSideEffects(e.HasSideEffects());
   b.setContainsErrors(e.ContainsErrors());
   b.setContainsUnexpandedParameterPack(e.ContainsUnexpandedParameterPack());
   b.setObjectKind(static_cast<mx::ast::ExprObjectKind>(mx::FromPasta(e.ObjectKind())));
   b.setValueKind(static_cast<mx::ast::ExprValueKind>(mx::FromPasta(e.ValueKind())));
   b.setHasNonTrivialCall(e.HasNonTrivialCall());
-  b.setIsBoundMemberFunction(e.IsBoundMemberFunction());
-  b.setIsCxX11ConstantExpression(e.IsCXX11ConstantExpression());
-  b.setIsCxX98IntegralConstantExpression(e.IsCXX98IntegralConstantExpression());
   b.setIsDefaultArgument(e.IsDefaultArgument());
-  b.setIsEvaluatable(e.IsEvaluatable());
   b.setIsGlValue(e.IsGLValue());
   b.setIsImplicitCxxThis(e.IsImplicitCXXThis());
   b.setIsInstantiationDependent(e.IsInstantiationDependent());
-  b.setIsIntegerConstantExpression(e.IsIntegerConstantExpression());
   b.setIsKnownToHaveBooleanValue(e.IsKnownToHaveBooleanValue());
   b.setIsLValue(e.IsLValue());
-  b.setIsModifiableLvalue(static_cast<mx::ast::ExprisModifiableLvalueResult>(mx::FromPasta(e.IsModifiableLvalue())));
   b.setIsObjcgcCandidate(e.IsOBJCGCCandidate());
   b.setIsObjCSelfExpression(e.IsObjCSelfExpression());
   b.setIsOrdinaryOrBitFieldObject(e.IsOrdinaryOrBitFieldObject());
@@ -1339,9 +1332,9 @@ void SerializeStringLiteral(EntitySerializer &es, mx::ast::StringLiteral::Builde
   b.setString(s4);
   b.setIsAscii(e.IsAscii());
   b.setIsPascal(e.IsPascal());
-  b.setIsUtF16(e.IsUTF16());
-  b.setIsUtF32(e.IsUTF32());
-  b.setIsUtF8(e.IsUTF8());
+  b.setIsUtf16(e.IsUTF16());
+  b.setIsUtf32(e.IsUTF32());
+  b.setIsUtf8(e.IsUTF8());
   b.setIsWide(e.IsWide());
 }
 
@@ -2250,7 +2243,7 @@ void SerializeCXXRecordDecl(EntitySerializer &es, mx::ast::CXXRecordDecl::Builde
   b.setIsAggregate(e.IsAggregate());
   b.setIsAnyDestructorNoReturn(e.IsAnyDestructorNoReturn());
   b.setIsCLike(e.IsCLike());
-  b.setIsCxX11StandardLayout(e.IsCXX11StandardLayout());
+  b.setIsCxx11StandardLayout(e.IsCXX11StandardLayout());
   b.setIsDependentLambda(e.IsDependentLambda());
   b.setIsDynamicClass(e.IsDynamicClass());
   b.setIsEffectivelyFinal(e.IsEffectivelyFinal());

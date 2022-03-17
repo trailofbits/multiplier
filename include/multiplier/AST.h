@@ -700,9 +700,9 @@ CapturedStmtVariableCaptureKind FromPasta(pasta::CapturedStmtVariableCaptureKind
 enum class CharacterLiteralCharacterKind : unsigned short {
   ASCII,
   WIDE,
-  UT_F8,
-  UT_F16,
-  UT_F32,
+  UTF8,
+  UTF16,
+  UTF32,
   NUM_ENUMERATORS
 };
 
@@ -800,7 +800,7 @@ enum class ExprNullPointerConstantKind : unsigned short {
   NOT_NULL,
   ZERO_EXPRESSION,
   ZERO_LITERAL,
-  CX_X11_NULLPTR,
+  CXX11_NULLPTR,
   GNU_NULL,
   NUM_ENUMERATORS
 };
@@ -1263,9 +1263,9 @@ StmtKind FromPasta(pasta::StmtKind pasta_val);
 enum class StringLiteralStringKind : unsigned short {
   ASCII,
   WIDE,
-  UT_F8,
-  UT_F16,
-  UT_F32,
+  UTF8,
+  UTF16,
+  UTF32,
   NUM_ENUMERATORS
 };
 
@@ -1626,7 +1626,7 @@ enum class AttributeKind : unsigned short {
   CUDA_INVALID_TARGET,
   CUDA_LAUNCH_BOUNDS,
   CUDA_SHARED,
-  CX_X11_NO_RETURN,
+  CXX11_NO_RETURN,
   CALLABLE_WHEN,
   CALLBACK,
   CAPABILITY,
@@ -1684,7 +1684,7 @@ enum class AttributeKind : unsigned short {
   MS_ALLOCATOR,
   MS_INHERITANCE,
   MS_NO_V_TABLE,
-  MS_P430_INTERRUPT,
+  MSP430_INTERRUPT,
   MS_STRUCT,
   MS_VTOR_DISP,
   MAX_FIELD_ALIGNMENT,
@@ -2465,7 +2465,7 @@ enum class ImbueAttribute : unsigned short {
   NONE,
   ALWAYS,
   NEVER,
-  ALWAYSAR_G1,
+  ALWAYSARG1,
   NUM_ENUMERATORS
 };
 
@@ -2712,15 +2712,15 @@ enum class MSInheritanceModel : unsigned short {
 MSInheritanceModel FromPasta(pasta::MSInheritanceModel pasta_val);
 
 enum class MSVCMajorVersion : unsigned short {
-  MSV_C2010,
-  MSV_C2012,
-  MSV_C2013,
-  MSV_C2015,
-  MSV_C2017,
-  MSV_C20175,
-  MSV_C20177,
-  MSV_C2019,
-  MSV_C20198,
+  MSVC2010,
+  MSVC2012,
+  MSVC2013,
+  MSVC2015,
+  MSVC2017,
+  MSVC20175,
+  MSVC20177,
+  MSVC2019,
+  MSVC20198,
   NUM_ENUMERATORS
 };
 
@@ -3582,7 +3582,7 @@ SpecifierKind FromPasta(pasta::SpecifierKind pasta_val);
 
 enum class Spelling : unsigned short {
   GNU_AARCH64_VECTOR_PCS,
-  CX_X11_CLANG_AARCH64_VECTOR_PCS,
+  CXX11_CLANG_AARCH64_VECTOR_PCS,
   C2_XCLANG_AARCH64_VECTOR_PCS,
   SPELLING_NOT_CALCULATED,
   NUM_ENUMERATORS
@@ -3698,7 +3698,7 @@ SyncScope FromPasta(pasta::SyncScope pasta_val);
 
 enum class Syntax : unsigned short {
   GNU,
-  CX_X11,
+  CXX11,
   C2_X,
   DECLSPEC,
   MICROSOFT,
@@ -3743,8 +3743,8 @@ TagTypeKind FromPasta(pasta::TagTypeKind pasta_val);
 
 enum class TailPaddingUseRules : unsigned short {
   ALWAYS_USE_TAIL_PADDING,
-  USE_TAIL_PADDING_UNLESS_PO_D03,
-  USE_TAIL_PADDING_UNLESS_PO_D11,
+  USE_TAIL_PADDING_UNLESS_POD03,
+  USE_TAIL_PADDING_UNLESS_POD11,
   NUM_ENUMERATORS
 };
 

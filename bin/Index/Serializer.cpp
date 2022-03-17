@@ -17,7 +17,6 @@ namespace {
 
 }  // namespace
 
-
 uint64_t EntitySerializer::EntityId(const pasta::Decl &entity) const {
   if (auto it = entity_ids.find(entity.RawDecl()); it != entity_ids.end()) {
     return it->second;
@@ -44,12 +43,10 @@ uint64_t EntitySerializer::EntityId(const pasta::Token &entity) const {
 
 bool EntitySerializer::Enter(const pasta::Decl &entity) {
 
-  LOG(INFO) << "entering decl " << entity.KindName();
-
   // Only serialize if we have a valid entity ID for this.
   const uint64_t id = EntityId(entity);
   if (!id) {
-    LOG(WARNING) << "bad entity id";
+    LOG(FATAL) << "bad entity id";
     return false;
   }
 
@@ -61,14 +58,13 @@ bool EntitySerializer::Enter(const pasta::Decl &entity) {
   // This entity doesn't belong in this code chunk. Not sure if/when this will
   // happen.
   if (decl_id.code_id != code_id) {
-    LOG(WARNING)
+    LOG(FATAL)
         << "wrong list";
     return false;
   }
 
   // Don't re-serialize if we've done it already.
   if (!serialized_entities.emplace(id).second) {
-    LOG(WARNING) << "already seen";
     return false;
   }
 

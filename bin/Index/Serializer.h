@@ -4,15 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <map>
-#include <multiplier/AST.capnp.h>
-#include <multiplier/Types.h>
-#include <pasta/AST/Decl.h>
-#include <pasta/AST/Forward.h>
-#include <pasta/AST/Stmt.h>
-#include <pasta/AST/Token.h>
-#include <unordered_map>
-#include <unordered_set>
+#pragma once
 
 #include "Visitor.h"
 

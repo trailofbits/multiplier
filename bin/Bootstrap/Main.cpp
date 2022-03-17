@@ -21,6 +21,7 @@
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Init.h>
+#include <set>
 #include <sstream>
 #include <unordered_map>
 #include <unordered_set>
@@ -71,6 +72,14 @@ static const std::unordered_set<std::string> gEntityClassNames{
   "FileToken",
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, PASTA_IGNORE_ABSTRACT)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, PASTA_IGNORE_ABSTRACT)
+};
+
+// These methods can trigger asserts deep in their internals that are hard
+// to design around in PASTA.
+static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
+  {"Expr", "ClassifyLValue"},  // Calls `clang::Expr::ClassifyImpl`.
+  {"Expr", "IsBoundMemberFunction"},   // Calls `clang::Expr::ClassifyImpl`.
+  {"Expr", "IsModifiableLvalue"},
 };
 
 struct ClassHierarchy {
@@ -146,7 +155,7 @@ static std::string CapitalCaseToSnakeCase(std::string_view name) {
 
     } else if (std::isupper(c)) {
       if (!added_sep && i && (i + 1u) < name.size()) {
-        if (std::islower(name[i + 1u]) || std::isdigit(name[i + 1u])) {
+        if (std::islower(name[i + 1u])) {
           ss << '_';
           added_sep = true;
         }
@@ -489,6 +498,11 @@ MethodListPtr CodeGenerator::RunOnClass(
       continue;  // E.g. `Decl::KindName()`, `operator==`.
     }
     if (!seen_methods->emplace(method_name).second) {
+      continue;
+    }
+
+    std::pair<std::string, std::string> method_key{class_name, method_name};
+    if (kMethodBlackList.count(method_key)) {
       continue;
     }
 
