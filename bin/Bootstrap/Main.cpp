@@ -68,6 +68,7 @@ static const std::unordered_set<std::string> gConcreteClassNames{
 
 static const std::unordered_set<std::string> gEntityClassNames{
   "Token",
+  "FileToken",
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, PASTA_IGNORE_ABSTRACT)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, PASTA_IGNORE_ABSTRACT)
 };
@@ -505,12 +506,13 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Handle `pasta::Token`.
       if (record_name == "Token") {
-        schema_os << "  " << camel_name << " @" << i << " :Ref(Token);\n";
+        schema_os
+            << "  " << camel_name << " @" << i << " :UInt64;\n";  // Reference.
         ++i;
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
-        schema_os << "  " << camel_name << " @" << i << " :Ref(TokenRange);\n";
+        schema_os << "  " << camel_name << " @" << i << " :TokenRange;\n";
         ++i;
 
       // Handle `std::string`
@@ -586,11 +588,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           } else if (gNotReferenceTypes.count(*element_name)) {
             capn_element_name = element_name.value();
 
-          } else if (gConcreteClassNames.count(*element_name) ||
-                     gDeclNames.count(*element_name) ||
-                     gStmtNames.count(*element_name) ||
-                     gTypeNames.count(*element_name)) {
-            capn_element_name = "Ref(" + element_name.value() + ")";
+          } else if (gEntityClassNames.count(*element_name)) {
+            capn_element_name = "UInt64";  // Reference.
           }
 
           if (!capn_element_name.empty()) {
@@ -607,10 +606,9 @@ MethodListPtr CodeGenerator::RunOnClass(
             << ";\n";
         ++i;
 
-      } else if (gConcreteClassNames.count(record_name)) {
+      } else if (gEntityClassNames.count(record_name)) {
         schema_os
-            << "  " << camel_name << " @" << i << " :Ref(" << record_name
-            << ");\n";
+            << "  " << camel_name << " @" << i << " :UInt64;\n";  // Ref.
         ++i;
       }
 
@@ -732,11 +730,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "  data @1 :Text $Cxx.name(\"data\");\n"
       << "}\n\n"
       << NameAndHash("struct TokenRange") << " {\n"
-      << "  beginId @0 :UInt64 $Cxx.name(\"begin_id\");\n"
+      << "  beginId @0 :UInt64 $Cxx.name(\"begin_id\");\n"  // References.
       << "  endId @1 :UInt64 $Cxx.name(\"end_id\");  # Inclusive.\n"
-      << "}\n\n"
-      << "struct Ref(Entity) {\n"  // NOTE(pag): generic types don't have hashes.
-      << "  id @0 :UInt64;\n"  // This is an `mx::EntityId`.
       << "}\n\n";
 
   include_h_os
@@ -816,32 +811,12 @@ int CodeGenerator::RunOnClassHierarchies(void) {
     serialize_h_os
         << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
         << name << "::Builder, const pasta::" << name << " &);\n";
-
-//    if (gEntityClassNames.count(name)) {
-//      std::string snake_name = CapitalCaseToSnakeCase(name);
-//      std::string camel_name = SnakeCaseToCamelCase(snake_name);
-//      std::string init_name = "init" + Capitalize(camel_name);
-//      serialize_cpp_os
-//          << "  Serialize" << name << "(*this, _builder = builder." << init_name
-//          << "(code.num_decls_of_kind[pasta::DeclKind::k"
-//          << name.substr(0, name.size() - 4) << "]);\n";
-//    }
   }
   for (const pasta::CXXRecordDecl &record : stmts) {
     auto name = record.Name();
     serialize_h_os
         << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
         << name << "::Builder, const pasta::" << name << " &);\n";
-
-//    if (gEntityClassNames.count(name)) {
-//      std::string snake_name = CapitalCaseToSnakeCase(name);
-//      std::string camel_name = SnakeCaseToCamelCase(snake_name);
-//      std::string init_name = "init" + Capitalize(camel_name);
-////      serialize_cpp_os
-////          << "  " << name << "_builder = builder." << init_name
-////          << "(code.num_stmts_of_kind[pasta::StmtKind::k"
-////          << name << "]);\n";
-//    }
   }
 
   serialize_cpp_os
@@ -881,12 +856,14 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   schema_os << "struct EntityList @0xf26db0d046aab9c9 {\n";
   auto i = 0u;
   for (const auto &class_name : gEntityClassNames) {
-    std::string snake_name = CapitalCaseToSnakeCase(class_name);
-    std::string camel_name = SnakeCaseToCamelCase(snake_name);
-    schema_os
-        << "  " << camel_name << " @" << i
-        << " :List(" << class_name << ");\n";
-    ++i;
+    if (class_name != "FileToken") {
+      std::string snake_name = CapitalCaseToSnakeCase(class_name);
+      std::string camel_name = SnakeCaseToCamelCase(snake_name);
+      schema_os
+          << "  " << camel_name << " @" << i
+          << " :List(" << class_name << ");\n";
+      ++i;
+    }
   }
   schema_os << "}\n";
 

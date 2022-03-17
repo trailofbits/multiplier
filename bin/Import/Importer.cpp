@@ -36,6 +36,7 @@
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/FileSystem.h>
+#include <pasta/Util/Result.h>
 
 DECLARE_string(system_compiler);
 DECLARE_string(sysroot_dir);
@@ -72,7 +73,8 @@ class BuildCommandAction final : public mx::Action {
 
   // If we are using something like CMake commands, then pull in the relevant
   // information by trying to execute the compiler directly.
-  std::pair<std::string, std::string> InitCompilerFromCommand(void);
+  mx::Result<std::pair<std::string, std::string>, std::error_code>
+  InitCompilerFromCommand(void);
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
                        CompileJobList &builder);
@@ -91,7 +93,7 @@ class BuildCommandAction final : public mx::Action {
 
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
-std::pair<std::string, std::string>
+mx::Result<std::pair<std::string, std::string>, std::error_code>
 BuildCommandAction::InitCompilerFromCommand(void) {
   std::vector<std::string> new_args;
   for (auto arg : command.vec) {
@@ -99,19 +101,27 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   }
   new_args.emplace_back("-Wno-missing-sysroot");
   new_args.emplace_back("-E");
+  new_args.emplace_back("-P");
   new_args.emplace_back("-v");
+  new_args.emplace_back("-dD");
 
-  std::stringstream output_sysroot;
-  (void) mx::Subprocess::Execute(
+  std::string output_sysroot;
+  auto ret = mx::Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_sysroot);
+  if (!ret.Succeeded()) {
+    return ret.TakeError();
+  }
 
-  std::stringstream output_no_sysroot;
+  std::string output_no_sysroot;
   new_args.emplace_back("-isysroot");
   new_args.emplace_back(command.working_dir + "/xyz");
-  (void) mx::Subprocess::Execute(
+  auto ret2 = mx::Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
+  if (!ret2.Succeeded()) {
+    return ret2.TakeError();
+  }
 
-  return {output_sysroot.str(), output_no_sysroot.str()};
+  return std::make_pair(output_sysroot, output_no_sysroot);
 }
 
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
@@ -142,7 +152,15 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
     return;
   }
 
-  auto [cc_version_sysroot, cc_version_no_sysroot] = InitCompilerFromCommand();
+  auto cc_info = InitCompilerFromCommand();
+  if (!cc_info.Succeeded()) {
+    LOG(ERROR)
+        << "Error invoking original compiler to find version information: "
+        << cc_info.TakeError().message();
+    return;
+  }
+
+  auto [cc_version_sysroot, cc_version_no_sysroot] = cc_info.TakeValue();
 
   pasta::Result<pasta::Compiler, std::string> maybe_cc =
       pasta::Compiler::Create(fm, command.vec[0], command.working_dir,

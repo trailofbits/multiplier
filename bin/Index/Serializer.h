@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Visitor.h"
+
 namespace indexer {
 
 using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
@@ -34,8 +36,7 @@ struct CodeChunk {
   std::map<pasta::StmtKind, unsigned> num_stmts_of_kind;
 };
 
-class EntitySerializer final : protected pasta::DeclVisitor,
-                               protected pasta::StmtVisitor {
+class EntitySerializer final : public EntityVisitor {
  private:
   const pasta::TokenRange range;
   const EntityIdMap entity_ids;
@@ -59,33 +60,6 @@ class EntitySerializer final : protected pasta::DeclVisitor,
 #undef MX_DECLARE_STMT_LIST_BUILDER
 #undef MX_DECLARE_DECL_LIST_BUILDER
 
-  void VisitDeclContext(const pasta::DeclContext &dc);
-  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final;
-  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final;
-  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final;
-  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final;
-  void VisitClassTemplatePartialSpecializationDecl(
-      const pasta::ClassTemplatePartialSpecializationDecl &) final;
-  void VisitVarTemplatePartialSpecializationDecl(
-      const pasta::VarTemplatePartialSpecializationDecl &) final;
-  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &) final;
-  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final;
-  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &) final;
-  void VisitVarDecl(const pasta::VarDecl &decl) final;
-  void VisitParmVarDecl(const pasta::ParmVarDecl &decl) final;
-  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final;
-  void VisitFieldDecl(const pasta::FieldDecl &decl) final;
-  void VisitRecordDecl(const pasta::RecordDecl &decl) final;
-  void VisitEnumConstantDecl(const pasta::EnumConstantDecl &decl) final;
-  void VisitEnumDecl(const pasta::EnumDecl &decl) final;
-  void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final;
-  void VisitMSAsmStmt(const pasta::MSAsmStmt &stmt) final;
-  void VisitBreakStmt(const pasta::BreakStmt &stmt) final;
-  void VisitCompoundStmt(const pasta::CompoundStmt &stmt) final;
-  void VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) final;
-  void VisitDecl(const pasta::Decl &decl) final;
-  void VisitStmt(const pasta::Stmt &stmt) final;
-
   void Serialize(mx::ast::Token::Builder token, const pasta::Token &entity);
 
  public:
@@ -101,8 +75,8 @@ class EntitySerializer final : protected pasta::DeclVisitor,
   uint64_t EntityId(const pasta::Stmt &entity) const;
   uint64_t EntityId(const pasta::Token &entity) const;
 
-  bool Serialize(const pasta::Decl &entity);
-  bool Serialize(const pasta::Stmt &entity);
+  bool Enter(const pasta::Decl &entity) final;
+  bool Enter(const pasta::Stmt &entity) final;
 };
 
 }  // namespace indexer

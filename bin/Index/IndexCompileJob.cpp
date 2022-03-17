@@ -158,9 +158,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 // the offset in one of the many `List(...)` types inside of the
 // `ast::EntityList`. This way, it's easy to identify exactly which entity we
 // need to reference inside of an entity list.
-class EntityLabeller final : protected pasta::DeclVisitor,
-                             protected pasta::StmtVisitor,
-                             protected pasta::TypeVisitor {
+class EntityLabeller final : public EntityVisitor {
  public:
   EntityIdMap entity_id;
  private:
@@ -169,7 +167,7 @@ class EntityLabeller final : protected pasta::DeclVisitor,
   std::map<std::pair<mx::CodeId, pasta::StmtKind>, uint32_t> next_stmt_offset;
 //  std::map<std::pair<mx::CodeId, pasta::TypeKind>, uint32_t> next_type_offset;
 
-  bool Label(const pasta::Decl &entity) {
+  bool Enter(const pasta::Decl &entity) final {
     auto kind = entity.Kind();
     auto &next_offset = next_decl_offset[{code.code_id, kind}];
     mx::DeclarationId id;
@@ -186,7 +184,7 @@ class EntityLabeller final : protected pasta::DeclVisitor,
     }
   }
 
-  bool Label(const pasta::Stmt &entity) {
+  bool Enter(const pasta::Stmt &entity) final {
     auto kind = entity.Kind();
     auto &next_offset = next_stmt_offset[{code.code_id, kind}];
     mx::StatementId id;
@@ -217,196 +215,6 @@ class EntityLabeller final : protected pasta::DeclVisitor,
       return true;
     } else {
       return false;
-    }
-  }
-
-//  bool Label(const pasta::Type &entity) {
-//    auto kind = entity.Kind();
-//    auto &next_offset = next_decl_offset[{code_id, kind}];
-//    EntityId id{
-//        code_id,
-//        next_offset,
-//        static_cast<uint16_t>(EntityKind::kType),
-//        static_cast<uint16_t>(kind)};
-//
-//    if (entity_id.emplace(entity, id).second) {
-//      ++next_offset;
-//      return true;
-//    } else {
-//      return false;
-//    }
-//  }
-
-
-  void VisitDeclContext(const pasta::DeclContext &dc) {;
-    for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
-      this->DeclVisitor::Accept(decl);
-    }
-  }
-
-  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
-    assert(false);
-    VisitDeclContext(decl);
-  }
-
-  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
-    assert(false);
-    VisitDeclContext(decl);
-  }
-
-  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
-    assert(false);
-    VisitDeclContext(decl);
-  }
-
-  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
-    assert(false);
-    VisitDeclContext(decl);
-  }
-
-  void VisitClassTemplatePartialSpecializationDecl(
-      const pasta::ClassTemplatePartialSpecializationDecl &) final {}
-  void VisitVarTemplatePartialSpecializationDecl(
-      const pasta::VarTemplatePartialSpecializationDecl &) final {}
-  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &) final {}
-  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final {}
-  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &) final {}
-
-  void VisitVarDecl(const pasta::VarDecl &decl) final {
-    if (Label(decl)) {
-      if (auto init_expr = decl.Initializer()) {
-        this->StmtVisitor::Accept(*init_expr);
-      }
-    }
-  }
-
-  void VisitParmVarDecl(const pasta::ParmVarDecl &decl) final {
-    if (Label(decl)) {
-      if (!decl.HasUninstantiatedDefaultArgument() &&
-          !decl.HasUnparsedDefaultArgument()) {
-        if (auto init_expr = decl.DefaultArgument()) {
-          this->StmtVisitor::Accept(*init_expr);
-        }
-      }
-    }
-  }
-
-  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    if (Label(decl)) {
-      VisitDeclContext(decl);
-      for (pasta::ParmVarDecl param : decl.Parameters()) {
-        this->DeclVisitor::Accept(param);
-      }
-      if (decl.DoesThisDeclarationHaveABody()) {
-        this->StmtVisitor::Accept(decl.Body());
-      }
-    }
-  }
-
-  void VisitFieldDecl(const pasta::FieldDecl &decl) final {
-    if (Label(decl)) {
-      if (auto bit_width = decl.BitWidth()) {
-        this->StmtVisitor::Accept(*bit_width);
-      }
-      if (auto init = decl.InClassInitializer()) {
-        this->StmtVisitor::Accept(*init);
-      }
-    }
-  }
-
-  // Structs, unions, etc.
-  void VisitRecordDecl(const pasta::RecordDecl &decl) final {
-    if (Label(decl)) {
-      VisitDeclContext(decl);
-      for (pasta::FieldDecl field : decl.Fields()) {
-        this->DeclVisitor::Accept(field);
-      }
-    }
-  }
-
-  void VisitEnumConstantDecl(const pasta::EnumConstantDecl &decl) final {
-    if (Label(decl)) {
-      if (auto init = decl.InitializerExpression()) {
-        this->StmtVisitor::Accept(*init);
-      }
-    }
-  }
-
-  // Enumerators.
-  void VisitEnumDecl(const pasta::EnumDecl &decl) final {
-    if (Label(decl)) {
-      VisitDeclContext(decl);
-      for (pasta::EnumConstantDecl enumerator : decl.Enumerators()) {
-        this->DeclVisitor::Accept(enumerator);
-      }
-    }
-  }
-
-  void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final {
-    if (Label(stmt)) {
-      for (auto child : stmt.InputConstraintLiterals()) {
-        this->StmtVisitor::Accept(child);
-      }
-      for (auto child : stmt.InputExpressions()) {
-        this->StmtVisitor::Accept(child);
-      }
-      for (auto child : stmt.OutputConstraintLiterals()) {
-        this->StmtVisitor::Accept(child);
-      }
-      for (auto child : stmt.OutputExpressions()) {
-        this->StmtVisitor::Accept(child);
-      }
-      for (auto child : stmt.Children()) {
-        this->StmtVisitor::Accept(child);
-      }
-    }
-  }
-
-  void VisitMSAsmStmt(const pasta::MSAsmStmt &stmt) final {
-    if (Label(stmt)) {
-      for (auto child : stmt.AllExpressions()) {
-        this->StmtVisitor::Accept(child);
-      }
-      for (auto child : stmt.InputExpressions()) {
-        this->StmtVisitor::Accept(child);
-      }
-    }
-  }
-
-  void VisitBreakStmt(const pasta::BreakStmt &stmt) final {
-    if (Label(stmt)) {
-      for (auto child : stmt.Children()) {
-        this->StmtVisitor::Accept(child);
-      }
-    }
-  }
-
-  void VisitCompoundStmt(const pasta::CompoundStmt &stmt) final {
-    if (Label(stmt)) {
-      for (pasta::Stmt child : stmt.Children()) {
-        this->StmtVisitor::Accept(child);
-      }
-    }
-  }
-
-  void VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) final {
-    if (Label(decl)) {
-      if (auto tag = decl.AnonymousDeclarationWithTypedefName()) {
-        this->DeclVisitor::Accept(*tag);
-      }
-    }
-  }
-
-  // Backups.
-  void VisitDecl(const pasta::Decl &decl) final {
-    (void) Label(decl);
-  }
-
-  void VisitStmt(const pasta::Stmt &stmt) final {
-    if (Label(stmt)) {
-      for (auto child : stmt.Children()) {
-        Label(child);
-      }
     }
   }
 

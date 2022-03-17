@@ -50,7 +50,7 @@ find_package(Z3 4.8 CONFIG REQUIRED)
 find_llvm(llvm)
 find_package(Clang CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
-
+find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 

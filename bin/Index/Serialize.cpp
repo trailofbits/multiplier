@@ -845,9 +845,9 @@ void SerializeAsmStmt(EntitySerializer &es, mx::ast::AsmStmt::Builder b, const p
 
 void SerializeMSAsmStmt(EntitySerializer &es, mx::ast::MSAsmStmt::Builder b, const pasta::MSAsmStmt &e) {
   SerializeAsmStmt(es, b.initAsmStmt(), e);
-  auto v3 = e.AssemblyString();
-  std::string s3(v3.data(), v3.size());
-  b.setAssemblyString(s3);
+  auto v2 = e.AssemblyString();
+  std::string s2(v2.data(), v2.size());
+  b.setAssemblyString(s2);
   b.setHasBraces(e.HasBraces());
 }
 
@@ -1879,7 +1879,6 @@ void SerializeVarDecl(EntitySerializer &es, mx::ast::VarDecl::Builder b, const p
   b.setHasDependentAlignment(e.HasDependentAlignment());
   b.setHasExternalStorage(e.HasExternalStorage());
   b.setHasGlobalStorage(e.HasGlobalStorage());
-  b.setHasIceInitializer(e.HasICEInitializer());
   b.setHasInitializer(e.HasInitializer());
   b.setHasLocalStorage(e.HasLocalStorage());
   b.setIsArcPseudoStrong(e.IsARCPseudoStrong());
@@ -1967,7 +1966,6 @@ void SerializeMSPropertyDecl(EntitySerializer &es, mx::ast::MSPropertyDecl::Buil
 
 void SerializeFunctionDecl(EntitySerializer &es, mx::ast::FunctionDecl::Builder b, const pasta::FunctionDecl &e) {
   SerializeDeclaratorDecl(es, b.initDeclaratorDecl(), e);
-  b.setDoesDeclarationForceExternallyVisibleDefinition(e.DoesDeclarationForceExternallyVisibleDefinition());
   b.setDoesThisDeclarationHaveABody(e.DoesThisDeclarationHaveABody());
   b.setConstexprKind(static_cast<mx::ast::ConstexprSpecKind>(mx::FromPasta(e.ConstexprKind())));
   b.setExceptionSpecType(static_cast<mx::ast::ExceptionSpecificationType>(mx::FromPasta(e.ExceptionSpecType())));
@@ -2003,11 +2001,9 @@ void SerializeFunctionDecl(EntitySerializer &es, mx::ast::FunctionDecl::Builder 
   b.setIsInExternCContext(e.IsInExternCContext());
   b.setIsInExternCxxContext(e.IsInExternCXXContext());
   b.setIsInlineBuiltinDeclaration(e.IsInlineBuiltinDeclaration());
-  b.setIsInlineDefinitionExternallyVisible(e.IsInlineDefinitionExternallyVisible());
   b.setIsInlineSpecified(e.IsInlineSpecified());
   b.setIsInlined(e.IsInlined());
   b.setIsLateTemplateParsed(e.IsLateTemplateParsed());
-  b.setIsMsExternInline(e.IsMSExternInline());
   b.setIsMsvcrtEntryPoint(e.IsMSVCRTEntryPoint());
   b.setIsMain(e.IsMain());
   b.setIsMultiVersion(e.IsMultiVersion());
@@ -2015,7 +2011,6 @@ void SerializeFunctionDecl(EntitySerializer &es, mx::ast::FunctionDecl::Builder 
   b.setIsOverloadedOperator(e.IsOverloadedOperator());
   b.setIsPure(e.IsPure());
   b.setIsReplaceableGlobalAllocationFunction(e.IsReplaceableGlobalAllocationFunction());
-  b.setIsReservedGlobalPlacementOperator(e.IsReservedGlobalPlacementOperator());
   b.setIsStatic(e.IsStatic());
   b.setIsTargetMultiVersion(e.IsTargetMultiVersion());
   b.setIsTemplateInstantiation(e.IsTemplateInstantiation());

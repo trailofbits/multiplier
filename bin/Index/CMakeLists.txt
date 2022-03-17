@@ -30,6 +30,8 @@ add_executable("${exe_name}"
     "TokenTree.h"
     "Util.cpp"
     "Util.h"
+    "Visitor.cpp"
+    "Visitor.h"
 )
 
 target_link_libraries("${exe_name}"

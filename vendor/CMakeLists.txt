@@ -23,4 +23,4 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" PARENT_SCOPE)
 
 add_subdirectory(capnproto)
 add_subdirectory(concurrentqueue)
-#add_subdirectory(sqlite)
+add_subdirectory(reproc)

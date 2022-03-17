@@ -8,8 +8,10 @@
 
 #include <iostream>
 #include <string>
+#include <system_error>
 #include <unordered_map>
 #include <vector>
+#include "Result.h"
 
 namespace pasta {
 class ArgumentVector;
@@ -22,12 +24,12 @@ class Subprocess {
   // Execute the command specified in `args` with the ability to feed the
   // command input and capture output. Passing `nullptr` to any of `input`,
   // `output`, or `error` is acceptable.
-  static int Execute(
+  static Result<int, std::error_code> Execute(
       const std::vector<std::string> &args,
       const std::unordered_map<std::string, std::string> *env=nullptr,
-      std::istream *input=nullptr,
-      std::ostream *output=nullptr,
-      std::ostream *error=nullptr);
+      std::string *input=nullptr,
+      std::string *output=nullptr,
+      std::string *error=nullptr);
 };
 
 }  // namespace mx

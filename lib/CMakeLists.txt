@@ -122,6 +122,7 @@ target_include_directories("util"
 target_link_libraries("util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
+    $<BUILD_INTERFACE:reproc++>
     RocksDB::rocksdb
     ZLIB::ZLIB
   PUBLIC
