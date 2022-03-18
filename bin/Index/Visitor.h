@@ -45,6 +45,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitBreakStmt(const pasta::BreakStmt &stmt) final;
   void VisitCompoundStmt(const pasta::CompoundStmt &stmt) final;
   void VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) final;
+  void VisitDeclStmt(const pasta::DeclStmt &stmt) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
 

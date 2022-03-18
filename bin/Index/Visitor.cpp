@@ -179,6 +179,18 @@ void EntityVisitor::VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) {
   }
 }
 
+
+void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
+  if (Enter(stmt)) {
+    for (auto child : stmt.Children()) {
+      this->StmtVisitor::Accept(child);
+    }
+    for (auto child : stmt.Declarations()) {
+      this->DeclVisitor::Accept(child);
+    }
+  }
+}
+
 // Backups.
 void EntityVisitor::VisitDecl(const pasta::Decl &decl) {
   (void) Enter(decl);
@@ -187,7 +199,7 @@ void EntityVisitor::VisitDecl(const pasta::Decl &decl) {
 void EntityVisitor::VisitStmt(const pasta::Stmt &stmt) {
   if (Enter(stmt)) {
     for (auto child : stmt.Children()) {
-      Enter(child);
+      this->StmtVisitor::Accept(child);
     }
   }
 }

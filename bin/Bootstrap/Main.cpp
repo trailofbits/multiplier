@@ -133,6 +133,13 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "HasBody"},
   {"Decl", "AsFunction"},
   {"Decl", "TranslationUnitDeclaration"},
+
+  // These can crash?
+  {"Expr", "BestDynamicClassType"},
+
+  // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
+  // PASTA's nullptr checking stuff.
+
 };
 
 struct ClassHierarchy {
@@ -545,7 +552,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     std::string camel_name = SnakeCaseToCamelCase(snake_name);
     std::string init_name = "init" + Capitalize(camel_name);
     schema_os
-        << "  " << camel_name << " @" << i << ":"
+        << "  " << camel_name << " @" << i << " :"
         << base_name << ";\n";
 
     // Parent class serialization.
@@ -832,15 +839,24 @@ MethodListPtr CodeGenerator::RunOnClass(
             << capn_element_name << ");\n";
         ++i;
 
+      // E.g. something that returns a `Decl`, `Stmt`, etc.
+      } else if (gEntityClassNames.count(record_name)) {
+        serialize_cpp_os
+            << "  b." << setter_name << "(es.EntityId(e." << method_name
+            << "()));\n";
+        schema_os
+            << "  " << camel_name << " @" << i << " :UInt64;\n";  // Ref.
+        ++i;
+
+      // E.g. `TemplateParameterList`.
       } else if (gNotReferenceTypes.count(record_name)) {
+        serialize_cpp_os
+            << "  Serialize" << record_name << "(es, b." << init_name
+            << "(), e." << method_name << "());\n";
+
         schema_os
             << "  " << camel_name << " @" << i << " :" << record_name
             << ";\n";
-        ++i;
-
-      } else if (gEntityClassNames.count(record_name)) {
-        schema_os
-            << "  " << camel_name << " @" << i << " :UInt64;\n";  // Ref.
         ++i;
       }
 
