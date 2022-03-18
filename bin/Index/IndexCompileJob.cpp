@@ -394,8 +394,7 @@ void IndexCompileJobAction::MaybeTokenizeFile(
       auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
           file_path, file_hash);
       if (is_new_file_id) {
-        exe.EmplaceAction<TokenizeFileAction>(
-            context, file_id, file_hash, file);
+        TokenizeFile(*context, file_id, file_hash, file);
       }
 
       file_ids.emplace(file, file_id);
@@ -567,7 +566,8 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     }
   }
 
-  EntitySerializer serializer(std::move(tok_range), labeller.TakeEntityIds());
+  EntitySerializer serializer(std::move(tok_range), labeller.TakeEntityIds(),
+                              file_ids);
 
   // Serialize the new code chunks.
   for (CodeChunk &code_chunk : code_chunks) {

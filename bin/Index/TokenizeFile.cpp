@@ -14,26 +14,18 @@
 #include <glog/logging.h>
 #include <kj/string-tree.h>
 #include <multiplier/AST.h>
+#include <multiplier/ProgressBar.h>
 #include <multiplier/RPC.capnp.h>
 #include <utility>
 
+#include "Context.h"
 #include "Util.h"
 
 namespace indexer {
 
-TokenizeFileAction::~TokenizeFileAction(void) {}
-
-TokenizeFileAction::TokenizeFileAction(
-    std::shared_ptr<IndexingContext> context_,
-    mx::FileId file_id_, std::string file_hash_, pasta::File file_)
-    : context(std::move(context_)),
-      file_id(file_id_),
-      file_hash(std::move(file_hash_)),
-      file(std::move(file_)) {}
-
-// Build and index the AST.
-void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
-  mx::ProgressBarWork progress_tracker(context->tokenizer_progress.get());
+void TokenizeFile(IndexingContext &context, mx::FileId file_id,
+                  std::string file_hash, pasta::File file) {
+  mx::ProgressBarWork progress_tracker(context.tokenizer_progress.get());
   auto file_tokens = file.Tokens();
 
   capnp::MallocMessageBuilder message;
@@ -45,22 +37,12 @@ void TokenizeFileAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   for (pasta::FileToken ft : file_tokens) {
     tok_data.clear();
     tok_data.insert(tok_data.end(), ft.Data().begin(), ft.Data().end());
-    mx::ast::FileToken::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
-    if (IsWhitespaceOrEmpty(ft.Data()) && !ft.Data().empty()) {
-      ftb.setKind(mx::ast::TokenKind::WHITESPACE);
-    } else {
-      ftb.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(ft.Kind())));
-    }
-    ftb.setPreProcessorKeywordKind(static_cast<mx::ast::PPKeywordKind>(
-        mx::FromPasta(ft.PreProcessorKeywordKind())));
-    ftb.setObjectiveCAtKeywordKind(static_cast<mx::ast::ObjCKeywordKind>(
-        mx::FromPasta(ft.ObjectiveCAtKeywordKind())));
-    ftb.setLine(ft.Line());
-    ftb.setColumn(ft.Column());
+    mx::ast::Token::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
+    ftb.setKind(static_cast<mx::ast::TokenKind>(TokenKindFromPasta(ft)));
     ftb.setData(tok_data);
   }
 
-  context->PutFileTokens(file_id, capnp::messageToFlatArray(message));
+  context.PutFileTokens(file_id, capnp::messageToFlatArray(message));
 }
 
 }  // namespace indexer

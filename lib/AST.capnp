@@ -11,16 +11,6 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("mx::ast");
 
-struct Token @0xdf7bccc629d6dcf9 {
-  kind @0 :TokenKind;
-  data @1 :Text;
-}
-
-struct TokenRange @0xfaaa666ba10b6696 {
-  beginId @0 :UInt64;
-  endId @1 :UInt64;  # Inclusive.
-}
-
 enum DeclKind @0x96ac187aac5afe4d {
   accessSpec @0 $Cxx.name("access_spec");
   baseUsing @1 $Cxx.name("base_using");
@@ -3322,6 +3312,57 @@ enum TokenKind @0xedc5e766e7f89f15 {
   annotModuleBegin @386 $Cxx.name("annot_module_begin");
   annotModuleEnd @387 $Cxx.name("annot_module_end");
   annotHeaderUnit @388 $Cxx.name("annot_header_unit");
+  ppIf @389 $Cxx.name("pp_if");
+  ppIfdef @390 $Cxx.name("pp_ifdef");
+  ppIfndef @391 $Cxx.name("pp_ifndef");
+  ppElif @392 $Cxx.name("pp_elif");
+  ppElifdef @393 $Cxx.name("pp_elifdef");
+  ppElifndef @394 $Cxx.name("pp_elifndef");
+  ppElse @395 $Cxx.name("pp_else");
+  ppEndif @396 $Cxx.name("pp_endif");
+  ppDefined @397 $Cxx.name("pp_defined");
+  ppInclude @398 $Cxx.name("pp_include");
+  ppUcUcIncludeMacros @399 $Cxx.name("pp___include_macros");
+  ppDefine @400 $Cxx.name("pp_define");
+  ppUndef @401 $Cxx.name("pp_undef");
+  ppLine @402 $Cxx.name("pp_line");
+  ppError @403 $Cxx.name("pp_error");
+  ppPragma @404 $Cxx.name("pp_pragma");
+  ppImport @405 $Cxx.name("pp_import");
+  ppIncludeNext @406 $Cxx.name("pp_include_next");
+  ppWarning @407 $Cxx.name("pp_warning");
+  ppIdentifier @408 $Cxx.name("pp_identifier");
+  ppSccs @409 $Cxx.name("pp_sccs");
+  ppAssert @410 $Cxx.name("pp_assert");
+  ppUnassert @411 $Cxx.name("pp_unassert");
+  ppUcUcPublicMacro @412 $Cxx.name("pp___public_macro");
+  ppUcUcPrivateMacro @413 $Cxx.name("pp___private_macro");
+  objcAtClass @414 $Cxx.name("objc_at_class");
+  objcAtCompatibilityAlias @415 $Cxx.name("objc_at_compatibility_alias");
+  objcAtDefinitions @416 $Cxx.name("objc_at_definitions");
+  objcAtEncode @417 $Cxx.name("objc_at_encode");
+  objcAtObjcEnd @418 $Cxx.name("objc_at_objc_end");
+  objcAtImplementation @419 $Cxx.name("objc_at_implementation");
+  objcAtInterface @420 $Cxx.name("objc_at_interface");
+  objcAtPrivate @421 $Cxx.name("objc_at_private");
+  objcAtProtected @422 $Cxx.name("objc_at_protected");
+  objcAtProtocol @423 $Cxx.name("objc_at_protocol");
+  objcAtPublic @424 $Cxx.name("objc_at_public");
+  objcAtSelector @425 $Cxx.name("objc_at_selector");
+  objcAtThrow @426 $Cxx.name("objc_at_throw");
+  objcAtTry @427 $Cxx.name("objc_at_try");
+  objcAtCatch @428 $Cxx.name("objc_at_catch");
+  objcAtFinally @429 $Cxx.name("objc_at_finally");
+  objcAtSynchronized @430 $Cxx.name("objc_at_synchronized");
+  objcAtAutoreleasepool @431 $Cxx.name("objc_at_autoreleasepool");
+  objcAtProperty @432 $Cxx.name("objc_at_property");
+  objcAtPackage @433 $Cxx.name("objc_at_package");
+  objcAtRequired @434 $Cxx.name("objc_at_required");
+  objcAtOptional @435 $Cxx.name("objc_at_optional");
+  objcAtSynthesize @436 $Cxx.name("objc_at_synthesize");
+  objcAtDynamic @437 $Cxx.name("objc_at_dynamic");
+  objcAtImport @438 $Cxx.name("objc_at_import");
+  objcAtAvailable @439 $Cxx.name("objc_at_available");
 }
 
 enum TrailingAllocKind @0xa00e8d253383f16f {
@@ -3647,6 +3688,16 @@ enum TargetLanguage @0xeabe5088e5bc86fc {
   cxx @1 $Cxx.name("cxx");
 }
 
+struct Token @0xdf7bccc629d6dcf9 {
+  kind @0 :TokenKind;
+  data @1 :Text;
+}
+
+struct TokenRange @0xfaaa666ba10b6696 {
+  beginId @0 :UInt64;
+  endId @1 :UInt64;  # Inclusive.
+}
+
 struct Compiler @0x848f89979be4f62d {
   name @0 :CompilerName;
   targetLanguage @1 :TargetLanguage;
@@ -3680,15 +3731,6 @@ struct CompileJob @0xa4db2371361c41ba {
   systemRootIncludeDirectory @4 :Text;
   targetTriple @5 :Text;
   auxiliaryTargetTriple @6 :Text;
-}
-
-struct FileToken @0xca57e1a97ecb7687 {
-  kind @0 :TokenKind;
-  preProcessorKeywordKind @1 :PPKeywordKind;
-  objectiveCAtKeywordKind @2 :ObjCKeywordKind;
-  line @3 :UInt32;
-  column @4 :UInt32;
-  data @5 :Text;
 }
 
 struct TemplateParameterList @0xee0d4e6aba92fdde {

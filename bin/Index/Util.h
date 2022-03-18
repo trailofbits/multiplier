@@ -8,9 +8,18 @@
 
 #include <string_view>
 
+namespace pasta {
+class FileToken;
+}  // namespace pasta
+namespace mx {
+enum class TokenKind : unsigned short;
+}  // namespace mx
 namespace indexer {
 
 // Returns `true` if `data` contains only whitespace or is empty.
 bool IsWhitespaceOrEmpty(std::string_view data);
+
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);
 
 }  // namespace indexer

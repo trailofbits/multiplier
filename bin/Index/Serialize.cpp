@@ -415,17 +415,6 @@ void SerializeCompileJob(EntitySerializer &es, mx::ast::CompileJob::Builder b, c
   b.setAuxiliaryTargetTriple(s6);
 }
 
-void SerializeFileToken(EntitySerializer &es, mx::ast::FileToken::Builder b, const pasta::FileToken &e) {
-  b.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(e.Kind())));
-  b.setPreProcessorKeywordKind(static_cast<mx::ast::PPKeywordKind>(mx::FromPasta(e.PreProcessorKeywordKind())));
-  b.setObjectiveCAtKeywordKind(static_cast<mx::ast::ObjCKeywordKind>(mx::FromPasta(e.ObjectiveCAtKeywordKind())));
-  b.setLine(e.Line());
-  b.setColumn(e.Column());
-  auto v5 = e.Data();
-  std::string s5(v5.data(), v5.size());
-  b.setData(s5);
-}
-
 void SerializeTemplateParameterList(EntitySerializer &es, mx::ast::TemplateParameterList::Builder b, const pasta::TemplateParameterList &e) {
   b.setNumParameters(e.NumParameters());
   b.setNumRequiredParameters(e.NumRequiredParameters());

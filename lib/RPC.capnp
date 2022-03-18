@@ -30,7 +30,7 @@ struct CompileCommand @0xab30180088262c95 {
 struct File @0x987f05f6a48636d5 {
   id @0 :UInt64;
   hash @1 :Text;
-  tokens @2 :List(AST.FileToken);
+  tokens @2 :List(AST.Token);
 }
 
 struct IndexedCode @0xe5f27760091f9a3a {

@@ -44,7 +44,6 @@ static const std::unordered_set<std::string> gTypeNames{
 };
 
 
-
 #define NON_REF_TYPES \
     "IncludePath", \
     "Compiler", \
@@ -406,6 +405,10 @@ class CodeGenerator {
   std::vector<pasta::CXXRecordDecl> types;
   std::vector<pasta::CXXRecordDecl> tokens;
 
+  // We extend `TokenKind` with these.
+  std::optional<pasta::EnumDecl> pp_keyword_kinds;
+  std::optional<pasta::EnumDecl> objc_at_keywords;
+
   std::stringstream header_enum_ss;
 
   void RunOnEnum(pasta::EnumDecl enum_decl);
@@ -497,6 +500,59 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     ++i;
   }
 
+  // We'll embed `PPKeywordKind` and `ObjCKeywordKind` at the end of
+  // `TokenKind`. We merge this info into `TokenKind` so that we can
+  // unify `FileToken` and `Token` without loss of information.
+  if (enum_name == "TokenKind") {
+    assert(pp_keyword_kinds.has_value());
+    assert(objc_at_keywords.has_value());
+    auto j = 0u;
+    for (pasta::EnumConstantDecl val : pp_keyword_kinds->Enumerators()) {
+      if (!j++) {
+        continue;  // Skip `PPKeywordKind::kNotKeyword`.
+      }
+
+      auto val_name = val.Name();
+      assert(val_name[0] == 'k');
+      val_name = "Pp" + val_name.substr(1);
+
+      auto snake_name = CapitalCaseToSnakeCase(val_name);
+      auto camel_name = SnakeCaseToCamelCase(snake_name);
+      auto enum_case = SnakeCaseToEnumCase(snake_name);
+
+      schema_os
+          << "  " << camel_name << " @" << i << " $Cxx.name(\""
+          << snake_name << "\");\n";
+
+      include_h_os
+          << "  " << enum_case << ",\n";
+      ++i;
+    }
+
+    j = 0u;
+    for (pasta::EnumConstantDecl val : objc_at_keywords->Enumerators()) {
+      if (!j++) {
+        continue;  // Skip `ObjCKeywordKind::kNotKeyword`.
+      }
+
+      auto val_name = val.Name();
+      assert(val_name[0] == 'k');
+      val_name = "ObjcAt" + val_name.substr(1);
+
+      auto snake_name = CapitalCaseToSnakeCase(val_name);
+      auto camel_name = SnakeCaseToCamelCase(snake_name);
+      auto enum_case = SnakeCaseToEnumCase(snake_name);
+
+      schema_os
+          << "  " << camel_name << " @" << i << " $Cxx.name(\""
+          << snake_name << "\");\n";
+
+      include_h_os
+          << "  " << enum_case << ",\n";
+      ++i;
+    }
+  }
+
   lib_cpp_os
       << "    default: __builtin_unreachable();\n"
       << "  }\n"  // End of `switch`.
@@ -535,7 +591,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   auto class_name = cls->record.Name();
 
   // We have our own representation for these.
-  if (class_name == "Token" || class_name == "TokenRange") {
+  if (class_name == "Token" || class_name == "TokenRange" ||
+      class_name == "FileToken") {
     return parent_methods;
   }
 
@@ -594,8 +651,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (auto record = return_type.AsRecordDeclaration()) {
       std::string record_name = record->Name();
 
-      // Handle `pasta::Token`.
-      if (record_name == "Token") {
+      // Handle `pasta::Token` and `pasta::FileToken` uniformly. We represent
+      // both as references.
+      if (record_name == "Token" || record_name == "FileToken") {
         serialize_cpp_os
             << "  b." << setter_name << "(es.EntityId(e."
             << method_name << "()));\n";
@@ -997,18 +1055,6 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "    Serialize(tokens_builder[static_cast<unsigned>(i - code.begin_index)], range[i]);\n"
       << "  }\n";
 
-  // Buffers the struct output so that we can output tag types on an as-
-  // needed basis.
-  schema_os
-      << NameAndHash("struct Token") << " {\n"
-      << "  kind @0 :TokenKind;\n"
-      << "  data @1 :Text;\n"
-      << "}\n\n"
-      << NameAndHash("struct TokenRange") << " {\n"
-      << "  beginId @0 :UInt64;\n"  // References.
-      << "  endId @1 :UInt64;  # Inclusive.\n"
-      << "}\n\n";
-
   include_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
@@ -1071,10 +1117,32 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   std::vector<std::string> class_names;
 
   for (const pasta::EnumDecl &tag : enums) {
+    std::string enum_name = tag.Name();
+    if (enum_name == "PPKeywordKind") {
+      pp_keyword_kinds = tag;
+    } else if (enum_name == "ObjCKeywordKind") {
+      objc_at_keywords = tag;
+    }
+  }
+
+  for (const pasta::EnumDecl &tag : enums) {
     if (auto itype = CxxIntType(tag.IntegerType())) {
       RunOnEnum(tag);
     }
   }
+
+  // Now that we've outputted schemas for all enums (`TokenKind`
+  // included), go and define our unified `Token` schema, which will
+  // apply for both `pasta::Token` and `pasta::FileToken`.
+  schema_os
+      << NameAndHash("struct Token") << " {\n"
+      << "  kind @0 :TokenKind;\n"
+      << "  data @1 :Text;\n"
+      << "}\n\n"
+      << NameAndHash("struct TokenRange") << " {\n"
+      << "  beginId @0 :UInt64;\n"  // References.
+      << "  endId @1 :UInt64;  # Inclusive.\n"
+      << "}\n\n";
 
   serialize_h_os
       << "class EntitySerializer;\n"
@@ -1108,7 +1176,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   }
   for (const pasta::CXXRecordDecl &record : tokens) {
     auto name = record.Name();
-    if (name != "Token" && name != "TokenRange") {
+    if (name != "Token" && name != "TokenRange" && name != "FileToken") {
       serialize_h_os
           << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
           << name << "::Builder, const pasta::" << name << " &);\n";

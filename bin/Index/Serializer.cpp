@@ -8,16 +8,18 @@
 
 #include <cassert>
 #include <glog/logging.h>
+#include <pasta/AST/Forward.h>
 #include <pasta/AST/Token.h>
+#include <pasta/Util/File.h>
 
 #include "Serialize.h"
+#include "Util.h"
 
 namespace indexer {
-namespace {
 
-}  // namespace
+EntitySerializer::~EntitySerializer(void) {}
 
-uint64_t EntitySerializer::EntityId(const pasta::Decl &entity) const {
+uint64_t EntitySerializer::EntityId(const pasta::Decl &entity) {
   if (auto it = entity_ids.find(entity.RawDecl()); it != entity_ids.end()) {
     return it->second;
   } else {
@@ -25,7 +27,7 @@ uint64_t EntitySerializer::EntityId(const pasta::Decl &entity) const {
   }
 }
 
-uint64_t EntitySerializer::EntityId(const pasta::Stmt &entity) const {
+uint64_t EntitySerializer::EntityId(const pasta::Stmt &entity) {
   if (auto it = entity_ids.find(entity.RawStmt()); it != entity_ids.end()) {
     return it->second;
   } else {
@@ -33,9 +35,36 @@ uint64_t EntitySerializer::EntityId(const pasta::Stmt &entity) const {
   }
 }
 
-uint64_t EntitySerializer::EntityId(const pasta::Token &entity) const {
+uint64_t EntitySerializer::EntityId(const pasta::Token &entity) {
   if (auto it = entity_ids.find(entity.RawToken()); it != entity_ids.end()) {
     return it->second;
+
+  // If we fail to resolve the parsed token to an entity ID, then try to
+  // see if it's associated with a `pasta::FileToken`, and if so, then form
+  // an entity ID for that. We unify `Token` and `FileToken` in our serialized
+  // representation, because we always want references to "point somewhere."
+  } else if (auto ft = entity.FileLocation()) {
+    return this->EntityId(ft.value());
+  
+  } else {
+    return mx::kInvalidEntityId;
+  }
+}
+
+uint64_t EntitySerializer::EntityId(const pasta::FileToken &entity) {
+  if (auto it = entity_ids.find(entity.RawFileToken()); it != entity_ids.end()) {
+    return it->second;
+  }
+
+  auto file = pasta::File::Containing(entity);
+  if (auto fit = file_ids.find(file); fit != file_ids.end()) {
+    mx::FileTokenId id;
+    id.file_id = fit->second;
+    id.kind = TokenKindFromPasta(entity);
+    id.offset = static_cast<uint32_t>(entity.Index());
+    ::mx::EntityId ret_id(id);
+    entity_ids.emplace(entity.RawFileToken(), ret_id);
+    return ret_id;
   } else {
     return mx::kInvalidEntityId;
   }

@@ -932,7 +932,6 @@ void SerializeCXXDynamicCastExpr(EntitySerializer &, mx::ast::CXXDynamicCastExpr
 void SerializeCXXBaseSpecifier(EntitySerializer &, mx::ast::CXXBaseSpecifier::Builder, const pasta::CXXBaseSpecifier &);
 void SerializeTemplateArgument(EntitySerializer &, mx::ast::TemplateArgument::Builder, const pasta::TemplateArgument &);
 void SerializeTemplateParameterList(EntitySerializer &, mx::ast::TemplateParameterList::Builder, const pasta::TemplateParameterList &);
-void SerializeFileToken(EntitySerializer &, mx::ast::FileToken::Builder, const pasta::FileToken &);
 void SerializeCompileJob(EntitySerializer &, mx::ast::CompileJob::Builder, const pasta::CompileJob &);
 void SerializeCompileCommand(EntitySerializer &, mx::ast::CompileCommand::Builder, const pasta::CompileCommand &);
 void SerializeIncludePath(EntitySerializer &, mx::ast::IncludePath::Builder, const pasta::IncludePath &);

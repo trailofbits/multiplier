@@ -8,6 +8,9 @@
 
 #include "Visitor.h"
 
+namespace pasta {
+class File;
+}  // namespace pasta
 namespace indexer {
 
 using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
@@ -31,9 +34,10 @@ struct CodeChunk {
 class EntitySerializer final : public EntityVisitor {
  private:
   const pasta::TokenRange range;
-  const EntityIdMap entity_ids;
+  EntityIdMap entity_ids;
   mx::CodeId code_id;
   std::unordered_set<uint64_t> serialized_entities;
+  const std::unordered_map<pasta::File, mx::FileId> &file_ids;
 
 #define MX_DECLARE_DECL_LIST_BUILDER(decl) \
     ::capnp::List<::mx::ast::decl ## Decl, ::capnp::Kind::STRUCT>::Builder decl ## Decl_builder;
@@ -55,17 +59,22 @@ class EntitySerializer final : public EntityVisitor {
   void Serialize(mx::ast::Token::Builder token, const pasta::Token &entity);
 
  public:
-  inline EntitySerializer(pasta::TokenRange range_, EntityIdMap entity_ids_)
+  virtual ~EntitySerializer(void);
+
+  inline EntitySerializer(pasta::TokenRange range_, EntityIdMap entity_ids_,
+                          const std::unordered_map<pasta::File, mx::FileId> &file_ids_)
       : range(std::move(range_)),
         entity_ids(std::move(entity_ids_)),
-        code_id(mx::kInvalidEntityId) {}
+        code_id(mx::kInvalidEntityId),
+        file_ids(file_ids_) {}
 
   void SerializeCodeEntities(
       CodeChunk code, mx::ast::EntityList::Builder entities);
 
-  uint64_t EntityId(const pasta::Decl &entity) const;
-  uint64_t EntityId(const pasta::Stmt &entity) const;
-  uint64_t EntityId(const pasta::Token &entity) const;
+  uint64_t EntityId(const pasta::Decl &entity);
+  uint64_t EntityId(const pasta::Stmt &entity);
+  uint64_t EntityId(const pasta::Token &entity);
+  uint64_t EntityId(const pasta::FileToken &entity);
 
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;

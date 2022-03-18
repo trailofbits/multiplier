@@ -7,31 +7,14 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Action.h>
-#include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
 #include <pasta/Util/File.h>
 
-#include "Context.h"
-
 namespace indexer {
 
-class TokenizeFileAction final : public mx::Action {
- private:
-  const std::shared_ptr<IndexingContext> context;
-  const mx::FileId file_id;
-  const std::string file_hash;
-  const pasta::File file;
+class IndexingContext;
 
- public:
-  virtual ~TokenizeFileAction(void);
-
-  TokenizeFileAction(std::shared_ptr<IndexingContext> context_,
-                     mx::FileId file_id_, std::string file_hash_,
-                     pasta::File file_);
-
-  // Tokenize the file.
-  void Run(mx::Executor exe, mx::WorkerId worker_id) final;
-};
+void TokenizeFile(IndexingContext &context, mx::FileId file_id,
+                  std::string file_hash, pasta::File file);
 
 }  // namespace indexer
