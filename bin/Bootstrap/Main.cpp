@@ -43,6 +43,8 @@ static const std::unordered_set<std::string> gTypeNames{
 //  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
 };
 
+
+
 #define NON_REF_TYPES \
     "IncludePath", \
     "Compiler", \
@@ -55,6 +57,39 @@ static const std::unordered_set<std::string> gTypeNames{
 
 static const std::unordered_set<std::string> gNotReferenceTypes{
   NON_REF_TYPES
+};
+
+static const std::unordered_set<std::string> kDeclContextTypes{
+  "BlockDecl",
+  "CXXConstructorDecl",
+  "CXXConversionDecl",
+  "CXXDeductionGuideDecl",
+  "CXXDestructorDecl",
+  "CXXMethodDecl",
+  "CXXRecordDecl",
+  "CapturedDecl",
+  "ClassTemplatePartialSpecializationDecl",
+  "ClassTemplateSpecializationDecl",
+  "EnumDecl",
+  "ExportDecl",
+  "ExternCContextDecl",
+  "FunctionDecl",
+  "LinkageSpecDecl",
+  "NamespaceDecl",
+  "OMPDeclareMapperDecl",
+  "OMPDeclareReductionDecl",
+  "ObjCCategoryDecl",
+  "ObjCCategoryImplDecl",
+  "ObjCContainerDecl",
+  "ObjCImplDecl",
+  "ObjCImplementationDecl",
+  "ObjCInterfaceDecl",
+  "ObjCMethodDecl",
+  "ObjCProtocolDecl",
+  "RecordDecl",
+  "RequiresExprBodyDecl",
+  "TagDecl",
+  "TranslationUnitDecl",
 };
 
 static const std::unordered_set<std::string> gConcreteClassNames{
@@ -89,6 +124,15 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Expr", "ClassifyLValue"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsBoundMemberFunction"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsModifiableLvalue"},  // Calls `clang::Expr::ClassifyImpl`.
+
+  // These are methods that we just don't want, e.g. they don't provide
+  // relevant info.
+  {"Decl", "GlobalID"},  // Related to loading from an AST file.
+  {"Decl", "ID"},  // Related to the ASTContext allocation.
+  {"Decl", "IsFromASTFile"},
+  {"Decl", "HasBody"},
+  {"Decl", "AsFunction"},
+  {"Decl", "TranslationUnitDeclaration"},
 };
 
 struct ClassHierarchy {
@@ -512,7 +556,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   for (pasta::CXXMethodDecl method : cls->record.Methods()) {
-    if (method.NumParams()) {
+    if (method.NumParameters()) {
       continue;  // Skip methods with parameters.
     }
     auto method_name = method.Name();
@@ -613,33 +657,106 @@ MethodListPtr CodeGenerator::RunOnClass(
         schema_os << "  " << camel_name << " @" << i << " :Text;\n";
         ++i;
 
-      // TODO(pag): Figure out optionals in Cap'n Proto.
+      // For optionals, we generally represent them as the thing itself, as well
+      // as a `*IsPresent` bool parameter. Cap'n Proto can represent optionals
+      // with `union`s, but those require an additional 16 bits of storage for
+      // the union tag, and the size of the union is the size of its largest
+      // member, so the extra `bool` just means 1 bit of overhead.
       } else if (record_name == "optional") {
-//        std::optional<std::string> element_name =
-//            GetFirstTemplateParameterType(record);
-//        std::string capn_element_name;
-//        if (!element_name) {
-//
-//        } else if (*element_name == "string" ||
-//                   *element_name == "basic_string" ||
-//                   *element_name == "string_view" ||
-//                   *element_name == "basic_string_view" ||
-//                   *element_name == "path") {
-//          capn_element_name = "Text";
-//
-//        } else if (gNotReferenceTypes.count(*element_name)) {
-//          capn_element_name = element_name.value();
-//
-//        } else if (gEntityClassNames.count(*element_name)) {
-//          capn_element_name = "UInt64";  // Reference.
-//        }
-//
-//        if (!capn_element_name.empty()) {
-//          schema_os
-//              << "  " << camel_name << " @" << i << " :List("
-//              << capn_element_name << ");\n";
-//          ++i;
-//        }
+        std::optional<std::string> element_name =
+            GetFirstTemplateParameterType(record);
+        std::string capn_element_name;
+        if (!element_name) {
+
+        // Optional strings will be empty.
+        } else if (*element_name == "string" ||
+                   *element_name == "basic_string" ||
+                   *element_name == "string_view" ||
+                   *element_name == "basic_string_view" ||
+                   *element_name == "path") {
+          capn_element_name = "Text";
+
+        // Optional references will be left as `0` if they're not present.
+        } else if (gEntityClassNames.count(*element_name)) {
+          capn_element_name = "UInt64";  // Reference.
+        }
+
+        if (capn_element_name.empty()) {
+          continue;
+        }
+
+        serialize_cpp_os
+            << "  auto v" << i << " = e." << method_name << "();\n";
+
+        // Strings.
+        if (*element_name == "string" || *element_name == "basic_string") {
+          serialize_cpp_os
+              << "  if (v" << i << ") {\n"
+              << "    b." << setter_name << "(v.value());\n"
+              << "    b." << setter_name << "IsPresent(true);\n"
+              << "  } else {\n"
+              << "    b." << setter_name << "(\"\");\n"
+              << "    b." << setter_name << "IsPresent(false);\n"
+              << "  }\n";
+
+        // String views need to be converted to `std::string` because Cap'n
+        // Proto requires `:Text` fields to be `NUL`-terminated.
+        } else if (*element_name == "string_view" ||
+                   *element_name == "basic_string_view") {
+          serialize_cpp_os
+              << "  if (v" << i << ") {\n"
+              << "    if (v" << i << "->empty()) {\n"
+              << "      b." << setter_name << "(\"\");\n"
+              << "    } else {\n"
+              << "      std::string s" << i << "(v" << i << "->data(), v"
+              << i << "->size());\n"
+              << "      b." << setter_name << "(s" << i << ");\n"
+              << "    }\n"
+              << "    b." << setter_name << "IsPresent(true);\n"
+              << "  } else {\n"
+              << "    b." << setter_name << "(\"\");\n"
+              << "    b." << setter_name << "IsPresent(false);\n"
+              << "  }\n";
+
+        // Filesystem paths.
+        } else if (*element_name == "path") {
+          serialize_cpp_os
+              << "  if (v" << i << ") {\n"
+              << "    b." << setter_name << "(v.value().generic_string());\n"
+              << "    b." << setter_name << "IsPresent(true);\n"
+              << "  } else {\n"
+              << "    b." << setter_name << "(\"\");\n"
+              << "    b." << setter_name << "IsPresent(false);\n"
+              << "  }\n";
+
+        // Reference types.
+        } else if (gEntityClassNames.count(*element_name)) {
+          serialize_cpp_os
+              << "  if (v" << i << ") {\n"
+              << "    if (auto id" << i << " = es.EntityId(v" << i << ".value())) {\n"
+              << "      b." << setter_name << "(id" << i << ");\n"
+              << "      b." << setter_name << "IsPresent(true);\n"
+              << "    } else {\n"
+              << "      b." << setter_name << "(0);\n"
+              << "      b." << setter_name << "IsPresent(false);\n"
+              << "    }\n"
+              << "  } else {\n"
+              << "    b." << setter_name << "(0);\n"
+              << "    b." << setter_name << "IsPresent(false);\n"
+              << "  }\n";
+
+        } else {
+          abort();
+        }
+
+        schema_os
+            << "  " << camel_name << " @" << i << " :"
+            << capn_element_name << ";\n";
+        ++i;
+        schema_os
+            << "  " << camel_name << "IsPresent @" << i << " :"
+            << capn_element_name << ";\n";
+        ++i;
 
       // List of things; figure out what.
       } else if (record_name == "vector") {
@@ -752,6 +869,33 @@ MethodListPtr CodeGenerator::RunOnClass(
       ++i;
     }
   }
+
+  // If this is a `DeclContext`, then try to add the `DeclarationsInContext`
+  // method.
+  if (kDeclContextTypes.count(class_name)) {
+    static const std::string method_name = "DeclarationsInContext";
+    if (seen_methods->emplace(method_name).second) {
+      static const std::string snake_name = "declarations_in_context";
+      static const std::string camel_name = "declarationsInContext";
+      static const std::string init_name = "initDeclarationsInContext";
+
+      serialize_cpp_os
+          << "  pasta::DeclContext dc" << i << "(e);\n"
+          << "  auto v" << i << " = dc" << i << ".AlreadyLoadedDeclarations();\n"
+          << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
+          << i << ".size()));\n"
+          << "  auto i" << i << " = 0u;\n"
+          << "  for (const pasta::Decl &e" << i << " : v" << i << ") {\n"
+          << "    sv" << i << ".set(i" << i << ", es.EntityId(e" << i << "));\n"
+          << "    ++i" << i << ";\n"
+          << "  }\n";
+
+      schema_os
+          << "  " << camel_name << " @" << i << " :List(UInt64);\n";
+      ++i;
+    }
+  }
+
   serialize_cpp_os << "}\n\n";
   schema_os << "}\n\n";
   return seen_methods;

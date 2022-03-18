@@ -1347,7 +1347,7 @@ enum AttributeKind @0xea12979c4469acdf {
   owner @238 $Cxx.name("owner");
   ownership @239 $Cxx.name("ownership");
   packed @240 $Cxx.name("packed");
-  paramTypestate @241 $Cxx.name("param_typestate");
+  parameterTypestate @241 $Cxx.name("parameter_typestate");
   patchableFunctionEntry @242 $Cxx.name("patchable_function_entry");
   pointer @243 $Cxx.name("pointer");
   pragmaClangBssSection @244 $Cxx.name("pragma_clang_bss_section");
@@ -3386,7 +3386,7 @@ enum TypeLocClass @0xd26f9faf6191a9d9 {
   objCObjectPointer @29 $Cxx.name("obj_c_object_pointer");
   objCObject @30 $Cxx.name("obj_c_object");
   objCInterface @31 $Cxx.name("obj_c_interface");
-  objCTypeParam @32 $Cxx.name("obj_c_type_param");
+  objCTypeParameter @32 $Cxx.name("obj_c_type_parameter");
   packExpansion @33 $Cxx.name("pack_expansion");
   parenthesis @34 $Cxx.name("parenthesis");
   pipe @35 $Cxx.name("pipe");
@@ -3711,6 +3711,8 @@ struct TemplateArgument @0xb5127dad01992f67 {
   isInstantiationDependent @3 :Bool;
   containsUnexpandedParameterPack @4 :Bool;
   isPackExpansion @5 :Bool;
+  asDeclaration @6 :UInt64;
+  asDeclarationIsPresent @7 :UInt64;
 }
 
 struct CXXBaseSpecifier @0x8e0e4024ab6be99f {
@@ -3720,8 +3722,10 @@ struct CXXBaseSpecifier @0x8e0e4024ab6be99f {
   baseKind @3 :TagTypeKind;
   isPackExpansion @4 :Bool;
   constructorsAreInherited @5 :Bool;
-  semanticAccessSpecifier @6 :AccessSpecifier;
-  lexicalAccessSpecifier @7 :AccessSpecifier;
+  ellipsis @6 :UInt64;
+  ellipsisIsPresent @7 :UInt64;
+  semanticAccessSpecifier @8 :AccessSpecifier;
+  lexicalAccessSpecifier @9 :AccessSpecifier;
 }
 
 struct Stmt @0x91127d30fade9a32 {
@@ -3800,7 +3804,7 @@ struct ObjCAtFinallyStmt @0xb4641f5dbb7b9c51 {
 struct ObjCAtCatchStmt @0xea4d614d29e03f4e {
   stmt @0:Stmt;
   atCatchToken @1 :UInt64;
-  catchParamDeclaration @2 :UInt64;
+  catchParameterDeclaration @2 :UInt64;
   rParenToken @3 :UInt64;
   hasEllipsis @4 :Bool;
 }
@@ -4635,7 +4639,7 @@ struct CXXDefaultInitExpr @0xa78e81b7ba8da8e6 {
 
 struct CXXDefaultArgExpr @0x9f9ee9dcf349cbcf {
   expr @0:Expr;
-  param @1 :UInt64;
+  parameter @1 :UInt64;
   usedToken @2 :UInt64;
 }
 
@@ -5270,49 +5274,45 @@ struct CaseStmt @0x829897c890006599 {
 struct Decl @0xfb5879761ffaedb6 {
   access @0 :AccessSpecifier;
   accessUnsafe @1 :AccessSpecifier;
-  asFunction @2 :UInt64;
-  availability @3 :AvailabilityResult;
-  beginToken @4 :UInt64;
-  bodyRBrace @5 :UInt64;
-  describedTemplate @6 :UInt64;
-  describedTemplateParams @7 :TemplateParameterList;
-  endToken @8 :UInt64;
-  friendObjectKind @9 :DeclFriendObjectKind;
-  moduleOwnershipKind @10 :DeclModuleOwnershipKind;
-  translationUnitDeclaration @11 :UInt64;
-  hasAttributes @12 :Bool;
-  hasBody @13 :Bool;
-  hasDefiningAttribute @14 :Bool;
-  hasOwningModule @15 :Bool;
-  hasTagIdentifierNamespace @16 :Bool;
-  isCanonicalDeclaration @17 :Bool;
-  isDefinedOutsideFunctionOrMethod @18 :Bool;
-  isDeprecated @19 :Bool;
-  isFirstDeclaration @20 :Bool;
-  isFromAstFile @21 :Bool;
-  isFunctionOrFunctionTemplate @22 :Bool;
-  isImplicit @23 :Bool;
-  isInAnonymousNamespace @24 :Bool;
-  isInLocalScopeForInstantiation @25 :Bool;
-  isInStdNamespace @26 :Bool;
-  isInvalidDeclaration @27 :Bool;
-  isModulePrivate @28 :Bool;
-  isOutOfLine @29 :Bool;
-  isParameterPack @30 :Bool;
-  isReferenced @31 :Bool;
-  isTemplateDeclaration @32 :Bool;
-  isTemplateParameter @33 :Bool;
-  isTemplateParameterPack @34 :Bool;
-  isTemplated @35 :Bool;
-  isThisDeclarationReferenced @36 :Bool;
-  isTopLevelDeclarationInObjCContainer @37 :Bool;
-  isUnavailable @38 :Bool;
-  isUnconditionallyVisible @39 :Bool;
-  isUsed @40 :Bool;
-  isWeakImported @41 :Bool;
-  kind @42 :DeclKind;
-  token @43 :UInt64;
-  tokenRange @44 :TokenRange;
+  availability @2 :AvailabilityResult;
+  beginToken @3 :UInt64;
+  bodyRBrace @4 :UInt64;
+  describedTemplate @5 :UInt64;
+  describedTemplateIsPresent @6 :UInt64;
+  endToken @7 :UInt64;
+  friendObjectKind @8 :DeclFriendObjectKind;
+  moduleOwnershipKind @9 :DeclModuleOwnershipKind;
+  hasAttributes @10 :Bool;
+  hasDefiningAttribute @11 :Bool;
+  hasOwningModule @12 :Bool;
+  hasTagIdentifierNamespace @13 :Bool;
+  isCanonicalDeclaration @14 :Bool;
+  isDefinedOutsideFunctionOrMethod @15 :Bool;
+  isDeprecated @16 :Bool;
+  isFirstDeclaration @17 :Bool;
+  isFunctionOrFunctionTemplate @18 :Bool;
+  isImplicit @19 :Bool;
+  isInAnonymousNamespace @20 :Bool;
+  isInLocalScopeForInstantiation @21 :Bool;
+  isInStdNamespace @22 :Bool;
+  isInvalidDeclaration @23 :Bool;
+  isModulePrivate @24 :Bool;
+  isOutOfLine @25 :Bool;
+  isParameterPack @26 :Bool;
+  isReferenced @27 :Bool;
+  isTemplateDeclaration @28 :Bool;
+  isTemplateParameter @29 :Bool;
+  isTemplateParameterPack @30 :Bool;
+  isTemplated @31 :Bool;
+  isThisDeclarationReferenced @32 :Bool;
+  isTopLevelDeclarationInObjCContainer @33 :Bool;
+  isUnavailable @34 :Bool;
+  isUnconditionallyVisible @35 :Bool;
+  isUsed @36 :Bool;
+  isWeakImported @37 :Bool;
+  kind @38 :DeclKind;
+  token @39 :UInt64;
+  tokenRange @40 :TokenRange;
 }
 
 struct ClassScopeFunctionSpecializationDecl @0x99eb38d6a1065986 {
@@ -5323,10 +5323,10 @@ struct ClassScopeFunctionSpecializationDecl @0x99eb38d6a1065986 {
 
 struct CapturedDecl @0xa1c847e4871d0b0a {
   decl @0:Decl;
-  contextParam @1 :UInt64;
+  contextParameter @1 :UInt64;
   isNothrow @2 :Bool;
   parameters @3 :List(UInt64);
-  params @4 :List(UInt64);
+  declarationsInContext @4 :List(UInt64);
 }
 
 struct BlockDecl @0xd21c906a9e197a51 {
@@ -5341,7 +5341,8 @@ struct BlockDecl @0xd21c906a9e197a51 {
   isConversionFromLambda @8 :Bool;
   isVariadic @9 :Bool;
   parameters @10 :List(UInt64);
-  paramDeclarations @11 :List(UInt64);
+  parameterDeclarations @11 :List(UInt64);
+  declarationsInContext @12 :List(UInt64);
 }
 
 struct AccessSpecDecl @0xe671324616f83d3c {
@@ -5369,6 +5370,7 @@ struct OMPAllocateDecl @0xe7eb4cee19c86540 {
 struct TranslationUnitDecl @0x84ba694d5be7caa3 {
   decl @0:Decl;
   anonymousNamespace @1 :UInt64;
+  declarationsInContext @2 :List(UInt64);
 }
 
 struct StaticAssertDecl @0xe3ab98945466226a {
@@ -5380,6 +5382,7 @@ struct StaticAssertDecl @0xe3ab98945466226a {
 
 struct RequiresExprBodyDecl @0x9eea1ed94972a3a6 {
   decl @0:Decl;
+  declarationsInContext @1 :List(UInt64);
 }
 
 struct PragmaDetectMismatchDecl @0xc2be564c48472f5d {
@@ -5473,6 +5476,7 @@ struct OMPDeclareReductionDecl @0xf59daefbeeafc092 {
   valueDecl @0:ValueDecl;
   initializerKind @1 :OMPDeclareReductionDeclInitKind;
   prevDeclarationInScope @2 :UInt64;
+  declarationsInContext @3 :List(UInt64);
 }
 
 struct MSGuidDecl @0x9ef09ebc4be76711 {
@@ -5501,49 +5505,59 @@ struct DeclaratorDecl @0xb95593a177af5810 {
 
 struct VarDecl @0xcf9adcbc59a4e339 {
   declaratorDecl @0:DeclaratorDecl;
-  initializerStyle @1 :VarDeclInitializationStyle;
-  languageLinkage @2 :LanguageLinkage;
-  pointOfInstantiation @3 :UInt64;
-  storageClass @4 :StorageClass;
-  storageDuration @5 :StorageDuration;
-  tlsKind @6 :VarDeclTLSKind;
-  tscSpec @7 :ThreadStorageClassSpecifier;
-  templateSpecializationKind @8 :TemplateSpecializationKind;
-  templateSpecializationKindForInstantiation @9 :TemplateSpecializationKind;
-  hasConstantInitialization @10 :Bool;
-  hasDependentAlignment @11 :Bool;
-  hasExternalStorage @12 :Bool;
-  hasGlobalStorage @13 :Bool;
-  hasInitializer @14 :Bool;
-  hasLocalStorage @15 :Bool;
-  isArcPseudoStrong @16 :Bool;
-  isCxxForRangeDeclaration @17 :Bool;
-  isConstexpr @18 :Bool;
-  isDirectInitializer @19 :Bool;
-  isEscapingByref @20 :Bool;
-  isExceptionVariable @21 :Bool;
-  isExternUcC @22 :Bool;
-  isFileVariableDeclaration @23 :Bool;
-  isFunctionOrMethodVariableDeclaration @24 :Bool;
-  isInExternCContext @25 :Bool;
-  isInExternCxxContext @26 :Bool;
-  isInitializerCapture @27 :Bool;
-  isInline @28 :Bool;
-  isInlineSpecified @29 :Bool;
-  isKnownToBeDefined @30 :Bool;
-  isLocalVariableDeclaration @31 :Bool;
-  isLocalVariableDeclarationOrParm @32 :Bool;
-  isNrvoVariable @33 :Bool;
-  isNoDestroy @34 :Bool;
-  isNonEscapingByref @35 :Bool;
-  isObjCForDeclaration @36 :Bool;
-  isPreviousDeclarationInSameBlockScope @37 :Bool;
-  isStaticDataMember @38 :Bool;
-  isStaticLocal @39 :Bool;
-  isThisDeclarationADemotedDefinition @40 :Bool;
-  isUsableInConstantExpressions @41 :Bool;
-  mightBeUsableInConstantExpressions @42 :Bool;
-  needsDestruction @43 :QualTypeDestructionKind;
+  actingDefinition @1 :UInt64;
+  actingDefinitionIsPresent @2 :UInt64;
+  describedVariableTemplate @3 :UInt64;
+  describedVariableTemplateIsPresent @4 :UInt64;
+  initializerStyle @5 :VarDeclInitializationStyle;
+  initializingDeclaration @6 :UInt64;
+  initializingDeclarationIsPresent @7 :UInt64;
+  instantiatedFromStaticDataMember @8 :UInt64;
+  instantiatedFromStaticDataMemberIsPresent @9 :UInt64;
+  languageLinkage @10 :LanguageLinkage;
+  pointOfInstantiation @11 :UInt64;
+  storageClass @12 :StorageClass;
+  storageDuration @13 :StorageDuration;
+  tlsKind @14 :VarDeclTLSKind;
+  tscSpec @15 :ThreadStorageClassSpecifier;
+  templateInstantiationPattern @16 :UInt64;
+  templateInstantiationPatternIsPresent @17 :UInt64;
+  templateSpecializationKind @18 :TemplateSpecializationKind;
+  templateSpecializationKindForInstantiation @19 :TemplateSpecializationKind;
+  hasConstantInitialization @20 :Bool;
+  hasDependentAlignment @21 :Bool;
+  hasExternalStorage @22 :Bool;
+  hasGlobalStorage @23 :Bool;
+  hasInitializer @24 :Bool;
+  hasLocalStorage @25 :Bool;
+  isArcPseudoStrong @26 :Bool;
+  isCxxForRangeDeclaration @27 :Bool;
+  isConstexpr @28 :Bool;
+  isDirectInitializer @29 :Bool;
+  isEscapingByref @30 :Bool;
+  isExceptionVariable @31 :Bool;
+  isExternUcC @32 :Bool;
+  isFileVariableDeclaration @33 :Bool;
+  isFunctionOrMethodVariableDeclaration @34 :Bool;
+  isInExternCContext @35 :Bool;
+  isInExternCxxContext @36 :Bool;
+  isInitializerCapture @37 :Bool;
+  isInline @38 :Bool;
+  isInlineSpecified @39 :Bool;
+  isKnownToBeDefined @40 :Bool;
+  isLocalVariableDeclaration @41 :Bool;
+  isLocalVariableDeclarationOrParm @42 :Bool;
+  isNrvoVariable @43 :Bool;
+  isNoDestroy @44 :Bool;
+  isNonEscapingByref @45 :Bool;
+  isObjCForDeclaration @46 :Bool;
+  isPreviousDeclarationInSameBlockScope @47 :Bool;
+  isStaticDataMember @48 :Bool;
+  isStaticLocal @49 :Bool;
+  isThisDeclarationADemotedDefinition @50 :Bool;
+  isUsableInConstantExpressions @51 :Bool;
+  mightBeUsableInConstantExpressions @52 :Bool;
+  needsDestruction @53 :QualTypeDestructionKind;
 }
 
 struct ParmVarDecl @0xedf01c1d7684de38 {
@@ -5614,68 +5628,77 @@ struct FunctionDecl @0x92bd4789888f8ccb {
   doesThisDeclarationHaveABody @1 :Bool;
   constexprKind @2 :ConstexprSpecKind;
   definition @3 :UInt64;
-  ellipsisToken @4 :UInt64;
-  exceptionSpecSourceRange @5 :TokenRange;
-  exceptionSpecType @6 :ExceptionSpecificationType;
-  languageLinkage @7 :LanguageLinkage;
-  multiVersionKind @8 :MultiVersionKind;
-  overloadedOperator @9 :OverloadedOperatorKind;
-  parametersSourceRange @10 :TokenRange;
-  pointOfInstantiation @11 :UInt64;
-  returnTypeSourceRange @12 :TokenRange;
-  storageClass @13 :StorageClass;
-  templateSpecializationKind @14 :TemplateSpecializationKind;
-  templateSpecializationKindForInstantiation @15 :TemplateSpecializationKind;
-  templatedKind @16 :FunctionDeclTemplatedKind;
-  hasImplicitReturnZero @17 :Bool;
-  hasInheritedPrototype @18 :Bool;
-  hasOneParamOrDefaultArguments @19 :Bool;
-  hasPrototype @20 :Bool;
-  hasSkippedBody @21 :Bool;
-  hasTrivialBody @22 :Bool;
-  hasWrittenPrototype @23 :Bool;
-  instantiationIsPending @24 :Bool;
-  isCpuDispatchMultiVersion @25 :Bool;
-  isCpuSpecificMultiVersion @26 :Bool;
-  isConsteval @27 :Bool;
-  isConstexpr @28 :Bool;
-  isConstexprSpecified @29 :Bool;
-  isDefaulted @30 :Bool;
-  isDeleted @31 :Bool;
-  isDeletedAsWritten @32 :Bool;
-  isDestroyingOperatorDelete @33 :Bool;
-  isExplicitlyDefaulted @34 :Bool;
-  isExternUcC @35 :Bool;
-  isFunctionTemplateSpecialization @36 :Bool;
-  isGlobal @37 :Bool;
-  isImplicitlyInstantiable @38 :Bool;
-  isInExternCContext @39 :Bool;
-  isInExternCxxContext @40 :Bool;
-  isInlineBuiltinDeclaration @41 :Bool;
-  isInlineSpecified @42 :Bool;
-  isInlined @43 :Bool;
-  isLateTemplateParsed @44 :Bool;
-  isMsvcrtEntryPoint @45 :Bool;
-  isMain @46 :Bool;
-  isMultiVersion @47 :Bool;
-  isNoReturn @48 :Bool;
-  isOverloadedOperator @49 :Bool;
-  isPure @50 :Bool;
-  isReplaceableGlobalAllocationFunction @51 :Bool;
-  isStatic @52 :Bool;
-  isTargetMultiVersion @53 :Bool;
-  isTemplateInstantiation @54 :Bool;
-  isThisDeclarationADefinition @55 :Bool;
-  isThisDeclarationInstantiatedFromAFriendDefinition @56 :Bool;
-  isTrivial @57 :Bool;
-  isTrivialForCall @58 :Bool;
-  isUserProvided @59 :Bool;
-  isVariadic @60 :Bool;
-  isVirtualAsWritten @61 :Bool;
-  parameters @62 :List(UInt64);
-  usesSehTry @63 :Bool;
-  willHaveBody @64 :Bool;
-  paramDeclarations @65 :List(UInt64);
+  describedFunctionTemplate @4 :UInt64;
+  describedFunctionTemplateIsPresent @5 :UInt64;
+  ellipsisToken @6 :UInt64;
+  exceptionSpecSourceRange @7 :TokenRange;
+  exceptionSpecType @8 :ExceptionSpecificationType;
+  instantiatedFromMemberFunction @9 :UInt64;
+  instantiatedFromMemberFunctionIsPresent @10 :UInt64;
+  languageLinkage @11 :LanguageLinkage;
+  multiVersionKind @12 :MultiVersionKind;
+  overloadedOperator @13 :OverloadedOperatorKind;
+  parametersSourceRange @14 :TokenRange;
+  pointOfInstantiation @15 :UInt64;
+  primaryTemplate @16 :UInt64;
+  primaryTemplateIsPresent @17 :UInt64;
+  returnTypeSourceRange @18 :TokenRange;
+  storageClass @19 :StorageClass;
+  templateInstantiationPattern @20 :UInt64;
+  templateInstantiationPatternIsPresent @21 :UInt64;
+  templateSpecializationKind @22 :TemplateSpecializationKind;
+  templateSpecializationKindForInstantiation @23 :TemplateSpecializationKind;
+  templatedKind @24 :FunctionDeclTemplatedKind;
+  hasImplicitReturnZero @25 :Bool;
+  hasInheritedPrototype @26 :Bool;
+  hasOneParameterOrDefaultArguments @27 :Bool;
+  hasPrototype @28 :Bool;
+  hasSkippedBody @29 :Bool;
+  hasTrivialBody @30 :Bool;
+  hasWrittenPrototype @31 :Bool;
+  instantiationIsPending @32 :Bool;
+  isCpuDispatchMultiVersion @33 :Bool;
+  isCpuSpecificMultiVersion @34 :Bool;
+  isConsteval @35 :Bool;
+  isConstexpr @36 :Bool;
+  isConstexprSpecified @37 :Bool;
+  isDefaulted @38 :Bool;
+  isDeleted @39 :Bool;
+  isDeletedAsWritten @40 :Bool;
+  isDestroyingOperatorDelete @41 :Bool;
+  isExplicitlyDefaulted @42 :Bool;
+  isExternUcC @43 :Bool;
+  isFunctionTemplateSpecialization @44 :Bool;
+  isGlobal @45 :Bool;
+  isImplicitlyInstantiable @46 :Bool;
+  isInExternCContext @47 :Bool;
+  isInExternCxxContext @48 :Bool;
+  isInlineBuiltinDeclaration @49 :Bool;
+  isInlineSpecified @50 :Bool;
+  isInlined @51 :Bool;
+  isLateTemplateParsed @52 :Bool;
+  isMsvcrtEntryPoint @53 :Bool;
+  isMain @54 :Bool;
+  isMultiVersion @55 :Bool;
+  isNoReturn @56 :Bool;
+  isOverloadedOperator @57 :Bool;
+  isPure @58 :Bool;
+  isReplaceableGlobalAllocationFunction @59 :Bool;
+  isStatic @60 :Bool;
+  isTargetMultiVersion @61 :Bool;
+  isTemplateInstantiation @62 :Bool;
+  isThisDeclarationADefinition @63 :Bool;
+  isThisDeclarationInstantiatedFromAFriendDefinition @64 :Bool;
+  isTrivial @65 :Bool;
+  isTrivialForCall @66 :Bool;
+  isUserProvided @67 :Bool;
+  isVariadic @68 :Bool;
+  isVirtualAsWritten @69 :Bool;
+  parameters @70 :List(UInt64);
+  usesSehTry @71 :Bool;
+  willHaveBody @72 :Bool;
+  parameterDeclarations @73 :List(UInt64);
+  declarationsInContext @74 :List(UInt64);
 }
 
 struct CXXMethodDecl @0xd83d5835cf6512db {
@@ -5762,6 +5785,7 @@ struct OMPDeclarativeDirectiveValueDecl @0xc2c7acb8e7dbee6f {
 struct OMPDeclareMapperDecl @0xa1fda623202f7e38 {
   ompDeclarativeDirectiveValueDecl @0:OMPDeclarativeDirectiveValueDecl;
   prevDeclarationInScope @1 :UInt64;
+  declarationsInContext @2 :List(UInt64);
 }
 
 struct UsingShadowDecl @0xef25bc2e71e7534e {
@@ -5775,8 +5799,12 @@ struct ConstructorUsingShadowDecl @0x8a43df80c48b7033 {
   usingShadowDecl @0:UsingShadowDecl;
   constructsVirtualBase @1 :Bool;
   constructedBaseClass @2 :UInt64;
-  nominatedBaseClass @3 :UInt64;
-  parent @4 :UInt64;
+  constructedBaseClassShadowDeclaration @3 :UInt64;
+  constructedBaseClassShadowDeclarationIsPresent @4 :UInt64;
+  nominatedBaseClass @5 :UInt64;
+  nominatedBaseClassShadowDeclaration @6 :UInt64;
+  nominatedBaseClassShadowDeclarationIsPresent @7 :UInt64;
+  parent @8 :UInt64;
 }
 
 struct UsingPackDecl @0xf68edcc97d568bee {
@@ -5816,50 +5844,55 @@ struct TemplateTypeParmDecl @0x87eba729b34d198a {
 struct TagDecl @0x8e30dcc81a0377d1 {
   typeDecl @0:TypeDecl;
   braceRange @1 :TokenRange;
-  innerTokenStart @2 :UInt64;
-  outerTokenStart @3 :UInt64;
-  tagKind @4 :TagTypeKind;
-  typedefNameForAnonymousDeclaration @5 :UInt64;
-  hasNameForLinkage @6 :Bool;
-  isBeingDefined @7 :Bool;
-  isClass @8 :Bool;
-  isCompleteDefinition @9 :Bool;
-  isCompleteDefinitionRequired @10 :Bool;
-  isDependentType @11 :Bool;
-  isEmbeddedInDeclarator @12 :Bool;
-  isEnum @13 :Bool;
-  isFreeStanding @14 :Bool;
-  isInterface @15 :Bool;
-  isStruct @16 :Bool;
-  isThisDeclarationADefinition @17 :Bool;
-  isUnion @18 :Bool;
-  mayHaveOutOfDateDefinition @19 :Bool;
-  templateParameterLists @20 :List(TemplateParameterList);
+  definition @2 :UInt64;
+  definitionIsPresent @3 :UInt64;
+  innerTokenStart @4 :UInt64;
+  outerTokenStart @5 :UInt64;
+  tagKind @6 :TagTypeKind;
+  typedefNameForAnonymousDeclaration @7 :UInt64;
+  hasNameForLinkage @8 :Bool;
+  isBeingDefined @9 :Bool;
+  isClass @10 :Bool;
+  isCompleteDefinition @11 :Bool;
+  isCompleteDefinitionRequired @12 :Bool;
+  isDependentType @13 :Bool;
+  isEmbeddedInDeclarator @14 :Bool;
+  isEnum @15 :Bool;
+  isFreeStanding @16 :Bool;
+  isInterface @17 :Bool;
+  isStruct @18 :Bool;
+  isThisDeclarationADefinition @19 :Bool;
+  isUnion @20 :Bool;
+  mayHaveOutOfDateDefinition @21 :Bool;
+  templateParameterLists @22 :List(TemplateParameterList);
+  declarationsInContext @23 :List(UInt64);
 }
 
 struct RecordDecl @0xae6dc96296678f51 {
   tagDecl @0:TagDecl;
   canPassInRegisters @1 :Bool;
   fields @2 :List(UInt64);
-  argumentPassingRestrictions @3 :RecordDeclArgPassingKind;
-  hasFlexibleArrayMember @4 :Bool;
-  hasLoadedFieldsFromExternalStorage @5 :Bool;
-  hasNonTrivialToPrimitiveCopyCUnion @6 :Bool;
-  hasNonTrivialToPrimitiveDefaultInitializeCUnion @7 :Bool;
-  hasNonTrivialToPrimitiveDestructCUnion @8 :Bool;
-  hasObjectMember @9 :Bool;
-  hasVolatileMember @10 :Bool;
-  isAnonymousStructOrUnion @11 :Bool;
-  isCapturedRecord @12 :Bool;
-  isInjectedClassName @13 :Bool;
-  isLambda @14 :Bool;
-  isMsStruct @15 :Bool;
-  isNonTrivialToPrimitiveCopy @16 :Bool;
-  isNonTrivialToPrimitiveDefaultInitialize @17 :Bool;
-  isNonTrivialToPrimitiveDestroy @18 :Bool;
-  isOrContainsUnion @19 :Bool;
-  isParamDestroyedInCallee @20 :Bool;
-  mayInsertExtraPadding @21 :Bool;
+  findFirstNamedDataMember @3 :UInt64;
+  findFirstNamedDataMemberIsPresent @4 :UInt64;
+  argumentPassingRestrictions @5 :RecordDeclArgPassingKind;
+  hasFlexibleArrayMember @6 :Bool;
+  hasLoadedFieldsFromExternalStorage @7 :Bool;
+  hasNonTrivialToPrimitiveCopyCUnion @8 :Bool;
+  hasNonTrivialToPrimitiveDefaultInitializeCUnion @9 :Bool;
+  hasNonTrivialToPrimitiveDestructCUnion @10 :Bool;
+  hasObjectMember @11 :Bool;
+  hasVolatileMember @12 :Bool;
+  isAnonymousStructOrUnion @13 :Bool;
+  isCapturedRecord @14 :Bool;
+  isInjectedClassName @15 :Bool;
+  isLambda @16 :Bool;
+  isMsStruct @17 :Bool;
+  isNonTrivialToPrimitiveCopy @18 :Bool;
+  isNonTrivialToPrimitiveDefaultInitialize @19 :Bool;
+  isNonTrivialToPrimitiveDestroy @20 :Bool;
+  isOrContainsUnion @21 :Bool;
+  isParameterDestroyedInCallee @22 :Bool;
+  mayInsertExtraPadding @23 :Bool;
 }
 
 struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
@@ -5891,8 +5924,8 @@ struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
   hasConstexprDefaultConstructor @25 :Bool;
   hasConstexprDestructor @26 :Bool;
   hasConstexprNonCopyMoveConstructor @27 :Bool;
-  hasCopyAssignmentWithConstParam @28 :Bool;
-  hasCopyConstructorWithConstParam @29 :Bool;
+  hasCopyAssignmentWithConstParameter @28 :Bool;
+  hasCopyConstructorWithConstParameter @29 :Bool;
   hasDefaultConstructor @30 :Bool;
   hasDefinition @31 :Bool;
   hasDirectFields @32 :Bool;
@@ -5941,8 +5974,8 @@ struct CXXRecordDecl @0x9ecc9c9b6a1f56fc {
   hasUserDeclaredMoveOperation @75 :Bool;
   hasUserProvidedDefaultConstructor @76 :Bool;
   hasVariantMembers @77 :Bool;
-  implicitCopyAssignmentHasConstParam @78 :Bool;
-  implicitCopyConstructorHasConstParam @79 :Bool;
+  implicitCopyAssignmentHasConstParameter @78 :Bool;
+  implicitCopyConstructorHasConstParameter @79 :Bool;
   isAbstract @80 :Bool;
   isAggregate @81 :Bool;
   isAnyDestructorNoReturn @82 :Bool;
@@ -6008,15 +6041,19 @@ struct ClassTemplatePartialSpecializationDecl @0x9492104c4b2eff2e {
 struct EnumDecl @0x93540bfa73a13c84 {
   tagDecl @0:TagDecl;
   enumerators @1 :List(UInt64);
-  integerTypeRange @2 :TokenRange;
-  templateSpecializationKind @3 :TemplateSpecializationKind;
-  isClosed @4 :Bool;
-  isClosedFlag @5 :Bool;
-  isClosedNonFlag @6 :Bool;
-  isComplete @7 :Bool;
-  isFixed @8 :Bool;
-  isScoped @9 :Bool;
-  isScopedUsingClassTag @10 :Bool;
+  instantiatedFromMemberEnum @2 :UInt64;
+  instantiatedFromMemberEnumIsPresent @3 :UInt64;
+  integerTypeRange @4 :TokenRange;
+  templateInstantiationPattern @5 :UInt64;
+  templateInstantiationPatternIsPresent @6 :UInt64;
+  templateSpecializationKind @7 :TemplateSpecializationKind;
+  isClosed @8 :Bool;
+  isClosedFlag @9 :Bool;
+  isClosedNonFlag @10 :Bool;
+  isComplete @11 :Bool;
+  isFixed @12 :Bool;
+  isScoped @13 :Bool;
+  isScopedUsingClassTag @14 :Bool;
 }
 
 struct UnresolvedUsingTypenameDecl @0x8b74c3415940bb24 {
@@ -6029,8 +6066,10 @@ struct UnresolvedUsingTypenameDecl @0x8b74c3415940bb24 {
 
 struct TypedefNameDecl @0xe8f3a8fa9f84b388 {
   typeDecl @0:TypeDecl;
-  isModed @1 :Bool;
-  isTransparentTag @2 :Bool;
+  anonymousDeclarationWithTypedefName @1 :UInt64;
+  anonymousDeclarationWithTypedefNameIsPresent @2 :UInt64;
+  isModed @3 :Bool;
+  isTransparentTag @4 :Bool;
 }
 
 struct TypedefDecl @0xcabfd592ecdf73ec {
@@ -6039,6 +6078,8 @@ struct TypedefDecl @0xcabfd592ecdf73ec {
 
 struct TypeAliasDecl @0x98b3c141fd82bbdd {
   typedefNameDecl @0:TypedefNameDecl;
+  describedAliasTemplate @1 :UInt64;
+  describedAliasTemplateIsPresent @2 :UInt64;
 }
 
 struct ObjCTypeParamDecl @0xfea48cce2b1c50cd {
@@ -6156,6 +6197,7 @@ struct ObjCMethodDecl @0xf8c8c7d3c113456e {
   isVariadic @28 :Bool;
   parameters @29 :List(UInt64);
   selectorTokens @30 :List(UInt64);
+  declarationsInContext @31 :List(UInt64);
 }
 
 struct ObjCContainerDecl @0xaf9db5ae0b65ce9e {
@@ -6168,6 +6210,7 @@ struct ObjCContainerDecl @0xaf9db5ae0b65ce9e {
   instanceProperties @6 :List(UInt64);
   methods @7 :List(UInt64);
   properties @8 :List(UInt64);
+  declarationsInContext @9 :List(UInt64);
 }
 
 struct ObjCCategoryDecl @0xb673566cbe41a76d {
@@ -6259,6 +6302,7 @@ struct NamespaceDecl @0xd4713edcad196585 {
   isAnonymousNamespace @4 :Bool;
   isInline @5 :Bool;
   isOriginalNamespace @6 :Bool;
+  declarationsInContext @7 :List(UInt64);
 }
 
 struct NamespaceAliasDecl @0xd8966652a484c480 {
@@ -6276,6 +6320,7 @@ struct LinkageSpecDecl @0xb0f84c4a56c95eec {
   language @2 :LinkageSpecDeclLanguageIDs;
   rBraceToken @3 :UInt64;
   hasBraces @4 :Bool;
+  declarationsInContext @5 :List(UInt64);
 }
 
 struct LifetimeExtendedTemporaryDecl @0x829a6a0ac2b5baa8 {
@@ -6313,6 +6358,7 @@ struct FileScopeAsmDecl @0xa91b82b590024228 {
 
 struct ExternCContextDecl @0xd79e4560c3f80cbd {
   decl @0:Decl;
+  declarationsInContext @1 :List(UInt64);
 }
 
 struct ExportDecl @0xb9bc9642842c6d81 {
@@ -6320,6 +6366,7 @@ struct ExportDecl @0xb9bc9642842c6d81 {
   exportToken @1 :UInt64;
   rBraceToken @2 :UInt64;
   hasBraces @3 :Bool;
+  declarationsInContext @4 :List(UInt64);
 }
 
 struct EmptyDecl @0xdb55f7b2f60fd2a7 {

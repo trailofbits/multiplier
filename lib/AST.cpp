@@ -1509,7 +1509,7 @@ AttributeKind FromPasta(pasta::AttributeKind e) {
     case 238: return AttributeKind::OWNER;
     case 239: return AttributeKind::OWNERSHIP;
     case 240: return AttributeKind::PACKED;
-    case 241: return AttributeKind::PARAM_TYPESTATE;
+    case 241: return AttributeKind::PARAMETER_TYPESTATE;
     case 242: return AttributeKind::PATCHABLE_FUNCTION_ENTRY;
     case 243: return AttributeKind::POINTER;
     case 244: return AttributeKind::PRAGMA_CLANG_BSS_SECTION;
@@ -4037,7 +4037,7 @@ TypeLocClass FromPasta(pasta::TypeLocClass e) {
     case 29: return TypeLocClass::OBJ_C_OBJECT_POINTER;
     case 30: return TypeLocClass::OBJ_C_OBJECT;
     case 31: return TypeLocClass::OBJ_C_INTERFACE;
-    case 32: return TypeLocClass::OBJ_C_TYPE_PARAM;
+    case 32: return TypeLocClass::OBJ_C_TYPE_PARAMETER;
     case 33: return TypeLocClass::PACK_EXPANSION;
     case 34: return TypeLocClass::PARENTHESIS;
     case 35: return TypeLocClass::PIPE;

@@ -80,7 +80,7 @@ void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
       this->DeclVisitor::Accept(param);
     }
     if (auto body = decl.Body()) {
-      this->StmtVisitor::Accept(*body);
+      this->StmtVisitor::Accept(body.value());
     }
   }
 }
