@@ -192,6 +192,7 @@ class PersistentMap {
           K key;
           V val;
           SerializedKeyReader key_reader(key_data);
+          key_reader.Skip(sizeof(kId));
           KeyDeserializer::Read(key_reader, key);
 
           SerializedValueReader val_reader(val_data);

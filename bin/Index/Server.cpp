@@ -119,7 +119,7 @@ kj::Promise<void> Server::indexCompileCommands(
       context.getParams();
 
   mx::rpc::Multiplier::IndexCompileCommandsResults::Builder results =
-      context.getResults();
+      context.initResults();
 
   if (!params.hasCommands()) {
     LOG(WARNING)
@@ -202,8 +202,6 @@ kj::Promise<void> Server::indexCompileCommands(
 // Download a list of file info (file id, path).
 kj::Promise<void> Server::downloadFileList(
     DownloadFileListContext context) {
-  LOG(INFO)
-      << "Server::downloadFileList";
 
   std::vector<std::pair<mx::FileId, std::string>> paths;
   d->server_context.file_id_to_path.ScanPrefix(
@@ -211,23 +209,20 @@ kj::Promise<void> Server::downloadFileList(
       [=, &paths] (std::pair<mx::FileId, std::string> key, mx::Empty) {
         DCHECK_NE(key.first, mx::kInvalidEntityId);
         DCHECK(!key.second.empty());
-        LOG(INFO) << "Found " << key.first << " " << key.second;
         paths.emplace_back(std::move(key));
         return true;
       });
 
   auto num_files = static_cast<unsigned>(paths.size());
-  auto results = context.initResults();
-  auto files = results.initFiles(num_files);
+  auto results = context.getResults();
+  auto files_builder = results.initFiles(num_files);
   for (auto i = 0u; i < num_files; ++i) {
     const auto &path = paths[i];
-    mx::rpc::FileInfo::Builder info = files[i];
+    mx::rpc::FileInfo::Builder info = files_builder[i];
     info.setId(path.first);
     info.setPath(path.second);
-    LOG(INFO) << "Appending " << path.first << " " << path.second;
   }
 
-  LOG(INFO) << "Ready!";
   return kj::READY_NOW;
 }
 

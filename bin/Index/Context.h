@@ -31,7 +31,7 @@ enum : char {
   kMetaNameToId,
   kFileIdToPath,
   kFileIdToHash,
-  kFileHashToTokens,
+  kFileIdToTokens,
   kFileHashToFileId,
   kFilePathToFileId,
   kCodeHashToCodeId,
@@ -63,7 +63,7 @@ class ServerContext {
   mx::PersistentMap<kFileIdToHash, mx::FileId, std::string> file_id_to_hash;
 
   // Maps file IDs to the tokenized file contents.
-  mx::PersistentMap<kFileHashToTokens, mx::FileId, kj::Array<capnp::word>>
+  mx::PersistentMap<kFileIdToTokens, mx::FileId, kj::Array<capnp::word>>
       file_id_to_tokens;
 
   // Maps a sha256 hash of a file's contents to an ID for that file.

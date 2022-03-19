@@ -85,7 +85,6 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
   std::string path_str = file_path.lexically_normal().generic_string();
   server_context.file_id_to_path.Set({file_id, path_str}, {});
   server_context.file_path_to_file_id.Set(path_str, file_id);
-
   return {file_id, file_id == created_id};
 }
 
