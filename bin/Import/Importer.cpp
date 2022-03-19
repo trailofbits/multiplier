@@ -341,13 +341,20 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
       const pasta::CompileJob &job = job_;
 
       mx::rpc::CompileCommand::Builder cb = commands_builder[i++];
-      cb.setSourcePath(job.SourceFile().Path().generic_string());
-      cb.setCompilerPath(cc.ExecutablePath());
-      cb.setWorkingDirectory(job.WorkingDirectory().generic_string());
-      cb.setSystemRootDirectory(job.SystemRootDirectory().generic_string());
-      cb.setSystemRootIncludeDirectory(job.SystemRootIncludeDirectory().generic_string());
-      cb.setResourceDirectory(job.ResourceDirectory().generic_string());
-      cb.setInstallationDirectory(cc.InstallationDirectory().generic_string());
+      cb.setSourcePath(
+          job.SourceFile().Path().lexically_normal().generic_string());
+      cb.setCompilerPath(
+          cc.ExecutablePath().lexically_normal().generic_string());
+      cb.setWorkingDirectory(
+          job.WorkingDirectory().lexically_normal().generic_string());
+      cb.setSystemRootDirectory(
+          job.SystemRootDirectory().lexically_normal().generic_string());
+      cb.setSystemRootIncludeDirectory(
+          job.SystemRootIncludeDirectory().lexically_normal().generic_string());
+      cb.setResourceDirectory(
+          job.ResourceDirectory().lexically_normal().generic_string());
+      cb.setInstallationDirectory(
+          cc.InstallationDirectory().lexically_normal().generic_string());
 
       auto system_includes = cc.SystemIncludeDirectories();
       auto user_includes = cc.UserIncludeDirectories();
@@ -358,7 +365,7 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
           static_cast<unsigned>(system_includes.size()));
       for (const auto &ip : system_includes) {
         mx::rpc::IncludePath::Builder ipb = paths[j++];
-        ipb.setDirectory(ip.Path().generic_string());
+        ipb.setDirectory(ip.Path().lexically_normal().generic_string());
         ipb.setLocation(FromPasta(ip.Location()));
       }
 
@@ -367,7 +374,7 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
           static_cast<unsigned>(user_includes.size()));
       for (const auto &ip : user_includes) {
         mx::rpc::IncludePath::Builder ipb = paths[j++];
-        ipb.setDirectory(ip.Path().generic_string());
+        ipb.setDirectory(ip.Path().lexically_normal().generic_string());
         ipb.setLocation(FromPasta(ip.Location()));
       }
 
@@ -376,7 +383,7 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
           static_cast<unsigned>(frameworks.size()));
       for (const auto &ip : frameworks) {
         mx::rpc::IncludePath::Builder ipb = paths[j++];
-        ipb.setDirectory(ip.Path().generic_string());
+        ipb.setDirectory(ip.Path().lexically_normal().generic_string());
         ipb.setLocation(FromPasta(ip.Location()));
       }
 

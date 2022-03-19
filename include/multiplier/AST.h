@@ -9,6 +9,12 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
+#include <memory>
+#include <optional>
+#include <vector>
+
+#include "Types.h"
 
 namespace pasta {
 enum class DeclKind : unsigned;
@@ -252,6 +258,12 @@ enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
 }  // namespace pasta
 namespace mx {
+
+class FragmentImpl;
+class FileImpl;
+class Token;
+class TokenRange;
+
 enum class DeclKind : unsigned short {
   ACCESS_SPEC,
   BASE_USING,
@@ -4645,5 +4657,3095 @@ enum class TargetLanguage : unsigned short {
 };
 
 TargetLanguage FromPasta(pasta::TargetLanguage pasta_val);
+
+class Token;
+class TokenRange;
+class CXXBaseSpecifier;
+class TemplateArgument;
+class TemplateParameterList;
+class FileToken;
+class CompileJob;
+class CompileCommand;
+class IncludePath;
+class Compiler;
+namespace ast {
+class Token;
+class TokenRange;
+class CXXBaseSpecifier;
+class TemplateArgument;
+class TemplateParameterList;
+class FileToken;
+class CompileJob;
+class CompileCommand;
+class IncludePath;
+class Compiler;
+}  // namespace ast
+class Decl;
+class EmptyDecl;
+class ExportDecl;
+class ExternCContextDecl;
+class FileScopeAsmDecl;
+class FriendDecl;
+class FriendTemplateDecl;
+class ImportDecl;
+class LifetimeExtendedTemporaryDecl;
+class LinkageSpecDecl;
+class NamedDecl;
+class NamespaceAliasDecl;
+class NamespaceDecl;
+class ObjCCompatibleAliasDecl;
+class ObjCContainerDecl;
+class ObjCImplDecl;
+class ObjCImplementationDecl;
+class ObjCInterfaceDecl;
+class ObjCMethodDecl;
+class ObjCPropertyDecl;
+class ObjCPropertyImplDecl;
+class ObjCProtocolDecl;
+class PragmaCommentDecl;
+class PragmaDetectMismatchDecl;
+class RequiresExprBodyDecl;
+class StaticAssertDecl;
+class TemplateDecl;
+class TemplateTemplateParmDecl;
+class TranslationUnitDecl;
+class TypeDecl;
+class TypedefNameDecl;
+class UnresolvedUsingIfExistsDecl;
+class UnresolvedUsingTypenameDecl;
+class UsingDirectiveDecl;
+class UsingPackDecl;
+class UsingShadowDecl;
+class ValueDecl;
+class OMPDeclarativeDirectiveDecl;
+class OMPDeclarativeDirectiveValueDecl;
+class AccessSpecDecl;
+class BaseUsingDecl;
+class BindingDecl;
+class BlockDecl;
+class BuiltinTemplateDecl;
+class CapturedDecl;
+class ClassScopeFunctionSpecializationDecl;
+class ConceptDecl;
+class ConstructorUsingShadowDecl;
+class DeclaratorDecl;
+class EnumConstantDecl;
+class FieldDecl;
+class FunctionDecl;
+class IndirectFieldDecl;
+class LabelDecl;
+class MSGuidDecl;
+class MSPropertyDecl;
+class NonTypeTemplateParmDecl;
+class OMPAllocateDecl;
+class OMPDeclareMapperDecl;
+class OMPDeclareReductionDecl;
+class OMPRequiresDecl;
+class OMPThreadPrivateDecl;
+class ObjCAtDefsFieldDecl;
+class ObjCCategoryDecl;
+class ObjCCategoryImplDecl;
+class ObjCIvarDecl;
+class ObjCTypeParamDecl;
+class RedeclarableTemplateDecl;
+class TagDecl;
+class TemplateParamObjectDecl;
+class TemplateTypeParmDecl;
+class TypeAliasDecl;
+class TypeAliasTemplateDecl;
+class TypedefDecl;
+class UnresolvedUsingValueDecl;
+class UsingDecl;
+class UsingEnumDecl;
+class VarDecl;
+class VarTemplateDecl;
+class VarTemplateSpecializationDecl;
+class CXXDeductionGuideDecl;
+class CXXMethodDecl;
+class ClassTemplateDecl;
+class DecompositionDecl;
+class EnumDecl;
+class FunctionTemplateDecl;
+class ImplicitParamDecl;
+class OMPCapturedExprDecl;
+class ParmVarDecl;
+class RecordDecl;
+class VarTemplatePartialSpecializationDecl;
+class CXXConstructorDecl;
+class CXXConversionDecl;
+class CXXDestructorDecl;
+class CXXRecordDecl;
+class ClassTemplateSpecializationDecl;
+class ClassTemplatePartialSpecializationDecl;
+class Stmt;
+class SwitchCase;
+class SwitchStmt;
+class ValueStmt;
+class WhileStmt;
+class AsmStmt;
+class AttributedStmt;
+class BreakStmt;
+class CXXCatchStmt;
+class CXXForRangeStmt;
+class CXXTryStmt;
+class CapturedStmt;
+class CaseStmt;
+class CompoundStmt;
+class ContinueStmt;
+class CoreturnStmt;
+class CoroutineBodyStmt;
+class DeclStmt;
+class DefaultStmt;
+class DoStmt;
+class Expr;
+class ExpressionTraitExpr;
+class ExtVectorElementExpr;
+class FixedPointLiteral;
+class FloatingLiteral;
+class ForStmt;
+class FullExpr;
+class FunctionParmPackExpr;
+class GCCAsmStmt;
+class GNUNullExpr;
+class GenericSelectionExpr;
+class GotoStmt;
+class IfStmt;
+class ImaginaryLiteral;
+class ImplicitValueInitExpr;
+class IndirectGotoStmt;
+class InitListExpr;
+class IntegerLiteral;
+class LabelStmt;
+class LambdaExpr;
+class MSAsmStmt;
+class MSDependentExistsStmt;
+class MSPropertyRefExpr;
+class MSPropertySubscriptExpr;
+class MaterializeTemporaryExpr;
+class MatrixSubscriptExpr;
+class MemberExpr;
+class NoInitExpr;
+class NullStmt;
+class OMPArraySectionExpr;
+class OMPArrayShapingExpr;
+class OMPCanonicalLoop;
+class OMPExecutableDirective;
+class OMPFlushDirective;
+class OMPInteropDirective;
+class OMPIteratorExpr;
+class OMPLoopBasedDirective;
+class OMPLoopDirective;
+class OMPMaskedDirective;
+class OMPMasterDirective;
+class OMPMasterTaskLoopDirective;
+class OMPMasterTaskLoopSimdDirective;
+class OMPOrderedDirective;
+class OMPParallelDirective;
+class OMPParallelForDirective;
+class OMPParallelForSimdDirective;
+class OMPParallelMasterDirective;
+class OMPParallelMasterTaskLoopDirective;
+class OMPParallelMasterTaskLoopSimdDirective;
+class OMPParallelSectionsDirective;
+class OMPScanDirective;
+class OMPSectionDirective;
+class OMPSectionsDirective;
+class OMPSimdDirective;
+class OMPSingleDirective;
+class OMPTargetDataDirective;
+class OMPTargetDirective;
+class OMPTargetEnterDataDirective;
+class OMPTargetExitDataDirective;
+class OMPTargetParallelDirective;
+class OMPTargetParallelForDirective;
+class OMPTargetParallelForSimdDirective;
+class OMPTargetSimdDirective;
+class OMPTargetTeamsDirective;
+class OMPTargetTeamsDistributeDirective;
+class OMPTargetTeamsDistributeParallelForDirective;
+class OMPTargetTeamsDistributeParallelForSimdDirective;
+class OMPTargetTeamsDistributeSimdDirective;
+class OMPTargetUpdateDirective;
+class OMPTaskDirective;
+class OMPTaskLoopDirective;
+class OMPTaskLoopSimdDirective;
+class OMPTaskgroupDirective;
+class OMPTaskwaitDirective;
+class OMPTaskyieldDirective;
+class OMPTeamsDirective;
+class OMPTeamsDistributeDirective;
+class OMPTeamsDistributeParallelForDirective;
+class OMPTeamsDistributeParallelForSimdDirective;
+class OMPTeamsDistributeSimdDirective;
+class OMPTileDirective;
+class OMPUnrollDirective;
+class ObjCArrayLiteral;
+class ObjCAtCatchStmt;
+class ObjCAtFinallyStmt;
+class ObjCAtSynchronizedStmt;
+class ObjCAtThrowStmt;
+class ObjCAtTryStmt;
+class ObjCAutoreleasePoolStmt;
+class ObjCAvailabilityCheckExpr;
+class ObjCBoolLiteralExpr;
+class ObjCBoxedExpr;
+class ObjCDictionaryLiteral;
+class ObjCEncodeExpr;
+class ObjCForCollectionStmt;
+class ObjCIndirectCopyRestoreExpr;
+class ObjCIsaExpr;
+class ObjCIvarRefExpr;
+class ObjCMessageExpr;
+class ObjCPropertyRefExpr;
+class ObjCProtocolExpr;
+class ObjCSelectorExpr;
+class ObjCStringLiteral;
+class ObjCSubscriptRefExpr;
+class OffsetOfExpr;
+class OpaqueValueExpr;
+class OverloadExpr;
+class PackExpansionExpr;
+class ParenExpr;
+class ParenListExpr;
+class PredefinedExpr;
+class PseudoObjectExpr;
+class RecoveryExpr;
+class RequiresExpr;
+class ReturnStmt;
+class SEHExceptStmt;
+class SEHFinallyStmt;
+class SEHLeaveStmt;
+class SEHTryStmt;
+class SYCLUniqueStableNameExpr;
+class ShuffleVectorExpr;
+class SizeOfPackExpr;
+class SourceLocExpr;
+class StmtExpr;
+class StringLiteral;
+class SubstNonTypeTemplateParmExpr;
+class SubstNonTypeTemplateParmPackExpr;
+class TypeTraitExpr;
+class TypoExpr;
+class UnaryExprOrTypeTraitExpr;
+class UnaryOperator;
+class UnresolvedLookupExpr;
+class UnresolvedMemberExpr;
+class VAArgExpr;
+class AbstractConditionalOperator;
+class AddrLabelExpr;
+class ArrayInitIndexExpr;
+class ArrayInitLoopExpr;
+class ArraySubscriptExpr;
+class ArrayTypeTraitExpr;
+class AsTypeExpr;
+class AtomicExpr;
+class BinaryConditionalOperator;
+class BinaryOperator;
+class BlockExpr;
+class CXXBindTemporaryExpr;
+class CXXBoolLiteralExpr;
+class CXXConstructExpr;
+class CXXDefaultArgExpr;
+class CXXDefaultInitExpr;
+class CXXDeleteExpr;
+class CXXDependentScopeMemberExpr;
+class CXXFoldExpr;
+class CXXInheritedCtorInitExpr;
+class CXXNewExpr;
+class CXXNoexceptExpr;
+class CXXNullPtrLiteralExpr;
+class CXXPseudoDestructorExpr;
+class CXXRewrittenBinaryOperator;
+class CXXScalarValueInitExpr;
+class CXXStdInitializerListExpr;
+class CXXTemporaryObjectExpr;
+class CXXThisExpr;
+class CXXThrowExpr;
+class CXXTypeidExpr;
+class CXXUnresolvedConstructExpr;
+class CXXUuidofExpr;
+class CallExpr;
+class CastExpr;
+class CharacterLiteral;
+class ChooseExpr;
+class CompoundAssignOperator;
+class CompoundLiteralExpr;
+class ConceptSpecializationExpr;
+class ConditionalOperator;
+class ConstantExpr;
+class ConvertVectorExpr;
+class CoroutineSuspendExpr;
+class CoyieldExpr;
+class DeclRefExpr;
+class DependentCoawaitExpr;
+class DependentScopeDeclRefExpr;
+class DesignatedInitExpr;
+class DesignatedInitUpdateExpr;
+class ExplicitCastExpr;
+class ExprWithCleanups;
+class ImplicitCastExpr;
+class OMPAtomicDirective;
+class OMPBarrierDirective;
+class OMPCancelDirective;
+class OMPCancellationPointDirective;
+class OMPCriticalDirective;
+class OMPDepobjDirective;
+class OMPDispatchDirective;
+class OMPDistributeDirective;
+class OMPDistributeParallelForDirective;
+class OMPDistributeParallelForSimdDirective;
+class OMPDistributeSimdDirective;
+class OMPForDirective;
+class OMPForSimdDirective;
+class ObjCBridgedCastExpr;
+class UserDefinedLiteral;
+class BuiltinBitCastExpr;
+class CStyleCastExpr;
+class CUDAKernelCallExpr;
+class CXXFunctionalCastExpr;
+class CXXMemberCallExpr;
+class CXXNamedCastExpr;
+class CXXOperatorCallExpr;
+class CXXReinterpretCastExpr;
+class CXXStaticCastExpr;
+class CoawaitExpr;
+class CXXAddrspaceCastExpr;
+class CXXConstCastExpr;
+class CXXDynamicCastExpr;
+class Compiler {
+ protected:
+  std::shared_ptr<ast::Compiler> data;
+
+ public:
+  CompilerName name(void) const noexcept;
+  TargetLanguage target_language(void) const noexcept;
+  std::string_view host_target_triple(void) const noexcept;
+  std::string_view target_triple(void) const noexcept;
+  std::filesystem::path executable_path(void) const noexcept;
+  std::filesystem::path resource_directory(void) const noexcept;
+  std::filesystem::path system_root_directory(void) const noexcept;
+  std::filesystem::path system_root_include_directory(void) const noexcept;
+  std::filesystem::path installation_directory(void) const noexcept;
+  std::vector<IncludePath> system_include_directories(void) const noexcept;
+  std::vector<IncludePath> user_include_directories(void) const noexcept;
+  std::vector<IncludePath> framework_directories(void) const noexcept;
+};
+
+class IncludePath {
+ protected:
+  std::shared_ptr<ast::IncludePath> data;
+
+ public:
+  std::filesystem::path path(void) const noexcept;
+  IncludePathLocation location(void) const noexcept;
+};
+
+class CompileCommand {
+ protected:
+  std::shared_ptr<ast::CompileCommand> data;
+
+ public:
+  std::vector<std::string_view> arguments(void) const noexcept;
+  std::filesystem::path working_directory(void) const noexcept;
+};
+
+class CompileJob {
+ protected:
+  std::shared_ptr<ast::CompileJob> data;
+
+ public:
+  std::vector<std::string_view> arguments(void) const noexcept;
+  std::filesystem::path working_directory(void) const noexcept;
+  std::filesystem::path resource_directory(void) const noexcept;
+  std::filesystem::path system_root_directory(void) const noexcept;
+  std::filesystem::path system_root_include_directory(void) const noexcept;
+  std::string_view target_triple(void) const noexcept;
+  std::string_view auxiliary_target_triple(void) const noexcept;
+};
+
+class TemplateParameterList {
+ protected:
+  std::shared_ptr<FragmentImpl> fragment;
+  std::shared_ptr<ast::TemplateParameterList> data;
+
+ public:
+  unsigned num_parameters(void) const noexcept;
+  unsigned num_required_parameters(void) const noexcept;
+  unsigned depth(void) const noexcept;
+  bool has_unexpanded_parameter_pack(void) const noexcept;
+  bool has_parameter_pack(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  Token left_angle_token(void) const noexcept;
+  Token right_angle_token(void) const noexcept;
+  TokenRange token_range(void) const noexcept;
+  std::vector<NamedDecl> parameters(void) const noexcept;
+};
+
+class TemplateArgument {
+ protected:
+  std::shared_ptr<FragmentImpl> fragment;
+  std::shared_ptr<ast::TemplateArgument> data;
+
+ public:
+  TemplateArgumentKind kind(void) const noexcept;
+  bool is_null(void) const noexcept;
+  bool is_dependent(void) const noexcept;
+  bool is_instantiation_dependent(void) const noexcept;
+  bool contains_unexpanded_parameter_pack(void) const noexcept;
+  bool is_pack_expansion(void) const noexcept;
+  std::optional<ValueDecl> as_declaration(void) const noexcept;
+};
+
+class CXXBaseSpecifier {
+ protected:
+  std::shared_ptr<FragmentImpl> fragment;
+  std::shared_ptr<ast::CXXBaseSpecifier> data;
+
+ public:
+  TokenRange token_range(void) const noexcept;
+  Token base_type_token(void) const noexcept;
+  bool is_virtual(void) const noexcept;
+  TagTypeKind base_kind(void) const noexcept;
+  bool is_pack_expansion(void) const noexcept;
+  bool constructors_are_inherited(void) const noexcept;
+  std::optional<Token> ellipsis(void) const noexcept;
+  AccessSpecifier semantic_access_specifier(void) const noexcept;
+  AccessSpecifier lexical_access_specifier(void) const noexcept;
+};
+
+class Stmt {
+ protected:
+  std::shared_ptr<FragmentImpl> fragment;
+  StatementId id;
+
+ public:
+  Token begin_token(void) const noexcept;
+  Token end_token(void) const noexcept;
+  TokenRange token_range(void) const noexcept;
+  StmtKind kind(void) const noexcept;
+};
+
+class SEHTryStmt : public Stmt {
+ public:
+  SEHExceptStmt except_handler(void) const noexcept;
+  SEHFinallyStmt finally_handler(void) const noexcept;
+  bool is_cxx_try(void) const noexcept;
+  CompoundStmt try_block(void) const noexcept;
+  Token try_token(void) const noexcept;
+};
+
+class SEHLeaveStmt : public Stmt {
+ public:
+  Token leave_token(void) const noexcept;
+};
+
+class SEHFinallyStmt : public Stmt {
+ public:
+  CompoundStmt block(void) const noexcept;
+  Token finally_token(void) const noexcept;
+};
+
+class SEHExceptStmt : public Stmt {
+ public:
+  CompoundStmt block(void) const noexcept;
+  Token except_token(void) const noexcept;
+};
+
+class ReturnStmt : public Stmt {
+ public:
+  std::optional<VarDecl> nrvo_candidate(void) const noexcept;
+  Token return_token(void) const noexcept;
+};
+
+class ObjCForCollectionStmt : public Stmt {
+ public:
+  Token for_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ObjCAutoreleasePoolStmt : public Stmt {
+ public:
+  Token at_token(void) const noexcept;
+};
+
+class ObjCAtTryStmt : public Stmt {
+ public:
+  Token at_try_token(void) const noexcept;
+  ObjCAtFinallyStmt finally_statement(void) const noexcept;
+  std::vector<ObjCAtCatchStmt> catch_statements(void) const noexcept;
+};
+
+class ObjCAtThrowStmt : public Stmt {
+ public:
+  Token throw_token(void) const noexcept;
+};
+
+class ObjCAtSynchronizedStmt : public Stmt {
+ public:
+  Token at_synchronized_token(void) const noexcept;
+  CompoundStmt synch_body(void) const noexcept;
+};
+
+class ObjCAtFinallyStmt : public Stmt {
+ public:
+  Token at_finally_token(void) const noexcept;
+};
+
+class ObjCAtCatchStmt : public Stmt {
+ public:
+  Token at_catch_token(void) const noexcept;
+  VarDecl catch_parameter_declaration(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool has_ellipsis(void) const noexcept;
+};
+
+class OMPExecutableDirective : public Stmt {
+ public:
+  CapturedStmt innermost_captured_statement(void) const noexcept;
+  bool has_associated_statement(void) const noexcept;
+  bool is_standalone_directive(void) const noexcept;
+};
+
+class OMPDispatchDirective : public OMPExecutableDirective {
+ public:
+  Token target_call_token(void) const noexcept;
+};
+
+class OMPDepobjDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPCriticalDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPCancellationPointDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPCancelDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPBarrierDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPAtomicDirective : public OMPExecutableDirective {
+ public:
+  bool is_postfix_update(void) const noexcept;
+  bool is_xlhs_in_rhs_part(void) const noexcept;
+};
+
+class OMPTeamsDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTaskyieldDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTaskwaitDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTaskgroupDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTaskDirective : public OMPExecutableDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPTargetUpdateDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTargetTeamsDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTargetParallelDirective : public OMPExecutableDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPTargetExitDataDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTargetEnterDataDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTargetDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPTargetDataDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPSingleDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPSectionsDirective : public OMPExecutableDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPSectionDirective : public OMPExecutableDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPScanDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPParallelSectionsDirective : public OMPExecutableDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPParallelMasterDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPParallelDirective : public OMPExecutableDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPOrderedDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPMasterDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPMaskedDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPLoopBasedDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPUnrollDirective : public OMPLoopBasedDirective {
+ public:
+};
+
+class OMPTileDirective : public OMPLoopBasedDirective {
+ public:
+};
+
+class OMPLoopDirective : public OMPLoopBasedDirective {
+ public:
+};
+
+class OMPForSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPForDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPDistributeSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPDistributeParallelForDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPDistributeDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPTeamsDistributeDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTaskLoopSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTaskLoopDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTargetSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPTargetParallelForDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPParallelForSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPParallelForDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
+ public:
+};
+
+class OMPMasterTaskLoopDirective : public OMPLoopDirective {
+ public:
+  bool has_cancel(void) const noexcept;
+};
+
+class OMPInteropDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPFlushDirective : public OMPExecutableDirective {
+ public:
+};
+
+class OMPCanonicalLoop : public Stmt {
+ public:
+  CapturedStmt distance_func(void) const noexcept;
+  CapturedStmt loop_variable_func(void) const noexcept;
+  DeclRefExpr loop_variable_reference(void) const noexcept;
+};
+
+class NullStmt : public Stmt {
+ public:
+  Token semi_token(void) const noexcept;
+  bool has_leading_empty_macro(void) const noexcept;
+};
+
+class MSDependentExistsStmt : public Stmt {
+ public:
+  Token keyword_token(void) const noexcept;
+  CompoundStmt sub_statement(void) const noexcept;
+  bool is_if_exists(void) const noexcept;
+  bool is_if_not_exists(void) const noexcept;
+};
+
+class IndirectGotoStmt : public Stmt {
+ public:
+  LabelDecl constant_target(void) const noexcept;
+  Token goto_token(void) const noexcept;
+  Token star_token(void) const noexcept;
+};
+
+class IfStmt : public Stmt {
+ public:
+  std::optional<VarDecl> condition_variable(void) const noexcept;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
+  Token else_token(void) const noexcept;
+  Token if_token(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool has_else_storage(void) const noexcept;
+  bool has_initializer_storage(void) const noexcept;
+  bool has_variable_storage(void) const noexcept;
+  bool is_constexpr(void) const noexcept;
+  bool is_obj_c_availability_check(void) const noexcept;
+};
+
+class GotoStmt : public Stmt {
+ public:
+  Token goto_token(void) const noexcept;
+  LabelDecl label(void) const noexcept;
+  Token label_token(void) const noexcept;
+};
+
+class ForStmt : public Stmt {
+ public:
+  std::optional<VarDecl> condition_variable(void) const noexcept;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
+  Token for_token(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class DoStmt : public Stmt {
+ public:
+  Token do_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  Token while_token(void) const noexcept;
+};
+
+class DeclStmt : public Stmt {
+ public:
+  bool is_single_declaration(void) const noexcept;
+};
+
+class CoroutineBodyStmt : public Stmt {
+ public:
+  VarDecl promise_declaration(void) const noexcept;
+  bool has_dependent_promise_type(void) const noexcept;
+};
+
+class CoreturnStmt : public Stmt {
+ public:
+  Token keyword_token(void) const noexcept;
+  bool is_implicit(void) const noexcept;
+};
+
+class ContinueStmt : public Stmt {
+ public:
+  Token continue_token(void) const noexcept;
+};
+
+class CompoundStmt : public Stmt {
+ public:
+  Token l_brac_token(void) const noexcept;
+  Token r_brac_token(void) const noexcept;
+};
+
+class CapturedStmt : public Stmt {
+ public:
+  CapturedDecl captured_declaration(void) const noexcept;
+  RecordDecl captured_record_declaration(void) const noexcept;
+  CapturedRegionKind captured_region_kind(void) const noexcept;
+};
+
+class CXXTryStmt : public Stmt {
+ public:
+  CompoundStmt try_block(void) const noexcept;
+  Token try_token(void) const noexcept;
+  std::vector<CXXCatchStmt> handlers(void) const noexcept;
+};
+
+class CXXForRangeStmt : public Stmt {
+ public:
+  DeclStmt begin_statement(void) const noexcept;
+  Token coawait_token(void) const noexcept;
+  Token colon_token(void) const noexcept;
+  DeclStmt end_statement(void) const noexcept;
+  Token for_token(void) const noexcept;
+  DeclStmt loop_variable_statement(void) const noexcept;
+  VarDecl loop_variable(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  DeclStmt range_statement(void) const noexcept;
+};
+
+class CXXCatchStmt : public Stmt {
+ public:
+  Token catch_token(void) const noexcept;
+  VarDecl exception_declaration(void) const noexcept;
+};
+
+class BreakStmt : public Stmt {
+ public:
+  Token break_token(void) const noexcept;
+};
+
+class AsmStmt : public Stmt {
+ public:
+  std::string_view generate_assembly_string(void) const noexcept;
+  Token assembly_token(void) const noexcept;
+  bool is_simple(void) const noexcept;
+  bool is_volatile(void) const noexcept;
+  std::vector<std::string_view> output_constraints(void) const noexcept;
+  std::vector<std::string_view> input_constraints(void) const noexcept;
+  std::vector<std::string_view> clobbers(void) const noexcept;
+};
+
+class MSAsmStmt : public AsmStmt {
+ public:
+  std::vector<std::string_view> all_constraints(void) const noexcept;
+  std::string_view assembly_string(void) const noexcept;
+  Token l_brace_token(void) const noexcept;
+  bool has_braces(void) const noexcept;
+};
+
+class GCCAsmStmt : public AsmStmt {
+ public:
+  StringLiteral assembly_string(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_assembly_goto(void) const noexcept;
+  std::vector<AddrLabelExpr> labels(void) const noexcept;
+  std::vector<StringLiteral> output_constraint_literals(void) const noexcept;
+  std::vector<std::string_view> output_names(void) const noexcept;
+  std::vector<StringLiteral> input_constraint_literals(void) const noexcept;
+  std::vector<std::string_view> input_names(void) const noexcept;
+  std::vector<StringLiteral> clobber_string_literals(void) const noexcept;
+  std::vector<AddrLabelExpr> label_expressions(void) const noexcept;
+  std::vector<std::string_view> label_names(void) const noexcept;
+};
+
+class WhileStmt : public Stmt {
+ public:
+  std::optional<VarDecl> condition_variable(void) const noexcept;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  Token while_token(void) const noexcept;
+  bool has_variable_storage(void) const noexcept;
+};
+
+class ValueStmt : public Stmt {
+ public:
+};
+
+class LabelStmt : public ValueStmt {
+ public:
+  LabelDecl declaration(void) const noexcept;
+  Token identifier_token(void) const noexcept;
+  std::string_view name(void) const noexcept;
+  bool is_side_entry(void) const noexcept;
+};
+
+class Expr : public ValueStmt {
+ public:
+  bool has_side_effects(void) const noexcept;
+  bool contains_errors(void) const noexcept;
+  bool contains_unexpanded_parameter_pack(void) const noexcept;
+  Token expression_token(void) const noexcept;
+  std::optional<ObjCPropertyRefExpr> obj_c_property(void) const noexcept;
+  ExprObjectKind object_kind(void) const noexcept;
+  std::optional<FieldDecl> source_bit_field(void) const noexcept;
+  ExprValueKind value_kind(void) const noexcept;
+  bool has_non_trivial_call(void) const noexcept;
+  bool is_default_argument(void) const noexcept;
+  bool is_gl_value(void) const noexcept;
+  bool is_implicit_cxx_this(void) const noexcept;
+  bool is_instantiation_dependent(void) const noexcept;
+  bool is_known_to_have_boolean_value(void) const noexcept;
+  bool is_l_value(void) const noexcept;
+  bool is_objcgc_candidate(void) const noexcept;
+  bool is_obj_c_self_expression(void) const noexcept;
+  bool is_ordinary_or_bit_field_object(void) const noexcept;
+  bool is_pr_value(void) const noexcept;
+  bool is_read_if_discarded_in_c_plus_plus11(void) const noexcept;
+  bool is_type_dependent(void) const noexcept;
+  bool is_value_dependent(void) const noexcept;
+  bool is_x_value(void) const noexcept;
+  bool refers_to_bit_field(void) const noexcept;
+  bool refers_to_global_register_variable(void) const noexcept;
+  bool refers_to_matrix_element(void) const noexcept;
+  bool refers_to_vector_element(void) const noexcept;
+};
+
+class DesignatedInitUpdateExpr : public Expr {
+ public:
+  InitListExpr updater(void) const noexcept;
+};
+
+class DesignatedInitExpr : public Expr {
+ public:
+  TokenRange designators_source_range(void) const noexcept;
+  Token equal_or_colon_token(void) const noexcept;
+  bool is_direct_initializer(void) const noexcept;
+  bool uses_gnu_syntax(void) const noexcept;
+};
+
+class DependentScopeDeclRefExpr : public Expr {
+ public:
+  Token l_angle_token(void) const noexcept;
+  Token r_angle_token(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  bool has_explicit_template_arguments(void) const noexcept;
+  bool has_template_keyword(void) const noexcept;
+};
+
+class DependentCoawaitExpr : public Expr {
+ public:
+  Token keyword_token(void) const noexcept;
+  UnresolvedLookupExpr operator_coawait_lookup(void) const noexcept;
+};
+
+class DeclRefExpr : public Expr {
+ public:
+  ValueDecl declaration(void) const noexcept;
+  NamedDecl found_declaration(void) const noexcept;
+  Token l_angle_token(void) const noexcept;
+  Token r_angle_token(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  bool had_multiple_candidates(void) const noexcept;
+  bool has_explicit_template_arguments(void) const noexcept;
+  bool has_qualifier(void) const noexcept;
+  bool has_template_kw_and_arguments_info(void) const noexcept;
+  bool has_template_keyword(void) const noexcept;
+  NonOdrUseReason is_non_odr_use(void) const noexcept;
+  bool refers_to_enclosing_variable_or_capture(void) const noexcept;
+};
+
+class CoroutineSuspendExpr : public Expr {
+ public:
+  Token keyword_token(void) const noexcept;
+  OpaqueValueExpr opaque_value(void) const noexcept;
+};
+
+class CoawaitExpr : public CoroutineSuspendExpr {
+ public:
+  bool is_implicit(void) const noexcept;
+};
+
+class CoyieldExpr : public CoroutineSuspendExpr {
+ public:
+};
+
+class ConvertVectorExpr : public Expr {
+ public:
+  Token builtin_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ConceptSpecializationExpr : public Expr {
+ public:
+  std::vector<TemplateArgument> template_arguments(void) const noexcept;
+  bool is_satisfied(void) const noexcept;
+};
+
+class CompoundLiteralExpr : public Expr {
+ public:
+  Token l_paren_token(void) const noexcept;
+  bool is_file_scope(void) const noexcept;
+};
+
+class ChooseExpr : public Expr {
+ public:
+  Token builtin_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_condition_dependent(void) const noexcept;
+  bool is_condition_true(void) const noexcept;
+};
+
+class CharacterLiteral : public Expr {
+ public:
+  Token token(void) const noexcept;
+};
+
+class CastExpr : public Expr {
+ public:
+  CastKind cast_kind(void) const noexcept;
+  std::string_view cast_kind_name(void) const noexcept;
+  std::optional<NamedDecl> conversion_function(void) const noexcept;
+  std::optional<FieldDecl> target_union_field(void) const noexcept;
+  bool has_stored_fp_features(void) const noexcept;
+};
+
+class ImplicitCastExpr : public CastExpr {
+ public:
+  bool is_part_of_explicit_cast(void) const noexcept;
+};
+
+class ExplicitCastExpr : public CastExpr {
+ public:
+};
+
+class CXXNamedCastExpr : public ExplicitCastExpr {
+ public:
+  TokenRange angle_brackets(void) const noexcept;
+  std::string_view cast_name(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class CXXDynamicCastExpr : public CXXNamedCastExpr {
+ public:
+  bool is_always_null(void) const noexcept;
+};
+
+class CXXConstCastExpr : public CXXNamedCastExpr {
+ public:
+};
+
+class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
+ public:
+};
+
+class CXXStaticCastExpr : public CXXNamedCastExpr {
+ public:
+};
+
+class CXXReinterpretCastExpr : public CXXNamedCastExpr {
+ public:
+};
+
+class CXXFunctionalCastExpr : public ExplicitCastExpr {
+ public:
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_list_initialization(void) const noexcept;
+};
+
+class CStyleCastExpr : public ExplicitCastExpr {
+ public:
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class BuiltinBitCastExpr : public ExplicitCastExpr {
+ public:
+};
+
+class ObjCBridgedCastExpr : public ExplicitCastExpr {
+ public:
+  Token bridge_keyword_token(void) const noexcept;
+  ObjCBridgeCastKind bridge_kind(void) const noexcept;
+  std::string_view bridge_kind_name(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+};
+
+class CallExpr : public Expr {
+ public:
+  CallExprADLCallKind adl_call_kind(void) const noexcept;
+  std::optional<FunctionDecl> direct_callee(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool has_stored_fp_features(void) const noexcept;
+  bool has_unused_result_attribute(void) const noexcept;
+  bool is_builtin_assume_false(void) const noexcept;
+  bool is_call_to_std_move(void) const noexcept;
+  bool is_unevaluated_builtin_call(void) const noexcept;
+  bool uses_adl(void) const noexcept;
+};
+
+class CXXOperatorCallExpr : public CallExpr {
+ public:
+  OverloadedOperatorKind operator_(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  bool is_assignment_operation(void) const noexcept;
+  bool is_comparison_operation(void) const noexcept;
+  bool is_infix_binary_operation(void) const noexcept;
+};
+
+class CXXMemberCallExpr : public CallExpr {
+ public:
+  CXXMethodDecl method_declaration(void) const noexcept;
+  CXXRecordDecl record_declaration(void) const noexcept;
+};
+
+class CUDAKernelCallExpr : public CallExpr {
+ public:
+  CallExpr config(void) const noexcept;
+};
+
+class UserDefinedLiteral : public CallExpr {
+ public:
+  UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const noexcept;
+  Token ud_suffix_token(void) const noexcept;
+};
+
+class CXXUuidofExpr : public Expr {
+ public:
+  MSGuidDecl guid_declaration(void) const noexcept;
+  bool is_type_operand(void) const noexcept;
+};
+
+class CXXUnresolvedConstructExpr : public Expr {
+ public:
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_list_initialization(void) const noexcept;
+};
+
+class CXXTypeidExpr : public Expr {
+ public:
+  bool is_most_derived(void) const noexcept;
+  bool is_potentially_evaluated(void) const noexcept;
+  bool is_type_operand(void) const noexcept;
+};
+
+class CXXThrowExpr : public Expr {
+ public:
+  Token throw_token(void) const noexcept;
+  bool is_thrown_variable_in_scope(void) const noexcept;
+};
+
+class CXXThisExpr : public Expr {
+ public:
+  Token token(void) const noexcept;
+  bool is_implicit(void) const noexcept;
+};
+
+class CXXStdInitializerListExpr : public Expr {
+ public:
+};
+
+class CXXScalarValueInitExpr : public Expr {
+ public:
+  Token r_paren_token(void) const noexcept;
+};
+
+class CXXRewrittenBinaryOperator : public Expr {
+ public:
+  BinaryOperatorKind opcode(void) const noexcept;
+  std::string_view opcode_string(void) const noexcept;
+  BinaryOperatorKind operator_(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  bool is_assignment_operation(void) const noexcept;
+  bool is_comparison_operation(void) const noexcept;
+  bool is_reversed(void) const noexcept;
+};
+
+class CXXPseudoDestructorExpr : public Expr {
+ public:
+  Token colon_colon_token(void) const noexcept;
+  Token destroyed_type_token(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  Token tilde_token(void) const noexcept;
+  bool has_qualifier(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+};
+
+class CXXNullPtrLiteralExpr : public Expr {
+ public:
+  Token token(void) const noexcept;
+};
+
+class CXXNoexceptExpr : public Expr {
+ public:
+  bool value(void) const noexcept;
+};
+
+class CXXNewExpr : public Expr {
+ public:
+  bool does_usual_array_delete_want_size(void) const noexcept;
+  CXXConstructExpr construct_expression(void) const noexcept;
+  TokenRange direct_initializer_range(void) const noexcept;
+  CXXNewExprInitializationStyle initialization_style(void) const noexcept;
+  FunctionDecl operator_delete(void) const noexcept;
+  FunctionDecl operator_new(void) const noexcept;
+  TokenRange type_id_parentheses(void) const noexcept;
+  bool has_initializer(void) const noexcept;
+  bool is_array(void) const noexcept;
+  bool is_global_new(void) const noexcept;
+  bool is_parenthesis_type_id(void) const noexcept;
+  bool pass_alignment(void) const noexcept;
+  bool should_null_check_allocation(void) const noexcept;
+};
+
+class CXXInheritedCtorInitExpr : public Expr {
+ public:
+  bool constructs_virtual_base(void) const noexcept;
+  CXXConstructExprConstructionKind construction_kind(void) const noexcept;
+  CXXConstructorDecl constructor(void) const noexcept;
+  Token token(void) const noexcept;
+  bool inherited_from_virtual_base(void) const noexcept;
+};
+
+class CXXFoldExpr : public Expr {
+ public:
+  UnresolvedLookupExpr callee(void) const noexcept;
+  Token ellipsis_token(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  BinaryOperatorKind operator_(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_left_fold(void) const noexcept;
+  bool is_right_fold(void) const noexcept;
+};
+
+class CXXDependentScopeMemberExpr : public Expr {
+ public:
+  NamedDecl first_qualifier_found_in_scope(void) const noexcept;
+  Token l_angle_token(void) const noexcept;
+  Token member_token(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  Token r_angle_token(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  bool has_explicit_template_arguments(void) const noexcept;
+  bool has_template_keyword(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+  bool is_implicit_access(void) const noexcept;
+};
+
+class CXXDeleteExpr : public Expr {
+ public:
+  bool does_usual_array_delete_want_size(void) const noexcept;
+  FunctionDecl operator_delete(void) const noexcept;
+  bool is_array_form(void) const noexcept;
+  bool is_array_form_as_written(void) const noexcept;
+  bool is_global_delete(void) const noexcept;
+};
+
+class CXXDefaultInitExpr : public Expr {
+ public:
+  FieldDecl field(void) const noexcept;
+  Token used_token(void) const noexcept;
+};
+
+class CXXDefaultArgExpr : public Expr {
+ public:
+  ParmVarDecl parameter(void) const noexcept;
+  Token used_token(void) const noexcept;
+};
+
+class CXXConstructExpr : public Expr {
+ public:
+  CXXConstructExprConstructionKind construction_kind(void) const noexcept;
+  CXXConstructorDecl constructor(void) const noexcept;
+  Token token(void) const noexcept;
+  TokenRange parenthesis_or_brace_range(void) const noexcept;
+  bool had_multiple_candidates(void) const noexcept;
+  bool is_elidable(void) const noexcept;
+  bool is_list_initialization(void) const noexcept;
+  bool is_std_initializer_list_initialization(void) const noexcept;
+  bool requires_zero_initialization(void) const noexcept;
+};
+
+class CXXTemporaryObjectExpr : public CXXConstructExpr {
+ public:
+};
+
+class CXXBoolLiteralExpr : public Expr {
+ public:
+  Token token(void) const noexcept;
+  bool value(void) const noexcept;
+};
+
+class CXXBindTemporaryExpr : public Expr {
+ public:
+};
+
+class BlockExpr : public Expr {
+ public:
+  BlockDecl block_declaration(void) const noexcept;
+  Token caret_token(void) const noexcept;
+};
+
+class BinaryOperator : public Expr {
+ public:
+  BinaryOperatorKind opcode(void) const noexcept;
+  std::string_view opcode_string(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  bool has_stored_fp_features(void) const noexcept;
+  bool is_additive_operation(void) const noexcept;
+  bool is_assignment_operation(void) const noexcept;
+  bool is_bitwise_operation(void) const noexcept;
+  bool is_comma_operation(void) const noexcept;
+  bool is_comparison_operation(void) const noexcept;
+  bool is_compound_assignment_operation(void) const noexcept;
+  bool is_equality_operation(void) const noexcept;
+  bool is_logical_operation(void) const noexcept;
+  bool is_multiplicative_operation(void) const noexcept;
+  bool is_pointer_memory_operation(void) const noexcept;
+  bool is_relational_operation(void) const noexcept;
+  bool is_shift_assign_operation(void) const noexcept;
+  bool is_shift_operation(void) const noexcept;
+};
+
+class CompoundAssignOperator : public BinaryOperator {
+ public:
+};
+
+class AtomicExpr : public Expr {
+ public:
+  Token builtin_token(void) const noexcept;
+  AtomicExprAtomicOp operation(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_cmp_x_chg(void) const noexcept;
+  bool is_open_cl(void) const noexcept;
+  bool is_volatile(void) const noexcept;
+};
+
+class AsTypeExpr : public Expr {
+ public:
+  Token builtin_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ArrayTypeTraitExpr : public Expr {
+ public:
+  ArrayTypeTrait trait(void) const noexcept;
+};
+
+class ArraySubscriptExpr : public Expr {
+ public:
+  Token r_bracket_token(void) const noexcept;
+};
+
+class ArrayInitLoopExpr : public Expr {
+ public:
+  OpaqueValueExpr common_expression(void) const noexcept;
+};
+
+class ArrayInitIndexExpr : public Expr {
+ public:
+};
+
+class AddrLabelExpr : public Expr {
+ public:
+  Token amp_amp_token(void) const noexcept;
+  LabelDecl label(void) const noexcept;
+  Token label_token(void) const noexcept;
+};
+
+class AbstractConditionalOperator : public Expr {
+ public:
+  Token colon_token(void) const noexcept;
+  Token question_token(void) const noexcept;
+};
+
+class ConditionalOperator : public AbstractConditionalOperator {
+ public:
+};
+
+class BinaryConditionalOperator : public AbstractConditionalOperator {
+ public:
+  OpaqueValueExpr opaque_value(void) const noexcept;
+};
+
+class VAArgExpr : public Expr {
+ public:
+  Token builtin_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_microsoft_abi(void) const noexcept;
+};
+
+class UnaryOperator : public Expr {
+ public:
+  bool can_overflow(void) const noexcept;
+  UnaryOperatorKind opcode(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  bool has_stored_fp_features(void) const noexcept;
+  bool is_arithmetic_operation(void) const noexcept;
+  bool is_decrement_operation(void) const noexcept;
+  bool is_increment_decrement_operation(void) const noexcept;
+  bool is_increment_operation(void) const noexcept;
+  bool is_postfix(void) const noexcept;
+  bool is_prefix(void) const noexcept;
+};
+
+class UnaryExprOrTypeTraitExpr : public Expr {
+ public:
+  Token operator_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_argument_type(void) const noexcept;
+};
+
+class TypoExpr : public Expr {
+ public:
+};
+
+class TypeTraitExpr : public Expr {
+ public:
+  TypeTrait trait(void) const noexcept;
+  bool value(void) const noexcept;
+};
+
+class SubstNonTypeTemplateParmPackExpr : public Expr {
+ public:
+  NonTypeTemplateParmDecl parameter_pack(void) const noexcept;
+  Token parameter_pack_token(void) const noexcept;
+};
+
+class SubstNonTypeTemplateParmExpr : public Expr {
+ public:
+  Token name_token(void) const noexcept;
+  NonTypeTemplateParmDecl parameter(void) const noexcept;
+  bool is_reference_parameter(void) const noexcept;
+};
+
+class StringLiteral : public Expr {
+ public:
+  bool contains_non_ascii(void) const noexcept;
+  bool contains_non_ascii_or_null(void) const noexcept;
+  std::string_view bytes(void) const noexcept;
+  std::string_view string(void) const noexcept;
+  bool is_ascii(void) const noexcept;
+  bool is_pascal(void) const noexcept;
+  bool is_utf16(void) const noexcept;
+  bool is_utf32(void) const noexcept;
+  bool is_utf8(void) const noexcept;
+  bool is_wide(void) const noexcept;
+};
+
+class StmtExpr : public Expr {
+ public:
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  CompoundStmt sub_statement(void) const noexcept;
+};
+
+class SourceLocExpr : public Expr {
+ public:
+  std::string_view builtin_string(void) const noexcept;
+  SourceLocExprIdentKind identifier_kind(void) const noexcept;
+  Token token(void) const noexcept;
+  bool is_int_type(void) const noexcept;
+  bool is_string_type(void) const noexcept;
+};
+
+class SizeOfPackExpr : public Expr {
+ public:
+  Token operator_token(void) const noexcept;
+  NamedDecl pack(void) const noexcept;
+  Token pack_token(void) const noexcept;
+  std::vector<TemplateArgument> partial_arguments(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_partially_substituted(void) const noexcept;
+};
+
+class ShuffleVectorExpr : public Expr {
+ public:
+  Token builtin_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class SYCLUniqueStableNameExpr : public Expr {
+ public:
+  std::string_view compute_name(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  Token token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class RequiresExpr : public Expr {
+ public:
+  RequiresExprBodyDecl body(void) const noexcept;
+  std::vector<ParmVarDecl> local_parameters(void) const noexcept;
+  Token r_brace_token(void) const noexcept;
+  Token requires_kw_token(void) const noexcept;
+  bool is_satisfied(void) const noexcept;
+};
+
+class RecoveryExpr : public Expr {
+ public:
+};
+
+class PseudoObjectExpr : public Expr {
+ public:
+};
+
+class PredefinedExpr : public Expr {
+ public:
+  StringLiteral function_name(void) const noexcept;
+  PredefinedExprIdentKind identifier_kind(void) const noexcept;
+  std::string_view identifier_kind_name(void) const noexcept;
+  Token token(void) const noexcept;
+};
+
+class ParenListExpr : public Expr {
+ public:
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ParenExpr : public Expr {
+ public:
+  Token l_paren(void) const noexcept;
+  Token r_paren(void) const noexcept;
+};
+
+class PackExpansionExpr : public Expr {
+ public:
+  Token ellipsis_token(void) const noexcept;
+};
+
+class OverloadExpr : public Expr {
+ public:
+  Token l_angle_token(void) const noexcept;
+  Token name_token(void) const noexcept;
+  CXXRecordDecl naming_class(void) const noexcept;
+  Token r_angle_token(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  bool has_explicit_template_arguments(void) const noexcept;
+  bool has_template_keyword(void) const noexcept;
+};
+
+class UnresolvedMemberExpr : public OverloadExpr {
+ public:
+  Token member_token(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  bool has_unresolved_using(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+  bool is_implicit_access(void) const noexcept;
+};
+
+class UnresolvedLookupExpr : public OverloadExpr {
+ public:
+  bool is_overloaded(void) const noexcept;
+  bool requires_adl(void) const noexcept;
+};
+
+class OpaqueValueExpr : public Expr {
+ public:
+  Token token(void) const noexcept;
+  bool is_unique(void) const noexcept;
+};
+
+class OffsetOfExpr : public Expr {
+ public:
+  Token operator_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ObjCSubscriptRefExpr : public Expr {
+ public:
+  ObjCMethodDecl at_index_method_declaration(void) const noexcept;
+  Token r_bracket(void) const noexcept;
+  bool is_array_subscript_reference_expression(void) const noexcept;
+};
+
+class ObjCStringLiteral : public Expr {
+ public:
+  Token at_token(void) const noexcept;
+  StringLiteral string(void) const noexcept;
+};
+
+class ObjCSelectorExpr : public Expr {
+ public:
+  Token at_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ObjCProtocolExpr : public Expr {
+ public:
+  Token at_token(void) const noexcept;
+  ObjCProtocolDecl protocol(void) const noexcept;
+  Token protocol_id_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ObjCPropertyRefExpr : public Expr {
+ public:
+  ObjCInterfaceDecl class_receiver(void) const noexcept;
+  ObjCPropertyDecl explicit_property(void) const noexcept;
+  ObjCMethodDecl implicit_property_getter(void) const noexcept;
+  ObjCMethodDecl implicit_property_setter(void) const noexcept;
+  Token token(void) const noexcept;
+  Token receiver_token(void) const noexcept;
+  bool is_class_receiver(void) const noexcept;
+  bool is_explicit_property(void) const noexcept;
+  bool is_implicit_property(void) const noexcept;
+  bool is_messaging_getter(void) const noexcept;
+  bool is_messaging_setter(void) const noexcept;
+  bool is_object_receiver(void) const noexcept;
+  bool is_super_receiver(void) const noexcept;
+};
+
+class ObjCMessageExpr : public Expr {
+ public:
+  Token left_token(void) const noexcept;
+  ObjCMethodDecl method_declaration(void) const noexcept;
+  ObjCMethodFamily method_family(void) const noexcept;
+  ObjCInterfaceDecl receiver_interface(void) const noexcept;
+  ObjCMessageExprReceiverKind receiver_kind(void) const noexcept;
+  TokenRange receiver_range(void) const noexcept;
+  Token right_token(void) const noexcept;
+  Token selector_start_token(void) const noexcept;
+  Token super_token(void) const noexcept;
+  bool is_class_message(void) const noexcept;
+  bool is_delegate_initializer_call(void) const noexcept;
+  bool is_implicit(void) const noexcept;
+  bool is_instance_message(void) const noexcept;
+  std::vector<Token> selector_tokens(void) const noexcept;
+};
+
+class ObjCIvarRefExpr : public Expr {
+ public:
+  ObjCIvarDecl declaration(void) const noexcept;
+  Token token(void) const noexcept;
+  Token operation_token(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+  bool is_free_instance_variable(void) const noexcept;
+};
+
+class ObjCIsaExpr : public Expr {
+ public:
+  Token base_token_end(void) const noexcept;
+  Token isa_member_token(void) const noexcept;
+  Token operation_token(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+};
+
+class ObjCIndirectCopyRestoreExpr : public Expr {
+ public:
+  bool should_copy(void) const noexcept;
+};
+
+class ObjCEncodeExpr : public Expr {
+ public:
+  Token at_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ObjCDictionaryLiteral : public Expr {
+ public:
+  ObjCMethodDecl dictionary_with_objects_method(void) const noexcept;
+};
+
+class ObjCBoxedExpr : public Expr {
+ public:
+  Token at_token(void) const noexcept;
+  ObjCMethodDecl boxing_method(void) const noexcept;
+  bool is_expressible_as_constant_initializer(void) const noexcept;
+};
+
+class ObjCBoolLiteralExpr : public Expr {
+ public:
+  Token token(void) const noexcept;
+  bool value(void) const noexcept;
+};
+
+class ObjCAvailabilityCheckExpr : public Expr {
+ public:
+  bool has_version(void) const noexcept;
+};
+
+class ObjCArrayLiteral : public Expr {
+ public:
+  ObjCMethodDecl array_with_objects_method(void) const noexcept;
+};
+
+class OMPIteratorExpr : public Expr {
+ public:
+  Token iterator_kw_token(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class OMPArrayShapingExpr : public Expr {
+ public:
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class OMPArraySectionExpr : public Expr {
+ public:
+  Token colon_token_first(void) const noexcept;
+  Token colon_token_second(void) const noexcept;
+  Token r_bracket_token(void) const noexcept;
+};
+
+class NoInitExpr : public Expr {
+ public:
+};
+
+class MemberExpr : public Expr {
+ public:
+  Token l_angle_token(void) const noexcept;
+  ValueDecl member_declaration(void) const noexcept;
+  Token member_token(void) const noexcept;
+  Token operator_token(void) const noexcept;
+  Token r_angle_token(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  bool had_multiple_candidates(void) const noexcept;
+  bool has_explicit_template_arguments(void) const noexcept;
+  bool has_qualifier(void) const noexcept;
+  bool has_template_keyword(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+  bool is_implicit_access(void) const noexcept;
+  NonOdrUseReason is_non_odr_use(void) const noexcept;
+};
+
+class MatrixSubscriptExpr : public Expr {
+ public:
+  Token r_bracket_token(void) const noexcept;
+  bool is_incomplete(void) const noexcept;
+};
+
+class MaterializeTemporaryExpr : public Expr {
+ public:
+  ValueDecl extending_declaration(void) const noexcept;
+  LifetimeExtendedTemporaryDecl lifetime_extended_temporary_declaration(void) const noexcept;
+  StorageDuration storage_duration(void) const noexcept;
+  bool is_bound_to_lvalue_reference(void) const noexcept;
+  bool is_usable_in_constant_expressions(void) const noexcept;
+};
+
+class MSPropertySubscriptExpr : public Expr {
+ public:
+  Token r_bracket_token(void) const noexcept;
+};
+
+class MSPropertyRefExpr : public Expr {
+ public:
+  Token member_token(void) const noexcept;
+  MSPropertyDecl property_declaration(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+  bool is_implicit_access(void) const noexcept;
+};
+
+class LambdaExpr : public Expr {
+ public:
+  CXXMethodDecl call_operator(void) const noexcept;
+  LambdaCaptureDefault capture_default(void) const noexcept;
+  Token capture_default_token(void) const noexcept;
+  CompoundStmt compound_statement_body(void) const noexcept;
+  FunctionTemplateDecl dependent_call_operator(void) const noexcept;
+  std::vector<NamedDecl> explicit_template_parameters(void) const noexcept;
+  TokenRange introducer_range(void) const noexcept;
+  CXXRecordDecl lambda_class(void) const noexcept;
+  TemplateParameterList template_parameter_list(void) const noexcept;
+  bool has_explicit_parameters(void) const noexcept;
+  bool has_explicit_result_type(void) const noexcept;
+  bool is_generic_lambda(void) const noexcept;
+  bool is_mutable(void) const noexcept;
+};
+
+class IntegerLiteral : public Expr {
+ public:
+  Token token(void) const noexcept;
+};
+
+class InitListExpr : public Expr {
+ public:
+  std::optional<FieldDecl> initialized_field_in_union(void) const noexcept;
+  Token l_brace_token(void) const noexcept;
+  Token r_brace_token(void) const noexcept;
+  std::optional<InitListExpr> semantic_form(void) const noexcept;
+  std::optional<InitListExpr> syntactic_form(void) const noexcept;
+  bool had_array_range_designator(void) const noexcept;
+  bool has_array_filler(void) const noexcept;
+  bool is_explicit(void) const noexcept;
+  bool is_semantic_form(void) const noexcept;
+  bool is_string_literal_initializer(void) const noexcept;
+  bool is_syntactic_form(void) const noexcept;
+  bool is_transparent(void) const noexcept;
+};
+
+class ImplicitValueInitExpr : public Expr {
+ public:
+};
+
+class ImaginaryLiteral : public Expr {
+ public:
+};
+
+class GenericSelectionExpr : public Expr {
+ public:
+  Token default_token(void) const noexcept;
+  Token generic_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_result_dependent(void) const noexcept;
+};
+
+class GNUNullExpr : public Expr {
+ public:
+  Token token_token(void) const noexcept;
+};
+
+class FunctionParmPackExpr : public Expr {
+ public:
+  VarDecl parameter_pack(void) const noexcept;
+  Token parameter_pack_token(void) const noexcept;
+  std::vector<VarDecl> expansions(void) const noexcept;
+};
+
+class FullExpr : public Expr {
+ public:
+};
+
+class ExprWithCleanups : public FullExpr {
+ public:
+  bool cleanups_have_side_effects(void) const noexcept;
+};
+
+class ConstantExpr : public FullExpr {
+ public:
+  ConstantExprResultStorageKind result_storage_kind(void) const noexcept;
+  bool has_ap_value_result(void) const noexcept;
+  bool is_immediate_invocation(void) const noexcept;
+};
+
+class FloatingLiteral : public Expr {
+ public:
+  Token token(void) const noexcept;
+  bool is_exact(void) const noexcept;
+};
+
+class FixedPointLiteral : public Expr {
+ public:
+  Token token(void) const noexcept;
+};
+
+class ExtVectorElementExpr : public Expr {
+ public:
+  bool contains_duplicate_elements(void) const noexcept;
+  Token accessor_token(void) const noexcept;
+  bool is_arrow(void) const noexcept;
+};
+
+class ExpressionTraitExpr : public Expr {
+ public:
+  ExpressionTrait trait(void) const noexcept;
+  bool value(void) const noexcept;
+};
+
+class AttributedStmt : public ValueStmt {
+ public:
+  Token attribute_token(void) const noexcept;
+};
+
+class SwitchStmt : public Stmt {
+ public:
+  std::optional<VarDecl> condition_variable(void) const noexcept;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  Token switch_token(void) const noexcept;
+  bool has_initializer_storage(void) const noexcept;
+  bool has_variable_storage(void) const noexcept;
+  bool is_all_enum_cases_covered(void) const noexcept;
+};
+
+class SwitchCase : public Stmt {
+ public:
+  Token colon_token(void) const noexcept;
+  Token keyword_token(void) const noexcept;
+};
+
+class DefaultStmt : public SwitchCase {
+ public:
+  Token default_token(void) const noexcept;
+};
+
+class CaseStmt : public SwitchCase {
+ public:
+  bool case_statement_is_gnu_range(void) const noexcept;
+  Token case_token(void) const noexcept;
+  Token ellipsis_token(void) const noexcept;
+};
+
+class Decl {
+ protected:
+  std::shared_ptr<FragmentImpl> fragment;
+  DeclarationId id;
+
+ public:
+  AccessSpecifier access(void) const noexcept;
+  AccessSpecifier access_unsafe(void) const noexcept;
+  AvailabilityResult availability(void) const noexcept;
+  Token begin_token(void) const noexcept;
+  Token body_r_brace(void) const noexcept;
+  std::optional<TemplateDecl> described_template(void) const noexcept;
+  Token end_token(void) const noexcept;
+  DeclFriendObjectKind friend_object_kind(void) const noexcept;
+  DeclModuleOwnershipKind module_ownership_kind(void) const noexcept;
+  bool has_attributes(void) const noexcept;
+  bool has_defining_attribute(void) const noexcept;
+  bool has_owning_module(void) const noexcept;
+  bool has_tag_identifier_namespace(void) const noexcept;
+  bool is_canonical_declaration(void) const noexcept;
+  bool is_defined_outside_function_or_method(void) const noexcept;
+  bool is_deprecated(void) const noexcept;
+  bool is_first_declaration(void) const noexcept;
+  bool is_function_or_function_template(void) const noexcept;
+  bool is_implicit(void) const noexcept;
+  bool is_in_anonymous_namespace(void) const noexcept;
+  bool is_in_local_scope_for_instantiation(void) const noexcept;
+  bool is_in_std_namespace(void) const noexcept;
+  bool is_invalid_declaration(void) const noexcept;
+  bool is_module_private(void) const noexcept;
+  bool is_out_of_line(void) const noexcept;
+  bool is_parameter_pack(void) const noexcept;
+  bool is_referenced(void) const noexcept;
+  bool is_template_declaration(void) const noexcept;
+  bool is_template_parameter(void) const noexcept;
+  bool is_template_parameter_pack(void) const noexcept;
+  bool is_templated(void) const noexcept;
+  bool is_this_declaration_referenced(void) const noexcept;
+  bool is_top_level_declaration_in_obj_c_container(void) const noexcept;
+  bool is_unavailable(void) const noexcept;
+  bool is_unconditionally_visible(void) const noexcept;
+  bool is_used(void) const noexcept;
+  bool is_weak_imported(void) const noexcept;
+  DeclKind kind(void) const noexcept;
+  Token token(void) const noexcept;
+  TokenRange token_range(void) const noexcept;
+};
+
+class ClassScopeFunctionSpecializationDecl : public Decl {
+ public:
+  CXXMethodDecl specialization(void) const noexcept;
+  bool has_explicit_template_arguments(void) const noexcept;
+};
+
+class CapturedDecl : public Decl {
+ public:
+  ImplicitParamDecl context_parameter(void) const noexcept;
+  bool is_nothrow(void) const noexcept;
+  std::vector<ImplicitParamDecl> parameters(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class BlockDecl : public Decl {
+ public:
+  bool block_missing_return_type(void) const noexcept;
+  bool can_avoid_copy_to_heap(void) const noexcept;
+  bool captures_cxx_this(void) const noexcept;
+  bool does_not_escape(void) const noexcept;
+  Token caret_token(void) const noexcept;
+  CompoundStmt compound_body(void) const noexcept;
+  bool has_captures(void) const noexcept;
+  bool is_conversion_from_lambda(void) const noexcept;
+  bool is_variadic(void) const noexcept;
+  std::vector<ParmVarDecl> parameters(void) const noexcept;
+  std::vector<ParmVarDecl> parameter_declarations(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class AccessSpecDecl : public Decl {
+ public:
+  Token access_specifier_token(void) const noexcept;
+  Token colon_token(void) const noexcept;
+};
+
+class OMPDeclarativeDirectiveDecl : public Decl {
+ public:
+};
+
+class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
+ public:
+};
+
+class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
+ public:
+};
+
+class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
+ public:
+};
+
+class TranslationUnitDecl : public Decl {
+ public:
+  NamespaceDecl anonymous_namespace(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class StaticAssertDecl : public Decl {
+ public:
+  StringLiteral message(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+  bool is_failed(void) const noexcept;
+};
+
+class RequiresExprBodyDecl : public Decl {
+ public:
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class PragmaDetectMismatchDecl : public Decl {
+ public:
+  std::string_view name(void) const noexcept;
+  std::string_view value(void) const noexcept;
+};
+
+class PragmaCommentDecl : public Decl {
+ public:
+  std::string_view argument(void) const noexcept;
+  PragmaMSCommentKind comment_kind(void) const noexcept;
+};
+
+class ObjCPropertyImplDecl : public Decl {
+ public:
+  ObjCMethodDecl getter_method_declaration(void) const noexcept;
+  ObjCPropertyDecl property_declaration(void) const noexcept;
+  ObjCPropertyImplDeclKind property_implementation(void) const noexcept;
+  ObjCIvarDecl property_instance_variable_declaration(void) const noexcept;
+  Token property_instance_variable_declaration_token(void) const noexcept;
+  ObjCMethodDecl setter_method_declaration(void) const noexcept;
+  bool is_instance_variable_name_specified(void) const noexcept;
+};
+
+class NamedDecl : public Decl {
+ public:
+  Linkage formal_linkage(void) const noexcept;
+  Linkage linkage_internal(void) const noexcept;
+  std::string_view name(void) const noexcept;
+  ObjCStringFormatFamily obj_cf_string_formatting_family(void) const noexcept;
+  std::string_view qualified_name_as_string(void) const noexcept;
+  NamedDecl underlying_declaration(void) const noexcept;
+  Visibility visibility(void) const noexcept;
+  bool has_external_formal_linkage(void) const noexcept;
+  bool has_linkage(void) const noexcept;
+  bool has_linkage_been_computed(void) const noexcept;
+  bool is_cxx_class_member(void) const noexcept;
+  bool is_cxx_instance_member(void) const noexcept;
+  bool is_externally_declarable(void) const noexcept;
+  bool is_externally_visible(void) const noexcept;
+  bool is_linkage_valid(void) const noexcept;
+};
+
+class LabelDecl : public NamedDecl {
+ public:
+  std::string_view ms_assembly_label(void) const noexcept;
+  LabelStmt statement(void) const noexcept;
+  bool is_gnu_local(void) const noexcept;
+  bool is_ms_assembly_label(void) const noexcept;
+  bool is_resolved_ms_assembly_label(void) const noexcept;
+};
+
+class BaseUsingDecl : public NamedDecl {
+ public:
+  std::vector<UsingShadowDecl> shadows(void) const noexcept;
+};
+
+class UsingEnumDecl : public BaseUsingDecl {
+ public:
+  EnumDecl enum_declaration(void) const noexcept;
+  Token enum_token(void) const noexcept;
+  Token using_token(void) const noexcept;
+};
+
+class UsingDecl : public BaseUsingDecl {
+ public:
+  Token using_token(void) const noexcept;
+  bool has_typename(void) const noexcept;
+  bool is_access_declaration(void) const noexcept;
+};
+
+class ValueDecl : public NamedDecl {
+ public:
+  bool is_weak(void) const noexcept;
+};
+
+class UnresolvedUsingValueDecl : public ValueDecl {
+ public:
+  Token ellipsis_token(void) const noexcept;
+  Token using_token(void) const noexcept;
+  bool is_access_declaration(void) const noexcept;
+  bool is_pack_expansion(void) const noexcept;
+};
+
+class TemplateParamObjectDecl : public ValueDecl {
+ public:
+};
+
+class OMPDeclareReductionDecl : public ValueDecl {
+ public:
+  OMPDeclareReductionDeclInitKind initializer_kind(void) const noexcept;
+  OMPDeclareReductionDecl prev_declaration_in_scope(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class MSGuidDecl : public ValueDecl {
+ public:
+};
+
+class IndirectFieldDecl : public ValueDecl {
+ public:
+  std::vector<NamedDecl> chain(void) const noexcept;
+  std::optional<FieldDecl> anonymous_field(void) const noexcept;
+  std::optional<VarDecl> variable_declaration(void) const noexcept;
+};
+
+class EnumConstantDecl : public ValueDecl {
+ public:
+};
+
+class DeclaratorDecl : public ValueDecl {
+ public:
+  Token inner_token_start(void) const noexcept;
+  Token outer_token_start(void) const noexcept;
+  Token type_spec_end_token(void) const noexcept;
+  Token type_spec_start_token(void) const noexcept;
+  std::vector<TemplateParameterList> template_parameter_lists(void) const noexcept;
+};
+
+class VarDecl : public DeclaratorDecl {
+ public:
+  std::optional<VarDecl> acting_definition(void) const noexcept;
+  std::optional<VarTemplateDecl> described_variable_template(void) const noexcept;
+  VarDeclInitializationStyle initializer_style(void) const noexcept;
+  std::optional<VarDecl> initializing_declaration(void) const noexcept;
+  std::optional<VarDecl> instantiated_from_static_data_member(void) const noexcept;
+  LanguageLinkage language_linkage(void) const noexcept;
+  Token point_of_instantiation(void) const noexcept;
+  StorageClass storage_class(void) const noexcept;
+  StorageDuration storage_duration(void) const noexcept;
+  VarDeclTLSKind tls_kind(void) const noexcept;
+  ThreadStorageClassSpecifier tsc_spec(void) const noexcept;
+  std::optional<VarDecl> template_instantiation_pattern(void) const noexcept;
+  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
+  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const noexcept;
+  bool has_constant_initialization(void) const noexcept;
+  bool has_dependent_alignment(void) const noexcept;
+  bool has_external_storage(void) const noexcept;
+  bool has_global_storage(void) const noexcept;
+  bool has_initializer(void) const noexcept;
+  bool has_local_storage(void) const noexcept;
+  bool is_arc_pseudo_strong(void) const noexcept;
+  bool is_cxx_for_range_declaration(void) const noexcept;
+  bool is_constexpr(void) const noexcept;
+  bool is_direct_initializer(void) const noexcept;
+  bool is_escaping_byref(void) const noexcept;
+  bool is_exception_variable(void) const noexcept;
+  bool is_extern_c(void) const noexcept;
+  bool is_file_variable_declaration(void) const noexcept;
+  bool is_function_or_method_variable_declaration(void) const noexcept;
+  bool is_in_extern_c_context(void) const noexcept;
+  bool is_in_extern_cxx_context(void) const noexcept;
+  bool is_initializer_capture(void) const noexcept;
+  bool is_inline(void) const noexcept;
+  bool is_inline_specified(void) const noexcept;
+  bool is_known_to_be_defined(void) const noexcept;
+  bool is_local_variable_declaration(void) const noexcept;
+  bool is_local_variable_declaration_or_parm(void) const noexcept;
+  bool is_nrvo_variable(void) const noexcept;
+  bool is_no_destroy(void) const noexcept;
+  bool is_non_escaping_byref(void) const noexcept;
+  bool is_obj_c_for_declaration(void) const noexcept;
+  bool is_previous_declaration_in_same_block_scope(void) const noexcept;
+  bool is_static_data_member(void) const noexcept;
+  bool is_static_local(void) const noexcept;
+  bool is_this_declaration_a_demoted_definition(void) const noexcept;
+  bool is_usable_in_constant_expressions(void) const noexcept;
+  bool might_be_usable_in_constant_expressions(void) const noexcept;
+  QualTypeDestructionKind needs_destruction(void) const noexcept;
+};
+
+class ParmVarDecl : public VarDecl {
+ public:
+  TokenRange default_argument_range(void) const noexcept;
+  DeclObjCDeclQualifier obj_c_decl_qualifier(void) const noexcept;
+  bool has_default_argument(void) const noexcept;
+  bool has_inherited_default_argument(void) const noexcept;
+  bool has_uninstantiated_default_argument(void) const noexcept;
+  bool has_unparsed_default_argument(void) const noexcept;
+  bool is_destroyed_in_callee(void) const noexcept;
+  bool is_knr_promoted(void) const noexcept;
+  bool is_obj_c_method_parameter(void) const noexcept;
+};
+
+class OMPCapturedExprDecl : public VarDecl {
+ public:
+};
+
+class ImplicitParamDecl : public VarDecl {
+ public:
+  ImplicitParamDeclImplicitParamKind parameter_kind(void) const noexcept;
+};
+
+class DecompositionDecl : public VarDecl {
+ public:
+  std::vector<BindingDecl> bindings(void) const noexcept;
+};
+
+class VarTemplateSpecializationDecl : public VarDecl {
+ public:
+  Token extern_token(void) const noexcept;
+  TemplateSpecializationKind specialization_kind(void) const noexcept;
+  VarTemplateDecl specialized_template(void) const noexcept;
+  std::vector<TemplateArgument> template_arguments(void) const noexcept;
+  std::vector<TemplateArgument> template_instantiation_arguments(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  bool is_class_scope_explicit_specialization(void) const noexcept;
+  bool is_explicit_instantiation_or_specialization(void) const noexcept;
+  bool is_explicit_specialization(void) const noexcept;
+};
+
+class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
+ public:
+  VarTemplatePartialSpecializationDecl instantiated_from_member(void) const noexcept;
+  TemplateParameterList template_parameters(void) const noexcept;
+  bool has_associated_constraints(void) const noexcept;
+};
+
+class NonTypeTemplateParmDecl : public DeclaratorDecl {
+ public:
+  bool default_argument_was_inherited(void) const noexcept;
+  Token default_argument_token(void) const noexcept;
+  bool has_default_argument(void) const noexcept;
+  bool has_placeholder_type_constraint(void) const noexcept;
+  bool is_expanded_parameter_pack(void) const noexcept;
+  bool is_pack_expansion(void) const noexcept;
+};
+
+class MSPropertyDecl : public DeclaratorDecl {
+ public:
+  bool has_getter(void) const noexcept;
+  bool has_setter(void) const noexcept;
+};
+
+class FunctionDecl : public DeclaratorDecl {
+ public:
+  bool does_this_declaration_have_a_body(void) const noexcept;
+  ConstexprSpecKind constexpr_kind(void) const noexcept;
+  std::optional<FunctionDecl> definition(void) const noexcept;
+  std::optional<FunctionTemplateDecl> described_function_template(void) const noexcept;
+  Token ellipsis_token(void) const noexcept;
+  TokenRange exception_spec_source_range(void) const noexcept;
+  ExceptionSpecificationType exception_spec_type(void) const noexcept;
+  std::optional<FunctionDecl> instantiated_from_member_function(void) const noexcept;
+  LanguageLinkage language_linkage(void) const noexcept;
+  MultiVersionKind multi_version_kind(void) const noexcept;
+  OverloadedOperatorKind overloaded_operator(void) const noexcept;
+  TokenRange parameters_source_range(void) const noexcept;
+  Token point_of_instantiation(void) const noexcept;
+  std::optional<FunctionTemplateDecl> primary_template(void) const noexcept;
+  TokenRange return_type_source_range(void) const noexcept;
+  StorageClass storage_class(void) const noexcept;
+  std::optional<FunctionDecl> template_instantiation_pattern(void) const noexcept;
+  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
+  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const noexcept;
+  FunctionDeclTemplatedKind templated_kind(void) const noexcept;
+  bool has_implicit_return_zero(void) const noexcept;
+  bool has_inherited_prototype(void) const noexcept;
+  bool has_one_parameter_or_default_arguments(void) const noexcept;
+  bool has_prototype(void) const noexcept;
+  bool has_skipped_body(void) const noexcept;
+  bool has_trivial_body(void) const noexcept;
+  bool has_written_prototype(void) const noexcept;
+  bool instantiation_is_pending(void) const noexcept;
+  bool is_cpu_dispatch_multi_version(void) const noexcept;
+  bool is_cpu_specific_multi_version(void) const noexcept;
+  bool is_consteval(void) const noexcept;
+  bool is_constexpr(void) const noexcept;
+  bool is_constexpr_specified(void) const noexcept;
+  bool is_defaulted(void) const noexcept;
+  bool is_deleted(void) const noexcept;
+  bool is_deleted_as_written(void) const noexcept;
+  bool is_destroying_operator_delete(void) const noexcept;
+  bool is_explicitly_defaulted(void) const noexcept;
+  bool is_extern_c(void) const noexcept;
+  bool is_function_template_specialization(void) const noexcept;
+  bool is_global(void) const noexcept;
+  bool is_implicitly_instantiable(void) const noexcept;
+  bool is_in_extern_c_context(void) const noexcept;
+  bool is_in_extern_cxx_context(void) const noexcept;
+  bool is_inline_builtin_declaration(void) const noexcept;
+  bool is_inline_specified(void) const noexcept;
+  bool is_inlined(void) const noexcept;
+  bool is_late_template_parsed(void) const noexcept;
+  bool is_msvcrt_entry_point(void) const noexcept;
+  bool is_main(void) const noexcept;
+  bool is_multi_version(void) const noexcept;
+  bool is_no_return(void) const noexcept;
+  bool is_overloaded_operator(void) const noexcept;
+  bool is_pure(void) const noexcept;
+  bool is_replaceable_global_allocation_function(void) const noexcept;
+  bool is_static(void) const noexcept;
+  bool is_target_multi_version(void) const noexcept;
+  bool is_template_instantiation(void) const noexcept;
+  bool is_this_declaration_a_definition(void) const noexcept;
+  bool is_this_declaration_instantiated_from_a_friend_definition(void) const noexcept;
+  bool is_trivial(void) const noexcept;
+  bool is_trivial_for_call(void) const noexcept;
+  bool is_user_provided(void) const noexcept;
+  bool is_variadic(void) const noexcept;
+  bool is_virtual_as_written(void) const noexcept;
+  std::vector<ParmVarDecl> parameters(void) const noexcept;
+  bool uses_seh_try(void) const noexcept;
+  bool will_have_body(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class CXXMethodDecl : public FunctionDecl {
+ public:
+  CXXRecordDecl parent(void) const noexcept;
+  RefQualifierKind reference_qualifier(void) const noexcept;
+  bool has_inline_body(void) const noexcept;
+  bool is_const(void) const noexcept;
+  bool is_copy_assignment_operator(void) const noexcept;
+  bool is_instance(void) const noexcept;
+  bool is_lambda_static_invoker(void) const noexcept;
+  bool is_move_assignment_operator(void) const noexcept;
+  bool is_virtual(void) const noexcept;
+  bool is_volatile(void) const noexcept;
+  std::vector<CXXMethodDecl> overridden_methods(void) const noexcept;
+};
+
+class CXXDestructorDecl : public CXXMethodDecl {
+ public:
+  FunctionDecl operator_delete(void) const noexcept;
+};
+
+class CXXConversionDecl : public CXXMethodDecl {
+ public:
+  bool is_explicit(void) const noexcept;
+  bool is_lambda_to_block_pointer_conversion(void) const noexcept;
+};
+
+class CXXConstructorDecl : public CXXMethodDecl {
+ public:
+  CXXConstructorDecl target_constructor(void) const noexcept;
+  bool is_default_constructor(void) const noexcept;
+  bool is_delegating_constructor(void) const noexcept;
+  bool is_explicit(void) const noexcept;
+  bool is_inheriting_constructor(void) const noexcept;
+  bool is_specialization_copying_object(void) const noexcept;
+};
+
+class CXXDeductionGuideDecl : public FunctionDecl {
+ public:
+  CXXConstructorDecl corresponding_constructor(void) const noexcept;
+  TemplateDecl deduced_template(void) const noexcept;
+  bool is_copy_deduction_candidate(void) const noexcept;
+  bool is_explicit(void) const noexcept;
+};
+
+class FieldDecl : public DeclaratorDecl {
+ public:
+  InClassInitStyle in_class_initializer_style(void) const noexcept;
+  RecordDecl parent(void) const noexcept;
+  bool has_captured_vla_type(void) const noexcept;
+  bool has_in_class_initializer(void) const noexcept;
+  bool is_anonymous_struct_or_union(void) const noexcept;
+  bool is_bit_field(void) const noexcept;
+  bool is_mutable(void) const noexcept;
+  bool is_unnamed_bitfield(void) const noexcept;
+  bool is_zero_length_bit_field(void) const noexcept;
+  bool is_zero_size(void) const noexcept;
+};
+
+class ObjCIvarDecl : public FieldDecl {
+ public:
+  ObjCIvarDeclAccessControl access_control(void) const noexcept;
+  ObjCIvarDeclAccessControl canonical_access_control(void) const noexcept;
+  ObjCInterfaceDecl containing_interface(void) const noexcept;
+  ObjCIvarDecl next_instance_variable(void) const noexcept;
+  bool synthesize(void) const noexcept;
+};
+
+class ObjCAtDefsFieldDecl : public FieldDecl {
+ public:
+};
+
+class BindingDecl : public ValueDecl {
+ public:
+  ValueDecl decomposed_declaration(void) const noexcept;
+  VarDecl holding_variable(void) const noexcept;
+};
+
+class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
+ public:
+};
+
+class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
+ public:
+  OMPDeclareMapperDecl prev_declaration_in_scope(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class UsingShadowDecl : public NamedDecl {
+ public:
+  BaseUsingDecl introducer(void) const noexcept;
+  UsingShadowDecl next_using_shadow_declaration(void) const noexcept;
+  NamedDecl target_declaration(void) const noexcept;
+};
+
+class ConstructorUsingShadowDecl : public UsingShadowDecl {
+ public:
+  bool constructs_virtual_base(void) const noexcept;
+  CXXRecordDecl constructed_base_class(void) const noexcept;
+  std::optional<ConstructorUsingShadowDecl> constructed_base_class_shadow_declaration(void) const noexcept;
+  CXXRecordDecl nominated_base_class(void) const noexcept;
+  std::optional<ConstructorUsingShadowDecl> nominated_base_class_shadow_declaration(void) const noexcept;
+  CXXRecordDecl parent(void) const noexcept;
+};
+
+class UsingPackDecl : public NamedDecl {
+ public:
+  std::vector<NamedDecl> expansions(void) const noexcept;
+  NamedDecl instantiated_from_using_declaration(void) const noexcept;
+};
+
+class UsingDirectiveDecl : public NamedDecl {
+ public:
+  Token identifier_token(void) const noexcept;
+  Token namespace_key_token(void) const noexcept;
+  NamespaceDecl nominated_namespace(void) const noexcept;
+  NamedDecl nominated_namespace_as_written(void) const noexcept;
+  Token using_token(void) const noexcept;
+};
+
+class UnresolvedUsingIfExistsDecl : public NamedDecl {
+ public:
+};
+
+class TypeDecl : public NamedDecl {
+ public:
+};
+
+class TemplateTypeParmDecl : public TypeDecl {
+ public:
+  bool default_argument_was_inherited(void) const noexcept;
+  Token default_argument_token(void) const noexcept;
+  bool has_default_argument(void) const noexcept;
+  bool has_type_constraint(void) const noexcept;
+  bool is_expanded_parameter_pack(void) const noexcept;
+  bool is_pack_expansion(void) const noexcept;
+  bool was_declared_with_typename(void) const noexcept;
+};
+
+class TagDecl : public TypeDecl {
+ public:
+  TokenRange brace_range(void) const noexcept;
+  std::optional<TagDecl> definition(void) const noexcept;
+  Token inner_token_start(void) const noexcept;
+  Token outer_token_start(void) const noexcept;
+  TagTypeKind tag_kind(void) const noexcept;
+  std::optional<TypedefNameDecl> typedef_name_for_anonymous_declaration(void) const noexcept;
+  bool has_name_for_linkage(void) const noexcept;
+  bool is_being_defined(void) const noexcept;
+  bool is_class(void) const noexcept;
+  bool is_complete_definition(void) const noexcept;
+  bool is_complete_definition_required(void) const noexcept;
+  bool is_dependent_type(void) const noexcept;
+  bool is_embedded_in_declarator(void) const noexcept;
+  bool is_enum(void) const noexcept;
+  bool is_free_standing(void) const noexcept;
+  bool is_interface(void) const noexcept;
+  bool is_struct(void) const noexcept;
+  bool is_this_declaration_a_definition(void) const noexcept;
+  bool is_union(void) const noexcept;
+  bool may_have_out_of_date_definition(void) const noexcept;
+  std::vector<TemplateParameterList> template_parameter_lists(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class RecordDecl : public TagDecl {
+ public:
+  bool can_pass_in_registers(void) const noexcept;
+  std::vector<FieldDecl> fields(void) const noexcept;
+  std::optional<FieldDecl> find_first_named_data_member(void) const noexcept;
+  RecordDeclArgPassingKind argument_passing_restrictions(void) const noexcept;
+  bool has_flexible_array_member(void) const noexcept;
+  bool has_loaded_fields_from_external_storage(void) const noexcept;
+  bool has_non_trivial_to_primitive_copy_c_union(void) const noexcept;
+  bool has_non_trivial_to_primitive_default_initialize_c_union(void) const noexcept;
+  bool has_non_trivial_to_primitive_destruct_c_union(void) const noexcept;
+  bool has_object_member(void) const noexcept;
+  bool has_volatile_member(void) const noexcept;
+  bool is_anonymous_struct_or_union(void) const noexcept;
+  bool is_captured_record(void) const noexcept;
+  bool is_injected_class_name(void) const noexcept;
+  bool is_lambda(void) const noexcept;
+  bool is_ms_struct(void) const noexcept;
+  bool is_non_trivial_to_primitive_copy(void) const noexcept;
+  bool is_non_trivial_to_primitive_default_initialize(void) const noexcept;
+  bool is_non_trivial_to_primitive_destroy(void) const noexcept;
+  bool is_or_contains_union(void) const noexcept;
+  bool is_parameter_destroyed_in_callee(void) const noexcept;
+  bool may_insert_extra_padding(void) const noexcept;
+};
+
+class CXXRecordDecl : public RecordDecl {
+ public:
+  bool allow_const_default_initializer(void) const noexcept;
+  std::vector<CXXBaseSpecifier> bases(void) const noexcept;
+  MSInheritanceModel calculate_inheritance_model(void) const noexcept;
+  std::vector<CXXConstructorDecl> constructors(void) const noexcept;
+  bool defaulted_copy_constructor_is_deleted(void) const noexcept;
+  bool defaulted_default_constructor_is_constexpr(void) const noexcept;
+  bool defaulted_destructor_is_constexpr(void) const noexcept;
+  bool defaulted_destructor_is_deleted(void) const noexcept;
+  bool defaulted_move_constructor_is_deleted(void) const noexcept;
+  std::vector<FriendDecl> friends(void) const noexcept;
+  FunctionTemplateDecl dependent_lambda_call_operator(void) const noexcept;
+  ClassTemplateDecl described_class_template(void) const noexcept;
+  CXXDestructorDecl destructor(void) const noexcept;
+  TemplateParameterList generic_lambda_template_parameter_list(void) const noexcept;
+  CXXRecordDecl instantiated_from_member_class(void) const noexcept;
+  CXXMethodDecl lambda_call_operator(void) const noexcept;
+  LambdaCaptureDefault lambda_capture_default(void) const noexcept;
+  std::vector<NamedDecl> lambda_explicit_template_parameters(void) const noexcept;
+  MSInheritanceModel ms_inheritance_model(void) const noexcept;
+  MSVtorDispMode ms_vtor_disp_mode(void) const noexcept;
+  CXXRecordDecl most_recent_non_injected_declaration(void) const noexcept;
+  CXXRecordDecl template_instantiation_pattern(void) const noexcept;
+  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
+  bool has_any_dependent_bases(void) const noexcept;
+  bool has_constexpr_default_constructor(void) const noexcept;
+  bool has_constexpr_destructor(void) const noexcept;
+  bool has_constexpr_non_copy_move_constructor(void) const noexcept;
+  bool has_copy_assignment_with_const_parameter(void) const noexcept;
+  bool has_copy_constructor_with_const_parameter(void) const noexcept;
+  bool has_default_constructor(void) const noexcept;
+  bool has_definition(void) const noexcept;
+  bool has_direct_fields(void) const noexcept;
+  bool has_friends(void) const noexcept;
+  bool has_in_class_initializer(void) const noexcept;
+  bool has_inherited_assignment(void) const noexcept;
+  bool has_inherited_constructor(void) const noexcept;
+  bool has_irrelevant_destructor(void) const noexcept;
+  bool has_known_lambda_internal_linkage(void) const noexcept;
+  bool has_move_assignment(void) const noexcept;
+  bool has_move_constructor(void) const noexcept;
+  bool has_mutable_fields(void) const noexcept;
+  bool has_non_literal_type_fields_or_bases(void) const noexcept;
+  bool has_non_trivial_copy_assignment(void) const noexcept;
+  bool has_non_trivial_copy_constructor(void) const noexcept;
+  bool has_non_trivial_copy_constructor_for_call(void) const noexcept;
+  bool has_non_trivial_default_constructor(void) const noexcept;
+  bool has_non_trivial_destructor(void) const noexcept;
+  bool has_non_trivial_destructor_for_call(void) const noexcept;
+  bool has_non_trivial_move_assignment(void) const noexcept;
+  bool has_non_trivial_move_constructor(void) const noexcept;
+  bool has_non_trivial_move_constructor_for_call(void) const noexcept;
+  bool has_private_fields(void) const noexcept;
+  bool has_protected_fields(void) const noexcept;
+  bool has_simple_copy_assignment(void) const noexcept;
+  bool has_simple_copy_constructor(void) const noexcept;
+  bool has_simple_destructor(void) const noexcept;
+  bool has_simple_move_assignment(void) const noexcept;
+  bool has_simple_move_constructor(void) const noexcept;
+  bool has_trivial_copy_assignment(void) const noexcept;
+  bool has_trivial_copy_constructor(void) const noexcept;
+  bool has_trivial_copy_constructor_for_call(void) const noexcept;
+  bool has_trivial_default_constructor(void) const noexcept;
+  bool has_trivial_destructor(void) const noexcept;
+  bool has_trivial_destructor_for_call(void) const noexcept;
+  bool has_trivial_move_assignment(void) const noexcept;
+  bool has_trivial_move_constructor(void) const noexcept;
+  bool has_trivial_move_constructor_for_call(void) const noexcept;
+  bool has_uninitialized_reference_member(void) const noexcept;
+  bool has_user_declared_constructor(void) const noexcept;
+  bool has_user_declared_copy_assignment(void) const noexcept;
+  bool has_user_declared_copy_constructor(void) const noexcept;
+  bool has_user_declared_destructor(void) const noexcept;
+  bool has_user_declared_move_assignment(void) const noexcept;
+  bool has_user_declared_move_constructor(void) const noexcept;
+  bool has_user_declared_move_operation(void) const noexcept;
+  bool has_user_provided_default_constructor(void) const noexcept;
+  bool has_variant_members(void) const noexcept;
+  bool implicit_copy_assignment_has_const_parameter(void) const noexcept;
+  bool implicit_copy_constructor_has_const_parameter(void) const noexcept;
+  bool is_abstract(void) const noexcept;
+  bool is_aggregate(void) const noexcept;
+  bool is_any_destructor_no_return(void) const noexcept;
+  bool is_c_like(void) const noexcept;
+  bool is_cxx11_standard_layout(void) const noexcept;
+  bool is_dependent_lambda(void) const noexcept;
+  bool is_dynamic_class(void) const noexcept;
+  bool is_effectively_final(void) const noexcept;
+  bool is_empty(void) const noexcept;
+  bool is_generic_lambda(void) const noexcept;
+  bool is_interface_like(void) const noexcept;
+  bool is_literal(void) const noexcept;
+  FunctionDecl is_local_class(void) const noexcept;
+  bool is_pod(void) const noexcept;
+  bool is_parsing_base_specifiers(void) const noexcept;
+  bool is_polymorphic(void) const noexcept;
+  bool is_standard_layout(void) const noexcept;
+  bool is_structural(void) const noexcept;
+  bool is_trivial(void) const noexcept;
+  bool is_trivially_copyable(void) const noexcept;
+  bool lambda_is_default_constructible_and_assignable(void) const noexcept;
+  bool may_be_abstract(void) const noexcept;
+  bool may_be_dynamic_class(void) const noexcept;
+  bool may_be_non_dynamic_class(void) const noexcept;
+  std::vector<CXXMethodDecl> methods(void) const noexcept;
+  bool needs_implicit_copy_assignment(void) const noexcept;
+  bool needs_implicit_copy_constructor(void) const noexcept;
+  bool needs_implicit_default_constructor(void) const noexcept;
+  bool needs_implicit_destructor(void) const noexcept;
+  bool needs_implicit_move_assignment(void) const noexcept;
+  bool needs_implicit_move_constructor(void) const noexcept;
+  bool needs_overload_resolution_for_copy_assignment(void) const noexcept;
+  bool needs_overload_resolution_for_copy_constructor(void) const noexcept;
+  bool needs_overload_resolution_for_destructor(void) const noexcept;
+  bool needs_overload_resolution_for_move_assignment(void) const noexcept;
+  bool needs_overload_resolution_for_move_constructor(void) const noexcept;
+  bool null_field_offset_is_zero(void) const noexcept;
+  std::vector<CXXBaseSpecifier> virtual_bases(void) const noexcept;
+};
+
+class ClassTemplateSpecializationDecl : public CXXRecordDecl {
+ public:
+  Token extern_token(void) const noexcept;
+  Token point_of_instantiation(void) const noexcept;
+  TemplateSpecializationKind specialization_kind(void) const noexcept;
+  ClassTemplateDecl specialized_template(void) const noexcept;
+  std::vector<TemplateArgument> template_arguments(void) const noexcept;
+  std::vector<TemplateArgument> template_instantiation_arguments(void) const noexcept;
+  Token template_keyword_token(void) const noexcept;
+  bool is_class_scope_explicit_specialization(void) const noexcept;
+  bool is_explicit_instantiation_or_specialization(void) const noexcept;
+  bool is_explicit_specialization(void) const noexcept;
+};
+
+class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
+ public:
+  ClassTemplatePartialSpecializationDecl instantiated_from_member(void) const noexcept;
+  ClassTemplatePartialSpecializationDecl instantiated_from_member_template(void) const noexcept;
+  TemplateParameterList template_parameters(void) const noexcept;
+  bool has_associated_constraints(void) const noexcept;
+};
+
+class EnumDecl : public TagDecl {
+ public:
+  std::vector<EnumConstantDecl> enumerators(void) const noexcept;
+  std::optional<EnumDecl> instantiated_from_member_enum(void) const noexcept;
+  TokenRange integer_type_range(void) const noexcept;
+  std::optional<EnumDecl> template_instantiation_pattern(void) const noexcept;
+  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
+  bool is_closed(void) const noexcept;
+  bool is_closed_flag(void) const noexcept;
+  bool is_closed_non_flag(void) const noexcept;
+  bool is_complete(void) const noexcept;
+  bool is_fixed(void) const noexcept;
+  bool is_scoped(void) const noexcept;
+  bool is_scoped_using_class_tag(void) const noexcept;
+};
+
+class UnresolvedUsingTypenameDecl : public TypeDecl {
+ public:
+  Token ellipsis_token(void) const noexcept;
+  Token typename_token(void) const noexcept;
+  Token using_token(void) const noexcept;
+  bool is_pack_expansion(void) const noexcept;
+};
+
+class TypedefNameDecl : public TypeDecl {
+ public:
+  std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const noexcept;
+  bool is_moded(void) const noexcept;
+  bool is_transparent_tag(void) const noexcept;
+};
+
+class TypedefDecl : public TypedefNameDecl {
+ public:
+};
+
+class TypeAliasDecl : public TypedefNameDecl {
+ public:
+  std::optional<TypeAliasTemplateDecl> described_alias_template(void) const noexcept;
+};
+
+class ObjCTypeParamDecl : public TypedefNameDecl {
+ public:
+  Token colon_token(void) const noexcept;
+  ObjCTypeParamVariance variance(void) const noexcept;
+  Token variance_token(void) const noexcept;
+  bool has_explicit_bound(void) const noexcept;
+};
+
+class TemplateDecl : public NamedDecl {
+ public:
+  TemplateParameterList template_parameters(void) const noexcept;
+  NamedDecl templated_declaration(void) const noexcept;
+  bool has_associated_constraints(void) const noexcept;
+};
+
+class RedeclarableTemplateDecl : public TemplateDecl {
+ public:
+  RedeclarableTemplateDecl instantiated_from_member_template(void) const noexcept;
+  bool is_member_specialization(void) const noexcept;
+};
+
+class FunctionTemplateDecl : public RedeclarableTemplateDecl {
+ public:
+  bool is_abbreviated(void) const noexcept;
+  bool is_this_declaration_a_definition(void) const noexcept;
+  std::vector<FunctionDecl> specializations(void) const noexcept;
+};
+
+class ClassTemplateDecl : public RedeclarableTemplateDecl {
+ public:
+  bool is_this_declaration_a_definition(void) const noexcept;
+  std::vector<ClassTemplateSpecializationDecl> specializations(void) const noexcept;
+};
+
+class VarTemplateDecl : public RedeclarableTemplateDecl {
+ public:
+  bool is_this_declaration_a_definition(void) const noexcept;
+  std::vector<VarTemplateSpecializationDecl> specializations(void) const noexcept;
+};
+
+class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
+ public:
+};
+
+class ConceptDecl : public TemplateDecl {
+ public:
+  bool is_type_concept(void) const noexcept;
+};
+
+class BuiltinTemplateDecl : public TemplateDecl {
+ public:
+};
+
+class TemplateTemplateParmDecl : public TemplateDecl {
+ public:
+  bool default_argument_was_inherited(void) const noexcept;
+  Token default_argument_token(void) const noexcept;
+  bool has_default_argument(void) const noexcept;
+  bool is_expanded_parameter_pack(void) const noexcept;
+  bool is_pack_expansion(void) const noexcept;
+};
+
+class ObjCPropertyDecl : public NamedDecl {
+ public:
+  Token at_token(void) const noexcept;
+  ObjCMethodDecl getter_method_declaration(void) const noexcept;
+  Token getter_name_token(void) const noexcept;
+  Token l_paren_token(void) const noexcept;
+  ObjCPropertyDeclPropertyControl property_implementation(void) const noexcept;
+  ObjCIvarDecl property_instance_variable_declaration(void) const noexcept;
+  ObjCPropertyQueryKind query_kind(void) const noexcept;
+  ObjCPropertyDeclSetterKind setter_kind(void) const noexcept;
+  ObjCMethodDecl setter_method_declaration(void) const noexcept;
+  Token setter_name_token(void) const noexcept;
+  bool is_atomic(void) const noexcept;
+  bool is_class_property(void) const noexcept;
+  bool is_direct_property(void) const noexcept;
+  bool is_instance_property(void) const noexcept;
+  bool is_optional(void) const noexcept;
+  bool is_read_only(void) const noexcept;
+  bool is_retaining(void) const noexcept;
+};
+
+class ObjCMethodDecl : public NamedDecl {
+ public:
+  bool defined_in_ns_object(void) const noexcept;
+  ObjCPropertyDecl find_property_declaration(void) const noexcept;
+  ObjCCategoryDecl category(void) const noexcept;
+  ObjCInterfaceDecl class_interface(void) const noexcept;
+  ImplicitParamDecl cmd_declaration(void) const noexcept;
+  Token declarator_end_token(void) const noexcept;
+  ObjCMethodDeclImplementationControl implementation_control(void) const noexcept;
+  ObjCMethodFamily method_family(void) const noexcept;
+  DeclObjCDeclQualifier obj_c_decl_qualifier(void) const noexcept;
+  TokenRange return_type_source_range(void) const noexcept;
+  Token selector_start_token(void) const noexcept;
+  ImplicitParamDecl self_declaration(void) const noexcept;
+  bool has_redeclaration(void) const noexcept;
+  bool has_related_result_type(void) const noexcept;
+  bool has_skipped_body(void) const noexcept;
+  bool is_class_method(void) const noexcept;
+  bool is_defined(void) const noexcept;
+  bool is_designated_initializer_for_the_interface(void) const noexcept;
+  bool is_direct_method(void) const noexcept;
+  bool is_instance_method(void) const noexcept;
+  bool is_optional(void) const noexcept;
+  bool is_overriding(void) const noexcept;
+  bool is_property_accessor(void) const noexcept;
+  bool is_redeclaration(void) const noexcept;
+  bool is_synthesized_accessor_stub(void) const noexcept;
+  bool is_this_declaration_a_definition(void) const noexcept;
+  bool is_this_declaration_a_designated_initializer(void) const noexcept;
+  bool is_variadic(void) const noexcept;
+  std::vector<ParmVarDecl> parameters(void) const noexcept;
+  std::vector<Token> selector_tokens(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class ObjCContainerDecl : public NamedDecl {
+ public:
+  std::vector<ObjCMethodDecl> class_methods(void) const noexcept;
+  std::vector<ObjCPropertyDecl> class_properties(void) const noexcept;
+  TokenRange at_end_range(void) const noexcept;
+  Token at_start_token(void) const noexcept;
+  std::vector<ObjCMethodDecl> instance_methods(void) const noexcept;
+  std::vector<ObjCPropertyDecl> instance_properties(void) const noexcept;
+  std::vector<ObjCMethodDecl> methods(void) const noexcept;
+  std::vector<ObjCPropertyDecl> properties(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class ObjCCategoryDecl : public ObjCContainerDecl {
+ public:
+  bool is_class_extension(void) const noexcept;
+  Token category_name_token(void) const noexcept;
+  ObjCInterfaceDecl class_interface(void) const noexcept;
+  ObjCCategoryImplDecl implementation(void) const noexcept;
+  Token instance_variable_l_brace_token(void) const noexcept;
+  Token instance_variable_r_brace_token(void) const noexcept;
+  ObjCCategoryDecl next_class_category(void) const noexcept;
+  ObjCCategoryDecl next_class_category_raw(void) const noexcept;
+  std::vector<ObjCIvarDecl> instance_variables(void) const noexcept;
+  std::vector<Token> protocol_tokens(void) const noexcept;
+  std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
+};
+
+class ObjCProtocolDecl : public ObjCContainerDecl {
+ public:
+  ObjCProtocolDecl definition(void) const noexcept;
+  std::string_view obj_c_runtime_name_as_string(void) const noexcept;
+  bool has_definition(void) const noexcept;
+  bool is_non_runtime_protocol(void) const noexcept;
+  bool is_this_declaration_a_definition(void) const noexcept;
+  std::vector<Token> protocol_tokens(void) const noexcept;
+  std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
+};
+
+class ObjCInterfaceDecl : public ObjCContainerDecl {
+ public:
+  std::vector<ObjCProtocolDecl> all_referenced_protocols(void) const noexcept;
+  bool declares_or_inherits_designated_initializers(void) const noexcept;
+  ObjCCategoryDecl category_list_raw(void) const noexcept;
+  ObjCInterfaceDecl definition(void) const noexcept;
+  Token end_of_definition_token(void) const noexcept;
+  ObjCImplementationDecl implementation(void) const noexcept;
+  std::string_view obj_c_runtime_name_as_string(void) const noexcept;
+  ObjCInterfaceDecl super_class(void) const noexcept;
+  Token super_class_token(void) const noexcept;
+  bool has_definition(void) const noexcept;
+  bool has_designated_initializers(void) const noexcept;
+  bool is_arc_weakref_unavailable(void) const noexcept;
+  bool is_implicit_interface_declaration(void) const noexcept;
+  ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const noexcept;
+  bool is_this_declaration_a_definition(void) const noexcept;
+  std::vector<ObjCIvarDecl> instance_variables(void) const noexcept;
+  std::vector<ObjCCategoryDecl> known_categories(void) const noexcept;
+  std::vector<ObjCCategoryDecl> known_extensions(void) const noexcept;
+  std::vector<Token> protocol_tokens(void) const noexcept;
+  std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
+  std::vector<ObjCCategoryDecl> visible_categories(void) const noexcept;
+  std::vector<ObjCCategoryDecl> visible_extensions(void) const noexcept;
+};
+
+class ObjCImplDecl : public ObjCContainerDecl {
+ public:
+  ObjCInterfaceDecl class_interface(void) const noexcept;
+  std::vector<ObjCPropertyImplDecl> property_implementations(void) const noexcept;
+};
+
+class ObjCCategoryImplDecl : public ObjCImplDecl {
+ public:
+  ObjCCategoryDecl category_declaration(void) const noexcept;
+  Token category_name_token(void) const noexcept;
+};
+
+class ObjCImplementationDecl : public ObjCImplDecl {
+ public:
+  Token instance_variable_l_brace_token(void) const noexcept;
+  Token instance_variable_r_brace_token(void) const noexcept;
+  std::string_view obj_c_runtime_name_as_string(void) const noexcept;
+  ObjCInterfaceDecl super_class(void) const noexcept;
+  Token super_class_token(void) const noexcept;
+  bool has_destructors(void) const noexcept;
+  bool has_non_zero_constructors(void) const noexcept;
+  std::vector<ObjCIvarDecl> instance_variables(void) const noexcept;
+};
+
+class ObjCCompatibleAliasDecl : public NamedDecl {
+ public:
+  ObjCInterfaceDecl class_interface(void) const noexcept;
+};
+
+class NamespaceDecl : public NamedDecl {
+ public:
+  NamespaceDecl anonymous_namespace(void) const noexcept;
+  NamespaceDecl original_namespace(void) const noexcept;
+  Token r_brace_token(void) const noexcept;
+  bool is_anonymous_namespace(void) const noexcept;
+  bool is_inline(void) const noexcept;
+  bool is_original_namespace(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class NamespaceAliasDecl : public NamedDecl {
+ public:
+  Token alias_token(void) const noexcept;
+  NamedDecl aliased_namespace(void) const noexcept;
+  NamespaceDecl namespace_(void) const noexcept;
+  Token namespace_token(void) const noexcept;
+  Token target_name_token(void) const noexcept;
+};
+
+class LinkageSpecDecl : public Decl {
+ public:
+  Token extern_token(void) const noexcept;
+  LinkageSpecDeclLanguageIDs language(void) const noexcept;
+  Token r_brace_token(void) const noexcept;
+  bool has_braces(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class LifetimeExtendedTemporaryDecl : public Decl {
+ public:
+  ValueDecl extending_declaration(void) const noexcept;
+  StorageDuration storage_duration(void) const noexcept;
+};
+
+class ImportDecl : public Decl {
+ public:
+  std::vector<Token> identifier_tokens(void) const noexcept;
+};
+
+class FriendTemplateDecl : public Decl {
+ public:
+  NamedDecl friend_declaration(void) const noexcept;
+  Token friend_token(void) const noexcept;
+  std::vector<TemplateParameterList> template_parameter_lists(void) const noexcept;
+};
+
+class FriendDecl : public Decl {
+ public:
+  NamedDecl friend_declaration(void) const noexcept;
+  Token friend_token(void) const noexcept;
+  bool is_unsupported_friend(void) const noexcept;
+  std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const noexcept;
+};
+
+class FileScopeAsmDecl : public Decl {
+ public:
+  Token assembly_token(void) const noexcept;
+  StringLiteral assembly_string(void) const noexcept;
+  Token r_paren_token(void) const noexcept;
+};
+
+class ExternCContextDecl : public Decl {
+ public:
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class ExportDecl : public Decl {
+ public:
+  Token export_token(void) const noexcept;
+  Token r_brace_token(void) const noexcept;
+  bool has_braces(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const noexcept;
+};
+
+class EmptyDecl : public Decl {
+ public:
+};
 
 }  // namespace mx

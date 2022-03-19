@@ -3754,7 +3754,7 @@ struct TemplateArgument @0xb5127dad01992f67 {
   containsUnexpandedParameterPack @4 :Bool;
   isPackExpansion @5 :Bool;
   asDeclaration @6 :UInt64;
-  asDeclarationIsPresent @7 :UInt64;
+  asDeclarationIsPresent @7 :Bool;
 }
 
 struct CXXBaseSpecifier @0x8e0e4024ab6be99f {
@@ -3765,7 +3765,7 @@ struct CXXBaseSpecifier @0x8e0e4024ab6be99f {
   isPackExpansion @4 :Bool;
   constructorsAreInherited @5 :Bool;
   ellipsis @6 :UInt64;
-  ellipsisIsPresent @7 :UInt64;
+  ellipsisIsPresent @7 :Bool;
   semanticAccessSpecifier @8 :AccessSpecifier;
   lexicalAccessSpecifier @9 :AccessSpecifier;
 }
@@ -3806,7 +3806,7 @@ struct SEHExceptStmt @0xec2050c67aa8fa46 {
 struct ReturnStmt @0xa64f08dfd7dbc80a {
   stmt @0 :Stmt;
   nrvoCandidate @1 :UInt64;
-  nrvoCandidateIsPresent @2 :UInt64;
+  nrvoCandidateIsPresent @2 :Bool;
   returnToken @3 :UInt64;
 }
 
@@ -4152,9 +4152,9 @@ struct IndirectGotoStmt @0xca063608491ba1fa {
 struct IfStmt @0xfc829da66c4e6bb1 {
   stmt @0 :Stmt;
   conditionVariable @1 :UInt64;
-  conditionVariableIsPresent @2 :UInt64;
+  conditionVariableIsPresent @2 :Bool;
   conditionVariableDeclarationStatement @3 :UInt64;
-  conditionVariableDeclarationStatementIsPresent @4 :UInt64;
+  conditionVariableDeclarationStatementIsPresent @4 :Bool;
   elseToken @5 :UInt64;
   ifToken @6 :UInt64;
   lParenToken @7 :UInt64;
@@ -4176,9 +4176,9 @@ struct GotoStmt @0xf542902873fc6c2b {
 struct ForStmt @0xb6591c23541f6a1e {
   stmt @0 :Stmt;
   conditionVariable @1 :UInt64;
-  conditionVariableIsPresent @2 :UInt64;
+  conditionVariableIsPresent @2 :Bool;
   conditionVariableDeclarationStatement @3 :UInt64;
-  conditionVariableDeclarationStatementIsPresent @4 :UInt64;
+  conditionVariableDeclarationStatementIsPresent @4 :Bool;
   forToken @5 :UInt64;
   lParenToken @6 :UInt64;
   rParenToken @7 :UInt64;
@@ -4294,9 +4294,9 @@ struct GCCAsmStmt @0x9d046a0d94b425db {
 struct WhileStmt @0x8f0fb0e808ef8cd3 {
   stmt @0 :Stmt;
   conditionVariable @1 :UInt64;
-  conditionVariableIsPresent @2 :UInt64;
+  conditionVariableIsPresent @2 :Bool;
   conditionVariableDeclarationStatement @3 :UInt64;
-  conditionVariableDeclarationStatementIsPresent @4 :UInt64;
+  conditionVariableDeclarationStatementIsPresent @4 :Bool;
   lParenToken @5 :UInt64;
   rParenToken @6 :UInt64;
   whileToken @7 :UInt64;
@@ -4322,10 +4322,10 @@ struct Expr @0x9e4316b5a505b8d6 {
   containsUnexpandedParameterPack @3 :Bool;
   expressionToken @4 :UInt64;
   objCProperty @5 :UInt64;
-  objCPropertyIsPresent @6 :UInt64;
+  objCPropertyIsPresent @6 :Bool;
   objectKind @7 :ExprObjectKind;
   sourceBitField @8 :UInt64;
-  sourceBitFieldIsPresent @9 :UInt64;
+  sourceBitFieldIsPresent @9 :Bool;
   valueKind @10 :ExprValueKind;
   hasNonTrivialCall @11 :Bool;
   isDefaultArgument @12 :Bool;
@@ -4443,9 +4443,9 @@ struct CastExpr @0x8cabd91ab4a4dcb3 {
   castKind @1 :CastKind;
   castKindName @2 :Text;
   conversionFunction @3 :UInt64;
-  conversionFunctionIsPresent @4 :UInt64;
+  conversionFunctionIsPresent @4 :Bool;
   targetUnionField @5 :UInt64;
-  targetUnionFieldIsPresent @6 :UInt64;
+  targetUnionFieldIsPresent @6 :Bool;
   hasStoredFpFeatures @7 :Bool;
 }
 
@@ -4516,7 +4516,7 @@ struct CallExpr @0x8cff24c7f68e334b {
   expr @0 :Expr;
   adlCallKind @1 :CallExprADLCallKind;
   directCallee @2 :UInt64;
-  directCalleeIsPresent @3 :UInt64;
+  directCalleeIsPresent @3 :Bool;
   rParenToken @4 :UInt64;
   hasStoredFpFeatures @5 :Bool;
   hasUnusedResultAttribute @6 :Bool;
@@ -5208,13 +5208,13 @@ struct IntegerLiteral @0x9555503bb691c665 {
 struct InitListExpr @0xee5bc39a46a85bfd {
   expr @0 :Expr;
   initializedFieldInUnion @1 :UInt64;
-  initializedFieldInUnionIsPresent @2 :UInt64;
+  initializedFieldInUnionIsPresent @2 :Bool;
   lBraceToken @3 :UInt64;
   rBraceToken @4 :UInt64;
   semanticForm @5 :UInt64;
-  semanticFormIsPresent @6 :UInt64;
+  semanticFormIsPresent @6 :Bool;
   syntacticForm @7 :UInt64;
-  syntacticFormIsPresent @8 :UInt64;
+  syntacticFormIsPresent @8 :Bool;
   hadArrayRangeDesignator @9 :Bool;
   hasArrayFiller @10 :Bool;
   isExplicit @11 :Bool;
@@ -5300,9 +5300,9 @@ struct AttributedStmt @0xc33cd79cc9238608 {
 struct SwitchStmt @0x8f2566a2d81612cd {
   stmt @0 :Stmt;
   conditionVariable @1 :UInt64;
-  conditionVariableIsPresent @2 :UInt64;
+  conditionVariableIsPresent @2 :Bool;
   conditionVariableDeclarationStatement @3 :UInt64;
-  conditionVariableDeclarationStatementIsPresent @4 :UInt64;
+  conditionVariableDeclarationStatementIsPresent @4 :Bool;
   lParenToken @5 :UInt64;
   rParenToken @6 :UInt64;
   switchToken @7 :UInt64;
@@ -5336,7 +5336,7 @@ struct Decl @0xfb5879761ffaedb6 {
   beginToken @3 :UInt64;
   bodyRBrace @4 :UInt64;
   describedTemplate @5 :UInt64;
-  describedTemplateIsPresent @6 :UInt64;
+  describedTemplateIsPresent @6 :Bool;
   endToken @7 :UInt64;
   friendObjectKind @8 :DeclFriendObjectKind;
   moduleOwnershipKind @9 :DeclModuleOwnershipKind;
@@ -5545,9 +5545,9 @@ struct IndirectFieldDecl @0xf8f906fde6cb040f {
   valueDecl @0 :ValueDecl;
   chain @1 :List(UInt64);
   anonymousField @2 :UInt64;
-  anonymousFieldIsPresent @3 :UInt64;
+  anonymousFieldIsPresent @3 :Bool;
   variableDeclaration @4 :UInt64;
-  variableDeclarationIsPresent @5 :UInt64;
+  variableDeclarationIsPresent @5 :Bool;
 }
 
 struct EnumConstantDecl @0xe2b34f222cdb8877 {
@@ -5566,14 +5566,14 @@ struct DeclaratorDecl @0xb95593a177af5810 {
 struct VarDecl @0xcf9adcbc59a4e339 {
   declaratorDecl @0 :DeclaratorDecl;
   actingDefinition @1 :UInt64;
-  actingDefinitionIsPresent @2 :UInt64;
+  actingDefinitionIsPresent @2 :Bool;
   describedVariableTemplate @3 :UInt64;
-  describedVariableTemplateIsPresent @4 :UInt64;
+  describedVariableTemplateIsPresent @4 :Bool;
   initializerStyle @5 :VarDeclInitializationStyle;
   initializingDeclaration @6 :UInt64;
-  initializingDeclarationIsPresent @7 :UInt64;
+  initializingDeclarationIsPresent @7 :Bool;
   instantiatedFromStaticDataMember @8 :UInt64;
-  instantiatedFromStaticDataMemberIsPresent @9 :UInt64;
+  instantiatedFromStaticDataMemberIsPresent @9 :Bool;
   languageLinkage @10 :LanguageLinkage;
   pointOfInstantiation @11 :UInt64;
   storageClass @12 :StorageClass;
@@ -5581,7 +5581,7 @@ struct VarDecl @0xcf9adcbc59a4e339 {
   tlsKind @14 :VarDeclTLSKind;
   tscSpec @15 :ThreadStorageClassSpecifier;
   templateInstantiationPattern @16 :UInt64;
-  templateInstantiationPatternIsPresent @17 :UInt64;
+  templateInstantiationPatternIsPresent @17 :Bool;
   templateSpecializationKind @18 :TemplateSpecializationKind;
   templateSpecializationKindForInstantiation @19 :TemplateSpecializationKind;
   hasConstantInitialization @20 :Bool;
@@ -5688,25 +5688,25 @@ struct FunctionDecl @0x92bd4789888f8ccb {
   doesThisDeclarationHaveABody @1 :Bool;
   constexprKind @2 :ConstexprSpecKind;
   definition @3 :UInt64;
-  definitionIsPresent @4 :UInt64;
+  definitionIsPresent @4 :Bool;
   describedFunctionTemplate @5 :UInt64;
-  describedFunctionTemplateIsPresent @6 :UInt64;
+  describedFunctionTemplateIsPresent @6 :Bool;
   ellipsisToken @7 :UInt64;
   exceptionSpecSourceRange @8 :TokenRange;
   exceptionSpecType @9 :ExceptionSpecificationType;
   instantiatedFromMemberFunction @10 :UInt64;
-  instantiatedFromMemberFunctionIsPresent @11 :UInt64;
+  instantiatedFromMemberFunctionIsPresent @11 :Bool;
   languageLinkage @12 :LanguageLinkage;
   multiVersionKind @13 :MultiVersionKind;
   overloadedOperator @14 :OverloadedOperatorKind;
   parametersSourceRange @15 :TokenRange;
   pointOfInstantiation @16 :UInt64;
   primaryTemplate @17 :UInt64;
-  primaryTemplateIsPresent @18 :UInt64;
+  primaryTemplateIsPresent @18 :Bool;
   returnTypeSourceRange @19 :TokenRange;
   storageClass @20 :StorageClass;
   templateInstantiationPattern @21 :UInt64;
-  templateInstantiationPatternIsPresent @22 :UInt64;
+  templateInstantiationPatternIsPresent @22 :Bool;
   templateSpecializationKind @23 :TemplateSpecializationKind;
   templateSpecializationKindForInstantiation @24 :TemplateSpecializationKind;
   templatedKind @25 :FunctionDeclTemplatedKind;
@@ -5758,8 +5758,7 @@ struct FunctionDecl @0x92bd4789888f8ccb {
   parameters @71 :List(UInt64);
   usesSehTry @72 :Bool;
   willHaveBody @73 :Bool;
-  parameterDeclarations @74 :List(UInt64);
-  declarationsInContext @75 :List(UInt64);
+  declarationsInContext @74 :List(UInt64);
 }
 
 struct CXXMethodDecl @0xd83d5835cf6512db {
@@ -5861,10 +5860,10 @@ struct ConstructorUsingShadowDecl @0x8a43df80c48b7033 {
   constructsVirtualBase @1 :Bool;
   constructedBaseClass @2 :UInt64;
   constructedBaseClassShadowDeclaration @3 :UInt64;
-  constructedBaseClassShadowDeclarationIsPresent @4 :UInt64;
+  constructedBaseClassShadowDeclarationIsPresent @4 :Bool;
   nominatedBaseClass @5 :UInt64;
   nominatedBaseClassShadowDeclaration @6 :UInt64;
-  nominatedBaseClassShadowDeclarationIsPresent @7 :UInt64;
+  nominatedBaseClassShadowDeclarationIsPresent @7 :Bool;
   parent @8 :UInt64;
 }
 
@@ -5906,12 +5905,12 @@ struct TagDecl @0x8e30dcc81a0377d1 {
   typeDecl @0 :TypeDecl;
   braceRange @1 :TokenRange;
   definition @2 :UInt64;
-  definitionIsPresent @3 :UInt64;
+  definitionIsPresent @3 :Bool;
   innerTokenStart @4 :UInt64;
   outerTokenStart @5 :UInt64;
   tagKind @6 :TagTypeKind;
   typedefNameForAnonymousDeclaration @7 :UInt64;
-  typedefNameForAnonymousDeclarationIsPresent @8 :UInt64;
+  typedefNameForAnonymousDeclarationIsPresent @8 :Bool;
   hasNameForLinkage @9 :Bool;
   isBeingDefined @10 :Bool;
   isClass @11 :Bool;
@@ -5935,7 +5934,7 @@ struct RecordDecl @0xae6dc96296678f51 {
   canPassInRegisters @1 :Bool;
   fields @2 :List(UInt64);
   findFirstNamedDataMember @3 :UInt64;
-  findFirstNamedDataMemberIsPresent @4 :UInt64;
+  findFirstNamedDataMemberIsPresent @4 :Bool;
   argumentPassingRestrictions @5 :RecordDeclArgPassingKind;
   hasFlexibleArrayMember @6 :Bool;
   hasLoadedFieldsFromExternalStorage @7 :Bool;
@@ -6104,10 +6103,10 @@ struct EnumDecl @0x93540bfa73a13c84 {
   tagDecl @0 :TagDecl;
   enumerators @1 :List(UInt64);
   instantiatedFromMemberEnum @2 :UInt64;
-  instantiatedFromMemberEnumIsPresent @3 :UInt64;
+  instantiatedFromMemberEnumIsPresent @3 :Bool;
   integerTypeRange @4 :TokenRange;
   templateInstantiationPattern @5 :UInt64;
-  templateInstantiationPatternIsPresent @6 :UInt64;
+  templateInstantiationPatternIsPresent @6 :Bool;
   templateSpecializationKind @7 :TemplateSpecializationKind;
   isClosed @8 :Bool;
   isClosedFlag @9 :Bool;
@@ -6129,7 +6128,7 @@ struct UnresolvedUsingTypenameDecl @0x8b74c3415940bb24 {
 struct TypedefNameDecl @0xe8f3a8fa9f84b388 {
   typeDecl @0 :TypeDecl;
   anonymousDeclarationWithTypedefName @1 :UInt64;
-  anonymousDeclarationWithTypedefNameIsPresent @2 :UInt64;
+  anonymousDeclarationWithTypedefNameIsPresent @2 :Bool;
   isModed @3 :Bool;
   isTransparentTag @4 :Bool;
 }
@@ -6141,7 +6140,7 @@ struct TypedefDecl @0xcabfd592ecdf73ec {
 struct TypeAliasDecl @0x98b3c141fd82bbdd {
   typedefNameDecl @0 :TypedefNameDecl;
   describedAliasTemplate @1 :UInt64;
-  describedAliasTemplateIsPresent @2 :UInt64;
+  describedAliasTemplateIsPresent @2 :Bool;
 }
 
 struct ObjCTypeParamDecl @0xfea48cce2b1c50cd {

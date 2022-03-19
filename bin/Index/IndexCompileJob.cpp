@@ -204,7 +204,7 @@ static std::string PrefixedLocation(const pasta::Decl &decl,
   if (ft) {
     auto file = pasta::File::Containing(*ft);
     std::stringstream ss;
-    ss << prefix << file.Path().generic_string()
+    ss << prefix << file.Path().lexically_normal().generic_string()
        << ':' << ft->Line() << ':' << ft->Column();
     return ss.str();
   }
@@ -412,7 +412,8 @@ void IndexCompileJobAction::MaybeTokenizeFile(
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   mx::ProgressBarWork progress_tracker(context->ast_progress.get());
 
-  auto main_file_path = job.SourceFile().Path().generic_string();
+  auto main_file_path =
+      job.SourceFile().Path().lexically_normal().generic_string();
   auto maybe_ast = job.Run();
   if (!maybe_ast.Succeeded()) {
     LOG(ERROR)

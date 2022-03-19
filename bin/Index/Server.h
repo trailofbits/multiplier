@@ -39,9 +39,26 @@ class Server final : public mx::rpc::Multiplier::Server {
   // Initialize the server.
   Server(ServerOptions &options_);
 
+  // Download a list of file info (file id, paths) where the file IDs
+  // are greater-than-or-equal to some minimum ID.
+  kj::Promise<void> downloadFileList(
+      DownloadFileListContext context) final;
+
   // Enqueue actions to index zero or more compile commands / jobs.
   kj::Promise<void> indexCompileCommands(
       IndexCompileCommandsContext context) final;
+
+  // Download a file associated with a specific file ID.
+  kj::Promise<void> downloadFile(DownloadFileContext context) final;
+
+  // Download a file containing a token with a specific ID.
+  kj::Promise<void> downloadFileContainingEntity(
+      DownloadFileContainingEntityContext context) final;
+
+  // Download some indexed code containing an entity with a specific ID.
+  kj::Promise<void> downloadIndexedCodeContainingEntity(
+      DownloadIndexedCodeContainingEntityContext context) final;
+
 };
 
 }  // namespace indexer

@@ -6,6 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
+add_subdirectory("Examples")
 add_subdirectory("Import")
 add_subdirectory("Index")
   

@@ -353,11 +353,11 @@ void SerializeCompiler(EntitySerializer &es, mx::ast::Compiler::Builder b, const
   b.setTargetLanguage(static_cast<mx::ast::TargetLanguage>(mx::FromPasta(e.TargetLanguage())));
   b.setHostTargetTriple(e.HostTargetTriple());
   b.setTargetTriple(e.TargetTriple());
-  b.setExecutablePath(e.ExecutablePath().generic_string());
-  b.setResourceDirectory(e.ResourceDirectory().generic_string());
-  b.setSystemRootDirectory(e.SystemRootDirectory().generic_string());
-  b.setSystemRootIncludeDirectory(e.SystemRootIncludeDirectory().generic_string());
-  b.setInstallationDirectory(e.InstallationDirectory().generic_string());
+  b.setExecutablePath(e.ExecutablePath().lexically_normal().generic_string());
+  b.setResourceDirectory(e.ResourceDirectory().lexically_normal().generic_string());
+  b.setSystemRootDirectory(e.SystemRootDirectory().lexically_normal().generic_string());
+  b.setSystemRootIncludeDirectory(e.SystemRootIncludeDirectory().lexically_normal().generic_string());
+  b.setInstallationDirectory(e.InstallationDirectory().lexically_normal().generic_string());
   auto v9 = e.SystemIncludeDirectories();
   auto sv9 = b.initSystemIncludeDirectories(static_cast<unsigned>(v9.size()));
   auto i9 = 0u;
@@ -382,7 +382,7 @@ void SerializeCompiler(EntitySerializer &es, mx::ast::Compiler::Builder b, const
 }
 
 void SerializeIncludePath(EntitySerializer &es, mx::ast::IncludePath::Builder b, const pasta::IncludePath &e) {
-  b.setPath(e.Path().generic_string());
+  b.setPath(e.Path().lexically_normal().generic_string());
   b.setLocation(static_cast<mx::ast::IncludePathLocation>(mx::FromPasta(e.Location())));
 }
 
@@ -393,7 +393,7 @@ void SerializeCompileCommand(EntitySerializer &es, mx::ast::CompileCommand::Buil
   for (const auto &arg : v0) {
     b0.set(i0++, arg);
   }
-  b.setWorkingDirectory(e.WorkingDirectory().generic_string());
+  b.setWorkingDirectory(e.WorkingDirectory().lexically_normal().generic_string());
 }
 
 void SerializeCompileJob(EntitySerializer &es, mx::ast::CompileJob::Builder b, const pasta::CompileJob &e) {
@@ -403,10 +403,10 @@ void SerializeCompileJob(EntitySerializer &es, mx::ast::CompileJob::Builder b, c
   for (const auto &arg : v0) {
     b0.set(i0++, arg);
   }
-  b.setWorkingDirectory(e.WorkingDirectory().generic_string());
-  b.setResourceDirectory(e.ResourceDirectory().generic_string());
-  b.setSystemRootDirectory(e.SystemRootDirectory().generic_string());
-  b.setSystemRootIncludeDirectory(e.SystemRootIncludeDirectory().generic_string());
+  b.setWorkingDirectory(e.WorkingDirectory().lexically_normal().generic_string());
+  b.setResourceDirectory(e.ResourceDirectory().lexically_normal().generic_string());
+  b.setSystemRootDirectory(e.SystemRootDirectory().lexically_normal().generic_string());
+  b.setSystemRootIncludeDirectory(e.SystemRootIncludeDirectory().lexically_normal().generic_string());
   auto v5 = e.TargetTriple();
   std::string s5(v5.data(), v5.size());
   b.setTargetTriple(s5);
@@ -3155,20 +3155,13 @@ void SerializeFunctionDecl(EntitySerializer &es, mx::ast::FunctionDecl::Builder 
   }
   b.setUsesSehTry(e.UsesSEHTry());
   b.setWillHaveBody(e.WillHaveBody());
-  auto v74 = e.ParameterDeclarations();
-  auto sv74 = b.initParameterDeclarations(static_cast<unsigned>(v74.size()));
+  pasta::DeclContext dc74(e);
+  auto v74 = dc74.AlreadyLoadedDeclarations();
+  auto sv74 = b.initDeclarationsInContext(static_cast<unsigned>(v74.size()));
   auto i74 = 0u;
-  for (const auto &e74 : v74) {
+  for (const pasta::Decl &e74 : v74) {
     sv74.set(i74, es.EntityId(e74));
     ++i74;
-  }
-  pasta::DeclContext dc75(e);
-  auto v75 = dc75.AlreadyLoadedDeclarations();
-  auto sv75 = b.initDeclarationsInContext(static_cast<unsigned>(v75.size()));
-  auto i75 = 0u;
-  for (const pasta::Decl &e75 : v75) {
-    sv75.set(i75, es.EntityId(e75));
-    ++i75;
   }
 }
 

@@ -64,6 +64,78 @@ add_custom_target("copy_headers"
     ${copied_headers}
 )
 
+set(api_headers
+  "${source_include_dir}/API.h"
+  "${source_include_dir}/AST.h"
+  "${source_include_dir}/Types.h"
+)
+
+add_library("api"
+  STATIC
+    ${api_headers}
+    ${copied_headers}
+
+    "AST.h"
+    "API.cpp"
+    "Types.cpp"
+    
+    ${MX_RPC_SOURCES}
+    ${MX_AST_SOURCES}
+)
+
+add_dependencies("api"
+  "copy_headers"
+)
+
+target_include_directories("api"
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}"
+)
+
+target_link_libraries("api"
+  PRIVATE
+    $<BUILD_INTERFACE:CapnProto::capnp-rpc>
+)
+
+set_target_properties("api"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    PUBLIC_HEADER
+      "${api_headers}"
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+)
+
+target_compile_features("api"
+  PUBLIC
+    cxx_std_20
+)
+
+add_library("${PROJECT_NAME}::api" ALIAS "api")
+set_target_properties("api" PROPERTIES LINKER_LANGUAGE CXX)
+
+set_target_properties("api"
+  PROPERTIES
+    PUBLIC_HEADER "${api_headers}")
+
+target_include_directories("api"
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>
+    $<INSTALL_INTERFACE:include>
+  PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
 set(util_headers
   "${source_include_dir}/Action.h"
   "${source_include_dir}/AST.h"
@@ -148,7 +220,6 @@ target_compile_features("util"
     cxx_std_20
 )
 
-
 add_library("${PROJECT_NAME}::util" ALIAS "util")
 set_target_properties("util" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -167,10 +238,11 @@ target_include_directories("util"
 )
 
 if(MX_ENABLE_INSTALL)
-
+  
+  # NOTE(pag): `util` is *not* installed, just `api`.
   install(
     TARGETS
-      "util"
+      "api"
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION

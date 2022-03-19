@@ -43,16 +43,23 @@ static const std::unordered_set<std::string> gTypeNames{
 //  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
 };
 
+#define FRAGMENT_NON_REF_TYPES \
+    "TemplateParameter", \
+    "TemplateArgument", \
+    "CXXBaseSpecifier", \
+    "TemplateParameterList"
+
 
 #define NON_REF_TYPES \
     "IncludePath", \
     "Compiler", \
     "CompileCommand", \
     "CompileJob", \
-    "TemplateParameter", \
-    "TemplateArgument", \
-    "CXXBaseSpecifier", \
-    "TemplateParameterList"
+    FRAGMENT_NON_REF_TYPES
+
+static const std::unordered_set<std::string> gNotReferenceTypesRelatedToEntities{
+  FRAGMENT_NON_REF_TYPES
+};
 
 static const std::unordered_set<std::string> gNotReferenceTypes{
   NON_REF_TYPES
@@ -133,6 +140,9 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "AsFunction"},
   {"Decl", "TranslationUnitDeclaration"},
 
+  // These are redundant.
+  {"FunctionDecl", "ParameterDeclarations"},
+
   // These can crash?
   {"Expr", "BestDynamicClassType"},
 
@@ -149,6 +159,14 @@ struct ClassHierarchy {
   inline ClassHierarchy(pasta::CXXRecordDecl record_)
       : record(std::move(record_)) {}
 };
+
+static std::string SnakeCaseToAPICase(std::string name) {
+  if (name == "operator" || name == "namespace" || name == "struct" ||
+      name == "class") {
+    name.push_back('_');
+  }
+  return name;
+}
 
 static void BuildHierarchy(
     std::vector<std::unique_ptr<ClassHierarchy>> &alloc,
@@ -390,12 +408,11 @@ class CodeGenerator {
  private:
   std::vector<ClassHierarchy *> roots;
 
-  std::ofstream schema_os;
-  std::ofstream lib_h_os;
-  std::ofstream lib_cpp_os;
-  std::ofstream include_h_os;
-  std::ofstream serialize_h_os;
-  std::ofstream serialize_cpp_os;
+  std::ofstream schema_os;  // `lib/AST.capnp`
+  std::ofstream lib_cpp_os;  // `lib/AST.cpp`
+  std::ofstream include_h_os;  // `include/multiplier/AST.h`
+  std::ofstream serialize_h_os;  // `bin/Index/Serialize.h`
+  std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
 
   std::vector<pasta::NamespaceDecl> pastas;
 
@@ -596,6 +613,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
+  include_h_os
+      << "class " << class_name;
+
   serialize_cpp_os
       << "void Serialize" << class_name << "(EntitySerializer &es, mx::ast::"
       << class_name << "::Builder b, const pasta::" << class_name << " &e) {\n";
@@ -608,16 +628,58 @@ MethodListPtr CodeGenerator::RunOnClass(
     std::string snake_name = CapitalCaseToSnakeCase(base_name);
     std::string camel_name = SnakeCaseToCamelCase(snake_name);
     std::string init_name = "init" + Capitalize(camel_name);
+
     schema_os
         << "  " << camel_name << " @" << i << " :"
         << base_name << ";\n";
+
+    // Inheritance.
+    include_h_os
+        << " : public " << base_name << " {\n";
 
     // Parent class serialization.
     serialize_cpp_os
         << "  Serialize" << base_name << "(es, b." << init_name << "(), e);\n";
 
     ++i;
+  
+  } else if (class_name == "Decl") {
+    include_h_os
+        << " {\n"
+        << " protected:\n"
+        << "  std::shared_ptr<FragmentImpl> fragment;\n"
+        << "  DeclarationId id;\n\n";
+
+  } else if (class_name == "Stmt") {
+    include_h_os
+        << " {\n"
+        << " protected:\n"
+        << "  std::shared_ptr<FragmentImpl> fragment;\n"
+        << "  StatementId id;\n\n";
+
+  // Things like `TemplateParameterList`, that aren't themselves entities, but
+  // are derived from entities in fragments, and link to entities in fragments,
+  // and so we need to carry around a fragment pointer.
+  } else if (gNotReferenceTypesRelatedToEntities.count(class_name)) {
+    include_h_os
+        << " {\n"
+        << " protected:\n"
+        << "  std::shared_ptr<FragmentImpl> fragment;\n"
+        << "  std::shared_ptr<ast::" << class_name << "> data;\n\n";
+
+  } else if (gEntityClassNames.count(class_name)) {
+    abort();
+
+  // Hrmm... Not sure what to put as the data for a non-entity.
+  } else {
+    include_h_os
+        << " {\n"
+        << " protected:\n"
+        << "  std::shared_ptr<ast::" << class_name << "> data;\n\n";
   }
+
+  include_h_os
+      << " public:\n";
 
   for (pasta::CXXMethodDecl method : cls->record.Methods()) {
     if (method.NumParameters()) {
@@ -640,6 +702,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     std::string snake_name = CapitalCaseToSnakeCase(method_name);
+    std::string api_name = SnakeCaseToAPICase(snake_name);
     std::string camel_name = SnakeCaseToCamelCase(snake_name);
     std::string setter_name = "set" + Capitalize(camel_name);
     std::string init_name = "init" + Capitalize(camel_name);
@@ -654,6 +717,9 @@ MethodListPtr CodeGenerator::RunOnClass(
       // Handle `pasta::Token` and `pasta::FileToken` uniformly. We represent
       // both as references.
       if (record_name == "Token" || record_name == "FileToken") {
+        include_h_os
+            << "  Token " << api_name << "(void) const noexcept;\n";
+
         serialize_cpp_os
             << "  b." << setter_name << "(es.EntityId(e."
             << method_name << "()));\n";
@@ -664,6 +730,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
+        include_h_os
+            << "  TokenRange " << api_name << "(void) const noexcept;\n";
+
         serialize_cpp_os
             << "  auto sr" << i << " = b." << init_name << "();\n"
             << "  if (auto r" << i << " = e." << method_name << "(); auto rs"
@@ -680,6 +749,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Handle `std::string`
       } else if (record_name == "string" || record_name == "basic_string") {
+        include_h_os
+            << "  std::string_view " << api_name << "(void) const noexcept;\n";
+
         serialize_cpp_os
             << "  b." << setter_name << "(e." << method_name << "());\n";
 
@@ -691,6 +763,9 @@ MethodListPtr CodeGenerator::RunOnClass(
       // `std::string`.
       } else if (record_name == "string_view" ||
                  record_name == "basic_string_view") {
+        include_h_os
+            << "  std::string_view " << api_name << "(void) const noexcept;\n";
+
         serialize_cpp_os
             << "  auto v" << i << " = e." << method_name << "();\n"
             << "  std::string s" << i << "(v" << i << ".data(), v"
@@ -701,6 +776,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // In pasta.
       } else if (record_name == "ArgumentVector") {
+        include_h_os
+            << "  std::vector<std::string_view> "
+            << api_name << "(void) const noexcept;\n";
 
         serialize_cpp_os
             << "  const auto &v" << i << " = e." << method_name << "();\n"
@@ -716,8 +794,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Probably `std::filesystem::path`.
       } else if (record_name == "path") {
+        include_h_os
+            << "  std::filesystem::path " << api_name << "(void) const noexcept;\n";
+
         serialize_cpp_os
-            << "  b." << setter_name << "(e." << method_name << "().generic_string());\n";
+            << "  b." << setter_name << "(e." << method_name
+            << "().lexically_normal().generic_string());\n";
 
         schema_os << "  " << camel_name << " @" << i << " :Text;\n";
         ++i;
@@ -731,6 +813,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         std::optional<std::string> element_name =
             GetFirstTemplateParameterType(record);
         std::string capn_element_name;
+        std::string cxx_element_name;
         if (!element_name) {
 
         // Optional strings will be empty.
@@ -740,21 +823,28 @@ MethodListPtr CodeGenerator::RunOnClass(
                    *element_name == "basic_string_view" ||
                    *element_name == "path") {
           capn_element_name = "Text";
+          cxx_element_name = "std::string_view";
 
         // Optional references will be left as `0` if they're not present.
-        } else if (gEntityClassNames.count(*element_name)) {
+        } else if (gEntityClassNames.count(element_name.value())) {
           capn_element_name = "UInt64";  // Reference.
+          cxx_element_name = element_name.value();
         }
 
         if (capn_element_name.empty()) {
           continue;
         }
 
+        include_h_os
+            << "  std::optional<" << cxx_element_name << "> "
+            << api_name << "(void) const noexcept;\n";
+
         serialize_cpp_os
             << "  auto v" << i << " = e." << method_name << "();\n";
 
         // Strings.
-        if (*element_name == "string" || *element_name == "basic_string") {
+        if (element_name.value() == "string" ||
+            element_name.value() == "basic_string") {
           serialize_cpp_os
               << "  if (v" << i << ") {\n"
               << "    b." << setter_name << "(v.value());\n"
@@ -787,7 +877,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         } else if (*element_name == "path") {
           serialize_cpp_os
               << "  if (v" << i << ") {\n"
-              << "    b." << setter_name << "(v.value().generic_string());\n"
+              << "    b." << setter_name
+              << "(v.value().lexically_normal().generic_string());\n"
               << "    b." << setter_name << "IsPresent(true);\n"
               << "  } else {\n"
               << "    b." << setter_name << "(\"\");\n"
@@ -819,8 +910,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << capn_element_name << ";\n";
         ++i;
         schema_os
-            << "  " << camel_name << "IsPresent @" << i << " :"
-            << capn_element_name << ";\n";
+            << "  " << camel_name << "IsPresent @" << i << " :Bool;\n";
         ++i;
 
       // List of things; figure out what.
@@ -828,6 +918,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         std::optional<std::string> element_name =
             GetFirstTemplateParameterType(record);
         std::string capn_element_name;
+        std::string cxx_element_name;
+
         if (!element_name) {
 
         } else if (*element_name == "string" ||
@@ -836,17 +928,24 @@ MethodListPtr CodeGenerator::RunOnClass(
                    *element_name == "basic_string_view" ||
                    *element_name == "path") {
           capn_element_name = "Text";
+          cxx_element_name = "std::string_view";
 
-        } else if (gEntityClassNames.count(*element_name)) {
+        } else if (gEntityClassNames.count(element_name.value())) {
           capn_element_name = "UInt64";  // Reference.
+          cxx_element_name = element_name.value();
 
-        } else if (gNotReferenceTypes.count(*element_name)) {
+        } else if (gNotReferenceTypes.count(element_name.value())) {
           capn_element_name = element_name.value();
+          cxx_element_name = element_name.value();
         }
 
         if (capn_element_name.empty()) {
           continue;
         }
+
+        include_h_os
+            << "  std::vector<" << cxx_element_name << "> "
+            << api_name << "(void) const noexcept;\n";
 
         serialize_cpp_os
             << "  auto v" << i << " = e." << method_name << "();\n"
@@ -854,7 +953,6 @@ MethodListPtr CodeGenerator::RunOnClass(
             << i << ".size()));\n"
             << "  auto i" << i << " = 0u;\n"
             << "  for (const auto &e" << i << " : v" << i << ") {\n";
-
 
         if (*element_name == "string" || *element_name == "basic_string") {
           serialize_cpp_os
@@ -873,7 +971,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         } else if (*element_name == "path") {
           serialize_cpp_os
               << "    sv" << i << ".set(i" << i << ", e" << i
-              << ".generic_string());\n";
+              << ".lexically_normal().generic_string());\n";
 
         // Reference types.
         } else if (gEntityClassNames.count(*element_name)) {
@@ -899,6 +997,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // E.g. something that returns a `Decl`, `Stmt`, etc.
       } else if (gEntityClassNames.count(record_name)) {
+        include_h_os
+            << "  " << record_name << " " << api_name
+            << "(void) const noexcept;\n";
+
         serialize_cpp_os
             << "  b." << setter_name << "(es.EntityId(e." << method_name
             << "()));\n";
@@ -908,6 +1010,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // E.g. `TemplateParameterList`.
       } else if (gNotReferenceTypes.count(record_name)) {
+        include_h_os
+            << "  " << record_name << " " << api_name
+            << "(void) const noexcept;\n";
+
         serialize_cpp_os
             << "  Serialize" << record_name << "(es, b." << init_name
             << "(), e." << method_name << "());\n";
@@ -921,7 +1027,10 @@ MethodListPtr CodeGenerator::RunOnClass(
     // Handle enumerations return types.
     } else if (auto tag = return_type.AsTagDeclaration()) {
       if (auto enum_decl = pasta::EnumDecl::From(*tag)) {
-        auto enum_name = enum_decl->Name();
+        std::string enum_name = enum_decl->Name();
+        include_h_os
+            << "  " << enum_name << " " << api_name
+            << "(void) const noexcept;\n";
         serialize_cpp_os
             << "  b." << setter_name << "(static_cast<mx::ast::"
             << enum_name << ">(mx::FromPasta(e." << method_name << "())));\n";
@@ -934,6 +1043,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     // Handle integral return types.
     } else if (auto int_type = SchemaIntType(return_type)) {
+      include_h_os
+          << "  " << CxxIntType(return_type) << " " << api_name
+          << "(void) const noexcept;\n";
+
       serialize_cpp_os
           << "  b." << setter_name << "(e." << method_name << "());\n";
 
@@ -950,8 +1063,12 @@ MethodListPtr CodeGenerator::RunOnClass(
     static const std::string method_name = "DeclarationsInContext";
     if (seen_methods->emplace(method_name).second) {
       static const std::string snake_name = "declarations_in_context";
+      static const std::string api_name = SnakeCaseToAPICase(snake_name);
       static const std::string camel_name = "declarationsInContext";
       static const std::string init_name = "initDeclarationsInContext";
+
+      include_h_os
+          << "  std::vector<Decl> " << snake_name << "(void) const noexcept;\n";
 
       serialize_cpp_os
           << "  pasta::DeclContext dc" << i << "(e);\n"
@@ -970,6 +1087,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
   }
 
+  include_h_os << "};\n\n";
   serialize_cpp_os << "}\n\n";
   schema_os << "}\n\n";
   return seen_methods;
@@ -993,18 +1111,6 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "@0xa04be7b45e95b659;\n\n"
       << "using Cxx = import \"/capnp/c++.capnp\";\n"
       << "$Cxx.namespace(\"mx::ast\");\n\n";
-
-  lib_h_os
-      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
-      << "//\n"
-      << "// This source code is licensed in accordance with the terms specified in\n"
-      << "// the LICENSE file found in the root directory of this source tree.\n\n"
-      << "// Auto-generated file; do not modify!\n\n"
-      << "#pragma once\n\n"
-      << "#include <multiplier/AST.h>\n\n"
-      << "#include \"AST.capnp.h\"\n\n"
-      << "namespace mx {\n";
 
   lib_cpp_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -1063,7 +1169,12 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
-      << "#include <cstdint>\n\n"
+      << "#include <cstdint>\n"
+      << "#include <filesystem>\n"
+      << "#include <memory>\n"
+      << "#include <optional>\n"
+      << "#include <vector>\n\n"
+      << "#include \"Types.h\"\n\n"
       << "namespace pasta {\n";
 
   // Forward declarations.
@@ -1112,7 +1223,11 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "namespace indexer {\n";
   include_h_os
       << "}  // namespace pasta\n"
-      << "namespace mx {\n";
+      << "namespace mx {\n\n"
+      << "class FragmentImpl;\n"
+      << "class FileImpl;\n"
+      << "class Token;\n"
+      << "class TokenRange;\n\n";
 
   std::vector<std::string> class_names;
 
@@ -1130,6 +1245,20 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       RunOnEnum(tag);
     }
   }
+
+  for (const pasta::CXXRecordDecl &record : tokens) {
+    include_h_os
+        << "class " << record.Name() << ";\n";
+  }
+
+  include_h_os
+      << "namespace ast {\n";
+  for (const pasta::CXXRecordDecl &record : tokens) {
+    include_h_os
+        << "class " << record.Name() << ";\n";
+  }
+  include_h_os
+      << "}  // namespace ast\n";
 
   // Now that we've outputted schemas for all enums (`TokenKind`
   // included), go and define our unified `Token` schema, which will
@@ -1151,12 +1280,16 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {
     std::string name = record.Name();
+    include_h_os
+        << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
         << name << "::Builder, const pasta::" << name << " &);\n";
   }
   for (const pasta::CXXRecordDecl &record : stmts) {
     auto name = record.Name();
+    include_h_os
+        << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
         << name << "::Builder, const pasta::" << name << " &);\n";
@@ -1170,6 +1303,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
   for (const pasta::CXXRecordDecl &record : types) {
     auto name = record.Name();
+    include_h_os
+        << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name << "(EntitySerializer &, mx::ast::"
         << name << "::Builder, const pasta::" << name << " &);\n";
@@ -1211,7 +1346,6 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   schema_os << "}\n";
 
   lib_cpp_os << "}  // namespace mx\n";
-  lib_h_os << "}  // namespace mx\n";
   include_h_os << "}  // namespace mx\n";
   serialize_h_os << "}  // namespace indexer\n";
   serialize_cpp_os << "}  // namespace indexer\n";
@@ -1291,14 +1425,13 @@ int CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {
 
 CodeGenerator::CodeGenerator(char *argv[])
     : schema_os(argv[3], std::ios::trunc | std::ios::out),
-      lib_h_os(argv[4], std::ios::trunc | std::ios::out),
-      lib_cpp_os(argv[5], std::ios::trunc | std::ios::out),
-      include_h_os(argv[6], std::ios::trunc | std::ios::out),
-      serialize_h_os(argv[7], std::ios::trunc | std::ios::out),
-      serialize_cpp_os(argv[8], std::ios::trunc | std::ios::out) {}
+      lib_cpp_os(argv[4], std::ios::trunc | std::ios::out),
+      include_h_os(argv[5], std::ios::trunc | std::ios::out),
+      serialize_h_os(argv[6], std::ios::trunc | std::ios::out),
+      serialize_cpp_os(argv[7], std::ios::trunc | std::ios::out) {}
 
 int main(int argc, char *argv[]) {
-  if (9 != argc) {
+  if (8 != argc) {
     std::cerr
         << "Usage: " << argv[0]
         << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_CAPNP LIB_H LIB_CPP INCLUDE_H"

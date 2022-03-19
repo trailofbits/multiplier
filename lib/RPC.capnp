@@ -33,6 +33,11 @@ struct File @0x987f05f6a48636d5 {
   tokens @2 :List(AST.Token);
 }
 
+struct FileInfo @0xfd1022cb187f18f8 {
+  id @0 :UInt64;
+  path @1 :Text;
+}
+
 struct IndexedCode @0xe5f27760091f9a3a {
   # The unique identifier for this top-level declaration.
   codeId @0 :UInt64;
@@ -48,4 +53,17 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   
   # Tell Multiplier to index a compile command.
   indexCompileCommands @0 (commands :List(CompileCommand)) -> (success :Bool);
+
+  # Download a list of all files whose file ID is greater than or
+  # equal to `minId`.
+  downloadFileList @1 () -> (files: List(FileInfo));
+
+  # Download a file by a file ID.
+  downloadFile @2 (id :UInt64) -> (file: File);
+
+  # Download a file that contains a given file token.
+  downloadFileContainingEntity @3 (id :UInt64) -> (file: File);
+
+  # Download indexed code that contains some entity.
+  downloadIndexedCodeContainingEntity @4 (id: UInt64) -> (code: IndexedCode);
 }

@@ -51,9 +51,6 @@ class ServerContext {
  public:
   const std::filesystem::path workspace_dir;
 
- private:
-  friend class IndexingContext;
-
   mx::PersistentMap<kMetaNameToId, MetadataName, uint64_t> meta_to_id;
 
   std::atomic<mx::FileId> next_file_id;
@@ -61,7 +58,8 @@ class ServerContext {
   std::atomic<mx::CodeId> next_big_code_id;
 
   // Maps file IDs to their absolute path, as well as to their token lists.
-  mx::PersistentMap<kFileIdToPath, mx::FileId, std::string> file_id_to_path;
+  mx::PersistentMap<kFileIdToPath, std::pair<mx::FileId, std::string>,
+                    mx::Empty> file_id_to_path;
   mx::PersistentMap<kFileIdToHash, mx::FileId, std::string> file_id_to_hash;
 
   // Maps file IDs to the tokenized file contents.
@@ -92,7 +90,6 @@ class ServerContext {
 
   void Flush(void);
 
- public:
   ~ServerContext(void);
 
   explicit ServerContext(std::filesystem::path workspace_dir_);
@@ -104,12 +101,12 @@ class IndexingContext {
  private:
 
  public:
-  const std::shared_ptr<ServerContext> server_context;
+  ServerContext &server_context;
   std::unique_ptr<mx::ProgressBar> command_progress;
   std::unique_ptr<mx::ProgressBar> ast_progress;
   std::unique_ptr<mx::ProgressBar> tokenizer_progress;
 
-  explicit IndexingContext(std::shared_ptr<ServerContext> server_context_);
+  explicit IndexingContext(ServerContext &server_context_);
 
   ~IndexingContext(void);
 

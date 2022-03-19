@@ -4,7 +4,6 @@
 
 #include <array>
 #include <capnp/message.h>
-#include <cassert>
 #include <cstdint>
 #include <kj/array.h>
 #include <kj/string.h>
@@ -20,6 +19,9 @@
 #include "Int.h"
 
 namespace mx {
+
+// Represents an empty key/value.
+struct Empty {};
 
 // An unserializer that always returns default-initialzied values.
 struct NullReader {
@@ -60,8 +62,7 @@ struct NullReader {
   MX_ALWAYS_INLINE int8_t ReadI8(void) {
     return {};
   }
-  MX_ALWAYS_INLINE void Skip(uint32_t num_bytes) {
-    assert(0u < num_bytes);
+  MX_ALWAYS_INLINE void Skip(uint32_t) {
   }
 };
 
@@ -85,8 +86,7 @@ struct NullWriter {
   MX_ALWAYS_INLINE uint8_t *WriteI32(int32_t) noexcept { return nullptr; }
   MX_ALWAYS_INLINE uint8_t *WriteI16(int16_t) noexcept { return nullptr; }
   MX_ALWAYS_INLINE uint8_t *WriteI8(int8_t) noexcept { return nullptr; }
-  MX_ALWAYS_INLINE uint8_t *Skip(uint32_t num_bytes) noexcept {
-    assert(0u < num_bytes);
+  MX_ALWAYS_INLINE uint8_t *Skip(uint32_t) noexcept {
     return nullptr;
   }
   MX_ALWAYS_INLINE void EnterFixedSizeComposite(uint32_t) noexcept {}
@@ -204,7 +204,6 @@ class ByteWriter {
 
   [[gnu::hot]] MX_ALWAYS_INLINE
   uint8_t *Skip(uint32_t num_bytes) noexcept {
-    assert(0u < num_bytes);
     auto ptr = write_ptr;
     write_ptr += num_bytes;
     return ptr;
@@ -274,7 +273,7 @@ class ByteReader {
     data[5] = static_cast<Self *>(this)->ReadU8();
     data[6] = static_cast<Self *>(this)->ReadU8();
     data[7] = static_cast<Self *>(this)->ReadU8();
-    return *(new (data) uint64_t);
+    return (*(new (data) uint64_t));
   }
 
   [[gnu::hot]] MX_ALWAYS_INLINE uint32_t ReadU32(void) noexcept {
@@ -283,14 +282,14 @@ class ByteReader {
     data[1] = static_cast<Self *>(this)->ReadU8();
     data[2] = static_cast<Self *>(this)->ReadU8();
     data[3] = static_cast<Self *>(this)->ReadU8();
-    return *(new (data) uint32_t);
+    return (*(new (data) uint32_t));
   }
 
   [[gnu::hot]] MX_ALWAYS_INLINE uint16_t ReadU16(void) noexcept {
     alignas(uint16_t) uint8_t data[2];
     data[0] = static_cast<Self *>(this)->ReadU8();
     data[1] = static_cast<Self *>(this)->ReadU8();
-    return *(new (data) uint16_t);
+    return (*(new (data) uint16_t));
   }
 
   [[gnu::hot]] MX_ALWAYS_INLINE uint8_t ReadU8(void) noexcept {
@@ -534,7 +533,6 @@ struct ByteCountingWriterProxy : public SubWriter {
   }
 
   MX_ALWAYS_INLINE uint8_t *Skip(uint32_t n) {
-    assert(0u < n);
     num_bytes += n;
     return SubWriter::Skip(n);
   }
@@ -630,7 +628,6 @@ struct ByteCountingReader : public SubReader {
   }
 
   MX_ALWAYS_INLINE void Skip(uint32_t n) {
-    assert(0u < n);
     num_bytes += n;
     SubReader::Skip(n);
   }
@@ -702,31 +699,24 @@ struct Serializer<Reader, Writer, const DataT>
   MX_DEFINE_UNSAFE_SERIALIZER_PRIV(type); \
   MX_SERIALIZER_NAMESPACE_END
 
-#define MX_MAKE_ENUM_SERIALIZER(type, cast_type) \
-  MX_SERIALIZER_NAMESPACE_BEGIN \
-  template <typename Reader, typename Writer> \
-  struct Serializer<Reader, Writer, type> \
-      : public Serializer<Reader, Writer, cast_type> { \
-    using Parent = Serializer<Reader, Writer, cast_type>; \
-    static constexpr bool kIsFixedSize = Parent::kIsFixedSize; \
-    MX_FLATTEN MX_INLINE static uint8_t *Write(Writer &writer, \
-                                                         type data) { \
-      return Parent::Write(writer, static_cast<cast_type>(data)); \
-    } \
-    MX_FLATTEN MX_INLINE static void Read(Reader &reader, \
-                                                    type &out) { \
-      Parent::Read(reader, reinterpret_cast<cast_type &>(out)); \
-    } \
-    static constexpr uint32_t SizeInBytes(void) noexcept { \
-      return Parent::SizeInBytes(); \
-    } \
-  }; \
-  MX_DEFINE_UNSAFE_SERIALIZER_PRIV(type); \
-  MX_SERIALIZER_NAMESPACE_END
-
 template <typename T>
-static constexpr bool kCanReadWriteUnsafely =
+inline constexpr bool kCanReadWriteUnsafely =
     std::is_enum_v<T> || std::is_arithmetic_v<T>;
+
+template <>
+inline constexpr bool kCanReadWriteUnsafely<Empty> = true;
+
+template <typename Reader, typename Writer>
+struct Serializer<Reader, Writer, Empty> {
+  static constexpr bool kIsFixedSize = true;
+  MX_INLINE static uint8_t *Write(Writer &writer, Empty) {
+    return writer.Skip(0);
+  }
+  MX_INLINE static void Read(Reader &reader, Empty &) {}
+  static constexpr uint32_t SizeInBytes(void) noexcept {
+    return 0u;
+  }
+};
 
 #if CHAR_MIN < 0
 MX_MAKE_FUNDAMENTAL_SERIALIZER(char, static_cast, int8_t, I8, 1)

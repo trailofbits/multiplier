@@ -46,12 +46,11 @@ void ServerContext::Flush(void) {
   meta_to_id.Set(MetadataName::kNextBigCodeId, next_big_code_id.load());
 }
 
-IndexingContext::IndexingContext(
-    std::shared_ptr<ServerContext> server_context_)
-    :  server_context(std::move(server_context_)) {}
+IndexingContext::IndexingContext(ServerContext &server_context_)
+    :  server_context(server_context_) {}
 
 IndexingContext::~IndexingContext(void) {
-  server_context->Flush();
+  server_context.Flush();
 }
 
 void IndexingContext::InitializeProgressBars(const mx::Executor &exe_) {
@@ -73,17 +72,20 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
     std::filesystem::path file_path, const std::string &contents_hash) {
 
   mx::FileId created_id = 0u;
-  mx::FileId file_id = server_context->file_hash_to_file_id.LazyGetOrSet(
+  mx::FileId file_id = server_context.file_hash_to_file_id.LazyGetOrSet(
       contents_hash,
       [this, &created_id] (void) -> mx::FileId {
-        created_id = server_context->next_file_id.fetch_add(
+        created_id = server_context.next_file_id.fetch_add(
             mx::kMinEntityIdIncrement);
         return created_id;
       });
 
   CHECK_LT(file_id, mx::kMaxFileId);
 
-  server_context->file_path_to_file_id.Set(file_path.generic_string(), file_id);
+  std::string path_str = file_path.lexically_normal().generic_string();
+  server_context.file_id_to_path.Set({file_id, path_str}, {});
+  server_context.file_path_to_file_id.Set(path_str, file_id);
+
   return {file_id, file_id == created_id};
 }
 
@@ -97,10 +99,10 @@ std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigCodeChunks)`.
   if (num_tokens >= mx::kNumTokensInBigCode) {
-    code_id = server_context->code_hash_to_code_id.LazyGetOrSet(
+    code_id = server_context.code_hash_to_code_id.LazyGetOrSet(
         code_hash,
         [this, &created_id] (void) -> mx::CodeId {
-          created_id = server_context->next_big_code_id.fetch_add(
+          created_id = server_context.next_big_code_id.fetch_add(
               mx::kMinEntityIdIncrement);
           return created_id;
         });
@@ -109,10 +111,10 @@ std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
 
   // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigCodeChunks, ...)`.
   } else {
-    code_id = server_context->code_hash_to_code_id.LazyGetOrSet(
+    code_id = server_context.code_hash_to_code_id.LazyGetOrSet(
         code_hash,
         [this, &created_id] (void) -> mx::CodeId {
-          created_id = server_context->next_small_code_id.fetch_add(
+          created_id = server_context.next_small_code_id.fetch_add(
               mx::kMinEntityIdIncrement);
           return created_id;
         });
@@ -126,13 +128,13 @@ std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
 // Save the tokenized contents of a file.
 void IndexingContext::PutFileTokens(
     mx::FileId file_id, kj::Array<capnp::word> tokens) {
-  server_context->file_id_to_tokens.Set(file_id, kj::mv(tokens));
+  server_context.file_id_to_tokens.Set(file_id, kj::mv(tokens));
 }
 
 // Save the serialized top-level entities and the parsed tokens.
 void IndexingContext::PutIndexedCode(mx::CodeId code_id,
                                      kj::Array<capnp::word> code) {
-  server_context->code_id_to_indexed_code.Set(code_id, kj::mv(code));
+  server_context.code_id_to_indexed_code.Set(code_id, kj::mv(code));
 }
 
 }  // namespace indexer

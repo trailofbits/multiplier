@@ -10,6 +10,8 @@
 #include <glog/logging.h>
 #include <kj/async-io.h>
 #include <kj/debug.h>
+#include <kj/exception.h>
+#include <kj/string.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
 #include <pasta/Compile/Job.h>
@@ -17,6 +19,7 @@
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
+#include <sstream>
 #include <mutex>
 #include <vector>
 
@@ -50,7 +53,7 @@ class ServerImpl final {
   // Should we show progress bars?
   const bool show_progress_bars;
 
-  std::shared_ptr<ServerContext> server_context;
+  ServerContext server_context;
 
   std::mutex indexing_context_lock;
   std::weak_ptr<IndexingContext> indexing_context;
@@ -76,7 +79,7 @@ ServerImpl::ServerImpl(ServerOptions &options)
     : executor(options.executor_options),
       workspace_dir(options.workspace_dir),
       show_progress_bars(options.show_progress_bars),
-      server_context(std::make_shared<ServerContext>(workspace_dir)),
+      server_context(options.workspace_dir),
       native_file_system(pasta::FileSystem::CreateNative()) {}
 
 // Get or create an indexing context. If there are concurrent indexing
@@ -194,6 +197,84 @@ kj::Promise<void> Server::indexCompileCommands(
 
   results.setSuccess(true);
   return kj::READY_NOW;
+}
+
+// Download a list of file info (file id, path).
+kj::Promise<void> Server::downloadFileList(
+    DownloadFileListContext context) {
+  LOG(INFO)
+      << "Server::downloadFileList";
+
+  std::vector<std::pair<mx::FileId, std::string>> paths;
+  d->server_context.file_id_to_path.ScanPrefix(
+      mx::Empty{},
+      [=, &paths] (std::pair<mx::FileId, std::string> key, mx::Empty) {
+        DCHECK_NE(key.first, mx::kInvalidEntityId);
+        DCHECK(!key.second.empty());
+        LOG(INFO) << "Found " << key.first << " " << key.second;
+        paths.emplace_back(std::move(key));
+        return true;
+      });
+
+  auto num_files = static_cast<unsigned>(paths.size());
+  auto results = context.initResults();
+  auto files = results.initFiles(num_files);
+  for (auto i = 0u; i < num_files; ++i) {
+    const auto &path = paths[i];
+    mx::rpc::FileInfo::Builder info = files[i];
+    info.setId(path.first);
+    info.setPath(path.second);
+    LOG(INFO) << "Appending " << path.first << " " << path.second;
+  }
+
+  LOG(INFO) << "Ready!";
+  return kj::READY_NOW;
+}
+
+// Download a file associated with a specific file ID.
+kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
+  mx::rpc::Multiplier::DownloadFileParams::Reader params =
+      context.getParams();
+
+  // std::stringstream err;
+  // err << "Unable to download file with id " << params.getId();
+
+  LOG(INFO)
+      << "Server::downloadFile";
+  return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                       kj::heapString("Unable to download file"));
+}
+
+// Download a file containing a token with a specific ID.
+kj::Promise<void> Server::downloadFileContainingEntity(
+    DownloadFileContainingEntityContext context) {
+  mx::rpc::Multiplier::DownloadFileContainingEntityParams::Reader params =
+      context.getParams();
+
+  // std::stringstream err;
+  // err << "Unable to download file containing file token with id "
+  //     << params.getId();
+
+  LOG(INFO)
+      << "Server::downloadFileContainingEntity";
+  return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                       kj::heapString("Unable to download file"));
+}
+
+// Download some indexed code containing an entity with a specific ID.
+kj::Promise<void> Server::downloadIndexedCodeContainingEntity(
+    DownloadIndexedCodeContainingEntityContext context) {
+  mx::rpc::Multiplier::DownloadIndexedCodeContainingEntityParams::Reader params =
+      context.getParams();
+
+  // std::stringstream err;
+  // err << "Unable to download code containing entity with id "
+  //     << params.getId();
+
+  LOG(INFO)
+      << "Server::downloadIndexedCodeContainingEntity";
+  return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                       kj::heapString("Unable to download code"));
 }
 
 }  // namespace indexer

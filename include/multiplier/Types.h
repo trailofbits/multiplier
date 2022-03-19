@@ -10,6 +10,9 @@
 #include <variant>
 
 namespace mx {
+namespace rpc {
+class FileInfo;
+}  // namespace rpc
 
 using FileId = uint64_t;
 using CodeId = uint64_t;
@@ -31,6 +34,8 @@ static constexpr uint64_t kNumTokensInBigCode = 1ull << kBigCodeIdNumBits;
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
 
+// Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
+// inside of a `Fragment`.
 struct DeclarationId {
   CodeId code_id;
   DeclKind kind;
@@ -45,6 +50,8 @@ struct DeclarationId {
   bool operator!=(const DeclarationId &) const noexcept = default;
 };
 
+// Identifies a serialized version of a `clang::Stmt` or `pasta::Stmt`
+// inside of a `Fragment`.
 struct StatementId {
   CodeId code_id;
   StmtKind kind;
@@ -57,6 +64,7 @@ struct StatementId {
   bool operator!=(const StatementId &) const noexcept = default;
 };
 
+// Identifies a token inside of a `Fragment`.
 struct TokenId {
   CodeId code_id;
   TokenKind kind;
@@ -69,6 +77,7 @@ struct TokenId {
   bool operator!=(const TokenId &) const noexcept = default;
 };
 
+// Identifies a token inside of a `File`.
 struct FileTokenId {
   FileId file_id;
   TokenKind kind;
@@ -84,7 +93,11 @@ struct FileTokenId {
 // A tag type representing an invalid entity id.
 struct InvalidId {};
 
-using VariantId = std::variant<InvalidId, DeclarationId, StatementId, TokenId, FileTokenId>;
+// Possible types of entity ids represented by a packed
+// `EntityId`.
+using VariantId = std::variant<InvalidId, DeclarationId,
+                               StatementId, TokenId,
+                               FileTokenId>;
 
 // An opaque, compressed entity id.
 class EntityId {
@@ -99,6 +112,7 @@ class EntityId {
     return opaque;
   }
 
+  // Pack an elaborated entity ID into an opaque entity ID.
   explicit EntityId(DeclarationId id);
   explicit EntityId(StatementId id);
   explicit EntityId(TokenId id);

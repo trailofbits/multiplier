@@ -5,8 +5,10 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
+#include <string_view>
 
 #include "Serialize.h"
 
@@ -31,6 +33,9 @@ class PersistentMapBase {
   bool LazyGetOrSet(std::string_view key, std::string *val) const;
   bool GetOrSet(std::string_view key, std::string *val) const;
   bool TryGet(std::string_view key, std::string *val) const;
+  void MatchCommonPrefix(
+      std::string  key_prefix,
+      std::function<bool(std::string_view, std::string_view)> cb) const;
 };
 
 // Persistent mapping from keys to values.
@@ -44,13 +49,15 @@ class PersistentMap {
   using ValueSerializer = Serializer<NullReader, UnsafeByteWriter, V>;
 
 #ifndef NDEBUG
+  using SerializedKeyReader = ByteRangeReader;
   using SerializedValueReader = ByteRangeReader;
 #else
+  using SerializedKeyReader = UnsafeByteReader;
   using SerializedValueReader = UnsafeByteReader;
 #endif
 
+  using KeyDeserializer = Serializer<SerializedKeyReader, NullWriter, K>;
   using ValueDeserializer = Serializer<SerializedValueReader, NullWriter, V>;
-
 
   PersistentMapBase impl;
 
@@ -159,6 +166,39 @@ class PersistentMap {
     }
 
     return val;
+  }
+
+  template <typename P, typename C>
+  void ScanPrefix(P prefix, C callback) const {
+    using PrefixCountingSerializer =
+        Serializer<NullReader, ByteCountingWriter, P>;
+
+    using PrefixSerializer = Serializer<NullReader, UnsafeByteWriter, P>;
+
+    ByteCountingWriter counting_writer;
+    counting_writer.Skip(sizeof(kId));
+    PrefixCountingSerializer::Write(counting_writer, prefix);
+    const auto prefix_size = counting_writer.num_bytes;
+    std::string prefix_data(prefix_size, char{});
+    UnsafeByteWriter writer(prefix_data);
+
+    writer.WriteI8(kId);
+    PrefixSerializer::Write(writer, prefix);
+
+    impl.MatchCommonPrefix(
+        std::move(prefix_data),
+        [cb = std::move(callback)] (std::string_view key_data,
+                                    std::string_view val_data) -> bool {
+          K key;
+          V val;
+          SerializedKeyReader key_reader(key_data);
+          KeyDeserializer::Read(key_reader, key);
+
+          SerializedValueReader val_reader(val_data);
+          ValueDeserializer::Read(val_reader, val);
+
+          return cb(std::move(key), std::move(val));
+        });
   }
 };
 
