@@ -14,6 +14,7 @@
 DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+DEFINE_uint64(id, 0, "ID of the file to print");
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
@@ -32,8 +33,14 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::EntityProvider::Ptr api = mx::RemoteEntityProvider::Create(
       FLAGS_host, FLAGS_port);
-  for (auto [path, id] : api->list_files()) {
-    std::cout << id << '\t' << path.generic_string() << std::endl;
+  mx::File file = api->download_file(FLAGS_id);
+  if (!file) {
+    std::cerr << "Invalid file id " << FLAGS_id << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  for (mx::Token token : file.tokens()) {
+    std::cout << token.data();
   }
 
   return EXIT_SUCCESS;

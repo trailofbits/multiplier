@@ -56,8 +56,8 @@ class Server final : public mx::rpc::Multiplier::Server {
       DownloadFileContainingEntityContext context) final;
 
   // Download some indexed code containing an entity with a specific ID.
-  kj::Promise<void> downloadIndexedCodeContainingEntity(
-      DownloadIndexedCodeContainingEntityContext context) final;
+  kj::Promise<void> downloadFragmentContainingEntity(
+      DownloadFragmentContainingEntityContext context) final;
 
 };
 

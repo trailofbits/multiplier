@@ -23,7 +23,7 @@ using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
 // break this macro expansion into two, as in the original source file it
 // represents a single logical thing.
 struct CodeChunk {
-  mx::CodeId code_id;
+  mx::FragmentId code_id;
   std::vector<pasta::Decl> decls;
   uint64_t begin_index;
   uint64_t end_index;
@@ -35,7 +35,7 @@ class EntitySerializer final : public EntityVisitor {
  private:
   const pasta::TokenRange range;
   EntityIdMap entity_ids;
-  mx::CodeId code_id;
+  mx::FragmentId code_id;
   std::unordered_set<uint64_t> serialized_entities;
   const std::unordered_map<pasta::File, mx::FileId> &file_ids;
 

@@ -1133,7 +1133,6 @@ struct Serializer<Reader, Writer, kj::Array<T>>
 
     } else {
       auto new_ret = kj::heapArray<T>(size);
-      T *const begin = &(ret[0]);
       for (uint32_t i = 0; i < size; ++i) {
         Serializer<Reader, NullWriter, T>::Read(reader, new_ret[i]);
       }

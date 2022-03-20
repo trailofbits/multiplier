@@ -30,8 +30,8 @@ class EntityLabeller final : public EntityVisitor {
  private:
   EntityIdMap entity_ids;
   CodeChunk code;
-  std::map<std::pair<mx::CodeId, pasta::DeclKind>, uint32_t> next_decl_offset;
-  std::map<std::pair<mx::CodeId, pasta::StmtKind>, uint32_t> next_stmt_offset;
+  std::map<std::pair<mx::FragmentId, pasta::DeclKind>, uint32_t> next_decl_offset;
+  std::map<std::pair<mx::FragmentId, pasta::StmtKind>, uint32_t> next_stmt_offset;
 //  std::map<std::pair<mx::CodeId, pasta::TypeKind>, uint32_t> next_type_offset;
 
   bool Enter(const pasta::Decl &entity) final;
@@ -41,7 +41,7 @@ class EntityLabeller final : public EntityVisitor {
  public:
   virtual ~EntityLabeller(void);
 
-  CodeChunk EnterCode(mx::CodeId code_id_, std::vector<pasta::Decl> tlds,
+  CodeChunk EnterCode(mx::FragmentId code_id_, std::vector<pasta::Decl> tlds,
                       const pasta::TokenRange &range,
                       uint64_t begin_index_, uint64_t end_index_);
 

@@ -547,7 +547,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
     // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
-    auto [code_id, is_new] = context->GetOrCreateCodeId(
+    auto [code_id, is_new] = context->GetOrCreateFragmentId(
         CodeHash(file_hashes, decls_for_chunk, tok_range,
                  begin_index, end_index),
         end_index - begin_index + 1u);
@@ -572,9 +572,9 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   // Serialize the new code chunks.
   for (CodeChunk &code_chunk : code_chunks) {
-    const mx::CodeId code_id = code_chunk.code_id;
+    const mx::FragmentId code_id = code_chunk.code_id;
     capnp::MallocMessageBuilder message;
-    auto builder = message.initRoot<mx::rpc::IndexedCode>();
+    mx::rpc::Fragment::Builder builder = message.initRoot<mx::rpc::Fragment>();
     builder.setCodeId(code_chunk.code_id);
     auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
     auto tlds = builder.initTopLevelDeclarations(num_tlds);
@@ -584,7 +584,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     serializer.SerializeCodeEntities(std::move(code_chunk),
                                      builder.initEntities());
 
-    context->PutIndexedCode(code_id, capnp::messageToFlatArray(message));
+    context->PutSerializedFragment(code_id, capnp::messageToFlatArray(message));
 
 //    const pasta::Decl &leader_decl = code_chunk.decls[0];
 //    mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(

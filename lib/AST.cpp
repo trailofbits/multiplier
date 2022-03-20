@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include "AST.h"
+#include "API.h"
 
 namespace mx {
 DeclKind FromPasta(pasta::DeclKind e) {

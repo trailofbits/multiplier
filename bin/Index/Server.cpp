@@ -7,6 +7,7 @@
 #include "Server.h"
 
 #include <capnp/message.h>
+#include <capnp/serialize.h>
 #include <glog/logging.h>
 #include <kj/async-io.h>
 #include <kj/debug.h>
@@ -214,7 +215,7 @@ kj::Promise<void> Server::downloadFileList(
       });
 
   auto num_files = static_cast<unsigned>(paths.size());
-  auto results = context.getResults();
+  auto results = context.initResults();
   auto files_builder = results.initFiles(num_files);
   for (auto i = 0u; i < num_files; ++i) {
     const auto &path = paths[i];
@@ -231,13 +232,23 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
   mx::rpc::Multiplier::DownloadFileParams::Reader params =
       context.getParams();
 
-  // std::stringstream err;
-  // err << "Unable to download file with id " << params.getId();
+  mx::FileId file_id = params.getId();
+  auto maybe_contents =
+      d->server_context.file_id_to_serialized_file.TryGet(file_id);
+  if (!maybe_contents) {
+    std::stringstream err;
+    err << "Invalid file id " << file_id;
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
 
-  LOG(INFO)
-      << "Server::downloadFile";
-  return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
-                       kj::heapString("Unable to download file"));
+  capnp::FlatArrayMessageReader reader(maybe_contents.value());
+  mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
+
+  auto results = context.initResults(file.totalSize());
+  results.setFile(file);
+
+  return kj::READY_NOW;
 }
 
 // Download a file containing a token with a specific ID.
@@ -257,9 +268,9 @@ kj::Promise<void> Server::downloadFileContainingEntity(
 }
 
 // Download some indexed code containing an entity with a specific ID.
-kj::Promise<void> Server::downloadIndexedCodeContainingEntity(
-    DownloadIndexedCodeContainingEntityContext context) {
-  mx::rpc::Multiplier::DownloadIndexedCodeContainingEntityParams::Reader params =
+kj::Promise<void> Server::downloadFragmentContainingEntity(
+    DownloadFragmentContainingEntityContext context) {
+  mx::rpc::Multiplier::DownloadFragmentContainingEntityParams::Reader params =
       context.getParams();
 
   // std::stringstream err;
@@ -267,7 +278,7 @@ kj::Promise<void> Server::downloadIndexedCodeContainingEntity(
   //     << params.getId();
 
   LOG(INFO)
-      << "Server::downloadIndexedCodeContainingEntity";
+      << "Server::downloadFragmentContainingEntity";
   return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
                        kj::heapString("Unable to download code"));
 }

@@ -75,7 +75,8 @@ add_library("api"
     ${api_headers}
     ${copied_headers}
 
-    "AST.h"
+    "AST.cpp"
+    "API.h"
     "API.cpp"
     "Types.cpp"
     
@@ -162,7 +163,7 @@ add_library("util"
 
     "Action.cpp"
     "AST.cpp"
-    "AST.h"
+    "API.h"
     "BloomFilter.cpp"
     "Compress.cpp"
     "Executor.cpp"

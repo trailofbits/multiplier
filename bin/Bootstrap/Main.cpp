@@ -1119,7 +1119,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
-      << "#include \"AST.h\"\n\n"
+      << "#include \"API.h\"\n\n"
       << "namespace mx {\n";
 
   serialize_h_os

@@ -52,7 +52,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
   auto index = entity.Index();
   CHECK_LE(code.begin_index, index);
   CHECK_LE(index, code.end_index);
-  mx::TokenId id;
+  mx::FragmentTokenId id;
   id.code_id = code.code_id;
   id.offset = static_cast<uint32_t>(index - code.begin_index);
   id.kind = mx::FromPasta(kind);
@@ -65,7 +65,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
 }
 
 CodeChunk EntityLabeller::EnterCode(
-    mx::CodeId code_id_, std::vector<pasta::Decl> tlds,
+    mx::FragmentId code_id_, std::vector<pasta::Decl> tlds,
     const pasta::TokenRange &range, uint64_t begin_index_,
     uint64_t end_index_) {
 

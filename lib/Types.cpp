@@ -27,7 +27,7 @@ enum EntityKind : uint64_t {
 };
 
 // A code chunk with many tokens. This
-static_assert(kNumTokensInBigCode == (1u << kBigCodeIdNumBits));
+static_assert(kNumTokensInBigFragment == (1u << kBigFragmentIdNumBits));
 
 static constexpr unsigned kEntityKindNumBits = 3;
 static_assert(static_cast<uint64_t>(EntityKind::kNumEnumerators) <=
@@ -65,49 +65,49 @@ union PackedEntityId {
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
     uint64_t decl_kind:kDeclKindNumBits;
-    uint64_t offset:kBigCodeIdNumBits;
+    uint64_t offset:kBigFragmentIdNumBits;
     uint64_t code_id:(64 - (kEntityKindNumBits + kDeclKindNumBits +
-                            kBigCodeIdNumBits));
+                            kBigFragmentIdNumBits));
   } __attribute__((packed)) small_decl;
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
     uint64_t decl_kind:kDeclKindNumBits;
-    uint64_t code_id:kBigCodeIdNumBits;
+    uint64_t code_id:kBigFragmentIdNumBits;
     uint64_t offset:(64 - (kEntityKindNumBits + kDeclKindNumBits +
-                           kBigCodeIdNumBits));
+                           kBigFragmentIdNumBits));
   } __attribute__((packed)) big_decl;
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
     uint64_t stmt_kind:kStmtKindNumBits;
-    uint64_t offset:kBigCodeIdNumBits;
+    uint64_t offset:kBigFragmentIdNumBits;
     uint64_t code_id:(64 - (kEntityKindNumBits + kStmtKindNumBits +
-                            kBigCodeIdNumBits));
+                            kBigFragmentIdNumBits));
   } __attribute__((packed)) small_stmt;
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
     uint64_t stmt_kind:kStmtKindNumBits;
-    uint64_t code_id:kBigCodeIdNumBits;
+    uint64_t code_id:kBigFragmentIdNumBits;
     uint64_t offset:(64 - (kEntityKindNumBits + kStmtKindNumBits +
-                           kBigCodeIdNumBits));
+                           kBigFragmentIdNumBits));
   } __attribute__((packed)) big_stmt;
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
     uint64_t token_kind:kTokenKindNumBits;
-    uint64_t offset:kBigCodeIdNumBits;
+    uint64_t offset:kBigFragmentIdNumBits;
     uint64_t code_id:(64 - (kEntityKindNumBits + kTokenKindNumBits +
-                            kBigCodeIdNumBits));
+                            kBigFragmentIdNumBits));
   } __attribute__((packed)) small_token;
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
     uint64_t token_kind:kTokenKindNumBits;
-    uint64_t code_id:kBigCodeIdNumBits;
+    uint64_t code_id:kBigFragmentIdNumBits;
     uint64_t offset:(64 - (kEntityKindNumBits + kTokenKindNumBits +
-                           kBigCodeIdNumBits));
+                           kBigFragmentIdNumBits));
   } __attribute__((packed)) big_token;
 
   struct {
@@ -127,7 +127,7 @@ static_assert(sizeof(PackedEntityId) == sizeof(uint64_t));
 EntityId::EntityId(DeclarationId id) {
   if (id.code_id) {
     PackedEntityId packed = {};
-    if (id.code_id >= kMaxBigCodeId) {
+    if (id.code_id >= kMaxBigFragmentId) {
       packed.small_decl.code_id = id.code_id;
       packed.small_decl.entity_kind = static_cast<uint64_t>(kSmallCodeDeclaration);
       packed.small_decl.decl_kind = static_cast<uint64_t>(id.kind);
@@ -150,7 +150,7 @@ EntityId::EntityId(DeclarationId id) {
 EntityId::EntityId(StatementId id) {
   if (id.code_id) {
     PackedEntityId packed = {};
-    if (id.code_id >= kMaxBigCodeId) {
+    if (id.code_id >= kMaxBigFragmentId) {
       packed.small_stmt.code_id = id.code_id;
       packed.small_stmt.entity_kind = static_cast<uint64_t>(kSmallCodeStatement);
       packed.small_stmt.stmt_kind = static_cast<uint64_t>(id.kind);
@@ -171,10 +171,10 @@ EntityId::EntityId(StatementId id) {
   }
 }
 
-EntityId::EntityId(TokenId id) {
+EntityId::EntityId(FragmentTokenId id) {
   if (id.code_id) {
     PackedEntityId packed = {};
-    if (id.code_id >= kMaxBigCodeId) {
+    if (id.code_id >= kMaxBigFragmentId) {
       packed.small_token.code_id = id.code_id;
       packed.small_token.entity_kind = static_cast<uint64_t>(kSmallCodeToken);
       packed.small_token.token_kind = static_cast<uint64_t>(id.kind);
@@ -189,8 +189,8 @@ EntityId::EntityId(TokenId id) {
 
 #ifndef NDEBUG
     auto unpacked = Unpack();
-    assert(std::holds_alternative<TokenId>(unpacked));
-    assert(std::get<TokenId>(unpacked) == id);
+    assert(std::holds_alternative<FragmentTokenId>(unpacked));
+    assert(std::get<FragmentTokenId>(unpacked) == id);
 #endif
   }
 }
@@ -253,14 +253,14 @@ VariantId EntityId::Unpack(void) const noexcept {
       return id;
     }
     case EntityKind::kBigCodeToken: {
-      TokenId id;
+      FragmentTokenId id;
       id.code_id = packed.big_token.code_id;
       id.kind = static_cast<TokenKind>(packed.big_token.token_kind);
       id.offset = packed.big_token.offset;
       return id;
     }
     case EntityKind::kSmallCodeToken: {
-      TokenId id;
+      FragmentTokenId id;
       id.code_id = packed.small_token.code_id;
       id.kind = static_cast<TokenKind>(packed.small_token.token_kind);
       id.offset = packed.small_token.offset;

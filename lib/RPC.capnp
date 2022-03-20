@@ -38,7 +38,7 @@ struct FileInfo @0xfd1022cb187f18f8 {
   path @1 :Text;
 }
 
-struct IndexedCode @0xe5f27760091f9a3a {
+struct Fragment @0xe5f27760091f9a3a {
   # The unique identifier for this top-level declaration.
   codeId @0 :UInt64;
   
@@ -65,5 +65,5 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   downloadFileContainingEntity @3 (id :UInt64) -> (file: File);
 
   # Download indexed code that contains some entity.
-  downloadIndexedCodeContainingEntity @4 (id: UInt64) -> (code: IndexedCode);
+  downloadFragmentContainingEntity @4 (id: UInt64) -> (code: Fragment);
 }

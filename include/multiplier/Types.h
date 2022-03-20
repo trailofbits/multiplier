@@ -15,7 +15,7 @@ class FileInfo;
 }  // namespace rpc
 
 using FileId = uint64_t;
-using CodeId = uint64_t;
+using FragmentId = uint64_t;
 
 enum class DeclKind : unsigned short;
 enum class StmtKind : unsigned short;
@@ -27,9 +27,10 @@ static constexpr uint64_t kMinEntityIdIncrement = 1ull;
 // If we have more than 2^16 tokens in a given code chunk, then we consider
 // this a "big code" chunk. We assume that we'll have few of these, i.e. less
 // than 2^16 of them.
-static constexpr unsigned kBigCodeIdNumBits = 16u;
-static constexpr CodeId kMaxBigCodeId = 1ull << kBigCodeIdNumBits;
-static constexpr uint64_t kNumTokensInBigCode = 1ull << kBigCodeIdNumBits;
+static constexpr unsigned kBigFragmentIdNumBits = 16u;
+static constexpr FragmentId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
+static constexpr uint64_t kNumTokensInBigFragment =
+    1ull << kBigFragmentIdNumBits;
 
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
@@ -37,7 +38,7 @@ static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
 // Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
 // inside of a `Fragment`.
 struct DeclarationId {
-  CodeId code_id;
+  FragmentId code_id;
   DeclKind kind;
 
   // Offset of this where this declaration is stored inside of a `kind`-specific
@@ -53,7 +54,7 @@ struct DeclarationId {
 // Identifies a serialized version of a `clang::Stmt` or `pasta::Stmt`
 // inside of a `Fragment`.
 struct StatementId {
-  CodeId code_id;
+  FragmentId code_id;
   StmtKind kind;
 
   // Offset of this where this declaration is stored inside of a `kind`-specific
@@ -65,16 +66,16 @@ struct StatementId {
 };
 
 // Identifies a token inside of a `Fragment`.
-struct TokenId {
-  CodeId code_id;
+struct FragmentTokenId {
+  FragmentId code_id;
   TokenKind kind;
 
   // Offset of this where this declaration is stored inside of a `kind`-specific
   // list in `ast::EntityList`.
   uint32_t offset;
 
-  bool operator==(const TokenId &) const noexcept = default;
-  bool operator!=(const TokenId &) const noexcept = default;
+  bool operator==(const FragmentTokenId &) const noexcept = default;
+  bool operator!=(const FragmentTokenId &) const noexcept = default;
 };
 
 // Identifies a token inside of a `File`.
@@ -96,7 +97,7 @@ struct InvalidId {};
 // Possible types of entity ids represented by a packed
 // `EntityId`.
 using VariantId = std::variant<InvalidId, DeclarationId,
-                               StatementId, TokenId,
+                               StatementId, FragmentTokenId,
                                FileTokenId>;
 
 // An opaque, compressed entity id.
@@ -115,7 +116,7 @@ class EntityId {
   // Pack an elaborated entity ID into an opaque entity ID.
   explicit EntityId(DeclarationId id);
   explicit EntityId(StatementId id);
-  explicit EntityId(TokenId id);
+  explicit EntityId(FragmentTokenId id);
   explicit EntityId(FileTokenId id);
 
   // Unpack this entity ID into a concrete type.

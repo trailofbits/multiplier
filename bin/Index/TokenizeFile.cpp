@@ -42,7 +42,7 @@ void TokenizeFile(IndexingContext &context, mx::FileId file_id,
     ftb.setData(tok_data);
   }
 
-  context.PutFileTokens(file_id, capnp::messageToFlatArray(message));
+  context.PutSerializedFile(file_id, capnp::messageToFlatArray(message));
 }
 
 }  // namespace indexer

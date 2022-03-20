@@ -36,3 +36,4 @@ function(define_example exe_name source_file)
 endfunction(define_example)
 
 define_example("mx-list-files" "ListFiles.cpp")
+define_example("mx-print-file" "PrintFile.cpp")

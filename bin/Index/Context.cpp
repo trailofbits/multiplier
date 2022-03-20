@@ -21,19 +21,18 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
     : workspace_dir(std::move(workspace_dir_)),
       meta_to_id(workspace_dir),
       file_id_to_path(workspace_dir),
-      file_id_to_hash(workspace_dir),
-      file_id_to_tokens(workspace_dir),
+      file_id_to_serialized_file(workspace_dir),
       file_hash_to_file_id(workspace_dir),
       file_path_to_file_id(workspace_dir),
-      code_hash_to_code_id(workspace_dir),
+      code_hash_to_fragment_id(workspace_dir),
       code_id_to_indexed_code(workspace_dir) {
 
-  next_file_id.store(meta_to_id.GetOrSet(MetadataName::kNextFileId,
-                                         mx::kMinEntityIdIncrement));
-  next_small_code_id.store(meta_to_id.GetOrSet(MetadataName::kNextSmallCodeId,
-                                               mx::kMaxBigCodeId));
-  next_big_code_id.store(meta_to_id.GetOrSet(MetadataName::kNextBigCodeId,
-                                             mx::kMinEntityIdIncrement));
+  next_file_id.store(meta_to_id.GetOrSet(
+      MetadataName::kNextFileId, mx::kMinEntityIdIncrement));
+  next_small_fragment_id.store(meta_to_id.GetOrSet(
+      MetadataName::kNextSmallCodeId, mx::kMaxBigFragmentId));
+  next_big_fragment_id.store(meta_to_id.GetOrSet(
+      MetadataName::kNextBigCodeId, mx::kMinEntityIdIncrement));
 }
 
 ServerContext::~ServerContext(void) {
@@ -42,12 +41,12 @@ ServerContext::~ServerContext(void) {
 
 void ServerContext::Flush(void) {
   meta_to_id.Set(MetadataName::kNextFileId, next_file_id.load());
-  meta_to_id.Set(MetadataName::kNextSmallCodeId, next_small_code_id.load());
-  meta_to_id.Set(MetadataName::kNextBigCodeId, next_big_code_id.load());
+  meta_to_id.Set(MetadataName::kNextSmallCodeId, next_small_fragment_id.load());
+  meta_to_id.Set(MetadataName::kNextBigCodeId, next_big_fragment_id.load());
 }
 
 IndexingContext::IndexingContext(ServerContext &server_context_)
-    :  server_context(server_context_) {}
+    : server_context(server_context_) {}
 
 IndexingContext::~IndexingContext(void) {
   server_context.Flush();
@@ -90,49 +89,49 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
 
 // Get or create a code ID for the top-level declarations that hash to
 // `code_hash`.
-std::pair<mx::CodeId, bool> IndexingContext::GetOrCreateCodeId(
+std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
     const std::string &code_hash, uint64_t num_tokens) {
 
-  mx::CodeId created_id = 0u;
-  mx::CodeId code_id = 0u;
+  mx::FragmentId created_id = 0u;
+  mx::FragmentId code_id = 0u;
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigCodeChunks)`.
-  if (num_tokens >= mx::kNumTokensInBigCode) {
-    code_id = server_context.code_hash_to_code_id.LazyGetOrSet(
+  if (num_tokens >= mx::kNumTokensInBigFragment) {
+    code_id = server_context.code_hash_to_fragment_id.LazyGetOrSet(
         code_hash,
-        [this, &created_id] (void) -> mx::CodeId {
-          created_id = server_context.next_big_code_id.fetch_add(
+        [this, &created_id] (void) -> mx::FragmentId {
+          created_id = server_context.next_big_fragment_id.fetch_add(
               mx::kMinEntityIdIncrement);
           return created_id;
         });
 
-    CHECK_LT(code_id, mx::kMaxBigCodeId);
+    CHECK_LT(code_id, mx::kMaxBigFragmentId);
 
   // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigCodeChunks, ...)`.
   } else {
-    code_id = server_context.code_hash_to_code_id.LazyGetOrSet(
+    code_id = server_context.code_hash_to_fragment_id.LazyGetOrSet(
         code_hash,
-        [this, &created_id] (void) -> mx::CodeId {
-          created_id = server_context.next_small_code_id.fetch_add(
+        [this, &created_id] (void) -> mx::FragmentId {
+          created_id = server_context.next_small_fragment_id.fetch_add(
               mx::kMinEntityIdIncrement);
           return created_id;
         });
 
-    CHECK_GE(code_id, mx::kMaxBigCodeId);
+    CHECK_GE(code_id, mx::kMaxBigFragmentId);
   }
 
   return {code_id, code_id == created_id};
 }
 
 // Save the tokenized contents of a file.
-void IndexingContext::PutFileTokens(
+void IndexingContext::PutSerializedFile(
     mx::FileId file_id, kj::Array<capnp::word> tokens) {
-  server_context.file_id_to_tokens.Set(file_id, kj::mv(tokens));
+  server_context.file_id_to_serialized_file.Set(file_id, kj::mv(tokens));
 }
 
 // Save the serialized top-level entities and the parsed tokens.
-void IndexingContext::PutIndexedCode(mx::CodeId code_id,
-                                     kj::Array<capnp::word> code) {
+void IndexingContext::PutSerializedFragment(mx::FragmentId code_id,
+                                            kj::Array<capnp::word> code) {
   server_context.code_id_to_indexed_code.Set(code_id, kj::mv(code));
 }
 
