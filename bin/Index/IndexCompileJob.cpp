@@ -572,10 +572,10 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   // Serialize the new code chunks.
   for (CodeChunk &code_chunk : code_chunks) {
-    const mx::FragmentId code_id = code_chunk.code_id;
+    const mx::FragmentId code_id = code_chunk.fragment_id;
     capnp::MallocMessageBuilder message;
     mx::rpc::Fragment::Builder builder = message.initRoot<mx::rpc::Fragment>();
-    builder.setCodeId(code_chunk.code_id);
+    builder.setCodeId(code_chunk.fragment_id);
     auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
     auto tlds = builder.initTopLevelDeclarations(num_tlds);
     for (auto i = 0u; i < num_tlds; ++i) {

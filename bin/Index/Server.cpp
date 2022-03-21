@@ -251,36 +251,29 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
   return kj::READY_NOW;
 }
 
-// Download a file containing a token with a specific ID.
-kj::Promise<void> Server::downloadFileContainingEntity(
-    DownloadFileContainingEntityContext context) {
-  mx::rpc::Multiplier::DownloadFileContainingEntityParams::Reader params =
+// Download a fragment containing a token with a specific ID.
+kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
+  mx::rpc::Multiplier::DownloadFragmentParams::Reader params =
       context.getParams();
 
-  // std::stringstream err;
-  // err << "Unable to download file containing file token with id "
-  //     << params.getId();
+  std::stringstream err;
+  mx::FragmentId fragment_id = params.getId();
 
-  LOG(INFO)
-      << "Server::downloadFileContainingEntity";
-  return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
-                       kj::heapString("Unable to download file"));
-}
+  auto maybe_contents =
+      d->server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
+  if (!maybe_contents) {
+    err << "Invalid fragment id " << fragment_id;
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
 
-// Download some indexed code containing an entity with a specific ID.
-kj::Promise<void> Server::downloadFragmentContainingEntity(
-    DownloadFragmentContainingEntityContext context) {
-  mx::rpc::Multiplier::DownloadFragmentContainingEntityParams::Reader params =
-      context.getParams();
+  capnp::FlatArrayMessageReader reader(maybe_contents.value());
+  mx::rpc::Fragment::Reader fragment = reader.getRoot<mx::rpc::Fragment>();
 
-  // std::stringstream err;
-  // err << "Unable to download code containing entity with id "
-  //     << params.getId();
+  auto results = context.initResults(fragment.totalSize());
+  results.setFragment(fragment);
 
-  LOG(INFO)
-      << "Server::downloadFragmentContainingEntity";
-  return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
-                       kj::heapString("Unable to download code"));
+  return kj::READY_NOW;
 }
 
 }  // namespace indexer

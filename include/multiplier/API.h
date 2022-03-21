@@ -19,7 +19,9 @@ namespace mx {
 
 class EntityProvider;
 class FileImpl;
+class Fragment;
 class FragmentImpl;
+class InvalidEntityProvider;
 class RemoteEntityProvider;
 class RemoteEntityProviderImpl;
 class Token;
@@ -30,6 +32,8 @@ class TokenReaderImpl;
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
  private:
+  friend class Fragment;
+  friend class FragmentImpl;
   friend class TokenList;
   friend class TokenListIterator;
 
@@ -49,6 +53,9 @@ class Token {
 
   // Return the data of this token.
   std::string_view data(void) const noexcept;
+
+  // Return the ID of this token.
+  EntityId id(void) const noexcept;
 };
 
 class TokenListEnd {};
@@ -103,6 +110,7 @@ class TokenListIterator {
 class TokenList {
  private:
   friend class File;
+  friend class Fragment;
 
   std::shared_ptr<const TokenReaderImpl> impl;
   unsigned num_tokens;
@@ -139,6 +147,7 @@ class TokenList {
 class File {
  private:
   friend class EntityProvider;
+  friend class Token;
   friend class RemoteEntityProvider;
 
   std::shared_ptr<const FileImpl> impl;
@@ -147,6 +156,9 @@ class File {
       : impl(std::move(impl_)) {}
 
  public:
+  // Return the file containing a specific fragment.
+  static File containing(const Fragment &fragment);
+
   // Return `true` if this is a valid file.
   operator bool(void) const noexcept;
 
@@ -155,18 +167,59 @@ class File {
 
   // Return the list of tokens in this file.
   TokenList tokens(void) const noexcept;
+
+  inline bool operator==(const File &that) const noexcept {
+    return id() == that.id();
+  }
+
+  inline bool operator!=(const File &that) const noexcept {
+    return id() != that.id();
+  }
 };
 
-//// A list of files, including their paths.
-//class FileList {
-// public:
-//};
+// A fragment of code containing one or more top-level declarations, the
+// associated declaration and statement entities, macro expansion/substitution
+// trees, and tokens.
+class Fragment {
+ private:
+  friend class EntityProvider;
+  friend class File;
+  friend class RemoteEntityProvider;
+  friend class Token;
+
+  std::shared_ptr<const FragmentImpl> impl;
+
+  inline Fragment(std::shared_ptr<const FragmentImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+ public:
+  // Return `true` if this is a valid fragment.
+  operator bool(void) const noexcept;
+
+  // Return the ID of this fragment.
+  FragmentId id(void) const noexcept;
+
+  // Return the list of parsed tokens in the fragment. This doesn't
+  // include all tokens, i.e. macro use tokens, comments, etc.
+  TokenList tokens(void) const noexcept;
+
+  // Return the list of top-level declarations in this fragment.
+  std::vector<Decl> declarations(void) const noexcept;
+
+  inline bool operator==(const Fragment &that) const noexcept {
+    return id() == that.id();
+  }
+
+  inline bool operator!=(const Fragment &that) const noexcept {
+    return id() != that.id();
+  }
+};
 
 // Provides the APIs with entities.
-class EntityProvider {
+class EntityProvider : public std::enable_shared_from_this<EntityProvider> {
  public:
 
-  using Ptr = std::shared_ptr<EntityProvider>;
+  using Ptr = std::shared_ptr<const EntityProvider>;
 
   virtual ~EntityProvider(void);
 
@@ -176,7 +229,13 @@ class EntityProvider {
   list_files(void) const = 0;
 
   // Download a file by its unique ID.
-  virtual File download_file(FileId id) const noexcept = 0;
+  virtual File file(FileId id) const noexcept = 0;
+
+  // Download a fragment by its unique ID.
+  virtual Fragment fragment(FragmentId id) const noexcept = 0;
+
+  // Download a fragment based off of an entity ID.
+  Fragment fragment_containing(EntityId) const noexcept;
 };
 
 // Provides entities from a remote source, i.e. a remote
@@ -199,7 +258,10 @@ class RemoteEntityProvider final : public EntityProvider {
   list_files(void) const final;
 
   // Download a file by its unique ID.
-  File download_file(FileId id) const noexcept final;
+  File file(FileId id) const noexcept final;
+
+  // Download a fragment by its unique ID.
+  Fragment fragment(FragmentId id) const noexcept final;
 };
 
 class FileManager {

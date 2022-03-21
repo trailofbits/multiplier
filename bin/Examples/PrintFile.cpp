@@ -33,7 +33,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::EntityProvider::Ptr api = mx::RemoteEntityProvider::Create(
       FLAGS_host, FLAGS_port);
-  mx::File file = api->download_file(FLAGS_id);
+  mx::File file = api->file(FLAGS_id);
   if (!file) {
     std::cerr << "Invalid file id " << FLAGS_id << std::endl;
     return EXIT_FAILURE;

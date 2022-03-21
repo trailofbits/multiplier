@@ -86,7 +86,7 @@ bool EntitySerializer::Enter(const pasta::Decl &entity) {
 
   // This entity doesn't belong in this code chunk. Not sure if/when this will
   // happen.
-  if (decl_id.code_id != code_id) {
+  if (decl_id.fragment_id != code_id) {
     LOG(FATAL)
         << "wrong list";
     return false;
@@ -136,7 +136,7 @@ bool EntitySerializer::Enter(const pasta::Stmt &entity) {
 
   // This entity doesn't belong in this code chunk. Not sure if/when this will
   // happen.
-  if (stmt_id.code_id != code_id) {
+  if (stmt_id.fragment_id != code_id) {
     DLOG(ERROR)
         << "Attempting to serialize into wrong entity list";
     return false;

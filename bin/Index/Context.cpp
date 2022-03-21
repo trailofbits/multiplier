@@ -25,7 +25,7 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       file_hash_to_file_id(workspace_dir),
       file_path_to_file_id(workspace_dir),
       code_hash_to_fragment_id(workspace_dir),
-      code_id_to_indexed_code(workspace_dir) {
+      fragment_id_to_serialized_fragment(workspace_dir) {
 
   next_file_id.store(meta_to_id.GetOrSet(
       MetadataName::kNextFileId, mx::kMinEntityIdIncrement));
@@ -132,7 +132,7 @@ void IndexingContext::PutSerializedFile(
 // Save the serialized top-level entities and the parsed tokens.
 void IndexingContext::PutSerializedFragment(mx::FragmentId code_id,
                                             kj::Array<capnp::word> code) {
-  server_context.code_id_to_indexed_code.Set(code_id, kj::mv(code));
+  server_context.fragment_id_to_serialized_fragment.Set(code_id, kj::mv(code));
 }
 
 }  // namespace indexer

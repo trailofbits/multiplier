@@ -38,7 +38,7 @@ static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
 // Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
 // inside of a `Fragment`.
 struct DeclarationId {
-  FragmentId code_id;
+  FragmentId fragment_id;
   DeclKind kind;
 
   // Offset of this where this declaration is stored inside of a `kind`-specific
@@ -54,7 +54,7 @@ struct DeclarationId {
 // Identifies a serialized version of a `clang::Stmt` or `pasta::Stmt`
 // inside of a `Fragment`.
 struct StatementId {
-  FragmentId code_id;
+  FragmentId fragment_id;
   StmtKind kind;
 
   // Offset of this where this declaration is stored inside of a `kind`-specific
@@ -67,7 +67,7 @@ struct StatementId {
 
 // Identifies a token inside of a `Fragment`.
 struct FragmentTokenId {
-  FragmentId code_id;
+  FragmentId fragment_id;
   TokenKind kind;
 
   // Offset of this where this declaration is stored inside of a `kind`-specific
@@ -109,15 +109,15 @@ class EntityId {
   /* implicit */ inline EntityId(uint64_t opaque_)
       : opaque(opaque_) {}
 
+  // Pack an elaborated entity ID into an opaque entity ID.
+  /* implicit */ EntityId(DeclarationId id);
+  /* implicit */ EntityId(StatementId id);
+  /* implicit */ EntityId(FragmentTokenId id);
+  /* implicit */ EntityId(FileTokenId id);
+
   inline operator uint64_t(void) const noexcept {
     return opaque;
   }
-
-  // Pack an elaborated entity ID into an opaque entity ID.
-  explicit EntityId(DeclarationId id);
-  explicit EntityId(StatementId id);
-  explicit EntityId(FragmentTokenId id);
-  explicit EntityId(FileTokenId id);
 
   // Unpack this entity ID into a concrete type.
   VariantId Unpack(void) const noexcept;

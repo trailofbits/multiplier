@@ -23,7 +23,7 @@ namespace indexer {
 void EntitySerializer::SerializeCodeEntities(
     CodeChunk code, mx::ast::EntityList::Builder builder) {
   serialized_entities.clear();
-  code_id = code.code_id;
+  code_id = code.fragment_id;
   auto tokens_builder = builder.initToken(
       static_cast<unsigned>(code.end_index - code.begin_index + 1u));
   for (auto i = code.begin_index; i <= code.end_index; ++i) {

@@ -23,7 +23,7 @@ using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
 // break this macro expansion into two, as in the original source file it
 // represents a single logical thing.
 struct CodeChunk {
-  mx::FragmentId code_id;
+  mx::FragmentId fragment_id;
   std::vector<pasta::Decl> decls;
   uint64_t begin_index;
   uint64_t end_index;

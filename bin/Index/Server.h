@@ -51,14 +51,9 @@ class Server final : public mx::rpc::Multiplier::Server {
   // Download a file associated with a specific file ID.
   kj::Promise<void> downloadFile(DownloadFileContext context) final;
 
-  // Download a file containing a token with a specific ID.
-  kj::Promise<void> downloadFileContainingEntity(
-      DownloadFileContainingEntityContext context) final;
-
-  // Download some indexed code containing an entity with a specific ID.
-  kj::Promise<void> downloadFragmentContainingEntity(
-      DownloadFragmentContainingEntityContext context) final;
-
+  // Download a fragment containing containing an entity identified by a
+  // specific entity ID.
+  kj::Promise<void> downloadFragment(DownloadFragmentContext context) final;
 };
 
 }  // namespace indexer

@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <cassert>
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <llvm/ADT/APSInt.h>

@@ -42,11 +42,16 @@ struct Fragment @0xe5f27760091f9a3a {
   # The unique identifier for this top-level declaration.
   codeId @0 :UInt64;
   
+  # ID of the first file token associated with this framgnet. We 'hang'
+  # the fragment on this ID from the perspective of rendering fragments
+  # in a GUI.
+  fileTokenId @1 :UInt64;
+  
   # Entities embedded in this code sequence.
-  entities @1 :AST.EntityList;
+  entities @2 :AST.EntityList;
   
   # List of top-level declarations in this code chunk.
-  topLevelDeclarations @2 :List(UInt64);
+  topLevelDeclarations @3 :List(UInt64);
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {
@@ -58,12 +63,9 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   # equal to `minId`.
   downloadFileList @1 () -> (files: List(FileInfo));
 
-  # Download a file by a file ID.
+  # Download a file by a file by an `mx::FileId`.
   downloadFile @2 (id :UInt64) -> (file: File);
 
-  # Download a file that contains a given file token.
-  downloadFileContainingEntity @3 (id :UInt64) -> (file: File);
-
-  # Download indexed code that contains some entity.
-  downloadFragmentContainingEntity @4 (id: UInt64) -> (code: Fragment);
+  # Download a code fragment by an `mx::FragmentId`.
+  downloadFragment @3 (id: UInt64) -> (fragment: Fragment);
 }

@@ -97,10 +97,10 @@ class ServerContext {
   mx::PersistentMap<kFragmentHashToFragmentId, std::string, mx::FragmentId>
       code_hash_to_fragment_id;
 
-  // Maps a code ID to the serialized `rpc::Fragment` data structure.
+  // Maps a fragment ID to the serialized `rpc::Fragment` data structure.
   mx::PersistentMap<kFragmentIdToSerializedFragment,
                     mx::FragmentId, kj::Array<capnp::word>>
-      code_id_to_indexed_code;
+      fragment_id_to_serialized_fragment;
 
   void Flush(void);
 

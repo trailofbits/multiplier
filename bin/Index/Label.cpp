@@ -15,9 +15,9 @@ EntityLabeller::~EntityLabeller(void) {}
 
 bool EntityLabeller::Enter(const pasta::Decl &entity) {
   auto kind = entity.Kind();
-  auto &next_offset = next_decl_offset[{code.code_id, kind}];
+  auto &next_offset = next_decl_offset[{code.fragment_id, kind}];
   mx::DeclarationId id;
-  id.code_id = code.code_id;
+  id.fragment_id = code.fragment_id;
   id.offset = next_offset;
   id.kind = mx::FromPasta(kind);
 
@@ -32,9 +32,9 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
 
 bool EntityLabeller::Enter(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
-  auto &next_offset = next_stmt_offset[{code.code_id, kind}];
+  auto &next_offset = next_stmt_offset[{code.fragment_id, kind}];
   mx::StatementId id;
-  id.code_id = code.code_id;
+  id.fragment_id = code.fragment_id;
   id.offset = next_offset;
   id.kind = mx::FromPasta(kind);
 
@@ -53,7 +53,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
   CHECK_LE(code.begin_index, index);
   CHECK_LE(index, code.end_index);
   mx::FragmentTokenId id;
-  id.code_id = code.code_id;
+  id.fragment_id = code.fragment_id;
   id.offset = static_cast<uint32_t>(index - code.begin_index);
   id.kind = mx::FromPasta(kind);
 
@@ -69,7 +69,7 @@ CodeChunk EntityLabeller::EnterCode(
     const pasta::TokenRange &range, uint64_t begin_index_,
     uint64_t end_index_) {
 
-  code.code_id = code_id_;
+  code.fragment_id = code_id_;
   code.begin_index = begin_index_;
   code.end_index = end_index_;
   code.decls = std::move(tlds);
