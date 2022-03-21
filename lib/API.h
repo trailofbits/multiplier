@@ -119,6 +119,12 @@ class FragmentImpl {
   // or look up entities related to other fragments.
   const EntityProvider::Ptr ep;
 
+  // The containing file, if we've computed it.
+  //
+  // TODO(pag): If we start using the client with multiple threads then we
+  //            should guard this with a mutex.
+  mutable FileImpl::Ptr containing_file;
+
   virtual ~FragmentImpl(void) noexcept;
 
   inline FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_)

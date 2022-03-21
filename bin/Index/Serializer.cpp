@@ -51,15 +51,23 @@ uint64_t EntitySerializer::EntityId(const pasta::Token &entity) {
   }
 }
 
+mx::FileId EntitySerializer::FileId(const pasta::File &file) {
+  if (auto fit = file_ids.find(file); fit != file_ids.end()) {
+    return fit->second;
+  } else {
+    return mx::kInvalidEntityId;
+  }
+}
+
 uint64_t EntitySerializer::EntityId(const pasta::FileToken &entity) {
   if (auto it = entity_ids.find(entity.RawFileToken()); it != entity_ids.end()) {
     return it->second;
   }
 
   auto file = pasta::File::Containing(entity);
-  if (auto fit = file_ids.find(file); fit != file_ids.end()) {
+  if (auto file_id = FileId(file); file_id != mx::kInvalidEntityId) {
     mx::FileTokenId id;
-    id.file_id = fit->second;
+    id.file_id = file_id;
     id.kind = TokenKindFromPasta(entity);
     id.offset = static_cast<uint32_t>(entity.Index());
     ::mx::EntityId ret_id(id);

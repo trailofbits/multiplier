@@ -62,8 +62,9 @@ class EntitySerializer final : public EntityVisitor {
 
   virtual ~EntitySerializer(void);
 
-  inline EntitySerializer(pasta::TokenRange range_, EntityIdMap entity_ids_,
-                          const std::unordered_map<pasta::File, mx::FileId> &file_ids_)
+  inline EntitySerializer(
+      pasta::TokenRange range_, EntityIdMap entity_ids_,
+      const std::unordered_map<pasta::File, mx::FileId> &file_ids_)
       : entity_ids(std::move(entity_ids_)),
         code_id(mx::kInvalidEntityId),
         file_ids(file_ids_),
@@ -72,6 +73,7 @@ class EntitySerializer final : public EntityVisitor {
   void SerializeCodeEntities(
       CodeChunk code, mx::ast::EntityList::Builder entities);
 
+  mx::FileId FileId(const pasta::File &file);
   uint64_t EntityId(const pasta::Decl &entity);
   uint64_t EntityId(const pasta::Stmt &entity);
   uint64_t EntityId(const pasta::Token &entity);

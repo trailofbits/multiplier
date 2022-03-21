@@ -375,8 +375,14 @@ Token TokenList::operator[](size_t index) const noexcept {
 
 // Return the file containing a specific fragment.
 File File::containing(const Fragment &fragment) {
-  return fragment.impl->ep->file(
-      fragment.impl->FileContaingFirstToken());
+  auto &fp = fragment.impl->containing_file;
+  if (!fp) {
+    auto ret = fragment.impl->ep->file(fragment.impl->FileContaingFirstToken());
+    fp = ret.impl;
+    return ret;
+  } else {
+    return File(fp);
+  }
 }
 
 // Return `true` if this is a valid file.

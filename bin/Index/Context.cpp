@@ -137,4 +137,19 @@ void IndexingContext::PutSerializedFragment(mx::FragmentId code_id,
   server_context.fragment_id_to_serialized_fragment.Set(code_id, kj::mv(code));
 }
 
+// Save an entries of the form `(file_id, line_number, fragment_id)` over
+// the inclusive range `[start_line, end_line]` so that we can figure out
+// which fragments overlap which lines.
+//
+// TODO(pag): Eventually implement an async writer for `PersistentMap` and
+//            `PersistentSet` using a RocksDB `WriteBatch`.
+void IndexingContext::PutFragmentLineCoverage(
+    mx::FileId file_id, mx::FragmentId fragment_id,
+    unsigned start_line, unsigned end_line) {
+  server_context.file_fragment_ids.Insert(file_id, fragment_id);
+  for (auto i = start_line; i <= end_line; ++i) {
+    server_context.file_fragment_lines.Insert(file_id, i, fragment_id);
+  }
+}
+
 }  // namespace indexer

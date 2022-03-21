@@ -160,6 +160,12 @@ class IndexingContext {
   // Save the serialized top-level entities and the parsed tokens.
   void PutSerializedFragment(mx::FragmentId code_id,
                              kj::Array<capnp::word> code);
+
+  // Save an entries of the form `(file_id, line_number, fragment_id)` over
+  // the inclusive range `[start_line, end_line]` so that we can figure out
+  // which fragments overlap which lines.
+  void PutFragmentLineCoverage(mx::FileId file_id, mx::FragmentId fragment_id,
+                               unsigned start_line, unsigned end_line);
 };
 
 }  // namespace indexer

@@ -49,6 +49,28 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
   context.PutSerializedFile(file_id, capnp::messageToFlatArray(message));
 }
 
+// Figure out the lines of `file` spanned by `tt`.
+static void FindFileRange(TokenTree tt, const pasta::File &file,
+                          pasta::FileToken *min, pasta::FileToken *max) {
+  if (tt.File() != file) {
+    return;
+  }
+
+  for (auto node : tt) {
+    if (auto ft = node.FileToken()) {
+      DCHECK(pasta::File::Containing(*ft) == file);
+      if (ft->Index() < min->Index()) {
+        *min = *ft;
+      }
+      if (ft->Index() > max->Index()) {
+        *max = *ft;
+      }
+    } else if (auto sub = node.Substitution()) {
+      FindFileRange(std::move(sub->first), file, min, max);
+    }
+  }
+}
+
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
                      CodeChunk code_chunk) {
 
@@ -68,15 +90,31 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
 
   TokenTree token_tree = maybe_tt.TakeValue();
 
+  // Figure out the lines spanned by this code fragment.
+  //
+  // TODO(pag): Handle sub-ranges for x-macros? Probably should have something
+  //            more robust that handles discontinuous ranges, just in case.
+  pasta::File file = token_tree.File();
+  pasta::FileTokenRange file_tokens = file.Tokens();
+  pasta::FileToken min_token = file_tokens[file_tokens.Size() - 1u];
+  pasta::FileToken max_token = file_tokens[0];
+  FindFileRange(token_tree, file, &min_token, &max_token);
+
+  mx::FileId file_id = serializer.FileId(file);
+  context.PutFragmentLineCoverage(file_id, code_id, min_token.Line(),
+                                  max_token.Line());
+
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder builder = message.initRoot<mx::rpc::Fragment>();
   builder.setCodeId(code_chunk.fragment_id);
+  builder.setFileTokenId(serializer.EntityId(min_token));
 
   auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
   auto tlds = builder.initTopLevelDeclarations(num_tlds);
   for (auto i = 0u; i < num_tlds; ++i) {
     tlds.set(i, serializer.EntityId(code_chunk.decls[i]));
   }
+
   serializer.SerializeCodeEntities(std::move(code_chunk),
                                    builder.initEntities());
 

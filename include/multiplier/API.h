@@ -146,11 +146,13 @@ class TokenList {
 // de-duplicate via a hash of the contents.
 class File {
  private:
+  using Ptr = std::shared_ptr<const FileImpl>;
+
   friend class EntityProvider;
   friend class Token;
   friend class RemoteEntityProvider;
 
-  std::shared_ptr<const FileImpl> impl;
+  Ptr impl;
 
   inline File(std::shared_ptr<const FileImpl> impl_)
       : impl(std::move(impl_)) {}

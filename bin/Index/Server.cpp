@@ -242,11 +242,28 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
                          kj::heapString(err.str()));
   }
 
+  // Collect the fragments associated with this file.
+  std::vector<mx::FragmentId> fragment_ids;
+  d->server_context.file_fragment_ids.ScanPrefix(
+      file_id,
+      [file_id, &fragment_ids] (mx::FileId found_file_id,
+                                mx::FragmentId fragment_id) {
+        DCHECK_EQ(file_id, found_file_id);
+        fragment_ids.push_back(fragment_id);
+        return file_id == found_file_id;
+      });
+
   capnp::FlatArrayMessageReader reader(maybe_contents.value());
   mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
 
   auto results = context.initResults(file.totalSize());
   results.setFile(file);
+
+  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
+  auto fragments = results.initFragments(num_fragments);
+  for (auto i = 0u; i < num_fragments; ++i) {
+    fragments.set(i, fragment_ids[0]);
+  }
 
   return kj::READY_NOW;
 }
