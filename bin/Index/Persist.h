@@ -10,11 +10,16 @@
 #include <multiplier/Types.h>
 #include <pasta/Util/File.h>
 
+#include "Serializer.h"
+
 namespace indexer {
 
 class IndexingContext;
 
-void TokenizeFile(IndexingContext &context, mx::FileId file_id,
-                  std::string file_hash, pasta::File file);
+void PersistFile(IndexingContext &context, mx::FileId file_id,
+                 std::string file_hash, pasta::File file);
+
+void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
+                     CodeChunk fragment_info);
 
 }  // namespace indexer

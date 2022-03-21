@@ -207,10 +207,10 @@ kj::Promise<void> Server::downloadFileList(
   std::vector<std::pair<mx::FileId, std::string>> paths;
   d->server_context.file_id_to_path.ScanPrefix(
       mx::Empty{},
-      [=, &paths] (std::pair<mx::FileId, std::string> key, mx::Empty) {
-        DCHECK_NE(key.first, mx::kInvalidEntityId);
-        DCHECK(!key.second.empty());
-        paths.emplace_back(std::move(key));
+      [=, &paths] (mx::FileId file_id, std::string file_path) {
+        DCHECK_NE(file_id, mx::kInvalidEntityId);
+        DCHECK(!file_path.empty());
+        paths.emplace_back(file_id, std::move(file_path));
         return true;
       });
 

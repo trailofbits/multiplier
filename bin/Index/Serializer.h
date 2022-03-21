@@ -33,7 +33,6 @@ struct CodeChunk {
 
 class EntitySerializer final : public EntityVisitor {
  private:
-  const pasta::TokenRange range;
   EntityIdMap entity_ids;
   mx::FragmentId code_id;
   std::unordered_set<uint64_t> serialized_entities;
@@ -59,14 +58,16 @@ class EntitySerializer final : public EntityVisitor {
   void Serialize(mx::ast::Token::Builder token, const pasta::Token &entity);
 
  public:
+  const pasta::TokenRange range;
+
   virtual ~EntitySerializer(void);
 
   inline EntitySerializer(pasta::TokenRange range_, EntityIdMap entity_ids_,
                           const std::unordered_map<pasta::File, mx::FileId> &file_ids_)
-      : range(std::move(range_)),
-        entity_ids(std::move(entity_ids_)),
+      : entity_ids(std::move(entity_ids_)),
         code_id(mx::kInvalidEntityId),
-        file_ids(file_ids_) {}
+        file_ids(file_ids_),
+        range(std::move(range_)) {}
 
   void SerializeCodeEntities(
       CodeChunk code, mx::ast::EntityList::Builder entities);

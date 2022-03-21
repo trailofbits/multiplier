@@ -7,10 +7,58 @@
 #include "Util.h"
 
 #include <multiplier/AST.h>
+#include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
+#include <pasta/AST/Printer.h>
+#include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
+#include <sstream>
 
 namespace indexer {
+
+// Print a declaration; useful for error reporting.
+std::string DeclToString(const pasta::Decl &decl) {
+  std::stringstream ss;
+  auto sep = "";
+  for (auto ptok : pasta::PrintedTokenRange::Create(decl)) {
+    ss << sep << ptok.Data();
+    sep = " ";
+  }
+  return ss.str();
+}
+
+// Return the name of a declaration with a leading `prefix`, or nothing.
+std::string PrefixedName(const pasta::Decl &decl, const char *prefix) {
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    auto name = nd->Name();
+    if (!name.empty()) {
+      return prefix + name;
+    }
+  }
+  return "";
+}
+
+
+// Return the location of a declaration with a leading `prefix`, or nothing.
+std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix) {
+  auto ft = decl.Token().FileLocation();
+  if (!ft) {
+    for (auto tok : decl.TokenRange()) {
+      ft = decl.Token().FileLocation();
+      if (ft) {
+        break;
+      }
+    }
+  }
+  if (ft) {
+    auto file = pasta::File::Containing(*ft);
+    std::stringstream ss;
+    ss << prefix << file.Path().lexically_normal().generic_string()
+       << ':' << ft->Line() << ':' << ft->Column();
+    return ss.str();
+  }
+  return "";
+}
 
 // Returns `true` if `data` contains only whitespace or is empty.
 bool IsWhitespaceOrEmpty(std::string_view data) {

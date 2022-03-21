@@ -32,6 +32,8 @@ enum : char {
   kFileIdToPath,
   kFileIdToHash,
   kFileIdToSerializedFile,
+  kFileIdToFragmentId,
+  kFileIdAndLineNumberToFragmentId,
   kFileHashToFileId,
   kFilePathToFileId,
   kFragmentHashToFragmentId,
@@ -72,12 +74,23 @@ class ServerContext {
   std::atomic<mx::FragmentId> next_big_fragment_id;
 
   // Maps file IDs to their absolute path, as well as to their token lists.
-  mx::PersistentMap<kFileIdToPath, std::pair<mx::FileId, std::string>,
-                    mx::Empty> file_id_to_path;
+  mx::PersistentSet<kFileIdToPath, mx::FileId, std::string> file_id_to_path;
 
   // Maps file IDs to a serialized `rpc::File` data structure.
   mx::PersistentMap<kFileIdToSerializedFile, mx::FileId, kj::Array<capnp::word>>
       file_id_to_serialized_file;
+
+  // A set of `(file_id, fragment_id)` pairs for mapping from files to the
+  // fragments contained in those files.
+  mx::PersistentSet<kFileIdToFragmentId, mx::FileId, mx::FragmentId>
+      file_fragment_ids;
+
+  // A set of `(file_id, line number, fragment_id)` triples for mapping from
+  // search results to the fragments that might overlap with those search
+  // results.
+  mx::PersistentSet<kFileIdAndLineNumberToFragmentId,
+                    mx::FileId, unsigned, mx::FragmentId>
+      file_fragment_lines;
 
   // Maps a hash of a file's contents to an ID for that file.
   mx::PersistentMap<kFileHashToFileId, std::string, mx::FileId>

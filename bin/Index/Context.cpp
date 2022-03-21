@@ -22,6 +22,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       meta_to_id(workspace_dir),
       file_id_to_path(workspace_dir),
       file_id_to_serialized_file(workspace_dir),
+      file_fragment_ids(workspace_dir),
+      file_fragment_lines(workspace_dir),
       file_hash_to_file_id(workspace_dir),
       file_path_to_file_id(workspace_dir),
       code_hash_to_fragment_id(workspace_dir),
@@ -82,7 +84,7 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
   CHECK_LT(file_id, mx::kMaxFileId);
 
   std::string path_str = file_path.lexically_normal().generic_string();
-  server_context.file_id_to_path.Set({file_id, path_str}, {});
+  server_context.file_id_to_path.Insert(file_id, path_str);
   server_context.file_path_to_file_id.Set(path_str, file_id);
   return {file_id, file_id == created_id};
 }

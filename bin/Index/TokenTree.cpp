@@ -46,16 +46,11 @@ struct TokenInfo {
   Category category{kFileToken};
 };
 
-// Inclusive range `[begin, end]` of tokens.
-struct TokenInfoRange {
-  TokenInfo *begin;
-  TokenInfo *end;
-};
-
 // Represents a token substitution. This can be due to a macro expansion, or
 // due to an X-macro file inclusion (i.e. where an include is nested inside
 // of a declaration, and then the included file expands macros).
-struct Substitution {
+class Substitution {
+ public:
   const enum Kind {
     // Default case, this is an identity substitution of `before` for itself,
     // i.e. this sustitution represents the tokens of `before`.
@@ -83,164 +78,10 @@ struct Substitution {
         after(nullptr),
         file(file_) {}
 
-  TokenInfo *RightCorner(void) {
-    if (kind == Substitution::kInclusion) {
-      if (after) {
-        return after->RightCorner();
-      }
-    }
-    if (!before.empty()) {
-      auto ent = before.back();
-      if (std::holds_alternative<TokenInfo *>(ent)) {
-        return std::get<TokenInfo *>(ent);
-      } else {
-        return std::get<Substitution *>(ent)->RightCorner();
-      }
-    }
-    return nullptr;
-  }
-
-  TokenInfo *RightCornerOfFile(pasta::File of_file) {
-    if (file == of_file) {
-      if (!before.empty()) {
-        auto ent = before.back();
-        if (std::holds_alternative<TokenInfo *>(ent)) {
-          return std::get<TokenInfo *>(ent);
-        } else {
-          return std::get<Substitution *>(ent)->RightCornerOfFile(of_file);
-        }
-      }
-    } else if (after) {
-      return after->RightCornerOfFile(std::move(of_file));
-    }
-
-    return nullptr;
-  }
-
-  void Print(std::ostream &os) {
-    for (auto ent : before) {
-      if (std::holds_alternative<TokenInfo *>(ent)) {
-        auto info = std::get<TokenInfo *>(ent);
-        switch (info->category) {
-          case TokenInfo::kFileToken:
-            std::cerr << info->file_tok->Data();
-            continue;
-          case TokenInfo::kMacroUseToken:
-          case TokenInfo::kMissingFileToken:
-            std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
-            continue;
-          case TokenInfo::kMarkerToken:
-          default:
-            continue;
-        }
-      } else {
-        std::get<Substitution *>(ent)->Print(os);
-      }
-    }
-  }
-
-  static std::string TokData(std::string_view data) {
-    std::stringstream ss;
-    for (auto ch : data) {
-      switch (ch) {
-        case '<': ss << "&lt;"; break;
-        case '>': ss << "&gt;"; break;
-        case '"': ss << "&quot;"; break;
-        case '\'': ss << "&apos;"; break;
-        case '\n': ss << " "; break;
-        case '&': ss << "&amp;"; break;
-        default: ss << ch; break;
-      }
-    }
-    return ss.str();
-  }
-
-  void PrintDOT(std::ostream &os) {
-    if (after) {
-      after->PrintDOT(os);
-    }
-
-    os << "s" << reinterpret_cast<void *>(this)
-       << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"><TR>";
-
-    auto has_any = false;
-    auto dump_ft = [&] (TokenInfo *info) {
-      if (auto tk = info->file_tok->Kind();
-          tk == pasta::TokenKind::kComment || tk == pasta::TokenKind::kUnknown) {
-        // Skip.
-      } else if (tk == pasta::TokenKind::kCharacterConstant ||
-                 tk == pasta::TokenKind::kUtf8CharacterConstant ||
-                 tk == pasta::TokenKind::kUtf16CharacterConstant ||
-                 tk == pasta::TokenKind::kUtf32CharacterConstant ||
-                 tk == pasta::TokenKind::kWideCharacterConstant ||
-                 tk == pasta::TokenKind::kStringLiteral ||
-                 tk == pasta::TokenKind::kUtf8StringLiteral ||
-                 tk == pasta::TokenKind::kUtf16StringLiteral ||
-                 tk == pasta::TokenKind::kUtf32StringLiteral ||
-                 tk == pasta::TokenKind::kWideStringLiteral) {
-
-        os << "<TD>&lt;str&gt;</TD>";
-        has_any = true;
-
-      } else {
-        os << "<TD>" << TokData(info->file_tok->Data()) << "</TD>";
-        has_any = true;
-      }
-    };
-
-    auto i = 0;
-    for (auto ent : before) {
-      if (std::holds_alternative<TokenInfo *>(ent)) {
-        auto info = std::get<TokenInfo *>(ent);
-        switch (info->category) {
-          case TokenInfo::kFileToken:
-            dump_ft(info);
-            continue;
-          case TokenInfo::kMacroExpansionToken:
-            os << "<TD>" << TokData(info->parsed_tok->Data()) << "</TD>";
-            has_any = true;
-            continue;
-          case TokenInfo::kMacroUseToken:
-          case TokenInfo::kMissingFileToken:
-            dump_ft(info);
-            continue;
-          case TokenInfo::kMarkerToken:
-            continue;
-          default:
-            continue;
-        }
-      } else {
-        os << "<TD port=\"s" << (i++) << "\"> </TD>";
-        has_any = true;
-      }
-    }
-
-    if (!has_any) {
-      os << "<TD> </TD>";
-    }
-
-    os << "</TR></TABLE>>];\n";
-
-    i = 0;
-    for (auto ent : before) {
-      if (std::holds_alternative<Substitution *>(ent)) {
-        auto s = std::get<Substitution *>(ent);
-        s->PrintDOT(os);
-
-        if (s->after) {
-          os << "s" << reinterpret_cast<void *>(this) << ":s" << i << " -> s"
-             << reinterpret_cast<void *>(s) << " [label=\"before\"];\n"
-             << "s" << reinterpret_cast<void *>(this) << ":s" << i << " -> s"
-             << reinterpret_cast<void *>(s->after) << " [label=\"after\"];\n";
-        } else {
-          os << "s" << reinterpret_cast<void *>(this) << ":s" << i << " -> s"
-             << reinterpret_cast<void *>(s) << ";\n";
-        }
-
-        ++i;
-      }
-    }
-  }
+  TokenInfo *RightCorner(void) const;
+  TokenInfo *RightCornerOfFile(pasta::File of_file) const;
+  void Print(std::ostream &os) const;
+  void PrintDOT(std::ostream &os) const;
 };
 
 class TokenTreeImpl {
@@ -256,8 +97,6 @@ class TokenTreeImpl {
   std::vector<Substitution *> substitutions;
 
   std::string data;
-//  std::vector<pasta::TokenKind> token_kinds;
-//  std::vector<unsigned> data_offsets;
 
   // Build an initial token info list. This contains all of the tokens that were
   // parsed, plus the file tokens that were macro uses. This does not contain
@@ -313,6 +152,169 @@ class TokenTreeImpl {
   TokenInfo *HandleEndOfMacroExpansion(TokenInfo *prev, TokenInfo *curr,
                                        std::stringstream &err);
 };
+
+static std::string TokData(std::string_view data) {
+  std::stringstream ss;
+  for (auto ch : data) {
+    switch (ch) {
+      case '<': ss << "&lt;"; break;
+      case '>': ss << "&gt;"; break;
+      case '"': ss << "&quot;"; break;
+      case '\'': ss << "&apos;"; break;
+      case '\n': ss << " "; break;
+      case '&': ss << "&amp;"; break;
+      default: ss << ch; break;
+    }
+  }
+  return ss.str();
+}
+
+TokenInfo *Substitution::RightCorner(void) const {
+  if (kind == Substitution::kInclusion) {
+    if (after) {
+      return after->RightCorner();
+    }
+  }
+  if (!before.empty()) {
+    auto ent = before.back();
+    if (std::holds_alternative<TokenInfo *>(ent)) {
+      return std::get<TokenInfo *>(ent);
+    } else {
+      return std::get<Substitution *>(ent)->RightCorner();
+    }
+  }
+  return nullptr;
+}
+
+TokenInfo *Substitution::RightCornerOfFile(pasta::File of_file) const {
+  if (file == of_file) {
+    if (!before.empty()) {
+      auto ent = before.back();
+      if (std::holds_alternative<TokenInfo *>(ent)) {
+        return std::get<TokenInfo *>(ent);
+      } else {
+        return std::get<Substitution *>(ent)->RightCornerOfFile(of_file);
+      }
+    }
+  } else if (after) {
+    return after->RightCornerOfFile(std::move(of_file));
+  }
+
+  return nullptr;
+}
+
+void Substitution::Print(std::ostream &os) const {
+  for (auto ent : before) {
+    if (std::holds_alternative<TokenInfo *>(ent)) {
+      auto info = std::get<TokenInfo *>(ent);
+      switch (info->category) {
+        case TokenInfo::kFileToken:
+          std::cerr << info->file_tok->Data();
+          continue;
+        case TokenInfo::kMacroUseToken:
+        case TokenInfo::kMissingFileToken:
+          std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
+          continue;
+        case TokenInfo::kMarkerToken:
+        default:
+          continue;
+      }
+    } else {
+      std::get<Substitution *>(ent)->Print(os);
+    }
+  }
+}
+
+void Substitution::PrintDOT(std::ostream &os) const {
+  if (after) {
+    after->PrintDOT(os);
+  }
+
+  os << "s" << reinterpret_cast<const void *>(this)
+     << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"><TR>";
+
+  auto has_any = false;
+  auto dump_ft = [&] (TokenInfo *info) {
+    if (auto tk = info->file_tok->Kind();
+        tk == pasta::TokenKind::kComment || tk == pasta::TokenKind::kUnknown) {
+      // Skip.
+    } else if (tk == pasta::TokenKind::kCharacterConstant ||
+               tk == pasta::TokenKind::kUtf8CharacterConstant ||
+               tk == pasta::TokenKind::kUtf16CharacterConstant ||
+               tk == pasta::TokenKind::kUtf32CharacterConstant ||
+               tk == pasta::TokenKind::kWideCharacterConstant ||
+               tk == pasta::TokenKind::kStringLiteral ||
+               tk == pasta::TokenKind::kUtf8StringLiteral ||
+               tk == pasta::TokenKind::kUtf16StringLiteral ||
+               tk == pasta::TokenKind::kUtf32StringLiteral ||
+               tk == pasta::TokenKind::kWideStringLiteral) {
+
+      os << "<TD>&lt;str&gt;</TD>";
+      has_any = true;
+
+    } else {
+      os << "<TD>" << TokData(info->file_tok->Data()) << "</TD>";
+      has_any = true;
+    }
+  };
+
+  auto i = 0;
+  for (auto ent : before) {
+    if (std::holds_alternative<TokenInfo *>(ent)) {
+      auto info = std::get<TokenInfo *>(ent);
+      switch (info->category) {
+        case TokenInfo::kFileToken:
+          dump_ft(info);
+          continue;
+        case TokenInfo::kMacroExpansionToken:
+          os << "<TD>" << TokData(info->parsed_tok->Data()) << "</TD>";
+          has_any = true;
+          continue;
+        case TokenInfo::kMacroUseToken:
+        case TokenInfo::kMissingFileToken:
+          dump_ft(info);
+          continue;
+        case TokenInfo::kMarkerToken:
+          continue;
+        default:
+          continue;
+      }
+    } else {
+      os << "<TD port=\"s" << (i++) << "\"> </TD>";
+      has_any = true;
+    }
+  }
+
+  if (!has_any) {
+    os << "<TD> </TD>";
+  }
+
+  os << "</TR></TABLE>>];\n";
+
+  i = 0;
+  for (auto ent : before) {
+    if (std::holds_alternative<Substitution *>(ent)) {
+      auto s = std::get<Substitution *>(ent);
+      s->PrintDOT(os);
+
+      if (s->after) {
+        os << "s" << reinterpret_cast<const void *>(this)
+           << ":s" << i << " -> s"
+           << reinterpret_cast<const void *>(s) << " [label=\"before\"];\n"
+           << "s" << reinterpret_cast<const void *>(this)
+           << ":s" << i << " -> s"
+           << reinterpret_cast<const void *>(s->after)
+           << " [label=\"after\"];\n";
+      } else {
+        os << "s" << reinterpret_cast<const void *>(this)
+           << ":s" << i << " -> s"
+           << reinterpret_cast<const void *>(s) << ";\n";
+      }
+
+      ++i;
+    }
+  }
+}
 
 // Back-fill tokens from the beginning of the file `file`, up to but not
 // including the token at index `stop_index`.
@@ -1081,7 +1083,7 @@ Substitution *TokenTreeImpl::FillMissingFileTokens(std::stringstream &err) {
   }
 
   CHECK(!substitutions.empty());
-
+  CHECK_EQ(toks, substitutions[0]);
   return toks;
 }
 
@@ -1108,43 +1110,71 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
   }
 
   auto impl = std::make_shared<TokenTreeImpl>();
-
-//  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-
   impl->BuildInitialTokenList(std::move(range), begin_index, end_index);
   if (impl->tokens_alloc.empty()) {
     err << "Cannot create token tree from empty token range";
     return err.str();
   }
 
-//  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-//  for (auto info = &(tokens_alloc.front()); info; info = info->next) {
-//    switch (info->category) {
-//      case TokenInfo::kFileToken:
-//        std::cerr << info->file_tok->Data();
-//        continue;
-//      case TokenInfo::kMacroUseToken:
-//      case TokenInfo::kMissingFileToken:
-//        std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
-//        continue;
-//      case TokenInfo::kMarkerToken:
-//      default:
-//        continue;
-//    }
-//  }
   auto sub = impl->FillMissingFileTokens(err);
   if (!sub) {
     return err.str();
   }
-//  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-//  sub->Print(std::cerr);
-//  std::cerr
-//      << "\n\ndigraph {\n"
-//      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
-//  sub->PrintDOT(std::cerr);
-//  std::cerr << "\n}\n";
-//  std::cerr << "\n\n\n";
-  return TokenTree(std::move(impl));
+
+  std::shared_ptr<const Substitution> ret(std::move(impl), sub);
+  return TokenTree(std::move(ret));
+}
+
+std::optional<pasta::FileToken> TokenTreeNode::FileToken(void) const noexcept {
+  if (const auto &ent = impl->before[offset];
+      std::holds_alternative<TokenInfo *>(ent)) {
+    return std::get<TokenInfo *>(ent)->file_tok;
+  } else {
+    return std::nullopt;
+  }
+}
+
+std::optional<pasta::Token> TokenTreeNode::Token(void) const noexcept {
+  if (const auto &ent = impl->before[offset];
+      std::holds_alternative<TokenInfo *>(ent)) {
+    return std::get<TokenInfo *>(ent)->parsed_tok;
+  } else {
+    return std::nullopt;
+  }
+}
+
+std::optional<std::pair<TokenTree, TokenTree>>
+TokenTreeNode::Substitution(void) const noexcept {
+  if (const auto &ent = impl->before[offset];
+      std::holds_alternative<class Substitution *>(ent)) {
+    auto lhs = std::get<class Substitution *>(ent);
+    auto rhs = lhs->after;
+    CHECK_NOTNULL(rhs);
+
+    TokenTree before(std::shared_ptr<const class Substitution>(impl, lhs));
+    TokenTree after(std::shared_ptr<const class Substitution>(impl, rhs));
+    return std::make_pair<TokenTree, TokenTree>(
+        std::move(before), std::move(after));
+  } else {
+    return std::nullopt;
+  }
+}
+
+bool TokenTreeNodeIterator::operator==(TokenTreeNodeIteratorEnd) const {
+  return node.offset >= node.impl->before.size();
+}
+
+bool TokenTreeNodeIterator::operator!=(TokenTreeNodeIteratorEnd) const {
+  return node.offset < node.impl->before.size();
+}
+
+// Return the file associated with the tokens of this substitution.
+::pasta::File TokenTree::File(void) const {
+  return impl->file;
+}
+
+TokenTreeNodeIterator TokenTree::begin(void) const noexcept {
+  return TokenTreeNodeIterator(impl);
 }
 
 }  // namespace indexer

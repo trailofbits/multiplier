@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <capnp/message.h>
-#include <capnp/serialize.h>
 #include <cassert>
 #include <fstream>
 #include <glog/logging.h>
@@ -32,8 +31,7 @@
 #include "Label.h"
 #include "PrintTokenGraph.h"
 #include "Serializer.h"
-#include "TokenizeFile.h"
-#include "TokenTree.h"
+#include "Persist.h"
 #include "Util.h"
 
 namespace indexer {
@@ -164,51 +162,6 @@ static bool TokenIsInContextOfDecl(const pasta::Token &tok,
     }
   }
   return false;
-}
-
-// Print a declaration; useful for error reporting.
-static std::string DeclToString(const pasta::Decl &decl) {
-  std::stringstream ss;
-  auto sep = "";
-  for (auto ptok : pasta::PrintedTokenRange::Create(decl)) {
-    ss << sep << ptok.Data();
-    sep = " ";
-  }
-  return ss.str();
-}
-
-// Return the name of a declaration with a leading `prefix`, or nothing.
-static std::string PrefixedName(const pasta::Decl &decl,
-                                const char *prefix=" ") {
-  if (auto nd = pasta::NamedDecl::From(decl)) {
-    auto name = nd->Name();
-    if (!name.empty()) {
-      return prefix + name;
-    }
-  }
-  return "";
-}
-
-// Return the location of a declaration with a leading `prefix`, or nothing.
-static std::string PrefixedLocation(const pasta::Decl &decl,
-                                    const char *prefix=" ") {
-  auto ft = decl.Token().FileLocation();
-  if (!ft) {
-    for (auto tok : decl.TokenRange()) {
-      ft = decl.Token().FileLocation();
-      if (ft) {
-        break;
-      }
-    }
-  }
-  if (ft) {
-    auto file = pasta::File::Containing(*ft);
-    std::stringstream ss;
-    ss << prefix << file.Path().lexically_normal().generic_string()
-       << ':' << ft->Line() << ':' << ft->Column();
-    return ss.str();
-  }
-  return "";
 }
 
 // Can we elide this token from the beginning or end of a top-level
@@ -384,28 +337,29 @@ IndexCompileJobAction::IndexCompileJobAction(
 
 // Look through all files referenced by the AST get their unique IDs. If this
 // is the first time seeing a file, then tokenize the file.
-void IndexCompileJobAction::MaybeTokenizeFile(
+void IndexCompileJobAction::MaybePersistFile(
     const mx::Executor &exe, pasta::File file) {
-  if (file.WasParsed()) {
-    auto maybe_data = file.Data();
-    auto file_path = file.Path();
-    if (maybe_data.Succeeded()) {
-      auto file_hash = FileHash(maybe_data.TakeValue());
-      auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
-          file_path, file_hash);
-      if (is_new_file_id) {
-        TokenizeFile(*context, file_id, file_hash, file);
-      }
-
-      file_ids.emplace(file, file_id);
-      file_hashes.emplace(file, std::move(file_hash));
-
-    } else {
-      LOG(ERROR)
-          << "Unable to get data for file '" << file_path.generic_string()
-          << ": " << maybe_data.TakeError().message();
-    }
+  if (!file.WasParsed()) {
+    return;
   }
+
+  auto maybe_data = file.Data();
+  auto file_path = file.Path();
+  if (!maybe_data.Succeeded()) {
+    LOG(ERROR)
+        << "Unable to get data for file '" << file_path.generic_string()
+        << ": " << maybe_data.TakeError().message();
+  }
+
+  auto file_hash = FileHash(maybe_data.TakeValue());
+  auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
+      file_path, file_hash);
+  if (is_new_file_id) {
+    PersistFile(*context, file_id, file_hash, file);
+  }
+
+  file_ids.emplace(file, file_id);
+  file_hashes.emplace(file, std::move(file_hash));
 }
 
 // Build and index the AST.
@@ -425,7 +379,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   pasta::AST ast = maybe_ast.TakeValue();
   for (pasta::File file : ast.ParsedFiles()) {
-    MaybeTokenizeFile(exe, std::move(file));
+    MaybePersistFile(exe, std::move(file));
   }
 
   using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
@@ -572,32 +526,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   // Serialize the new code chunks.
   for (CodeChunk &code_chunk : code_chunks) {
-    const mx::FragmentId code_id = code_chunk.fragment_id;
-    capnp::MallocMessageBuilder message;
-    mx::rpc::Fragment::Builder builder = message.initRoot<mx::rpc::Fragment>();
-    builder.setCodeId(code_chunk.fragment_id);
-    auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
-    auto tlds = builder.initTopLevelDeclarations(num_tlds);
-    for (auto i = 0u; i < num_tlds; ++i) {
-      tlds.set(i, serializer.EntityId(code_chunk.decls[i]));
-    }
-    serializer.SerializeCodeEntities(std::move(code_chunk),
-                                     builder.initEntities());
-
-    context->PutSerializedFragment(code_id, capnp::messageToFlatArray(message));
-
-//    const pasta::Decl &leader_decl = code_chunk.decls[0];
-//    mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-//        tok_range, code_chunk.begin_index, code_chunk.end_index);
-//    if (maybe_tt.Succeeded()) {
-//
-//    } else {
-//      LOG(ERROR)
-//          << maybe_tt.TakeError() << " for top-level declaration "
-//          << DeclToString(leader_decl)
-//          << PrefixedLocation(leader_decl, " at or near ")
-//          << " on main job file " << main_file_path;
-//    }
+    PersistFragment(*context, serializer, std::move(code_chunk));
   }
 }
 
