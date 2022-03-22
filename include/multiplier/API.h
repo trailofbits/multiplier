@@ -26,7 +26,6 @@ class Fragment;
 class FragmentImpl;
 class InvalidEntityProvider;
 class RemoteEntityProvider;
-class RemoteEntityProviderImpl;
 class Token;
 class TokenList;
 class TokenListIterator;
@@ -312,49 +311,29 @@ class Fragment {
 class EntityProvider : public std::enable_shared_from_this<EntityProvider> {
  public:
 
-  using Ptr = std::shared_ptr<const EntityProvider>;
+  using Ptr = std::shared_ptr<EntityProvider>;
 
-  virtual ~EntityProvider(void);
+  virtual ~EntityProvider(void) noexcept;
+
+  // Returns an entity provider that gets entities from a remote host.
+  static Ptr from_remote(std::string host, std::string port);
+
+  // Returns an entity provider that gets entities from a UNIX domain socket.
+  static Ptr from_socket(std::filesystem::path path);
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
   virtual std::set<std::pair<std::filesystem::path, FileId>>
-  list_files(void) const = 0;
+  list_files(void) noexcept = 0;
 
   // Download a file by its unique ID.
-  virtual File file(FileId id) const noexcept = 0;
+  virtual File file(FileId id) noexcept = 0;
 
   // Download a fragment by its unique ID.
-  virtual Fragment fragment(FragmentId id) const noexcept = 0;
+  virtual Fragment fragment(FragmentId id) noexcept = 0;
 
   // Download a fragment based off of an entity ID.
-  Fragment fragment_containing(EntityId) const noexcept;
-};
-
-// Provides entities from a remote source, i.e. a remote
-// server available via `host:port`, or another process
-// available over a UNIX domain socket `unix:/path`.
-class RemoteEntityProvider final : public EntityProvider {
- private:
-  const std::unique_ptr<RemoteEntityProviderImpl> impl;
-
- public:
-  RemoteEntityProvider(RemoteEntityProviderImpl *impl_);
-
-  virtual ~RemoteEntityProvider(void);
-
-  static Ptr Create(std::string host, std::string port);
-
-  // Get the current list of parsed files, where the minimum ID
-  // in the returned list of fetched files will be `start_at`.
-  std::set<std::pair<std::filesystem::path, FileId>>
-  list_files(void) const final;
-
-  // Download a file by its unique ID.
-  File file(FileId id) const noexcept final;
-
-  // Download a fragment by its unique ID.
-  Fragment fragment(FragmentId id) const noexcept final;
+  Fragment fragment_containing(EntityId) noexcept;
 };
 
 class FileManager {

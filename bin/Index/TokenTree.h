@@ -10,7 +10,11 @@
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 #include <string>
+#include <tuple>
 
+namespace mx {
+enum class TokenSubstitutionKind : unsigned short;
+}  // namespace mx
 namespace indexer {
 
 class Substitution;
@@ -32,7 +36,8 @@ class TokenTreeNode {
  public:
   std::optional<pasta::FileToken> FileToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
-  std::optional<std::pair<TokenTree, TokenTree>> Substitution(void) const noexcept;
+  std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree, TokenTree>>
+  Substitution(void) const noexcept;
 };
 
 class TokenTreeNodeIteratorEnd {};
@@ -93,6 +98,9 @@ class TokenTree {
   inline TokenTreeNodeIteratorEnd end(void) const noexcept {
     return {};
   }
+
+  // Return the number of nodes in this tree.
+  unsigned NumNodes(void) const noexcept;
 };
 
 }  // namespace indexer

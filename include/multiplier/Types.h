@@ -17,9 +17,18 @@ class FileInfo;
 using FileId = uint64_t;
 using FragmentId = uint64_t;
 
+class Fragment;
+class FragmentImpl;
+
 enum class DeclKind : unsigned short;
 enum class StmtKind : unsigned short;
 enum class TokenKind : unsigned short;
+
+enum class TokenSubstitutionKind : unsigned short {
+  MACRO_EXPANSION,
+  FUNCTION_LIKE_MACRO_EXPANSION,
+  INCLUDE_EXPANSION
+};
 
 static constexpr uint64_t kInvalidEntityId = 0ull;
 static constexpr uint64_t kMinEntityIdIncrement = 1ull;
@@ -57,7 +66,7 @@ struct StatementId {
   FragmentId fragment_id;
   StmtKind kind;
 
-  // Offset of this where this declaration is stored inside of a `kind`-specific
+  // Offset of this where this statement is stored inside of a `kind`-specific
   // list in `ast::EntityList`.
   uint32_t offset;
 
@@ -70,12 +79,28 @@ struct FragmentTokenId {
   FragmentId fragment_id;
   TokenKind kind;
 
-  // Offset of this where this declaration is stored inside of a `kind`-specific
-  // list in `ast::EntityList`.
+  // Offset of this where this token is stored inside of a serialized
+  // `rpc::Fragment::entities::token`, where `rpc::Fragment::entities`
+  // is an `ast::EntityList`.
   uint32_t offset;
 
   bool operator==(const FragmentTokenId &) const noexcept = default;
   bool operator!=(const FragmentTokenId &) const noexcept = default;
+};
+
+// The offset of a substitution inside of a
+struct TokenSubstitutionId {
+ public:
+  FragmentId fragment_id;
+
+  TokenSubstitutionKind kind;
+
+  // Offset of this where this token substitution is stored inside of a
+  // serialized `rpc::Fragment::tokenSubstitutions`.
+  uint32_t offset;
+
+  bool operator==(const TokenSubstitutionId &) const noexcept = default;
+  bool operator!=(const TokenSubstitutionId &) const noexcept = default;
 };
 
 // Identifies a token inside of a `File`.
@@ -83,8 +108,8 @@ struct FileTokenId {
   FileId file_id;
   TokenKind kind;
 
-  // Offset of this where this declaration is stored inside of a `kind`-specific
-  // list in `rpc::File::Tokens`.
+  // Offset of this where this token is stored inside of a serialized
+  // `rpc::File::tokens` list.
   uint32_t offset;
 
   bool operator==(const FileTokenId &) const noexcept = default;
@@ -98,7 +123,7 @@ struct InvalidId {};
 // `EntityId`.
 using VariantId = std::variant<InvalidId, DeclarationId,
                                StatementId, FragmentTokenId,
-                               FileTokenId>;
+                               TokenSubstitutionId, FileTokenId>;
 
 // An opaque, compressed entity id.
 class EntityId {
@@ -113,6 +138,7 @@ class EntityId {
   /* implicit */ EntityId(DeclarationId id);
   /* implicit */ EntityId(StatementId id);
   /* implicit */ EntityId(FragmentTokenId id);
+  /* implicit */ EntityId(TokenSubstitutionId id);
   /* implicit */ EntityId(FileTokenId id);
 
   inline operator uint64_t(void) const noexcept {

@@ -205,4 +205,37 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
   EntityId NthTokenId(unsigned token_index) const final;
 };
 
+// Provides entities from a remote source, i.e. a remote
+// server available via `host:port`, or another process
+// available over a UNIX domain socket `unix:/path`.
+class RemoteEntityProvider final : public EntityProvider {
+ private:
+  // TODO(pag): Consider eventually running the client on a separate thread,
+  //            and talking to it via `kj::Executor::executeSync`. Performance-
+  //            wise this won't be great; however, it means that client/server
+  //            stuff would happen on a single (background) thread, rather than
+  //            from whatever thread the user of the API has to be on. It's not
+  //            clear if the current API is thread-safe.
+  capnp::EzRpcClient client;
+  mx::rpc::Multiplier::Client multiplier;
+
+ public:
+  RemoteEntityProvider(std::string host, std::string port)
+      : client(host + ':' + port),
+        multiplier(client.getMain<mx::rpc::Multiplier>()) {}
+
+  virtual ~RemoteEntityProvider(void) noexcept;
+
+  // Get the current list of parsed files, where the minimum ID
+  // in the returned list of fetched files will be `start_at`.
+  std::set<std::pair<std::filesystem::path, FileId>>
+  list_files(void) noexcept final;
+
+  // Download a file by its unique ID.
+  File file(FileId id) noexcept final;
+
+  // Download a fragment by its unique ID.
+  Fragment fragment(FragmentId id) noexcept final;
+};
+
 }  // namespace mx

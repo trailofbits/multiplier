@@ -232,10 +232,10 @@ EntityId ResponseFragmentImpl::NthTokenId(unsigned index) const {
   return kInvalidEntityId;
 }
 
-EntityProvider::~EntityProvider(void) {}
+EntityProvider::~EntityProvider(void) noexcept {}
 
 // Download a fragment based off of an entity ID.
-Fragment EntityProvider::fragment_containing(EntityId id) const noexcept {
+Fragment EntityProvider::fragment_containing(EntityId id) noexcept {
   mx::VariantId opt_id = id.Unpack();
   if (std::holds_alternative<mx::DeclarationId>(opt_id)) {
     return this->fragment(
@@ -256,31 +256,20 @@ Fragment EntityProvider::fragment_containing(EntityId id) const noexcept {
   }
 }
 
-RemoteEntityProvider::RemoteEntityProvider(RemoteEntityProviderImpl *impl_)
-      : impl(impl_) {}
+RemoteEntityProvider::~RemoteEntityProvider(void) noexcept {}
 
-RemoteEntityProvider::~RemoteEntityProvider(void) {}
-
-class RemoteEntityProviderImpl {
- public:
-  // TODO(pag): Consider eventually running the client on a separate thread,
-  //            and talking to it via `kj::Executor::executeSync`. Performance-
-  //            wise this won't be great; however, it means that client/server
-  //            stuff would happen on a single (background) thread, rather than
-  //            from whatever thread the user of the API has to be on. It's not
-  //            clear if the current API is thread-safe.
-  capnp::EzRpcClient client;
-  mx::rpc::Multiplier::Client multiplier;
-
-  RemoteEntityProviderImpl(std::string host, std::string port)
-      : client(host + ':' + port),
-        multiplier(client.getMain<mx::rpc::Multiplier>()) {}
-};
-
-EntityProvider::Ptr RemoteEntityProvider::Create(
-      std::string host, std::string port) {
+// Returns an entity provider that gets entities from a remote host.
+EntityProvider::Ptr EntityProvider::from_remote(
+    std::string host, std::string port) {
   return std::make_shared<RemoteEntityProvider>(
-      new RemoteEntityProviderImpl(std::move(host), std::move(port)));
+      std::move(host), std::move(port));
+}
+
+// Returns an entity provider that gets entities from a UNIX domain socket.
+EntityProvider::Ptr EntityProvider::from_socket(
+    std::filesystem::path path) {
+  return std::make_shared<RemoteEntityProvider>(
+      "unix", path.lexically_normal().generic_string());
 }
 
 using FileListResults =
@@ -289,12 +278,12 @@ using FileListResults =
 // Get the current list of parsed files, where the minimum ID
 // in the returned list of fetched files will be `start_at`.
 std::set<std::pair<std::filesystem::path, FileId>>
-RemoteEntityProvider::list_files(void) const {
+RemoteEntityProvider::list_files(void) noexcept {
   capnp::Request<mx::rpc::Multiplier::DownloadFileListParams,
                  mx::rpc::Multiplier::DownloadFileListResults>
-      request = impl->multiplier.downloadFileListRequest();
+      request = multiplier.downloadFileListRequest();
   capnp::Response<mx::rpc::Multiplier::DownloadFileListResults> response =
-      request.send().wait(impl->client.getWaitScope());
+      request.send().wait(client.getWaitScope());
 
   std::set<std::pair<std::filesystem::path, FileId>> files;
   if (!response.hasFiles()) {
@@ -320,16 +309,16 @@ RemoteEntityProvider::list_files(void) const {
 }
 
 // Download a file by its unique ID.
-File RemoteEntityProvider::file(FileId id) const noexcept {
+File RemoteEntityProvider::file(FileId id) noexcept {
   EntityProvider::Ptr self = shared_from_this();
 
   capnp::Request<mx::rpc::Multiplier::DownloadFileParams,
                  mx::rpc::Multiplier::DownloadFileResults>
-  request = impl->multiplier.downloadFileRequest();
+  request = multiplier.downloadFileRequest();
   request.setId(id);
   try {
     auto ret = std::make_shared<ResponseFileImpl>(
-        id, std::move(self), request.send().wait(impl->client.getWaitScope()));
+        id, std::move(self), request.send().wait(client.getWaitScope()));
     auto ret_ptr = ret.get();
     return File(FileImpl::Ptr(std::move(ret), ret_ptr));
 
@@ -342,16 +331,16 @@ File RemoteEntityProvider::file(FileId id) const noexcept {
 }
 
 // Download a fragment based off of an entity ID.
-Fragment RemoteEntityProvider::fragment(FragmentId id) const noexcept {
+Fragment RemoteEntityProvider::fragment(FragmentId id) noexcept {
   EntityProvider::Ptr self = shared_from_this();
 
   capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
                  mx::rpc::Multiplier::DownloadFragmentResults>
-      request = impl->multiplier.downloadFragmentRequest();
+      request = multiplier.downloadFragmentRequest();
   request.setId(id);
   try {
     auto ret = std::make_shared<ResponseFragmentImpl>(
-        id, std::move(self), request.send().wait(impl->client.getWaitScope()));
+        id, std::move(self), request.send().wait(client.getWaitScope()));
     auto ret_ptr = ret.get();
     return Fragment(FragmentImpl::Ptr(std::move(ret), ret_ptr));
 

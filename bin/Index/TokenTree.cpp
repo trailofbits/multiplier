@@ -8,6 +8,7 @@
 
 #include <deque>
 #include <glog/logging.h>
+#include <multiplier/Types.h>
 #include <optional>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Token.h>
@@ -1143,7 +1144,7 @@ std::optional<pasta::Token> TokenTreeNode::Token(void) const noexcept {
   }
 }
 
-std::optional<std::pair<TokenTree, TokenTree>>
+std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree, TokenTree>>
 TokenTreeNode::Substitution(void) const noexcept {
   if (const auto &ent = impl->before[offset];
       std::holds_alternative<class Substitution *>(ent)) {
@@ -1153,8 +1154,30 @@ TokenTreeNode::Substitution(void) const noexcept {
 
     TokenTree before(std::shared_ptr<const class Substitution>(impl, lhs));
     TokenTree after(std::shared_ptr<const class Substitution>(impl, rhs));
-    return std::make_pair<TokenTree, TokenTree>(
-        std::move(before), std::move(after));
+
+    switch (lhs->kind) {
+      case Substitution::kInclusion:
+        return std::make_tuple(
+            mx::TokenSubstitutionKind::INCLUDE_EXPANSION,
+            std::move(before), std::move(after));
+
+      case Substitution::kMacroUse:
+        if (lhs->before.size() == 1u) {
+          return std::make_tuple(
+              mx::TokenSubstitutionKind::MACRO_EXPANSION,
+              std::move(before), std::move(after));
+        } else {
+          return std::make_tuple(
+              mx::TokenSubstitutionKind::FUNCTION_LIKE_MACRO_EXPANSION,
+              std::move(before), std::move(after));
+        }
+
+      case Substitution::kMacroExpansion:
+      case Substitution::kIdentity:
+        LOG(FATAL) << "Hrmm";
+        break;
+    }
+
   } else {
     return std::nullopt;
   }
@@ -1175,6 +1198,11 @@ bool TokenTreeNodeIterator::operator!=(TokenTreeNodeIteratorEnd) const {
 
 TokenTreeNodeIterator TokenTree::begin(void) const noexcept {
   return TokenTreeNodeIterator(impl);
+}
+
+// Return the number of nodes in this tree.
+unsigned TokenTree::NumNodes(void) const noexcept {
+  return static_cast<unsigned>(impl->before.size());
 }
 
 }  // namespace indexer

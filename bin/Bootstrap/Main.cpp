@@ -1155,7 +1155,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "void EntitySerializer::SerializeCodeEntities(\n"
       << "    CodeChunk code, mx::ast::EntityList::Builder builder) {\n"
       << "  serialized_entities.clear();\n"
-      << "  code_id = code.code_id;\n"
+      << "  code_id = code.fragment_id;\n"
       << "  auto tokens_builder = builder.initToken(\n"
       << "      static_cast<unsigned>(code.end_index - code.begin_index + 1u));\n"
       << "  for (auto i = code.begin_index; i <= code.end_index; ++i) {\n"
@@ -1332,7 +1332,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   // The entity list is a storage for zero-or-more entities.
-  schema_os << "struct EntityList @0xf26db0d046aab9c9 {\n";
+  schema_os
+      << "struct EntityList @0xf26db0d046aab9c9 {\n";
   auto i = 0u;
   for (const auto &class_name : gEntityClassNames) {
     if (class_name != "FileToken") {

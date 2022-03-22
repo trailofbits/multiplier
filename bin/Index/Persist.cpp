@@ -49,9 +49,21 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
   context.PutSerializedFile(file_id, capnp::messageToFlatArray(message));
 }
 
+static void CountSubstitutions(TokenTree tt, unsigned *num_subs) {
+  for (auto node : tt) {
+    if (auto sub = node.Substitution()) {
+      auto [kind, lhs, rhs] = std::move(sub.value());
+      CountSubstitutions(std::move(lhs), num_subs);
+      CountSubstitutions(std::move(rhs), num_subs);
+      ++num_subs;
+    }
+  }
+}
+
 // Figure out the lines of `file` spanned by `tt`.
 static void FindFileRange(TokenTree tt, const pasta::File &file,
-                          pasta::FileToken *min, pasta::FileToken *max) {
+                          pasta::FileToken *min, pasta::FileToken *max,
+                          unsigned *num_subs) {
   if (tt.File() != file) {
     return;
   }
@@ -66,7 +78,54 @@ static void FindFileRange(TokenTree tt, const pasta::File &file,
         *max = *ft;
       }
     } else if (auto sub = node.Substitution()) {
-      FindFileRange(std::move(sub->first), file, min, max);
+      auto [kind, lhs, rhs] = std::move(sub.value());
+      FindFileRange(std::move(lhs), file, min, max, num_subs);
+      CountSubstitutions(std::move(rhs), num_subs);
+      ++*num_subs;
+    }
+  }
+}
+
+using SubstitutionListBuilder =
+    capnp::List<mx::rpc::TokenSubstitution, capnp::Kind::STRUCT>::Builder;
+
+using TokenListBuilder =
+    capnp::List<uint64_t, ::capnp::Kind::PRIMITIVE>::Builder;
+
+static void PersistTokenTree(EntitySerializer &serializer,
+                             SubstitutionListBuilder &subs_builder,
+                             TokenListBuilder toks_builder,
+                             TokenTree tree, mx::FragmentId fragment_id,
+                             unsigned &next_sub_offset) {
+  unsigned i =0;
+  for (TokenTreeNode node : tree) {
+    if (std::optional<pasta::Token> pt = node.Token()) {
+      toks_builder.set(i++, serializer.EntityId(pt.value()));
+
+    } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
+      toks_builder.set(i++, serializer.EntityId(ft.value()));
+
+    } else if (auto sub = node.Substitution()) {
+      auto [kind, lhs, rhs] = std::move(sub.value());
+      mx::TokenSubstitutionId sub_id;
+      sub_id.fragment_id = fragment_id;
+      sub_id.kind = kind;
+      sub_id.offset = next_sub_offset;
+      mx::EntityId id(sub_id);
+      toks_builder.set(i++, id);
+
+      mx::rpc::TokenSubstitution::Builder next_sub =
+          subs_builder[next_sub_offset++];
+
+      unsigned num_nodes_lhs = lhs.NumNodes();
+      PersistTokenTree(serializer, subs_builder,
+                       next_sub.initBeforeTokens(num_nodes_lhs), std::move(lhs),
+                       fragment_id, next_sub_offset);
+
+      unsigned num_nodes_rhs = rhs.NumNodes();
+      PersistTokenTree(serializer, subs_builder,
+                       next_sub.initAfterTokens(num_nodes_rhs), std::move(rhs),
+                       fragment_id, next_sub_offset);
     }
   }
 }
@@ -90,6 +149,8 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
 
   TokenTree token_tree = maybe_tt.TakeValue();
 
+  unsigned num_substitutions{0u};
+
   // Figure out the lines spanned by this code fragment.
   //
   // TODO(pag): Handle sub-ranges for x-macros? Probably should have something
@@ -98,7 +159,7 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   pasta::FileTokenRange file_tokens = file.Tokens();
   pasta::FileToken min_token = file_tokens[file_tokens.Size() - 1u];
   pasta::FileToken max_token = file_tokens[0];
-  FindFileRange(token_tree, file, &min_token, &max_token);
+  FindFileRange(token_tree, file, &min_token, &max_token, &num_substitutions);
 
   mx::FileId file_id = serializer.FileId(file);
   context.PutFragmentLineCoverage(file_id, code_id, min_token.Line(),
@@ -119,6 +180,18 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
 
   serializer.SerializeCodeEntities(std::move(code_chunk),
                                    builder.initEntities());
+
+  unsigned next_substitution_index = 0u;
+  SubstitutionListBuilder substitutions_builder =
+      builder.initTokenSubstitutions(num_substitutions);
+  PersistTokenTree(
+      serializer,
+      substitutions_builder,
+      builder.initTokens(token_tree.NumNodes()),
+      std::move(token_tree),
+      code_chunk.fragment_id,
+      next_substitution_index);
+  CHECK_EQ(next_substitution_index, num_substitutions);
 
   context.PutSerializedFragment(code_id, capnp::messageToFlatArray(message));
 }

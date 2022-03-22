@@ -6,6 +6,18 @@ using AST = import "AST.capnp";
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("mx::rpc");
 
+enum TokenSubstitutionKind @0xa2f26f9d2081dec7 {
+  macroExpansion @0 $Cxx.name("macro_expansion");
+  functionLikeMacroExpansion @1 $Cxx.name("function_like_macro_expansion");
+  includeExpansion @2 $Cxx.name("include_expansion");
+}
+
+struct TokenSubstitution @0xade5195a85fdc847 {
+  beforeTokens @0 :List(UInt64);
+  afterTokens @1 :List(UInt64);
+  kind @2 :TokenSubstitutionKind;
+}
+
 struct IncludePath @0x8b7f7dfed6973665 {
   directory @0 :Text;
   location @1 :AST.IncludePathLocation;
@@ -55,6 +67,12 @@ struct Fragment @0xe5f27760091f9a3a {
   
   # List of top-level declarations in this code chunk.
   topLevelDeclarations @5 :List(UInt64);
+  
+  # List of token substitutions in this fragment.
+  tokenSubstitutions @6 :List(TokenSubstitution);
+  
+  # List of tokens/substitution IDs in the top level.
+  tokens @7 :List(UInt64);
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {

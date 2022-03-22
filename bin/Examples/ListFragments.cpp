@@ -31,7 +31,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::EntityProvider::Ptr api = mx::RemoteEntityProvider::Create(
+  mx::EntityProvider::Ptr api = mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port);
   mx::File file = api->file(FLAGS_id);
   if (!file) {
