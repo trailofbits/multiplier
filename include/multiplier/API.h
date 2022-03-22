@@ -18,6 +18,9 @@
 namespace mx {
 
 class EntityProvider;
+class File;
+class FileFragmentList;
+class FileFragmentListIterator;
 class FileImpl;
 class Fragment;
 class FragmentImpl;
@@ -142,6 +145,77 @@ class TokenList {
   }
 };
 
+class FileFragmentListEnd {};
+
+// Iterate over the fragments from a file.
+class FileFragmentListIterator {
+ private:
+  friend class File;
+  friend class FileFragmentList;
+
+  std::shared_ptr<const FileImpl> impl;
+  unsigned index;
+  unsigned num_fragments;
+
+  inline FileFragmentListIterator(std::shared_ptr<const FileImpl> impl_,
+                                  unsigned index_, unsigned num_fragments_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_fragments(num_fragments_) {}
+
+ public:
+
+  Fragment operator*(void) const noexcept;
+
+  // Pre-increment.
+  inline FileFragmentListIterator &operator++(void) noexcept {
+    ++index;
+    return *this;
+  }
+
+  // Post-increment.
+  inline FileFragmentListIterator operator++(int) noexcept {
+    return FileFragmentListIterator(impl, index++, num_fragments);
+  }
+
+  inline bool operator==(FileFragmentListEnd) const noexcept {
+    return index == num_fragments;
+  }
+
+  inline bool operator!=(FileFragmentListEnd) const noexcept {
+    return index != num_fragments;
+  }
+};
+
+// List of fragments asociated with a file.
+class FileFragmentList {
+ private:
+  friend class File;
+
+  std::shared_ptr<const FileImpl> impl;
+  unsigned num_fragments;
+
+  inline FileFragmentList(std::shared_ptr<const FileImpl> impl_,
+                          unsigned num_fragments_)
+      : impl(std::move(impl_)),
+        num_fragments(num_fragments_) {}
+
+ public:
+  // Return the number of fragments in this token list.
+  inline size_t size(void) const noexcept {
+    return num_fragments;
+  }
+
+  // Return an iterator pointing at the first token in this list.
+  inline FileFragmentListIterator begin(void) const noexcept {
+    return FileFragmentListIterator(impl, 0, num_fragments);
+  }
+
+  inline FileFragmentListEnd end(void) const noexcept {
+    return {};
+  }
+};
+
 // Represents a file. A given file may have many associated paths. We
 // de-duplicate via a hash of the contents.
 class File {
@@ -149,6 +223,7 @@ class File {
   using Ptr = std::shared_ptr<const FileImpl>;
 
   friend class EntityProvider;
+  friend class FileFragmentList;
   friend class Token;
   friend class RemoteEntityProvider;
 
@@ -158,6 +233,10 @@ class File {
       : impl(std::move(impl_)) {}
 
  public:
+  inline static File containing(const FileFragmentList &fragment_list) {
+    return File(fragment_list.impl);
+  }
+
   // Return the file containing a specific fragment.
   static File containing(const Fragment &fragment);
 
@@ -169,6 +248,9 @@ class File {
 
   // Return the list of tokens in this file.
   TokenList tokens(void) const noexcept;
+
+  // Return the list of fragments in this file.
+  FileFragmentList fragments(void) const noexcept;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();
@@ -186,6 +268,7 @@ class Fragment {
  private:
   friend class EntityProvider;
   friend class File;
+  friend class FileFragmentListIterator;
   friend class RemoteEntityProvider;
   friend class Token;
 
@@ -200,6 +283,14 @@ class Fragment {
 
   // Return the ID of this fragment.
   FragmentId id(void) const noexcept;
+
+  // The smallest line of the file for which one of the tokens from this
+  // fragment resides.
+  unsigned first_line(void) const noexcept;
+
+  // The largest line of the file for which one of the tokens from this
+  // fragment resides.
+  unsigned last_line(void) const noexcept;
 
   // Return the list of parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.

@@ -262,7 +262,7 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
   auto num_fragments = static_cast<unsigned>(fragment_ids.size());
   auto fragments = results.initFragments(num_fragments);
   for (auto i = 0u; i < num_fragments; ++i) {
-    fragments.set(i, fragment_ids[0]);
+    fragments.set(i, fragment_ids[i]);
   }
 
   return kj::READY_NOW;

@@ -46,10 +46,16 @@ TokenReaderImpl::Ptr InvalidFileImpl::TokenReader(
 ResponseFileImpl::~ResponseFileImpl(void) noexcept {}
 
 ResponseFileImpl::ResponseFileImpl(
-    FileId id_, Response response_)
-    : FileImpl(id_),
+    FileId id_, EntityProvider::Ptr ep_, Response response_)
+    : FileImpl(id_, std::move(ep_)),
       response(kj::mv(response_)),
-      reader(response.getFile()) {}
+      reader(response.getFile()) {
+  if (response.hasFragments()) {
+    for (auto frag_id : response.getFragments()) {
+      fragments.emplace_back().first = frag_id;
+    }
+  }
+}
 
 // Return a reader for the tokens in the file.
 TokenReaderImpl::Ptr ResponseFileImpl::TokenReader(
@@ -119,6 +125,14 @@ TokenReaderImpl::Ptr InvalidFragmentImpl::TokenReader(
   return TokenReaderImpl::Ptr(self, &empty_reader);
 }
 
+unsigned InvalidFragmentImpl::FirstLine(void) const {
+  return ~0u;
+}
+
+unsigned InvalidFragmentImpl::LastLine(void) const {
+  return 0u;
+}
+
 ResponseFragmentImpl::~ResponseFragmentImpl(void) noexcept {}
 
 ResponseFragmentImpl::ResponseFragmentImpl(FragmentId id_,
@@ -137,6 +151,14 @@ FileId ResponseFragmentImpl::FileContaingFirstToken(void) const {
   } else {
     return kInvalidEntityId;
   }
+}
+
+unsigned ResponseFragmentImpl::FirstLine(void) const {
+  return reader.getFirstLine();
+}
+
+unsigned ResponseFragmentImpl::LastLine(void) const {
+  return reader.getLastLine();
 }
 
 // Return a reader for the parsed tokens in the fragment. This doesn't
@@ -299,19 +321,21 @@ RemoteEntityProvider::list_files(void) const {
 
 // Download a file by its unique ID.
 File RemoteEntityProvider::file(FileId id) const noexcept {
+  EntityProvider::Ptr self = shared_from_this();
+
   capnp::Request<mx::rpc::Multiplier::DownloadFileParams,
                  mx::rpc::Multiplier::DownloadFileResults>
   request = impl->multiplier.downloadFileRequest();
   request.setId(id);
   try {
     auto ret = std::make_shared<ResponseFileImpl>(
-        id, request.send().wait(impl->client.getWaitScope()));
+        id, std::move(self), request.send().wait(impl->client.getWaitScope()));
     auto ret_ptr = ret.get();
     return File(FileImpl::Ptr(std::move(ret), ret_ptr));
 
   // TODO(pag): Log something.
   } catch (...) {
-    auto ret = std::make_shared<InvalidFileImpl>(id);
+    auto ret = std::make_shared<InvalidFileImpl>(id, std::move(self));
     auto ret_ptr = ret.get();
     return File(FileImpl::Ptr(std::move(ret), ret_ptr));
   }
@@ -319,7 +343,8 @@ File RemoteEntityProvider::file(FileId id) const noexcept {
 
 // Download a fragment based off of an entity ID.
 Fragment RemoteEntityProvider::fragment(FragmentId id) const noexcept {
-  auto self = shared_from_this();
+  EntityProvider::Ptr self = shared_from_this();
+
   capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
                  mx::rpc::Multiplier::DownloadFragmentResults>
       request = impl->multiplier.downloadFragmentRequest();
@@ -373,16 +398,39 @@ Token TokenList::operator[](size_t index) const noexcept {
   }
 }
 
+Fragment FileFragmentListIterator::operator*(void) const noexcept {
+  auto &wf = impl->fragments[index].second;
+  if (auto frag = wf.lock()) {
+    frag->containing_file = impl;
+    return Fragment(std::move(frag));
+  }
+
+  Fragment ret = impl->ep->fragment(impl->fragments[index].first);
+  wf = ret.impl;
+  ret.impl->containing_file = impl;  // Save the file <-> fragment mapping.
+  return ret;
+}
+
 // Return the file containing a specific fragment.
 File File::containing(const Fragment &fragment) {
   auto &fp = fragment.impl->containing_file;
-  if (!fp) {
-    auto ret = fragment.impl->ep->file(fragment.impl->FileContaingFirstToken());
-    fp = ret.impl;
-    return ret;
-  } else {
+  if (fp) {
     return File(fp);
   }
+
+  const auto frag_id = fragment.impl->id;
+  auto ret = fragment.impl->ep->file(fragment.impl->FileContaingFirstToken());
+
+  // Save the file <-> fragment mapping.
+  fp = ret.impl;
+  for (auto &[file_frag_id, frag_wp] : fp->fragments) {
+    if (frag_id == file_frag_id) {
+      frag_wp = fragment.impl;
+      break;
+    }
+  }
+
+  return ret;
 }
 
 // Return `true` if this is a valid file.
@@ -402,6 +450,11 @@ TokenList File::tokens(void) const noexcept {
   return TokenList(std::move(tokens), num_tokens);
 }
 
+// Return the list of fragments in this file.
+FileFragmentList File::fragments(void) const noexcept {
+  return FileFragmentList(impl, static_cast<unsigned>(impl->fragments.size()));
+}
+
 // Return `true` if this is a valid fragment.
 Fragment::operator bool(void) const noexcept {
   return !dynamic_cast<const InvalidFragmentImpl *>(impl.get());
@@ -410,6 +463,18 @@ Fragment::operator bool(void) const noexcept {
 // Return the ID of this fragment.
 FragmentId Fragment::id(void) const noexcept {
   return impl->id;
+}
+
+// The smallest line of the file for which one of the tokens from this
+// fragment resides.
+unsigned Fragment::first_line(void) const noexcept {
+  return impl->FirstLine();
+}
+
+// The largest line of the file for which one of the tokens from this
+// fragment resides.
+unsigned Fragment::last_line(void) const noexcept {
+  return impl->LastLine();
 }
 
 // Return the list of parsed tokens in the fragment. This doesn't

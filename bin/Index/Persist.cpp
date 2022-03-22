@@ -108,6 +108,8 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   mx::rpc::Fragment::Builder builder = message.initRoot<mx::rpc::Fragment>();
   builder.setCodeId(code_chunk.fragment_id);
   builder.setFileTokenId(serializer.EntityId(min_token));
+  builder.setFirstLine(min_token.Line());
+  builder.setLastLine(max_token.Line());
 
   auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
   auto tlds = builder.initTopLevelDeclarations(num_tlds);

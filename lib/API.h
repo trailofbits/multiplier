@@ -60,10 +60,20 @@ class FileImpl {
 
   const FileId id;
 
+  // Needed for us to be able to look up the file containing this fragment,
+  // or look up entities related to other fragments.
+  const EntityProvider::Ptr ep;
+
+  // List of fragments in this file.
+  mutable std::vector<std::pair<mx::FragmentId,
+                                std::weak_ptr<const FragmentImpl>>>
+      fragments;
+
   virtual ~FileImpl(void) noexcept;
 
-  inline FileImpl(FileId id_)
-      : id(id_) {}
+  inline FileImpl(FileId id_, EntityProvider::Ptr ep_)
+      : id(id_),
+        ep(std::move(ep_)) {}
 
   // Return a reader for the tokens in the file.
   virtual TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
@@ -91,7 +101,7 @@ class ResponseFileImpl final : public FileImpl, public TokenReaderImpl {
 
   virtual ~ResponseFileImpl(void) noexcept;
 
-  ResponseFileImpl(FileId id_, Response response_);
+  ResponseFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_);
 
   // Return a reader for the tokens in the file.
   TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const final;
@@ -112,6 +122,7 @@ class ResponseFileImpl final : public FileImpl, public TokenReaderImpl {
 class FragmentImpl {
  public:
   using Ptr = std::shared_ptr<const FragmentImpl>;
+  using WeakPtr = std::weak_ptr<const FragmentImpl>;
 
   const FragmentId id;
 
@@ -137,6 +148,9 @@ class FragmentImpl {
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
   virtual TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const = 0;
+
+  virtual unsigned FirstLine(void) const = 0;
+  virtual unsigned LastLine(void) const = 0;
 };
 
 class InvalidFragmentImpl : public FragmentImpl {
@@ -150,6 +164,8 @@ class InvalidFragmentImpl : public FragmentImpl {
 
   FileId FileContaingFirstToken(void) const final;
   TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
+  unsigned FirstLine(void) const final;
+  unsigned LastLine(void) const final;
 };
 
 // A fragment of code downloaded from the server.
@@ -168,6 +184,9 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
 
   // Return the ID of the file containing the first token.
   FileId FileContaingFirstToken(void) const final;
+
+  unsigned FirstLine(void) const final;
+  unsigned LastLine(void) const final;
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.

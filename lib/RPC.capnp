@@ -47,11 +47,14 @@ struct Fragment @0xe5f27760091f9a3a {
   # in a GUI.
   fileTokenId @1 :UInt64;
   
+  firstLine @2 :UInt32;
+  lastLine @3 :UInt32;
+  
   # Entities embedded in this code sequence.
-  entities @2 :AST.EntityList;
+  entities @4 :AST.EntityList;
   
   # List of top-level declarations in this code chunk.
-  topLevelDeclarations @3 :List(UInt64);
+  topLevelDeclarations @5 :List(UInt64);
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {

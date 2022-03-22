@@ -37,3 +37,5 @@ endfunction(define_example)
 
 define_example("mx-list-files" "ListFiles.cpp")
 define_example("mx-print-file" "PrintFile.cpp")
+define_example("mx-list-fragments" "ListFragments.cpp")
+define_example("mx-print-fragment" "PrintFragment.cpp")
