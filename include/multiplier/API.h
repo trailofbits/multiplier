@@ -30,6 +30,8 @@ class Token;
 class TokenList;
 class TokenListIterator;
 class TokenReaderImpl;
+class TokenSubstitution;
+class TokenSubstitutionList;
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
@@ -260,6 +262,30 @@ class File {
   }
 };
 
+class TokenSubstitutionReader;
+
+class TokenSubstitution {
+ public:
+  TokenSubstitutionKind kind(void) const noexcept;
+  TokenSubstitutionList before(void) const noexcept;
+  TokenSubstitutionList after(void) const noexcept;
+};
+
+using TokenSubstitutionEnty = std::variant<Token, TokenSubstitution>;
+
+class TokenSubstitutionListIterator {
+ public:
+};
+
+class TokenSubstitutionList {
+ private:
+  std::shared_ptr<const TokenSubstitutionReader> reader;
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned num_nodes;
+
+ public:
+};
+
 // A fragment of code containing one or more top-level declarations, the
 // associated declaration and statement entities, macro expansion/substitution
 // trees, and tokens.
@@ -294,6 +320,9 @@ class Fragment {
   // Return the list of parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
   TokenList tokens(void) const noexcept;
+
+  // Return the list of token substitutions.
+  TokenSubstitutionList unparsed_tokens(void) const noexcept;
 
   // Return the list of top-level declarations in this fragment.
   std::vector<Decl> declarations(void) const noexcept;

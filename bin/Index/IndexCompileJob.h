@@ -36,7 +36,8 @@ class IndexCompileJobAction final : public mx::Action {
 
   // Look through all files referenced by the AST get their unique IDs. If this
   // is the first time seeing a file, then tokenize the file.
-  void MaybePersistFile(const mx::Executor &exe, pasta::File file);
+  void MaybePersistFile(
+      mx::WorkerId worker_id, const mx::Executor &exe, pasta::File file);
 
  public:
   virtual ~IndexCompileJobAction(void);

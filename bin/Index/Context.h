@@ -24,6 +24,7 @@
 namespace mx {
 class Executor;
 class ProgressBar;
+enum WorkerId : unsigned;
 }  // namespace mx
 namespace indexer {
 
@@ -47,6 +48,11 @@ enum MetadataName : char {
 };
 
 class IndexingContext;
+
+template <typename T>
+struct alignas(64) NextId {
+  std::optional<T> id;
+};
 
 // State that lives at least as long as the server itself.
 class ServerContext {
@@ -138,21 +144,31 @@ class IndexingContext {
   // Tracks progress in saving tokenized files.
   std::unique_ptr<mx::ProgressBar> tokenizer_progress;
 
-  explicit IndexingContext(ServerContext &server_context_);
+  const unsigned num_workers;
+
+  // Worker-local next counters for IDs.
+  std::vector<NextId<mx::FileId>> local_next_file_id;
+  std::vector<NextId<mx::FragmentId>> local_next_small_fragment_id;
+  std::vector<NextId<mx::FragmentId>> local_next_big_fragment_id;
+
+  explicit IndexingContext(ServerContext &server_context_,
+                           const mx::Executor &exe_);
 
   ~IndexingContext(void);
 
-  void InitializeProgressBars(const mx::Executor &exe_);
+  void InitializeProgressBars(void);
 
   // Get or create a file ID for the file at `file_path` with contents
   // `contents_hash`.
   std::pair<mx::FileId, bool> GetOrCreateFileId(
-      std::filesystem::path file_path, const std::string &contents_hash);
+      mx::WorkerId worker_id, std::filesystem::path file_path,
+      const std::string &contents_hash);
 
   // Get or create a code ID for the top-level declarations that hash to
   // `code_hash`.
   std::pair<mx::FragmentId, bool> GetOrCreateFragmentId(
-      const std::string &code_hash, uint64_t num_tokens);
+      mx::WorkerId worker_id, const std::string &code_hash,
+      uint64_t num_tokens);
 
   // Save the serialized contents of a file as a token list.
   void PutSerializedFile(mx::FileId file_id, kj::Array<capnp::word> tokens);

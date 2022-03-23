@@ -474,6 +474,11 @@ TokenList Fragment::tokens(void) const noexcept {
   return TokenList(std::move(tokens), num_tokens);
 }
 
+// Return the list of token substitutions.
+TokenSubstitutionList Fragment::unparsed_tokens(void) const noexcept {
+
+}
+
 // Return the list of top-level declarations in this fragment.
 std::vector<Decl> Fragment::declarations(void) const noexcept {
   return {};

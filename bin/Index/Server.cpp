@@ -93,9 +93,9 @@ ServerImpl::GetOrCreateIndexingContext(void) {
   if (ic) {
     return ic;
   } else {
-    ic = std::make_shared<IndexingContext>(server_context);
+    ic = std::make_shared<IndexingContext>(server_context, executor);
     if (show_progress_bars) {
-      ic->InitializeProgressBars(executor);
+      ic->InitializeProgressBars();
     }
     indexing_context = ic;
     return ic;

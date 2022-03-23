@@ -47,21 +47,25 @@ void ServerContext::Flush(void) {
   meta_to_id.Set(MetadataName::kNextBigCodeId, next_big_fragment_id.load());
 }
 
-IndexingContext::IndexingContext(ServerContext &server_context_)
-    : server_context(server_context_) {}
+IndexingContext::IndexingContext(ServerContext &server_context_,
+                                 const mx::Executor &exe_)
+    : server_context(server_context_),
+      num_workers(exe_.NumWorkers()),
+      local_next_file_id(num_workers),
+      local_next_small_fragment_id(num_workers),
+      local_next_big_fragment_id(num_workers) {}
 
 IndexingContext::~IndexingContext(void) {
   server_context.Flush();
 }
 
-void IndexingContext::InitializeProgressBars(const mx::Executor &exe_) {
+void IndexingContext::InitializeProgressBars(void) {
   command_progress.reset(new mx::ProgressBar("Command parsing",
                                              std::chrono::seconds(1)));
   ast_progress.reset(new mx::ProgressBar("AST building",
                                          std::chrono::seconds(1)));
   tokenizer_progress.reset(new mx::ProgressBar("Tokenizer",
                                                std::chrono::seconds(1)));
-  auto num_workers = exe_.NumWorkers();
   command_progress->SetNumWorkers(num_workers);
   ast_progress->SetNumWorkers(num_workers);
   tokenizer_progress->SetNumWorkers(num_workers);
@@ -70,59 +74,93 @@ void IndexingContext::InitializeProgressBars(const mx::Executor &exe_) {
 // Get or create a file ID for the file at `file_path` with contents
 // `contents_hash`.
 std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
-    std::filesystem::path file_path, const std::string &contents_hash) {
+    mx::WorkerId worker_id_, std::filesystem::path file_path,
+    const std::string &contents_hash) {
 
-  mx::FileId created_id = 0u;
-  mx::FileId file_id = server_context.file_hash_to_file_id.LazyGetOrSet(
-      contents_hash,
-      [this, &created_id] (void) -> mx::FileId {
-        created_id = server_context.next_file_id.fetch_add(
-            mx::kMinEntityIdIncrement);
-        return created_id;
-      });
+  const auto worker_id = static_cast<unsigned>(worker_id_);
+  auto &maybe_id = this->local_next_file_id[worker_id].id;
+  mx::FileId created_id = mx::kInvalidEntityId;
+  if (!maybe_id.has_value()) {
+    created_id = server_context.next_file_id.fetch_add(
+        mx::kMinEntityIdIncrement);;
+  } else {
+    created_id = std::move(maybe_id.value());
+    maybe_id = {};
+  }
+
+  mx::FileId file_id = server_context.file_hash_to_file_id.GetOrSet(
+      contents_hash, created_id);
 
   CHECK_LT(file_id, mx::kMaxFileId);
 
   std::string path_str = file_path.lexically_normal().generic_string();
   server_context.file_id_to_path.Insert(file_id, path_str);
   server_context.file_path_to_file_id.Set(path_str, file_id);
-  return {file_id, file_id == created_id};
+  if (file_id == created_id) {
+    return {file_id, true};
+
+  } else {
+    maybe_id = created_id;  // Put it back in the worker-specific cache.
+    return {file_id, false};
+  }
 }
 
 // Get or create a code ID for the top-level declarations that hash to
 // `code_hash`.
 std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
-    const std::string &code_hash, uint64_t num_tokens) {
+    mx::WorkerId worker_id_, const std::string &code_hash,
+    uint64_t num_tokens) {
 
-  mx::FragmentId created_id = 0u;
+  const auto worker_id = static_cast<unsigned>(worker_id_);
   mx::FragmentId code_id = 0u;
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigCodeChunks)`.
   if (num_tokens >= mx::kNumTokensInBigFragment) {
-    code_id = server_context.code_hash_to_fragment_id.LazyGetOrSet(
-        code_hash,
-        [this, &created_id] (void) -> mx::FragmentId {
-          created_id = server_context.next_big_fragment_id.fetch_add(
-              mx::kMinEntityIdIncrement);
-          return created_id;
-        });
+    auto &maybe_id = this->local_next_big_fragment_id[worker_id].id;
+    mx::FileId created_id = mx::kInvalidEntityId;
+    if (!maybe_id.has_value()) {
+      created_id = server_context.next_big_fragment_id.fetch_add(
+          mx::kMinEntityIdIncrement);;
+    } else {
+      created_id = std::move(maybe_id.value());
+      maybe_id = {};
+    }
+
+    code_id = server_context.code_hash_to_fragment_id.GetOrSet(
+        code_hash, created_id);
 
     CHECK_LT(code_id, mx::kMaxBigFragmentId);
+    if (code_id == created_id) {
+      return {code_id, true};
+
+    } else {
+      maybe_id = created_id;  // Put it back in the worker-specific cache.
+      return {code_id, false};
+    }
 
   // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigCodeChunks, ...)`.
   } else {
-    code_id = server_context.code_hash_to_fragment_id.LazyGetOrSet(
-        code_hash,
-        [this, &created_id] (void) -> mx::FragmentId {
-          created_id = server_context.next_small_fragment_id.fetch_add(
-              mx::kMinEntityIdIncrement);
-          return created_id;
-        });
+    auto &maybe_id = this->local_next_small_fragment_id[worker_id].id;
+    mx::FileId created_id = mx::kInvalidEntityId;
+    if (!maybe_id.has_value()) {
+      created_id = server_context.next_small_fragment_id.fetch_add(
+          mx::kMinEntityIdIncrement);;
+    } else {
+      created_id = std::move(maybe_id.value());
+      maybe_id = {};
+    }
+    code_id = server_context.code_hash_to_fragment_id.GetOrSet(
+        code_hash, created_id);
 
     CHECK_GE(code_id, mx::kMaxBigFragmentId);
-  }
+    if (code_id == created_id) {
+      return {code_id, true};
 
-  return {code_id, code_id == created_id};
+    } else {
+      maybe_id = created_id;  // Put it back in the worker-specific cache.
+      return {code_id, false};
+    }
+  }
 }
 
 // Save the tokenized contents of a file.

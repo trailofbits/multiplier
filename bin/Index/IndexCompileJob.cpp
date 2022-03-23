@@ -338,7 +338,7 @@ IndexCompileJobAction::IndexCompileJobAction(
 // Look through all files referenced by the AST get their unique IDs. If this
 // is the first time seeing a file, then tokenize the file.
 void IndexCompileJobAction::MaybePersistFile(
-    const mx::Executor &exe, pasta::File file) {
+    mx::WorkerId worker_id, const mx::Executor &exe, pasta::File file) {
   if (!file.WasParsed()) {
     return;
   }
@@ -353,7 +353,7 @@ void IndexCompileJobAction::MaybePersistFile(
 
   auto file_hash = FileHash(maybe_data.TakeValue());
   auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
-      file_path, file_hash);
+      worker_id, file_path, file_hash);
   if (is_new_file_id) {
     PersistFile(*context, file_id, file_hash, file);
   }
@@ -379,7 +379,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
   pasta::AST ast = maybe_ast.TakeValue();
   for (pasta::File file : ast.ParsedFiles()) {
-    MaybePersistFile(exe, std::move(file));
+    MaybePersistFile(worker_id, exe, std::move(file));
   }
 
   using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
@@ -502,6 +502,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
     auto [code_id, is_new] = context->GetOrCreateFragmentId(
+        worker_id,
         CodeHash(file_hashes, decls_for_chunk, tok_range,
                  begin_index, end_index),
         end_index - begin_index + 1u);
