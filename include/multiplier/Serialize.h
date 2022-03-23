@@ -4,7 +4,6 @@
 
 #include <array>
 #include <capnp/message.h>
-#include <cassert>
 #include <cstdint>
 #include <kj/array.h>
 #include <kj/string.h>
@@ -20,6 +19,9 @@
 #include "Int.h"
 
 namespace mx {
+
+// Represents an empty key/value.
+struct Empty {};
 
 // An unserializer that always returns default-initialzied values.
 struct NullReader {
@@ -60,8 +62,7 @@ struct NullReader {
   MX_ALWAYS_INLINE int8_t ReadI8(void) {
     return {};
   }
-  MX_ALWAYS_INLINE void Skip(uint32_t num_bytes) {
-    assert(0u < num_bytes);
+  MX_ALWAYS_INLINE void Skip(uint32_t) {
   }
 };
 
@@ -85,8 +86,7 @@ struct NullWriter {
   MX_ALWAYS_INLINE uint8_t *WriteI32(int32_t) noexcept { return nullptr; }
   MX_ALWAYS_INLINE uint8_t *WriteI16(int16_t) noexcept { return nullptr; }
   MX_ALWAYS_INLINE uint8_t *WriteI8(int8_t) noexcept { return nullptr; }
-  MX_ALWAYS_INLINE uint8_t *Skip(uint32_t num_bytes) noexcept {
-    assert(0u < num_bytes);
+  MX_ALWAYS_INLINE uint8_t *Skip(uint32_t) noexcept {
     return nullptr;
   }
   MX_ALWAYS_INLINE void EnterFixedSizeComposite(uint32_t) noexcept {}
@@ -110,104 +110,153 @@ class ByteWriter {
   }
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteF64(double d) noexcept {
-    uint64_t q = {};
-    *(new (&q) double) = d;
-    const auto ptr =
-        static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 0));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 8));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 16));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 24));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 32));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 40));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 48));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 56));
-    return ptr;
+  void WriteF64(double d) noexcept {
+    alignas(double) uint8_t data[sizeof(double)];
+    *(new (data) double) = d;
+    auto self = static_cast<Self *>(this);
+
+    // Serialize data to big-endian byte order for lexicographic sorting
+    // using `memcmp`.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      self->WriteU8(data[0]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[3]);
+      self->WriteU8(data[4]);
+      self->WriteU8(data[5]);
+      self->WriteU8(data[6]);
+      self->WriteU8(data[7]);
+
+    } else {
+      self->WriteU8(data[7]);
+      self->WriteU8(data[6]);
+      self->WriteU8(data[5]);
+      self->WriteU8(data[4]);
+      self->WriteU8(data[3]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[0]);
+    }
   }
 
-  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteF32(float f) noexcept {
-    uint32_t d = {};
-    *(new (&d) float) = f;
-    const auto ptr =
-        static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 0));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 8));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 16));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 24));
-    return ptr;
+  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE void WriteF32(float f) noexcept {
+    alignas(float) uint8_t data[sizeof(float)];
+    *(new (data) float) = f;
+    auto self = static_cast<Self *>(this);
+
+    // Serialize data to big-endian byte order for lexicographic sorting
+    // using `memcmp`.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      self->WriteU8(data[0]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[3]);
+
+    } else {
+      self->WriteU8(data[3]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[0]);
+    }
   }
 
-  [[gnu::hot]] MX_ALWAYS_INLINE uint8_t *WriteU64(uint64_t q) noexcept {
-    const auto ptr =
-        static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 0));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 8));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 16));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 24));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 32));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 40));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 48));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(q >> 56));
-    return ptr;
+  [[gnu::hot]] MX_ALWAYS_INLINE void WriteU64(uint64_t q) noexcept {
+    alignas(uint64_t) uint8_t data[sizeof(uint64_t)];
+    *(new (data) uint64_t) = q;
+    auto self = static_cast<Self *>(this);
+
+    // Serialize data to big-endian byte order for lexicographic sorting
+    // using `memcmp`.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      self->WriteU8(data[0]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[3]);
+      self->WriteU8(data[4]);
+      self->WriteU8(data[5]);
+      self->WriteU8(data[6]);
+      self->WriteU8(data[7]);
+
+    } else {
+      self->WriteU8(data[7]);
+      self->WriteU8(data[6]);
+      self->WriteU8(data[5]);
+      self->WriteU8(data[4]);
+      self->WriteU8(data[3]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[0]);
+    }
   }
 
-  [[gnu::hot]] MX_ALWAYS_INLINE uint8_t *WriteU32(uint32_t d) noexcept {
-    const auto ptr =
-        static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 0));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 8));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 16));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(d >> 24));
-    return ptr;
+  [[gnu::hot]] MX_ALWAYS_INLINE void WriteU32(uint32_t d) noexcept {
+    alignas(uint32_t) uint8_t data[sizeof(uint32_t)];
+    *(new (data) uint32_t) = d;
+    auto self = static_cast<Self *>(this);
+
+    // Serialize data to big-endian byte order for lexicographic sorting
+    // using `memcmp`.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      self->WriteU8(data[0]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[3]);
+
+    } else {
+      self->WriteU8(data[3]);
+      self->WriteU8(data[2]);
+      self->WriteU8(data[1]);
+      self->WriteU8(data[0]);
+    }
   }
 
-  [[gnu::hot]] MX_ALWAYS_INLINE uint8_t *WriteU16(uint16_t h) noexcept {
-    const auto ptr =
-        static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(h >> 0));
-    static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(h >> 8));
-    return ptr;
+  [[gnu::hot]] MX_ALWAYS_INLINE void WriteU16(uint16_t h) noexcept {
+    alignas(uint16_t) uint8_t data[sizeof(uint16_t)];
+    *(new (data) uint16_t) = h;
+    auto self = static_cast<Self *>(this);
+
+    // Serialize data to big-endian byte order for lexicographic sorting
+    // using `memcmp`.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      self->WriteU8(data[0]);
+      self->WriteU8(data[1]);
+
+    } else {
+      self->WriteU8(data[1]);
+      self->WriteU8(data[0]);
+    }
   }
 
-  [[gnu::hot]] MX_ALWAYS_INLINE uint8_t *WriteU8(uint8_t b) noexcept {
-    const auto ptr = write_ptr;
+  [[gnu::hot]] MX_ALWAYS_INLINE void WriteU8(uint8_t b) noexcept {
     *write_ptr++ = b;
-    return ptr;
   }
 
-  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteI64(int64_t q) noexcept {
-    return WriteU64(static_cast<uint64_t>(q));
+  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE void WriteI64(int64_t q) noexcept {
+    WriteU64(static_cast<uint64_t>(q));
   }
 
-  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteI32(int32_t w) noexcept {
-    return WriteU32(static_cast<uint32_t>(w));
+  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE void WriteI32(int32_t w) noexcept {
+    WriteU32(static_cast<uint32_t>(w));
   }
 
-  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteI16(int16_t h) noexcept {
-    return WriteU16(static_cast<uint16_t>(h));
+  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE void WriteI16(int16_t h) noexcept {
+    WriteU16(static_cast<uint16_t>(h));
   }
 
-  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteI8(int8_t b) noexcept {
-    return static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(b));
+  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE void WriteI8(int8_t b) noexcept {
+    WriteU8(static_cast<uint8_t>(b));
   }
 
-  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteB(bool b) noexcept {
-    return static_cast<Self *>(this)->WriteU8(static_cast<uint8_t>(!!b));
+  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE void WriteB(bool b) noexcept {
+    WriteU8(static_cast<uint8_t>(!!b));
   }
 
-  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE
-  uint8_t *WriteSize(uint32_t d) noexcept {
-    return WriteU32(d);
+  [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE void WriteSize(uint32_t d) noexcept {
+    WriteU32(d);
   }
 
-  [[gnu::hot]] MX_ALWAYS_INLINE
-  uint8_t *Skip(uint32_t num_bytes) noexcept {
-    assert(0u < num_bytes);
-    auto ptr = write_ptr;
+  [[gnu::hot]] MX_ALWAYS_INLINE void Skip(uint32_t num_bytes) noexcept {
     write_ptr += num_bytes;
-    return ptr;
   }
 
   MX_ALWAYS_INLINE void EnterFixedSizeComposite(uint32_t) {}
@@ -244,52 +293,137 @@ class ByteReader {
 
   [[gnu::hot]] MX_ALWAYS_INLINE double ReadF64(void) noexcept {
     alignas(double) uint8_t data[8u];
-    data[0] = static_cast<Self *>(this)->ReadU8();
-    data[1] = static_cast<Self *>(this)->ReadU8();
-    data[2] = static_cast<Self *>(this)->ReadU8();
-    data[3] = static_cast<Self *>(this)->ReadU8();
-    data[4] = static_cast<Self *>(this)->ReadU8();
-    data[5] = static_cast<Self *>(this)->ReadU8();
-    data[6] = static_cast<Self *>(this)->ReadU8();
-    data[7] = static_cast<Self *>(this)->ReadU8();
+    auto self = static_cast<Self *>(this);
+
+    // Data is serialized in big-endian byte order, we need to deserialize it
+    // into the host byte order.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      data[0] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[3] = self->ReadU8();
+      data[4] = self->ReadU8();
+      data[5] = self->ReadU8();
+      data[6] = self->ReadU8();
+      data[7] = self->ReadU8();
+
+    // Host is little endian, serialized data is big endian, so the first byte
+    // read is the high-order byte, so we need to store it at `data[7]`, as
+    // `data[0]` is our low-order byte.
+    } else {
+      data[7] = self->ReadU8();
+      data[6] = self->ReadU8();
+      data[5] = self->ReadU8();
+      data[4] = self->ReadU8();
+      data[3] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[0] = self->ReadU8();
+    }
+
     return *(new (data) double);
   }
 
   [[gnu::hot]] MX_ALWAYS_INLINE float ReadF32(void) noexcept {
     alignas(float) uint8_t data[4u];
-    data[0] = static_cast<Self *>(this)->ReadU8();
-    data[1] = static_cast<Self *>(this)->ReadU8();
-    data[2] = static_cast<Self *>(this)->ReadU8();
-    data[3] = static_cast<Self *>(this)->ReadU8();
+    auto self = static_cast<Self *>(this);
+
+    // Data is serialized in big-endian byte order, we need to deserialize it
+    // into the host byte order.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      data[0] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[3] = self->ReadU8();
+
+    // Host is little endian, serialized data is big endian, so the first byte
+    // read is the high-order byte, so we need to store it at `data[3]`, as
+    // `data[0]` is our low-order byte.
+    } else {
+      data[3] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[0] = self->ReadU8();
+    }
+
     return *(new (data) float);
   }
 
   [[gnu::hot]] MX_ALWAYS_INLINE uint64_t ReadU64(void) noexcept {
     alignas(uint64_t) uint8_t data[8u];
-    data[0] = static_cast<Self *>(this)->ReadU8();
-    data[1] = static_cast<Self *>(this)->ReadU8();
-    data[2] = static_cast<Self *>(this)->ReadU8();
-    data[3] = static_cast<Self *>(this)->ReadU8();
-    data[4] = static_cast<Self *>(this)->ReadU8();
-    data[5] = static_cast<Self *>(this)->ReadU8();
-    data[6] = static_cast<Self *>(this)->ReadU8();
-    data[7] = static_cast<Self *>(this)->ReadU8();
+    auto self = static_cast<Self *>(this);
+
+    // Data is serialized in big-endian byte order, we need to deserialize it
+    // into the host byte order.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      data[0] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[3] = self->ReadU8();
+      data[4] = self->ReadU8();
+      data[5] = self->ReadU8();
+      data[6] = self->ReadU8();
+      data[7] = self->ReadU8();
+
+    // Host is little endian, serialized data is big endian, so the first byte
+    // read is the high-order byte, so we need to store it at `data[7]`, as
+    // `data[0]` is our low-order byte.
+    } else {
+      data[7] = self->ReadU8();
+      data[6] = self->ReadU8();
+      data[5] = self->ReadU8();
+      data[4] = self->ReadU8();
+      data[3] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[0] = self->ReadU8();
+    }
     return *(new (data) uint64_t);
   }
 
   [[gnu::hot]] MX_ALWAYS_INLINE uint32_t ReadU32(void) noexcept {
     alignas(uint32_t) uint8_t data[4u];
-    data[0] = static_cast<Self *>(this)->ReadU8();
-    data[1] = static_cast<Self *>(this)->ReadU8();
-    data[2] = static_cast<Self *>(this)->ReadU8();
-    data[3] = static_cast<Self *>(this)->ReadU8();
+    auto self = static_cast<Self *>(this);
+
+    // Data is serialized in big-endian byte order, we need to deserialize it
+    // into the host byte order.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      data[0] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[3] = self->ReadU8();
+
+    // Host is little endian, serialized data is big endian, so the first byte
+    // read is the high-order byte, so we need to store it at `data[3]`, as
+    // `data[0]` is our low-order byte.
+    } else {
+      data[3] = self->ReadU8();
+      data[2] = self->ReadU8();
+      data[1] = self->ReadU8();
+      data[0] = self->ReadU8();
+    }
+
     return *(new (data) uint32_t);
   }
 
   [[gnu::hot]] MX_ALWAYS_INLINE uint16_t ReadU16(void) noexcept {
     alignas(uint16_t) uint8_t data[2];
-    data[0] = static_cast<Self *>(this)->ReadU8();
-    data[1] = static_cast<Self *>(this)->ReadU8();
+    auto self = static_cast<Self *>(this);
+
+    // Data is serialized in big-endian byte order, we need to deserialize it
+    // into the host byte order.
+    if MX_CONSTEXPR_ENDIAN (MX_BIG_ENDIAN) {
+      data[0] = self->ReadU8();
+      data[1] = self->ReadU8();
+
+    // Host is little endian, serialized data is big endian, so the first byte
+    // read is the high-order byte, so we need to store it at `data[1]`, as
+    // `data[0]` is our low-order byte.
+    } else {
+      data[1] = self->ReadU8();
+      data[0] = self->ReadU8();
+    }
+
     return *(new (data) uint16_t);
   }
 
@@ -318,8 +452,9 @@ class ByteReader {
   }
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE bool ReadB(void) noexcept {
-    return !!static_cast<Self *>(this)->ReadU8();
+    return !!ReadU8();
   }
+
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE uint32_t
   ReadSize(void) noexcept {
     return ReadU32();
@@ -473,70 +608,69 @@ struct ByteCountingWriterProxy : public SubWriter {
  public:
   using SubWriter::SubWriter;
 
-  MX_ALWAYS_INLINE uint8_t *WriteSize(uint32_t v) {
+  MX_ALWAYS_INLINE void WriteSize(uint32_t v) {
     num_bytes += 4;
-    return SubWriter::WriteSize(v);
+    SubWriter::WriteSize(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteF64(double v) {
+  MX_ALWAYS_INLINE void WriteF64(double v) {
     num_bytes += 8;
-    return SubWriter::WriteF64(v);
+    SubWriter::WriteF64(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteF32(float v) {
+  MX_ALWAYS_INLINE void WriteF32(float v) {
     num_bytes += 4;
-    return SubWriter::WriteF32(v);
+    SubWriter::WriteF32(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteU64(uint64_t v) {
+  MX_ALWAYS_INLINE void WriteU64(uint64_t v) {
     num_bytes += 8;
-    return SubWriter::WriteU64(v);
+    SubWriter::WriteU64(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteU32(uint32_t v) {
+  MX_ALWAYS_INLINE void WriteU32(uint32_t v) {
     num_bytes += 4;
-    return SubWriter::WriteU32(v);
+    SubWriter::WriteU32(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteU16(uint16_t v) {
+  MX_ALWAYS_INLINE void WriteU16(uint16_t v) {
     num_bytes += 2;
-    return SubWriter::WriteU16(v);
+    SubWriter::WriteU16(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteU8(uint8_t v) {
+  MX_ALWAYS_INLINE void WriteU8(uint8_t v) {
     num_bytes += 1;
-    return SubWriter::WriteU8(v);
+    SubWriter::WriteU8(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteB(bool v) {
+  MX_ALWAYS_INLINE void WriteB(bool v) {
     num_bytes += 1;
-    return SubWriter::WriteB(v);
+    SubWriter::WriteB(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteI64(int64_t v) {
+  MX_ALWAYS_INLINE void WriteI64(int64_t v) {
     num_bytes += 8;
-    return SubWriter::WriteI64(v);
+    SubWriter::WriteI64(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteI32(int32_t v) {
+  MX_ALWAYS_INLINE void WriteI32(int32_t v) {
     num_bytes += 4;
-    return SubWriter::WriteI32(v);
+    SubWriter::WriteI32(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteI16(int16_t v) {
+  MX_ALWAYS_INLINE void WriteI16(int16_t v) {
     num_bytes += 2;
-    return SubWriter::WriteI16(v);
+    SubWriter::WriteI16(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *WriteI8(int8_t v) {
+  MX_ALWAYS_INLINE void WriteI8(int8_t v) {
     num_bytes += 1;
-    return SubWriter::WriteI8(v);
+    SubWriter::WriteI8(v);
   }
 
-  MX_ALWAYS_INLINE uint8_t *Skip(uint32_t n) {
-    assert(0u < n);
+  MX_ALWAYS_INLINE void Skip(uint32_t n) {
     num_bytes += n;
-    return SubWriter::Skip(n);
+    SubWriter::Skip(n);
   }
 
   uint32_t num_bytes{0};
@@ -630,7 +764,6 @@ struct ByteCountingReader : public SubReader {
   }
 
   MX_ALWAYS_INLINE void Skip(uint32_t n) {
-    assert(0u < n);
     num_bytes += n;
     SubReader::Skip(n);
   }
@@ -652,8 +785,8 @@ struct Serializer {
   using UT = std::underlying_type_t<T>;
 
   static constexpr bool kIsFixedSize = true;
-  MX_FLATTEN MX_INLINE static uint8_t *Write(Writer &writer, T data) {
-    return Serializer<Reader, Writer, UT>::Write(writer, static_cast<UT>(data));
+  MX_FLATTEN MX_INLINE static void Write(Writer &writer, T data) {
+    Serializer<Reader, Writer, UT>::Write(writer, static_cast<UT>(data));
   }
   MX_FLATTEN MX_INLINE static void Read(Reader &reader, T &out) {
     Serializer<Reader, Writer, UT>::Read(
@@ -689,8 +822,8 @@ struct Serializer<Reader, Writer, const DataT>
   template <typename Reader, typename Writer> \
   struct Serializer<Reader, Writer, type> { \
     static constexpr bool kIsFixedSize = true; \
-    MX_FLATTEN MX_INLINE static uint8_t *Write(Writer &writer, type data) { \
-      return writer.Write##method_suffix(cast_op<cast_type>(data)); \
+    MX_FLATTEN MX_INLINE static void Write(Writer &writer, type data) { \
+      writer.Write##method_suffix(cast_op<cast_type>(data)); \
     } \
     MX_FLATTEN MX_INLINE static void Read(Reader &reader, type &out) { \
       out = cast_op<type>(reader.Read##method_suffix()); \
@@ -702,31 +835,22 @@ struct Serializer<Reader, Writer, const DataT>
   MX_DEFINE_UNSAFE_SERIALIZER_PRIV(type); \
   MX_SERIALIZER_NAMESPACE_END
 
-#define MX_MAKE_ENUM_SERIALIZER(type, cast_type) \
-  MX_SERIALIZER_NAMESPACE_BEGIN \
-  template <typename Reader, typename Writer> \
-  struct Serializer<Reader, Writer, type> \
-      : public Serializer<Reader, Writer, cast_type> { \
-    using Parent = Serializer<Reader, Writer, cast_type>; \
-    static constexpr bool kIsFixedSize = Parent::kIsFixedSize; \
-    MX_FLATTEN MX_INLINE static uint8_t *Write(Writer &writer, \
-                                                         type data) { \
-      return Parent::Write(writer, static_cast<cast_type>(data)); \
-    } \
-    MX_FLATTEN MX_INLINE static void Read(Reader &reader, \
-                                                    type &out) { \
-      Parent::Read(reader, reinterpret_cast<cast_type &>(out)); \
-    } \
-    static constexpr uint32_t SizeInBytes(void) noexcept { \
-      return Parent::SizeInBytes(); \
-    } \
-  }; \
-  MX_DEFINE_UNSAFE_SERIALIZER_PRIV(type); \
-  MX_SERIALIZER_NAMESPACE_END
-
 template <typename T>
-static constexpr bool kCanReadWriteUnsafely =
+inline constexpr bool kCanReadWriteUnsafely =
     std::is_enum_v<T> || std::is_arithmetic_v<T>;
+
+template <>
+inline constexpr bool kCanReadWriteUnsafely<Empty> = true;
+
+template <typename Reader, typename Writer>
+struct Serializer<Reader, Writer, Empty> {
+  static constexpr bool kIsFixedSize = true;
+  MX_INLINE static void Write(Writer &writer, Empty) {}
+  MX_INLINE static void Read(Reader &reader, Empty &) {}
+  static constexpr uint32_t SizeInBytes(void) noexcept {
+    return 0u;
+  }
+};
 
 #if CHAR_MIN < 0
 MX_MAKE_FUNDAMENTAL_SERIALIZER(char, static_cast, int8_t, I8, 1)
@@ -755,9 +879,9 @@ MX_MAKE_FUNDAMENTAL_SERIALIZER(double, static_cast, double, F64, 8)
 template <typename Reader, typename Writer>
 struct Serializer<Reader, Writer, capnp::word> {
   static constexpr bool kIsFixedSize = true;
-  MX_FLATTEN MX_INLINE static uint8_t *Write(
+  MX_FLATTEN MX_INLINE static void Write(
       Writer &writer, const capnp::word &data) {
-    return writer.WriteU64(reinterpret_cast<const uint64_t &>(data));
+    writer.WriteU64(reinterpret_cast<const uint64_t &>(data));
   }
   MX_FLATTEN MX_INLINE static void Read(Reader &reader, capnp::word &out) {
     new (&out) uint64_t(reader.ReadU64());
@@ -773,22 +897,20 @@ inline constexpr bool kCanReadWriteUnsafely<capnp::word> = true;
 template <typename Reader, typename Writer>
 struct Serializer<Reader, Writer, int128_t> {
   static constexpr bool kIsFixedSize = true;
-  static uint8_t *Write(Writer &writer, int128_t val) {
+  static void Write(Writer &writer, int128_t val) {
     alignas(int128_t) uint8_t data[16u];
     *(new (data) int128_t) = val;
 
-    if constexpr (MX_LITTLE_ENDIAN) {
-      auto ret = writer.WriteU8(data[0]);
+    if MX_CONSTEXPR_ENDIAN (MX_LITTLE_ENDIAN) {
+      writer.WriteU8(data[0]);
       for (auto i = 1u; i < 16u; ++i) {
         writer.WriteU8(data[i]);
       }
-      return ret;
     } else {
-      auto ret = writer.WriteU8(data[16u - 1u]);
+      writer.WriteU8(data[16u - 1u]);
       for (auto i = 2u; i <= 16u; ++i) {
         writer.WriteU8(data[16u - i]);
       }
-      return ret;
     }
   }
 
@@ -809,22 +931,20 @@ template <typename Reader, typename Writer>
 struct Serializer<Reader, Writer, uint128_t> {
   static constexpr bool kIsFixedSize = true;
 
-  static uint8_t *Write(Writer &writer, uint128_t val) {
+  static void Write(Writer &writer, uint128_t val) {
     alignas(uint128_t) uint8_t data[16u];
     *(new (data) uint128_t) = val;
 
-    if constexpr (MX_LITTLE_ENDIAN) {
-      auto ret = writer.WriteU8(data[0]);
+    if MX_CONSTEXPR_ENDIAN (MX_LITTLE_ENDIAN) {
+      writer.WriteU8(data[0]);
       for (auto i = 1u; i < 16u; ++i) {
         writer.WriteU8(data[i]);
       }
-      return ret;
     } else {
-      auto ret = writer.WriteU8(data[16u - 1u]);
+      writer.WriteU8(data[16u - 1u]);
       for (auto i = 2u; i <= 16u; ++i) {
         writer.WriteU8(data[16u - i]);
       }
-      return ret;
     }
   }
 
@@ -892,11 +1012,11 @@ struct LinearContainerReader<ByteCountingReader<SubReader>, ContainerType,
 template <typename Writer, typename ContainerType, typename ElementType>
 struct LinearContainerWriter {
  public:
-  MX_FLATTEN MX_INLINE static uint8_t *Write(
+  MX_FLATTEN MX_INLINE static void Write(
       Writer &writer, const ContainerType &data) {
     const auto size = static_cast<uint32_t>(data.size());
     writer.EnterVariableSizedComposite(size);
-    auto ret = writer.WriteSize(size);
+    writer.WriteSize(size);
 
     // NOTE(pag): Induction variable based `for` loop so that a a byte counting
     //            writer can elide the `for` loop entirely and count `size`.
@@ -908,7 +1028,6 @@ struct LinearContainerWriter {
     }
 
     writer.ExitComposite();
-    return ret;
   }
 };
 
@@ -917,11 +1036,11 @@ struct LinearContainerWriter {
 template <typename ContainerType, typename ElementType>
 struct LinearContainerWriter<ByteCountingWriter, ContainerType, ElementType> {
  public:
-  MX_FLATTEN MX_INLINE static uint8_t *Write(
+  MX_FLATTEN MX_INLINE static void Write(
       ByteCountingWriter &writer, const ContainerType &data) {
     const auto size = static_cast<uint32_t>(data.size());
     writer.EnterVariableSizedComposite(size);
-    auto ret = writer.WriteSize(size);
+    writer.WriteSize(size);
     if (size) {
       if constexpr (kHasTrivialFixedSizeSerialization<ElementType>) {
         writer.Skip(
@@ -936,7 +1055,6 @@ struct LinearContainerWriter<ByteCountingWriter, ContainerType, ElementType> {
       }
     }
     writer.ExitComposite();
-    return ret;
   }
 };
 
@@ -1015,7 +1133,6 @@ struct Serializer<Reader, Writer, kj::Array<T>>
 
     } else {
       auto new_ret = kj::heapArray<T>(size);
-      T *const begin = &(ret[0]);
       for (uint32_t i = 0; i < size; ++i) {
         Serializer<Reader, NullWriter, T>::Read(reader, new_ret[i]);
       }
@@ -1029,7 +1146,7 @@ template <typename Reader, typename Writer, typename Val, size_t kIndex,
           size_t kMaxIndex>
 struct IndexedSerializer {
 
-  MX_FLATTEN MX_INLINE static uint8_t *Write(Writer &writer, const Val &data) {
+  MX_FLATTEN MX_INLINE static void Write(Writer &writer, const Val &data) {
     if constexpr (kIndex == 0u) {
       writer.EnterFixedSizeComposite(kMaxIndex);
     }
@@ -1037,16 +1154,13 @@ struct IndexedSerializer {
       const auto &elem = std::get<kIndex>(data);
       using ElemT =
           std::remove_const_t<std::remove_reference_t<decltype(elem)>>;
-      auto ret = Serializer<Reader, Writer, ElemT>::Write(writer, elem);
+      Serializer<Reader, Writer, ElemT>::Write(writer, elem);
       if constexpr ((kIndex + 1u) < kMaxIndex) {
         IndexedSerializer<NullReader, Writer, Val, kIndex + 1u,
                           kMaxIndex>::Write(writer, data);
       } else {
         writer.ExitComposite();
       }
-      return ret;
-    } else {
-      return nullptr;
     }
   }
 
@@ -1107,13 +1221,8 @@ struct Serializer<Reader, Writer, std::tuple<>> {
     return 0u;
   }
 
-  MX_FLATTEN MX_INLINE static uint8_t *Write(
-      Writer &writer, std::tuple<>) {
-    return writer.Current();
-  }
-
-  MX_FLATTEN MX_INLINE static void Read(
-      Reader &writer, std::tuple<> &) {}
+  MX_FLATTEN MX_INLINE static void Write(Writer &writer, std::tuple<>) {}
+  MX_FLATTEN MX_INLINE static void Read(Reader &writer, std::tuple<> &) {}
 };
 
 template <typename Reader, typename Writer, typename ElemT, size_t kSize>

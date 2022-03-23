@@ -6,24 +6,6 @@
 
 #pragma once
 
-#include <cassert>
-
-#if defined(__has_include) && __has_include(<pasta/Util/Result.h>)
-#include <pasta/Util/Result.h>
-
-namespace mx {
-
-template <typename ValueType, typename ErrorType>
-using Result = pasta::Result<ValueType, ErrorType>;
-
-}  // namespace mx
-
-// If we don't have pasta headers pre-installed or available then just define
-// the same Result type manually below.
-#else
-
-#pragma once
-
 #include <stdexcept>
 #include <variant>
 
@@ -214,4 +196,3 @@ void Result<ValueType, ErrorType>::VerifyFailed(void) const {
 }
 
 }  // namespace mx
-#endif

@@ -7,66 +7,146 @@
 #pragma once
 
 #include <cstdint>
+#include <variant>
 
 namespace mx {
+namespace rpc {
+class FileInfo;
+}  // namespace rpc
 
 using FileId = uint64_t;
-using CodeId = uint64_t;
+using FragmentId = uint64_t;
 
-enum class EntityKind : uint16_t {
-  kDeclaration,
-  kStatement,
-  kType,
-  kCodeToken,
-  kFileToken
+class Fragment;
+class FragmentImpl;
+
+enum class DeclKind : unsigned short;
+enum class StmtKind : unsigned short;
+enum class TokenKind : unsigned short;
+
+enum class TokenSubstitutionKind : unsigned short {
+  MACRO_EXPANSION,
+  FUNCTION_LIKE_MACRO_EXPANSION,
+  INCLUDE_EXPANSION
 };
 
-static constexpr uint64_t kMinEntityIdIncrement = 1u;
+static constexpr uint64_t kInvalidEntityId = 0ull;
+static constexpr uint64_t kMinEntityIdIncrement = 1ull;
 
-struct EntityId {
-  // The ID of the entity. This can be a `FileId` or a `CodeId`.
-  uint64_t id;
+// If we have more than 2^16 tokens in a given code chunk, then we consider
+// this a "big code" chunk. We assume that we'll have few of these, i.e. less
+// than 2^16 of them.
+static constexpr unsigned kBigFragmentIdNumBits = 16u;
+static constexpr FragmentId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
+static constexpr uint64_t kNumTokensInBigFragment =
+    1ull << kBigFragmentIdNumBits;
 
-  // The "offset" of this entity.
-  //
-  //    Declarations, Statements:
-  //        The index into one of the lists in a serialized `ast::EntityList`
-  //        inside of an `rpc::Code`. The entity lists are specific to
-  //        `sub_kind`.
-  //
-  //    Types:
-  //        TODO(pag): The qualifiers of the type.
-  //
-  //    Files:
-  //        TODO(pag): The size of the file, in bytes.
-  //
-  //    File tokens:
-  //        TODO(pag): Index of the token in the file.
-  //
-  //    Code tokens:
-  //        TODO(pag): Index of the token inside of the code chunk.
+static constexpr unsigned kFileIdNumBits = 20u;
+static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
+
+// Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
+// inside of a `Fragment`.
+struct DeclarationId {
+  FragmentId fragment_id;
+  DeclKind kind;
+
+  // Offset of this where this declaration is stored inside of a `kind`-specific
+  // list in `ast::EntityList`. For example, if `kind` is `DeclKind::CXX_METHOD`
+  // then `offset` represents an index inside of
+  // `ast::EntityList::cxxMethodDecl`.
   uint32_t offset;
 
-  // What kind of entity is this?
-  EntityKind kind;
+  bool operator==(const DeclarationId &) const noexcept = default;
+  bool operator!=(const DeclarationId &) const noexcept = default;
+};
 
-  // The "sub_kind" of this entity.
-  //
-  //    Declarations:
-  //        Encodes a `mx::DeclKind`.
-  //
-  //    Statements:
-  //        Encodes a `mx::StmtKind`.
-  //
-  //    Types:
-  //        Encodes a `mx::TypeKind`.
-  //
-  //    File:
-  //        N/A
-  //
-  //    File tokens, code tokens:
-  //        Encodes a `mx::TokenKind`.
-  uint16_t sub_kind;
+// Identifies a serialized version of a `clang::Stmt` or `pasta::Stmt`
+// inside of a `Fragment`.
+struct StatementId {
+  FragmentId fragment_id;
+  StmtKind kind;
+
+  // Offset of this where this statement is stored inside of a `kind`-specific
+  // list in `ast::EntityList`.
+  uint32_t offset;
+
+  bool operator==(const StatementId &) const noexcept = default;
+  bool operator!=(const StatementId &) const noexcept = default;
+};
+
+// Identifies a token inside of a `Fragment`.
+struct FragmentTokenId {
+  FragmentId fragment_id;
+  TokenKind kind;
+
+  // Offset of this where this token is stored inside of a serialized
+  // `rpc::Fragment::entities::token`, where `rpc::Fragment::entities`
+  // is an `ast::EntityList`.
+  uint32_t offset;
+
+  bool operator==(const FragmentTokenId &) const noexcept = default;
+  bool operator!=(const FragmentTokenId &) const noexcept = default;
+};
+
+// The offset of a substitution inside of a
+struct TokenSubstitutionId {
+ public:
+  FragmentId fragment_id;
+
+  TokenSubstitutionKind kind;
+
+  // Offset of this where this token substitution is stored inside of a
+  // serialized `rpc::Fragment::tokenSubstitutions`.
+  uint32_t offset;
+
+  bool operator==(const TokenSubstitutionId &) const noexcept = default;
+  bool operator!=(const TokenSubstitutionId &) const noexcept = default;
+};
+
+// Identifies a token inside of a `File`.
+struct FileTokenId {
+  FileId file_id;
+  TokenKind kind;
+
+  // Offset of this where this token is stored inside of a serialized
+  // `rpc::File::tokens` list.
+  uint32_t offset;
+
+  bool operator==(const FileTokenId &) const noexcept = default;
+  bool operator!=(const FileTokenId &) const noexcept = default;
+};
+
+// A tag type representing an invalid entity id.
+struct InvalidId {};
+
+// Possible types of entity ids represented by a packed
+// `EntityId`.
+using VariantId = std::variant<InvalidId, DeclarationId,
+                               StatementId, FragmentTokenId,
+                               TokenSubstitutionId, FileTokenId>;
+
+// An opaque, compressed entity id.
+class EntityId {
+ private:
+  uint64_t opaque{kInvalidEntityId};
+
+ public:
+  /* implicit */ inline EntityId(uint64_t opaque_)
+      : opaque(opaque_) {}
+
+  // Pack an elaborated entity ID into an opaque entity ID.
+  /* implicit */ EntityId(DeclarationId id);
+  /* implicit */ EntityId(StatementId id);
+  /* implicit */ EntityId(FragmentTokenId id);
+  /* implicit */ EntityId(TokenSubstitutionId id);
+  /* implicit */ EntityId(FileTokenId id);
+
+  inline operator uint64_t(void) const noexcept {
+    return opaque;
+  }
+
+  // Unpack this entity ID into a concrete type.
+  VariantId Unpack(void) const noexcept;
 };
 
 }  // namespace mx

@@ -30,7 +30,6 @@ set(dependencies_include_dir "${VCPKG_ROOT_INSTALL_DIR}/${VCPKG_TARGET_TRIPLET}/
 
 set(generated_files
   "${MX_BOOTSTRAP_LIB_AST_CAPNP}"
-  "${MX_BOOTSTRAP_LIB_AST_H}"
   "${MX_BOOTSTRAP_LIB_AST_CPP}"
   "${MX_BOOTSTRAP_INCLUDE_AST_H}"
   "${MX_BOOTSTRAP_INDEX_SERIALIZE_H}"
@@ -38,8 +37,12 @@ set(generated_files
 )
 
 # Run `mx-bootstrap` to auto-generate the files.
-add_custom_command(TARGET "${exe_name}"
+add_custom_command(
+  TARGET
+    "${exe_name}"
   POST_BUILD
+  BYPRODUCTS
+    ${generated_files}
   COMMAND
     "${exe_name}"
     "${install_include_dir}"
@@ -47,6 +50,4 @@ add_custom_command(TARGET "${exe_name}"
     ${generated_files}
   COMMENT
     "Bootstrapping Multiplier"
-  BYPRODUCTS
-    ${generated_files}
 )

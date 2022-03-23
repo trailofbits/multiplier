@@ -7,9 +7,12 @@
 #include "Server.h"
 
 #include <capnp/message.h>
+#include <capnp/serialize.h>
 #include <glog/logging.h>
 #include <kj/async-io.h>
 #include <kj/debug.h>
+#include <kj/exception.h>
+#include <kj/string.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
 #include <pasta/Compile/Job.h>
@@ -17,6 +20,7 @@
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
+#include <sstream>
 #include <mutex>
 #include <vector>
 
@@ -50,7 +54,7 @@ class ServerImpl final {
   // Should we show progress bars?
   const bool show_progress_bars;
 
-  std::shared_ptr<ServerContext> server_context;
+  ServerContext server_context;
 
   std::mutex indexing_context_lock;
   std::weak_ptr<IndexingContext> indexing_context;
@@ -76,7 +80,7 @@ ServerImpl::ServerImpl(ServerOptions &options)
     : executor(options.executor_options),
       workspace_dir(options.workspace_dir),
       show_progress_bars(options.show_progress_bars),
-      server_context(std::make_shared<ServerContext>(workspace_dir)),
+      server_context(options.workspace_dir),
       native_file_system(pasta::FileSystem::CreateNative()) {}
 
 // Get or create an indexing context. If there are concurrent indexing
@@ -89,9 +93,9 @@ ServerImpl::GetOrCreateIndexingContext(void) {
   if (ic) {
     return ic;
   } else {
-    ic = std::make_shared<IndexingContext>(server_context);
+    ic = std::make_shared<IndexingContext>(server_context, executor);
     if (show_progress_bars) {
-      ic->InitializeProgressBars(executor);
+      ic->InitializeProgressBars();
     }
     indexing_context = ic;
     return ic;
@@ -116,7 +120,7 @@ kj::Promise<void> Server::indexCompileCommands(
       context.getParams();
 
   mx::rpc::Multiplier::IndexCompileCommandsResults::Builder results =
-      context.getResults();
+      context.initResults();
 
   if (!params.hasCommands()) {
     LOG(WARNING)
@@ -193,6 +197,99 @@ kj::Promise<void> Server::indexCompileCommands(
   }
 
   results.setSuccess(true);
+  return kj::READY_NOW;
+}
+
+// Download a list of file info (file id, path).
+kj::Promise<void> Server::downloadFileList(
+    DownloadFileListContext context) {
+
+  std::vector<std::pair<mx::FileId, std::string>> paths;
+  d->server_context.file_id_to_path.ScanPrefix(
+      mx::Empty{},
+      [=, &paths] (mx::FileId file_id, std::string file_path) {
+        DCHECK_NE(file_id, mx::kInvalidEntityId);
+        DCHECK(!file_path.empty());
+        paths.emplace_back(file_id, std::move(file_path));
+        return true;
+      });
+
+  auto num_files = static_cast<unsigned>(paths.size());
+  auto results = context.initResults();
+  auto files_builder = results.initFiles(num_files);
+  for (auto i = 0u; i < num_files; ++i) {
+    const auto &path = paths[i];
+    mx::rpc::FileInfo::Builder info = files_builder[i];
+    info.setId(path.first);
+    info.setPath(path.second);
+  }
+
+  return kj::READY_NOW;
+}
+
+// Download a file associated with a specific file ID.
+kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
+  mx::rpc::Multiplier::DownloadFileParams::Reader params =
+      context.getParams();
+
+  mx::FileId file_id = params.getId();
+  auto maybe_contents =
+      d->server_context.file_id_to_serialized_file.TryGet(file_id);
+  if (!maybe_contents) {
+    std::stringstream err;
+    err << "Invalid file id " << file_id;
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  // Collect the fragments associated with this file.
+  std::vector<mx::FragmentId> fragment_ids;
+  d->server_context.file_fragment_ids.ScanPrefix(
+      file_id,
+      [file_id, &fragment_ids] (mx::FileId found_file_id,
+                                mx::FragmentId fragment_id) {
+        DCHECK_EQ(file_id, found_file_id);
+        fragment_ids.push_back(fragment_id);
+        return file_id == found_file_id;
+      });
+
+  capnp::FlatArrayMessageReader reader(maybe_contents.value());
+  mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
+
+  auto results = context.initResults(file.totalSize());
+  results.setFile(file);
+
+  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
+  auto fragments = results.initFragments(num_fragments);
+  for (auto i = 0u; i < num_fragments; ++i) {
+    fragments.set(i, fragment_ids[i]);
+  }
+
+  return kj::READY_NOW;
+}
+
+// Download a fragment containing a token with a specific ID.
+kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
+  mx::rpc::Multiplier::DownloadFragmentParams::Reader params =
+      context.getParams();
+
+  std::stringstream err;
+  mx::FragmentId fragment_id = params.getId();
+
+  auto maybe_contents =
+      d->server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
+  if (!maybe_contents) {
+    err << "Invalid fragment id " << fragment_id;
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  capnp::FlatArrayMessageReader reader(maybe_contents.value());
+  mx::rpc::Fragment::Reader fragment = reader.getRoot<mx::rpc::Fragment>();
+
+  auto results = context.initResults(fragment.totalSize());
+  results.setFragment(fragment);
+
   return kj::READY_NOW;
 }
 

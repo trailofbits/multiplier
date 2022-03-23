@@ -202,6 +202,31 @@ void PersistentMapBase::Set(std::string_view key, std::string_view val) const {
   }
 }
 
+void PersistentMapBase::MatchCommonPrefix(
+    std::string key_prefix_,
+    std::function<bool(std::string_view, std::string_view)> cb) const {
+
+  rocksdb::ReadOptions options;
+  options.prefix_same_as_start = true;
+
+  const rocksdb::Slice key_prefix(key_prefix_);
+
+  std::unique_ptr<rocksdb::Iterator> it(impl->NewIterator(options, cf_handle));
+
+  for (it->Seek(key_prefix); it->Valid(); it->Next()) {
+    rocksdb::Slice key = it->key();
+    if (!key.starts_with(key_prefix)) {
+      break;
+    }
+    rocksdb::Slice value = it->value();
+    std::string_view key_view(key.data(), key.size());
+    std::string_view value_view(key.data(), key.size());
+    if (!cb(key_view, value_view)) {
+      break;
+    }
+  }
+}
+
 bool PersistentMapBase::GetOrSet(std::string_view key,
                                  std::string *val) const {
   const rocksdb::ReadOptions read_options;

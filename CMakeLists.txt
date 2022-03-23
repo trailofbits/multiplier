@@ -36,8 +36,13 @@ endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
 
-find_package(SQLite REQUIRED)
-find_package(CapnProto CONFIG REQUIRED)
+# TODO(pag): Ugh this is ughly. I misunderstood how `ExternalProject_Add`
+#            works and so this is just a dumb way of trying to go and get
+#            things.
+if(NOT MX_ENABLE_BOOTSTRAP)
+  find_package(CapnProto CONFIG REQUIRED)
+endif()
+
 find_package(ZLIB REQUIRED)
 find_package(gflags CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
@@ -45,18 +50,10 @@ find_package(Z3 4.8 CONFIG REQUIRED)
 find_llvm(llvm)
 find_package(Clang CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
-
+find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
-#add_library(mx_sqlite INTERFACE)
-#target_link_libraries(mx_sqlite INTERFACE
-#  ${SQLite_LIBRARIES}
-#)
-#
-#target_include_directories(mx_sqlite INTERFACE
-#  ${SQLite_INCLUDE_DIRS}
-#)
 
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
@@ -106,12 +103,14 @@ add_custom_target("copy_datalog_server_headers"
 # The remaining arguments to `mx-bootstrap` are the paths to the files that will
 # be generated based on analyzing the types/classes in the `pasta` namespace.
 set(MX_BOOTSTRAP_LIB_AST_CAPNP "${PROJECT_SOURCE_DIR}/lib/AST.capnp")
-set(MX_BOOTSTRAP_LIB_AST_H "${PROJECT_SOURCE_DIR}/lib/AST.h")
 set(MX_BOOTSTRAP_LIB_AST_CPP "${PROJECT_SOURCE_DIR}/lib/AST.cpp")
 set(MX_BOOTSTRAP_INCLUDE_AST_H "${PROJECT_SOURCE_DIR}/include/multiplier/AST.h")
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_H "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.h")
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_CPP "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.cpp")
 
-add_subdirectory("lib")
-add_subdirectory("bin")
-
+if(MX_ENABLE_BOOTSTRAP)
+  add_subdirectory("bin/Bootstrap")
+else()
+  add_subdirectory("lib")
+  add_subdirectory("bin")
+endif()
