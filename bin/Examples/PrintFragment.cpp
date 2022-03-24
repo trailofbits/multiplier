@@ -52,12 +52,16 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  // Print our the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
     PrintUnparsedTokens(fragment.unparsed_tokens());
 
+  // Print out the tokens of this fragment that were actually parsed. These
+  // are post-macro expansion tokens, and generally don't include whitespace
+  // or comments. There can be empty tokens, however.
   } else {
     for (mx::Token token : fragment.tokens()) {
-      std::cout << token.data();
+      std::cout << ' ' << token.data();
     }
   }
 

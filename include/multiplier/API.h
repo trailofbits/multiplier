@@ -6,11 +6,13 @@
 
 #pragma once
 
+#include <deque>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <set>
+#include <map>
+#include <mutex>
 
 #include "AST.h"
 #include "Types.h"
@@ -34,6 +36,8 @@ class TokenSubstitution;
 class TokenSubstitutionList;
 class TokenSubstitutionListImpl;
 
+using FileList = std::map<std::filesystem::path, FileId>;
+
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
  private:
@@ -51,6 +55,9 @@ class Token {
         index(index_) {}
 
  public:
+  // Return an invalid token.
+  static Token invalid(void) noexcept;
+
   // Return `true` if this is a valid token.
   operator bool(void) const noexcept;
 
@@ -266,6 +273,9 @@ class File {
   }
 };
 
+// A token substitution gives access to the before and after tokens of a
+// substitution. There can be one-or-more `before` tokens (e.g. function-like
+// macro expansions, file inclusions) and zero-or-more `after` tokens.
 class TokenSubstitution {
  private:
   friend class TokenSubstitutionListIterator;
@@ -296,6 +306,7 @@ using TokenSubstitutionEnty = std::variant<Token, TokenSubstitution>;
 
 class TokenSubstitutionListEnd {};
 
+// Iterate over a list of token or token substitution nodes.
 class TokenSubstitutionListIterator {
  private:
   friend class TokenSubstitutionList;
@@ -335,6 +346,7 @@ class TokenSubstitutionListIterator {
   }
 };
 
+// List of token or substitution nodes.
 class TokenSubstitutionList {
  private:
   friend class Fragment;
@@ -426,8 +438,7 @@ class EntityProvider : public std::enable_shared_from_this<EntityProvider> {
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  virtual std::set<std::pair<std::filesystem::path, FileId>>
-  list_files(void) noexcept = 0;
+  virtual FileList list_files(void) noexcept = 0;
 
   // Download a file by its unique ID.
   virtual File file(FileId id) noexcept = 0;

@@ -648,14 +648,14 @@ MethodListPtr CodeGenerator::RunOnClass(
     include_h_os
         << " {\n"
         << " protected:\n"
-        << "  std::shared_ptr<FragmentImpl> fragment;\n"
+        << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  DeclarationId id;\n\n";
 
   } else if (class_name == "Stmt") {
     include_h_os
         << " {\n"
         << " protected:\n"
-        << "  std::shared_ptr<FragmentImpl> fragment;\n"
+        << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  StatementId id;\n\n";
 
   // Things like `TemplateParameterList`, that aren't themselves entities, but
@@ -705,6 +705,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     std::string snake_name = CapitalCaseToSnakeCase(method_name);
     std::string api_name = SnakeCaseToAPICase(snake_name);
     std::string camel_name = SnakeCaseToCamelCase(snake_name);
+    std::string getter_name = "get" + Capitalize(camel_name);
     std::string setter_name = "set" + Capitalize(camel_name);
     std::string init_name = "init" + Capitalize(camel_name);
     auto return_type = method.ReturnType().UnqualifiedType();
@@ -720,6 +721,13 @@ MethodListPtr CodeGenerator::RunOnClass(
       if (record_name == "Token" || record_name == "FileToken") {
         include_h_os
             << "  Token " << api_name << "(void) const noexcept;\n";
+
+//        lib_cpp_os
+//            << "Token " << class_name << "::" << api_name
+//            << "(void) const noexcept {\n"
+//            << "  auto entities = fragment->Entities();\n"
+//            << "  auto self = entities.get" << class_name << "()[id.offset];\n"
+//            << "  EntityId val = self." << getter_name << "();\n";
 
         serialize_cpp_os
             << "  b." << setter_name << "(es.EntityId(e."

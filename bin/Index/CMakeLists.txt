@@ -38,7 +38,7 @@ add_executable("${exe_name}"
 
 target_link_libraries("${exe_name}"
   PRIVATE
-    "util"
+    "mx-util"
     pasta::pasta
 )
 

@@ -19,6 +19,8 @@ namespace mx {
 using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
                                             capnp::Kind::STRUCT>::Reader;
+using EntityListReader = ast::EntityList::Reader;
+
 class TokenReader {
  public:
   using Ptr = std::shared_ptr<const TokenReader>;
@@ -177,6 +179,9 @@ class FragmentImpl {
 
   // Return a reader for token substitutions.
   virtual TokenSubstitutionsReader Substitutions(void) const = 0;
+
+  // Return a reader for the entities in this fragment.
+  virtual EntityListReader Entities(void) const = 0;
 };
 
 class InvalidFragmentImpl : public FragmentImpl {
@@ -194,6 +199,7 @@ class InvalidFragmentImpl : public FragmentImpl {
   unsigned LastLine(void) const final;
   NodeReader Nodes(void) const final;
   TokenSubstitutionsReader Substitutions(void) const final;
+  EntityListReader Entities(void) const final;
 };
 
 // A fragment of code downloaded from the server.
@@ -237,6 +243,9 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReader {
 
   // Return a reader for token substitutions.
   TokenSubstitutionsReader Substitutions(void) const final;
+
+  // Return a reader for the entities in this fragment.
+  EntityListReader Entities(void) const final;
 };
 
 // Provides entities from a remote source, i.e. a remote
@@ -244,26 +253,31 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReader {
 // available over a UNIX domain socket `unix:/path`.
 class RemoteEntityProvider final : public EntityProvider {
  private:
-  // TODO(pag): Consider eventually running the client on a separate thread,
-  //            and talking to it via `kj::Executor::executeSync`. Performance-
-  //            wise this won't be great; however, it means that client/server
-  //            stuff would happen on a single (background) thread, rather than
-  //            from whatever thread the user of the API has to be on. It's not
-  //            clear if the current API is thread-safe.
-  capnp::EzRpcClient client;
-  mx::rpc::Multiplier::Client multiplier;
+
+  struct ClientConnection
+      : public std::enable_shared_from_this<ClientConnection> {
+    capnp::EzRpcClient connection;
+    mx::rpc::Multiplier::Client client;
+
+    ClientConnection(const std::string &host_port);
+  };
+
+  const std::string host_port;
+
+  // Thread-local connections.
+  std::deque<std::unique_ptr<ClientConnection>> tls_connections;
+  std::mutex tls_connections_lock;
+
+  ClientConnection &Connection(void);
 
  public:
-  RemoteEntityProvider(std::string host, std::string port)
-      : client(host + ':' + port),
-        multiplier(client.getMain<mx::rpc::Multiplier>()) {}
+  RemoteEntityProvider(std::string host, std::string port);
 
   virtual ~RemoteEntityProvider(void) noexcept;
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  std::set<std::pair<std::filesystem::path, FileId>>
-  list_files(void) noexcept final;
+  FileList list_files(void) noexcept final;
 
   // Download a file by its unique ID.
   File file(FileId id) noexcept final;

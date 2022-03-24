@@ -6,12 +6,20 @@
 
 #include "API.h"
 
+#include <atomic>
 #include <cassert>
 #include <sstream>
 #include <thread>
 #include <iostream>
 
 namespace mx {
+namespace {
+
+static thread_local unsigned tClientIndex = 0;
+
+static std::atomic<unsigned> gNextClientIndex;
+
+}  // namespace
 
 TokenReader::~TokenReader(void) noexcept {}
 InvalidTokenReaderImpl::~InvalidTokenReaderImpl(void) noexcept {}
@@ -142,6 +150,10 @@ TokenSubstitutionsReader InvalidFragmentImpl::Substitutions(void) const {
   return {};
 }
 
+EntityListReader InvalidFragmentImpl::Entities(void) const {
+  return {};
+}
+
 ResponseFragmentImpl::~ResponseFragmentImpl(void) noexcept {}
 
 ResponseFragmentImpl::ResponseFragmentImpl(FragmentId id_,
@@ -259,6 +271,15 @@ TokenSubstitutionsReader ResponseFragmentImpl::Substitutions(void) const {
   }
 }
 
+// Return a reader for the entities in this fragment.
+EntityListReader ResponseFragmentImpl::Entities(void) const {
+  if (reader.hasEntities()) {
+    return reader.getEntities();
+  } else {
+    return {};
+  }
+}
+
 EntityProvider::~EntityProvider(void) noexcept {}
 
 // Download a fragment based off of an entity ID.
@@ -283,6 +304,36 @@ Fragment EntityProvider::fragment_containing(EntityId id) noexcept {
   }
 }
 
+RemoteEntityProvider::ClientConnection::ClientConnection(const std::string &hp)
+    : connection(hp),
+      client(connection.getMain<mx::rpc::Multiplier>()) {}
+
+RemoteEntityProvider::RemoteEntityProvider(std::string host, std::string port)
+    : host_port(host + ':' + port) {
+  tls_connections.resize(1024);
+}
+
+RemoteEntityProvider::ClientConnection &RemoteEntityProvider::Connection(void) {
+  auto &id = tClientIndex;
+  std::unique_ptr<ClientConnection> *cc = nullptr;
+  if (!id) {
+    id = gNextClientIndex.fetch_add(1u);
+
+    std::unique_lock<std::mutex> locker(tls_connections_lock);
+    if (id >= tls_connections.size()) {
+      tls_connections.resize(id + 1u);
+    }
+
+    cc = &(tls_connections[id]);
+  }
+
+  if (!*cc) {
+    *cc = std::make_unique<ClientConnection>(host_port);
+  }
+
+  return **cc;
+}
+
 RemoteEntityProvider::~RemoteEntityProvider(void) noexcept {}
 
 // Returns an entity provider that gets entities from a remote host.
@@ -304,15 +355,15 @@ using FileListResults =
 
 // Get the current list of parsed files, where the minimum ID
 // in the returned list of fetched files will be `start_at`.
-std::set<std::pair<std::filesystem::path, FileId>>
-RemoteEntityProvider::list_files(void) noexcept {
+FileList RemoteEntityProvider::list_files(void) noexcept {
+  ClientConnection &cc = Connection();
   capnp::Request<mx::rpc::Multiplier::DownloadFileListParams,
                  mx::rpc::Multiplier::DownloadFileListResults>
-      request = multiplier.downloadFileListRequest();
+      request = cc.client.downloadFileListRequest();
   capnp::Response<mx::rpc::Multiplier::DownloadFileListResults> response =
-      request.send().wait(client.getWaitScope());
+      request.send().wait(cc.connection.getWaitScope());
 
-  std::set<std::pair<std::filesystem::path, FileId>> files;
+  FileList files;
   if (!response.hasFiles()) {
     return files;
   }
@@ -329,7 +380,8 @@ RemoteEntityProvider::list_files(void) noexcept {
       continue;
     }
 
-    files.emplace(path.cStr(), file_id);
+    std::filesystem::path p(path.cStr());
+    files.try_emplace(std::move(p), file_id);
   }
 
   return files;
@@ -339,13 +391,14 @@ RemoteEntityProvider::list_files(void) noexcept {
 File RemoteEntityProvider::file(FileId id) noexcept {
   EntityProvider::Ptr self = shared_from_this();
 
+  ClientConnection &cc = Connection();
   capnp::Request<mx::rpc::Multiplier::DownloadFileParams,
                  mx::rpc::Multiplier::DownloadFileResults>
-  request = multiplier.downloadFileRequest();
+  request = cc.client.downloadFileRequest();
   request.setId(id);
   try {
     auto ret = std::make_shared<ResponseFileImpl>(
-        id, std::move(self), request.send().wait(client.getWaitScope()));
+        id, std::move(self), request.send().wait(cc.connection.getWaitScope()));
     auto ret_ptr = ret.get();
     return File(FileImpl::Ptr(std::move(ret), ret_ptr));
 
@@ -361,13 +414,14 @@ File RemoteEntityProvider::file(FileId id) noexcept {
 Fragment RemoteEntityProvider::fragment(FragmentId id) noexcept {
   EntityProvider::Ptr self = shared_from_this();
 
+  ClientConnection &cc = Connection();
   capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
                  mx::rpc::Multiplier::DownloadFragmentResults>
-      request = multiplier.downloadFragmentRequest();
+      request = cc.client.downloadFragmentRequest();
   request.setId(id);
   try {
     auto ret = std::make_shared<ResponseFragmentImpl>(
-        id, std::move(self), request.send().wait(client.getWaitScope()));
+        id, std::move(self), request.send().wait(cc.connection.getWaitScope()));
     auto ret_ptr = ret.get();
     return Fragment(FragmentImpl::Ptr(std::move(ret), ret_ptr));
 
@@ -405,10 +459,15 @@ TokenList TokenList::containing(Token tok) noexcept {
   return TokenList(std::move(tok.impl), num_tokens);
 }
 
+// Return an invalid token.
+Token Token::invalid(void) noexcept {
+  return Token(std::make_shared<InvalidTokenReaderImpl>(), 0);
+}
+
 // Return the token at index `index`.
 Token TokenList::operator[](size_t index) const noexcept {
   if (index >= num_tokens) {
-    return Token(std::make_shared<InvalidTokenReaderImpl>(), index);
+    return Token::invalid();
   } else {
     return Token(impl, index);
   }

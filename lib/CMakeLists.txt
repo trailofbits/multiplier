@@ -70,7 +70,7 @@ set(api_headers
   "${source_include_dir}/Types.h"
 )
 
-add_library("api"
+add_library("mx-api"
   STATIC
     ${api_headers}
     ${copied_headers}
@@ -84,11 +84,11 @@ add_library("api"
     ${MX_AST_SOURCES}
 )
 
-add_dependencies("api"
+add_dependencies("mx-api"
   "copy_headers"
 )
 
-target_include_directories("api"
+target_include_directories("mx-api"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -98,12 +98,15 @@ target_include_directories("api"
     "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-target_link_libraries("api"
+target_link_libraries("mx-api"
+  PUBLIC
+    glog::glog
+    gflags::gflags
   PRIVATE
     $<BUILD_INTERFACE:CapnProto::capnp-rpc>
 )
 
-set_target_properties("api"
+set_target_properties("mx-api"
   PROPERTIES
     LINKER_LANGUAGE
       CXX
@@ -115,19 +118,19 @@ set_target_properties("api"
       hidden
 )
 
-target_compile_features("api"
+target_compile_features("mx-api"
   PUBLIC
     cxx_std_20
 )
 
-add_library("${PROJECT_NAME}::api" ALIAS "api")
-set_target_properties("api" PROPERTIES LINKER_LANGUAGE CXX)
+add_library("${PROJECT_NAME}::api" ALIAS "mx-api")
+set_target_properties("mx-api" PROPERTIES LINKER_LANGUAGE CXX)
 
-set_target_properties("api"
+set_target_properties("mx-api"
   PROPERTIES
     PUBLIC_HEADER "${api_headers}")
 
-target_include_directories("api"
+target_include_directories("mx-api"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -157,7 +160,7 @@ set(util_headers
   ${copied_headers}
 )
 
-add_library("util"
+add_library("mx-util"
   STATIC
     ${util_headers}
 
@@ -178,11 +181,11 @@ add_library("util"
     ${MX_AST_SOURCES}
 )
 
-add_dependencies("util"
+add_dependencies("mx-util"
   "copy_headers"
 )
 
-target_include_directories("util"
+target_include_directories("mx-util"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -192,7 +195,7 @@ target_include_directories("util"
     "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-target_link_libraries("util"
+target_link_libraries("mx-util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
@@ -204,7 +207,7 @@ target_link_libraries("util"
     $<BUILD_INTERFACE:CapnProto::capnp-rpc>
 )
 
-set_target_properties("util"
+set_target_properties("mx-util"
   PROPERTIES
     LINKER_LANGUAGE
       CXX
@@ -216,19 +219,18 @@ set_target_properties("util"
       hidden
 )
 
-target_compile_features("util"
+target_compile_features("mx-util"
   PUBLIC
     cxx_std_20
 )
 
-add_library("${PROJECT_NAME}::util" ALIAS "util")
-set_target_properties("util" PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties("mx-util" PROPERTIES LINKER_LANGUAGE CXX)
 
-set_target_properties("util"
+set_target_properties("mx-util"
   PROPERTIES
     PUBLIC_HEADER "${public_headers}")
 
-target_include_directories("util"
+target_include_directories("mx-util"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -243,7 +245,7 @@ if(MX_ENABLE_INSTALL)
   # NOTE(pag): `util` is *not* installed, just `api`.
   install(
     TARGETS
-      "api"
+      "mx-api"
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION

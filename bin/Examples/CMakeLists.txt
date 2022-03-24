@@ -14,7 +14,7 @@ function(define_example exe_name source_file)
   
   target_link_libraries("${exe_name}"
     PRIVATE
-      "api"
+      "mx-api"
       glog::glog
       gflags::gflags
   )
