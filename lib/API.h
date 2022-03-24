@@ -16,11 +16,14 @@
 
 namespace mx {
 
-class TokenReaderImpl {
+using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
+using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
+                                            capnp::Kind::STRUCT>::Reader;
+class TokenReader {
  public:
-  using Ptr = std::shared_ptr<const TokenReaderImpl>;
+  using Ptr = std::shared_ptr<const TokenReader>;
 
-  virtual ~TokenReaderImpl(void) noexcept;
+  virtual ~TokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
   virtual unsigned NumTokens(void) const noexcept = 0;
@@ -35,8 +38,25 @@ class TokenReaderImpl {
   virtual EntityId NthTokenId(unsigned token_index) const = 0;
 };
 
+struct BeforeTag {};
+struct AfterTag {};
+
+class TokenSubstitutionListImpl {
+ public:
+  const std::shared_ptr<const FragmentImpl> fragment;
+  const NodeReader nodes;
+
+  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_);
+
+  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+                            unsigned offset, BeforeTag);
+
+  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+                            unsigned offset, AfterTag);
+};
+
 // Used for invalid tokens.
-class InvalidTokenReaderImpl final : public TokenReaderImpl {
+class InvalidTokenReaderImpl final : public TokenReader {
  public:
   virtual ~InvalidTokenReaderImpl(void) noexcept;
 
@@ -76,7 +96,7 @@ class FileImpl {
         ep(std::move(ep_)) {}
 
   // Return a reader for the tokens in the file.
-  virtual TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
+  virtual TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
 };
 
 // An invalid file. This exists to handle some failure somewhere, e.g. a failure
@@ -89,11 +109,11 @@ class InvalidFileImpl final : public FileImpl {
   using FileImpl::FileImpl;
 
   // Return a reader for the tokens in the file.
-  TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const final;
+  TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const final;
 };
 
 // A file downloaded as a result of a making an RPC.
-class ResponseFileImpl final : public FileImpl, public TokenReaderImpl {
+class ResponseFileImpl final : public FileImpl, public TokenReader {
  public:
   using Response = capnp::Response<mx::rpc::Multiplier::DownloadFileResults>;
   const Response response;
@@ -104,7 +124,7 @@ class ResponseFileImpl final : public FileImpl, public TokenReaderImpl {
   ResponseFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_);
 
   // Return a reader for the tokens in the file.
-  TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const final;
+  TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const final;
 
   // Return the number of tokens in the file.
   unsigned NumTokens(void) const noexcept final;
@@ -147,10 +167,16 @@ class FragmentImpl {
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
-  virtual TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const = 0;
+  virtual TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const = 0;
 
   virtual unsigned FirstLine(void) const = 0;
   virtual unsigned LastLine(void) const = 0;
+
+  // Return a reader for token nodes.
+  virtual NodeReader Nodes(void) const = 0;
+
+  // Return a reader for token substitutions.
+  virtual TokenSubstitutionsReader Substitutions(void) const = 0;
 };
 
 class InvalidFragmentImpl : public FragmentImpl {
@@ -163,13 +189,15 @@ class InvalidFragmentImpl : public FragmentImpl {
   virtual ~InvalidFragmentImpl(void) noexcept;
 
   FileId FileContaingFirstToken(void) const final;
-  TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
+  TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
   unsigned FirstLine(void) const final;
   unsigned LastLine(void) const final;
+  NodeReader Nodes(void) const final;
+  TokenSubstitutionsReader Substitutions(void) const final;
 };
 
 // A fragment of code downloaded from the server.
-class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
+class ResponseFragmentImpl final : public FragmentImpl, public TokenReader {
  public:
   using Response = capnp::Response<
       mx::rpc::Multiplier::DownloadFragmentResults>;
@@ -190,7 +218,7 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
-  TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
+  TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
 
   // Return the number of tokens in the file.
   unsigned NumTokens(void) const noexcept final;
@@ -203,6 +231,12 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
 
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const final;
+
+  // Return a reader for token nodes.
+  NodeReader Nodes(void) const final;
+
+  // Return a reader for token substitutions.
+  TokenSubstitutionsReader Substitutions(void) const final;
 };
 
 // Provides entities from a remote source, i.e. a remote

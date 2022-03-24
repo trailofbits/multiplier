@@ -6,13 +6,14 @@
 
 #include "API.h"
 
+#include <cassert>
 #include <sstream>
 #include <thread>
 #include <iostream>
 
 namespace mx {
 
-TokenReaderImpl::~TokenReaderImpl(void) noexcept {}
+TokenReader::~TokenReader(void) noexcept {}
 InvalidTokenReaderImpl::~InvalidTokenReaderImpl(void) noexcept {}
 
 // Return the number of tokens accessible to this reader.
@@ -38,9 +39,9 @@ EntityId InvalidTokenReaderImpl::NthTokenId(unsigned) const {
 FileImpl::~FileImpl(void) noexcept {}
 
 // Return a reader for the tokens in the file.
-TokenReaderImpl::Ptr InvalidFileImpl::TokenReader(
+TokenReader::Ptr InvalidFileImpl::TokenReader(
     const FileImpl::Ptr &self) const {
-  return TokenReaderImpl::Ptr(self, &empty_reader);
+  return TokenReader::Ptr(self, &empty_reader);
 }
 
 ResponseFileImpl::~ResponseFileImpl(void) noexcept {}
@@ -58,9 +59,9 @@ ResponseFileImpl::ResponseFileImpl(
 }
 
 // Return a reader for the tokens in the file.
-TokenReaderImpl::Ptr ResponseFileImpl::TokenReader(
+TokenReader::Ptr ResponseFileImpl::TokenReader(
     const FileImpl::Ptr &self) const {
-  return TokenReaderImpl::Ptr(self, static_cast<const TokenReaderImpl *>(this));
+  return TokenReader::Ptr(self, static_cast<const class TokenReader *>(this));
 }
 
 // Return the number of tokens in the file.
@@ -120,9 +121,9 @@ FileId InvalidFragmentImpl::FileContaingFirstToken(void) const {
   return kInvalidEntityId;
 }
 
-TokenReaderImpl::Ptr InvalidFragmentImpl::TokenReader(
+TokenReader::Ptr InvalidFragmentImpl::TokenReader(
     const FragmentImpl::Ptr &self) const {
-  return TokenReaderImpl::Ptr(self, &empty_reader);
+  return TokenReader::Ptr(self, &empty_reader);
 }
 
 unsigned InvalidFragmentImpl::FirstLine(void) const {
@@ -131,6 +132,14 @@ unsigned InvalidFragmentImpl::FirstLine(void) const {
 
 unsigned InvalidFragmentImpl::LastLine(void) const {
   return 0u;
+}
+
+NodeReader InvalidFragmentImpl::Nodes(void) const {
+  return {};
+}
+
+TokenSubstitutionsReader InvalidFragmentImpl::Substitutions(void) const {
+  return {};
 }
 
 ResponseFragmentImpl::~ResponseFragmentImpl(void) noexcept {}
@@ -163,9 +172,9 @@ unsigned ResponseFragmentImpl::LastLine(void) const {
 
 // Return a reader for the parsed tokens in the fragment. This doesn't
 // include all tokens, i.e. macro use tokens, comments, etc.
-TokenReaderImpl::Ptr ResponseFragmentImpl::TokenReader(
+TokenReader::Ptr ResponseFragmentImpl::TokenReader(
     const FragmentImpl::Ptr &self) const {
-  return TokenReaderImpl::Ptr(self, static_cast<const TokenReaderImpl *>(this));
+  return TokenReader::Ptr(self, static_cast<const class TokenReader *>(this));
 }
 
 // Return the number of tokens in the file.
@@ -230,6 +239,24 @@ EntityId ResponseFragmentImpl::NthTokenId(unsigned index) const {
     }
   }
   return kInvalidEntityId;
+}
+
+// Return a reader for token nodes.
+NodeReader ResponseFragmentImpl::Nodes(void) const {
+  if (reader.hasTokens()) {
+    return reader.getTokens();
+  } else {
+    return {};
+  }
+}
+
+// Return a reader for token substitutions.
+TokenSubstitutionsReader ResponseFragmentImpl::Substitutions(void) const {
+  if (reader.hasTokenSubstitutions()) {
+    return reader.getTokenSubstitutions();
+  } else {
+    return {};
+  }
 }
 
 EntityProvider::~EntityProvider(void) noexcept {}
@@ -476,12 +503,67 @@ TokenList Fragment::tokens(void) const noexcept {
 
 // Return the list of token substitutions.
 TokenSubstitutionList Fragment::unparsed_tokens(void) const noexcept {
-
+  auto ret = std::make_shared<const TokenSubstitutionListImpl>(impl);
+  auto num_nodes = ret->nodes.size();
+  return TokenSubstitutionList(std::move(ret), num_nodes);
 }
 
 // Return the list of top-level declarations in this fragment.
 std::vector<Decl> Fragment::declarations(void) const noexcept {
   return {};
+}
+
+std::variant<Token, TokenSubstitution>
+TokenSubstitutionListIterator::operator*(void) const noexcept {
+  VariantId id = EntityId(impl->nodes[index]).Unpack();
+
+  if (std::holds_alternative<FragmentTokenId>(id)) {
+    auto tok = std::get<FragmentTokenId>(id);
+    return Token(impl->fragment->TokenReader(impl->fragment), tok.offset);
+
+  } else if (std::holds_alternative<FileTokenId>(id)) {
+    auto tok = std::get<FileTokenId>(id);
+    auto file = File::containing(impl->fragment);
+    return Token(file.impl->TokenReader(file.impl), tok.offset);
+
+  } else if (std::holds_alternative<TokenSubstitutionId>(id)) {
+    auto sub = std::get<TokenSubstitutionId>(id);
+    assert(sub.fragment_id == impl->fragment->id);
+    return TokenSubstitution(impl->fragment, sub.offset, sub.kind);
+
+  } else {
+    assert(false);
+    __builtin_unreachable();
+  }
+}
+
+TokenSubstitutionListImpl::TokenSubstitutionListImpl(
+    std::shared_ptr<const FragmentImpl> fragment_)
+    : fragment(std::move(fragment_)),
+      nodes(fragment->Nodes()) {}
+
+TokenSubstitutionListImpl::TokenSubstitutionListImpl(
+    std::shared_ptr<const FragmentImpl> fragment_, unsigned offset, BeforeTag)
+    : fragment(std::move(fragment_)),
+      nodes(fragment->Substitutions()[offset].getBeforeTokens()) {}
+
+TokenSubstitutionListImpl::TokenSubstitutionListImpl(
+    std::shared_ptr<const FragmentImpl> fragment_, unsigned offset, AfterTag)
+    : fragment(std::move(fragment_)),
+      nodes(fragment->Substitutions()[offset].getAfterTokens()) {}
+
+TokenSubstitutionList TokenSubstitution::before(void) const noexcept {
+  auto ret = std::make_shared<const TokenSubstitutionListImpl>(
+      impl, offset, BeforeTag{});
+  auto num_nodes = ret->nodes.size();
+  return TokenSubstitutionList(std::move(ret), num_nodes);
+}
+
+TokenSubstitutionList TokenSubstitution::after(void) const noexcept {
+  auto ret = std::make_shared<const TokenSubstitutionListImpl>(
+      impl, offset, AfterTag{});
+  auto num_nodes = ret->nodes.size();
+  return TokenSubstitutionList(std::move(ret), num_nodes);
 }
 
 }  // namespace mx

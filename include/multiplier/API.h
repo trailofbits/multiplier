@@ -29,9 +29,10 @@ class RemoteEntityProvider;
 class Token;
 class TokenList;
 class TokenListIterator;
-class TokenReaderImpl;
+class TokenReader;
 class TokenSubstitution;
 class TokenSubstitutionList;
+class TokenSubstitutionListImpl;
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
@@ -40,11 +41,12 @@ class Token {
   friend class FragmentImpl;
   friend class TokenList;
   friend class TokenListIterator;
+  friend class TokenSubstitutionListIterator;
 
-  std::shared_ptr<const TokenReaderImpl> impl;
+  std::shared_ptr<const TokenReader> impl;
   unsigned index;
 
-  inline Token(std::shared_ptr<const TokenReaderImpl> impl_, unsigned index_)
+  inline Token(std::shared_ptr<const TokenReader> impl_, unsigned index_)
       : impl(std::move(impl_)),
         index(index_) {}
 
@@ -75,7 +77,7 @@ class TokenListIterator {
   bool operator==(const TokenListIterator &) = delete;
   bool operator!=(const TokenListIterator &) = delete;
 
-  inline TokenListIterator(std::shared_ptr<const TokenReaderImpl> impl_,
+  inline TokenListIterator(std::shared_ptr<const TokenReader> impl_,
                            unsigned index_, unsigned num_tokens_)
       : impl(std::move(impl_), index_),
         num_tokens(num_tokens_) {}
@@ -115,11 +117,12 @@ class TokenList {
  private:
   friend class File;
   friend class Fragment;
+  friend class TokenSubstitutionListIterator;
 
-  std::shared_ptr<const TokenReaderImpl> impl;
+  std::shared_ptr<const TokenReader> impl;
   unsigned num_tokens;
 
-  inline TokenList(std::shared_ptr<const TokenReaderImpl> impl_,
+  inline TokenList(std::shared_ptr<const TokenReader> impl_,
                    unsigned num_tokens_)
       : impl(std::move(impl_)),
         num_tokens(num_tokens_) {}
@@ -225,8 +228,9 @@ class File {
 
   friend class EntityProvider;
   friend class FileFragmentList;
-  friend class Token;
   friend class RemoteEntityProvider;
+  friend class Token;
+  friend class TokenSubstitutionListIterator;
 
   Ptr impl;
 
@@ -262,28 +266,97 @@ class File {
   }
 };
 
-class TokenSubstitutionReader;
-
 class TokenSubstitution {
+ private:
+  friend class TokenSubstitutionListIterator;
+
+  std::shared_ptr<const FragmentImpl> impl;
+  const unsigned offset;
+  const TokenSubstitutionKind kind_;
+
+  inline TokenSubstitution(
+      std::shared_ptr<const FragmentImpl> impl_,
+      unsigned offset_, TokenSubstitutionKind kind__)
+      : impl(std::move(impl_)),
+        offset(offset_),
+        kind_(kind__) {}
+
  public:
-  TokenSubstitutionKind kind(void) const noexcept;
+  inline TokenSubstitutionKind kind(void) const noexcept {
+    return kind_;
+  }
+
   TokenSubstitutionList before(void) const noexcept;
   TokenSubstitutionList after(void) const noexcept;
 };
 
+class TokenSubstitutionListIterator;
+
 using TokenSubstitutionEnty = std::variant<Token, TokenSubstitution>;
 
+class TokenSubstitutionListEnd {};
+
 class TokenSubstitutionListIterator {
+ private:
+  friend class TokenSubstitutionList;
+  friend class TokenSubstitutionListIterator;
+
+  std::shared_ptr<const TokenSubstitutionListImpl> impl;
+  unsigned index;
+  unsigned num_nodes;
+
+  inline TokenSubstitutionListIterator(
+      std::shared_ptr<const TokenSubstitutionListImpl> impl_,
+      unsigned index_, unsigned num_nodes_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_nodes(num_nodes_) {}
+
  public:
+  std::variant<Token, TokenSubstitution> operator*(void) const noexcept;
+
+  // Pre-increment.
+  inline TokenSubstitutionListIterator &operator++(void) noexcept {
+    ++index;
+    return *this;
+  }
+
+  // Post-increment.
+  inline TokenSubstitutionListIterator operator++(int) noexcept {
+    return TokenSubstitutionListIterator(impl, index++, num_nodes);
+  }
+
+  inline bool operator==(TokenSubstitutionListEnd) const noexcept {
+    return index == num_nodes;
+  }
+
+  inline bool operator!=(TokenSubstitutionListEnd) const noexcept {
+    return index != num_nodes;
+  }
 };
 
 class TokenSubstitutionList {
  private:
-  std::shared_ptr<const TokenSubstitutionReader> reader;
-  std::shared_ptr<const FragmentImpl> fragment;
+  friend class Fragment;
+  friend class TokenSubstitution;
+
+  std::shared_ptr<const TokenSubstitutionListImpl> impl;
   unsigned num_nodes;
 
+  inline TokenSubstitutionList(
+      std::shared_ptr<const TokenSubstitutionListImpl> impl_,
+      unsigned num_nodes_)
+      : impl(std::move(impl_)),
+        num_nodes(num_nodes_) {}
+
  public:
+  inline TokenSubstitutionListIterator begin(void) const noexcept {
+    return TokenSubstitutionListIterator(impl, 0, num_nodes);
+  }
+
+  inline TokenSubstitutionListEnd end(void) const noexcept {
+    return {};
+  }
 };
 
 // A fragment of code containing one or more top-level declarations, the
@@ -296,6 +369,7 @@ class Fragment {
   friend class FileFragmentListIterator;
   friend class RemoteEntityProvider;
   friend class Token;
+  friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const FragmentImpl> impl;
 
