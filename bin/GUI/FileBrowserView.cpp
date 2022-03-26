@@ -4,11 +4,8 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "FileListView.h"
-
 #include <QHeaderView>
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QThreadPool>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -16,39 +13,72 @@
 #include <map>
 #include <unordered_map>
 
+#include "FileBrowserView.h"
+#include "MainWindow.h"
+
 namespace mx::gui {
 
-struct FileListView::PrivateData final {
+struct FileBrowserView::PrivateData final {
+  QVBoxLayout *layout{nullptr};
   QTreeWidget *source_file_tree{nullptr};
-  std::unordered_map<QTreeWidgetItem *, mx::FileId> file_ids;
+  std::unordered_map<
+      QTreeWidgetItem *,
+      std::pair<std::filesystem::path, mx::FileId>> file_infos;
 };
 
-FileListView::FileListView(QWidget *parent)
+void DownloadFileListThread::run(void) {
+  emit DownloadedFileList(ep->list_files());
+}
+
+FileBrowserView::FileBrowserView(MainWindow *mw, QWidget *parent)
     : QWidget(parent),
       d(new PrivateData) {
 
-  setWindowTitle(tr("Files"));
+  connect(this, &FileBrowserView::Connected,
+          mw, &MainWindow::OnConnected);
 
-  d->source_file_tree = new QTreeWidget();
+  connect(this, &FileBrowserView::SourceFileDoubleClicked,
+          mw, &MainWindow::OnSourceFileDoubleClicked);
+
+  d->layout = new QVBoxLayout;
+  d->layout->setContentsMargins(0, 0, 0, 0);
+
+  d->source_file_tree = new QTreeWidget;
+  d->layout->addWidget(d->source_file_tree);
+
+  setWindowTitle(tr("File Browser"));
+  setLayout(d->layout);
+
+  InitializeWidgets();
+}
+
+FileBrowserView::~FileBrowserView(void) {}
+
+void FileBrowserView::Clear(void) {
+  d->source_file_tree->clear();
+}
+
+void FileBrowserView::DownloadFileListInBackground(EntityProvider::Ptr ep) {
+  auto downloader = new DownloadFileListThread(std::move(ep));
+  downloader->setAutoDelete(true);
+
+  connect(downloader, &DownloadFileListThread::DownloadedFileList,
+          this, &FileBrowserView::OnDownloadedFileList);
+  QThreadPool::globalInstance()->start(downloader);
+}
+
+void FileBrowserView::InitializeWidgets(void) {
   d->source_file_tree->setHeaderHidden(true);
   d->source_file_tree->setColumnCount(1);
   d->source_file_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   d->source_file_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
   d->source_file_tree->header()->setStretchLastSection(false);
 
-  auto layout = new QVBoxLayout();
-  layout->setContentsMargins(0, 0, 0, 0);
-  setLayout(layout);
-
-  layout->addWidget(d->source_file_tree);
-
   connect(d->source_file_tree, &QTreeWidget::itemActivated, this,
-          &FileListView::OnTreeWidgetItemActivated);
+          &FileBrowserView::OnTreeWidgetItemActivated);
 }
 
-FileListView::~FileListView(void) {}
-
-void FileListView::Set(FileList files) {
+void FileBrowserView::OnDownloadedFileList(FileList files) {
   QTreeWidgetItem *root_item = nullptr;
 
   // Build up the items.
@@ -71,24 +101,21 @@ void FileListView::Set(FileList files) {
       }
       last = item;
     }
-    d->file_ids.emplace(last, file_id);
+    d->file_infos.emplace(last, std::make_pair(std::move(path), file_id));
   }
 
   d->source_file_tree->addTopLevelItem(root_item);
   d->source_file_tree->expandAll();
   d->source_file_tree->sortItems(0, Qt::AscendingOrder);
+
+  emit Connected();
 }
 
-void FileListView::Clear(void) {
-  d->file_ids.clear();
-  d->source_file_tree->reset();
-}
-
-void FileListView::OnTreeWidgetItemActivated(
+void FileBrowserView::OnTreeWidgetItemActivated(
     QTreeWidgetItem *item, int) {
 
-  if (auto it = d->file_ids.find(item); it != d->file_ids.end()) {
-    emit SourceFileDoubleClicked(it->second);
+  if (auto it = d->file_infos.find(item); it != d->file_infos.end()) {
+    emit SourceFileDoubleClicked(it->second.first, it->second.second);
   }
 }
 

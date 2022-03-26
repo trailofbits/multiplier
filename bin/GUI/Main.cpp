@@ -1,10 +1,8 @@
-/*
-  Copyright (c) 2021-present, Trail of Bits, Inc.
-  All rights reserved.
-
-  This source code is licensed in accordance with the terms specified in
-  the LICENSE file found in the root directory of this source tree.
-*/
+// Copyright (c) 2021-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
 
 #include <cstdlib>
 #include <gflags/gflags.h>
@@ -64,6 +62,7 @@ int main(int argc, char *argv[]) {
   }
 
   qRegisterMetaType<mx::FileList>("FileList");
+  qRegisterMetaType<std::optional<mx::File>>("std::optional<File>");
 
   mx::gui::MainWindow main_window;
   main_window.show();

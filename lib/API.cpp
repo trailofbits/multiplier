@@ -59,10 +59,9 @@ ResponseFileImpl::ResponseFileImpl(
     : FileImpl(id_, std::move(ep_)),
       response(kj::mv(response_)),
       reader(response.getFile()) {
-  if (response.hasFragments()) {
-    for (auto frag_id : response.getFragments()) {
-      fragments.emplace_back().first = frag_id;
-    }
+
+  for (auto frag_id : response.getFragments()) {
+    fragments.emplace_back().first = frag_id;
   }
 }
 
@@ -74,51 +73,33 @@ TokenReader::Ptr ResponseFileImpl::TokenReader(
 
 // Return the number of tokens in the file.
 unsigned ResponseFileImpl::NumTokens(void) const noexcept {
-  if (!reader.hasTokens()) {
-    return 0u;
-  } else {
-    return reader.getTokens().size();
-  }
+  return reader.getTokens().size();
 }
 
 // Return the kind of the Nth token.
 TokenKind ResponseFileImpl::NthTokenKind(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
-  if (index < tokens_list_reader.size()) {
-    ast::Token::Reader token_reader = tokens_list_reader[index];
-    return static_cast<TokenKind>(token_reader.getKind());
-  } else {
-    return TokenKind::UNKNOWN;
-  }
+  ast::Token::Reader token_reader = tokens_list_reader[index];
+  return static_cast<TokenKind>(token_reader.getKind());
 }
 
 // Return the data of the Nth token.
 std::string_view ResponseFileImpl::NthTokenData(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
-  if (index < tokens_list_reader.size()) {
-    ast::Token::Reader token_reader = tokens_list_reader[index];
-    if (token_reader.hasData()) {
-      capnp::Text::Reader data_reader = token_reader.getData();
-      return std::string_view(data_reader.cStr(), data_reader.size());
-    }
-  }
-  return {};
+  ast::Token::Reader token_reader = tokens_list_reader[index];
+  capnp::Text::Reader data_reader = token_reader.getData();
+  return std::string_view(data_reader.cStr(), data_reader.size());
 }
 
 // Return the id of the Nth token.
 EntityId ResponseFileImpl::NthTokenId(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
-  if (index < tokens_list_reader.size()) {
-    ast::Token::Reader token_reader = tokens_list_reader[index];
-    if (token_reader.hasData()) {
-      FileTokenId id;
-      id.file_id = this->id;
-      id.kind = static_cast<TokenKind>(token_reader.getKind());
-      id.offset = index;
-      return id;
-    }
-  }
-  return kInvalidEntityId;
+  ast::Token::Reader token_reader = tokens_list_reader[index];
+  FileTokenId id;
+  id.file_id = this->id;
+  id.kind = static_cast<TokenKind>(token_reader.getKind());
+  id.offset = index;
+  return id;
 }
 
 FragmentImpl::~FragmentImpl(void) noexcept {}
@@ -191,93 +172,52 @@ TokenReader::Ptr ResponseFragmentImpl::TokenReader(
 
 // Return the number of tokens in the file.
 unsigned ResponseFragmentImpl::NumTokens(void) const noexcept {
-  if (!reader.hasEntities()) {
-    return 0u;
-  }
-
   ast::EntityList::Reader entities = reader.getEntities();
-  if (!entities.hasToken()) {
-    return 0u;
-  }
-
   return entities.getToken().size();
 }
 
 // Return the kind of the Nth token.
 TokenKind ResponseFragmentImpl::NthTokenKind(unsigned index) const {
-  if (reader.hasEntities()) {
-    ast::EntityList::Reader entities = reader.getEntities();
-    if (entities.hasToken()) {
-      auto tokens_list_reader = entities.getToken();
-      if (index < tokens_list_reader.size()) {
-        ast::Token::Reader token_reader = tokens_list_reader[index];
-        return static_cast<TokenKind>(token_reader.getKind());
-      }
-    }
-  }
-  return TokenKind::UNKNOWN;
+  ast::EntityList::Reader entities = reader.getEntities();
+  auto tokens_list_reader = entities.getToken();
+  ast::Token::Reader token_reader = tokens_list_reader[index];
+  return static_cast<TokenKind>(token_reader.getKind());
 }
 
 // Return the data of the Nth token.
 std::string_view ResponseFragmentImpl::NthTokenData(unsigned index) const {
-  if (reader.hasEntities()) {
-    ast::EntityList::Reader entities = reader.getEntities();
-    if (entities.hasToken()) {
-      auto tokens_list_reader = entities.getToken();
-      if (index < tokens_list_reader.size()) {
-        ast::Token::Reader token_reader = tokens_list_reader[index];
-        capnp::Text::Reader data_reader = token_reader.getData();
-        return std::string_view(data_reader.cStr(), data_reader.size());
-      }
-    }
-  }
-  return {};
+  ast::EntityList::Reader entities = reader.getEntities();
+  auto tokens_list_reader = entities.getToken();
+  ast::Token::Reader token_reader = tokens_list_reader[index];
+  capnp::Text::Reader data_reader = token_reader.getData();
+  return std::string_view(data_reader.cStr(), data_reader.size());
 }
 
 // Return the id of the Nth token.
 EntityId ResponseFragmentImpl::NthTokenId(unsigned index) const {
-  if (reader.hasEntities()) {
-    ast::EntityList::Reader entities = reader.getEntities();
-    if (entities.hasToken()) {
-      auto tokens_list_reader = entities.getToken();
-      if (index < tokens_list_reader.size()) {
-        ast::Token::Reader token_reader = tokens_list_reader[index];
-        FragmentTokenId id;
-        id.fragment_id = this->id;
-        id.offset = index;
-        id.kind = static_cast<TokenKind>(token_reader.getKind());
-        return id;
-      }
-    }
-  }
-  return kInvalidEntityId;
+  ast::EntityList::Reader entities = reader.getEntities();
+  auto tokens_list_reader = entities.getToken();
+  ast::Token::Reader token_reader = tokens_list_reader[index];
+  FragmentTokenId id;
+  id.fragment_id = this->id;
+  id.offset = index;
+  id.kind = static_cast<TokenKind>(token_reader.getKind());
+  return id;
 }
 
 // Return a reader for token nodes.
 NodeReader ResponseFragmentImpl::Nodes(void) const {
-  if (reader.hasTokens()) {
-    return reader.getTokens();
-  } else {
-    return {};
-  }
+  return reader.getTokens();
 }
 
 // Return a reader for token substitutions.
 TokenSubstitutionsReader ResponseFragmentImpl::Substitutions(void) const {
-  if (reader.hasTokenSubstitutions()) {
-    return reader.getTokenSubstitutions();
-  } else {
-    return {};
-  }
+  return reader.getTokenSubstitutions();
 }
 
 // Return a reader for the entities in this fragment.
 EntityListReader ResponseFragmentImpl::Entities(void) const {
-  if (reader.hasEntities()) {
-    return reader.getEntities();
-  } else {
-    return {};
-  }
+  return reader.getEntities();
 }
 
 EntityProvider::~EntityProvider(void) noexcept {}
@@ -305,7 +245,11 @@ Fragment EntityProvider::fragment_containing(EntityId id) noexcept {
 }
 
 RemoteEntityProvider::ClientConnection::ClientConnection(const std::string &hp)
-    : connection(hp),
+    : options{
+        .traversalLimitInWords = ~0ull,
+        .nestingLimit = 1024
+      },
+      connection(hp, 0, options),
       client(connection.getMain<mx::rpc::Multiplier>()) {}
 
 RemoteEntityProvider::RemoteEntityProvider(std::string host, std::string port)
@@ -316,12 +260,13 @@ RemoteEntityProvider::RemoteEntityProvider(std::string host, std::string port)
 RemoteEntityProvider::ClientConnection &RemoteEntityProvider::Connection(void) {
   auto &id = tClientIndex;
   std::unique_ptr<ClientConnection> *cc = nullptr;
-  if (!id) {
-    id = gNextClientIndex.fetch_add(1u);
-
+  {
     std::unique_lock<std::mutex> locker(tls_connections_lock);
-    if (id >= tls_connections.size()) {
-      tls_connections.resize(id + 1u);
+    if (!id) {
+      id = gNextClientIndex.fetch_add(1u);
+      if (id >= tls_connections.size()) {
+        tls_connections.resize(id + 1u);
+      }
     }
 
     cc = &(tls_connections[id]);
@@ -364,22 +309,12 @@ FileList RemoteEntityProvider::list_files(void) noexcept {
       request.send().wait(cc.connection.getWaitScope());
 
   FileList files;
-  if (!response.hasFiles()) {
-    return files;
-  }
-
-  auto files_reader = response.getFiles();
-  for (rpc::FileInfo::Reader entry : files_reader) {
+  for (rpc::FileInfo::Reader entry : response.getFiles()) {
     const FileId file_id = entry.getId();
-    if (!file_id || !entry.hasPath()) {
-      continue;
-    }
-
+    assert(file_id != kInvalidEntityId);
+    assert(entry.hasPath());
     capnp::Text::Reader path = entry.getPath();
-    if (!path.size()) {
-      continue;
-    }
-
+    assert(0u < path.size());
     std::filesystem::path p(path.cStr());
     files.try_emplace(std::move(p), file_id);
   }

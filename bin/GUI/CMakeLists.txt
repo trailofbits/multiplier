@@ -13,8 +13,15 @@ find_package(${MX_QT} COMPONENTS Core Widgets REQUIRED)
 set(exe_name "multiplier")
 add_executable("${exe_name}"
 
-  FileListView.h
-  FileListView.cpp
+  FileBrowserView.h
+  FileBrowserView.cpp
+
+  FileView.h
+  FileView.cpp
+  
+  ITextModel.h
+  ITextView.cpp
+  ITextView.h
 
   MainWindow.h
   MainWindow.cpp

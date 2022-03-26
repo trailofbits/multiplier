@@ -9,6 +9,7 @@
 #include <multiplier/API.h>
 
 #include <capnp/ez-rpc.h>
+#include <capnp/message.h>
 #include <kj/async.h>
 
 #include "AST.capnp.h"
@@ -256,6 +257,8 @@ class RemoteEntityProvider final : public EntityProvider {
 
   struct ClientConnection
       : public std::enable_shared_from_this<ClientConnection> {
+
+    capnp::ReaderOptions options;
     capnp::EzRpcClient connection;
     mx::rpc::Multiplier::Client client;
 

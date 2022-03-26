@@ -24,13 +24,12 @@
 #include <QMessageBox>
 #include <QPaintEvent>
 #include <QPainter>
-#include <QRunnable>
-#include <QThreadPool>
 #include <unordered_map>
 
 #include <multiplier/API.h>
 
-#include "FileListView.h"
+#include "FileBrowserView.h"
+#include "FileView.h"
 #include "OpenConnectionDialog.h"
 
 namespace mx::gui {
@@ -51,10 +50,6 @@ struct MainMindowMenus final {
 
 }  // namespace
 
-void DownloadFileListThread::run(void) {
-  emit DownloadedFileList(ep->list_files());
-}
-
 struct MainWindow::PrivateData final {
   MainMindowMenus menus;
 
@@ -62,10 +57,12 @@ struct MainWindow::PrivateData final {
   QTabWidget *central_widget{nullptr};
 
   // File list. This shows files included in the build.
-  FileListView *file_list_view{nullptr};
+  FileBrowserView *file_list_view{nullptr};
   QDockWidget *file_list_dock{nullptr};
 
   EntityProvider::Ptr entity_provider;
+
+  std::unordered_map<FileId, FileView *> file_views;
 
   ConnectionState connection_state{ConnectionState::kNotConnected};
 
@@ -133,16 +130,16 @@ MainWindow::MainWindow(void)
   UpdateUI();
 }
 
-void MainWindow::InitializeWidgets(void ) {
+void MainWindow::InitializeWidgets(void) {
   d->central_widget = new QTabWidget;
 
-  d->file_list_view = new FileListView;
+  d->file_list_view = new FileBrowserView(this);
   d->file_list_dock = new QDockWidget(d->file_list_view->windowTitle());
   d->file_list_dock->setWidget(d->file_list_view);
+
   addDockWidget(Qt::LeftDockWidgetArea, d->file_list_dock);
 
-  // Otherwise need to support an object list somewhere.
-  d->central_widget->setTabsClosable(false);
+  d->central_widget->setTabsClosable(true);
   d->central_widget->setDocumentMode(true);
   d->central_widget->setUsesScrollButtons(true);
   setCentralWidget(d->central_widget);
@@ -226,14 +223,15 @@ void MainWindow::OnConnectionStateChange(ConnectionState state) {
   UpdateUI();
 }
 
-void MainWindow::OnNewFileList(FileList files) {
-  d->file_list_view->Set(std::move(files));
+void MainWindow::OnConnected(void) {
   d->connection_state = ConnectionState::kConnected;
   UpdateUI();
 }
 
-void MainWindow::OnSourceFileDoubleClicked(mx::FileId file_id) {
-
+void MainWindow::OnSourceFileDoubleClicked(
+    std::filesystem::path path, mx::FileId file_id) {
+  d->central_widget->addTab(
+      new FileView(d->entity_provider, path, file_id), path.c_str());
 }
 
 void MainWindow::OnFileConnectAction(void) {
@@ -249,12 +247,7 @@ void MainWindow::OnFileConnectAction(void) {
       connect_settings->host.toStdString(),
       connect_settings->port.toStdString());
 
-  auto connector = new DownloadFileListThread(d->entity_provider);
-  connector->setAutoDelete(true);
-
-  connect(connector, &DownloadFileListThread::DownloadedFileList,
-          this, &MainWindow::OnNewFileList);
-  QThreadPool::globalInstance()->start(connector);
+  d->file_list_view->DownloadFileListInBackground(d->entity_provider);
 }
 
 void MainWindow::OnFileDisconnectAction(void) {

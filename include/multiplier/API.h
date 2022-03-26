@@ -26,7 +26,6 @@ class FileFragmentListIterator;
 class FileImpl;
 class Fragment;
 class FragmentImpl;
-class InvalidEntityProvider;
 class RemoteEntityProvider;
 class Token;
 class TokenList;
@@ -245,6 +244,7 @@ class File {
       : impl(std::move(impl_)) {}
 
  public:
+
   inline static File containing(const FileFragmentList &fragment_list) {
     return File(fragment_list.impl);
   }
