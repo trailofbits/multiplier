@@ -50,10 +50,8 @@ struct DeclarationId {
   FragmentId fragment_id;
   DeclKind kind;
 
-  // Offset of this where this declaration is stored inside of a `kind`-specific
-  // list in `ast::EntityList`. For example, if `kind` is `DeclKind::CXX_METHOD`
-  // then `offset` represents an index inside of
-  // `ast::EntityList::cxxMethodDecl`.
+  // Offset of this where this declaration is stored inside of
+  // `rpc::Fragment::entities`.
   uint32_t offset;
 
   bool operator==(const DeclarationId &) const noexcept = default;
@@ -66,8 +64,8 @@ struct StatementId {
   FragmentId fragment_id;
   StmtKind kind;
 
-  // Offset of this where this statement is stored inside of a `kind`-specific
-  // list in `ast::EntityList`.
+  // Offset of this where this statement is stored inside of
+  // `rpc::Fragment::entities`.
   uint32_t offset;
 
   bool operator==(const StatementId &) const noexcept = default;
@@ -80,8 +78,7 @@ struct FragmentTokenId {
   TokenKind kind;
 
   // Offset of this where this token is stored inside of a serialized
-  // `rpc::Fragment::entities::token`, where `rpc::Fragment::entities`
-  // is an `ast::EntityList`.
+  // `rpc::Fragment::tokens`.
   uint32_t offset;
 
   bool operator==(const FragmentTokenId &) const noexcept = default;

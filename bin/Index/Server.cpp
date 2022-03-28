@@ -155,10 +155,10 @@ kj::Promise<void> Server::indexCompileCommands(
 
   auto cc = maybe_cc.TakeValue();
   auto cxx = maybe_cxx.TakeValue();
-  auto which_cc = [&cc, &cxx] (mx::ast::TargetLanguage tl) {
+  auto which_cc = [&cc, &cxx] (mx::rpc::TargetLanguage tl) {
     switch (tl) {
-      case mx::ast::TargetLanguage::C: return cc;
-      case mx::ast::TargetLanguage::CXX: return cxx;
+      case mx::rpc::TargetLanguage::C: return cc;
+      case mx::rpc::TargetLanguage::CXX: return cxx;
     }
   };
 

@@ -83,7 +83,7 @@ class TokenListIterator {
   bool operator==(const TokenListIterator &) = delete;
   bool operator!=(const TokenListIterator &) = delete;
 
-  inline TokenListIterator(std::shared_ptr<const TokenReader> impl_,
+  inline TokenListIterator(std::shared_ptr<const class TokenReader> impl_,
                            unsigned index_, unsigned num_tokens_)
       : impl(std::move(impl_), index_),
         num_tokens(num_tokens_) {}
@@ -123,6 +123,7 @@ class TokenList {
  private:
   friend class File;
   friend class Fragment;
+  friend class FragmentImpl;
   friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
@@ -234,6 +235,7 @@ class File {
 
   friend class EntityProvider;
   friend class FileFragmentList;
+  friend class FragmentImpl;
   friend class RemoteEntityProvider;
   friend class Token;
   friend class TokenSubstitutionListIterator;
@@ -380,6 +382,7 @@ class Fragment {
   friend class File;
   friend class FileFragmentListIterator;
   friend class RemoteEntityProvider;
+  friend class FragmentImpl;
   friend class Token;
   friend class TokenSubstitutionListIterator;
 

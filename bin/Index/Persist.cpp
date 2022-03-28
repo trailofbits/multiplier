@@ -41,15 +41,15 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
   for (pasta::FileToken ft : file_tokens) {
     tok_data.clear();
     tok_data.insert(tok_data.end(), ft.Data().begin(), ft.Data().end());
-    mx::ast::Token::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
-    ftb.setKind(static_cast<mx::ast::TokenKind>(TokenKindFromPasta(ft)));
+    mx::rpc::Token::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
+    ftb.setKind(static_cast<unsigned short>(TokenKindFromPasta(ft)));
     ftb.setData(tok_data);
   }
 
   context.PutSerializedFile(file_id, capnp::messageToFlatArray(message));
 }
 
-static void CountSubstitutions(TokenTree tt, unsigned *num_subs) {
+static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
   for (auto node : tt) {
     if (auto sub = node.Substitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
@@ -63,7 +63,7 @@ static void CountSubstitutions(TokenTree tt, unsigned *num_subs) {
 // Figure out the lines of `file` spanned by `tt`.
 static void FindFileRange(TokenTree tt, const pasta::File &file,
                           pasta::FileToken *min, pasta::FileToken *max,
-                          unsigned *num_subs) {
+                          unsigned &num_subs) {
   if (tt.File() != file) {
     return;
   }
@@ -81,7 +81,7 @@ static void FindFileRange(TokenTree tt, const pasta::File &file,
       auto [kind, lhs, rhs] = std::move(sub.value());
       FindFileRange(std::move(lhs), file, min, max, num_subs);
       CountSubstitutions(std::move(rhs), num_subs);
-      ++*num_subs;
+      ++num_subs;
     }
   }
 }
@@ -130,6 +130,19 @@ static void PersistTokenTree(EntitySerializer &serializer,
   }
 }
 
+static void PersistTokens(EntitySerializer &serializer,
+                          const CodeChunk &code,
+                          FragmentBuilder &builder) {
+  auto num_toks = static_cast<unsigned>(
+      (code.end_index - code.begin_index) + 1u);
+  auto tok_builder = builder.initTokens(num_toks);
+  for (auto i = code.begin_index; i <= code.end_index; ++i) {
+    serializer.Serialize(
+        tok_builder[static_cast<unsigned>(i - code.begin_index)],
+        serializer.range[i]);
+  }
+}
+
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
                      CodeChunk code_chunk) {
 
@@ -159,7 +172,7 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   pasta::FileTokenRange file_tokens = file.Tokens();
   pasta::FileToken min_token = file_tokens[file_tokens.Size() - 1u];
   pasta::FileToken max_token = file_tokens[0];
-  FindFileRange(token_tree, file, &min_token, &max_token, &num_substitutions);
+  FindFileRange(token_tree, file, &min_token, &max_token, num_substitutions);
 
   mx::FileId file_id = serializer.FileId(file);
   context.PutFragmentLineCoverage(file_id, code_id, min_token.Line(),
@@ -178,8 +191,9 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
     tlds.set(i, serializer.EntityId(code_chunk.decls[i]));
   }
 
-  serializer.SerializeCodeEntities(std::move(code_chunk),
-                                   builder.initEntities());
+  PersistTokens(serializer, code_chunk, builder);
+
+  serializer.SerializeCodeEntities(std::move(code_chunk), builder);
 
   unsigned next_substitution_index = 0u;
   SubstitutionListBuilder substitutions_builder =
@@ -187,7 +201,7 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   PersistTokenTree(
       serializer,
       substitutions_builder,
-      builder.initTokens(token_tree.NumNodes()),
+      builder.initUnparsedTokens(token_tree.NumNodes()),
       std::move(token_tree),
       code_chunk.fragment_id,
       next_substitution_index);

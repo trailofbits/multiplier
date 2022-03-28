@@ -46,6 +46,10 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitCompoundStmt(const pasta::CompoundStmt &stmt) final;
   void VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) final;
   void VisitDeclStmt(const pasta::DeclStmt &stmt) final;
+  void VisitConceptSpecializationExpr(const pasta::ConceptSpecializationExpr &stmt) final;
+  void VisitSizeOfPackExpr(const pasta::SizeOfPackExpr &stmt) final;
+  void VisitVarTemplateSpecializationDecl(const pasta::VarTemplateSpecializationDecl &decl) final;
+  void VisitClassTemplateSpecializationDecl(const pasta::ClassTemplateSpecializationDecl &decl) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
 
@@ -57,6 +61,10 @@ class EntityVisitor : protected pasta::DeclVisitor,
   virtual ~EntityVisitor(void);
   virtual bool Enter(const pasta::Decl &entity) = 0;
   virtual bool Enter(const pasta::Stmt &entity) = 0;
+  virtual void Enter(const pasta::Decl &entity,
+                     std::vector<pasta::TemplateArgument>) = 0;
+  virtual void Enter(const pasta::Stmt &entity,
+                     std::vector<pasta::TemplateArgument>) = 0;
 };
 
 }  // namespace indexer

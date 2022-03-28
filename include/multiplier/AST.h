@@ -4664,22 +4664,6 @@ class CXXBaseSpecifier;
 class TemplateArgument;
 class TemplateParameterList;
 class FileToken;
-class CompileJob;
-class CompileCommand;
-class IncludePath;
-class Compiler;
-namespace ast {
-class Token;
-class TokenRange;
-class CXXBaseSpecifier;
-class TemplateArgument;
-class TemplateParameterList;
-class FileToken;
-class CompileJob;
-class CompileCommand;
-class IncludePath;
-class Compiler;
-}  // namespace ast
 class Decl;
 class EmptyDecl;
 class ExportDecl;
@@ -5012,61 +4996,10 @@ class CoawaitExpr;
 class CXXAddrspaceCastExpr;
 class CXXConstCastExpr;
 class CXXDynamicCastExpr;
-class Compiler {
- protected:
-  std::shared_ptr<ast::Compiler> data;
-
- public:
-  CompilerName name(void) const noexcept;
-  TargetLanguage target_language(void) const noexcept;
-  std::string_view host_target_triple(void) const noexcept;
-  std::string_view target_triple(void) const noexcept;
-  std::filesystem::path executable_path(void) const noexcept;
-  std::filesystem::path resource_directory(void) const noexcept;
-  std::filesystem::path system_root_directory(void) const noexcept;
-  std::filesystem::path system_root_include_directory(void) const noexcept;
-  std::filesystem::path installation_directory(void) const noexcept;
-  std::vector<IncludePath> system_include_directories(void) const noexcept;
-  std::vector<IncludePath> user_include_directories(void) const noexcept;
-  std::vector<IncludePath> framework_directories(void) const noexcept;
-};
-
-class IncludePath {
- protected:
-  std::shared_ptr<ast::IncludePath> data;
-
- public:
-  std::filesystem::path path(void) const noexcept;
-  IncludePathLocation location(void) const noexcept;
-};
-
-class CompileCommand {
- protected:
-  std::shared_ptr<ast::CompileCommand> data;
-
- public:
-  std::vector<std::string_view> arguments(void) const noexcept;
-  std::filesystem::path working_directory(void) const noexcept;
-};
-
-class CompileJob {
- protected:
-  std::shared_ptr<ast::CompileJob> data;
-
- public:
-  std::vector<std::string_view> arguments(void) const noexcept;
-  std::filesystem::path working_directory(void) const noexcept;
-  std::filesystem::path resource_directory(void) const noexcept;
-  std::filesystem::path system_root_directory(void) const noexcept;
-  std::filesystem::path system_root_include_directory(void) const noexcept;
-  std::string_view target_triple(void) const noexcept;
-  std::string_view auxiliary_target_triple(void) const noexcept;
-};
-
 class TemplateParameterList {
  protected:
-  std::shared_ptr<FragmentImpl> fragment;
-  std::shared_ptr<ast::TemplateParameterList> data;
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset;
 
  public:
   unsigned num_parameters(void) const noexcept;
@@ -5083,8 +5016,8 @@ class TemplateParameterList {
 
 class TemplateArgument {
  protected:
-  std::shared_ptr<FragmentImpl> fragment;
-  std::shared_ptr<ast::TemplateArgument> data;
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset;
 
  public:
   TemplateArgumentKind kind(void) const noexcept;
@@ -5098,8 +5031,8 @@ class TemplateArgument {
 
 class CXXBaseSpecifier {
  protected:
-  std::shared_ptr<FragmentImpl> fragment;
-  std::shared_ptr<ast::CXXBaseSpecifier> data;
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset;
 
  public:
   TokenRange token_range(void) const noexcept;
@@ -5115,8 +5048,8 @@ class CXXBaseSpecifier {
 
 class Stmt {
  protected:
-  std::shared_ptr<FragmentImpl> fragment;
-  StatementId id;
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset;
 
  public:
   Token begin_token(void) const noexcept;
@@ -6662,8 +6595,8 @@ class CaseStmt : public SwitchCase {
 
 class Decl {
  protected:
-  std::shared_ptr<FragmentImpl> fragment;
-  DeclarationId id;
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset;
 
  public:
   AccessSpecifier access(void) const noexcept;

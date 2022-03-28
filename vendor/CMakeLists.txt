@@ -14,13 +14,8 @@ list(PREPEND CMAKE_MODULE_PATH
   ${additional_module_paths_list}
 )
 
-list(PREPEND CMAKE_PREFIX_PATH
-  "${CMAKE_CURRENT_BINARY_DIR}/capnproto/install"
-)
-
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" PARENT_SCOPE)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" PARENT_SCOPE)
 
-add_subdirectory(capnproto)
 add_subdirectory(concurrentqueue)
 add_subdirectory(reproc)

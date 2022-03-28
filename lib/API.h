@@ -19,8 +19,8 @@ namespace mx {
 
 using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
-                                            capnp::Kind::STRUCT>::Reader;
-using EntityListReader = ast::EntityList::Reader;
+                                             capnp::Kind::STRUCT>::Reader;
+using EntityListReader = capnp::List<ast::Entity, capnp::Kind::STRUCT>::Reader;
 
 class TokenReader {
  public:
@@ -59,9 +59,9 @@ class TokenSubstitutionListImpl {
 };
 
 // Used for invalid tokens.
-class InvalidTokenReaderImpl final : public TokenReader {
+class InvalidTokenReader final : public TokenReader {
  public:
-  virtual ~InvalidTokenReaderImpl(void) noexcept;
+  virtual ~InvalidTokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
   unsigned NumTokens(void) const noexcept final;
@@ -106,7 +106,7 @@ class FileImpl {
 // to get a response from the database.
 class InvalidFileImpl final : public FileImpl {
  private:
-  InvalidTokenReaderImpl empty_reader;
+  InvalidTokenReader empty_reader;
 
  public:
   using FileImpl::FileImpl;
@@ -183,11 +183,14 @@ class FragmentImpl {
 
   // Return a reader for the entities in this fragment.
   virtual EntityListReader Entities(void) const = 0;
+
+  // Return the token associated with a specific entity ID.
+  virtual Token TokenFor(const FragmentImpl::Ptr &, EntityId id) const;
 };
 
 class InvalidFragmentImpl : public FragmentImpl {
  private:
-  InvalidTokenReaderImpl empty_reader;
+  InvalidTokenReader empty_reader;
 
  public:
   using FragmentImpl::FragmentImpl;
@@ -201,6 +204,7 @@ class InvalidFragmentImpl : public FragmentImpl {
   NodeReader Nodes(void) const final;
   TokenSubstitutionsReader Substitutions(void) const final;
   EntityListReader Entities(void) const final;
+  Token TokenFor(const FragmentImpl::Ptr &, EntityId id) const final;
 };
 
 // A fragment of code downloaded from the server.

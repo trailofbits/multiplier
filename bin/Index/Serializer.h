@@ -8,12 +8,17 @@
 
 #include "Visitor.h"
 
+#include <multiplier/RPC.capnp.h>
+
 namespace pasta {
 class File;
 }  // namespace pasta
 namespace indexer {
 
 using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
+
+using EntityListBuilder = capnp::List<mx::ast::Entity, capnp::Kind::STRUCT>::Builder;
+using FragmentBuilder = mx::rpc::Fragment::Builder;
 
 // Summary information about a group of top-level declarations that are
 // somehow lexically/syntactically "stuck together" and thus serialized
@@ -27,38 +32,24 @@ struct CodeChunk {
   std::vector<pasta::Decl> decls;
   uint64_t begin_index;
   uint64_t end_index;
-  std::map<pasta::DeclKind, unsigned> num_decls_of_kind;
-  std::map<pasta::StmtKind, unsigned> num_stmts_of_kind;
+  unsigned num_entities{0u};
+  unsigned num_template_arguments{0u};
 };
 
 class EntitySerializer final : public EntityVisitor {
- private:
+ public:
   EntityIdMap entity_ids;
   mx::FragmentId code_id;
+  unsigned next_pseudo_entity_offset{0};
   std::unordered_set<uint64_t> serialized_entities;
   const std::unordered_map<pasta::File, mx::FileId> &file_ids;
 
-#define MX_DECLARE_DECL_LIST_BUILDER(decl) \
-    ::capnp::List<::mx::ast::decl ## Decl, ::capnp::Kind::STRUCT>::Builder decl ## Decl_builder;
+  ::capnp::List<::mx::ast::Entity, ::capnp::Kind::STRUCT>::Builder
+      entity_builder;
 
-#define MX_DECLARE_STMT_LIST_BUILDER(stmt) \
-    ::capnp::List<::mx::ast::stmt, ::capnp::Kind::STRUCT>::Builder stmt ## _builder;
-
-  PASTA_FOR_EACH_DECL_IMPL(MX_DECLARE_DECL_LIST_BUILDER, PASTA_IGNORE_ABSTRACT)
-  PASTA_FOR_EACH_STMT_IMPL(MX_DECLARE_STMT_LIST_BUILDER,
-                           MX_DECLARE_STMT_LIST_BUILDER,
-                           MX_DECLARE_STMT_LIST_BUILDER,
-                           MX_DECLARE_STMT_LIST_BUILDER,
-                           MX_DECLARE_STMT_LIST_BUILDER,
-                           PASTA_IGNORE_ABSTRACT)
-
-#undef MX_DECLARE_STMT_LIST_BUILDER
-#undef MX_DECLARE_DECL_LIST_BUILDER
-
-  void Serialize(mx::ast::Token::Builder token, const pasta::Token &entity);
-
- public:
   const pasta::TokenRange range;
+
+  void Serialize(mx::rpc::Token::Builder token, const pasta::Token &entity);
 
   virtual ~EntitySerializer(void);
 
@@ -70,8 +61,7 @@ class EntitySerializer final : public EntityVisitor {
         file_ids(file_ids_),
         range(std::move(range_)) {}
 
-  void SerializeCodeEntities(
-      CodeChunk code, mx::ast::EntityList::Builder entities);
+  void SerializeCodeEntities(CodeChunk code, FragmentBuilder &builder);
 
   mx::FileId FileId(const pasta::File &file);
   uint64_t EntityId(const pasta::Decl &entity);
@@ -81,6 +71,8 @@ class EntitySerializer final : public EntityVisitor {
 
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;
+  void Enter(const pasta::Decl &entity, std::vector<pasta::TemplateArgument>) final;
+  void Enter(const pasta::Stmt &entity, std::vector<pasta::TemplateArgument>) final;
 };
 
 }  // namespace indexer

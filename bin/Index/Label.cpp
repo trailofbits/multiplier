@@ -15,7 +15,7 @@ EntityLabeller::~EntityLabeller(void) {}
 
 bool EntityLabeller::Enter(const pasta::Decl &entity) {
   auto kind = entity.Kind();
-  auto &next_offset = next_decl_offset[{code.fragment_id, kind}];
+  auto &next_offset = next_entity_offset[code.fragment_id];
   mx::DeclarationId id;
   id.fragment_id = code.fragment_id;
   id.offset = next_offset;
@@ -23,7 +23,7 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
 
   if (entity_ids.emplace(entity.RawDecl(), id).second) {
     ++next_offset;
-    code.num_decls_of_kind[kind] = next_offset;
+    ++code.num_entities;
     return true;
   } else {
     return false;
@@ -32,7 +32,7 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
 
 bool EntityLabeller::Enter(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
-  auto &next_offset = next_stmt_offset[{code.fragment_id, kind}];
+  auto &next_offset = next_entity_offset[code.fragment_id];
   mx::StatementId id;
   id.fragment_id = code.fragment_id;
   id.offset = next_offset;
@@ -40,11 +40,22 @@ bool EntityLabeller::Enter(const pasta::Stmt &entity) {
 
   if (entity_ids.emplace(entity.RawStmt(), id).second) {
     ++next_offset;
-    code.num_stmts_of_kind[kind] = next_offset;
+    ++code.num_entities;
     return true;
   } else {
     return false;
   }
+}
+
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, std::vector<pasta::TemplateArgument> args) {
+  code.num_template_arguments += static_cast<unsigned>(args.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Stmt &, std::vector<pasta::TemplateArgument> args) {
+  code.num_template_arguments += static_cast<unsigned>(args.size());
 }
 
 bool EntityLabeller::Label(const pasta::Token &entity) {

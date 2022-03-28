@@ -19,28 +19,31 @@ static thread_local unsigned tClientIndex = 0;
 
 static std::atomic<unsigned> gNextClientIndex;
 
+static const std::shared_ptr<InvalidTokenReader> kInvalidTokenReader =
+    std::make_shared<InvalidTokenReader>();
+
 }  // namespace
 
 TokenReader::~TokenReader(void) noexcept {}
-InvalidTokenReaderImpl::~InvalidTokenReaderImpl(void) noexcept {}
+InvalidTokenReader::~InvalidTokenReader(void) noexcept {}
 
 // Return the number of tokens accessible to this reader.
-unsigned InvalidTokenReaderImpl::NumTokens(void) const noexcept {
+unsigned InvalidTokenReader::NumTokens(void) const noexcept {
   return 0u;
 }
 
 // Return the kind of the Nth token.
-TokenKind InvalidTokenReaderImpl::NthTokenKind(unsigned) const {
+TokenKind InvalidTokenReader::NthTokenKind(unsigned) const {
   return TokenKind::UNKNOWN;
 }
 
 // Return the data of the Nth token.
-std::string_view InvalidTokenReaderImpl::NthTokenData(unsigned) const {
+std::string_view InvalidTokenReader::NthTokenData(unsigned) const {
   return {};
 }
 
 // Return the id of the Nth token.
-EntityId InvalidTokenReaderImpl::NthTokenId(unsigned) const {
+EntityId InvalidTokenReader::NthTokenId(unsigned) const {
   return kInvalidEntityId;
 }
 
@@ -79,14 +82,14 @@ unsigned ResponseFileImpl::NumTokens(void) const noexcept {
 // Return the kind of the Nth token.
 TokenKind ResponseFileImpl::NthTokenKind(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
-  ast::Token::Reader token_reader = tokens_list_reader[index];
+  rpc::Token::Reader token_reader = tokens_list_reader[index];
   return static_cast<TokenKind>(token_reader.getKind());
 }
 
 // Return the data of the Nth token.
 std::string_view ResponseFileImpl::NthTokenData(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
-  ast::Token::Reader token_reader = tokens_list_reader[index];
+  rpc::Token::Reader token_reader = tokens_list_reader[index];
   capnp::Text::Reader data_reader = token_reader.getData();
   return std::string_view(data_reader.cStr(), data_reader.size());
 }
@@ -94,7 +97,7 @@ std::string_view ResponseFileImpl::NthTokenData(unsigned index) const {
 // Return the id of the Nth token.
 EntityId ResponseFileImpl::NthTokenId(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
-  ast::Token::Reader token_reader = tokens_list_reader[index];
+  rpc::Token::Reader token_reader = tokens_list_reader[index];
   FileTokenId id;
   id.file_id = this->id;
   id.kind = static_cast<TokenKind>(token_reader.getKind());
@@ -103,6 +106,45 @@ EntityId ResponseFileImpl::NthTokenId(unsigned index) const {
 }
 
 FragmentImpl::~FragmentImpl(void) noexcept {}
+
+// Return the token associated with a specific entity ID.
+Token FragmentImpl::TokenFor(
+    const FragmentImpl::Ptr &self, EntityId id) const {
+  auto vid = id.Unpack();
+
+  // It's a fragment token.
+  if (std::holds_alternative<FragmentTokenId>(vid)) {
+    auto fid = std::get<FragmentTokenId>(vid);
+
+    // It's a token inside of the current fragment.
+    if (fid.fragment_id == id) {
+      return Token(this->TokenReader(self), fid.offset);
+
+    // It's a token inside of another fragment, go get the other fragment.
+    } else {
+      auto other_frag = ep->fragment(fid.fragment_id);
+      auto reader = other_frag.impl->TokenReader(other_frag.impl);
+      return Token(std::move(reader), fid.offset);
+    }
+
+  // It's a file token; go get the file.
+  } else if (std::holds_alternative<FileTokenId>(vid)) {
+    auto fid = std::get<FileTokenId>(vid);
+    FileImpl::Ptr file;
+    if (containing_file && containing_file->id == fid.file_id) {
+      file = containing_file;  // Try to use the containing file if it matches.
+    } else {
+      file = ep->file(fid.file_id).impl;
+    }
+
+    auto reader = file->TokenReader(file);
+    return Token(std::move(reader), fid.offset);
+
+  } else {
+    assert(false);
+    return Token::invalid();
+  }
+}
 
 InvalidFragmentImpl::~InvalidFragmentImpl(void) noexcept {}
 
@@ -133,6 +175,12 @@ TokenSubstitutionsReader InvalidFragmentImpl::Substitutions(void) const {
 
 EntityListReader InvalidFragmentImpl::Entities(void) const {
   return {};
+}
+
+Token InvalidFragmentImpl::TokenFor(
+    const FragmentImpl::Ptr &, EntityId id) const {
+  assert(static_cast<uint64_t>(id) == kInvalidEntityId);
+  return Token::invalid();
 }
 
 ResponseFragmentImpl::~ResponseFragmentImpl(void) noexcept {}
@@ -172,32 +220,28 @@ TokenReader::Ptr ResponseFragmentImpl::TokenReader(
 
 // Return the number of tokens in the file.
 unsigned ResponseFragmentImpl::NumTokens(void) const noexcept {
-  ast::EntityList::Reader entities = reader.getEntities();
-  return entities.getToken().size();
+  return reader.getTokens().size();
 }
 
 // Return the kind of the Nth token.
 TokenKind ResponseFragmentImpl::NthTokenKind(unsigned index) const {
-  ast::EntityList::Reader entities = reader.getEntities();
-  auto tokens_list_reader = entities.getToken();
-  ast::Token::Reader token_reader = tokens_list_reader[index];
+  auto tokens_list_reader = reader.getTokens();
+  rpc::Token::Reader token_reader = tokens_list_reader[index];
   return static_cast<TokenKind>(token_reader.getKind());
 }
 
 // Return the data of the Nth token.
 std::string_view ResponseFragmentImpl::NthTokenData(unsigned index) const {
-  ast::EntityList::Reader entities = reader.getEntities();
-  auto tokens_list_reader = entities.getToken();
-  ast::Token::Reader token_reader = tokens_list_reader[index];
+  auto tokens_list_reader = reader.getTokens();
+  rpc::Token::Reader token_reader = tokens_list_reader[index];
   capnp::Text::Reader data_reader = token_reader.getData();
   return std::string_view(data_reader.cStr(), data_reader.size());
 }
 
 // Return the id of the Nth token.
 EntityId ResponseFragmentImpl::NthTokenId(unsigned index) const {
-  ast::EntityList::Reader entities = reader.getEntities();
-  auto tokens_list_reader = entities.getToken();
-  ast::Token::Reader token_reader = tokens_list_reader[index];
+  auto tokens_list_reader = reader.getTokens();
+  rpc::Token::Reader token_reader = tokens_list_reader[index];
   FragmentTokenId id;
   id.fragment_id = this->id;
   id.offset = index;
@@ -207,7 +251,7 @@ EntityId ResponseFragmentImpl::NthTokenId(unsigned index) const {
 
 // Return a reader for token nodes.
 NodeReader ResponseFragmentImpl::Nodes(void) const {
-  return reader.getTokens();
+  return reader.getUnparsedTokens();
 }
 
 // Return a reader for token substitutions.
@@ -370,7 +414,7 @@ Fragment RemoteEntityProvider::fragment(FragmentId id) noexcept {
 
 // Return `true` if this is a valid token.
 Token::operator bool(void) const noexcept {
-  return !!dynamic_cast<const InvalidTokenReaderImpl *>(impl.get());
+  return !!dynamic_cast<const InvalidTokenReader *>(impl.get());
 }
 
 // Kind of this token.
@@ -396,7 +440,7 @@ TokenList TokenList::containing(Token tok) noexcept {
 
 // Return an invalid token.
 Token Token::invalid(void) noexcept {
-  return Token(std::make_shared<InvalidTokenReaderImpl>(), 0);
+  return Token(kInvalidTokenReader, 0);
 }
 
 // Return the token at index `index`.

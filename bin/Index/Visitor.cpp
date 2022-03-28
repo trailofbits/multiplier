@@ -179,7 +179,6 @@ void EntityVisitor::VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) {
   }
 }
 
-
 void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
   if (Enter(stmt)) {
     for (auto child : stmt.Children()) {
@@ -187,6 +186,48 @@ void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
     }
     for (auto child : stmt.Declarations()) {
       this->DeclVisitor::Accept(child);
+    }
+  }
+}
+
+void EntityVisitor::VisitConceptSpecializationExpr(
+    const pasta::ConceptSpecializationExpr &stmt) {
+  if (Enter(stmt)) {
+    Enter(stmt, stmt.TemplateArguments());
+    for (auto child : stmt.Children()) {
+      this->StmtVisitor::Accept(child);
+    }
+  }
+}
+
+void EntityVisitor::VisitSizeOfPackExpr(const pasta::SizeOfPackExpr &stmt) {
+  if (Enter(stmt)) {
+    Enter(stmt, stmt.PartialArguments());
+    for (auto child : stmt.Children()) {
+      this->StmtVisitor::Accept(child);
+    }
+  }
+}
+
+void EntityVisitor::VisitVarTemplateSpecializationDecl(
+    const pasta::VarTemplateSpecializationDecl &decl) {
+  if (Enter(decl)) {
+    Enter(decl, decl.TemplateArguments());
+    Enter(decl, decl.TemplateInstantiationArguments());
+    if (auto init_expr = decl.Initializer()) {
+      this->StmtVisitor::Accept(*init_expr);
+    }
+  }
+}
+
+void EntityVisitor::VisitClassTemplateSpecializationDecl(
+    const pasta::ClassTemplateSpecializationDecl &decl) {
+  if (Enter(decl)) {
+    Enter(decl, decl.TemplateArguments());
+    Enter(decl, decl.TemplateInstantiationArguments());
+    VisitDeclContext(decl);
+    for (pasta::FieldDecl field : decl.Fields()) {
+      this->DeclVisitor::Accept(field);
     }
   }
 }
