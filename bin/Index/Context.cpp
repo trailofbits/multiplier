@@ -62,17 +62,17 @@ IndexingContext::~IndexingContext(void) {
 }
 
 void IndexingContext::InitializeProgressBars(void) {
-  command_progress.reset(new mx::ProgressBar("Command parsing",
+  command_progress.reset(new mx::ProgressBar("1) Command interpretation",
                                              std::chrono::seconds(1)));
-  ast_progress.reset(new mx::ProgressBar("Parsing / AST building",
+  ast_progress.reset(new mx::ProgressBar("2) Parsing / AST building",
                                          std::chrono::seconds(1)));
-  partitioning_progress.reset(new mx::ProgressBar("Fragment partitioning",
+  partitioning_progress.reset(new mx::ProgressBar("4) Fragment partitioning",
                                                   std::chrono::seconds(1)));
-  identification_progress.reset(new mx::ProgressBar("Fragment identification",
+  identification_progress.reset(new mx::ProgressBar("5) Fragment identification",
                                                     std::chrono::seconds(1)));
-  serialization_progress.reset(new mx::ProgressBar("Fragment serialization",
+  serialization_progress.reset(new mx::ProgressBar("6) Fragment serialization",
                                               std::chrono::seconds(1)));
-  file_progress.reset(new mx::ProgressBar("File serialization",
+  file_progress.reset(new mx::ProgressBar("3) File serialization",
                                           std::chrono::seconds(1)));
   command_progress->SetNumWorkers(num_workers);
   ast_progress->SetNumWorkers(num_workers);
