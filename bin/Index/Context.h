@@ -15,9 +15,8 @@
 #include <multiplier/PersistentMap.h>
 #include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
-
+#include <mutex>
 #include <pasta/Util/FileManager.h>
-
 #include <string>
 #include <unordered_map>
 
@@ -128,6 +127,10 @@ class ServerContext {
   explicit ServerContext(std::filesystem::path workspace_dir_);
 };
 
+template <typename K, typename V>
+struct alignas(64) AtomicMap
+    : public std::unordered_map<K, V>, public std::mutex {};
+
 // State that needs to live only as long as there are active indexing jobs
 // underway.
 class IndexingContext {
@@ -154,6 +157,16 @@ class IndexingContext {
   std::unique_ptr<mx::ProgressBar> file_progress;
 
   const unsigned num_workers;
+
+  // In-memory caches that gate read/write access to
+  // `ServerContext::code_hash_to_fragment_id`, because a lot of CPU is spent
+  // there.
+  //
+  // TODO(pag): Perhaps its related to RocksDB trying to maintain ordering?
+  //            Would be nice to use a separate `rocksdb::ColumnFamily` and tell
+  //            it to optimize for point queries.
+  AtomicMap<std::string, AtomicMap<std::string, mx::FragmentId>>
+      code_hash_to_fragment_id_maps;
 
   // Worker-local next counters for IDs.
   std::vector<NextId<mx::FileId>> local_next_file_id;

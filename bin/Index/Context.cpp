@@ -47,6 +47,8 @@ void ServerContext::Flush(void) {
   meta_to_id.Set(MetadataName::kNextBigCodeId, next_big_fragment_id.load());
 }
 
+static constexpr size_t kNumFragmentCacheShards = 1024u;
+
 IndexingContext::IndexingContext(ServerContext &server_context_,
                                  const mx::Executor &exe_)
     : server_context(server_context_),
@@ -117,8 +119,25 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
     mx::WorkerId worker_id_, const std::string &code_hash,
     uint64_t num_tokens) {
 
+  std::string prefix;
+  prefix.reserve(32);
+  if (code_hash.size() > 32) {
+    prefix.insert(prefix.end(), &(code_hash[0]), &(code_hash[32]));
+  } else {
+    prefix = code_hash;
+  }
+
+  code_hash_to_fragment_id_maps.lock();
+  auto &cache = code_hash_to_fragment_id_maps[std::move(prefix)];
+  code_hash_to_fragment_id_maps.unlock();
+
+  std::unique_lock<std::mutex> locker(cache);
+  mx::FragmentId &code_id = cache[code_hash];
+  if (code_id != mx::kInvalidEntityId) {
+    return {code_id, false};
+  }
+
   const auto worker_id = static_cast<unsigned>(worker_id_);
-  mx::FragmentId code_id = 0u;
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   if (num_tokens >= mx::kNumTokensInBigFragment) {
