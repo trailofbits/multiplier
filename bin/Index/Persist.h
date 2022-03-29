@@ -20,6 +20,6 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
                  std::string file_hash, pasta::File file);
 
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
-                     CodeChunk fragment_info);
+                     PendingFragment fragment_info);
 
 }  // namespace indexer

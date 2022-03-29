@@ -27,14 +27,14 @@ using FragmentBuilder = mx::rpc::Fragment::Builder;
 // that expands into two separate top-level declarations. We don't want to
 // break this macro expansion into two, as in the original source file it
 // represents a single logical thing.
-struct CodeChunk {
+struct PendingFragment {
   mx::FragmentId fragment_id;
   std::vector<pasta::Decl> decls;
   uint64_t begin_index;
   uint64_t end_index;
 
   // The number of entities that will be stored in the serialized
-  // `rpc::Fragment` generated from this `CodeChunk`. We count the number of
+  // `rpc::Fragment` generated from this `PendingFragment`. We count the number of
   // entities because we need to pre-allocate space with Cap'n Proto. We
   // distinguish entities from "pseudo" entities, where an entity is uniquely
   // identifiable via an `mx::EntityId`, whereas a pseudo entity is not uniquely
@@ -69,7 +69,7 @@ class EntitySerializer final : public EntityVisitor {
         file_ids(file_ids_),
         range(std::move(range_)) {}
 
-  void SerializeCodeEntities(CodeChunk code, FragmentBuilder &builder);
+  void SerializeCodeEntities(PendingFragment code, FragmentBuilder &builder);
 
   mx::FileId FileId(const pasta::File &file);
   uint64_t EntityId(const pasta::Decl &entity);

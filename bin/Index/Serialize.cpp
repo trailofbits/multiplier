@@ -21,7 +21,7 @@
 namespace indexer {
 
 void EntitySerializer::SerializeCodeEntities(
-    CodeChunk code, FragmentBuilder &builder) {
+    PendingFragment code, FragmentBuilder &builder) {
   serialized_entities.clear();
   code_id = code.fragment_id;
   next_pseudo_entity_offset = code.num_entities;

@@ -95,7 +95,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
   }
 }
 
-CodeChunk EntityLabeller::EnterCode(
+PendingFragment EntityLabeller::EnterCode(
     mx::FragmentId code_id_, std::vector<pasta::Decl> tlds,
     const pasta::TokenRange &range, uint64_t begin_index_,
     uint64_t end_index_) {

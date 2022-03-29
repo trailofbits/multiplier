@@ -62,13 +62,19 @@ IndexingContext::~IndexingContext(void) {
 void IndexingContext::InitializeProgressBars(void) {
   command_progress.reset(new mx::ProgressBar("Command parsing",
                                              std::chrono::seconds(1)));
-  ast_progress.reset(new mx::ProgressBar("AST building",
+  ast_progress.reset(new mx::ProgressBar("Parsing / AST building",
                                          std::chrono::seconds(1)));
-  tokenizer_progress.reset(new mx::ProgressBar("Tokenizer",
-                                               std::chrono::seconds(1)));
+  partitioning_progress.reset(new mx::ProgressBar("Fragment partitioning",
+                                                  std::chrono::seconds(1)));
+  identification_progress.reset(new mx::ProgressBar("Fragment identification",
+                                                    std::chrono::seconds(1)));
+  serialization_progress.reset(new mx::ProgressBar("Fragment serialization",
+                                              std::chrono::seconds(1)));
+  file_progress.reset(new mx::ProgressBar("File serialization",
+                                          std::chrono::seconds(1)));
   command_progress->SetNumWorkers(num_workers);
   ast_progress->SetNumWorkers(num_workers);
-  tokenizer_progress->SetNumWorkers(num_workers);
+  file_progress->SetNumWorkers(num_workers);
 }
 
 // Get or create a file ID for the file at `file_path` with contents
@@ -114,7 +120,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
   const auto worker_id = static_cast<unsigned>(worker_id_);
   mx::FragmentId code_id = 0u;
 
-  // "Big codes" have IDs in the range [1, mx::kMaxNumBigCodeChunks)`.
+  // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   if (num_tokens >= mx::kNumTokensInBigFragment) {
     auto &maybe_id = this->local_next_big_fragment_id[worker_id].id;
     mx::FileId created_id = mx::kInvalidEntityId;
@@ -138,7 +144,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
       return {code_id, false};
     }
 
-  // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigCodeChunks, ...)`.
+  // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigPendingFragments, ...)`.
   } else {
     auto &maybe_id = this->local_next_small_fragment_id[worker_id].id;
     mx::FileId created_id = mx::kInvalidEntityId;

@@ -29,7 +29,6 @@ namespace indexer {
 
 void PersistFile(IndexingContext &context, mx::FileId file_id,
                  std::string file_hash, pasta::File file) {
-  mx::ProgressBarWork progress_tracker(context.tokenizer_progress.get());
   auto file_tokens = file.Tokens();
 
   capnp::MallocMessageBuilder message;
@@ -131,7 +130,7 @@ static void PersistTokenTree(EntitySerializer &serializer,
 }
 
 static void PersistTokens(EntitySerializer &serializer,
-                          const CodeChunk &code,
+                          const PendingFragment &code,
                           FragmentBuilder &builder) {
   auto num_toks = static_cast<unsigned>(
       (code.end_index - code.begin_index) + 1u);
@@ -144,7 +143,7 @@ static void PersistTokens(EntitySerializer &serializer,
 }
 
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
-                     CodeChunk code_chunk) {
+                     PendingFragment code_chunk) {
 
   const mx::FragmentId code_id = code_chunk.fragment_id;
   const pasta::Decl &leader_decl = code_chunk.decls[0];

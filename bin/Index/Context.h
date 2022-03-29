@@ -141,8 +141,17 @@ class IndexingContext {
   // Tracks progress in running compile jobs to produce ASTs.
   std::unique_ptr<mx::ProgressBar> ast_progress;
 
+  // Tracks progress in partitioning an AST into fragments.
+  std::unique_ptr<mx::ProgressBar> partitioning_progress;
+
+  // Tracks progress in identifying fragments with IDs.
+  std::unique_ptr<mx::ProgressBar> identification_progress;
+
+  // Tracks progress in serializing fragments.
+  std::unique_ptr<mx::ProgressBar> serialization_progress;
+
   // Tracks progress in saving tokenized files.
-  std::unique_ptr<mx::ProgressBar> tokenizer_progress;
+  std::unique_ptr<mx::ProgressBar> file_progress;
 
   const unsigned num_workers;
 

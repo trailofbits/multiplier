@@ -14,7 +14,7 @@ namespace indexer {
 // Labels entities (decls, stmts, types, tokens). The idea here is that in
 // `rpc::Fragment`, which is derived from a Cap'n Proto schema, we have a
 // lists of entities (decls, stmts, etc.). We index code at the granularity of
-// fragments (represented here as `CodeChunk`) which contain one or more top-
+// fragments (represented here as `PendingFragment`) which contain one or more top-
 // level declarations. Each code chunk has a unique code ID, and there is an
 // `ast::EntityList` associated with each code chunk. We'd like to be able to
 // reference across code chunks, and to do so deterministically. The way we do
@@ -29,7 +29,7 @@ namespace indexer {
 class EntityLabeller final : public EntityVisitor {
  private:
   EntityIdMap entity_ids;
-  CodeChunk code;
+  PendingFragment code;
 
   // The next offset of an entity in `rpc::Fragment::entities`.
   std::unordered_map<mx::FragmentId, unsigned> next_entity_offset;
@@ -47,7 +47,7 @@ class EntityLabeller final : public EntityVisitor {
  public:
   virtual ~EntityLabeller(void);
 
-  CodeChunk EnterCode(mx::FragmentId code_id_, std::vector<pasta::Decl> tlds,
+  PendingFragment EnterCode(mx::FragmentId code_id_, std::vector<pasta::Decl> tlds,
                       const pasta::TokenRange &range,
                       uint64_t begin_index_, uint64_t end_index_);
 
