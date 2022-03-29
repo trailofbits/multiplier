@@ -32,8 +32,16 @@ struct CodeChunk {
   std::vector<pasta::Decl> decls;
   uint64_t begin_index;
   uint64_t end_index;
+
+  // The number of entities that will be stored in the serialized
+  // `rpc::Fragment` generated from this `CodeChunk`. We count the number of
+  // entities because we need to pre-allocate space with Cap'n Proto. We
+  // distinguish entities from "pseudo" entities, where an entity is uniquely
+  // identifiable via an `mx::EntityId`, whereas a pseudo entity is not uniquely
+  // identifiable, but is attached to some other entity. For example, a
+  // `TemplateParamterList` or a `TemplateArgument` is a pseudo entity.
   unsigned num_entities{0u};
-  unsigned num_template_arguments{0u};
+  unsigned num_pseudo_entities{0u};
 };
 
 class EntitySerializer final : public EntityVisitor {
@@ -71,8 +79,12 @@ class EntitySerializer final : public EntityVisitor {
 
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;
-  void Enter(const pasta::Decl &entity, std::vector<pasta::TemplateArgument>) final;
-  void Enter(const pasta::Stmt &entity, std::vector<pasta::TemplateArgument>) final;
+  void Enter(const pasta::Decl &, std::vector<pasta::TemplateArgument>) final;
+  void Enter(const pasta::Stmt &, std::vector<pasta::TemplateArgument>) final;
+  void Enter(const pasta::Decl &, std::vector<pasta::CXXBaseSpecifier>) final;
+  void Enter(const pasta::Decl &, std::vector<pasta::TemplateParameterList>) final;
+  void Enter(const pasta::Decl &, const pasta::TemplateParameterList &) final;
+  void Enter(const pasta::Stmt &, const pasta::TemplateParameterList &) final;
 };
 
 }  // namespace indexer

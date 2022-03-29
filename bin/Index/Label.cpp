@@ -50,12 +50,32 @@ bool EntityLabeller::Enter(const pasta::Stmt &entity) {
 
 void EntityLabeller::Enter(
     const pasta::Decl &, std::vector<pasta::TemplateArgument> args) {
-  code.num_template_arguments += static_cast<unsigned>(args.size());
+  code.num_pseudo_entities += static_cast<unsigned>(args.size());
 }
 
 void EntityLabeller::Enter(
     const pasta::Stmt &, std::vector<pasta::TemplateArgument> args) {
-  code.num_template_arguments += static_cast<unsigned>(args.size());
+  code.num_pseudo_entities += static_cast<unsigned>(args.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, std::vector<pasta::CXXBaseSpecifier> bases) {
+  code.num_pseudo_entities += static_cast<unsigned>(bases.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, std::vector<pasta::TemplateParameterList> params) {
+  code.num_pseudo_entities += static_cast<unsigned>(params.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, const pasta::TemplateParameterList &) {
+  code.num_pseudo_entities += 1u;
+}
+
+void EntityLabeller::Enter(
+    const pasta::Stmt &, const pasta::TemplateParameterList &) {
+  code.num_pseudo_entities += 1u;
 }
 
 bool EntityLabeller::Label(const pasta::Token &entity) {

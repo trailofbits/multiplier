@@ -32,6 +32,34 @@
 #define TYPE_NAME(name) #name "Type",
 #define STR_NAME(name) #name,
 
+static const std::unordered_set<std::string> gUnserializableTypes{
+  // These aren't "real entities," as they don't result in tangible code being
+  // generated. Instead, they are templates for real entities.
+  //
+  // TODO(pag): Re-think all of these. We will likely want to be able to get at
+  //            templates and other things from the instantiated things.
+  "ClassTemplatePartialSpecializationDecl",
+  "VarTemplatePartialSpecializationDecl",
+  "ClassTemplateDecl",
+  "VarTemplateDecl",
+  "FunctionTemplateDecl",
+
+  "BuiltinTemplateDecl",
+  "RedeclarableTemplateDecl",
+  "TemplateDecl",
+  "TemplateTemplateParmDecl",
+  "FriendTemplateDecl",
+
+  // These are not contained in fragments.
+  "NamespaceDecl",
+  "TranslationUnitDecl",
+  "ExternCContextDecl",
+
+  // TODO(pag): If we add more fine-grained handling of these in PASTA then
+  //            maybe remove this.
+  "LinkageSpecDecl",
+};
+
 static const std::unordered_set<std::string> gDeclNames{
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, STR_NAME)
 };
@@ -651,6 +679,12 @@ MethodListPtr CodeGenerator::RunOnClass(
       << "(EntitySerializer &es, mx::ast::Entity::Builder b, const pasta::"
       << class_name << " &e) {\n";
 
+//  std::stringstream dummy_ss;
+//  std::ostream &maybe_serialize_cpp_os =
+//      gUnserializableTypes.count(class_name) ? dummy_ss : serialize_cpp_os;
+
+  auto dont_serialize = !!gUnserializableTypes.count(class_name);
+
   if (cls->base) {
     std::string base_name = cls->base->record.Name();
     std::string snake_name = CapitalCaseToSnakeCase(base_name);
@@ -662,9 +696,10 @@ MethodListPtr CodeGenerator::RunOnClass(
         << " : public " << base_name << " {\n";
 
     // Parent class serialization.
-    serialize_cpp_os
-        << "  Serialize" << base_name << "(es, b, e);\n";
-  
+    if (!dont_serialize) {
+      serialize_cpp_os
+          << "  Serialize" << base_name << "(es, b, e);\n";
+    }
 
   // Things like `TemplateParameterList`, that aren't themselves entities, but
   // are derived from entities in fragments, and link to entities in fragments,
@@ -709,6 +744,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     std::pair<std::string, std::string> method_key{class_name, method_name};
     if (kMethodBlackList.count(method_key)) {
+      continue;
+    }
+
+    if (dont_serialize) {
       continue;
     }
 
@@ -844,8 +883,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         // Optional references will be left as `0` if they're not present.
         } else if (gEntityClassNames.count(element_name.value())) {
-          capn_element_name = "UInt64";  // Reference.
-          cxx_element_name = element_name.value();
+          if (!gUnserializableTypes.count(element_name.value())) {
+            capn_element_name = "UInt64";  // Reference.
+            cxx_element_name = element_name.value();
+          }
         }
 
         if (capn_element_name.empty()) {
@@ -951,8 +992,10 @@ MethodListPtr CodeGenerator::RunOnClass(
           cxx_element_name = element_name.value();
 
         } else if (gEntityClassNames.count(element_name.value())) {
-          capn_element_name = "UInt64";  // Reference.
-          cxx_element_name = element_name.value();
+          if (!gUnserializableTypes.count(element_name.value())) {
+            capn_element_name = "UInt64";  // Reference.
+            cxx_element_name = element_name.value();
+          }
 
         } else if (gNotReferenceTypes.count(element_name.value())) {
           abort();
@@ -1018,6 +1061,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // E.g. something that returns a `Decl`, `Stmt`, etc.
       } else if (gEntityClassNames.count(record_name)) {
+        if (gUnserializableTypes.count(record_name)) {
+          continue;
+        }
+
         const auto i = storage.AddMethod("UInt64");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
@@ -1039,8 +1086,10 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "(void) const noexcept;\n";
 
         serialize_cpp_os
-            << "  Serialize" << record_name << "(es, b, e."
-            << method_name << "());\n";
+            << "  auto o" << i << " = es.next_pseudo_entity_offset++;\n"
+            << "  sv" << i << ".set(i" << i << ", o" << i << ");\n"
+            << "  Serialize" << record_name
+            << "(es, es.entity_builder[o" << i << "], e" << i << ");\n";
 
       } else if (gNotReferenceTypes.count(record_name)) {
         abort();
@@ -1184,7 +1233,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "  code_id = code.fragment_id;\n"
       << "  next_pseudo_entity_offset = code.num_entities;\n"
       << "  entity_builder = builder.initEntities(\n"
-      << "      code.num_entities + code.num_template_arguments);\n";
+      << "      code.num_entities + code.num_pseudo_entities);\n";
 
   include_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"

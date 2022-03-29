@@ -36,8 +36,9 @@ void EntityVisitor::VisitExternCContextDecl(
 
 void EntityVisitor::VisitLinkageSpecDecl(
     const pasta::LinkageSpecDecl &decl) {
-  assert(false);
-  VisitDeclContext(decl);
+  if (!decl.HasBraces()) {
+    VisitDeclContext(decl);
+  }
 }
 
 void EntityVisitor::VisitClassTemplatePartialSpecializationDecl(
@@ -45,6 +46,11 @@ void EntityVisitor::VisitClassTemplatePartialSpecializationDecl(
 
 void EntityVisitor::VisitVarTemplatePartialSpecializationDecl(
     const pasta::VarTemplatePartialSpecializationDecl &) {}
+
+void EntityVisitor::VisitTemplateDecl(const pasta::TemplateDecl &) {}
+
+void EntityVisitor::VisitFriendTemplateDecl(
+    const pasta::FriendTemplateDecl &) {}
 
 void EntityVisitor::VisitClassTemplateDecl(
     const pasta::ClassTemplateDecl &) {}
@@ -54,8 +60,15 @@ void EntityVisitor::VisitVarTemplateDecl(const pasta::VarTemplateDecl &) {}
 void EntityVisitor::VisitFunctionTemplateDecl(
     const pasta::FunctionTemplateDecl &) {}
 
+void EntityVisitor::VisitFriendDecl(const pasta::FriendDecl &decl) {
+  if (Enter(decl)) {
+    Enter(decl, decl.FriendTypeTemplateParameterLists());
+  }
+}
+
 void EntityVisitor::VisitVarDecl(const pasta::VarDecl &decl) {
   if (Enter(decl)) {
+    Enter(decl, decl.TemplateParameterLists());
     if (auto init_expr = decl.Initializer()) {
       this->StmtVisitor::Accept(*init_expr);
     }
@@ -64,6 +77,7 @@ void EntityVisitor::VisitVarDecl(const pasta::VarDecl &decl) {
 
 void EntityVisitor::VisitParmVarDecl(const pasta::ParmVarDecl &decl) {
   if (Enter(decl)) {
+    Enter(decl, decl.TemplateParameterLists());
     if (!decl.HasUninstantiatedDefaultArgument() &&
         !decl.HasUnparsedDefaultArgument()) {
       if (auto init_expr = decl.DefaultArgument()) {
@@ -75,6 +89,7 @@ void EntityVisitor::VisitParmVarDecl(const pasta::ParmVarDecl &decl) {
 
 void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
   if (Enter(decl)) {
+    Enter(decl, decl.TemplateParameterLists());
     VisitDeclContext(decl);
     for (pasta::ParmVarDecl param : decl.Parameters()) {
       this->DeclVisitor::Accept(param);
@@ -87,6 +102,7 @@ void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
 
 void EntityVisitor::VisitFieldDecl(const pasta::FieldDecl &decl) {
   if (Enter(decl)) {
+    Enter(decl, decl.TemplateParameterLists());
     if (auto bit_width = decl.BitWidth()) {
       this->StmtVisitor::Accept(*bit_width);
     }
@@ -117,6 +133,7 @@ void EntityVisitor::VisitEnumConstantDecl(const pasta::EnumConstantDecl &decl) {
 // Enumerators.
 void EntityVisitor::VisitEnumDecl(const pasta::EnumDecl &decl) {
   if (Enter(decl)) {
+    Enter(decl, decl.TemplateParameterLists());
     VisitDeclContext(decl);
     for (pasta::EnumConstantDecl enumerator : decl.Enumerators()) {
       this->DeclVisitor::Accept(enumerator);
@@ -214,20 +231,60 @@ void EntityVisitor::VisitVarTemplateSpecializationDecl(
   if (Enter(decl)) {
     Enter(decl, decl.TemplateArguments());
     Enter(decl, decl.TemplateInstantiationArguments());
+    Enter(decl, decl.TemplateParameterLists());
     if (auto init_expr = decl.Initializer()) {
       this->StmtVisitor::Accept(*init_expr);
     }
   }
 }
 
+void EntityVisitor::VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) {
+  if (Enter(decl)) {
+    Enter(decl, decl.Bases());
+    Enter(decl, decl.VirtualBases());
+    Enter(decl, decl.TemplateParameterLists());
+    VisitDeclContext(decl);
+    for (pasta::FieldDecl field : decl.Fields()) {
+      this->DeclVisitor::Accept(field);
+    }
+  }
+}
+
+void EntityVisitor::VisitTagDecl(const pasta::TagDecl &decl) {
+  if (Enter(decl)) {
+    Enter(decl, decl.TemplateParameterLists());
+    VisitDeclContext(decl);
+  }
+}
+
 void EntityVisitor::VisitClassTemplateSpecializationDecl(
     const pasta::ClassTemplateSpecializationDecl &decl) {
   if (Enter(decl)) {
+    Enter(decl, decl.Bases());
+    Enter(decl, decl.VirtualBases());
+    Enter(decl, decl.TemplateParameterLists());
     Enter(decl, decl.TemplateArguments());
     Enter(decl, decl.TemplateInstantiationArguments());
     VisitDeclContext(decl);
     for (pasta::FieldDecl field : decl.Fields()) {
       this->DeclVisitor::Accept(field);
+    }
+  }
+}
+
+void EntityVisitor::VisitDeclaratorDecl(const pasta::DeclaratorDecl &decl) {
+  if (Enter(decl)) {
+    Enter(decl, decl.TemplateParameterLists());
+  }
+}
+
+void EntityVisitor::VisitLambdaExpr(const pasta::LambdaExpr &stmt) {
+  if (Enter(stmt)) {
+    if (auto ls = stmt.TemplateParameterList()) {
+      Enter(stmt, std::move(ls.value()));
+    }
+    for (auto child : stmt.Children()) {
+      this->StmtVisitor::Accept(child);
     }
   }
 }

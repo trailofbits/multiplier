@@ -176,6 +176,14 @@ void EntitySerializer::Enter(
     const pasta::Decl &, std::vector<pasta::TemplateArgument>) {}
 void EntitySerializer::Enter(
     const pasta::Stmt &, std::vector<pasta::TemplateArgument>) {}
+void EntitySerializer::Enter(
+    const pasta::Decl &, std::vector<pasta::CXXBaseSpecifier>) {}
+void EntitySerializer::Enter(
+    const pasta::Decl &, std::vector<pasta::TemplateParameterList>) {}
+void EntitySerializer::Enter(
+    const pasta::Decl &, const pasta::TemplateParameterList &) {}
+void EntitySerializer::Enter(
+    const pasta::Stmt &, const pasta::TemplateParameterList &) {}
 
 void EntitySerializer::Serialize(mx::rpc::Token::Builder token,
                                  const pasta::Token &entity) {

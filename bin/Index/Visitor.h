@@ -30,9 +30,12 @@ class EntityVisitor : protected pasta::DeclVisitor,
       const pasta::ClassTemplatePartialSpecializationDecl &) final;
   void VisitVarTemplatePartialSpecializationDecl(
       const pasta::VarTemplatePartialSpecializationDecl &) final;
+  void VisitTemplateDecl(const pasta::TemplateDecl &) final;
+  void VisitFriendTemplateDecl(const pasta::FriendTemplateDecl &) final;
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &) final;
   void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final;
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &) final;
+  void VisitFriendDecl(const pasta::FriendDecl &decl) final;
   void VisitVarDecl(const pasta::VarDecl &decl) final;
   void VisitParmVarDecl(const pasta::ParmVarDecl &decl) final;
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final;
@@ -49,7 +52,11 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitConceptSpecializationExpr(const pasta::ConceptSpecializationExpr &stmt) final;
   void VisitSizeOfPackExpr(const pasta::SizeOfPackExpr &stmt) final;
   void VisitVarTemplateSpecializationDecl(const pasta::VarTemplateSpecializationDecl &decl) final;
+  void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final;
+  void VisitTagDecl(const pasta::TagDecl &decl) final;
   void VisitClassTemplateSpecializationDecl(const pasta::ClassTemplateSpecializationDecl &decl) final;
+  void VisitDeclaratorDecl(const pasta::DeclaratorDecl &decl) final;
+  void VisitLambdaExpr(const pasta::LambdaExpr &stmt) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
 
@@ -65,6 +72,14 @@ class EntityVisitor : protected pasta::DeclVisitor,
                      std::vector<pasta::TemplateArgument>) = 0;
   virtual void Enter(const pasta::Stmt &entity,
                      std::vector<pasta::TemplateArgument>) = 0;
+  virtual void Enter(const pasta::Decl &entity,
+                     std::vector<pasta::CXXBaseSpecifier>) = 0;
+  virtual void Enter(const pasta::Decl &entity,
+                     std::vector<pasta::TemplateParameterList>) = 0;
+  virtual void Enter(const pasta::Decl &entity,
+                     const pasta::TemplateParameterList &) = 0;
+  virtual void Enter(const pasta::Stmt &entity,
+                     const pasta::TemplateParameterList &) = 0;
 };
 
 }  // namespace indexer

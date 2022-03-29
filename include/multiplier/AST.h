@@ -6458,11 +6458,9 @@ class LambdaExpr : public Expr {
   LambdaCaptureDefault capture_default(void) const noexcept;
   Token capture_default_token(void) const noexcept;
   CompoundStmt compound_statement_body(void) const noexcept;
-  FunctionTemplateDecl dependent_call_operator(void) const noexcept;
   std::vector<NamedDecl> explicit_template_parameters(void) const noexcept;
   TokenRange introducer_range(void) const noexcept;
   CXXRecordDecl lambda_class(void) const noexcept;
-  TemplateParameterList template_parameter_list(void) const noexcept;
   bool has_explicit_parameters(void) const noexcept;
   bool has_explicit_result_type(void) const noexcept;
   bool is_generic_lambda(void) const noexcept;
@@ -6604,7 +6602,6 @@ class Decl {
   AvailabilityResult availability(void) const noexcept;
   Token begin_token(void) const noexcept;
   Token body_r_brace(void) const noexcept;
-  std::optional<TemplateDecl> described_template(void) const noexcept;
   Token end_token(void) const noexcept;
   DeclFriendObjectKind friend_object_kind(void) const noexcept;
   DeclModuleOwnershipKind module_ownership_kind(void) const noexcept;
@@ -6695,7 +6692,6 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
 
 class TranslationUnitDecl : public Decl {
  public:
-  NamespaceDecl anonymous_namespace(void) const noexcept;
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
@@ -6832,7 +6828,6 @@ class DeclaratorDecl : public ValueDecl {
 class VarDecl : public DeclaratorDecl {
  public:
   std::optional<VarDecl> acting_definition(void) const noexcept;
-  std::optional<VarTemplateDecl> described_variable_template(void) const noexcept;
   VarDeclInitializationStyle initializer_style(void) const noexcept;
   std::optional<VarDecl> initializing_declaration(void) const noexcept;
   std::optional<VarDecl> instantiated_from_static_data_member(void) const noexcept;
@@ -6912,7 +6907,6 @@ class VarTemplateSpecializationDecl : public VarDecl {
  public:
   Token extern_token(void) const noexcept;
   TemplateSpecializationKind specialization_kind(void) const noexcept;
-  VarTemplateDecl specialized_template(void) const noexcept;
   std::vector<TemplateArgument> template_arguments(void) const noexcept;
   std::vector<TemplateArgument> template_instantiation_arguments(void) const noexcept;
   Token template_keyword_token(void) const noexcept;
@@ -6923,9 +6917,6 @@ class VarTemplateSpecializationDecl : public VarDecl {
 
 class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
  public:
-  VarTemplatePartialSpecializationDecl instantiated_from_member(void) const noexcept;
-  TemplateParameterList template_parameters(void) const noexcept;
-  bool has_associated_constraints(void) const noexcept;
 };
 
 class NonTypeTemplateParmDecl : public DeclaratorDecl {
@@ -6949,7 +6940,6 @@ class FunctionDecl : public DeclaratorDecl {
   bool does_this_declaration_have_a_body(void) const noexcept;
   ConstexprSpecKind constexpr_kind(void) const noexcept;
   std::optional<FunctionDecl> definition(void) const noexcept;
-  std::optional<FunctionTemplateDecl> described_function_template(void) const noexcept;
   Token ellipsis_token(void) const noexcept;
   TokenRange exception_spec_source_range(void) const noexcept;
   ExceptionSpecificationType exception_spec_type(void) const noexcept;
@@ -6959,7 +6949,6 @@ class FunctionDecl : public DeclaratorDecl {
   OverloadedOperatorKind overloaded_operator(void) const noexcept;
   TokenRange parameters_source_range(void) const noexcept;
   Token point_of_instantiation(void) const noexcept;
-  std::optional<FunctionTemplateDecl> primary_template(void) const noexcept;
   TokenRange return_type_source_range(void) const noexcept;
   StorageClass storage_class(void) const noexcept;
   std::optional<FunctionDecl> template_instantiation_pattern(void) const noexcept;
@@ -7056,7 +7045,6 @@ class CXXConstructorDecl : public CXXMethodDecl {
 class CXXDeductionGuideDecl : public FunctionDecl {
  public:
   CXXConstructorDecl corresponding_constructor(void) const noexcept;
-  TemplateDecl deduced_template(void) const noexcept;
   bool is_copy_deduction_candidate(void) const noexcept;
   bool is_explicit(void) const noexcept;
 };
@@ -7131,7 +7119,6 @@ class UsingDirectiveDecl : public NamedDecl {
  public:
   Token identifier_token(void) const noexcept;
   Token namespace_key_token(void) const noexcept;
-  NamespaceDecl nominated_namespace(void) const noexcept;
   NamedDecl nominated_namespace_as_written(void) const noexcept;
   Token using_token(void) const noexcept;
 };
@@ -7219,18 +7206,15 @@ class CXXRecordDecl : public RecordDecl {
   bool defaulted_destructor_is_deleted(void) const noexcept;
   bool defaulted_move_constructor_is_deleted(void) const noexcept;
   std::vector<FriendDecl> friends(void) const noexcept;
-  FunctionTemplateDecl dependent_lambda_call_operator(void) const noexcept;
-  ClassTemplateDecl described_class_template(void) const noexcept;
-  CXXDestructorDecl destructor(void) const noexcept;
-  TemplateParameterList generic_lambda_template_parameter_list(void) const noexcept;
-  CXXRecordDecl instantiated_from_member_class(void) const noexcept;
-  CXXMethodDecl lambda_call_operator(void) const noexcept;
+  std::optional<CXXDestructorDecl> destructor(void) const noexcept;
+  std::optional<CXXRecordDecl> instantiated_from_member_class(void) const noexcept;
+  std::optional<CXXMethodDecl> lambda_call_operator(void) const noexcept;
   LambdaCaptureDefault lambda_capture_default(void) const noexcept;
   std::vector<NamedDecl> lambda_explicit_template_parameters(void) const noexcept;
   MSInheritanceModel ms_inheritance_model(void) const noexcept;
   MSVtorDispMode ms_vtor_disp_mode(void) const noexcept;
   CXXRecordDecl most_recent_non_injected_declaration(void) const noexcept;
-  CXXRecordDecl template_instantiation_pattern(void) const noexcept;
+  std::optional<CXXRecordDecl> template_instantiation_pattern(void) const noexcept;
   TemplateSpecializationKind template_specialization_kind(void) const noexcept;
   bool has_any_dependent_bases(void) const noexcept;
   bool has_constexpr_default_constructor(void) const noexcept;
@@ -7300,7 +7284,7 @@ class CXXRecordDecl : public RecordDecl {
   bool is_generic_lambda(void) const noexcept;
   bool is_interface_like(void) const noexcept;
   bool is_literal(void) const noexcept;
-  FunctionDecl is_local_class(void) const noexcept;
+  std::optional<FunctionDecl> is_local_class(void) const noexcept;
   bool is_pod(void) const noexcept;
   bool is_parsing_base_specifiers(void) const noexcept;
   bool is_polymorphic(void) const noexcept;
@@ -7333,7 +7317,6 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   Token extern_token(void) const noexcept;
   Token point_of_instantiation(void) const noexcept;
   TemplateSpecializationKind specialization_kind(void) const noexcept;
-  ClassTemplateDecl specialized_template(void) const noexcept;
   std::vector<TemplateArgument> template_arguments(void) const noexcept;
   std::vector<TemplateArgument> template_instantiation_arguments(void) const noexcept;
   Token template_keyword_token(void) const noexcept;
@@ -7344,10 +7327,6 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
 
 class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
  public:
-  ClassTemplatePartialSpecializationDecl instantiated_from_member(void) const noexcept;
-  ClassTemplatePartialSpecializationDecl instantiated_from_member_template(void) const noexcept;
-  TemplateParameterList template_parameters(void) const noexcept;
-  bool has_associated_constraints(void) const noexcept;
 };
 
 class EnumDecl : public TagDecl {
@@ -7400,34 +7379,22 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
 
 class TemplateDecl : public NamedDecl {
  public:
-  TemplateParameterList template_parameters(void) const noexcept;
-  NamedDecl templated_declaration(void) const noexcept;
-  bool has_associated_constraints(void) const noexcept;
 };
 
 class RedeclarableTemplateDecl : public TemplateDecl {
  public:
-  RedeclarableTemplateDecl instantiated_from_member_template(void) const noexcept;
-  bool is_member_specialization(void) const noexcept;
 };
 
 class FunctionTemplateDecl : public RedeclarableTemplateDecl {
  public:
-  bool is_abbreviated(void) const noexcept;
-  bool is_this_declaration_a_definition(void) const noexcept;
-  std::vector<FunctionDecl> specializations(void) const noexcept;
 };
 
 class ClassTemplateDecl : public RedeclarableTemplateDecl {
  public:
-  bool is_this_declaration_a_definition(void) const noexcept;
-  std::vector<ClassTemplateSpecializationDecl> specializations(void) const noexcept;
 };
 
 class VarTemplateDecl : public RedeclarableTemplateDecl {
  public:
-  bool is_this_declaration_a_definition(void) const noexcept;
-  std::vector<VarTemplateSpecializationDecl> specializations(void) const noexcept;
 };
 
 class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
@@ -7445,11 +7412,6 @@ class BuiltinTemplateDecl : public TemplateDecl {
 
 class TemplateTemplateParmDecl : public TemplateDecl {
  public:
-  bool default_argument_was_inherited(void) const noexcept;
-  Token default_argument_token(void) const noexcept;
-  bool has_default_argument(void) const noexcept;
-  bool is_expanded_parameter_pack(void) const noexcept;
-  bool is_pack_expansion(void) const noexcept;
 };
 
 class ObjCPropertyDecl : public NamedDecl {
@@ -7604,12 +7566,6 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
 
 class NamespaceDecl : public NamedDecl {
  public:
-  NamespaceDecl anonymous_namespace(void) const noexcept;
-  NamespaceDecl original_namespace(void) const noexcept;
-  Token r_brace_token(void) const noexcept;
-  bool is_anonymous_namespace(void) const noexcept;
-  bool is_inline(void) const noexcept;
-  bool is_original_namespace(void) const noexcept;
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
@@ -7617,17 +7573,12 @@ class NamespaceAliasDecl : public NamedDecl {
  public:
   Token alias_token(void) const noexcept;
   NamedDecl aliased_namespace(void) const noexcept;
-  NamespaceDecl namespace_(void) const noexcept;
   Token namespace_token(void) const noexcept;
   Token target_name_token(void) const noexcept;
 };
 
 class LinkageSpecDecl : public Decl {
  public:
-  Token extern_token(void) const noexcept;
-  LinkageSpecDeclLanguageIDs language(void) const noexcept;
-  Token r_brace_token(void) const noexcept;
-  bool has_braces(void) const noexcept;
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
@@ -7644,9 +7595,6 @@ class ImportDecl : public Decl {
 
 class FriendTemplateDecl : public Decl {
  public:
-  NamedDecl friend_declaration(void) const noexcept;
-  Token friend_token(void) const noexcept;
-  std::vector<TemplateParameterList> template_parameter_lists(void) const noexcept;
 };
 
 class FriendDecl : public Decl {

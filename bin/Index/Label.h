@@ -39,6 +39,10 @@ class EntityLabeller final : public EntityVisitor {
   bool Label(const pasta::Token &entity);
   void Enter(const pasta::Decl &entity, std::vector<pasta::TemplateArgument>) final;
   void Enter(const pasta::Stmt &entity, std::vector<pasta::TemplateArgument>) final;
+  void Enter(const pasta::Decl &, std::vector<pasta::CXXBaseSpecifier>) final;
+  void Enter(const pasta::Decl &, std::vector<pasta::TemplateParameterList>) final;
+  void Enter(const pasta::Decl &, const pasta::TemplateParameterList &) final;
+  void Enter(const pasta::Stmt &, const pasta::TemplateParameterList &) final;
 
  public:
   virtual ~EntityLabeller(void);
