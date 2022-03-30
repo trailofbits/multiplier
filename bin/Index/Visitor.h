@@ -21,6 +21,16 @@ namespace indexer {
 class EntityVisitor : protected pasta::DeclVisitor,
                       protected pasta::StmtVisitor {
  private:
+  bool EnterDecl(const pasta::Decl &decl);
+  bool EnterStmt(const pasta::Stmt &stmt);
+  bool EnterTagDecl(const pasta::TagDecl &decl);
+  bool EnterRecordDecl(const pasta::RecordDecl &decl);
+  bool EnterCXXRecordDecl(const pasta::CXXRecordDecl &decl);
+  bool EnterDeclaratorDecl(const pasta::DeclaratorDecl &decl);
+  bool EnterVarDecl(const pasta::VarDecl &decl);
+
+
+ private:
   void VisitDeclContext(const pasta::DeclContext &dc);
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final;
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final;

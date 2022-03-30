@@ -137,7 +137,7 @@ FragmentImpl::~FragmentImpl(void) noexcept {}
 // Return the token associated with a specific entity ID.
 Token FragmentImpl::TokenFor(
     const FragmentImpl::Ptr &self, EntityId id) const {
-  auto vid = id.Unpack();
+  VariantId vid = id.Unpack();
 
   // It's a fragment token.
   if (std::holds_alternative<FragmentTokenId>(vid)) {
@@ -167,9 +167,131 @@ Token FragmentImpl::TokenFor(
     auto reader = file->TokenReader(file);
     return Token(std::move(reader), fid.offset);
 
+  // An invalid ID.
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    return Token::invalid();
+
+  // A non-token ID.
   } else {
     assert(false);
     return Token::invalid();
+  }
+}
+
+// Return the inclusive token range associated with two entity IDs.
+TokenRange FragmentImpl::TokenRangeFor(
+    const FragmentImpl::Ptr &self, EntityId begin_id, EntityId end_id) const {
+  auto begin_tok = TokenFor(self, begin_id);
+
+  VariantId bvid = begin_id.Unpack();
+  VariantId evid = end_id.Unpack();
+
+  // It's a fragment token.
+  if (std::holds_alternative<FragmentTokenId>(bvid)) {
+    if (!std::holds_alternative<FragmentTokenId>(evid)) {
+      return TokenRange();
+    }
+
+    auto bfid = std::get<FragmentTokenId>(bvid);
+    auto efid = std::get<FragmentTokenId>(evid);
+    if (bfid.fragment_id != efid.fragment_id ||
+        bfid.offset > efid.offset) {
+      return TokenRange();
+    }
+
+    auto range_size = static_cast<unsigned>((efid.offset - bfid.offset) + 1u);
+
+    // It's a token inside of the current fragment.
+    if (bfid.fragment_id == id) {
+      return TokenRange(this->TokenReader(self), bfid.offset, range_size);
+
+    // It's a token inside of another fragment, go get the other fragment.
+    } else {
+      auto other_frag = ep->fragment(bfid.fragment_id);
+      auto reader = other_frag.impl->TokenReader(other_frag.impl);
+      return TokenRange(std::move(reader), bfid.offset, range_size);
+    }
+
+  // It's a file token; go get the file.
+  } else if (std::holds_alternative<FileTokenId>(bvid)) {
+    if (!std::holds_alternative<FileTokenId>(evid)) {
+      return TokenRange();
+    }
+
+    auto bfid = std::get<FileTokenId>(bvid);
+    auto efid = std::get<FileTokenId>(evid);
+    if (bfid.file_id != efid.file_id ||
+        bfid.offset > efid.offset) {
+      return TokenRange();
+    }
+
+    auto range_size = static_cast<unsigned>((efid.offset - bfid.offset) + 1u);
+
+    FileImpl::Ptr file;
+    if (containing_file && containing_file->id == bfid.file_id) {
+      file = containing_file;  // Try to use the containing file if it matches.
+    } else {
+      file = ep->file(bfid.file_id).impl;
+    }
+
+    auto reader = file->TokenReader(file);
+    return TokenRange(std::move(reader), bfid.offset, range_size);
+
+  // An invalid ID.
+  } else if (std::holds_alternative<InvalidId>(bvid) &&
+             std::holds_alternative<InvalidId>(evid)) {
+    return TokenRange();
+
+  // A non-token ID.
+  } else {
+    assert(false);
+    return TokenRange();
+  }
+}
+
+// Return the declaration associated with a specific entity ID.
+Decl FragmentImpl::DeclFor(const FragmentImpl::Ptr &self, EntityId id) const {
+  VariantId vid = id.Unpack();
+
+  // It's a fragment token.
+  if (!std::holds_alternative<DeclarationId>(vid)) {
+    assert(false);
+    abort();
+  }
+
+  DeclarationId decl_id = std::get<DeclarationId>(vid);
+
+  // It's a token inside of the current fragment.
+  if (decl_id.fragment_id == id) {
+    return Decl(self, decl_id.offset);
+
+  // It's a token inside of another fragment, go get the other fragment.
+  } else {
+    return Decl(std::move(ep->fragment(decl_id.fragment_id).impl),
+                decl_id.offset);
+  }
+}
+
+// Return the statement associated with a specific entity ID.
+Stmt FragmentImpl::StmtFor(const FragmentImpl::Ptr &self, EntityId id) const {
+  VariantId vid = id.Unpack();
+
+  // It's a fragment token.
+  if (!std::holds_alternative<StatementId>(vid)) {
+    assert(false);
+    abort();
+  }
+  ast::Entity::Reader x;
+  StatementId stmt_id = std::get<StatementId>(vid);
+
+  // It's a token inside of the current fragment.
+  if (stmt_id.fragment_id == id) {
+    return Stmt(self, stmt_id.offset);
+
+  // It's a token inside of another fragment, go get the other fragment.
+  } else {
+    return Stmt(std::move(ep->fragment(stmt_id.fragment_id).impl),
+                stmt_id.offset);
   }
 }
 
@@ -204,10 +326,8 @@ EntityListReader InvalidFragmentImpl::Entities(void) const {
   return {};
 }
 
-Token InvalidFragmentImpl::TokenFor(
-    const FragmentImpl::Ptr &, EntityId id) const {
-  assert(static_cast<uint64_t>(id) == kInvalidEntityId);
-  return Token::invalid();
+TopLevelDeclListReader InvalidFragmentImpl::TopLevelDeclarations(void) const {
+  return {};
 }
 
 PackedFragmentImpl::~PackedFragmentImpl(void) noexcept {}
@@ -289,6 +409,11 @@ TokenSubstitutionsReader PackedFragmentImpl::Substitutions(void) const {
 // Return a reader for the entities in this fragment.
 EntityListReader PackedFragmentImpl::Entities(void) const {
   return reader.getEntities();
+}
+
+// Return a reader for the top-level declarations of this fragment.
+TopLevelDeclListReader PackedFragmentImpl::TopLevelDeclarations(void) const {
+  return reader.getTopLevelDeclarations();
 }
 
 EntityProvider::~EntityProvider(void) noexcept {}
@@ -470,12 +595,17 @@ Token Token::invalid(void) noexcept {
   return Token(kInvalidTokenReader, 0);
 }
 
+TokenRange::TokenRange(void)
+    : index(0),
+      num_tokens(0) {}
+
 // Return the token at index `index`.
-Token TokenList::operator[](size_t index) const noexcept {
-  if (index >= num_tokens) {
+Token TokenRange::operator[](size_t relative_index) const noexcept {
+  auto effective_index = (index + relative_index);
+  if (effective_index >= num_tokens) {
     return Token::invalid();
   } else {
-    return Token(impl, index);
+    return Token(impl, effective_index);
   }
 }
 
@@ -575,7 +705,24 @@ TokenSubstitutionList Fragment::unparsed_tokens(void) const noexcept {
 
 // Return the list of top-level declarations in this fragment.
 std::vector<Decl> Fragment::declarations(void) const noexcept {
-  return {};
+  std::vector<Decl> decls;
+  TopLevelDeclListReader decl_ids = impl->TopLevelDeclarations();
+  decls.reserve(decl_ids.size());
+  for (auto id_ : decl_ids) {
+    EntityId id(id_);
+    VariantId vid = id.Unpack();
+    if (std::holds_alternative<DeclarationId>(vid)) {
+      auto decl_id = std::get<DeclarationId>(vid);
+      if (decl_id.fragment_id == impl->id) {
+        decls.emplace_back(impl, decl_id.offset);
+      } else {
+        assert(false);
+      }
+    } else {
+      assert(false);
+    }
+  }
+  return decls;
 }
 
 std::variant<Token, TokenSubstitution>

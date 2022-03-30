@@ -28,9 +28,17 @@
 #include <unordered_set>
 #include <vector>
 
+#define IGNORE(name)
 #define DECL_NAME(name) #name "Decl",
 #define TYPE_NAME(name) #name "Type",
 #define STR_NAME(name) #name,
+
+// These are types with no corresponding enumeration for the respective `kind`
+// methods.
+static const std::unordered_set<std::string> gAbstractTypes{
+  PASTA_FOR_EACH_DECL_IMPL(IGNORE, STR_NAME)
+  PASTA_FOR_EACH_STMT_IMPL(IGNORE, IGNORE, IGNORE, IGNORE, IGNORE, STR_NAME)
+};
 
 static const std::unordered_set<std::string> gUnserializableTypes{
   // These aren't "real entities," as they don't result in tangible code being
@@ -133,16 +141,16 @@ static const std::unordered_set<std::string> gConcreteClassNames{
   "TokenRange",
   "FileToken",
   NON_REF_TYPES,
-  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, PASTA_IGNORE_ABSTRACT)
-  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, PASTA_IGNORE_ABSTRACT)
-//  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, PASTA_IGNORE_ABSTRACT)
+  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
+  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
+//  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, IGNORE)
 };
 
 static const std::unordered_set<std::string> gEntityClassNames{
   "Token",
   "FileToken",
-  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, PASTA_IGNORE_ABSTRACT)
-  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, PASTA_IGNORE_ABSTRACT)
+  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
+  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
 };
 
 // These methods can trigger asserts deep in their internals that are hard
@@ -470,6 +478,7 @@ class CodeGenerator {
   std::ofstream schema_os;  // `lib/AST.capnp`
   std::ofstream lib_cpp_os;  // `lib/AST.cpp`
   std::ofstream include_h_os;  // `include/multiplier/AST.h`
+  std::stringstream late_include_h_os;
   std::ofstream serialize_h_os;  // `bin/Index/Serialize.h`
   std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
 
@@ -693,13 +702,28 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     // Inheritance.
     include_h_os
-        << " : public " << base_name << " {\n";
+        << " : public " << base_name << " {\n"
+        << " private:\n"
+        << "  friend class FragmentImpl;\n";
+
+    // Derived classes are friends with all of their parents.
+    for (auto parent = cls->base; parent; parent = parent->base) {
+      include_h_os
+          << "  friend class " << parent->record.Name() << ";\n";
+    }
 
     // Parent class serialization.
     if (!dont_serialize) {
       serialize_cpp_os
           << "  Serialize" << base_name << "(es, b, e);\n";
     }
+
+    include_h_os
+        << " public:\n";
+
+    late_include_h_os
+        << "static_assert(sizeof(" << class_name
+        << ") == sizeof(" << base_name << "));\n\n";
 
   // Things like `TemplateParameterList`, that aren't themselves entities, but
   // are derived from entities in fragments, and link to entities in fragments,
@@ -709,8 +733,14 @@ MethodListPtr CodeGenerator::RunOnClass(
     include_h_os
         << " {\n"
         << " protected:\n"
+        << "  friend class FragmentImpl;\n\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
-        << "  unsigned offset;\n\n";
+        << "  unsigned offset;\n\n"
+        << " public:\n"
+        << "  inline " << class_name
+        << "(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)\n"
+        << "      : fragment(std::move(fragment_)),\n"
+        << "        offset(offset_) {}\n\n";
 
   } else if (gEntityClassNames.count(class_name)) {
     abort();
@@ -724,8 +754,104 @@ MethodListPtr CodeGenerator::RunOnClass(
 //        << "  std::shared_ptr<ast::" << class_name << "> data;\n\n";
   }
 
-  include_h_os
-      << " public:\n";
+  // Derived classes have optional conversion operators with all of their
+  // parents.
+  for (auto parent = cls->base; parent; parent = parent->base) {
+    auto grand_parent_class_name = parent->record.Name();
+    include_h_os
+        << "  static std::optional<" << class_name << "> from(const "
+        << grand_parent_class_name << " &parent);\n";
+
+    lib_cpp_os
+        << "std::optional<" << class_name << "> " << class_name
+        << "::from(const " << grand_parent_class_name << " &parent) {\n";
+
+    if (grand_parent_class_name != "Decl" &&
+        grand_parent_class_name != "Stmt") {
+      if (gDeclNames.count(grand_parent_class_name)) {
+        lib_cpp_os
+            << "  return from(reinterpret_cast<const Decl &>(parent));\n"
+            << "}\n\n";
+
+      } else if (gStmtNames.count(grand_parent_class_name)) {
+        lib_cpp_os
+            << "  return from(reinterpret_cast<const Stmt &>(parent));\n"
+            << "}\n\n";
+
+      } else {
+        abort();
+      }
+      continue;
+    }
+
+    lib_cpp_os
+        << "  switch (parent.kind()) {\n";
+
+    std::vector<ClassHierarchy *> children_work_list;
+    children_work_list.push_back(cls);
+    while (!children_work_list.empty()) {
+      auto grand_child_cls = children_work_list.back();
+      children_work_list.pop_back();
+      children_work_list.insert(children_work_list.end(),
+                                grand_child_cls->derived.begin(),
+                                grand_child_cls->derived.end());
+
+      std::string grand_child_class_name = grand_child_cls->record.Name();
+      if (gAbstractTypes.count(grand_child_class_name)) {
+        continue;
+      }
+
+      if (grand_parent_class_name == "Decl") {
+        grand_child_class_name.pop_back();
+        grand_child_class_name.pop_back();
+        grand_child_class_name.pop_back();
+        grand_child_class_name.pop_back();
+        lib_cpp_os
+            << "    case mx::DeclKind::";
+
+      } else if (grand_parent_class_name == "Stmt"){
+        lib_cpp_os
+            << "    case mx::StmtKind::";
+
+      } else {
+        abort();
+      }
+
+      std::string snake_name = CapitalCaseToSnakeCase(grand_child_class_name);
+      std::string enum_name = SnakeCaseToEnumCase(snake_name);
+      lib_cpp_os << enum_name << ":\n";
+    }
+
+    lib_cpp_os
+        << "      return reinterpret_cast<const " << class_name
+        << " &>(parent);\n"
+        << "    default: return std::nullopt;\n"
+        << "  }\n"
+        << "}\n\n";
+  }
+
+//  // Create implicit conversion operators for all derived clsses.
+//  std::vector<ClassHierarchy *> children_work_list = cls->derived;
+//  while (!children_work_list.empty()) {
+//    auto grand_child_cls = children_work_list.back();
+//    children_work_list.pop_back();
+//    children_work_list.insert(children_work_list.end(),
+//                              grand_child_cls->derived.begin(),
+//                              grand_child_cls->derived.end());
+//
+//    std::string grand_child_class_name = grand_child_cls->record.Name();
+//
+//    include_h_os
+//        << "  friend class " << grand_child_class_name << ";\n"
+//        << "  inline " << class_name << "(const "
+//        << grand_child_class_name << " &child);";
+//
+//    late_include_h_os
+//        << "inline " << class_name << "::" << class_name << "(const "
+//        << grand_child_class_name << " &child)\n"
+//        << "    : fragment(child.fragment),\n"
+//        << "      offset(child.offset) {}\n\n";
+//  }
 
   for (pasta::CXXMethodDecl method : cls->record.Methods()) {
     if (method.NumParameters()) {
@@ -770,14 +896,15 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         include_h_os
             << "  Token " << api_name << "(void) const noexcept;\n";
-//        lib_cpp_os
-//            << "Token " << class_name << "::" << api_name
-//            << "(void) const noexcept {\n"
-//            << "  auto entities = fragment->Entities();\n"
-//            << "  auto self = entities.get" << class_name << "()[id.offset];\n"
-//            << "  return fragment->TokenFor(fragment, self." << getter_name
-//            << "());\n"
-//            << "}\n\n";
+
+        lib_cpp_os
+            << "Token " << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  return fragment->TokenFor(fragment, self." << getter_name
+            << "());\n"
+            << "}\n\n";
 
         serialize_cpp_os
             << "  b." << setter_name << "(es.EntityId(e."
@@ -792,6 +919,15 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         include_h_os
             << "  TokenRange " << api_name << "(void) const noexcept;\n";
+
+        lib_cpp_os
+            << "TokenRange " << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  return fragment->TokenRangeFor(fragment, self."
+            << begin_getter_name << "(), self." << end_getter_name << "());\n"
+            << "}\n\n";
 
         serialize_cpp_os
             << "  if (auto r" << i << " = e." << method_name << "(); auto rs"
@@ -811,6 +947,16 @@ MethodListPtr CodeGenerator::RunOnClass(
         include_h_os
             << "  std::string_view " << api_name << "(void) const noexcept;\n";
 
+        lib_cpp_os
+            << "std::string_view " << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  capnp::Text::Reader data = self." << getter_name
+            << "();\n"
+            << "  return std::string_view(data.cStr(), data.size());\n"
+            << "}\n\n";
+
         serialize_cpp_os
             << "  b." << setter_name << "(e." << method_name << "());\n";
 
@@ -825,6 +971,16 @@ MethodListPtr CodeGenerator::RunOnClass(
         include_h_os
             << "  std::string_view " << api_name << "(void) const noexcept;\n";
 
+        lib_cpp_os
+            << "std::string_view " << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  capnp::Text::Reader data = self." << getter_name
+            << "();\n"
+            << "  return std::string_view(data.cStr(), data.size());\n"
+            << "}\n\n";
+
         serialize_cpp_os
             << "  auto v" << i << " = e." << method_name << "();\n"
             << "  std::string s" << i << "(v" << i << ".data(), v"
@@ -832,21 +988,23 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // In pasta.
       } else if (record_name == "ArgumentVector") {
-        const auto i = storage.AddMethod("List(Text)");
-        auto [getter_name, setter_name, init_name] = NamesFor(i);
-
-        include_h_os
-            << "  std::vector<std::string_view> "
-            << api_name << "(void) const noexcept;\n";
-
-        serialize_cpp_os
-            << "  const auto &v" << i << " = e." << method_name << "();\n"
-            << "  auto b" << i << " = b." << init_name
-            << "(static_cast<unsigned>(v" << i << ".Size()));\n"
-            << "  auto i" << i << " = 0u;\n"
-            << "  for (const auto &arg : v" << i << ") {\n"
-            << "    b" << i << ".set(i" << i << "++, arg);\n"
-            << "  }\n";
+        std::cerr << "!!! ArgumentVector\n";
+        abort();
+//        const auto i = storage.AddMethod("List(Text)");
+//        auto [getter_name, setter_name, init_name] = NamesFor(i);
+//
+//        include_h_os
+//            << "  std::vector<std::string_view> "
+//            << api_name << "(void) const noexcept;\n";
+//
+//        serialize_cpp_os
+//            << "  const auto &v" << i << " = e." << method_name << "();\n"
+//            << "  auto b" << i << " = b." << init_name
+//            << "(static_cast<unsigned>(v" << i << ".Size()));\n"
+//            << "  auto i" << i << " = 0u;\n"
+//            << "  for (const auto &arg : v" << i << ") {\n"
+//            << "    b" << i << ".set(i" << i << "++, arg);\n"
+//            << "  }\n";
 
       // Probably `std::filesystem::path`.
       } else if (record_name == "path") {
@@ -854,6 +1012,16 @@ MethodListPtr CodeGenerator::RunOnClass(
         auto [getter_name, setter_name, init_name] = NamesFor(i);
         include_h_os
             << "  std::filesystem::path " << api_name << "(void) const noexcept;\n";
+
+        lib_cpp_os
+            << "std::filesystem::path " << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  capnp::Text::Reader data = self." << getter_name
+            << "();\n"
+            << "  return data.cStr();\n"
+            << "}\n\n";
 
         serialize_cpp_os
             << "  b." << setter_name << "(e." << method_name
@@ -887,6 +1055,9 @@ MethodListPtr CodeGenerator::RunOnClass(
             capn_element_name = "UInt64";  // Reference.
             cxx_element_name = element_name.value();
           }
+        } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
+          capn_element_name = "UInt32";  // Offset.
+          cxx_element_name = element_name.value();
         }
 
         if (capn_element_name.empty()) {
@@ -904,20 +1075,36 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  std::optional<" << cxx_element_name << "> "
             << api_name << "(void) const noexcept;\n";
 
+        lib_cpp_os
+            << "std::optional<" << cxx_element_name << "> "
+            << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  if (!self." << ip_getter_name << "()) {\n"
+            << "    return std::nullopt;\n"
+            << "  } else {\n";
+
         serialize_cpp_os
             << "  auto v" << i << " = e." << method_name << "();\n";
 
         // Strings.
         if (element_name.value() == "string" ||
             element_name.value() == "basic_string") {
+
           serialize_cpp_os
               << "  if (v" << i << ") {\n"
               << "    b." << setter_name << "(v.value());\n"
               << "    b." << ip_setter_name << "(true);\n"
               << "  } else {\n"
-              << "    b." << setter_name << "(\"\");\n"
               << "    b." << ip_setter_name << "(false);\n"
               << "  }\n";
+
+          lib_cpp_os
+              << "    capnp::Text::Reader data = self." << getter_name
+              << "();\n"
+              << "    return " << cxx_element_name
+              << "(data.cStr(), data.size());\n";
 
         // String views need to be converted to `std::string` because Cap'n
         // Proto requires `:Text` fields to be `NUL`-terminated.
@@ -934,9 +1121,14 @@ MethodListPtr CodeGenerator::RunOnClass(
               << "    }\n"
               << "    b." << ip_setter_name << "(true);\n"
               << "  } else {\n"
-              << "    b." << setter_name << "(\"\");\n"
               << "    b." << ip_setter_name << "(false);\n"
               << "  }\n";
+
+          lib_cpp_os
+              << "    capnp::Text::Reader data = self." << getter_name
+              << "();\n"
+              << "    return " << cxx_element_name
+              << "(data.cStr(), data.size());\n";
 
         // Filesystem paths.
         } else if (*element_name == "path") {
@@ -946,9 +1138,13 @@ MethodListPtr CodeGenerator::RunOnClass(
               << "(v.value().lexically_normal().generic_string());\n"
               << "    b." << ip_setter_name << "(true);\n"
               << "  } else {\n"
-              << "    b." << setter_name << "(\"\");\n"
               << "    b." << ip_setter_name << "(false);\n"
               << "  }\n";
+
+          lib_cpp_os
+              << "    capnp::Text::Reader data = self." << getter_name
+              << "();\n"
+              << "    return data.cStr();\n";
 
         // Reference types.
         } else if (gEntityClassNames.count(*element_name)) {
@@ -958,17 +1154,70 @@ MethodListPtr CodeGenerator::RunOnClass(
               << "      b." << setter_name << "(id" << i << ");\n"
               << "      b." << ip_setter_name << "(true);\n"
               << "    } else {\n"
-              << "      b." << setter_name << "(0);\n"
               << "      b." << ip_setter_name << "(false);\n"
               << "    }\n"
               << "  } else {\n"
-              << "    b." << setter_name << "(0);\n"
               << "    b." << ip_setter_name << "(false);\n"
               << "  }\n";
+
+          lib_cpp_os
+              << "    EntityId id(self." << getter_name
+              << "());\n";
+
+          // Tokens are more like pseudo-entities but whatever.
+          if (*element_name == "Token") {
+            lib_cpp_os
+                << "    return fragment->TokenFor(fragment, id);\n";
+
+          } else if (*element_name == "Decl") {
+            lib_cpp_os
+                << "    return fragment->DeclFor(fragment, id);\n";
+
+          } else if (*element_name == "Stmt") {
+            lib_cpp_os
+                << "    return fragment->StmtFor(fragment, id);\n";
+
+          } else if (gDeclNames.count(*element_name)) {
+            lib_cpp_os
+                << "    return " << (*element_name)
+                << "::from(fragment->DeclFor(fragment, id));\n";
+
+          } else if (gStmtNames.count(*element_name)) {
+            lib_cpp_os
+                << "    return " << (*element_name)
+                << "::from(fragment->StmtFor(fragment, id));\n";
+
+          } else {
+            std::cerr << "??? " << (*element_name) << '\n';
+            abort();
+          }
+
+        // Pseudo-entities.
+        } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
+
+          serialize_cpp_os
+              << "  if (v" << i << ") {\n"
+              << "    auto o" << i << " = es.next_pseudo_entity_offset++;\n"
+              << "    Serialize" << (*element_name)
+              << "(es, es.entity_builder[o" << i << "], v" << i
+              << ".value());\n"
+              << "    b." << setter_name << "(o" << i << ");\n"
+              << "    b." << ip_setter_name << "(true);\n"
+              << "  } else {\n"
+              << "    b." << ip_setter_name << "(false);\n"
+              << "  }\n";
+
+          lib_cpp_os
+              << "    return " << (*element_name) << "(fragment, self."
+              << getter_name << "());\n";
 
         } else {
           abort();
         }
+
+        lib_cpp_os
+            << "  }\n"
+            << "}\n\n";
 
       // List of things; figure out what.
       } else if (record_name == "vector") {
@@ -1014,6 +1263,17 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  std::vector<" << cxx_element_name << "> "
             << api_name << "(void) const noexcept;\n";
 
+        lib_cpp_os
+            << "std::vector<" << cxx_element_name << "> "
+            << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto list = self." << getter_name << "();\n"
+            << "  std::vector<" << cxx_element_name << "> vec;\n"
+            << "  vec.reserve(list.size());\n"
+            << "  for (auto v : list) {\n";
+
         serialize_cpp_os
             << "  auto v" << i << " = e." << method_name << "();\n"
             << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
@@ -1025,6 +1285,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           serialize_cpp_os
               << "    sv" << i << ".set(i" << i << ", e" << i << ");\n";
 
+          lib_cpp_os
+              << "vec.emplace_back(v.cStr(), v.size());\n";
+
         // String views need to be converted to `std::string` because Cap'n
         // Proto requires `:Text` fields to be `NUL`-terminated.
         } else if (*element_name == "string_view" ||
@@ -1034,17 +1297,58 @@ MethodListPtr CodeGenerator::RunOnClass(
               << i << ".size());\n"
               << "    sv" << i << ".set(i" << i << ", se" << i << ");\n";
 
+          lib_cpp_os
+              << "vec.emplace_back(v.cStr(), v.size());\n";
+
         // Filesystem paths.
         } else if (*element_name == "path") {
           serialize_cpp_os
               << "    sv" << i << ".set(i" << i << ", e" << i
               << ".lexically_normal().generic_string());\n";
 
+          lib_cpp_os
+              << "    vec.emplace_back(v.cStr());\n";
+
         // Reference types.
         } else if (gEntityClassNames.count(*element_name)) {
           serialize_cpp_os
               << "    sv" << i << ".set(i" << i << ", es.EntityId(e" << i
               << "));\n";
+
+          lib_cpp_os
+              << "    EntityId id(v);\n";
+
+          // Tokens are more like pseudo-entities but whatever.
+          if (*element_name == "Token") {
+            lib_cpp_os
+                << "    vec.emplace_back(fragment->TokenFor(fragment, id));\n";
+
+          } else if (*element_name == "Decl") {
+            lib_cpp_os
+                << "    vec.emplace_back(fragment->DeclFor(fragment, id));\n";
+
+          } else if (*element_name == "Stmt") {
+            lib_cpp_os
+                << "    vec.emplace_back(fragment->StmtFor(fragment, id));\n";
+
+          } else if (gDeclNames.count(*element_name)) {
+            lib_cpp_os
+                << "    if (auto e = " << (*element_name)
+                << "::from(fragment->DeclFor(fragment, id))) {\n"
+                << "      vec.emplace_back(std::move(*e));\n"
+                << "    }\n";
+
+          } else if (gStmtNames.count(*element_name)) {
+            lib_cpp_os
+                << "    if (auto e = " << (*element_name)
+                << "::from(fragment->StmtFor(fragment, id))) {\n"
+                << "      vec.emplace_back(std::move(*e));\n"
+                << "    }\n";
+
+          } else {
+            std::cerr << "??? vec " << (*element_name) << '\n';
+            abort();
+          }
 
         // Not reference types, need to serialize offsets.
         } else {
@@ -1053,7 +1357,15 @@ MethodListPtr CodeGenerator::RunOnClass(
               << "    sv" << i << ".set(i" << i << ", o" << i << ");\n"
               << "    Serialize" << (*element_name)
               << "(es, es.entity_builder[o" << i << "], e" << i << ");\n";
+
+          lib_cpp_os
+              << "vec.emplace_back(fragment, v);\n";
         }
+
+        lib_cpp_os
+            << "  }\n"
+            << "  return vec;\n"
+            << "}\n\n";
 
         serialize_cpp_os
             << "    ++i" << i << ";\n"
@@ -1085,6 +1397,15 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  " << record_name << " " << api_name
             << "(void) const noexcept;\n";
 
+        lib_cpp_os
+            << record_name << " " << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  return " << record_name << "(fragment, self." << getter_name
+            << "());\n"
+            << "}\n\n";
+
         serialize_cpp_os
             << "  auto o" << i << " = es.next_pseudo_entity_offset++;\n"
             << "  sv" << i << ".set(i" << i << ", o" << i << ");\n"
@@ -1115,6 +1436,16 @@ MethodListPtr CodeGenerator::RunOnClass(
         include_h_os
             << "  " << enum_name << " " << api_name
             << "(void) const noexcept;\n";
+
+        lib_cpp_os
+            << enum_name << " " << class_name << "::" << api_name
+            << "(void) const noexcept {\n"
+            << "  EntityListReader entities = fragment->Entities();\n"
+            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  return static_cast<" << enum_name << ">(self." << getter_name
+            << "());\n"
+            << "}\n\n";
+
         serialize_cpp_os
             << "  b." << setter_name
             << "(static_cast<unsigned short>(mx::FromPasta(e."
@@ -1129,6 +1460,15 @@ MethodListPtr CodeGenerator::RunOnClass(
       include_h_os
           << "  " << CxxIntType(return_type) << " " << api_name
           << "(void) const noexcept;\n";
+
+      lib_cpp_os
+          << CxxIntType(return_type) << " " << class_name << "::" << api_name
+          << "(void) const noexcept {\n"
+          << "  EntityListReader entities = fragment->Entities();\n"
+          << "  mx::ast::Entity::Reader self = entities[offset];\n"
+          << "  return self." << getter_name
+          << "();\n"
+          << "}\n\n";
 
       serialize_cpp_os
           << "  b." << setter_name << "(e." << method_name << "());\n";
@@ -1228,7 +1568,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Serializer.h\"\n\n"
       << "namespace indexer {\n\n"
       << "void EntitySerializer::SerializeCodeEntities(\n"
-      << "    CodeChunk code, FragmentBuilder &builder) {\n"
+      << "    PendingFragment code, FragmentBuilder &builder) {\n"
       << "  serialized_entities.clear();\n"
       << "  code_id = code.fragment_id;\n"
       << "  next_pseudo_entity_offset = code.num_entities;\n"
@@ -1352,6 +1692,12 @@ int CodeGenerator::RunOnClassHierarchies(void) {
     }
   }
 
+  include_h_os
+      << "#ifndef MX_DISABLE_API\n";
+
+  lib_cpp_os
+      << "#ifndef MX_DISABLE_API\n";
+
   while (!work_list.empty()) {
     auto [cls, parent_methods] = work_list.back();
     work_list.pop_back();
@@ -1389,6 +1735,14 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 //    }
 //  }
 //  schema_os << "}\n";
+
+  include_h_os << late_include_h_os.str();
+
+  include_h_os
+      << "#endif  // MX_DISABLE_API\n";
+
+  lib_cpp_os
+      << "#endif  // MX_DISABLE_API\n";
 
   lib_cpp_os << "}  // namespace mx\n";
   include_h_os << "}  // namespace mx\n";

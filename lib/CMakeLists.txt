@@ -184,6 +184,10 @@ add_library("mx-util"
     ${MX_AST_SOURCES}
 )
 
+target_compile_definitions("mx-util"
+  PRIVATE
+    "MX_DISABLE_API")
+
 add_dependencies("mx-util"
   "copy_headers"
 )

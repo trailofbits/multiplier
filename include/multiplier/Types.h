@@ -85,7 +85,7 @@ struct FragmentTokenId {
   bool operator!=(const FragmentTokenId &) const noexcept = default;
 };
 
-// The offset of a substitution inside of a
+// The offset of a substitution inside of a fragment.
 struct TokenSubstitutionId {
  public:
   FragmentId fragment_id;

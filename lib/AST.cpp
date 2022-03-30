@@ -4348,4 +4348,13228 @@ TargetLanguage FromPasta(pasta::TargetLanguage e) {
   }
 }
 
+#ifndef MX_DISABLE_API
+unsigned TemplateParameterList::num_parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal0();
+}
+
+unsigned TemplateParameterList::num_required_parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal1();
+}
+
+unsigned TemplateParameterList::depth(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal2();
+}
+
+bool TemplateParameterList::has_unexpanded_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+bool TemplateParameterList::has_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+Token TemplateParameterList::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal5());
+}
+
+Token TemplateParameterList::left_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal6());
+}
+
+Token TemplateParameterList::right_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal7());
+}
+
+TokenRange TemplateParameterList::token_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal8(), self.getVal9());
+}
+
+std::vector<NamedDecl> TemplateParameterList::parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<NamedDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = NamedDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+TemplateArgumentKind TemplateArgument::kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateArgumentKind>(self.getVal11());
+}
+
+bool TemplateArgument::is_null(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+bool TemplateArgument::is_dependent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+bool TemplateArgument::is_instantiation_dependent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+bool TemplateArgument::contains_unexpanded_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal13();
+}
+
+bool TemplateArgument::is_pack_expansion(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal14();
+}
+
+std::optional<ValueDecl> TemplateArgument::as_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal15()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal5());
+    return ValueDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+TokenRange CXXBaseSpecifier::token_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal5(), self.getVal6());
+}
+
+Token CXXBaseSpecifier::base_type_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal7());
+}
+
+bool CXXBaseSpecifier::is_virtual(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+TagTypeKind CXXBaseSpecifier::base_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TagTypeKind>(self.getVal11());
+}
+
+bool CXXBaseSpecifier::is_pack_expansion(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+bool CXXBaseSpecifier::constructors_are_inherited(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<Token> CXXBaseSpecifier::ellipsis(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal13()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal8());
+    return fragment->TokenFor(fragment, id);
+  }
+}
+
+AccessSpecifier CXXBaseSpecifier::semantic_access_specifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<AccessSpecifier>(self.getVal16());
+}
+
+AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<AccessSpecifier>(self.getVal17());
+}
+
+Token Stmt::begin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal5());
+}
+
+Token Stmt::end_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal6());
+}
+
+TokenRange Stmt::token_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal7(), self.getVal8());
+}
+
+StmtKind Stmt::kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<StmtKind>(self.getVal11());
+}
+
+std::optional<SEHTryStmt> SEHTryStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SEH_TRY_STMT:
+      return reinterpret_cast<const SEHTryStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool SEHTryStmt::is_cxx_try(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+Token SEHTryStmt::try_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SEH_LEAVE_STMT:
+      return reinterpret_cast<const SEHLeaveStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token SEHLeaveStmt::leave_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SEH_FINALLY_STMT:
+      return reinterpret_cast<const SEHFinallyStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token SEHFinallyStmt::finally_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::optional<SEHExceptStmt> SEHExceptStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SEH_EXCEPT_STMT:
+      return reinterpret_cast<const SEHExceptStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token SEHExceptStmt::except_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::RETURN_STMT:
+      return reinterpret_cast<const ReturnStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal3()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal9());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+Token ReturnStmt::return_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_FOR_COLLECTION_STMT:
+      return reinterpret_cast<const ObjCForCollectionStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCForCollectionStmt::for_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+Token ObjCForCollectionStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_AUTORELEASE_POOL_STMT:
+      return reinterpret_cast<const ObjCAutoreleasePoolStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCAutoreleasePoolStmt::at_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_AT_TRY_STMT:
+      return reinterpret_cast<const ObjCAtTryStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCAtTryStmt::at_try_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::vector<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<ObjCAtCatchStmt> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCAtCatchStmt::from(fragment->StmtFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_AT_THROW_STMT:
+      return reinterpret_cast<const ObjCAtThrowStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCAtThrowStmt::throw_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT:
+      return reinterpret_cast<const ObjCAtSynchronizedStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCAtSynchronizedStmt::at_synchronized_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_AT_FINALLY_STMT:
+      return reinterpret_cast<const ObjCAtFinallyStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCAtFinallyStmt::at_finally_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_AT_CATCH_STMT:
+      return reinterpret_cast<const ObjCAtCatchStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCAtCatchStmt::at_catch_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+Token ObjCAtCatchStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+bool ObjCAtCatchStmt::has_ellipsis(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_DISPATCH_DIRECTIVE:
+    case mx::StmtKind::OMP_DEPOBJ_DIRECTIVE:
+    case mx::StmtKind::OMP_CRITICAL_DIRECTIVE:
+    case mx::StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE:
+    case mx::StmtKind::OMP_CANCEL_DIRECTIVE:
+    case mx::StmtKind::OMP_BARRIER_DIRECTIVE:
+    case mx::StmtKind::OMP_ATOMIC_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DIRECTIVE:
+    case mx::StmtKind::OMP_TASKYIELD_DIRECTIVE:
+    case mx::StmtKind::OMP_TASKWAIT_DIRECTIVE:
+    case mx::StmtKind::OMP_TASKGROUP_DIRECTIVE:
+    case mx::StmtKind::OMP_TASK_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_UPDATE_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_PARALLEL_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_ENTER_DATA_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_DATA_DIRECTIVE:
+    case mx::StmtKind::OMP_SINGLE_DIRECTIVE:
+    case mx::StmtKind::OMP_SECTIONS_DIRECTIVE:
+    case mx::StmtKind::OMP_SECTION_DIRECTIVE:
+    case mx::StmtKind::OMP_SCAN_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_MASTER_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_DIRECTIVE:
+    case mx::StmtKind::OMP_ORDERED_DIRECTIVE:
+    case mx::StmtKind::OMP_MASTER_DIRECTIVE:
+    case mx::StmtKind::OMP_MASKED_DIRECTIVE:
+    case mx::StmtKind::OMP_UNROLL_DIRECTIVE:
+    case mx::StmtKind::OMP_TILE_DIRECTIVE:
+    case mx::StmtKind::OMP_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TASK_LOOP_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE:
+    case mx::StmtKind::OMP_INTEROP_DIRECTIVE:
+    case mx::StmtKind::OMP_FLUSH_DIRECTIVE:
+      return reinterpret_cast<const OMPExecutableDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPExecutableDirective::has_associated_statement(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+bool OMPExecutableDirective::is_standalone_directive(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_DISPATCH_DIRECTIVE:
+      return reinterpret_cast<const OMPDispatchDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token OMPDispatchDirective::target_call_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::optional<OMPDepobjDirective> OMPDepobjDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDepobjDirective> OMPDepobjDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_DEPOBJ_DIRECTIVE:
+      return reinterpret_cast<const OMPDepobjDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPCriticalDirective> OMPCriticalDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPCriticalDirective> OMPCriticalDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_CRITICAL_DIRECTIVE:
+      return reinterpret_cast<const OMPCriticalDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE:
+      return reinterpret_cast<const OMPCancellationPointDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPCancelDirective> OMPCancelDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPCancelDirective> OMPCancelDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_CANCEL_DIRECTIVE:
+      return reinterpret_cast<const OMPCancelDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPBarrierDirective> OMPBarrierDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPBarrierDirective> OMPBarrierDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_BARRIER_DIRECTIVE:
+      return reinterpret_cast<const OMPBarrierDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_ATOMIC_DIRECTIVE:
+      return reinterpret_cast<const OMPAtomicDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPAtomicDirective::is_postfix_update(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+bool OMPAtomicDirective::is_xlhs_in_rhs_part(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal13();
+}
+
+std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TEAMS_DIRECTIVE:
+      return reinterpret_cast<const OMPTeamsDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TASKYIELD_DIRECTIVE:
+      return reinterpret_cast<const OMPTaskyieldDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TASKWAIT_DIRECTIVE:
+      return reinterpret_cast<const OMPTaskwaitDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TASKGROUP_DIRECTIVE:
+      return reinterpret_cast<const OMPTaskgroupDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTaskDirective> OMPTaskDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskDirective> OMPTaskDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TASK_DIRECTIVE:
+      return reinterpret_cast<const OMPTaskDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPTaskDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPTargetUpdateDirective> OMPTargetUpdateDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetUpdateDirective> OMPTargetUpdateDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_UPDATE_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetUpdateDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetTeamsDirective> OMPTargetTeamsDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDirective> OMPTargetTeamsDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_TEAMS_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetTeamsDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_PARALLEL_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetParallelDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPTargetParallelDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetExitDataDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_ENTER_DATA_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetEnterDataDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetDirective> OMPTargetDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetDirective> OMPTargetDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetDataDirective> OMPTargetDataDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetDataDirective> OMPTargetDataDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_DATA_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetDataDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPSingleDirective> OMPSingleDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPSingleDirective> OMPSingleDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_SINGLE_DIRECTIVE:
+      return reinterpret_cast<const OMPSingleDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_SECTIONS_DIRECTIVE:
+      return reinterpret_cast<const OMPSectionsDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPSectionsDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPSectionDirective> OMPSectionDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPSectionDirective> OMPSectionDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_SECTION_DIRECTIVE:
+      return reinterpret_cast<const OMPSectionDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPSectionDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPScanDirective> OMPScanDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPScanDirective> OMPScanDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_SCAN_DIRECTIVE:
+      return reinterpret_cast<const OMPScanDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE:
+      return reinterpret_cast<const OMPParallelSectionsDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPParallelSectionsDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_PARALLEL_MASTER_DIRECTIVE:
+      return reinterpret_cast<const OMPParallelMasterDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPParallelDirective> OMPParallelDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelDirective> OMPParallelDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_PARALLEL_DIRECTIVE:
+      return reinterpret_cast<const OMPParallelDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPParallelDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPOrderedDirective> OMPOrderedDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPOrderedDirective> OMPOrderedDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_ORDERED_DIRECTIVE:
+      return reinterpret_cast<const OMPOrderedDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPMasterDirective> OMPMasterDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMasterDirective> OMPMasterDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_MASTER_DIRECTIVE:
+      return reinterpret_cast<const OMPMasterDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPMaskedDirective> OMPMaskedDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMaskedDirective> OMPMaskedDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_MASKED_DIRECTIVE:
+      return reinterpret_cast<const OMPMaskedDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_UNROLL_DIRECTIVE:
+    case mx::StmtKind::OMP_TILE_DIRECTIVE:
+    case mx::StmtKind::OMP_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TASK_LOOP_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE:
+      return reinterpret_cast<const OMPLoopBasedDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_UNROLL_DIRECTIVE:
+      return reinterpret_cast<const OMPUnrollDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTileDirective> OMPTileDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTileDirective> OMPTileDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTileDirective> OMPTileDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TILE_DIRECTIVE:
+      return reinterpret_cast<const OMPTileDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPLoopDirective> OMPLoopDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPLoopDirective> OMPLoopDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPLoopDirective> OMPLoopDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TASK_LOOP_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_PARALLEL_FOR_DIRECTIVE:
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE:
+      return reinterpret_cast<const OMPLoopDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_FOR_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPForSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPForDirective> OMPForDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPForDirective> OMPForDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPForDirective> OMPForDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPForDirective> OMPForDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_FOR_DIRECTIVE:
+      return reinterpret_cast<const OMPForDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPForDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPDistributeSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPDistributeParallelForSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+      return reinterpret_cast<const OMPDistributeParallelForDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPDistributeParallelForDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_DISTRIBUTE_DIRECTIVE:
+      return reinterpret_cast<const OMPDistributeDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPTeamsDistributeSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPTeamsDistributeParallelForSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+      return reinterpret_cast<const OMPTeamsDistributeParallelForDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPTeamsDistributeParallelForDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE:
+      return reinterpret_cast<const OMPTeamsDistributeDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPTaskLoopSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TASK_LOOP_DIRECTIVE:
+      return reinterpret_cast<const OMPTaskLoopDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPTaskLoopDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetTeamsDistributeSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetTeamsDistributeParallelForSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetTeamsDistributeParallelForDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPTargetTeamsDistributeParallelForDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetTeamsDistributeDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetParallelForSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE:
+      return reinterpret_cast<const OMPTargetParallelForDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPTargetParallelForDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPSimdDirective> OMPSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPSimdDirective> OMPSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPSimdDirective> OMPSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPSimdDirective> OMPSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPParallelMasterTaskLoopSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE:
+      return reinterpret_cast<const OMPParallelMasterTaskLoopDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPParallelMasterTaskLoopDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPParallelForSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_PARALLEL_FOR_DIRECTIVE:
+      return reinterpret_cast<const OMPParallelForDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPParallelForDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE:
+      return reinterpret_cast<const OMPMasterTaskLoopSimdDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const OMPLoopDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const OMPLoopBasedDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE:
+      return reinterpret_cast<const OMPMasterTaskLoopDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool OMPMasterTaskLoopDirective::has_cancel(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<OMPInteropDirective> OMPInteropDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPInteropDirective> OMPInteropDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_INTEROP_DIRECTIVE:
+      return reinterpret_cast<const OMPInteropDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPFlushDirective> OMPFlushDirective::from(const OMPExecutableDirective &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPFlushDirective> OMPFlushDirective::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_FLUSH_DIRECTIVE:
+      return reinterpret_cast<const OMPFlushDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_CANONICAL_LOOP:
+      return reinterpret_cast<const OMPCanonicalLoop &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<NullStmt> NullStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::NULL_STMT:
+      return reinterpret_cast<const NullStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token NullStmt::semi_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+bool NullStmt::has_leading_empty_macro(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MS_DEPENDENT_EXISTS_STMT:
+      return reinterpret_cast<const MSDependentExistsStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token MSDependentExistsStmt::keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+bool MSDependentExistsStmt::is_if_exists(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+bool MSDependentExistsStmt::is_if_not_exists(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::INDIRECT_GOTO_STMT:
+      return reinterpret_cast<const IndirectGotoStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token IndirectGotoStmt::goto_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+Token IndirectGotoStmt::star_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+std::optional<IfStmt> IfStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::IF_STMT:
+      return reinterpret_cast<const IfStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VarDecl> IfStmt::condition_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal3()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal9());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal4()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal18());
+    return DeclStmt::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+Token IfStmt::else_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token IfStmt::if_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token IfStmt::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token IfStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool IfStmt::has_else_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+bool IfStmt::has_initializer_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal13();
+}
+
+bool IfStmt::has_variable_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal14();
+}
+
+bool IfStmt::is_constexpr(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal15();
+}
+
+bool IfStmt::is_obj_c_availability_check(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal23();
+}
+
+std::optional<GotoStmt> GotoStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::GOTO_STMT:
+      return reinterpret_cast<const GotoStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token GotoStmt::goto_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+Token GotoStmt::label_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+std::optional<ForStmt> ForStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::FOR_STMT:
+      return reinterpret_cast<const ForStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VarDecl> ForStmt::condition_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal3()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal9());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal4()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal18());
+    return DeclStmt::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+Token ForStmt::for_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token ForStmt::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ForStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<DoStmt> DoStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DO_STMT:
+      return reinterpret_cast<const DoStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token DoStmt::do_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+Token DoStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+Token DoStmt::while_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+std::optional<DeclStmt> DeclStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DECL_STMT:
+      return reinterpret_cast<const DeclStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool DeclStmt::is_single_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::COROUTINE_BODY_STMT:
+      return reinterpret_cast<const CoroutineBodyStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CoroutineBodyStmt::has_dependent_promise_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+std::optional<CoreturnStmt> CoreturnStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CORETURN_STMT:
+      return reinterpret_cast<const CoreturnStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CoreturnStmt::keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+bool CoreturnStmt::is_implicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+std::optional<ContinueStmt> ContinueStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CONTINUE_STMT:
+      return reinterpret_cast<const ContinueStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ContinueStmt::continue_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<CompoundStmt> CompoundStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::COMPOUND_STMT:
+      return reinterpret_cast<const CompoundStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CompoundStmt::l_brac_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+Token CompoundStmt::r_brac_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CAPTURED_STMT:
+      return reinterpret_cast<const CapturedStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+CapturedRegionKind CapturedStmt::captured_region_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<CapturedRegionKind>(self.getVal16());
+}
+
+std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_TRY_STMT:
+      return reinterpret_cast<const CXXTryStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXTryStmt::try_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::vector<CXXCatchStmt> CXXTryStmt::handlers(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<CXXCatchStmt> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = CXXCatchStmt::from(fragment->StmtFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_FOR_RANGE_STMT:
+      return reinterpret_cast<const CXXForRangeStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXForRangeStmt::coawait_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+Token CXXForRangeStmt::colon_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token CXXForRangeStmt::for_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token CXXForRangeStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+std::optional<CXXCatchStmt> CXXCatchStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_CATCH_STMT:
+      return reinterpret_cast<const CXXCatchStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXCatchStmt::catch_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<BreakStmt> BreakStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::BREAK_STMT:
+      return reinterpret_cast<const BreakStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token BreakStmt::break_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<AsmStmt> AsmStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MS_ASM_STMT:
+    case mx::StmtKind::GCC_ASM_STMT:
+      return reinterpret_cast<const AsmStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::string_view AsmStmt::generate_assembly_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token AsmStmt::assembly_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+bool AsmStmt::is_simple(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+bool AsmStmt::is_volatile(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+std::vector<std::string_view> AsmStmt::output_constraints(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal28();
+  std::vector<std::string_view> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(v.cStr(), v.size());
+  }
+  return vec;
+}
+
+std::vector<std::string_view> AsmStmt::input_constraints(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal29();
+  std::vector<std::string_view> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(v.cStr(), v.size());
+  }
+  return vec;
+}
+
+std::vector<std::string_view> AsmStmt::clobbers(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal30();
+  std::vector<std::string_view> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(v.cStr(), v.size());
+  }
+  return vec;
+}
+
+std::optional<MSAsmStmt> MSAsmStmt::from(const AsmStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MSAsmStmt> MSAsmStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MS_ASM_STMT:
+      return reinterpret_cast<const MSAsmStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<std::string_view> MSAsmStmt::all_constraints(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal31();
+  std::vector<std::string_view> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(v.cStr(), v.size());
+  }
+  return vec;
+}
+
+std::string_view MSAsmStmt::assembly_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal32();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token MSAsmStmt::l_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+bool MSAsmStmt::has_braces(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<GCCAsmStmt> GCCAsmStmt::from(const AsmStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<GCCAsmStmt> GCCAsmStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::GCC_ASM_STMT:
+      return reinterpret_cast<const GCCAsmStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token GCCAsmStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+bool GCCAsmStmt::is_assembly_goto(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::vector<AddrLabelExpr> GCCAsmStmt::labels(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<AddrLabelExpr> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = AddrLabelExpr::from(fragment->StmtFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal33();
+  std::vector<StringLiteral> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = StringLiteral::from(fragment->StmtFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<std::string_view> GCCAsmStmt::output_names(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal31();
+  std::vector<std::string_view> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(v.cStr(), v.size());
+  }
+  return vec;
+}
+
+std::vector<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal34();
+  std::vector<StringLiteral> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = StringLiteral::from(fragment->StmtFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<std::string_view> GCCAsmStmt::input_names(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal35();
+  std::vector<std::string_view> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(v.cStr(), v.size());
+  }
+  return vec;
+}
+
+std::vector<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal36();
+  std::vector<StringLiteral> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = StringLiteral::from(fragment->StmtFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal37();
+  std::vector<AddrLabelExpr> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = AddrLabelExpr::from(fragment->StmtFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<std::string_view> GCCAsmStmt::label_names(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal38();
+  std::vector<std::string_view> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(v.cStr(), v.size());
+  }
+  return vec;
+}
+
+std::optional<WhileStmt> WhileStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::WHILE_STMT:
+      return reinterpret_cast<const WhileStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VarDecl> WhileStmt::condition_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal3()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal9());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<DeclStmt> WhileStmt::condition_variable_declaration_statement(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal4()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal18());
+    return DeclStmt::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+Token WhileStmt::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token WhileStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token WhileStmt::while_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool WhileStmt::has_variable_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+std::optional<ValueStmt> ValueStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::LABEL_STMT:
+    case mx::StmtKind::DESIGNATED_INIT_UPDATE_EXPR:
+    case mx::StmtKind::DESIGNATED_INIT_EXPR:
+    case mx::StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR:
+    case mx::StmtKind::DEPENDENT_COAWAIT_EXPR:
+    case mx::StmtKind::DECL_REF_EXPR:
+    case mx::StmtKind::COAWAIT_EXPR:
+    case mx::StmtKind::COYIELD_EXPR:
+    case mx::StmtKind::CONVERT_VECTOR_EXPR:
+    case mx::StmtKind::CONCEPT_SPECIALIZATION_EXPR:
+    case mx::StmtKind::COMPOUND_LITERAL_EXPR:
+    case mx::StmtKind::CHOOSE_EXPR:
+    case mx::StmtKind::CHARACTER_LITERAL:
+    case mx::StmtKind::IMPLICIT_CAST_EXPR:
+    case mx::StmtKind::CXX_DYNAMIC_CAST_EXPR:
+    case mx::StmtKind::CXX_CONST_CAST_EXPR:
+    case mx::StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+    case mx::StmtKind::CXX_STATIC_CAST_EXPR:
+    case mx::StmtKind::CXX_REINTERPRET_CAST_EXPR:
+    case mx::StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+    case mx::StmtKind::C_STYLE_CAST_EXPR:
+    case mx::StmtKind::BUILTIN_BIT_CAST_EXPR:
+    case mx::StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+    case mx::StmtKind::CALL_EXPR:
+    case mx::StmtKind::CXX_OPERATOR_CALL_EXPR:
+    case mx::StmtKind::CXX_MEMBER_CALL_EXPR:
+    case mx::StmtKind::CUDA_KERNEL_CALL_EXPR:
+    case mx::StmtKind::USER_DEFINED_LITERAL:
+    case mx::StmtKind::CXX_UUIDOF_EXPR:
+    case mx::StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR:
+    case mx::StmtKind::CXX_TYPEID_EXPR:
+    case mx::StmtKind::CXX_THROW_EXPR:
+    case mx::StmtKind::CXX_THIS_EXPR:
+    case mx::StmtKind::CXX_STD_INITIALIZER_LIST_EXPR:
+    case mx::StmtKind::CXX_SCALAR_VALUE_INIT_EXPR:
+    case mx::StmtKind::CXX_REWRITTEN_BINARY_OPERATOR:
+    case mx::StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR:
+    case mx::StmtKind::CXX_NULL_PTR_LITERAL_EXPR:
+    case mx::StmtKind::CXX_NOEXCEPT_EXPR:
+    case mx::StmtKind::CXX_NEW_EXPR:
+    case mx::StmtKind::CXX_INHERITED_CTOR_INIT_EXPR:
+    case mx::StmtKind::CXX_FOLD_EXPR:
+    case mx::StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR:
+    case mx::StmtKind::CXX_DELETE_EXPR:
+    case mx::StmtKind::CXX_DEFAULT_INIT_EXPR:
+    case mx::StmtKind::CXX_DEFAULT_ARG_EXPR:
+    case mx::StmtKind::CXX_CONSTRUCT_EXPR:
+    case mx::StmtKind::CXX_TEMPORARY_OBJECT_EXPR:
+    case mx::StmtKind::CXX_BOOL_LITERAL_EXPR:
+    case mx::StmtKind::CXX_BIND_TEMPORARY_EXPR:
+    case mx::StmtKind::BLOCK_EXPR:
+    case mx::StmtKind::BINARY_OPERATOR:
+    case mx::StmtKind::COMPOUND_ASSIGN_OPERATOR:
+    case mx::StmtKind::ATOMIC_EXPR:
+    case mx::StmtKind::AS_TYPE_EXPR:
+    case mx::StmtKind::ARRAY_TYPE_TRAIT_EXPR:
+    case mx::StmtKind::ARRAY_SUBSCRIPT_EXPR:
+    case mx::StmtKind::ARRAY_INIT_LOOP_EXPR:
+    case mx::StmtKind::ARRAY_INIT_INDEX_EXPR:
+    case mx::StmtKind::ADDR_LABEL_EXPR:
+    case mx::StmtKind::CONDITIONAL_OPERATOR:
+    case mx::StmtKind::BINARY_CONDITIONAL_OPERATOR:
+    case mx::StmtKind::VA_ARG_EXPR:
+    case mx::StmtKind::UNARY_OPERATOR:
+    case mx::StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
+    case mx::StmtKind::TYPO_EXPR:
+    case mx::StmtKind::TYPE_TRAIT_EXPR:
+    case mx::StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR:
+    case mx::StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR:
+    case mx::StmtKind::STRING_LITERAL:
+    case mx::StmtKind::STMT_EXPR:
+    case mx::StmtKind::SOURCE_LOC_EXPR:
+    case mx::StmtKind::SIZE_OF_PACK_EXPR:
+    case mx::StmtKind::SHUFFLE_VECTOR_EXPR:
+    case mx::StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR:
+    case mx::StmtKind::REQUIRES_EXPR:
+    case mx::StmtKind::RECOVERY_EXPR:
+    case mx::StmtKind::PSEUDO_OBJECT_EXPR:
+    case mx::StmtKind::PREDEFINED_EXPR:
+    case mx::StmtKind::PAREN_LIST_EXPR:
+    case mx::StmtKind::PAREN_EXPR:
+    case mx::StmtKind::PACK_EXPANSION_EXPR:
+    case mx::StmtKind::UNRESOLVED_MEMBER_EXPR:
+    case mx::StmtKind::UNRESOLVED_LOOKUP_EXPR:
+    case mx::StmtKind::OPAQUE_VALUE_EXPR:
+    case mx::StmtKind::OFFSET_OF_EXPR:
+    case mx::StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR:
+    case mx::StmtKind::OBJ_C_STRING_LITERAL:
+    case mx::StmtKind::OBJ_C_SELECTOR_EXPR:
+    case mx::StmtKind::OBJ_C_PROTOCOL_EXPR:
+    case mx::StmtKind::OBJ_C_PROPERTY_REF_EXPR:
+    case mx::StmtKind::OBJ_C_MESSAGE_EXPR:
+    case mx::StmtKind::OBJ_C_IVAR_REF_EXPR:
+    case mx::StmtKind::OBJ_C_ISA_EXPR:
+    case mx::StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR:
+    case mx::StmtKind::OBJ_C_ENCODE_EXPR:
+    case mx::StmtKind::OBJ_C_DICTIONARY_LITERAL:
+    case mx::StmtKind::OBJ_C_BOXED_EXPR:
+    case mx::StmtKind::OBJ_C_BOOL_LITERAL_EXPR:
+    case mx::StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR:
+    case mx::StmtKind::OBJ_C_ARRAY_LITERAL:
+    case mx::StmtKind::OMP_ITERATOR_EXPR:
+    case mx::StmtKind::OMP_ARRAY_SHAPING_EXPR:
+    case mx::StmtKind::OMP_ARRAY_SECTION_EXPR:
+    case mx::StmtKind::NO_INIT_EXPR:
+    case mx::StmtKind::MEMBER_EXPR:
+    case mx::StmtKind::MATRIX_SUBSCRIPT_EXPR:
+    case mx::StmtKind::MATERIALIZE_TEMPORARY_EXPR:
+    case mx::StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR:
+    case mx::StmtKind::MS_PROPERTY_REF_EXPR:
+    case mx::StmtKind::LAMBDA_EXPR:
+    case mx::StmtKind::INTEGER_LITERAL:
+    case mx::StmtKind::INIT_LIST_EXPR:
+    case mx::StmtKind::IMPLICIT_VALUE_INIT_EXPR:
+    case mx::StmtKind::IMAGINARY_LITERAL:
+    case mx::StmtKind::GENERIC_SELECTION_EXPR:
+    case mx::StmtKind::GNU_NULL_EXPR:
+    case mx::StmtKind::FUNCTION_PARM_PACK_EXPR:
+    case mx::StmtKind::EXPR_WITH_CLEANUPS:
+    case mx::StmtKind::CONSTANT_EXPR:
+    case mx::StmtKind::FLOATING_LITERAL:
+    case mx::StmtKind::FIXED_POINT_LITERAL:
+    case mx::StmtKind::EXT_VECTOR_ELEMENT_EXPR:
+    case mx::StmtKind::EXPRESSION_TRAIT_EXPR:
+    case mx::StmtKind::ATTRIBUTED_STMT:
+      return reinterpret_cast<const ValueStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<LabelStmt> LabelStmt::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<LabelStmt> LabelStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::LABEL_STMT:
+      return reinterpret_cast<const LabelStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token LabelStmt::identifier_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::string_view LabelStmt::name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+bool LabelStmt::is_side_entry(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+std::optional<Expr> Expr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<Expr> Expr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DESIGNATED_INIT_UPDATE_EXPR:
+    case mx::StmtKind::DESIGNATED_INIT_EXPR:
+    case mx::StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR:
+    case mx::StmtKind::DEPENDENT_COAWAIT_EXPR:
+    case mx::StmtKind::DECL_REF_EXPR:
+    case mx::StmtKind::COAWAIT_EXPR:
+    case mx::StmtKind::COYIELD_EXPR:
+    case mx::StmtKind::CONVERT_VECTOR_EXPR:
+    case mx::StmtKind::CONCEPT_SPECIALIZATION_EXPR:
+    case mx::StmtKind::COMPOUND_LITERAL_EXPR:
+    case mx::StmtKind::CHOOSE_EXPR:
+    case mx::StmtKind::CHARACTER_LITERAL:
+    case mx::StmtKind::IMPLICIT_CAST_EXPR:
+    case mx::StmtKind::CXX_DYNAMIC_CAST_EXPR:
+    case mx::StmtKind::CXX_CONST_CAST_EXPR:
+    case mx::StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+    case mx::StmtKind::CXX_STATIC_CAST_EXPR:
+    case mx::StmtKind::CXX_REINTERPRET_CAST_EXPR:
+    case mx::StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+    case mx::StmtKind::C_STYLE_CAST_EXPR:
+    case mx::StmtKind::BUILTIN_BIT_CAST_EXPR:
+    case mx::StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+    case mx::StmtKind::CALL_EXPR:
+    case mx::StmtKind::CXX_OPERATOR_CALL_EXPR:
+    case mx::StmtKind::CXX_MEMBER_CALL_EXPR:
+    case mx::StmtKind::CUDA_KERNEL_CALL_EXPR:
+    case mx::StmtKind::USER_DEFINED_LITERAL:
+    case mx::StmtKind::CXX_UUIDOF_EXPR:
+    case mx::StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR:
+    case mx::StmtKind::CXX_TYPEID_EXPR:
+    case mx::StmtKind::CXX_THROW_EXPR:
+    case mx::StmtKind::CXX_THIS_EXPR:
+    case mx::StmtKind::CXX_STD_INITIALIZER_LIST_EXPR:
+    case mx::StmtKind::CXX_SCALAR_VALUE_INIT_EXPR:
+    case mx::StmtKind::CXX_REWRITTEN_BINARY_OPERATOR:
+    case mx::StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR:
+    case mx::StmtKind::CXX_NULL_PTR_LITERAL_EXPR:
+    case mx::StmtKind::CXX_NOEXCEPT_EXPR:
+    case mx::StmtKind::CXX_NEW_EXPR:
+    case mx::StmtKind::CXX_INHERITED_CTOR_INIT_EXPR:
+    case mx::StmtKind::CXX_FOLD_EXPR:
+    case mx::StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR:
+    case mx::StmtKind::CXX_DELETE_EXPR:
+    case mx::StmtKind::CXX_DEFAULT_INIT_EXPR:
+    case mx::StmtKind::CXX_DEFAULT_ARG_EXPR:
+    case mx::StmtKind::CXX_CONSTRUCT_EXPR:
+    case mx::StmtKind::CXX_TEMPORARY_OBJECT_EXPR:
+    case mx::StmtKind::CXX_BOOL_LITERAL_EXPR:
+    case mx::StmtKind::CXX_BIND_TEMPORARY_EXPR:
+    case mx::StmtKind::BLOCK_EXPR:
+    case mx::StmtKind::BINARY_OPERATOR:
+    case mx::StmtKind::COMPOUND_ASSIGN_OPERATOR:
+    case mx::StmtKind::ATOMIC_EXPR:
+    case mx::StmtKind::AS_TYPE_EXPR:
+    case mx::StmtKind::ARRAY_TYPE_TRAIT_EXPR:
+    case mx::StmtKind::ARRAY_SUBSCRIPT_EXPR:
+    case mx::StmtKind::ARRAY_INIT_LOOP_EXPR:
+    case mx::StmtKind::ARRAY_INIT_INDEX_EXPR:
+    case mx::StmtKind::ADDR_LABEL_EXPR:
+    case mx::StmtKind::CONDITIONAL_OPERATOR:
+    case mx::StmtKind::BINARY_CONDITIONAL_OPERATOR:
+    case mx::StmtKind::VA_ARG_EXPR:
+    case mx::StmtKind::UNARY_OPERATOR:
+    case mx::StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
+    case mx::StmtKind::TYPO_EXPR:
+    case mx::StmtKind::TYPE_TRAIT_EXPR:
+    case mx::StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR:
+    case mx::StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR:
+    case mx::StmtKind::STRING_LITERAL:
+    case mx::StmtKind::STMT_EXPR:
+    case mx::StmtKind::SOURCE_LOC_EXPR:
+    case mx::StmtKind::SIZE_OF_PACK_EXPR:
+    case mx::StmtKind::SHUFFLE_VECTOR_EXPR:
+    case mx::StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR:
+    case mx::StmtKind::REQUIRES_EXPR:
+    case mx::StmtKind::RECOVERY_EXPR:
+    case mx::StmtKind::PSEUDO_OBJECT_EXPR:
+    case mx::StmtKind::PREDEFINED_EXPR:
+    case mx::StmtKind::PAREN_LIST_EXPR:
+    case mx::StmtKind::PAREN_EXPR:
+    case mx::StmtKind::PACK_EXPANSION_EXPR:
+    case mx::StmtKind::UNRESOLVED_MEMBER_EXPR:
+    case mx::StmtKind::UNRESOLVED_LOOKUP_EXPR:
+    case mx::StmtKind::OPAQUE_VALUE_EXPR:
+    case mx::StmtKind::OFFSET_OF_EXPR:
+    case mx::StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR:
+    case mx::StmtKind::OBJ_C_STRING_LITERAL:
+    case mx::StmtKind::OBJ_C_SELECTOR_EXPR:
+    case mx::StmtKind::OBJ_C_PROTOCOL_EXPR:
+    case mx::StmtKind::OBJ_C_PROPERTY_REF_EXPR:
+    case mx::StmtKind::OBJ_C_MESSAGE_EXPR:
+    case mx::StmtKind::OBJ_C_IVAR_REF_EXPR:
+    case mx::StmtKind::OBJ_C_ISA_EXPR:
+    case mx::StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR:
+    case mx::StmtKind::OBJ_C_ENCODE_EXPR:
+    case mx::StmtKind::OBJ_C_DICTIONARY_LITERAL:
+    case mx::StmtKind::OBJ_C_BOXED_EXPR:
+    case mx::StmtKind::OBJ_C_BOOL_LITERAL_EXPR:
+    case mx::StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR:
+    case mx::StmtKind::OBJ_C_ARRAY_LITERAL:
+    case mx::StmtKind::OMP_ITERATOR_EXPR:
+    case mx::StmtKind::OMP_ARRAY_SHAPING_EXPR:
+    case mx::StmtKind::OMP_ARRAY_SECTION_EXPR:
+    case mx::StmtKind::NO_INIT_EXPR:
+    case mx::StmtKind::MEMBER_EXPR:
+    case mx::StmtKind::MATRIX_SUBSCRIPT_EXPR:
+    case mx::StmtKind::MATERIALIZE_TEMPORARY_EXPR:
+    case mx::StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR:
+    case mx::StmtKind::MS_PROPERTY_REF_EXPR:
+    case mx::StmtKind::LAMBDA_EXPR:
+    case mx::StmtKind::INTEGER_LITERAL:
+    case mx::StmtKind::INIT_LIST_EXPR:
+    case mx::StmtKind::IMPLICIT_VALUE_INIT_EXPR:
+    case mx::StmtKind::IMAGINARY_LITERAL:
+    case mx::StmtKind::GENERIC_SELECTION_EXPR:
+    case mx::StmtKind::GNU_NULL_EXPR:
+    case mx::StmtKind::FUNCTION_PARM_PACK_EXPR:
+    case mx::StmtKind::EXPR_WITH_CLEANUPS:
+    case mx::StmtKind::CONSTANT_EXPR:
+    case mx::StmtKind::FLOATING_LITERAL:
+    case mx::StmtKind::FIXED_POINT_LITERAL:
+    case mx::StmtKind::EXT_VECTOR_ELEMENT_EXPR:
+    case mx::StmtKind::EXPRESSION_TRAIT_EXPR:
+      return reinterpret_cast<const Expr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool Expr::has_side_effects(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+bool Expr::contains_errors(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+bool Expr::contains_unexpanded_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+Token Expr::expression_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal13()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal18());
+    return ObjCPropertyRefExpr::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+ExprObjectKind Expr::object_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ExprObjectKind>(self.getVal16());
+}
+
+std::optional<FieldDecl> Expr::source_bit_field(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal14()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal19());
+    return FieldDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+ExprValueKind Expr::value_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ExprValueKind>(self.getVal17());
+}
+
+bool Expr::has_non_trivial_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal15();
+}
+
+bool Expr::is_default_argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal23();
+}
+
+bool Expr::is_gl_value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal39();
+}
+
+bool Expr::is_implicit_cxx_this(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal40();
+}
+
+bool Expr::is_instantiation_dependent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal41();
+}
+
+bool Expr::is_known_to_have_boolean_value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal42();
+}
+
+bool Expr::is_l_value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal43();
+}
+
+bool Expr::is_objcgc_candidate(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal44();
+}
+
+bool Expr::is_obj_c_self_expression(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal45();
+}
+
+bool Expr::is_ordinary_or_bit_field_object(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal46();
+}
+
+bool Expr::is_pr_value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal47();
+}
+
+bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal48();
+}
+
+bool Expr::is_type_dependent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal49();
+}
+
+bool Expr::is_value_dependent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal50();
+}
+
+bool Expr::is_x_value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal51();
+}
+
+bool Expr::refers_to_bit_field(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal52();
+}
+
+bool Expr::refers_to_global_register_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal53();
+}
+
+bool Expr::refers_to_matrix_element(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal54();
+}
+
+bool Expr::refers_to_vector_element(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal55();
+}
+
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DESIGNATED_INIT_UPDATE_EXPR:
+      return reinterpret_cast<const DesignatedInitUpdateExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DESIGNATED_INIT_EXPR:
+      return reinterpret_cast<const DesignatedInitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+TokenRange DesignatedInitExpr::designators_source_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
+}
+
+Token DesignatedInitExpr::equal_or_colon_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool DesignatedInitExpr::is_direct_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool DesignatedInitExpr::uses_gnu_syntax(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR:
+      return reinterpret_cast<const DependentScopeDeclRefExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token DependentScopeDeclRefExpr::l_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token DependentScopeDeclRefExpr::r_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token DependentScopeDeclRefExpr::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool DependentScopeDeclRefExpr::has_explicit_template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool DependentScopeDeclRefExpr::has_template_keyword(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DEPENDENT_COAWAIT_EXPR:
+      return reinterpret_cast<const DependentCoawaitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token DependentCoawaitExpr::keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<DeclRefExpr> DeclRefExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DeclRefExpr> DeclRefExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DeclRefExpr> DeclRefExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DECL_REF_EXPR:
+      return reinterpret_cast<const DeclRefExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token DeclRefExpr::l_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token DeclRefExpr::r_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+Token DeclRefExpr::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+bool DeclRefExpr::had_multiple_candidates(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool DeclRefExpr::has_explicit_template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool DeclRefExpr::has_qualifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool DeclRefExpr::has_template_kw_and_arguments_info(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool DeclRefExpr::has_template_keyword(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<NonOdrUseReason>(self.getVal61());
+}
+
+bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::COAWAIT_EXPR:
+    case mx::StmtKind::COYIELD_EXPR:
+      return reinterpret_cast<const CoroutineSuspendExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CoroutineSuspendExpr::keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<CoawaitExpr> CoawaitExpr::from(const CoroutineSuspendExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoawaitExpr> CoawaitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoawaitExpr> CoawaitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoawaitExpr> CoawaitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::COAWAIT_EXPR:
+      return reinterpret_cast<const CoawaitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CoawaitExpr::is_implicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CoyieldExpr> CoyieldExpr::from(const CoroutineSuspendExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoyieldExpr> CoyieldExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoyieldExpr> CoyieldExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CoyieldExpr> CoyieldExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::COYIELD_EXPR:
+      return reinterpret_cast<const CoyieldExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CONVERT_VECTOR_EXPR:
+      return reinterpret_cast<const ConvertVectorExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ConvertVectorExpr::builtin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ConvertVectorExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CONCEPT_SPECIALIZATION_EXPR:
+      return reinterpret_cast<const ConceptSpecializationExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal63();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+bool ConceptSpecializationExpr::is_satisfied(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::COMPOUND_LITERAL_EXPR:
+      return reinterpret_cast<const CompoundLiteralExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CompoundLiteralExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool CompoundLiteralExpr::is_file_scope(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ChooseExpr> ChooseExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ChooseExpr> ChooseExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ChooseExpr> ChooseExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CHOOSE_EXPR:
+      return reinterpret_cast<const ChooseExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ChooseExpr::builtin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ChooseExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool ChooseExpr::is_condition_dependent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool ChooseExpr::is_condition_true(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<CharacterLiteral> CharacterLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CharacterLiteral> CharacterLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CharacterLiteral> CharacterLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CHARACTER_LITERAL:
+      return reinterpret_cast<const CharacterLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CharacterLiteral::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<CastExpr> CastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CastExpr> CastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CastExpr> CastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::IMPLICIT_CAST_EXPR:
+    case mx::StmtKind::CXX_DYNAMIC_CAST_EXPR:
+    case mx::StmtKind::CXX_CONST_CAST_EXPR:
+    case mx::StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+    case mx::StmtKind::CXX_STATIC_CAST_EXPR:
+    case mx::StmtKind::CXX_REINTERPRET_CAST_EXPR:
+    case mx::StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+    case mx::StmtKind::C_STYLE_CAST_EXPR:
+    case mx::StmtKind::BUILTIN_BIT_CAST_EXPR:
+    case mx::StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+      return reinterpret_cast<const CastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+CastKind CastExpr::cast_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<CastKind>(self.getVal61());
+}
+
+std::string_view CastExpr::cast_kind_name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+std::optional<NamedDecl> CastExpr::conversion_function(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal56()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal20());
+    return NamedDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<FieldDecl> CastExpr::target_union_field(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal57()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal21());
+    return FieldDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+bool CastExpr::has_stored_fp_features(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::IMPLICIT_CAST_EXPR:
+      return reinterpret_cast<const ImplicitCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ImplicitCastExpr::is_part_of_explicit_cast(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_DYNAMIC_CAST_EXPR:
+    case mx::StmtKind::CXX_CONST_CAST_EXPR:
+    case mx::StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+    case mx::StmtKind::CXX_STATIC_CAST_EXPR:
+    case mx::StmtKind::CXX_REINTERPRET_CAST_EXPR:
+    case mx::StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+    case mx::StmtKind::C_STYLE_CAST_EXPR:
+    case mx::StmtKind::BUILTIN_BIT_CAST_EXPR:
+    case mx::StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+      return reinterpret_cast<const ExplicitCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_DYNAMIC_CAST_EXPR:
+    case mx::StmtKind::CXX_CONST_CAST_EXPR:
+    case mx::StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+    case mx::StmtKind::CXX_STATIC_CAST_EXPR:
+    case mx::StmtKind::CXX_REINTERPRET_CAST_EXPR:
+      return reinterpret_cast<const CXXNamedCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+TokenRange CXXNamedCastExpr::angle_brackets(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal22(), self.getVal24());
+}
+
+std::string_view CXXNamedCastExpr::cast_name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal32();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token CXXNamedCastExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+Token CXXNamedCastExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const CXXNamedCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_DYNAMIC_CAST_EXPR:
+      return reinterpret_cast<const CXXDynamicCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXDynamicCastExpr::is_always_null(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const CXXNamedCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_CONST_CAST_EXPR:
+      return reinterpret_cast<const CXXConstCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const CXXNamedCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+      return reinterpret_cast<const CXXAddrspaceCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const CXXNamedCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_STATIC_CAST_EXPR:
+      return reinterpret_cast<const CXXStaticCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const CXXNamedCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_REINTERPRET_CAST_EXPR:
+      return reinterpret_cast<const CXXReinterpretCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+      return reinterpret_cast<const CXXFunctionalCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXFunctionalCastExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token CXXFunctionalCastExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+bool CXXFunctionalCastExpr::is_list_initialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+std::optional<CStyleCastExpr> CStyleCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CStyleCastExpr> CStyleCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CStyleCastExpr> CStyleCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CStyleCastExpr> CStyleCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CStyleCastExpr> CStyleCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::C_STYLE_CAST_EXPR:
+      return reinterpret_cast<const CStyleCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CStyleCastExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token CStyleCastExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::BUILTIN_BIT_CAST_EXPR:
+      return reinterpret_cast<const BuiltinBitCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const ExplicitCastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const CastExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+      return reinterpret_cast<const ObjCBridgedCastExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCBridgedCastExpr::bridge_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCBridgeCastKind>(self.getVal64());
+}
+
+std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal32();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token ObjCBridgedCastExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+std::optional<CallExpr> CallExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CallExpr> CallExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CallExpr> CallExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CALL_EXPR:
+    case mx::StmtKind::CXX_OPERATOR_CALL_EXPR:
+    case mx::StmtKind::CXX_MEMBER_CALL_EXPR:
+    case mx::StmtKind::CUDA_KERNEL_CALL_EXPR:
+    case mx::StmtKind::USER_DEFINED_LITERAL:
+      return reinterpret_cast<const CallExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+CallExprADLCallKind CallExpr::adl_call_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<CallExprADLCallKind>(self.getVal61());
+}
+
+std::optional<FunctionDecl> CallExpr::direct_callee(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal56()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal20());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+Token CallExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool CallExpr::has_stored_fp_features(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool CallExpr::has_unused_result_attribute(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool CallExpr::is_builtin_assume_false(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool CallExpr::is_call_to_std_move(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool CallExpr::is_unevaluated_builtin_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool CallExpr::uses_adl(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const CallExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_OPERATOR_CALL_EXPR:
+      return reinterpret_cast<const CXXOperatorCallExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<OverloadedOperatorKind>(self.getVal64());
+}
+
+Token CXXOperatorCallExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool CXXOperatorCallExpr::is_assignment_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal66();
+}
+
+bool CXXOperatorCallExpr::is_comparison_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal67();
+}
+
+bool CXXOperatorCallExpr::is_infix_binary_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal68();
+}
+
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const CallExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_MEMBER_CALL_EXPR:
+      return reinterpret_cast<const CXXMemberCallExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const CallExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CUDA_KERNEL_CALL_EXPR:
+      return reinterpret_cast<const CUDAKernelCallExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const CallExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::USER_DEFINED_LITERAL:
+      return reinterpret_cast<const UserDefinedLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<UserDefinedLiteralLiteralOperatorKind>(self.getVal64());
+}
+
+Token UserDefinedLiteral::ud_suffix_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_UUIDOF_EXPR:
+      return reinterpret_cast<const CXXUuidofExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXUuidofExpr::is_type_operand(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR:
+      return reinterpret_cast<const CXXUnresolvedConstructExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXUnresolvedConstructExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token CXXUnresolvedConstructExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool CXXUnresolvedConstructExpr::is_list_initialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_TYPEID_EXPR:
+      return reinterpret_cast<const CXXTypeidExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXTypeidExpr::is_most_derived(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool CXXTypeidExpr::is_potentially_evaluated(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool CXXTypeidExpr::is_type_operand(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+std::optional<CXXThrowExpr> CXXThrowExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXThrowExpr> CXXThrowExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXThrowExpr> CXXThrowExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_THROW_EXPR:
+      return reinterpret_cast<const CXXThrowExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXThrowExpr::throw_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool CXXThrowExpr::is_thrown_variable_in_scope(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CXXThisExpr> CXXThisExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXThisExpr> CXXThisExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXThisExpr> CXXThisExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_THIS_EXPR:
+      return reinterpret_cast<const CXXThisExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXThisExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool CXXThisExpr::is_implicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_STD_INITIALIZER_LIST_EXPR:
+      return reinterpret_cast<const CXXStdInitializerListExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_SCALAR_VALUE_INIT_EXPR:
+      return reinterpret_cast<const CXXScalarValueInitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXScalarValueInitExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_REWRITTEN_BINARY_OPERATOR:
+      return reinterpret_cast<const CXXRewrittenBinaryOperator &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<BinaryOperatorKind>(self.getVal61());
+}
+
+std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<BinaryOperatorKind>(self.getVal64());
+}
+
+Token CXXRewrittenBinaryOperator::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool CXXRewrittenBinaryOperator::is_reversed(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR:
+      return reinterpret_cast<const CXXPseudoDestructorExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXPseudoDestructorExpr::colon_colon_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token CXXPseudoDestructorExpr::destroyed_type_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token CXXPseudoDestructorExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token CXXPseudoDestructorExpr::tilde_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+bool CXXPseudoDestructorExpr::has_qualifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool CXXPseudoDestructorExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_NULL_PTR_LITERAL_EXPR:
+      return reinterpret_cast<const CXXNullPtrLiteralExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXNullPtrLiteralExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_NOEXCEPT_EXPR:
+      return reinterpret_cast<const CXXNoexceptExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXNoexceptExpr::value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CXXNewExpr> CXXNewExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNewExpr> CXXNewExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXNewExpr> CXXNewExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_NEW_EXPR:
+      return reinterpret_cast<const CXXNewExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXNewExpr::does_usual_array_delete_want_size(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+TokenRange CXXNewExpr::direct_initializer_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal21(), self.getVal22());
+}
+
+CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<CXXNewExprInitializationStyle>(self.getVal61());
+}
+
+TokenRange CXXNewExpr::type_id_parentheses(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal26(), self.getVal69());
+}
+
+bool CXXNewExpr::has_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool CXXNewExpr::is_array(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool CXXNewExpr::is_global_new(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool CXXNewExpr::is_parenthesis_type_id(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool CXXNewExpr::pass_alignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool CXXNewExpr::should_null_check_allocation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_INHERITED_CTOR_INIT_EXPR:
+      return reinterpret_cast<const CXXInheritedCtorInitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<CXXConstructExprConstructionKind>(self.getVal61());
+}
+
+Token CXXInheritedCtorInitExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<CXXFoldExpr> CXXFoldExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXFoldExpr> CXXFoldExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXFoldExpr> CXXFoldExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_FOLD_EXPR:
+      return reinterpret_cast<const CXXFoldExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXFoldExpr::ellipsis_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token CXXFoldExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+BinaryOperatorKind CXXFoldExpr::operator_(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<BinaryOperatorKind>(self.getVal61());
+}
+
+Token CXXFoldExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+bool CXXFoldExpr::is_left_fold(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool CXXFoldExpr::is_right_fold(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR:
+      return reinterpret_cast<const CXXDependentScopeMemberExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXDependentScopeMemberExpr::l_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token CXXDependentScopeMemberExpr::member_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token CXXDependentScopeMemberExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+Token CXXDependentScopeMemberExpr::r_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+Token CXXDependentScopeMemberExpr::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool CXXDependentScopeMemberExpr::has_template_keyword(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool CXXDependentScopeMemberExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool CXXDependentScopeMemberExpr::is_implicit_access(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_DELETE_EXPR:
+      return reinterpret_cast<const CXXDeleteExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool CXXDeleteExpr::is_array_form(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool CXXDeleteExpr::is_array_form_as_written(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool CXXDeleteExpr::is_global_delete(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_DEFAULT_INIT_EXPR:
+      return reinterpret_cast<const CXXDefaultInitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXDefaultInitExpr::used_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_DEFAULT_ARG_EXPR:
+      return reinterpret_cast<const CXXDefaultArgExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXDefaultArgExpr::used_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_CONSTRUCT_EXPR:
+    case mx::StmtKind::CXX_TEMPORARY_OBJECT_EXPR:
+      return reinterpret_cast<const CXXConstructExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<CXXConstructExprConstructionKind>(self.getVal61());
+}
+
+Token CXXConstructExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal22(), self.getVal24());
+}
+
+bool CXXConstructExpr::had_multiple_candidates(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool CXXConstructExpr::is_elidable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool CXXConstructExpr::is_list_initialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool CXXConstructExpr::is_std_initializer_list_initialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool CXXConstructExpr::requires_zero_initialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const CXXConstructExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_TEMPORARY_OBJECT_EXPR:
+      return reinterpret_cast<const CXXTemporaryObjectExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_BOOL_LITERAL_EXPR:
+      return reinterpret_cast<const CXXBoolLiteralExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token CXXBoolLiteralExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool CXXBoolLiteralExpr::value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CXX_BIND_TEMPORARY_EXPR:
+      return reinterpret_cast<const CXXBindTemporaryExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<BlockExpr> BlockExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BlockExpr> BlockExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BlockExpr> BlockExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::BLOCK_EXPR:
+      return reinterpret_cast<const BlockExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token BlockExpr::caret_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<BinaryOperator> BinaryOperator::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BinaryOperator> BinaryOperator::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BinaryOperator> BinaryOperator::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::BINARY_OPERATOR:
+    case mx::StmtKind::COMPOUND_ASSIGN_OPERATOR:
+      return reinterpret_cast<const BinaryOperator &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+BinaryOperatorKind BinaryOperator::opcode(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<BinaryOperatorKind>(self.getVal61());
+}
+
+std::string_view BinaryOperator::opcode_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token BinaryOperator::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool BinaryOperator::has_stored_fp_features(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool BinaryOperator::is_additive_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool BinaryOperator::is_assignment_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool BinaryOperator::is_bitwise_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool BinaryOperator::is_comma_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool BinaryOperator::is_comparison_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool BinaryOperator::is_compound_assignment_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+bool BinaryOperator::is_equality_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal66();
+}
+
+bool BinaryOperator::is_logical_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal67();
+}
+
+bool BinaryOperator::is_multiplicative_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal68();
+}
+
+bool BinaryOperator::is_pointer_memory_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal70();
+}
+
+bool BinaryOperator::is_relational_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal71();
+}
+
+bool BinaryOperator::is_shift_assign_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal72();
+}
+
+bool BinaryOperator::is_shift_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const BinaryOperator &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::COMPOUND_ASSIGN_OPERATOR:
+      return reinterpret_cast<const CompoundAssignOperator &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<AtomicExpr> AtomicExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AtomicExpr> AtomicExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AtomicExpr> AtomicExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::ATOMIC_EXPR:
+      return reinterpret_cast<const AtomicExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token AtomicExpr::builtin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+AtomicExprAtomicOp AtomicExpr::operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<AtomicExprAtomicOp>(self.getVal61());
+}
+
+Token AtomicExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool AtomicExpr::is_cmp_x_chg(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool AtomicExpr::is_open_cl(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool AtomicExpr::is_volatile(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+std::optional<AsTypeExpr> AsTypeExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AsTypeExpr> AsTypeExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AsTypeExpr> AsTypeExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::AS_TYPE_EXPR:
+      return reinterpret_cast<const AsTypeExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token AsTypeExpr::builtin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token AsTypeExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::ARRAY_TYPE_TRAIT_EXPR:
+      return reinterpret_cast<const ArrayTypeTraitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ArrayTypeTrait>(self.getVal61());
+}
+
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::ARRAY_SUBSCRIPT_EXPR:
+      return reinterpret_cast<const ArraySubscriptExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ArraySubscriptExpr::r_bracket_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::ARRAY_INIT_LOOP_EXPR:
+      return reinterpret_cast<const ArrayInitLoopExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::ARRAY_INIT_INDEX_EXPR:
+      return reinterpret_cast<const ArrayInitIndexExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<AddrLabelExpr> AddrLabelExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AddrLabelExpr> AddrLabelExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AddrLabelExpr> AddrLabelExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::ADDR_LABEL_EXPR:
+      return reinterpret_cast<const AddrLabelExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token AddrLabelExpr::amp_amp_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token AddrLabelExpr::label_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CONDITIONAL_OPERATOR:
+    case mx::StmtKind::BINARY_CONDITIONAL_OPERATOR:
+      return reinterpret_cast<const AbstractConditionalOperator &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token AbstractConditionalOperator::colon_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token AbstractConditionalOperator::question_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ConditionalOperator> ConditionalOperator::from(const AbstractConditionalOperator &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConditionalOperator> ConditionalOperator::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConditionalOperator> ConditionalOperator::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConditionalOperator> ConditionalOperator::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CONDITIONAL_OPERATOR:
+      return reinterpret_cast<const ConditionalOperator &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const AbstractConditionalOperator &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::BINARY_CONDITIONAL_OPERATOR:
+      return reinterpret_cast<const BinaryConditionalOperator &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VAArgExpr> VAArgExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<VAArgExpr> VAArgExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<VAArgExpr> VAArgExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::VA_ARG_EXPR:
+      return reinterpret_cast<const VAArgExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token VAArgExpr::builtin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token VAArgExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool VAArgExpr::is_microsoft_abi(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<UnaryOperator> UnaryOperator::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnaryOperator> UnaryOperator::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnaryOperator> UnaryOperator::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::UNARY_OPERATOR:
+      return reinterpret_cast<const UnaryOperator &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool UnaryOperator::can_overflow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+UnaryOperatorKind UnaryOperator::opcode(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<UnaryOperatorKind>(self.getVal61());
+}
+
+Token UnaryOperator::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool UnaryOperator::has_stored_fp_features(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool UnaryOperator::is_arithmetic_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool UnaryOperator::is_decrement_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool UnaryOperator::is_increment_decrement_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool UnaryOperator::is_increment_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool UnaryOperator::is_postfix(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+bool UnaryOperator::is_prefix(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal66();
+}
+
+std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
+      return reinterpret_cast<const UnaryExprOrTypeTraitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token UnaryExprOrTypeTraitExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token UnaryExprOrTypeTraitExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<TypoExpr> TypoExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<TypoExpr> TypoExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<TypoExpr> TypoExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::TYPO_EXPR:
+      return reinterpret_cast<const TypoExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TypeTraitExpr> TypeTraitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<TypeTraitExpr> TypeTraitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<TypeTraitExpr> TypeTraitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::TYPE_TRAIT_EXPR:
+      return reinterpret_cast<const TypeTraitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+TypeTrait TypeTraitExpr::trait(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TypeTrait>(self.getVal61());
+}
+
+bool TypeTraitExpr::value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR:
+      return reinterpret_cast<const SubstNonTypeTemplateParmPackExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token SubstNonTypeTemplateParmPackExpr::parameter_pack_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR:
+      return reinterpret_cast<const SubstNonTypeTemplateParmExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token SubstNonTypeTemplateParmExpr::name_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<StringLiteral> StringLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<StringLiteral> StringLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<StringLiteral> StringLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::STRING_LITERAL:
+      return reinterpret_cast<const StringLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool StringLiteral::contains_non_ascii(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool StringLiteral::contains_non_ascii_or_null(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::string_view StringLiteral::bytes(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+std::string_view StringLiteral::string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal32();
+  return std::string_view(data.cStr(), data.size());
+}
+
+bool StringLiteral::is_ascii(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool StringLiteral::is_pascal(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool StringLiteral::is_utf16(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool StringLiteral::is_utf32(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool StringLiteral::is_utf8(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+bool StringLiteral::is_wide(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal66();
+}
+
+std::optional<StmtExpr> StmtExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<StmtExpr> StmtExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<StmtExpr> StmtExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::STMT_EXPR:
+      return reinterpret_cast<const StmtExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token StmtExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token StmtExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<SourceLocExpr> SourceLocExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SourceLocExpr> SourceLocExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SourceLocExpr> SourceLocExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SOURCE_LOC_EXPR:
+      return reinterpret_cast<const SourceLocExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::string_view SourceLocExpr::builtin_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<SourceLocExprIdentKind>(self.getVal61());
+}
+
+Token SourceLocExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool SourceLocExpr::is_int_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool SourceLocExpr::is_string_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SIZE_OF_PACK_EXPR:
+      return reinterpret_cast<const SizeOfPackExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token SizeOfPackExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token SizeOfPackExpr::pack_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::vector<TemplateArgument> SizeOfPackExpr::partial_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal63();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+Token SizeOfPackExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+bool SizeOfPackExpr::is_partially_substituted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SHUFFLE_VECTOR_EXPR:
+      return reinterpret_cast<const ShuffleVectorExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ShuffleVectorExpr::builtin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ShuffleVectorExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR:
+      return reinterpret_cast<const SYCLUniqueStableNameExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::string_view SYCLUniqueStableNameExpr::compute_name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token SYCLUniqueStableNameExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token SYCLUniqueStableNameExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token SYCLUniqueStableNameExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::optional<RequiresExpr> RequiresExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<RequiresExpr> RequiresExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<RequiresExpr> RequiresExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::REQUIRES_EXPR:
+      return reinterpret_cast<const RequiresExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<ParmVarDecl> RequiresExpr::local_parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<ParmVarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ParmVarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+Token RequiresExpr::r_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token RequiresExpr::requires_kw_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool RequiresExpr::is_satisfied(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<RecoveryExpr> RecoveryExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<RecoveryExpr> RecoveryExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<RecoveryExpr> RecoveryExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::RECOVERY_EXPR:
+      return reinterpret_cast<const RecoveryExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::PSEUDO_OBJECT_EXPR:
+      return reinterpret_cast<const PseudoObjectExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<PredefinedExpr> PredefinedExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<PredefinedExpr> PredefinedExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<PredefinedExpr> PredefinedExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::PREDEFINED_EXPR:
+      return reinterpret_cast<const PredefinedExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<PredefinedExprIdentKind>(self.getVal61());
+}
+
+std::string_view PredefinedExpr::identifier_kind_name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token PredefinedExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ParenListExpr> ParenListExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ParenListExpr> ParenListExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ParenListExpr> ParenListExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::PAREN_LIST_EXPR:
+      return reinterpret_cast<const ParenListExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ParenListExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ParenListExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ParenExpr> ParenExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ParenExpr> ParenExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ParenExpr> ParenExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::PAREN_EXPR:
+      return reinterpret_cast<const ParenExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ParenExpr::l_paren(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ParenExpr::r_paren(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<PackExpansionExpr> PackExpansionExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<PackExpansionExpr> PackExpansionExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<PackExpansionExpr> PackExpansionExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::PACK_EXPANSION_EXPR:
+      return reinterpret_cast<const PackExpansionExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token PackExpansionExpr::ellipsis_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<OverloadExpr> OverloadExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OverloadExpr> OverloadExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OverloadExpr> OverloadExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::UNRESOLVED_MEMBER_EXPR:
+    case mx::StmtKind::UNRESOLVED_LOOKUP_EXPR:
+      return reinterpret_cast<const OverloadExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token OverloadExpr::l_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token OverloadExpr::name_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token OverloadExpr::r_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+Token OverloadExpr::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+bool OverloadExpr::has_explicit_template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool OverloadExpr::has_template_keyword(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const OverloadExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::UNRESOLVED_MEMBER_EXPR:
+      return reinterpret_cast<const UnresolvedMemberExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token UnresolvedMemberExpr::member_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+Token UnresolvedMemberExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal69());
+}
+
+bool UnresolvedMemberExpr::has_unresolved_using(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool UnresolvedMemberExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool UnresolvedMemberExpr::is_implicit_access(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const OverloadExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::UNRESOLVED_LOOKUP_EXPR:
+      return reinterpret_cast<const UnresolvedLookupExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool UnresolvedLookupExpr::is_overloaded(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool UnresolvedLookupExpr::requires_adl(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OPAQUE_VALUE_EXPR:
+      return reinterpret_cast<const OpaqueValueExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token OpaqueValueExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool OpaqueValueExpr::is_unique(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<OffsetOfExpr> OffsetOfExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OffsetOfExpr> OffsetOfExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OffsetOfExpr> OffsetOfExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OFFSET_OF_EXPR:
+      return reinterpret_cast<const OffsetOfExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token OffsetOfExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token OffsetOfExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR:
+      return reinterpret_cast<const ObjCSubscriptRefExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCSubscriptRefExpr::r_bracket(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool ObjCSubscriptRefExpr::is_array_subscript_reference_expression(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_STRING_LITERAL:
+      return reinterpret_cast<const ObjCStringLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCStringLiteral::at_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_SELECTOR_EXPR:
+      return reinterpret_cast<const ObjCSelectorExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCSelectorExpr::at_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ObjCSelectorExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_PROTOCOL_EXPR:
+      return reinterpret_cast<const ObjCProtocolExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCProtocolExpr::at_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ObjCProtocolExpr::protocol_id_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token ObjCProtocolExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_PROPERTY_REF_EXPR:
+      return reinterpret_cast<const ObjCPropertyRefExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCPropertyRefExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+Token ObjCPropertyRefExpr::receiver_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+bool ObjCPropertyRefExpr::is_class_receiver(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool ObjCPropertyRefExpr::is_explicit_property(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool ObjCPropertyRefExpr::is_implicit_property(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool ObjCPropertyRefExpr::is_messaging_getter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool ObjCPropertyRefExpr::is_messaging_setter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool ObjCPropertyRefExpr::is_object_receiver(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool ObjCPropertyRefExpr::is_super_receiver(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_MESSAGE_EXPR:
+      return reinterpret_cast<const ObjCMessageExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCMessageExpr::left_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+ObjCMethodFamily ObjCMessageExpr::method_family(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCMethodFamily>(self.getVal61());
+}
+
+ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCMessageExprReceiverKind>(self.getVal64());
+}
+
+TokenRange ObjCMessageExpr::receiver_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal24(), self.getVal25());
+}
+
+Token ObjCMessageExpr::right_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+Token ObjCMessageExpr::selector_start_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal69());
+}
+
+Token ObjCMessageExpr::super_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal74());
+}
+
+bool ObjCMessageExpr::is_class_message(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool ObjCMessageExpr::is_delegate_initializer_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool ObjCMessageExpr::is_implicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool ObjCMessageExpr::is_instance_message(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+std::vector<Token> ObjCMessageExpr::selector_tokens(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<Token> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    vec.emplace_back(fragment->TokenFor(fragment, id));
+  }
+  return vec;
+}
+
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_IVAR_REF_EXPR:
+      return reinterpret_cast<const ObjCIvarRefExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCIvarRefExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token ObjCIvarRefExpr::operation_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool ObjCIvarRefExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool ObjCIvarRefExpr::is_free_instance_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_ISA_EXPR:
+      return reinterpret_cast<const ObjCIsaExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCIsaExpr::base_token_end(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ObjCIsaExpr::isa_member_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token ObjCIsaExpr::operation_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool ObjCIsaExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR:
+      return reinterpret_cast<const ObjCIndirectCopyRestoreExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ObjCIndirectCopyRestoreExpr::should_copy(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_ENCODE_EXPR:
+      return reinterpret_cast<const ObjCEncodeExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCEncodeExpr::at_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ObjCEncodeExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_DICTIONARY_LITERAL:
+      return reinterpret_cast<const ObjCDictionaryLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_BOXED_EXPR:
+      return reinterpret_cast<const ObjCBoxedExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCBoxedExpr::at_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_BOOL_LITERAL_EXPR:
+      return reinterpret_cast<const ObjCBoolLiteralExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCBoolLiteralExpr::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool ObjCBoolLiteralExpr::value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR:
+      return reinterpret_cast<const ObjCAvailabilityCheckExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ObjCAvailabilityCheckExpr::has_version(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OBJ_C_ARRAY_LITERAL:
+      return reinterpret_cast<const ObjCArrayLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_ITERATOR_EXPR:
+      return reinterpret_cast<const OMPIteratorExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token OMPIteratorExpr::iterator_kw_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token OMPIteratorExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token OMPIteratorExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_ARRAY_SHAPING_EXPR:
+      return reinterpret_cast<const OMPArrayShapingExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token OMPArrayShapingExpr::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token OMPArrayShapingExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::OMP_ARRAY_SECTION_EXPR:
+      return reinterpret_cast<const OMPArraySectionExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token OMPArraySectionExpr::colon_token_first(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token OMPArraySectionExpr::colon_token_second(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token OMPArraySectionExpr::r_bracket_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::optional<NoInitExpr> NoInitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<NoInitExpr> NoInitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<NoInitExpr> NoInitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::NO_INIT_EXPR:
+      return reinterpret_cast<const NoInitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<MemberExpr> MemberExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MemberExpr> MemberExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MemberExpr> MemberExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MEMBER_EXPR:
+      return reinterpret_cast<const MemberExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token MemberExpr::l_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token MemberExpr::member_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token MemberExpr::operator_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+Token MemberExpr::r_angle_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+Token MemberExpr::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+bool MemberExpr::had_multiple_candidates(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool MemberExpr::has_explicit_template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool MemberExpr::has_qualifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool MemberExpr::has_template_keyword(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool MemberExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool MemberExpr::is_implicit_access(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+NonOdrUseReason MemberExpr::is_non_odr_use(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<NonOdrUseReason>(self.getVal61());
+}
+
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MATRIX_SUBSCRIPT_EXPR:
+      return reinterpret_cast<const MatrixSubscriptExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token MatrixSubscriptExpr::r_bracket_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool MatrixSubscriptExpr::is_incomplete(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MATERIALIZE_TEMPORARY_EXPR:
+      return reinterpret_cast<const MaterializeTemporaryExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+StorageDuration MaterializeTemporaryExpr::storage_duration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<StorageDuration>(self.getVal61());
+}
+
+bool MaterializeTemporaryExpr::is_bound_to_lvalue_reference(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool MaterializeTemporaryExpr::is_usable_in_constant_expressions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR:
+      return reinterpret_cast<const MSPropertySubscriptExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token MSPropertySubscriptExpr::r_bracket_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::MS_PROPERTY_REF_EXPR:
+      return reinterpret_cast<const MSPropertyRefExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token MSPropertyRefExpr::member_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool MSPropertyRefExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool MSPropertyRefExpr::is_implicit_access(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<LambdaExpr> LambdaExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<LambdaExpr> LambdaExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<LambdaExpr> LambdaExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::LAMBDA_EXPR:
+      return reinterpret_cast<const LambdaExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+LambdaCaptureDefault LambdaExpr::capture_default(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<LambdaCaptureDefault>(self.getVal61());
+}
+
+Token LambdaExpr::capture_default_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::vector<NamedDecl> LambdaExpr::explicit_template_parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<NamedDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = NamedDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+TokenRange LambdaExpr::introducer_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal24(), self.getVal25());
+}
+
+std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal56()) {
+    return std::nullopt;
+  } else {
+    return TemplateParameterList(fragment, self.getVal0());
+  }
+}
+
+bool LambdaExpr::has_explicit_parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool LambdaExpr::has_explicit_result_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool LambdaExpr::is_generic_lambda(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool LambdaExpr::is_mutable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+std::optional<IntegerLiteral> IntegerLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<IntegerLiteral> IntegerLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<IntegerLiteral> IntegerLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::INTEGER_LITERAL:
+      return reinterpret_cast<const IntegerLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token IntegerLiteral::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<InitListExpr> InitListExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<InitListExpr> InitListExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<InitListExpr> InitListExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::INIT_LIST_EXPR:
+      return reinterpret_cast<const InitListExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal56()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal20());
+    return FieldDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+Token InitListExpr::l_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token InitListExpr::r_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::optional<InitListExpr> InitListExpr::semantic_form(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal57()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal24());
+    return InitListExpr::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+std::optional<InitListExpr> InitListExpr::syntactic_form(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal58()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal25());
+    return InitListExpr::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+bool InitListExpr::had_array_range_designator(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool InitListExpr::has_array_filler(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+bool InitListExpr::is_explicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool InitListExpr::is_semantic_form(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+bool InitListExpr::is_string_literal_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal66();
+}
+
+bool InitListExpr::is_syntactic_form(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal67();
+}
+
+bool InitListExpr::is_transparent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal68();
+}
+
+std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::IMPLICIT_VALUE_INIT_EXPR:
+      return reinterpret_cast<const ImplicitValueInitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::IMAGINARY_LITERAL:
+      return reinterpret_cast<const ImaginaryLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::GENERIC_SELECTION_EXPR:
+      return reinterpret_cast<const GenericSelectionExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token GenericSelectionExpr::default_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token GenericSelectionExpr::generic_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token GenericSelectionExpr::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool GenericSelectionExpr::is_result_dependent(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<GNUNullExpr> GNUNullExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<GNUNullExpr> GNUNullExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<GNUNullExpr> GNUNullExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::GNU_NULL_EXPR:
+      return reinterpret_cast<const GNUNullExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token GNUNullExpr::token_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::FUNCTION_PARM_PACK_EXPR:
+      return reinterpret_cast<const FunctionParmPackExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token FunctionParmPackExpr::parameter_pack_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::vector<VarDecl> FunctionParmPackExpr::expansions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<VarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = VarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<FullExpr> FullExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FullExpr> FullExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FullExpr> FullExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::EXPR_WITH_CLEANUPS:
+    case mx::StmtKind::CONSTANT_EXPR:
+      return reinterpret_cast<const FullExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ExprWithCleanups> ExprWithCleanups::from(const FullExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExprWithCleanups> ExprWithCleanups::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExprWithCleanups> ExprWithCleanups::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExprWithCleanups> ExprWithCleanups::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::EXPR_WITH_CLEANUPS:
+      return reinterpret_cast<const ExprWithCleanups &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ExprWithCleanups::cleanups_have_side_effects(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<ConstantExpr> ConstantExpr::from(const FullExpr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConstantExpr> ConstantExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConstantExpr> ConstantExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ConstantExpr> ConstantExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CONSTANT_EXPR:
+      return reinterpret_cast<const ConstantExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ConstantExprResultStorageKind ConstantExpr::result_storage_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ConstantExprResultStorageKind>(self.getVal61());
+}
+
+bool ConstantExpr::has_ap_value_result(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool ConstantExpr::is_immediate_invocation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<FloatingLiteral> FloatingLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FloatingLiteral> FloatingLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FloatingLiteral> FloatingLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::FLOATING_LITERAL:
+      return reinterpret_cast<const FloatingLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token FloatingLiteral::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool FloatingLiteral::is_exact(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<FixedPointLiteral> FixedPointLiteral::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FixedPointLiteral> FixedPointLiteral::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<FixedPointLiteral> FixedPointLiteral::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::FIXED_POINT_LITERAL:
+      return reinterpret_cast<const FixedPointLiteral &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token FixedPointLiteral::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::EXT_VECTOR_ELEMENT_EXPR:
+      return reinterpret_cast<const ExtVectorElementExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ExtVectorElementExpr::contains_duplicate_elements(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+Token ExtVectorElementExpr::accessor_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool ExtVectorElementExpr::is_arrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Expr &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::EXPRESSION_TRAIT_EXPR:
+      return reinterpret_cast<const ExpressionTraitExpr &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ExpressionTrait ExpressionTraitExpr::trait(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ExpressionTrait>(self.getVal61());
+}
+
+bool ExpressionTraitExpr::value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+std::optional<AttributedStmt> AttributedStmt::from(const ValueStmt &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<AttributedStmt> AttributedStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::ATTRIBUTED_STMT:
+      return reinterpret_cast<const AttributedStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token AttributedStmt::attribute_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::SWITCH_STMT:
+      return reinterpret_cast<const SwitchStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VarDecl> SwitchStmt::condition_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal3()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal9());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal4()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal18());
+    return DeclStmt::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+Token SwitchStmt::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token SwitchStmt::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token SwitchStmt::switch_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool SwitchStmt::has_initializer_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+bool SwitchStmt::has_variable_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal13();
+}
+
+bool SwitchStmt::is_all_enum_cases_covered(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal14();
+}
+
+std::optional<SwitchCase> SwitchCase::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DEFAULT_STMT:
+    case mx::StmtKind::CASE_STMT:
+      return reinterpret_cast<const SwitchCase &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token SwitchCase::colon_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal9());
+}
+
+Token SwitchCase::keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal18());
+}
+
+std::optional<DefaultStmt> DefaultStmt::from(const SwitchCase &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<DefaultStmt> DefaultStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::DEFAULT_STMT:
+      return reinterpret_cast<const DefaultStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token DefaultStmt::default_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+std::optional<CaseStmt> CaseStmt::from(const SwitchCase &parent) {
+  return from(reinterpret_cast<const Stmt &>(parent));
+}
+
+std::optional<CaseStmt> CaseStmt::from(const Stmt &parent) {
+  switch (parent.kind()) {
+    case mx::StmtKind::CASE_STMT:
+      return reinterpret_cast<const CaseStmt &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CaseStmt::case_statement_is_gnu_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal3();
+}
+
+Token CaseStmt::case_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token CaseStmt::ellipsis_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+AccessSpecifier Decl::access(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<AccessSpecifier>(self.getVal11());
+}
+
+AccessSpecifier Decl::access_unsafe(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<AccessSpecifier>(self.getVal16());
+}
+
+AvailabilityResult Decl::availability(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<AvailabilityResult>(self.getVal17());
+}
+
+Token Decl::begin_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal5());
+}
+
+Token Decl::body_r_brace(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal6());
+}
+
+std::optional<TemplateParameterList> Decl::described_template_parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal3()) {
+    return std::nullopt;
+  } else {
+    return TemplateParameterList(fragment, self.getVal0());
+  }
+}
+
+Token Decl::end_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal7());
+}
+
+DeclFriendObjectKind Decl::friend_object_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<DeclFriendObjectKind>(self.getVal61());
+}
+
+DeclModuleOwnershipKind Decl::module_ownership_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<DeclModuleOwnershipKind>(self.getVal64());
+}
+
+bool Decl::has_attributes(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal4();
+}
+
+bool Decl::has_defining_attribute(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal12();
+}
+
+bool Decl::has_owning_module(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal13();
+}
+
+bool Decl::has_tag_identifier_namespace(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal14();
+}
+
+bool Decl::is_canonical_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal15();
+}
+
+bool Decl::is_defined_outside_function_or_method(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal23();
+}
+
+bool Decl::is_deprecated(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal39();
+}
+
+bool Decl::is_first_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal40();
+}
+
+bool Decl::is_function_or_function_template(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal41();
+}
+
+bool Decl::is_implicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal42();
+}
+
+bool Decl::is_in_anonymous_namespace(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal43();
+}
+
+bool Decl::is_in_local_scope_for_instantiation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal44();
+}
+
+bool Decl::is_in_std_namespace(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal45();
+}
+
+bool Decl::is_invalid_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal46();
+}
+
+bool Decl::is_module_private(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal47();
+}
+
+bool Decl::is_out_of_line(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal48();
+}
+
+bool Decl::is_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal49();
+}
+
+bool Decl::is_referenced(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal50();
+}
+
+bool Decl::is_template_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal51();
+}
+
+bool Decl::is_template_parameter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal52();
+}
+
+bool Decl::is_template_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal53();
+}
+
+bool Decl::is_templated(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal54();
+}
+
+bool Decl::is_this_declaration_referenced(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal55();
+}
+
+bool Decl::is_top_level_declaration_in_obj_c_container(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal56();
+}
+
+bool Decl::is_unavailable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal57();
+}
+
+bool Decl::is_unconditionally_visible(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal58();
+}
+
+bool Decl::is_used(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal59();
+}
+
+bool Decl::is_weak_imported(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal60();
+}
+
+DeclKind Decl::kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<DeclKind>(self.getVal75());
+}
+
+Token Decl::token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal8());
+}
+
+TokenRange Decl::token_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal9(), self.getVal18());
+}
+
+std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION:
+      return reinterpret_cast<const ClassScopeFunctionSpecializationDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CAPTURED:
+      return reinterpret_cast<const CapturedDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CapturedDecl::is_nothrow(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+std::vector<ImplicitParamDecl> CapturedDecl::parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<ImplicitParamDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ImplicitParamDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<BlockDecl> BlockDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::BLOCK:
+      return reinterpret_cast<const BlockDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool BlockDecl::block_missing_return_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool BlockDecl::can_avoid_copy_to_heap(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+bool BlockDecl::captures_cxx_this(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal66();
+}
+
+bool BlockDecl::does_not_escape(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal67();
+}
+
+Token BlockDecl::caret_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+bool BlockDecl::has_captures(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal68();
+}
+
+bool BlockDecl::is_conversion_from_lambda(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal70();
+}
+
+bool BlockDecl::is_variadic(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal71();
+}
+
+std::vector<ParmVarDecl> BlockDecl::parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<ParmVarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ParmVarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ParmVarDecl> BlockDecl::parameter_declarations(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal33();
+  std::vector<ParmVarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ParmVarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<AccessSpecDecl> AccessSpecDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::ACCESS_SPEC:
+      return reinterpret_cast<const AccessSpecDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token AccessSpecDecl::access_specifier_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token AccessSpecDecl::colon_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_THREAD_PRIVATE:
+    case mx::DeclKind::OMP_REQUIRES:
+    case mx::DeclKind::OMP_ALLOCATE:
+      return reinterpret_cast<const OMPDeclarativeDirectiveDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const OMPDeclarativeDirectiveDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_THREAD_PRIVATE:
+      return reinterpret_cast<const OMPThreadPrivateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const OMPDeclarativeDirectiveDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_REQUIRES:
+      return reinterpret_cast<const OMPRequiresDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const OMPDeclarativeDirectiveDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_ALLOCATE:
+      return reinterpret_cast<const OMPAllocateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TRANSLATION_UNIT:
+      return reinterpret_cast<const TranslationUnitDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<StaticAssertDecl> StaticAssertDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::STATIC_ASSERT:
+      return reinterpret_cast<const StaticAssertDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token StaticAssertDecl::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool StaticAssertDecl::is_failed(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::REQUIRES_EXPR_BODY:
+      return reinterpret_cast<const RequiresExprBodyDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::PRAGMA_DETECT_MISMATCH:
+      return reinterpret_cast<const PragmaDetectMismatchDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::string_view PragmaDetectMismatchDecl::name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+std::string_view PragmaDetectMismatchDecl::value(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal32();
+  return std::string_view(data.cStr(), data.size());
+}
+
+std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::PRAGMA_COMMENT:
+      return reinterpret_cast<const PragmaCommentDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::string_view PragmaCommentDecl::argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<PragmaMSCommentKind>(self.getVal76());
+}
+
+std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_PROPERTY_IMPL:
+      return reinterpret_cast<const ObjCPropertyImplDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCPropertyImplDeclKind>(self.getVal76());
+}
+
+Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::NAMED:
+    case mx::DeclKind::LABEL:
+    case mx::DeclKind::BASE_USING:
+    case mx::DeclKind::USING_ENUM:
+    case mx::DeclKind::USING:
+    case mx::DeclKind::VALUE:
+    case mx::DeclKind::UNRESOLVED_USING_VALUE:
+    case mx::DeclKind::TEMPLATE_PARAM_OBJECT:
+    case mx::DeclKind::OMP_DECLARE_REDUCTION:
+    case mx::DeclKind::MS_GUID:
+    case mx::DeclKind::INDIRECT_FIELD:
+    case mx::DeclKind::ENUM_CONSTANT:
+    case mx::DeclKind::DECLARATOR:
+    case mx::DeclKind::VAR:
+    case mx::DeclKind::PARM_VAR:
+    case mx::DeclKind::OMP_CAPTURED_EXPR:
+    case mx::DeclKind::IMPLICIT_PARAM:
+    case mx::DeclKind::DECOMPOSITION:
+    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case mx::DeclKind::NON_TYPE_TEMPLATE_PARM:
+    case mx::DeclKind::MS_PROPERTY:
+    case mx::DeclKind::FUNCTION:
+    case mx::DeclKind::CXX_METHOD:
+    case mx::DeclKind::CXX_DESTRUCTOR:
+    case mx::DeclKind::CXX_CONVERSION:
+    case mx::DeclKind::CXX_CONSTRUCTOR:
+    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+    case mx::DeclKind::FIELD:
+    case mx::DeclKind::OBJ_C_IVAR:
+    case mx::DeclKind::OBJ_C_AT_DEFS_FIELD:
+    case mx::DeclKind::BINDING:
+    case mx::DeclKind::OMP_DECLARE_MAPPER:
+    case mx::DeclKind::USING_SHADOW:
+    case mx::DeclKind::CONSTRUCTOR_USING_SHADOW:
+    case mx::DeclKind::USING_PACK:
+    case mx::DeclKind::USING_DIRECTIVE:
+    case mx::DeclKind::UNRESOLVED_USING_IF_EXISTS:
+    case mx::DeclKind::TYPE:
+    case mx::DeclKind::TEMPLATE_TYPE_PARM:
+    case mx::DeclKind::TAG:
+    case mx::DeclKind::RECORD:
+    case mx::DeclKind::CXX_RECORD:
+    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case mx::DeclKind::ENUM:
+    case mx::DeclKind::UNRESOLVED_USING_TYPENAME:
+    case mx::DeclKind::TYPEDEF_NAME:
+    case mx::DeclKind::TYPEDEF:
+    case mx::DeclKind::TYPE_ALIAS:
+    case mx::DeclKind::OBJ_C_TYPE_PARAM:
+    case mx::DeclKind::TEMPLATE:
+    case mx::DeclKind::REDECLARABLE_TEMPLATE:
+    case mx::DeclKind::FUNCTION_TEMPLATE:
+    case mx::DeclKind::CLASS_TEMPLATE:
+    case mx::DeclKind::VAR_TEMPLATE:
+    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+    case mx::DeclKind::CONCEPT:
+    case mx::DeclKind::BUILTIN_TEMPLATE:
+    case mx::DeclKind::TEMPLATE_TEMPLATE_PARM:
+    case mx::DeclKind::OBJ_C_PROPERTY:
+    case mx::DeclKind::OBJ_C_METHOD:
+    case mx::DeclKind::OBJ_C_CONTAINER:
+    case mx::DeclKind::OBJ_C_CATEGORY:
+    case mx::DeclKind::OBJ_C_PROTOCOL:
+    case mx::DeclKind::OBJ_C_INTERFACE:
+    case mx::DeclKind::OBJ_C_IMPL:
+    case mx::DeclKind::OBJ_C_CATEGORY_IMPL:
+    case mx::DeclKind::OBJ_C_IMPLEMENTATION:
+    case mx::DeclKind::OBJ_C_COMPATIBLE_ALIAS:
+    case mx::DeclKind::NAMESPACE:
+    case mx::DeclKind::NAMESPACE_ALIAS:
+      return reinterpret_cast<const NamedDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Linkage NamedDecl::formal_linkage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<Linkage>(self.getVal76());
+}
+
+Linkage NamedDecl::linkage_internal(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<Linkage>(self.getVal77());
+}
+
+std::string_view NamedDecl::name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal27();
+  return std::string_view(data.cStr(), data.size());
+}
+
+ObjCStringFormatFamily NamedDecl::obj_cf_string_formatting_family(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCStringFormatFamily>(self.getVal78());
+}
+
+std::string_view NamedDecl::qualified_name_as_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal32();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Visibility NamedDecl::visibility(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<Visibility>(self.getVal79());
+}
+
+bool NamedDecl::has_external_formal_linkage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+bool NamedDecl::has_linkage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal65();
+}
+
+bool NamedDecl::has_linkage_been_computed(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal66();
+}
+
+bool NamedDecl::is_cxx_class_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal67();
+}
+
+bool NamedDecl::is_cxx_instance_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal68();
+}
+
+bool NamedDecl::is_externally_declarable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal70();
+}
+
+bool NamedDecl::is_externally_visible(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal71();
+}
+
+bool NamedDecl::is_linkage_valid(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal72();
+}
+
+std::optional<LabelDecl> LabelDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<LabelDecl> LabelDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::LABEL:
+      return reinterpret_cast<const LabelDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::string_view LabelDecl::ms_assembly_label(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal80();
+  return std::string_view(data.cStr(), data.size());
+}
+
+bool LabelDecl::is_gnu_local(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+bool LabelDecl::is_ms_assembly_label(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool LabelDecl::is_resolved_ms_assembly_label(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+std::optional<BaseUsingDecl> BaseUsingDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<BaseUsingDecl> BaseUsingDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::BASE_USING:
+    case mx::DeclKind::USING_ENUM:
+    case mx::DeclKind::USING:
+      return reinterpret_cast<const BaseUsingDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<UsingShadowDecl> BaseUsingDecl::shadows(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<UsingShadowDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = UsingShadowDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<UsingEnumDecl> UsingEnumDecl::from(const BaseUsingDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UsingEnumDecl> UsingEnumDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UsingEnumDecl> UsingEnumDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::USING_ENUM:
+      return reinterpret_cast<const UsingEnumDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token UsingEnumDecl::enum_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token UsingEnumDecl::using_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::optional<UsingDecl> UsingDecl::from(const BaseUsingDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UsingDecl> UsingDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UsingDecl> UsingDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::USING:
+      return reinterpret_cast<const UsingDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token UsingDecl::using_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool UsingDecl::has_typename(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+bool UsingDecl::is_access_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+std::optional<ValueDecl> ValueDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::VALUE:
+    case mx::DeclKind::UNRESOLVED_USING_VALUE:
+    case mx::DeclKind::TEMPLATE_PARAM_OBJECT:
+    case mx::DeclKind::OMP_DECLARE_REDUCTION:
+    case mx::DeclKind::MS_GUID:
+    case mx::DeclKind::INDIRECT_FIELD:
+    case mx::DeclKind::ENUM_CONSTANT:
+    case mx::DeclKind::DECLARATOR:
+    case mx::DeclKind::VAR:
+    case mx::DeclKind::PARM_VAR:
+    case mx::DeclKind::OMP_CAPTURED_EXPR:
+    case mx::DeclKind::IMPLICIT_PARAM:
+    case mx::DeclKind::DECOMPOSITION:
+    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case mx::DeclKind::NON_TYPE_TEMPLATE_PARM:
+    case mx::DeclKind::MS_PROPERTY:
+    case mx::DeclKind::FUNCTION:
+    case mx::DeclKind::CXX_METHOD:
+    case mx::DeclKind::CXX_DESTRUCTOR:
+    case mx::DeclKind::CXX_CONVERSION:
+    case mx::DeclKind::CXX_CONSTRUCTOR:
+    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+    case mx::DeclKind::FIELD:
+    case mx::DeclKind::OBJ_C_IVAR:
+    case mx::DeclKind::OBJ_C_AT_DEFS_FIELD:
+    case mx::DeclKind::BINDING:
+    case mx::DeclKind::OMP_DECLARE_MAPPER:
+      return reinterpret_cast<const ValueDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ValueDecl::is_weak(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::UNRESOLVED_USING_VALUE:
+      return reinterpret_cast<const UnresolvedUsingValueDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token UnresolvedUsingValueDecl::ellipsis_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token UnresolvedUsingValueDecl::using_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+bool UnresolvedUsingValueDecl::is_access_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool UnresolvedUsingValueDecl::is_pack_expansion(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TEMPLATE_PARAM_OBJECT:
+      return reinterpret_cast<const TemplateParamObjectDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_DECLARE_REDUCTION:
+      return reinterpret_cast<const OMPDeclareReductionDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<OMPDeclareReductionDeclInitKind>(self.getVal83());
+}
+
+std::optional<MSGuidDecl> MSGuidDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<MSGuidDecl> MSGuidDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<MSGuidDecl> MSGuidDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::MS_GUID:
+      return reinterpret_cast<const MSGuidDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::INDIRECT_FIELD:
+      return reinterpret_cast<const IndirectFieldDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<NamedDecl> IndirectFieldDecl::chain(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<NamedDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = NamedDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal81()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal20());
+    return FieldDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal82()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal21());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<EnumConstantDecl> EnumConstantDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<EnumConstantDecl> EnumConstantDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<EnumConstantDecl> EnumConstantDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::ENUM_CONSTANT:
+      return reinterpret_cast<const EnumConstantDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<DeclaratorDecl> DeclaratorDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<DeclaratorDecl> DeclaratorDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<DeclaratorDecl> DeclaratorDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::DECLARATOR:
+    case mx::DeclKind::VAR:
+    case mx::DeclKind::PARM_VAR:
+    case mx::DeclKind::OMP_CAPTURED_EXPR:
+    case mx::DeclKind::IMPLICIT_PARAM:
+    case mx::DeclKind::DECOMPOSITION:
+    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case mx::DeclKind::NON_TYPE_TEMPLATE_PARM:
+    case mx::DeclKind::MS_PROPERTY:
+    case mx::DeclKind::FUNCTION:
+    case mx::DeclKind::CXX_METHOD:
+    case mx::DeclKind::CXX_DESTRUCTOR:
+    case mx::DeclKind::CXX_CONVERSION:
+    case mx::DeclKind::CXX_CONSTRUCTOR:
+    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+    case mx::DeclKind::FIELD:
+    case mx::DeclKind::OBJ_C_IVAR:
+    case mx::DeclKind::OBJ_C_AT_DEFS_FIELD:
+      return reinterpret_cast<const DeclaratorDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token DeclaratorDecl::inner_token_start(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token DeclaratorDecl::outer_token_start(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token DeclaratorDecl::type_spec_end_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token DeclaratorDecl::type_spec_start_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+std::vector<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal63();
+  std::vector<TemplateParameterList> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+std::optional<VarDecl> VarDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarDecl> VarDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarDecl> VarDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarDecl> VarDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::VAR:
+    case mx::DeclKind::PARM_VAR:
+    case mx::DeclKind::OMP_CAPTURED_EXPR:
+    case mx::DeclKind::IMPLICIT_PARAM:
+    case mx::DeclKind::DECOMPOSITION:
+    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+      return reinterpret_cast<const VarDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VarDecl> VarDecl::acting_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal81()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal25());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+VarDeclInitializationStyle VarDecl::initializer_style(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<VarDeclInitializationStyle>(self.getVal83());
+}
+
+std::optional<VarDecl> VarDecl::initializing_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal82()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal26());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<VarDecl> VarDecl::instantiated_from_static_data_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal84()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal69());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+LanguageLinkage VarDecl::language_linkage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<LanguageLinkage>(self.getVal85());
+}
+
+Token VarDecl::point_of_instantiation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal74());
+}
+
+StorageClass VarDecl::storage_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<StorageClass>(self.getVal86());
+}
+
+StorageDuration VarDecl::storage_duration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<StorageDuration>(self.getVal87());
+}
+
+VarDeclTLSKind VarDecl::tls_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<VarDeclTLSKind>(self.getVal88());
+}
+
+ThreadStorageClassSpecifier VarDecl::tsc_spec(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ThreadStorageClassSpecifier>(self.getVal89());
+}
+
+std::optional<VarDecl> VarDecl::template_instantiation_pattern(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal91()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal90());
+    return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+TemplateSpecializationKind VarDecl::template_specialization_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal92());
+}
+
+TemplateSpecializationKind VarDecl::template_specialization_kind_for_instantiation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal93());
+}
+
+bool VarDecl::has_constant_initialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+bool VarDecl::has_dependent_alignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal95();
+}
+
+bool VarDecl::has_external_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal96();
+}
+
+bool VarDecl::has_global_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal97();
+}
+
+bool VarDecl::has_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal98();
+}
+
+bool VarDecl::has_local_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal99();
+}
+
+bool VarDecl::is_arc_pseudo_strong(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal100();
+}
+
+bool VarDecl::is_cxx_for_range_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal101();
+}
+
+bool VarDecl::is_constexpr(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal102();
+}
+
+bool VarDecl::is_direct_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal103();
+}
+
+bool VarDecl::is_escaping_byref(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal104();
+}
+
+bool VarDecl::is_exception_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal105();
+}
+
+bool VarDecl::is_extern_c(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal106();
+}
+
+bool VarDecl::is_file_variable_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal107();
+}
+
+bool VarDecl::is_function_or_method_variable_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal108();
+}
+
+bool VarDecl::is_in_extern_c_context(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal109();
+}
+
+bool VarDecl::is_in_extern_cxx_context(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal110();
+}
+
+bool VarDecl::is_initializer_capture(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal111();
+}
+
+bool VarDecl::is_inline(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal112();
+}
+
+bool VarDecl::is_inline_specified(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal113();
+}
+
+bool VarDecl::is_known_to_be_defined(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal114();
+}
+
+bool VarDecl::is_local_variable_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal115();
+}
+
+bool VarDecl::is_local_variable_declaration_or_parm(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal116();
+}
+
+bool VarDecl::is_nrvo_variable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal117();
+}
+
+bool VarDecl::is_no_destroy(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal118();
+}
+
+bool VarDecl::is_non_escaping_byref(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal119();
+}
+
+bool VarDecl::is_obj_c_for_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal120();
+}
+
+bool VarDecl::is_previous_declaration_in_same_block_scope(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal121();
+}
+
+bool VarDecl::is_static_data_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal122();
+}
+
+bool VarDecl::is_static_local(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal123();
+}
+
+bool VarDecl::is_this_declaration_a_demoted_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal124();
+}
+
+bool VarDecl::is_usable_in_constant_expressions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal125();
+}
+
+bool VarDecl::might_be_usable_in_constant_expressions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal126();
+}
+
+QualTypeDestructionKind VarDecl::needs_destruction(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<QualTypeDestructionKind>(self.getVal127());
+}
+
+std::optional<ParmVarDecl> ParmVarDecl::from(const VarDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ParmVarDecl> ParmVarDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ParmVarDecl> ParmVarDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ParmVarDecl> ParmVarDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ParmVarDecl> ParmVarDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::PARM_VAR:
+      return reinterpret_cast<const ParmVarDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+TokenRange ParmVarDecl::default_argument_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal128(), self.getVal129());
+}
+
+DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<DeclObjCDeclQualifier>(self.getVal130());
+}
+
+bool ParmVarDecl::has_default_argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal131();
+}
+
+bool ParmVarDecl::has_inherited_default_argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal132();
+}
+
+bool ParmVarDecl::has_uninstantiated_default_argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal133();
+}
+
+bool ParmVarDecl::has_unparsed_default_argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal134();
+}
+
+bool ParmVarDecl::is_destroyed_in_callee(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal135();
+}
+
+bool ParmVarDecl::is_knr_promoted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal136();
+}
+
+bool ParmVarDecl::is_obj_c_method_parameter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal137();
+}
+
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const VarDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_CAPTURED_EXPR:
+      return reinterpret_cast<const OMPCapturedExprDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const VarDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::IMPLICIT_PARAM:
+      return reinterpret_cast<const ImplicitParamDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ImplicitParamDeclImplicitParamKind>(self.getVal130());
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::from(const VarDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::DECOMPOSITION:
+      return reinterpret_cast<const DecompositionDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<BindingDecl> DecompositionDecl::bindings(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<BindingDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = BindingDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const VarDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+      return reinterpret_cast<const VarTemplateSpecializationDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token VarTemplateSpecializationDecl::extern_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal128());
+}
+
+TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal130());
+}
+
+std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal138();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal139();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+Token VarTemplateSpecializationDecl::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal129());
+}
+
+bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal131();
+}
+
+bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal132();
+}
+
+bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal133();
+}
+
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const VarTemplateSpecializationDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const VarDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+      return reinterpret_cast<const VarTemplatePartialSpecializationDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::NON_TYPE_TEMPLATE_PARM:
+      return reinterpret_cast<const NonTypeTemplateParmDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+Token NonTypeTemplateParmDecl::default_argument_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+bool NonTypeTemplateParmDecl::has_default_argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+bool NonTypeTemplateParmDecl::has_placeholder_type_constraint(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal91();
+}
+
+bool NonTypeTemplateParmDecl::is_pack_expansion(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+std::optional<MSPropertyDecl> MSPropertyDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<MSPropertyDecl> MSPropertyDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<MSPropertyDecl> MSPropertyDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<MSPropertyDecl> MSPropertyDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::MS_PROPERTY:
+      return reinterpret_cast<const MSPropertyDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool MSPropertyDecl::has_getter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool MSPropertyDecl::has_setter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+std::optional<FunctionDecl> FunctionDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FunctionDecl> FunctionDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FunctionDecl> FunctionDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FunctionDecl> FunctionDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::FUNCTION:
+    case mx::DeclKind::CXX_METHOD:
+    case mx::DeclKind::CXX_DESTRUCTOR:
+    case mx::DeclKind::CXX_CONVERSION:
+    case mx::DeclKind::CXX_CONSTRUCTOR:
+    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+      return reinterpret_cast<const FunctionDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool FunctionDecl::does_this_declaration_have_a_body(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+ConstexprSpecKind FunctionDecl::constexpr_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ConstexprSpecKind>(self.getVal83());
+}
+
+std::optional<FunctionDecl> FunctionDecl::definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal82()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal25());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+Token FunctionDecl::ellipsis_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+TokenRange FunctionDecl::exception_spec_source_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal69(), self.getVal74());
+}
+
+ExceptionSpecificationType FunctionDecl::exception_spec_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ExceptionSpecificationType>(self.getVal85());
+}
+
+std::optional<FunctionDecl> FunctionDecl::instantiated_from_member_function(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal84()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal90());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+LanguageLinkage FunctionDecl::language_linkage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<LanguageLinkage>(self.getVal86());
+}
+
+MultiVersionKind FunctionDecl::multi_version_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<MultiVersionKind>(self.getVal87());
+}
+
+OverloadedOperatorKind FunctionDecl::overloaded_operator(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<OverloadedOperatorKind>(self.getVal88());
+}
+
+TokenRange FunctionDecl::parameters_source_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal128(), self.getVal129());
+}
+
+Token FunctionDecl::point_of_instantiation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal140());
+}
+
+TokenRange FunctionDecl::return_type_source_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal141(), self.getVal142());
+}
+
+StorageClass FunctionDecl::storage_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<StorageClass>(self.getVal89());
+}
+
+std::optional<FunctionDecl> FunctionDecl::template_instantiation_pattern(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal91()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal143());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+TemplateSpecializationKind FunctionDecl::template_specialization_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal92());
+}
+
+TemplateSpecializationKind FunctionDecl::template_specialization_kind_for_instantiation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal93());
+}
+
+FunctionDeclTemplatedKind FunctionDecl::templated_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<FunctionDeclTemplatedKind>(self.getVal127());
+}
+
+bool FunctionDecl::has_implicit_return_zero(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+bool FunctionDecl::has_inherited_prototype(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal95();
+}
+
+bool FunctionDecl::has_one_parameter_or_default_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal96();
+}
+
+bool FunctionDecl::has_prototype(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal97();
+}
+
+bool FunctionDecl::has_skipped_body(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal98();
+}
+
+bool FunctionDecl::has_trivial_body(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal99();
+}
+
+bool FunctionDecl::has_written_prototype(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal100();
+}
+
+bool FunctionDecl::instantiation_is_pending(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal101();
+}
+
+bool FunctionDecl::is_cpu_dispatch_multi_version(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal102();
+}
+
+bool FunctionDecl::is_cpu_specific_multi_version(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal103();
+}
+
+bool FunctionDecl::is_consteval(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal104();
+}
+
+bool FunctionDecl::is_constexpr(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal105();
+}
+
+bool FunctionDecl::is_constexpr_specified(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal106();
+}
+
+bool FunctionDecl::is_defaulted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal107();
+}
+
+bool FunctionDecl::is_deleted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal108();
+}
+
+bool FunctionDecl::is_deleted_as_written(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal109();
+}
+
+bool FunctionDecl::is_destroying_operator_delete(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal110();
+}
+
+bool FunctionDecl::is_explicitly_defaulted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal111();
+}
+
+bool FunctionDecl::is_extern_c(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal112();
+}
+
+bool FunctionDecl::is_function_template_specialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal113();
+}
+
+bool FunctionDecl::is_global(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal114();
+}
+
+bool FunctionDecl::is_implicitly_instantiable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal115();
+}
+
+bool FunctionDecl::is_in_extern_c_context(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal116();
+}
+
+bool FunctionDecl::is_in_extern_cxx_context(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal117();
+}
+
+bool FunctionDecl::is_inline_builtin_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal118();
+}
+
+bool FunctionDecl::is_inline_specified(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal119();
+}
+
+bool FunctionDecl::is_inlined(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal120();
+}
+
+bool FunctionDecl::is_late_template_parsed(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal121();
+}
+
+bool FunctionDecl::is_msvcrt_entry_point(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal122();
+}
+
+bool FunctionDecl::is_main(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal123();
+}
+
+bool FunctionDecl::is_multi_version(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal124();
+}
+
+bool FunctionDecl::is_no_return(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal125();
+}
+
+bool FunctionDecl::is_overloaded_operator(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal126();
+}
+
+bool FunctionDecl::is_pure(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal131();
+}
+
+bool FunctionDecl::is_replaceable_global_allocation_function(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal132();
+}
+
+bool FunctionDecl::is_static(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal133();
+}
+
+bool FunctionDecl::is_target_multi_version(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal134();
+}
+
+bool FunctionDecl::is_template_instantiation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal135();
+}
+
+bool FunctionDecl::is_this_declaration_a_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal136();
+}
+
+bool FunctionDecl::is_this_declaration_instantiated_from_a_friend_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal137();
+}
+
+bool FunctionDecl::is_trivial(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal144();
+}
+
+bool FunctionDecl::is_trivial_for_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal145();
+}
+
+bool FunctionDecl::is_user_provided(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal146();
+}
+
+bool FunctionDecl::is_variadic(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal147();
+}
+
+bool FunctionDecl::is_virtual_as_written(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal148();
+}
+
+std::vector<ParmVarDecl> FunctionDecl::parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<ParmVarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ParmVarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+bool FunctionDecl::uses_seh_try(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal149();
+}
+
+bool FunctionDecl::will_have_body(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal150();
+}
+
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const FunctionDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CXX_METHOD:
+    case mx::DeclKind::CXX_DESTRUCTOR:
+    case mx::DeclKind::CXX_CONVERSION:
+    case mx::DeclKind::CXX_CONSTRUCTOR:
+      return reinterpret_cast<const CXXMethodDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+RefQualifierKind CXXMethodDecl::reference_qualifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<RefQualifierKind>(self.getVal130());
+}
+
+bool CXXMethodDecl::has_inline_body(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal152();
+}
+
+bool CXXMethodDecl::is_const(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal153();
+}
+
+bool CXXMethodDecl::is_copy_assignment_operator(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal154();
+}
+
+bool CXXMethodDecl::is_instance(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal155();
+}
+
+bool CXXMethodDecl::is_lambda_static_invoker(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal156();
+}
+
+bool CXXMethodDecl::is_move_assignment_operator(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal157();
+}
+
+bool CXXMethodDecl::is_virtual(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal158();
+}
+
+bool CXXMethodDecl::is_volatile(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal159();
+}
+
+std::vector<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal34();
+  std::vector<CXXMethodDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = CXXMethodDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const CXXMethodDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const FunctionDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CXX_DESTRUCTOR:
+      return reinterpret_cast<const CXXDestructorDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const CXXMethodDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const FunctionDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CXX_CONVERSION:
+      return reinterpret_cast<const CXXConversionDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXConversionDecl::is_explicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal161();
+}
+
+bool CXXConversionDecl::is_lambda_to_block_pointer_conversion(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal162();
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const CXXMethodDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const FunctionDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CXX_CONSTRUCTOR:
+      return reinterpret_cast<const CXXConstructorDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXConstructorDecl::is_default_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal161();
+}
+
+bool CXXConstructorDecl::is_delegating_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal162();
+}
+
+bool CXXConstructorDecl::is_explicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal163();
+}
+
+bool CXXConstructorDecl::is_inheriting_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal164();
+}
+
+bool CXXConstructorDecl::is_specialization_copying_object(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal165();
+}
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const FunctionDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+      return reinterpret_cast<const CXXDeductionGuideDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal152();
+}
+
+bool CXXDeductionGuideDecl::is_explicit(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal153();
+}
+
+std::optional<FieldDecl> FieldDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FieldDecl> FieldDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FieldDecl> FieldDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FieldDecl> FieldDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::FIELD:
+    case mx::DeclKind::OBJ_C_IVAR:
+    case mx::DeclKind::OBJ_C_AT_DEFS_FIELD:
+      return reinterpret_cast<const FieldDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+InClassInitStyle FieldDecl::in_class_initializer_style(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<InClassInitStyle>(self.getVal83());
+}
+
+bool FieldDecl::has_captured_vla_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool FieldDecl::has_in_class_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+bool FieldDecl::is_anonymous_struct_or_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+bool FieldDecl::is_bit_field(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal91();
+}
+
+bool FieldDecl::is_mutable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+bool FieldDecl::is_unnamed_bitfield(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal95();
+}
+
+bool FieldDecl::is_zero_length_bit_field(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal96();
+}
+
+bool FieldDecl::is_zero_size(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal97();
+}
+
+std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const FieldDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_IVAR:
+      return reinterpret_cast<const ObjCIvarDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ObjCIvarDeclAccessControl ObjCIvarDecl::access_control(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCIvarDeclAccessControl>(self.getVal85());
+}
+
+ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCIvarDeclAccessControl>(self.getVal86());
+}
+
+bool ObjCIvarDecl::synthesize(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal98();
+}
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const FieldDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const DeclaratorDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_AT_DEFS_FIELD:
+      return reinterpret_cast<const ObjCAtDefsFieldDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<BindingDecl> BindingDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<BindingDecl> BindingDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<BindingDecl> BindingDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::BINDING:
+      return reinterpret_cast<const BindingDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_DECLARE_MAPPER:
+      return reinterpret_cast<const OMPDeclarativeDirectiveValueDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const OMPDeclarativeDirectiveValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const ValueDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OMP_DECLARE_MAPPER:
+      return reinterpret_cast<const OMPDeclareMapperDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<UsingShadowDecl> UsingShadowDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UsingShadowDecl> UsingShadowDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::USING_SHADOW:
+    case mx::DeclKind::CONSTRUCTOR_USING_SHADOW:
+      return reinterpret_cast<const UsingShadowDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const UsingShadowDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CONSTRUCTOR_USING_SHADOW:
+      return reinterpret_cast<const ConstructorUsingShadowDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal81()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal25());
+    return ConstructorUsingShadowDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal82()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal69());
+    return ConstructorUsingShadowDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<UsingPackDecl> UsingPackDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UsingPackDecl> UsingPackDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::USING_PACK:
+      return reinterpret_cast<const UsingPackDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<NamedDecl> UsingPackDecl::expansions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<NamedDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = NamedDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::USING_DIRECTIVE:
+      return reinterpret_cast<const UsingDirectiveDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token UsingDirectiveDecl::identifier_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token UsingDirectiveDecl::namespace_key_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token UsingDirectiveDecl::using_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::UNRESOLVED_USING_IF_EXISTS:
+      return reinterpret_cast<const UnresolvedUsingIfExistsDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TypeDecl> TypeDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypeDecl> TypeDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TYPE:
+    case mx::DeclKind::TEMPLATE_TYPE_PARM:
+    case mx::DeclKind::TAG:
+    case mx::DeclKind::RECORD:
+    case mx::DeclKind::CXX_RECORD:
+    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case mx::DeclKind::ENUM:
+    case mx::DeclKind::UNRESOLVED_USING_TYPENAME:
+    case mx::DeclKind::TYPEDEF_NAME:
+    case mx::DeclKind::TYPEDEF:
+    case mx::DeclKind::TYPE_ALIAS:
+    case mx::DeclKind::OBJ_C_TYPE_PARAM:
+      return reinterpret_cast<const TypeDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TEMPLATE_TYPE_PARM:
+      return reinterpret_cast<const TemplateTypeParmDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool TemplateTypeParmDecl::default_argument_was_inherited(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+Token TemplateTypeParmDecl::default_argument_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool TemplateTypeParmDecl::has_default_argument(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool TemplateTypeParmDecl::has_type_constraint(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+bool TemplateTypeParmDecl::is_pack_expansion(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal91();
+}
+
+bool TemplateTypeParmDecl::was_declared_with_typename(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+std::optional<TagDecl> TagDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TagDecl> TagDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TagDecl> TagDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TAG:
+    case mx::DeclKind::RECORD:
+    case mx::DeclKind::CXX_RECORD:
+    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case mx::DeclKind::ENUM:
+      return reinterpret_cast<const TagDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+TokenRange TagDecl::brace_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
+}
+
+std::optional<TagDecl> TagDecl::definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal73()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal22());
+    return TagDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+Token TagDecl::inner_token_start(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+Token TagDecl::outer_token_start(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+TagTypeKind TagDecl::tag_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TagTypeKind>(self.getVal83());
+}
+
+std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal81()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal26());
+    return TypedefNameDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+bool TagDecl::has_name_for_linkage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+bool TagDecl::is_being_defined(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+bool TagDecl::is_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal91();
+}
+
+bool TagDecl::is_complete_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+bool TagDecl::is_complete_definition_required(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal95();
+}
+
+bool TagDecl::is_dependent_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal96();
+}
+
+bool TagDecl::is_embedded_in_declarator(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal97();
+}
+
+bool TagDecl::is_enum(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal98();
+}
+
+bool TagDecl::is_free_standing(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal99();
+}
+
+bool TagDecl::is_interface(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal100();
+}
+
+bool TagDecl::is_struct(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal101();
+}
+
+bool TagDecl::is_this_declaration_a_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal102();
+}
+
+bool TagDecl::is_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal103();
+}
+
+bool TagDecl::may_have_out_of_date_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal104();
+}
+
+std::vector<TemplateParameterList> TagDecl::template_parameter_lists(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal63();
+  std::vector<TemplateParameterList> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+std::optional<RecordDecl> RecordDecl::from(const TagDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<RecordDecl> RecordDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<RecordDecl> RecordDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<RecordDecl> RecordDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::RECORD:
+    case mx::DeclKind::CXX_RECORD:
+    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+      return reinterpret_cast<const RecordDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool RecordDecl::can_pass_in_registers(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal105();
+}
+
+std::vector<FieldDecl> RecordDecl::fields(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal33();
+  std::vector<FieldDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = FieldDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<FieldDecl> RecordDecl::find_first_named_data_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal106()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal69());
+    return FieldDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+RecordDeclArgPassingKind RecordDecl::argument_passing_restrictions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<RecordDeclArgPassingKind>(self.getVal85());
+}
+
+bool RecordDecl::has_flexible_array_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal107();
+}
+
+bool RecordDecl::has_loaded_fields_from_external_storage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal108();
+}
+
+bool RecordDecl::has_non_trivial_to_primitive_copy_c_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal109();
+}
+
+bool RecordDecl::has_non_trivial_to_primitive_default_initialize_c_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal110();
+}
+
+bool RecordDecl::has_non_trivial_to_primitive_destruct_c_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal111();
+}
+
+bool RecordDecl::has_object_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal112();
+}
+
+bool RecordDecl::has_volatile_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal113();
+}
+
+bool RecordDecl::is_anonymous_struct_or_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal114();
+}
+
+bool RecordDecl::is_captured_record(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal115();
+}
+
+bool RecordDecl::is_injected_class_name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal116();
+}
+
+bool RecordDecl::is_lambda(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal117();
+}
+
+bool RecordDecl::is_ms_struct(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal118();
+}
+
+bool RecordDecl::is_non_trivial_to_primitive_copy(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal119();
+}
+
+bool RecordDecl::is_non_trivial_to_primitive_default_initialize(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal120();
+}
+
+bool RecordDecl::is_non_trivial_to_primitive_destroy(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal121();
+}
+
+bool RecordDecl::is_or_contains_union(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal122();
+}
+
+bool RecordDecl::is_parameter_destroyed_in_callee(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal123();
+}
+
+bool RecordDecl::may_insert_extra_padding(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal124();
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const RecordDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const TagDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CXX_RECORD:
+    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+      return reinterpret_cast<const CXXRecordDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool CXXRecordDecl::allow_const_default_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal125();
+}
+
+std::vector<CXXBaseSpecifier> CXXRecordDecl::bases(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal138();
+  std::vector<CXXBaseSpecifier> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+MSInheritanceModel CXXRecordDecl::calculate_inheritance_model(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<MSInheritanceModel>(self.getVal86());
+}
+
+std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal34();
+  std::vector<CXXConstructorDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = CXXConstructorDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+bool CXXRecordDecl::defaulted_copy_constructor_is_deleted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal126();
+}
+
+bool CXXRecordDecl::defaulted_default_constructor_is_constexpr(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal131();
+}
+
+bool CXXRecordDecl::defaulted_destructor_is_constexpr(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal132();
+}
+
+bool CXXRecordDecl::defaulted_destructor_is_deleted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal133();
+}
+
+bool CXXRecordDecl::defaulted_move_constructor_is_deleted(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal134();
+}
+
+std::vector<FriendDecl> CXXRecordDecl::friends(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal36();
+  std::vector<FriendDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = FriendDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal135()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal74());
+    return CXXDestructorDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal136()) {
+    return std::nullopt;
+  } else {
+    return TemplateParameterList(fragment, self.getVal1());
+  }
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal137()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal90());
+    return CXXRecordDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal144()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal128());
+    return CXXMethodDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+LambdaCaptureDefault CXXRecordDecl::lambda_capture_default(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<LambdaCaptureDefault>(self.getVal87());
+}
+
+std::vector<NamedDecl> CXXRecordDecl::lambda_explicit_template_parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal37();
+  std::vector<NamedDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = NamedDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+MSInheritanceModel CXXRecordDecl::ms_inheritance_model(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<MSInheritanceModel>(self.getVal88());
+}
+
+MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<MSVtorDispMode>(self.getVal89());
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal145()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal140());
+    return CXXRecordDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal92());
+}
+
+bool CXXRecordDecl::has_any_dependent_bases(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal146();
+}
+
+bool CXXRecordDecl::has_constexpr_default_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal147();
+}
+
+bool CXXRecordDecl::has_constexpr_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal148();
+}
+
+bool CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal149();
+}
+
+bool CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal150();
+}
+
+bool CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal152();
+}
+
+bool CXXRecordDecl::has_default_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal153();
+}
+
+bool CXXRecordDecl::has_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal154();
+}
+
+bool CXXRecordDecl::has_direct_fields(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal155();
+}
+
+bool CXXRecordDecl::has_friends(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal156();
+}
+
+bool CXXRecordDecl::has_in_class_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal157();
+}
+
+bool CXXRecordDecl::has_inherited_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal158();
+}
+
+bool CXXRecordDecl::has_inherited_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal159();
+}
+
+bool CXXRecordDecl::has_irrelevant_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal161();
+}
+
+bool CXXRecordDecl::has_known_lambda_internal_linkage(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal162();
+}
+
+bool CXXRecordDecl::has_move_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal163();
+}
+
+bool CXXRecordDecl::has_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal164();
+}
+
+bool CXXRecordDecl::has_mutable_fields(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal165();
+}
+
+bool CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal166();
+}
+
+bool CXXRecordDecl::has_non_trivial_copy_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal167();
+}
+
+bool CXXRecordDecl::has_non_trivial_copy_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal168();
+}
+
+bool CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal169();
+}
+
+bool CXXRecordDecl::has_non_trivial_default_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal170();
+}
+
+bool CXXRecordDecl::has_non_trivial_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal171();
+}
+
+bool CXXRecordDecl::has_non_trivial_destructor_for_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal172();
+}
+
+bool CXXRecordDecl::has_non_trivial_move_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal173();
+}
+
+bool CXXRecordDecl::has_non_trivial_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal174();
+}
+
+bool CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal175();
+}
+
+bool CXXRecordDecl::has_private_fields(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal176();
+}
+
+bool CXXRecordDecl::has_protected_fields(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal177();
+}
+
+bool CXXRecordDecl::has_simple_copy_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal178();
+}
+
+bool CXXRecordDecl::has_simple_copy_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal179();
+}
+
+bool CXXRecordDecl::has_simple_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal180();
+}
+
+bool CXXRecordDecl::has_simple_move_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal181();
+}
+
+bool CXXRecordDecl::has_simple_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal182();
+}
+
+bool CXXRecordDecl::has_trivial_copy_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal183();
+}
+
+bool CXXRecordDecl::has_trivial_copy_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal184();
+}
+
+bool CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal185();
+}
+
+bool CXXRecordDecl::has_trivial_default_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal186();
+}
+
+bool CXXRecordDecl::has_trivial_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal187();
+}
+
+bool CXXRecordDecl::has_trivial_destructor_for_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal188();
+}
+
+bool CXXRecordDecl::has_trivial_move_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal189();
+}
+
+bool CXXRecordDecl::has_trivial_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal190();
+}
+
+bool CXXRecordDecl::has_trivial_move_constructor_for_call(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal191();
+}
+
+bool CXXRecordDecl::has_uninitialized_reference_member(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal192();
+}
+
+bool CXXRecordDecl::has_user_declared_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal193();
+}
+
+bool CXXRecordDecl::has_user_declared_copy_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal194();
+}
+
+bool CXXRecordDecl::has_user_declared_copy_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal195();
+}
+
+bool CXXRecordDecl::has_user_declared_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal196();
+}
+
+bool CXXRecordDecl::has_user_declared_move_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal197();
+}
+
+bool CXXRecordDecl::has_user_declared_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal198();
+}
+
+bool CXXRecordDecl::has_user_declared_move_operation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal199();
+}
+
+bool CXXRecordDecl::has_user_provided_default_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal200();
+}
+
+bool CXXRecordDecl::has_variant_members(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal201();
+}
+
+bool CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal202();
+}
+
+bool CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal203();
+}
+
+bool CXXRecordDecl::is_abstract(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal204();
+}
+
+bool CXXRecordDecl::is_aggregate(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal205();
+}
+
+bool CXXRecordDecl::is_any_destructor_no_return(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal206();
+}
+
+bool CXXRecordDecl::is_c_like(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal207();
+}
+
+bool CXXRecordDecl::is_cxx11_standard_layout(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal208();
+}
+
+bool CXXRecordDecl::is_dependent_lambda(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal209();
+}
+
+bool CXXRecordDecl::is_dynamic_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal210();
+}
+
+bool CXXRecordDecl::is_effectively_final(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal211();
+}
+
+bool CXXRecordDecl::is_empty(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal212();
+}
+
+bool CXXRecordDecl::is_generic_lambda(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal213();
+}
+
+bool CXXRecordDecl::is_interface_like(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal214();
+}
+
+bool CXXRecordDecl::is_literal(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal215();
+}
+
+std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal216()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal141());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+bool CXXRecordDecl::is_pod(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal217();
+}
+
+bool CXXRecordDecl::is_parsing_base_specifiers(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal218();
+}
+
+bool CXXRecordDecl::is_polymorphic(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal219();
+}
+
+bool CXXRecordDecl::is_standard_layout(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal220();
+}
+
+bool CXXRecordDecl::is_structural(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal221();
+}
+
+bool CXXRecordDecl::is_trivial(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal222();
+}
+
+bool CXXRecordDecl::is_trivially_copyable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal223();
+}
+
+bool CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal224();
+}
+
+bool CXXRecordDecl::may_be_abstract(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal225();
+}
+
+bool CXXRecordDecl::may_be_dynamic_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal226();
+}
+
+bool CXXRecordDecl::may_be_non_dynamic_class(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal227();
+}
+
+std::vector<CXXMethodDecl> CXXRecordDecl::methods(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal228();
+  std::vector<CXXMethodDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = CXXMethodDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+bool CXXRecordDecl::needs_implicit_copy_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal229();
+}
+
+bool CXXRecordDecl::needs_implicit_copy_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal230();
+}
+
+bool CXXRecordDecl::needs_implicit_default_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal231();
+}
+
+bool CXXRecordDecl::needs_implicit_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal232();
+}
+
+bool CXXRecordDecl::needs_implicit_move_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal233();
+}
+
+bool CXXRecordDecl::needs_implicit_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal234();
+}
+
+bool CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal235();
+}
+
+bool CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal236();
+}
+
+bool CXXRecordDecl::needs_overload_resolution_for_destructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal237();
+}
+
+bool CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal238();
+}
+
+bool CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal239();
+}
+
+bool CXXRecordDecl::null_field_offset_is_zero(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal240();
+}
+
+std::vector<CXXBaseSpecifier> CXXRecordDecl::virtual_bases(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal139();
+  std::vector<CXXBaseSpecifier> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const CXXRecordDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const RecordDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const TagDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+      return reinterpret_cast<const ClassTemplateSpecializationDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ClassTemplateSpecializationDecl::extern_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal142());
+}
+
+Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal143());
+}
+
+TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal93());
+}
+
+std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal241();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal242();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+Token ClassTemplateSpecializationDecl::template_keyword_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal151());
+}
+
+bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal243();
+}
+
+bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal244();
+}
+
+bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal245();
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const ClassTemplateSpecializationDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const CXXRecordDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const RecordDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const TagDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+      return reinterpret_cast<const ClassTemplatePartialSpecializationDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<EnumDecl> EnumDecl::from(const TagDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<EnumDecl> EnumDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<EnumDecl> EnumDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<EnumDecl> EnumDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::ENUM:
+      return reinterpret_cast<const EnumDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<EnumConstantDecl> EnumDecl::enumerators(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal33();
+  std::vector<EnumConstantDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = EnumConstantDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal105()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal69());
+    return EnumDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+TokenRange EnumDecl::integer_type_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal74(), self.getVal90());
+}
+
+std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal106()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal128());
+    return EnumDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<TemplateSpecializationKind>(self.getVal85());
+}
+
+bool EnumDecl::is_closed(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal107();
+}
+
+bool EnumDecl::is_closed_flag(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal108();
+}
+
+bool EnumDecl::is_closed_non_flag(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal109();
+}
+
+bool EnumDecl::is_complete(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal110();
+}
+
+bool EnumDecl::is_fixed(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal111();
+}
+
+bool EnumDecl::is_scoped(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal112();
+}
+
+bool EnumDecl::is_scoped_using_class_tag(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal113();
+}
+
+std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::UNRESOLVED_USING_TYPENAME:
+      return reinterpret_cast<const UnresolvedUsingTypenameDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token UnresolvedUsingTypenameDecl::typename_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+Token UnresolvedUsingTypenameDecl::using_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+std::optional<TypedefNameDecl> TypedefNameDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypedefNameDecl> TypedefNameDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypedefNameDecl> TypedefNameDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TYPEDEF_NAME:
+    case mx::DeclKind::TYPEDEF:
+    case mx::DeclKind::TYPE_ALIAS:
+    case mx::DeclKind::OBJ_C_TYPE_PARAM:
+      return reinterpret_cast<const TypedefNameDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal73()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal20());
+    return TagDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+bool TypedefNameDecl::is_moded(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool TypedefNameDecl::is_transparent_tag(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+std::optional<TypedefDecl> TypedefDecl::from(const TypedefNameDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypedefDecl> TypedefDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypedefDecl> TypedefDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypedefDecl> TypedefDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TYPEDEF:
+      return reinterpret_cast<const TypedefDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::from(const TypedefNameDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TYPE_ALIAS:
+      return reinterpret_cast<const TypeAliasDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  if (!self.getVal84()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal21());
+    return TypeAliasTemplateDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TypedefNameDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TypeDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_TYPE_PARAM:
+      return reinterpret_cast<const ObjCTypeParamDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCTypeParamDecl::colon_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCTypeParamVariance>(self.getVal83());
+}
+
+Token ObjCTypeParamDecl::variance_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+bool ObjCTypeParamDecl::has_explicit_bound(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+std::optional<TemplateDecl> TemplateDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TemplateDecl> TemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TEMPLATE:
+    case mx::DeclKind::REDECLARABLE_TEMPLATE:
+    case mx::DeclKind::FUNCTION_TEMPLATE:
+    case mx::DeclKind::CLASS_TEMPLATE:
+    case mx::DeclKind::VAR_TEMPLATE:
+    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+    case mx::DeclKind::CONCEPT:
+    case mx::DeclKind::BUILTIN_TEMPLATE:
+    case mx::DeclKind::TEMPLATE_TEMPLATE_PARM:
+      return reinterpret_cast<const TemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::REDECLARABLE_TEMPLATE:
+    case mx::DeclKind::FUNCTION_TEMPLATE:
+    case mx::DeclKind::CLASS_TEMPLATE:
+    case mx::DeclKind::VAR_TEMPLATE:
+    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+      return reinterpret_cast<const RedeclarableTemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::FUNCTION_TEMPLATE:
+      return reinterpret_cast<const FunctionTemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CLASS_TEMPLATE:
+      return reinterpret_cast<const ClassTemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<VarTemplateDecl> VarTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplateDecl> VarTemplateDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplateDecl> VarTemplateDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<VarTemplateDecl> VarTemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::VAR_TEMPLATE:
+      return reinterpret_cast<const VarTemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+      return reinterpret_cast<const TypeAliasTemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ConceptDecl> ConceptDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ConceptDecl> ConceptDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ConceptDecl> ConceptDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::CONCEPT:
+      return reinterpret_cast<const ConceptDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ConceptDecl::is_type_concept(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::BUILTIN_TEMPLATE:
+      return reinterpret_cast<const BuiltinTemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const TemplateDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::TEMPLATE_TEMPLATE_PARM:
+      return reinterpret_cast<const TemplateTemplateParmDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_PROPERTY:
+      return reinterpret_cast<const ObjCPropertyDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCPropertyDecl::at_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token ObjCPropertyDecl::getter_name_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token ObjCPropertyDecl::l_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+ObjCPropertyDeclPropertyControl ObjCPropertyDecl::property_implementation(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCPropertyDeclPropertyControl>(self.getVal83());
+}
+
+ObjCPropertyQueryKind ObjCPropertyDecl::query_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCPropertyQueryKind>(self.getVal85());
+}
+
+ObjCPropertyDeclSetterKind ObjCPropertyDecl::setter_kind(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCPropertyDeclSetterKind>(self.getVal86());
+}
+
+Token ObjCPropertyDecl::setter_name_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal69());
+}
+
+bool ObjCPropertyDecl::is_atomic(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+bool ObjCPropertyDecl::is_class_property(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool ObjCPropertyDecl::is_direct_property(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+bool ObjCPropertyDecl::is_instance_property(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+bool ObjCPropertyDecl::is_optional(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal91();
+}
+
+bool ObjCPropertyDecl::is_read_only(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+bool ObjCPropertyDecl::is_retaining(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal95();
+}
+
+std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_METHOD:
+      return reinterpret_cast<const ObjCMethodDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ObjCMethodDecl::defined_in_ns_object(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+Token ObjCMethodDecl::declarator_end_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+ObjCMethodDeclImplementationControl ObjCMethodDecl::implementation_control(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCMethodDeclImplementationControl>(self.getVal83());
+}
+
+ObjCMethodFamily ObjCMethodDecl::method_family(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<ObjCMethodFamily>(self.getVal85());
+}
+
+DeclObjCDeclQualifier ObjCMethodDecl::obj_c_decl_qualifier(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<DeclObjCDeclQualifier>(self.getVal86());
+}
+
+TokenRange ObjCMethodDecl::return_type_source_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal26(), self.getVal69());
+}
+
+Token ObjCMethodDecl::selector_start_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal74());
+}
+
+bool ObjCMethodDecl::has_redeclaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool ObjCMethodDecl::has_related_result_type(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+bool ObjCMethodDecl::has_skipped_body(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+bool ObjCMethodDecl::is_class_method(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal91();
+}
+
+bool ObjCMethodDecl::is_defined(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+bool ObjCMethodDecl::is_designated_initializer_for_the_interface(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal95();
+}
+
+bool ObjCMethodDecl::is_direct_method(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal96();
+}
+
+bool ObjCMethodDecl::is_instance_method(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal97();
+}
+
+bool ObjCMethodDecl::is_optional(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal98();
+}
+
+bool ObjCMethodDecl::is_overriding(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal99();
+}
+
+bool ObjCMethodDecl::is_property_accessor(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal100();
+}
+
+bool ObjCMethodDecl::is_redeclaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal101();
+}
+
+bool ObjCMethodDecl::is_synthesized_accessor_stub(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal102();
+}
+
+bool ObjCMethodDecl::is_this_declaration_a_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal103();
+}
+
+bool ObjCMethodDecl::is_this_declaration_a_designated_initializer(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal104();
+}
+
+bool ObjCMethodDecl::is_variadic(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal105();
+}
+
+std::vector<ParmVarDecl> ObjCMethodDecl::parameters(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<ParmVarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ParmVarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<Token> ObjCMethodDecl::selector_tokens(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal33();
+  std::vector<Token> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    vec.emplace_back(fragment->TokenFor(fragment, id));
+  }
+  return vec;
+}
+
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_CONTAINER:
+    case mx::DeclKind::OBJ_C_CATEGORY:
+    case mx::DeclKind::OBJ_C_PROTOCOL:
+    case mx::DeclKind::OBJ_C_INTERFACE:
+    case mx::DeclKind::OBJ_C_IMPL:
+    case mx::DeclKind::OBJ_C_CATEGORY_IMPL:
+    case mx::DeclKind::OBJ_C_IMPLEMENTATION:
+      return reinterpret_cast<const ObjCContainerDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<ObjCMethodDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCMethodDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal33();
+  std::vector<ObjCPropertyDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCPropertyDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+TokenRange ObjCContainerDecl::at_end_range(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
+}
+
+Token ObjCContainerDecl::at_start_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+std::vector<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal34();
+  std::vector<ObjCMethodDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCMethodDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal36();
+  std::vector<ObjCPropertyDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCPropertyDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCMethodDecl> ObjCContainerDecl::methods(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal37();
+  std::vector<ObjCMethodDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCMethodDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal228();
+  std::vector<ObjCPropertyDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCPropertyDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const ObjCContainerDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_CATEGORY:
+      return reinterpret_cast<const ObjCCategoryDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+bool ObjCCategoryDecl::is_class_extension(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+Token ObjCCategoryDecl::category_name_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+Token ObjCCategoryDecl::instance_variable_l_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal69());
+}
+
+Token ObjCCategoryDecl::instance_variable_r_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal74());
+}
+
+std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal247();
+  std::vector<ObjCIvarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCIvarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal248();
+  std::vector<Token> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    vec.emplace_back(fragment->TokenFor(fragment, id));
+  }
+  return vec;
+}
+
+std::vector<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal249();
+  std::vector<ObjCProtocolDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCProtocolDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const ObjCContainerDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_PROTOCOL:
+      return reinterpret_cast<const ObjCProtocolDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::string_view ObjCProtocolDecl::obj_c_runtime_name_as_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal80();
+  return std::string_view(data.cStr(), data.size());
+}
+
+bool ObjCProtocolDecl::has_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+bool ObjCProtocolDecl::is_non_runtime_protocol(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal247();
+  std::vector<Token> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    vec.emplace_back(fragment->TokenFor(fragment, id));
+  }
+  return vec;
+}
+
+std::vector<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal248();
+  std::vector<ObjCProtocolDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCProtocolDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const ObjCContainerDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_INTERFACE:
+      return reinterpret_cast<const ObjCInterfaceDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal247();
+  std::vector<ObjCProtocolDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCProtocolDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+bool ObjCInterfaceDecl::declares_or_inherits_designated_initializers(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+Token ObjCInterfaceDecl::end_of_definition_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal80();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token ObjCInterfaceDecl::super_class_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal90());
+}
+
+bool ObjCInterfaceDecl::has_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+bool ObjCInterfaceDecl::has_designated_initializers(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal82();
+}
+
+bool ObjCInterfaceDecl::is_arc_weakref_unavailable(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal84();
+}
+
+bool ObjCInterfaceDecl::is_implicit_interface_declaration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal91();
+}
+
+bool ObjCInterfaceDecl::is_this_declaration_a_definition(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal94();
+}
+
+std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal248();
+  std::vector<ObjCIvarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCIvarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal249();
+  std::vector<ObjCCategoryDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCCategoryDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal250();
+  std::vector<ObjCCategoryDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCCategoryDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal251();
+  std::vector<Token> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    vec.emplace_back(fragment->TokenFor(fragment, id));
+  }
+  return vec;
+}
+
+std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal252();
+  std::vector<ObjCProtocolDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCProtocolDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal253();
+  std::vector<ObjCCategoryDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCCategoryDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal254();
+  std::vector<ObjCCategoryDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCCategoryDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<ObjCImplDecl> ObjCImplDecl::from(const ObjCContainerDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCImplDecl> ObjCImplDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCImplDecl> ObjCImplDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_IMPL:
+    case mx::DeclKind::OBJ_C_CATEGORY_IMPL:
+    case mx::DeclKind::OBJ_C_IMPLEMENTATION:
+      return reinterpret_cast<const ObjCImplDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal247();
+  std::vector<ObjCPropertyImplDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCPropertyImplDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const ObjCImplDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const ObjCContainerDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_CATEGORY_IMPL:
+      return reinterpret_cast<const ObjCCategoryImplDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCCategoryImplDecl::category_name_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const ObjCImplDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const ObjCContainerDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_IMPLEMENTATION:
+      return reinterpret_cast<const ObjCImplementationDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal25());
+}
+
+Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal26());
+}
+
+std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  capnp::Text::Reader data = self.getVal80();
+  return std::string_view(data.cStr(), data.size());
+}
+
+Token ObjCImplementationDecl::super_class_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal74());
+}
+
+bool ObjCImplementationDecl::has_destructors(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal73();
+}
+
+bool ObjCImplementationDecl::has_non_zero_constructors(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal81();
+}
+
+std::vector<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal248();
+  std::vector<ObjCIvarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto e = ObjCIvarDecl::from(fragment->DeclFor(fragment, id))) {
+      vec.emplace_back(std::move(*e));
+    }
+  }
+  return vec;
+}
+
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::OBJ_C_COMPATIBLE_ALIAS:
+      return reinterpret_cast<const ObjCCompatibleAliasDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<NamespaceDecl> NamespaceDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<NamespaceDecl> NamespaceDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::NAMESPACE:
+      return reinterpret_cast<const NamespaceDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const NamedDecl &parent) {
+  return from(reinterpret_cast<const Decl &>(parent));
+}
+
+std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::NAMESPACE_ALIAS:
+      return reinterpret_cast<const NamespaceAliasDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token NamespaceAliasDecl::alias_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+Token NamespaceAliasDecl::namespace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal22());
+}
+
+Token NamespaceAliasDecl::target_name_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal24());
+}
+
+std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::LINKAGE_SPEC:
+      return reinterpret_cast<const LinkageSpecDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::LIFETIME_EXTENDED_TEMPORARY:
+      return reinterpret_cast<const LifetimeExtendedTemporaryDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return static_cast<StorageDuration>(self.getVal76());
+}
+
+std::optional<ImportDecl> ImportDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::IMPORT:
+      return reinterpret_cast<const ImportDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::vector<Token> ImportDecl::identifier_tokens(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal10();
+  std::vector<Token> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    vec.emplace_back(fragment->TokenFor(fragment, id));
+  }
+  return vec;
+}
+
+std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::FRIEND_TEMPLATE:
+      return reinterpret_cast<const FriendTemplateDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::FRIEND:
+      return reinterpret_cast<const FriendDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token FriendDecl::friend_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool FriendDecl::is_unsupported_friend(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+std::vector<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  auto list = self.getVal63();
+  std::vector<TemplateParameterList> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::FILE_SCOPE_ASM:
+      return reinterpret_cast<const FileScopeAsmDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token FileScopeAsmDecl::assembly_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token FileScopeAsmDecl::r_paren_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal21());
+}
+
+std::optional<ExternCContextDecl> ExternCContextDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::EXTERN_C_CONTEXT:
+      return reinterpret_cast<const ExternCContextDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<ExportDecl> ExportDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::EXPORT:
+      return reinterpret_cast<const ExportDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+Token ExportDecl::export_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal19());
+}
+
+Token ExportDecl::r_brace_token(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return fragment->TokenFor(fragment, self.getVal20());
+}
+
+bool ExportDecl::has_braces(void) const noexcept {
+  EntityListReader entities = fragment->Entities();
+  mx::ast::Entity::Reader self = entities[offset];
+  return self.getVal62();
+}
+
+std::optional<EmptyDecl> EmptyDecl::from(const Decl &parent) {
+  switch (parent.kind()) {
+    case mx::DeclKind::EMPTY:
+      return reinterpret_cast<const EmptyDecl &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+#endif  // MX_DISABLE_API
 }  // namespace mx

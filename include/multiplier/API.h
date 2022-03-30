@@ -30,6 +30,7 @@ class RemoteEntityProvider;
 class Token;
 class TokenList;
 class TokenListIterator;
+class TokenRange;
 class TokenReader;
 class TokenSubstitution;
 class TokenSubstitutionList;
@@ -44,6 +45,7 @@ class Token {
   friend class FragmentImpl;
   friend class TokenList;
   friend class TokenListIterator;
+  friend class TokenRange;
   friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
@@ -76,6 +78,7 @@ class TokenListEnd {};
 class TokenListIterator {
  private:
   friend class TokenList;
+  friend class TokenRange;
 
   Token impl;
   unsigned num_tokens;
@@ -118,29 +121,30 @@ class TokenListIterator {
   }
 };
 
-// List of tokens.
-class TokenList {
- private:
+
+class TokenRange {
+ protected:
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
+  unsigned index;
   unsigned num_tokens;
 
-  inline TokenList(std::shared_ptr<const TokenReader> impl_,
-                   unsigned num_tokens_)
+  inline TokenRange(std::shared_ptr<const TokenReader> impl_,
+                    unsigned index_, unsigned num_tokens_)
       : impl(std::move(impl_)),
+        index(index_),
         num_tokens(num_tokens_) {}
 
  public:
-  // Return the token list containing a particular token.
-  static TokenList containing(Token tok) noexcept;
+  TokenRange(void);
 
   // Return the number of tokens in this token list.
   inline size_t size(void) const noexcept {
-    return num_tokens;
+    return num_tokens - index;
   }
 
   // Return the token at index `index`.
@@ -148,12 +152,29 @@ class TokenList {
 
   // Return an iterator pointing at the first token in this list.
   inline TokenListIterator begin(void) const noexcept {
-    return TokenListIterator(impl, 0, num_tokens);
+    return TokenListIterator(impl, index, num_tokens);
   }
 
   inline TokenListEnd end(void) const noexcept {
     return {};
   }
+};
+
+// List of tokens.
+class TokenList : public TokenRange {
+ private:
+  friend class File;
+  friend class Fragment;
+  friend class FragmentImpl;
+  friend class TokenSubstitutionListIterator;
+
+  inline TokenList(std::shared_ptr<const TokenReader> impl_,
+                   unsigned num_tokens_)
+      : TokenRange(std::move(impl_), 0, num_tokens_) {}
+
+ public:
+  // Return the token list containing a particular token.
+  static TokenList containing(Token tok) noexcept;
 };
 
 class FileFragmentListEnd {};

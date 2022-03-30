@@ -25,6 +25,7 @@ using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
                                              capnp::Kind::STRUCT>::Reader;
 using EntityListReader = capnp::List<ast::Entity, capnp::Kind::STRUCT>::Reader;
+using TopLevelDeclListReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 
 struct PackedReaderState {
  private:
@@ -206,8 +207,21 @@ class FragmentImpl {
   // Return a reader for the entities in this fragment.
   virtual EntityListReader Entities(void) const = 0;
 
+  // Return a reader for the top-level declarations of this fragment.
+  virtual TopLevelDeclListReader TopLevelDeclarations(void) const = 0;
+
   // Return the token associated with a specific entity ID.
-  virtual Token TokenFor(const FragmentImpl::Ptr &, EntityId id) const;
+  Token TokenFor(const FragmentImpl::Ptr &, EntityId id) const;
+
+  // Return the inclusive token range associated with two entity IDs.
+  TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
+                           EntityId end_id) const;
+
+  // Return the declaration associated with a specific entity ID.
+  Decl DeclFor(const FragmentImpl::Ptr &, EntityId id) const;
+
+  // Return the statement associated with a specific entity ID.
+  Stmt StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
 };
 
 class InvalidFragmentImpl : public FragmentImpl {
@@ -226,7 +240,7 @@ class InvalidFragmentImpl : public FragmentImpl {
   NodeReader Nodes(void) const final;
   TokenSubstitutionsReader Substitutions(void) const final;
   EntityListReader Entities(void) const final;
-  Token TokenFor(const FragmentImpl::Ptr &, EntityId id) const final;
+  TopLevelDeclListReader TopLevelDeclarations(void) const final;
 };
 
 // A packed fragment of code.
@@ -273,6 +287,9 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
 
   // Return a reader for the entities in this fragment.
   EntityListReader Entities(void) const final;
+
+  // Return a reader for the top-level declarations of this fragment.
+  TopLevelDeclListReader TopLevelDeclarations(void) const final;
 };
 
 // Provides entities from a remote source, i.e. a remote

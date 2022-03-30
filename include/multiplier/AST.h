@@ -4996,12 +4996,19 @@ class CoawaitExpr;
 class CXXAddrspaceCastExpr;
 class CXXConstCastExpr;
 class CXXDynamicCastExpr;
+#ifndef MX_DISABLE_API
 class TemplateParameterList {
  protected:
+  friend class FragmentImpl;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
  public:
+  inline TemplateParameterList(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+      : fragment(std::move(fragment_)),
+        offset(offset_) {}
+
   unsigned num_parameters(void) const noexcept;
   unsigned num_required_parameters(void) const noexcept;
   unsigned depth(void) const noexcept;
@@ -5016,10 +5023,16 @@ class TemplateParameterList {
 
 class TemplateArgument {
  protected:
+  friend class FragmentImpl;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
  public:
+  inline TemplateArgument(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+      : fragment(std::move(fragment_)),
+        offset(offset_) {}
+
   TemplateArgumentKind kind(void) const noexcept;
   bool is_null(void) const noexcept;
   bool is_dependent(void) const noexcept;
@@ -5031,10 +5044,16 @@ class TemplateArgument {
 
 class CXXBaseSpecifier {
  protected:
+  friend class FragmentImpl;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
  public:
+  inline CXXBaseSpecifier(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+      : fragment(std::move(fragment_)),
+        offset(offset_) {}
+
   TokenRange token_range(void) const noexcept;
   Token base_type_token(void) const noexcept;
   bool is_virtual(void) const noexcept;
@@ -5048,10 +5067,16 @@ class CXXBaseSpecifier {
 
 class Stmt {
  protected:
+  friend class FragmentImpl;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
  public:
+  inline Stmt(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+      : fragment(std::move(fragment_)),
+        offset(offset_) {}
+
   Token begin_token(void) const noexcept;
   Token end_token(void) const noexcept;
   TokenRange token_range(void) const noexcept;
@@ -5059,7 +5084,11 @@ class Stmt {
 };
 
 class SEHTryStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<SEHTryStmt> from(const Stmt &parent);
   SEHExceptStmt except_handler(void) const noexcept;
   SEHFinallyStmt finally_handler(void) const noexcept;
   bool is_cxx_try(void) const noexcept;
@@ -5068,64 +5097,108 @@ class SEHTryStmt : public Stmt {
 };
 
 class SEHLeaveStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<SEHLeaveStmt> from(const Stmt &parent);
   Token leave_token(void) const noexcept;
 };
 
 class SEHFinallyStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<SEHFinallyStmt> from(const Stmt &parent);
   CompoundStmt block(void) const noexcept;
   Token finally_token(void) const noexcept;
 };
 
 class SEHExceptStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<SEHExceptStmt> from(const Stmt &parent);
   CompoundStmt block(void) const noexcept;
   Token except_token(void) const noexcept;
 };
 
 class ReturnStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ReturnStmt> from(const Stmt &parent);
   std::optional<VarDecl> nrvo_candidate(void) const noexcept;
   Token return_token(void) const noexcept;
 };
 
 class ObjCForCollectionStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
   Token for_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ObjCAutoreleasePoolStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent);
   Token at_token(void) const noexcept;
 };
 
 class ObjCAtTryStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
   Token at_try_token(void) const noexcept;
   ObjCAtFinallyStmt finally_statement(void) const noexcept;
   std::vector<ObjCAtCatchStmt> catch_statements(void) const noexcept;
 };
 
 class ObjCAtThrowStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ObjCAtThrowStmt> from(const Stmt &parent);
   Token throw_token(void) const noexcept;
 };
 
 class ObjCAtSynchronizedStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ObjCAtSynchronizedStmt> from(const Stmt &parent);
   Token at_synchronized_token(void) const noexcept;
   CompoundStmt synch_body(void) const noexcept;
 };
 
 class ObjCAtFinallyStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ObjCAtFinallyStmt> from(const Stmt &parent);
   Token at_finally_token(void) const noexcept;
 };
 
 class ObjCAtCatchStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
   Token at_catch_token(void) const noexcept;
   VarDecl catch_parameter_declaration(void) const noexcept;
   Token r_paren_token(void) const noexcept;
@@ -5133,289 +5206,781 @@ class ObjCAtCatchStmt : public Stmt {
 };
 
 class OMPExecutableDirective : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<OMPExecutableDirective> from(const Stmt &parent);
   CapturedStmt innermost_captured_statement(void) const noexcept;
   bool has_associated_statement(void) const noexcept;
   bool is_standalone_directive(void) const noexcept;
 };
 
 class OMPDispatchDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPDispatchDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPDispatchDirective> from(const Stmt &parent);
   Token target_call_token(void) const noexcept;
 };
 
 class OMPDepobjDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPDepobjDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPDepobjDirective> from(const Stmt &parent);
 };
 
 class OMPCriticalDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPCriticalDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPCriticalDirective> from(const Stmt &parent);
 };
 
 class OMPCancellationPointDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPCancellationPointDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPCancellationPointDirective> from(const Stmt &parent);
 };
 
 class OMPCancelDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPCancelDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPCancelDirective> from(const Stmt &parent);
 };
 
 class OMPBarrierDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPBarrierDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPBarrierDirective> from(const Stmt &parent);
 };
 
 class OMPAtomicDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPAtomicDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPAtomicDirective> from(const Stmt &parent);
   bool is_postfix_update(void) const noexcept;
   bool is_xlhs_in_rhs_part(void) const noexcept;
 };
 
 class OMPTeamsDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTeamsDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTeamsDirective> from(const Stmt &parent);
 };
 
 class OMPTaskyieldDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTaskyieldDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTaskyieldDirective> from(const Stmt &parent);
 };
 
 class OMPTaskwaitDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTaskwaitDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTaskwaitDirective> from(const Stmt &parent);
 };
 
 class OMPTaskgroupDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTaskgroupDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTaskgroupDirective> from(const Stmt &parent);
 };
 
 class OMPTaskDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTaskDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTaskDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPTargetUpdateDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetUpdateDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetUpdateDirective> from(const Stmt &parent);
 };
 
 class OMPTargetTeamsDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetTeamsDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetTeamsDirective> from(const Stmt &parent);
 };
 
 class OMPTargetParallelDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetParallelDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetParallelDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPTargetExitDataDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetExitDataDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetExitDataDirective> from(const Stmt &parent);
 };
 
 class OMPTargetEnterDataDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetEnterDataDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetEnterDataDirective> from(const Stmt &parent);
 };
 
 class OMPTargetDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetDirective> from(const Stmt &parent);
 };
 
 class OMPTargetDataDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetDataDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetDataDirective> from(const Stmt &parent);
 };
 
 class OMPSingleDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPSingleDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPSingleDirective> from(const Stmt &parent);
 };
 
 class OMPSectionsDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPSectionsDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPSectionsDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPSectionDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPSectionDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPSectionDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPScanDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPScanDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPScanDirective> from(const Stmt &parent);
 };
 
 class OMPParallelSectionsDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPParallelSectionsDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPParallelSectionsDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPParallelMasterDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPParallelMasterDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPParallelMasterDirective> from(const Stmt &parent);
 };
 
 class OMPParallelDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPParallelDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPParallelDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPOrderedDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPOrderedDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPOrderedDirective> from(const Stmt &parent);
 };
 
 class OMPMasterDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPMasterDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPMasterDirective> from(const Stmt &parent);
 };
 
 class OMPMaskedDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPMaskedDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPMaskedDirective> from(const Stmt &parent);
 };
 
 class OMPLoopBasedDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPLoopBasedDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPLoopBasedDirective> from(const Stmt &parent);
 };
 
 class OMPUnrollDirective : public OMPLoopBasedDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPUnrollDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPUnrollDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPUnrollDirective> from(const Stmt &parent);
 };
 
 class OMPTileDirective : public OMPLoopBasedDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTileDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTileDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTileDirective> from(const Stmt &parent);
 };
 
 class OMPLoopDirective : public OMPLoopBasedDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPLoopDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPLoopDirective> from(const Stmt &parent);
 };
 
 class OMPForSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPForSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPForSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPForSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPForSimdDirective> from(const Stmt &parent);
 };
 
 class OMPForDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPForDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPForDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPForDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPDistributeSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPDistributeSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPDistributeSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPDistributeSimdDirective> from(const Stmt &parent);
 };
 
 class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPDistributeParallelForSimdDirective> from(const Stmt &parent);
 };
 
 class OMPDistributeParallelForDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPDistributeParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPDistributeDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPDistributeDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPDistributeDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPDistributeDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPDistributeDirective> from(const Stmt &parent);
 };
 
 class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTeamsDistributeSimdDirective> from(const Stmt &parent);
 };
 
 class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const Stmt &parent);
 };
 
 class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTeamsDistributeParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPTeamsDistributeDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTeamsDistributeDirective> from(const Stmt &parent);
 };
 
 class OMPTaskLoopSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTaskLoopSimdDirective> from(const Stmt &parent);
 };
 
 class OMPTaskLoopDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTaskLoopDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTaskLoopDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTaskLoopDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const Stmt &parent);
 };
 
 class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const Stmt &parent);
 };
 
 class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetTeamsDistributeDirective> from(const Stmt &parent);
 };
 
 class OMPTargetSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTargetSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTargetSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetSimdDirective> from(const Stmt &parent);
 };
 
 class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTargetParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetParallelForSimdDirective> from(const Stmt &parent);
 };
 
 class OMPTargetParallelForDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPTargetParallelForDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPTargetParallelForDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPTargetParallelForDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPTargetParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPSimdDirective> from(const Stmt &parent);
 };
 
 class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const Stmt &parent);
 };
 
 class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPParallelMasterTaskLoopDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPParallelForSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPParallelForSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPParallelForSimdDirective> from(const Stmt &parent);
 };
 
 class OMPParallelForDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPParallelForDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPParallelForDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPParallelForDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPMasterTaskLoopSimdDirective> from(const Stmt &parent);
 };
 
 class OMPMasterTaskLoopDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
+  static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
+  static std::optional<OMPMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPMasterTaskLoopDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
 
 class OMPInteropDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPInteropDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPInteropDirective> from(const Stmt &parent);
 };
 
 class OMPFlushDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
  public:
+  static std::optional<OMPFlushDirective> from(const OMPExecutableDirective &parent);
+  static std::optional<OMPFlushDirective> from(const Stmt &parent);
 };
 
 class OMPCanonicalLoop : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<OMPCanonicalLoop> from(const Stmt &parent);
   CapturedStmt distance_func(void) const noexcept;
   CapturedStmt loop_variable_func(void) const noexcept;
   DeclRefExpr loop_variable_reference(void) const noexcept;
 };
 
 class NullStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<NullStmt> from(const Stmt &parent);
   Token semi_token(void) const noexcept;
   bool has_leading_empty_macro(void) const noexcept;
 };
 
 class MSDependentExistsStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<MSDependentExistsStmt> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   CompoundStmt sub_statement(void) const noexcept;
   bool is_if_exists(void) const noexcept;
@@ -5423,14 +5988,22 @@ class MSDependentExistsStmt : public Stmt {
 };
 
 class IndirectGotoStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<IndirectGotoStmt> from(const Stmt &parent);
   LabelDecl constant_target(void) const noexcept;
   Token goto_token(void) const noexcept;
   Token star_token(void) const noexcept;
 };
 
 class IfStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<IfStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
   Token else_token(void) const noexcept;
@@ -5445,14 +6018,22 @@ class IfStmt : public Stmt {
 };
 
 class GotoStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<GotoStmt> from(const Stmt &parent);
   Token goto_token(void) const noexcept;
   LabelDecl label(void) const noexcept;
   Token label_token(void) const noexcept;
 };
 
 class ForStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ForStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
   Token for_token(void) const noexcept;
@@ -5461,56 +6042,92 @@ class ForStmt : public Stmt {
 };
 
 class DoStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<DoStmt> from(const Stmt &parent);
   Token do_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   Token while_token(void) const noexcept;
 };
 
 class DeclStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<DeclStmt> from(const Stmt &parent);
   bool is_single_declaration(void) const noexcept;
 };
 
 class CoroutineBodyStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<CoroutineBodyStmt> from(const Stmt &parent);
   VarDecl promise_declaration(void) const noexcept;
   bool has_dependent_promise_type(void) const noexcept;
 };
 
 class CoreturnStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<CoreturnStmt> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   bool is_implicit(void) const noexcept;
 };
 
 class ContinueStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ContinueStmt> from(const Stmt &parent);
   Token continue_token(void) const noexcept;
 };
 
 class CompoundStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<CompoundStmt> from(const Stmt &parent);
   Token l_brac_token(void) const noexcept;
   Token r_brac_token(void) const noexcept;
 };
 
 class CapturedStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<CapturedStmt> from(const Stmt &parent);
   CapturedDecl captured_declaration(void) const noexcept;
   RecordDecl captured_record_declaration(void) const noexcept;
   CapturedRegionKind captured_region_kind(void) const noexcept;
 };
 
 class CXXTryStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<CXXTryStmt> from(const Stmt &parent);
   CompoundStmt try_block(void) const noexcept;
   Token try_token(void) const noexcept;
   std::vector<CXXCatchStmt> handlers(void) const noexcept;
 };
 
 class CXXForRangeStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<CXXForRangeStmt> from(const Stmt &parent);
   DeclStmt begin_statement(void) const noexcept;
   Token coawait_token(void) const noexcept;
   Token colon_token(void) const noexcept;
@@ -5523,18 +6140,30 @@ class CXXForRangeStmt : public Stmt {
 };
 
 class CXXCatchStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<CXXCatchStmt> from(const Stmt &parent);
   Token catch_token(void) const noexcept;
   VarDecl exception_declaration(void) const noexcept;
 };
 
 class BreakStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<BreakStmt> from(const Stmt &parent);
   Token break_token(void) const noexcept;
 };
 
 class AsmStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<AsmStmt> from(const Stmt &parent);
   std::string_view generate_assembly_string(void) const noexcept;
   Token assembly_token(void) const noexcept;
   bool is_simple(void) const noexcept;
@@ -5545,7 +6174,13 @@ class AsmStmt : public Stmt {
 };
 
 class MSAsmStmt : public AsmStmt {
+ private:
+  friend class FragmentImpl;
+  friend class AsmStmt;
+  friend class Stmt;
  public:
+  static std::optional<MSAsmStmt> from(const AsmStmt &parent);
+  static std::optional<MSAsmStmt> from(const Stmt &parent);
   std::vector<std::string_view> all_constraints(void) const noexcept;
   std::string_view assembly_string(void) const noexcept;
   Token l_brace_token(void) const noexcept;
@@ -5553,7 +6188,13 @@ class MSAsmStmt : public AsmStmt {
 };
 
 class GCCAsmStmt : public AsmStmt {
+ private:
+  friend class FragmentImpl;
+  friend class AsmStmt;
+  friend class Stmt;
  public:
+  static std::optional<GCCAsmStmt> from(const AsmStmt &parent);
+  static std::optional<GCCAsmStmt> from(const Stmt &parent);
   StringLiteral assembly_string(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_assembly_goto(void) const noexcept;
@@ -5568,7 +6209,11 @@ class GCCAsmStmt : public AsmStmt {
 };
 
 class WhileStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<WhileStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
   Token l_paren_token(void) const noexcept;
@@ -5578,11 +6223,21 @@ class WhileStmt : public Stmt {
 };
 
 class ValueStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<ValueStmt> from(const Stmt &parent);
 };
 
 class LabelStmt : public ValueStmt {
+ private:
+  friend class FragmentImpl;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<LabelStmt> from(const ValueStmt &parent);
+  static std::optional<LabelStmt> from(const Stmt &parent);
   LabelDecl declaration(void) const noexcept;
   Token identifier_token(void) const noexcept;
   std::string_view name(void) const noexcept;
@@ -5590,7 +6245,13 @@ class LabelStmt : public ValueStmt {
 };
 
 class Expr : public ValueStmt {
+ private:
+  friend class FragmentImpl;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<Expr> from(const ValueStmt &parent);
+  static std::optional<Expr> from(const Stmt &parent);
   bool has_side_effects(void) const noexcept;
   bool contains_errors(void) const noexcept;
   bool contains_unexpanded_parameter_pack(void) const noexcept;
@@ -5621,12 +6282,28 @@ class Expr : public ValueStmt {
 };
 
 class DesignatedInitUpdateExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<DesignatedInitUpdateExpr> from(const Expr &parent);
+  static std::optional<DesignatedInitUpdateExpr> from(const ValueStmt &parent);
+  static std::optional<DesignatedInitUpdateExpr> from(const Stmt &parent);
   InitListExpr updater(void) const noexcept;
 };
 
 class DesignatedInitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<DesignatedInitExpr> from(const Expr &parent);
+  static std::optional<DesignatedInitExpr> from(const ValueStmt &parent);
+  static std::optional<DesignatedInitExpr> from(const Stmt &parent);
   TokenRange designators_source_range(void) const noexcept;
   Token equal_or_colon_token(void) const noexcept;
   bool is_direct_initializer(void) const noexcept;
@@ -5634,7 +6311,15 @@ class DesignatedInitExpr : public Expr {
 };
 
 class DependentScopeDeclRefExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<DependentScopeDeclRefExpr> from(const Expr &parent);
+  static std::optional<DependentScopeDeclRefExpr> from(const ValueStmt &parent);
+  static std::optional<DependentScopeDeclRefExpr> from(const Stmt &parent);
   Token l_angle_token(void) const noexcept;
   Token r_angle_token(void) const noexcept;
   Token template_keyword_token(void) const noexcept;
@@ -5643,13 +6328,29 @@ class DependentScopeDeclRefExpr : public Expr {
 };
 
 class DependentCoawaitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<DependentCoawaitExpr> from(const Expr &parent);
+  static std::optional<DependentCoawaitExpr> from(const ValueStmt &parent);
+  static std::optional<DependentCoawaitExpr> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   UnresolvedLookupExpr operator_coawait_lookup(void) const noexcept;
 };
 
 class DeclRefExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<DeclRefExpr> from(const Expr &parent);
+  static std::optional<DeclRefExpr> from(const ValueStmt &parent);
+  static std::optional<DeclRefExpr> from(const Stmt &parent);
   ValueDecl declaration(void) const noexcept;
   NamedDecl found_declaration(void) const noexcept;
   Token l_angle_token(void) const noexcept;
@@ -5665,40 +6366,100 @@ class DeclRefExpr : public Expr {
 };
 
 class CoroutineSuspendExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CoroutineSuspendExpr> from(const Expr &parent);
+  static std::optional<CoroutineSuspendExpr> from(const ValueStmt &parent);
+  static std::optional<CoroutineSuspendExpr> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   OpaqueValueExpr opaque_value(void) const noexcept;
 };
 
 class CoawaitExpr : public CoroutineSuspendExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CoroutineSuspendExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CoawaitExpr> from(const CoroutineSuspendExpr &parent);
+  static std::optional<CoawaitExpr> from(const Expr &parent);
+  static std::optional<CoawaitExpr> from(const ValueStmt &parent);
+  static std::optional<CoawaitExpr> from(const Stmt &parent);
   bool is_implicit(void) const noexcept;
 };
 
 class CoyieldExpr : public CoroutineSuspendExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CoroutineSuspendExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CoyieldExpr> from(const CoroutineSuspendExpr &parent);
+  static std::optional<CoyieldExpr> from(const Expr &parent);
+  static std::optional<CoyieldExpr> from(const ValueStmt &parent);
+  static std::optional<CoyieldExpr> from(const Stmt &parent);
 };
 
 class ConvertVectorExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ConvertVectorExpr> from(const Expr &parent);
+  static std::optional<ConvertVectorExpr> from(const ValueStmt &parent);
+  static std::optional<ConvertVectorExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ConceptSpecializationExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ConceptSpecializationExpr> from(const Expr &parent);
+  static std::optional<ConceptSpecializationExpr> from(const ValueStmt &parent);
+  static std::optional<ConceptSpecializationExpr> from(const Stmt &parent);
   std::vector<TemplateArgument> template_arguments(void) const noexcept;
   bool is_satisfied(void) const noexcept;
 };
 
 class CompoundLiteralExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CompoundLiteralExpr> from(const Expr &parent);
+  static std::optional<CompoundLiteralExpr> from(const ValueStmt &parent);
+  static std::optional<CompoundLiteralExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   bool is_file_scope(void) const noexcept;
 };
 
 class ChooseExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ChooseExpr> from(const Expr &parent);
+  static std::optional<ChooseExpr> from(const ValueStmt &parent);
+  static std::optional<ChooseExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_condition_dependent(void) const noexcept;
@@ -5706,12 +6467,28 @@ class ChooseExpr : public Expr {
 };
 
 class CharacterLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CharacterLiteral> from(const Expr &parent);
+  static std::optional<CharacterLiteral> from(const ValueStmt &parent);
+  static std::optional<CharacterLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
 
 class CastExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CastExpr> from(const Expr &parent);
+  static std::optional<CastExpr> from(const ValueStmt &parent);
+  static std::optional<CastExpr> from(const Stmt &parent);
   CastKind cast_kind(void) const noexcept;
   std::string_view cast_kind_name(void) const noexcept;
   std::optional<NamedDecl> conversion_function(void) const noexcept;
@@ -5720,16 +6497,48 @@ class CastExpr : public Expr {
 };
 
 class ImplicitCastExpr : public CastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ImplicitCastExpr> from(const CastExpr &parent);
+  static std::optional<ImplicitCastExpr> from(const Expr &parent);
+  static std::optional<ImplicitCastExpr> from(const ValueStmt &parent);
+  static std::optional<ImplicitCastExpr> from(const Stmt &parent);
   bool is_part_of_explicit_cast(void) const noexcept;
 };
 
 class ExplicitCastExpr : public CastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ExplicitCastExpr> from(const CastExpr &parent);
+  static std::optional<ExplicitCastExpr> from(const Expr &parent);
+  static std::optional<ExplicitCastExpr> from(const ValueStmt &parent);
+  static std::optional<ExplicitCastExpr> from(const Stmt &parent);
 };
 
 class CXXNamedCastExpr : public ExplicitCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXNamedCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CXXNamedCastExpr> from(const CastExpr &parent);
+  static std::optional<CXXNamedCastExpr> from(const Expr &parent);
+  static std::optional<CXXNamedCastExpr> from(const ValueStmt &parent);
+  static std::optional<CXXNamedCastExpr> from(const Stmt &parent);
   TokenRange angle_brackets(void) const noexcept;
   std::string_view cast_name(void) const noexcept;
   Token operator_token(void) const noexcept;
@@ -5737,45 +6546,163 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
 };
 
 class CXXDynamicCastExpr : public CXXNamedCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CXXNamedCastExpr;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXDynamicCastExpr> from(const CXXNamedCastExpr &parent);
+  static std::optional<CXXDynamicCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CXXDynamicCastExpr> from(const CastExpr &parent);
+  static std::optional<CXXDynamicCastExpr> from(const Expr &parent);
+  static std::optional<CXXDynamicCastExpr> from(const ValueStmt &parent);
+  static std::optional<CXXDynamicCastExpr> from(const Stmt &parent);
   bool is_always_null(void) const noexcept;
 };
 
 class CXXConstCastExpr : public CXXNamedCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CXXNamedCastExpr;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXConstCastExpr> from(const CXXNamedCastExpr &parent);
+  static std::optional<CXXConstCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CXXConstCastExpr> from(const CastExpr &parent);
+  static std::optional<CXXConstCastExpr> from(const Expr &parent);
+  static std::optional<CXXConstCastExpr> from(const ValueStmt &parent);
+  static std::optional<CXXConstCastExpr> from(const Stmt &parent);
 };
 
 class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CXXNamedCastExpr;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXAddrspaceCastExpr> from(const CXXNamedCastExpr &parent);
+  static std::optional<CXXAddrspaceCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CXXAddrspaceCastExpr> from(const CastExpr &parent);
+  static std::optional<CXXAddrspaceCastExpr> from(const Expr &parent);
+  static std::optional<CXXAddrspaceCastExpr> from(const ValueStmt &parent);
+  static std::optional<CXXAddrspaceCastExpr> from(const Stmt &parent);
 };
 
 class CXXStaticCastExpr : public CXXNamedCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CXXNamedCastExpr;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXStaticCastExpr> from(const CXXNamedCastExpr &parent);
+  static std::optional<CXXStaticCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CXXStaticCastExpr> from(const CastExpr &parent);
+  static std::optional<CXXStaticCastExpr> from(const Expr &parent);
+  static std::optional<CXXStaticCastExpr> from(const ValueStmt &parent);
+  static std::optional<CXXStaticCastExpr> from(const Stmt &parent);
 };
 
 class CXXReinterpretCastExpr : public CXXNamedCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CXXNamedCastExpr;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXReinterpretCastExpr> from(const CXXNamedCastExpr &parent);
+  static std::optional<CXXReinterpretCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CXXReinterpretCastExpr> from(const CastExpr &parent);
+  static std::optional<CXXReinterpretCastExpr> from(const Expr &parent);
+  static std::optional<CXXReinterpretCastExpr> from(const ValueStmt &parent);
+  static std::optional<CXXReinterpretCastExpr> from(const Stmt &parent);
 };
 
 class CXXFunctionalCastExpr : public ExplicitCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXFunctionalCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CXXFunctionalCastExpr> from(const CastExpr &parent);
+  static std::optional<CXXFunctionalCastExpr> from(const Expr &parent);
+  static std::optional<CXXFunctionalCastExpr> from(const ValueStmt &parent);
+  static std::optional<CXXFunctionalCastExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_list_initialization(void) const noexcept;
 };
 
 class CStyleCastExpr : public ExplicitCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CStyleCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<CStyleCastExpr> from(const CastExpr &parent);
+  static std::optional<CStyleCastExpr> from(const Expr &parent);
+  static std::optional<CStyleCastExpr> from(const ValueStmt &parent);
+  static std::optional<CStyleCastExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class BuiltinBitCastExpr : public ExplicitCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<BuiltinBitCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<BuiltinBitCastExpr> from(const CastExpr &parent);
+  static std::optional<BuiltinBitCastExpr> from(const Expr &parent);
+  static std::optional<BuiltinBitCastExpr> from(const ValueStmt &parent);
+  static std::optional<BuiltinBitCastExpr> from(const Stmt &parent);
 };
 
 class ObjCBridgedCastExpr : public ExplicitCastExpr {
+ private:
+  friend class FragmentImpl;
+  friend class ExplicitCastExpr;
+  friend class CastExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCBridgedCastExpr> from(const ExplicitCastExpr &parent);
+  static std::optional<ObjCBridgedCastExpr> from(const CastExpr &parent);
+  static std::optional<ObjCBridgedCastExpr> from(const Expr &parent);
+  static std::optional<ObjCBridgedCastExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCBridgedCastExpr> from(const Stmt &parent);
   Token bridge_keyword_token(void) const noexcept;
   ObjCBridgeCastKind bridge_kind(void) const noexcept;
   std::string_view bridge_kind_name(void) const noexcept;
@@ -5783,7 +6710,15 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
 };
 
 class CallExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CallExpr> from(const Expr &parent);
+  static std::optional<CallExpr> from(const ValueStmt &parent);
+  static std::optional<CallExpr> from(const Stmt &parent);
   CallExprADLCallKind adl_call_kind(void) const noexcept;
   std::optional<FunctionDecl> direct_callee(void) const noexcept;
   Token r_paren_token(void) const noexcept;
@@ -5796,7 +6731,17 @@ class CallExpr : public Expr {
 };
 
 class CXXOperatorCallExpr : public CallExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CallExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXOperatorCallExpr> from(const CallExpr &parent);
+  static std::optional<CXXOperatorCallExpr> from(const Expr &parent);
+  static std::optional<CXXOperatorCallExpr> from(const ValueStmt &parent);
+  static std::optional<CXXOperatorCallExpr> from(const Stmt &parent);
   OverloadedOperatorKind operator_(void) const noexcept;
   Token operator_token(void) const noexcept;
   bool is_assignment_operation(void) const noexcept;
@@ -5805,65 +6750,159 @@ class CXXOperatorCallExpr : public CallExpr {
 };
 
 class CXXMemberCallExpr : public CallExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CallExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXMemberCallExpr> from(const CallExpr &parent);
+  static std::optional<CXXMemberCallExpr> from(const Expr &parent);
+  static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
+  static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
   CXXMethodDecl method_declaration(void) const noexcept;
   CXXRecordDecl record_declaration(void) const noexcept;
 };
 
 class CUDAKernelCallExpr : public CallExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CallExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CUDAKernelCallExpr> from(const CallExpr &parent);
+  static std::optional<CUDAKernelCallExpr> from(const Expr &parent);
+  static std::optional<CUDAKernelCallExpr> from(const ValueStmt &parent);
+  static std::optional<CUDAKernelCallExpr> from(const Stmt &parent);
   CallExpr config(void) const noexcept;
 };
 
 class UserDefinedLiteral : public CallExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CallExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<UserDefinedLiteral> from(const CallExpr &parent);
+  static std::optional<UserDefinedLiteral> from(const Expr &parent);
+  static std::optional<UserDefinedLiteral> from(const ValueStmt &parent);
+  static std::optional<UserDefinedLiteral> from(const Stmt &parent);
   UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const noexcept;
   Token ud_suffix_token(void) const noexcept;
 };
 
 class CXXUuidofExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXUuidofExpr> from(const Expr &parent);
+  static std::optional<CXXUuidofExpr> from(const ValueStmt &parent);
+  static std::optional<CXXUuidofExpr> from(const Stmt &parent);
   MSGuidDecl guid_declaration(void) const noexcept;
   bool is_type_operand(void) const noexcept;
 };
 
 class CXXUnresolvedConstructExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXUnresolvedConstructExpr> from(const Expr &parent);
+  static std::optional<CXXUnresolvedConstructExpr> from(const ValueStmt &parent);
+  static std::optional<CXXUnresolvedConstructExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_list_initialization(void) const noexcept;
 };
 
 class CXXTypeidExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXTypeidExpr> from(const Expr &parent);
+  static std::optional<CXXTypeidExpr> from(const ValueStmt &parent);
+  static std::optional<CXXTypeidExpr> from(const Stmt &parent);
   bool is_most_derived(void) const noexcept;
   bool is_potentially_evaluated(void) const noexcept;
   bool is_type_operand(void) const noexcept;
 };
 
 class CXXThrowExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXThrowExpr> from(const Expr &parent);
+  static std::optional<CXXThrowExpr> from(const ValueStmt &parent);
+  static std::optional<CXXThrowExpr> from(const Stmt &parent);
   Token throw_token(void) const noexcept;
   bool is_thrown_variable_in_scope(void) const noexcept;
 };
 
 class CXXThisExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXThisExpr> from(const Expr &parent);
+  static std::optional<CXXThisExpr> from(const ValueStmt &parent);
+  static std::optional<CXXThisExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool is_implicit(void) const noexcept;
 };
 
 class CXXStdInitializerListExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXStdInitializerListExpr> from(const Expr &parent);
+  static std::optional<CXXStdInitializerListExpr> from(const ValueStmt &parent);
+  static std::optional<CXXStdInitializerListExpr> from(const Stmt &parent);
 };
 
 class CXXScalarValueInitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXScalarValueInitExpr> from(const Expr &parent);
+  static std::optional<CXXScalarValueInitExpr> from(const ValueStmt &parent);
+  static std::optional<CXXScalarValueInitExpr> from(const Stmt &parent);
   Token r_paren_token(void) const noexcept;
 };
 
 class CXXRewrittenBinaryOperator : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXRewrittenBinaryOperator> from(const Expr &parent);
+  static std::optional<CXXRewrittenBinaryOperator> from(const ValueStmt &parent);
+  static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent);
   BinaryOperatorKind opcode(void) const noexcept;
   std::string_view opcode_string(void) const noexcept;
   BinaryOperatorKind operator_(void) const noexcept;
@@ -5874,7 +6913,15 @@ class CXXRewrittenBinaryOperator : public Expr {
 };
 
 class CXXPseudoDestructorExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXPseudoDestructorExpr> from(const Expr &parent);
+  static std::optional<CXXPseudoDestructorExpr> from(const ValueStmt &parent);
+  static std::optional<CXXPseudoDestructorExpr> from(const Stmt &parent);
   Token colon_colon_token(void) const noexcept;
   Token destroyed_type_token(void) const noexcept;
   Token operator_token(void) const noexcept;
@@ -5884,17 +6931,41 @@ class CXXPseudoDestructorExpr : public Expr {
 };
 
 class CXXNullPtrLiteralExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXNullPtrLiteralExpr> from(const Expr &parent);
+  static std::optional<CXXNullPtrLiteralExpr> from(const ValueStmt &parent);
+  static std::optional<CXXNullPtrLiteralExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
 
 class CXXNoexceptExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXNoexceptExpr> from(const Expr &parent);
+  static std::optional<CXXNoexceptExpr> from(const ValueStmt &parent);
+  static std::optional<CXXNoexceptExpr> from(const Stmt &parent);
   bool value(void) const noexcept;
 };
 
 class CXXNewExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXNewExpr> from(const Expr &parent);
+  static std::optional<CXXNewExpr> from(const ValueStmt &parent);
+  static std::optional<CXXNewExpr> from(const Stmt &parent);
   bool does_usual_array_delete_want_size(void) const noexcept;
   CXXConstructExpr construct_expression(void) const noexcept;
   TokenRange direct_initializer_range(void) const noexcept;
@@ -5911,7 +6982,15 @@ class CXXNewExpr : public Expr {
 };
 
 class CXXInheritedCtorInitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXInheritedCtorInitExpr> from(const Expr &parent);
+  static std::optional<CXXInheritedCtorInitExpr> from(const ValueStmt &parent);
+  static std::optional<CXXInheritedCtorInitExpr> from(const Stmt &parent);
   bool constructs_virtual_base(void) const noexcept;
   CXXConstructExprConstructionKind construction_kind(void) const noexcept;
   CXXConstructorDecl constructor(void) const noexcept;
@@ -5920,7 +6999,15 @@ class CXXInheritedCtorInitExpr : public Expr {
 };
 
 class CXXFoldExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXFoldExpr> from(const Expr &parent);
+  static std::optional<CXXFoldExpr> from(const ValueStmt &parent);
+  static std::optional<CXXFoldExpr> from(const Stmt &parent);
   UnresolvedLookupExpr callee(void) const noexcept;
   Token ellipsis_token(void) const noexcept;
   Token l_paren_token(void) const noexcept;
@@ -5931,7 +7018,15 @@ class CXXFoldExpr : public Expr {
 };
 
 class CXXDependentScopeMemberExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXDependentScopeMemberExpr> from(const Expr &parent);
+  static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
+  static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
   NamedDecl first_qualifier_found_in_scope(void) const noexcept;
   Token l_angle_token(void) const noexcept;
   Token member_token(void) const noexcept;
@@ -5945,7 +7040,15 @@ class CXXDependentScopeMemberExpr : public Expr {
 };
 
 class CXXDeleteExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXDeleteExpr> from(const Expr &parent);
+  static std::optional<CXXDeleteExpr> from(const ValueStmt &parent);
+  static std::optional<CXXDeleteExpr> from(const Stmt &parent);
   bool does_usual_array_delete_want_size(void) const noexcept;
   FunctionDecl operator_delete(void) const noexcept;
   bool is_array_form(void) const noexcept;
@@ -5954,19 +7057,43 @@ class CXXDeleteExpr : public Expr {
 };
 
 class CXXDefaultInitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXDefaultInitExpr> from(const Expr &parent);
+  static std::optional<CXXDefaultInitExpr> from(const ValueStmt &parent);
+  static std::optional<CXXDefaultInitExpr> from(const Stmt &parent);
   FieldDecl field(void) const noexcept;
   Token used_token(void) const noexcept;
 };
 
 class CXXDefaultArgExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXDefaultArgExpr> from(const Expr &parent);
+  static std::optional<CXXDefaultArgExpr> from(const ValueStmt &parent);
+  static std::optional<CXXDefaultArgExpr> from(const Stmt &parent);
   ParmVarDecl parameter(void) const noexcept;
   Token used_token(void) const noexcept;
 };
 
 class CXXConstructExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXConstructExpr> from(const Expr &parent);
+  static std::optional<CXXConstructExpr> from(const ValueStmt &parent);
+  static std::optional<CXXConstructExpr> from(const Stmt &parent);
   CXXConstructExprConstructionKind construction_kind(void) const noexcept;
   CXXConstructorDecl constructor(void) const noexcept;
   Token token(void) const noexcept;
@@ -5979,27 +7106,69 @@ class CXXConstructExpr : public Expr {
 };
 
 class CXXTemporaryObjectExpr : public CXXConstructExpr {
+ private:
+  friend class FragmentImpl;
+  friend class CXXConstructExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXTemporaryObjectExpr> from(const CXXConstructExpr &parent);
+  static std::optional<CXXTemporaryObjectExpr> from(const Expr &parent);
+  static std::optional<CXXTemporaryObjectExpr> from(const ValueStmt &parent);
+  static std::optional<CXXTemporaryObjectExpr> from(const Stmt &parent);
 };
 
 class CXXBoolLiteralExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXBoolLiteralExpr> from(const Expr &parent);
+  static std::optional<CXXBoolLiteralExpr> from(const ValueStmt &parent);
+  static std::optional<CXXBoolLiteralExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool value(void) const noexcept;
 };
 
 class CXXBindTemporaryExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CXXBindTemporaryExpr> from(const Expr &parent);
+  static std::optional<CXXBindTemporaryExpr> from(const ValueStmt &parent);
+  static std::optional<CXXBindTemporaryExpr> from(const Stmt &parent);
 };
 
 class BlockExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<BlockExpr> from(const Expr &parent);
+  static std::optional<BlockExpr> from(const ValueStmt &parent);
+  static std::optional<BlockExpr> from(const Stmt &parent);
   BlockDecl block_declaration(void) const noexcept;
   Token caret_token(void) const noexcept;
 };
 
 class BinaryOperator : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<BinaryOperator> from(const Expr &parent);
+  static std::optional<BinaryOperator> from(const ValueStmt &parent);
+  static std::optional<BinaryOperator> from(const Stmt &parent);
   BinaryOperatorKind opcode(void) const noexcept;
   std::string_view opcode_string(void) const noexcept;
   Token operator_token(void) const noexcept;
@@ -6020,11 +7189,29 @@ class BinaryOperator : public Expr {
 };
 
 class CompoundAssignOperator : public BinaryOperator {
+ private:
+  friend class FragmentImpl;
+  friend class BinaryOperator;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<CompoundAssignOperator> from(const BinaryOperator &parent);
+  static std::optional<CompoundAssignOperator> from(const Expr &parent);
+  static std::optional<CompoundAssignOperator> from(const ValueStmt &parent);
+  static std::optional<CompoundAssignOperator> from(const Stmt &parent);
 };
 
 class AtomicExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<AtomicExpr> from(const Expr &parent);
+  static std::optional<AtomicExpr> from(const ValueStmt &parent);
+  static std::optional<AtomicExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   AtomicExprAtomicOp operation(void) const noexcept;
   Token r_paren_token(void) const noexcept;
@@ -6034,61 +7221,153 @@ class AtomicExpr : public Expr {
 };
 
 class AsTypeExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<AsTypeExpr> from(const Expr &parent);
+  static std::optional<AsTypeExpr> from(const ValueStmt &parent);
+  static std::optional<AsTypeExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ArrayTypeTraitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ArrayTypeTraitExpr> from(const Expr &parent);
+  static std::optional<ArrayTypeTraitExpr> from(const ValueStmt &parent);
+  static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
   ArrayTypeTrait trait(void) const noexcept;
 };
 
 class ArraySubscriptExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ArraySubscriptExpr> from(const Expr &parent);
+  static std::optional<ArraySubscriptExpr> from(const ValueStmt &parent);
+  static std::optional<ArraySubscriptExpr> from(const Stmt &parent);
   Token r_bracket_token(void) const noexcept;
 };
 
 class ArrayInitLoopExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ArrayInitLoopExpr> from(const Expr &parent);
+  static std::optional<ArrayInitLoopExpr> from(const ValueStmt &parent);
+  static std::optional<ArrayInitLoopExpr> from(const Stmt &parent);
   OpaqueValueExpr common_expression(void) const noexcept;
 };
 
 class ArrayInitIndexExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ArrayInitIndexExpr> from(const Expr &parent);
+  static std::optional<ArrayInitIndexExpr> from(const ValueStmt &parent);
+  static std::optional<ArrayInitIndexExpr> from(const Stmt &parent);
 };
 
 class AddrLabelExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<AddrLabelExpr> from(const Expr &parent);
+  static std::optional<AddrLabelExpr> from(const ValueStmt &parent);
+  static std::optional<AddrLabelExpr> from(const Stmt &parent);
   Token amp_amp_token(void) const noexcept;
   LabelDecl label(void) const noexcept;
   Token label_token(void) const noexcept;
 };
 
 class AbstractConditionalOperator : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<AbstractConditionalOperator> from(const Expr &parent);
+  static std::optional<AbstractConditionalOperator> from(const ValueStmt &parent);
+  static std::optional<AbstractConditionalOperator> from(const Stmt &parent);
   Token colon_token(void) const noexcept;
   Token question_token(void) const noexcept;
 };
 
 class ConditionalOperator : public AbstractConditionalOperator {
+ private:
+  friend class FragmentImpl;
+  friend class AbstractConditionalOperator;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ConditionalOperator> from(const AbstractConditionalOperator &parent);
+  static std::optional<ConditionalOperator> from(const Expr &parent);
+  static std::optional<ConditionalOperator> from(const ValueStmt &parent);
+  static std::optional<ConditionalOperator> from(const Stmt &parent);
 };
 
 class BinaryConditionalOperator : public AbstractConditionalOperator {
+ private:
+  friend class FragmentImpl;
+  friend class AbstractConditionalOperator;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
+  static std::optional<BinaryConditionalOperator> from(const Expr &parent);
+  static std::optional<BinaryConditionalOperator> from(const ValueStmt &parent);
+  static std::optional<BinaryConditionalOperator> from(const Stmt &parent);
   OpaqueValueExpr opaque_value(void) const noexcept;
 };
 
 class VAArgExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<VAArgExpr> from(const Expr &parent);
+  static std::optional<VAArgExpr> from(const ValueStmt &parent);
+  static std::optional<VAArgExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_microsoft_abi(void) const noexcept;
 };
 
 class UnaryOperator : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<UnaryOperator> from(const Expr &parent);
+  static std::optional<UnaryOperator> from(const ValueStmt &parent);
+  static std::optional<UnaryOperator> from(const Stmt &parent);
   bool can_overflow(void) const noexcept;
   UnaryOperatorKind opcode(void) const noexcept;
   Token operator_token(void) const noexcept;
@@ -6102,37 +7381,85 @@ class UnaryOperator : public Expr {
 };
 
 class UnaryExprOrTypeTraitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const Expr &parent);
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const ValueStmt &parent);
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const Stmt &parent);
   Token operator_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_argument_type(void) const noexcept;
 };
 
 class TypoExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<TypoExpr> from(const Expr &parent);
+  static std::optional<TypoExpr> from(const ValueStmt &parent);
+  static std::optional<TypoExpr> from(const Stmt &parent);
 };
 
 class TypeTraitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<TypeTraitExpr> from(const Expr &parent);
+  static std::optional<TypeTraitExpr> from(const ValueStmt &parent);
+  static std::optional<TypeTraitExpr> from(const Stmt &parent);
   TypeTrait trait(void) const noexcept;
   bool value(void) const noexcept;
 };
 
 class SubstNonTypeTemplateParmPackExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Expr &parent);
+  static std::optional<SubstNonTypeTemplateParmPackExpr> from(const ValueStmt &parent);
+  static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Stmt &parent);
   NonTypeTemplateParmDecl parameter_pack(void) const noexcept;
   Token parameter_pack_token(void) const noexcept;
 };
 
 class SubstNonTypeTemplateParmExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<SubstNonTypeTemplateParmExpr> from(const Expr &parent);
+  static std::optional<SubstNonTypeTemplateParmExpr> from(const ValueStmt &parent);
+  static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent);
   Token name_token(void) const noexcept;
   NonTypeTemplateParmDecl parameter(void) const noexcept;
   bool is_reference_parameter(void) const noexcept;
 };
 
 class StringLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<StringLiteral> from(const Expr &parent);
+  static std::optional<StringLiteral> from(const ValueStmt &parent);
+  static std::optional<StringLiteral> from(const Stmt &parent);
   bool contains_non_ascii(void) const noexcept;
   bool contains_non_ascii_or_null(void) const noexcept;
   std::string_view bytes(void) const noexcept;
@@ -6146,14 +7473,30 @@ class StringLiteral : public Expr {
 };
 
 class StmtExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<StmtExpr> from(const Expr &parent);
+  static std::optional<StmtExpr> from(const ValueStmt &parent);
+  static std::optional<StmtExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   CompoundStmt sub_statement(void) const noexcept;
 };
 
 class SourceLocExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<SourceLocExpr> from(const Expr &parent);
+  static std::optional<SourceLocExpr> from(const ValueStmt &parent);
+  static std::optional<SourceLocExpr> from(const Stmt &parent);
   std::string_view builtin_string(void) const noexcept;
   SourceLocExprIdentKind identifier_kind(void) const noexcept;
   Token token(void) const noexcept;
@@ -6162,7 +7505,15 @@ class SourceLocExpr : public Expr {
 };
 
 class SizeOfPackExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<SizeOfPackExpr> from(const Expr &parent);
+  static std::optional<SizeOfPackExpr> from(const ValueStmt &parent);
+  static std::optional<SizeOfPackExpr> from(const Stmt &parent);
   Token operator_token(void) const noexcept;
   NamedDecl pack(void) const noexcept;
   Token pack_token(void) const noexcept;
@@ -6172,13 +7523,29 @@ class SizeOfPackExpr : public Expr {
 };
 
 class ShuffleVectorExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ShuffleVectorExpr> from(const Expr &parent);
+  static std::optional<ShuffleVectorExpr> from(const ValueStmt &parent);
+  static std::optional<ShuffleVectorExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class SYCLUniqueStableNameExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<SYCLUniqueStableNameExpr> from(const Expr &parent);
+  static std::optional<SYCLUniqueStableNameExpr> from(const ValueStmt &parent);
+  static std::optional<SYCLUniqueStableNameExpr> from(const Stmt &parent);
   std::string_view compute_name(void) const noexcept;
   Token l_paren_token(void) const noexcept;
   Token token(void) const noexcept;
@@ -6186,7 +7553,15 @@ class SYCLUniqueStableNameExpr : public Expr {
 };
 
 class RequiresExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<RequiresExpr> from(const Expr &parent);
+  static std::optional<RequiresExpr> from(const ValueStmt &parent);
+  static std::optional<RequiresExpr> from(const Stmt &parent);
   RequiresExprBodyDecl body(void) const noexcept;
   std::vector<ParmVarDecl> local_parameters(void) const noexcept;
   Token r_brace_token(void) const noexcept;
@@ -6195,15 +7570,39 @@ class RequiresExpr : public Expr {
 };
 
 class RecoveryExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<RecoveryExpr> from(const Expr &parent);
+  static std::optional<RecoveryExpr> from(const ValueStmt &parent);
+  static std::optional<RecoveryExpr> from(const Stmt &parent);
 };
 
 class PseudoObjectExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<PseudoObjectExpr> from(const Expr &parent);
+  static std::optional<PseudoObjectExpr> from(const ValueStmt &parent);
+  static std::optional<PseudoObjectExpr> from(const Stmt &parent);
 };
 
 class PredefinedExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<PredefinedExpr> from(const Expr &parent);
+  static std::optional<PredefinedExpr> from(const ValueStmt &parent);
+  static std::optional<PredefinedExpr> from(const Stmt &parent);
   StringLiteral function_name(void) const noexcept;
   PredefinedExprIdentKind identifier_kind(void) const noexcept;
   std::string_view identifier_kind_name(void) const noexcept;
@@ -6211,24 +7610,56 @@ class PredefinedExpr : public Expr {
 };
 
 class ParenListExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ParenListExpr> from(const Expr &parent);
+  static std::optional<ParenListExpr> from(const ValueStmt &parent);
+  static std::optional<ParenListExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ParenExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ParenExpr> from(const Expr &parent);
+  static std::optional<ParenExpr> from(const ValueStmt &parent);
+  static std::optional<ParenExpr> from(const Stmt &parent);
   Token l_paren(void) const noexcept;
   Token r_paren(void) const noexcept;
 };
 
 class PackExpansionExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<PackExpansionExpr> from(const Expr &parent);
+  static std::optional<PackExpansionExpr> from(const ValueStmt &parent);
+  static std::optional<PackExpansionExpr> from(const Stmt &parent);
   Token ellipsis_token(void) const noexcept;
 };
 
 class OverloadExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<OverloadExpr> from(const Expr &parent);
+  static std::optional<OverloadExpr> from(const ValueStmt &parent);
+  static std::optional<OverloadExpr> from(const Stmt &parent);
   Token l_angle_token(void) const noexcept;
   Token name_token(void) const noexcept;
   CXXRecordDecl naming_class(void) const noexcept;
@@ -6239,7 +7670,17 @@ class OverloadExpr : public Expr {
 };
 
 class UnresolvedMemberExpr : public OverloadExpr {
+ private:
+  friend class FragmentImpl;
+  friend class OverloadExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<UnresolvedMemberExpr> from(const OverloadExpr &parent);
+  static std::optional<UnresolvedMemberExpr> from(const Expr &parent);
+  static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
+  static std::optional<UnresolvedMemberExpr> from(const Stmt &parent);
   Token member_token(void) const noexcept;
   Token operator_token(void) const noexcept;
   bool has_unresolved_using(void) const noexcept;
@@ -6248,44 +7689,102 @@ class UnresolvedMemberExpr : public OverloadExpr {
 };
 
 class UnresolvedLookupExpr : public OverloadExpr {
+ private:
+  friend class FragmentImpl;
+  friend class OverloadExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<UnresolvedLookupExpr> from(const OverloadExpr &parent);
+  static std::optional<UnresolvedLookupExpr> from(const Expr &parent);
+  static std::optional<UnresolvedLookupExpr> from(const ValueStmt &parent);
+  static std::optional<UnresolvedLookupExpr> from(const Stmt &parent);
   bool is_overloaded(void) const noexcept;
   bool requires_adl(void) const noexcept;
 };
 
 class OpaqueValueExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<OpaqueValueExpr> from(const Expr &parent);
+  static std::optional<OpaqueValueExpr> from(const ValueStmt &parent);
+  static std::optional<OpaqueValueExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool is_unique(void) const noexcept;
 };
 
 class OffsetOfExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<OffsetOfExpr> from(const Expr &parent);
+  static std::optional<OffsetOfExpr> from(const ValueStmt &parent);
+  static std::optional<OffsetOfExpr> from(const Stmt &parent);
   Token operator_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ObjCSubscriptRefExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCSubscriptRefExpr> from(const Expr &parent);
+  static std::optional<ObjCSubscriptRefExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent);
   ObjCMethodDecl at_index_method_declaration(void) const noexcept;
   Token r_bracket(void) const noexcept;
   bool is_array_subscript_reference_expression(void) const noexcept;
 };
 
 class ObjCStringLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCStringLiteral> from(const Expr &parent);
+  static std::optional<ObjCStringLiteral> from(const ValueStmt &parent);
+  static std::optional<ObjCStringLiteral> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   StringLiteral string(void) const noexcept;
 };
 
 class ObjCSelectorExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCSelectorExpr> from(const Expr &parent);
+  static std::optional<ObjCSelectorExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCSelectorExpr> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ObjCProtocolExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCProtocolExpr> from(const Expr &parent);
+  static std::optional<ObjCProtocolExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCProtocolExpr> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   ObjCProtocolDecl protocol(void) const noexcept;
   Token protocol_id_token(void) const noexcept;
@@ -6293,7 +7792,15 @@ class ObjCProtocolExpr : public Expr {
 };
 
 class ObjCPropertyRefExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCPropertyRefExpr> from(const Expr &parent);
+  static std::optional<ObjCPropertyRefExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCPropertyRefExpr> from(const Stmt &parent);
   ObjCInterfaceDecl class_receiver(void) const noexcept;
   ObjCPropertyDecl explicit_property(void) const noexcept;
   ObjCMethodDecl implicit_property_getter(void) const noexcept;
@@ -6310,7 +7817,15 @@ class ObjCPropertyRefExpr : public Expr {
 };
 
 class ObjCMessageExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCMessageExpr> from(const Expr &parent);
+  static std::optional<ObjCMessageExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCMessageExpr> from(const Stmt &parent);
   Token left_token(void) const noexcept;
   ObjCMethodDecl method_declaration(void) const noexcept;
   ObjCMethodFamily method_family(void) const noexcept;
@@ -6328,7 +7843,15 @@ class ObjCMessageExpr : public Expr {
 };
 
 class ObjCIvarRefExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCIvarRefExpr> from(const Expr &parent);
+  static std::optional<ObjCIvarRefExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCIvarRefExpr> from(const Stmt &parent);
   ObjCIvarDecl declaration(void) const noexcept;
   Token token(void) const noexcept;
   Token operation_token(void) const noexcept;
@@ -6337,7 +7860,15 @@ class ObjCIvarRefExpr : public Expr {
 };
 
 class ObjCIsaExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCIsaExpr> from(const Expr &parent);
+  static std::optional<ObjCIsaExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCIsaExpr> from(const Stmt &parent);
   Token base_token_end(void) const noexcept;
   Token isa_member_token(void) const noexcept;
   Token operation_token(void) const noexcept;
@@ -6345,70 +7876,166 @@ class ObjCIsaExpr : public Expr {
 };
 
 class ObjCIndirectCopyRestoreExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCIndirectCopyRestoreExpr> from(const Expr &parent);
+  static std::optional<ObjCIndirectCopyRestoreExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCIndirectCopyRestoreExpr> from(const Stmt &parent);
   bool should_copy(void) const noexcept;
 };
 
 class ObjCEncodeExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCEncodeExpr> from(const Expr &parent);
+  static std::optional<ObjCEncodeExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCEncodeExpr> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ObjCDictionaryLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCDictionaryLiteral> from(const Expr &parent);
+  static std::optional<ObjCDictionaryLiteral> from(const ValueStmt &parent);
+  static std::optional<ObjCDictionaryLiteral> from(const Stmt &parent);
   ObjCMethodDecl dictionary_with_objects_method(void) const noexcept;
 };
 
 class ObjCBoxedExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCBoxedExpr> from(const Expr &parent);
+  static std::optional<ObjCBoxedExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCBoxedExpr> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   ObjCMethodDecl boxing_method(void) const noexcept;
   bool is_expressible_as_constant_initializer(void) const noexcept;
 };
 
 class ObjCBoolLiteralExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCBoolLiteralExpr> from(const Expr &parent);
+  static std::optional<ObjCBoolLiteralExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCBoolLiteralExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool value(void) const noexcept;
 };
 
 class ObjCAvailabilityCheckExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCAvailabilityCheckExpr> from(const Expr &parent);
+  static std::optional<ObjCAvailabilityCheckExpr> from(const ValueStmt &parent);
+  static std::optional<ObjCAvailabilityCheckExpr> from(const Stmt &parent);
   bool has_version(void) const noexcept;
 };
 
 class ObjCArrayLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ObjCArrayLiteral> from(const Expr &parent);
+  static std::optional<ObjCArrayLiteral> from(const ValueStmt &parent);
+  static std::optional<ObjCArrayLiteral> from(const Stmt &parent);
   ObjCMethodDecl array_with_objects_method(void) const noexcept;
 };
 
 class OMPIteratorExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<OMPIteratorExpr> from(const Expr &parent);
+  static std::optional<OMPIteratorExpr> from(const ValueStmt &parent);
+  static std::optional<OMPIteratorExpr> from(const Stmt &parent);
   Token iterator_kw_token(void) const noexcept;
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class OMPArrayShapingExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<OMPArrayShapingExpr> from(const Expr &parent);
+  static std::optional<OMPArrayShapingExpr> from(const ValueStmt &parent);
+  static std::optional<OMPArrayShapingExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class OMPArraySectionExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<OMPArraySectionExpr> from(const Expr &parent);
+  static std::optional<OMPArraySectionExpr> from(const ValueStmt &parent);
+  static std::optional<OMPArraySectionExpr> from(const Stmt &parent);
   Token colon_token_first(void) const noexcept;
   Token colon_token_second(void) const noexcept;
   Token r_bracket_token(void) const noexcept;
 };
 
 class NoInitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<NoInitExpr> from(const Expr &parent);
+  static std::optional<NoInitExpr> from(const ValueStmt &parent);
+  static std::optional<NoInitExpr> from(const Stmt &parent);
 };
 
 class MemberExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<MemberExpr> from(const Expr &parent);
+  static std::optional<MemberExpr> from(const ValueStmt &parent);
+  static std::optional<MemberExpr> from(const Stmt &parent);
   Token l_angle_token(void) const noexcept;
   ValueDecl member_declaration(void) const noexcept;
   Token member_token(void) const noexcept;
@@ -6425,13 +8052,29 @@ class MemberExpr : public Expr {
 };
 
 class MatrixSubscriptExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<MatrixSubscriptExpr> from(const Expr &parent);
+  static std::optional<MatrixSubscriptExpr> from(const ValueStmt &parent);
+  static std::optional<MatrixSubscriptExpr> from(const Stmt &parent);
   Token r_bracket_token(void) const noexcept;
   bool is_incomplete(void) const noexcept;
 };
 
 class MaterializeTemporaryExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<MaterializeTemporaryExpr> from(const Expr &parent);
+  static std::optional<MaterializeTemporaryExpr> from(const ValueStmt &parent);
+  static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent);
   ValueDecl extending_declaration(void) const noexcept;
   LifetimeExtendedTemporaryDecl lifetime_extended_temporary_declaration(void) const noexcept;
   StorageDuration storage_duration(void) const noexcept;
@@ -6440,12 +8083,28 @@ class MaterializeTemporaryExpr : public Expr {
 };
 
 class MSPropertySubscriptExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<MSPropertySubscriptExpr> from(const Expr &parent);
+  static std::optional<MSPropertySubscriptExpr> from(const ValueStmt &parent);
+  static std::optional<MSPropertySubscriptExpr> from(const Stmt &parent);
   Token r_bracket_token(void) const noexcept;
 };
 
 class MSPropertyRefExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<MSPropertyRefExpr> from(const Expr &parent);
+  static std::optional<MSPropertyRefExpr> from(const ValueStmt &parent);
+  static std::optional<MSPropertyRefExpr> from(const Stmt &parent);
   Token member_token(void) const noexcept;
   MSPropertyDecl property_declaration(void) const noexcept;
   bool is_arrow(void) const noexcept;
@@ -6453,7 +8112,15 @@ class MSPropertyRefExpr : public Expr {
 };
 
 class LambdaExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<LambdaExpr> from(const Expr &parent);
+  static std::optional<LambdaExpr> from(const ValueStmt &parent);
+  static std::optional<LambdaExpr> from(const Stmt &parent);
   CXXMethodDecl call_operator(void) const noexcept;
   LambdaCaptureDefault capture_default(void) const noexcept;
   Token capture_default_token(void) const noexcept;
@@ -6461,6 +8128,7 @@ class LambdaExpr : public Expr {
   std::vector<NamedDecl> explicit_template_parameters(void) const noexcept;
   TokenRange introducer_range(void) const noexcept;
   CXXRecordDecl lambda_class(void) const noexcept;
+  std::optional<TemplateParameterList> template_parameter_list(void) const noexcept;
   bool has_explicit_parameters(void) const noexcept;
   bool has_explicit_result_type(void) const noexcept;
   bool is_generic_lambda(void) const noexcept;
@@ -6468,12 +8136,28 @@ class LambdaExpr : public Expr {
 };
 
 class IntegerLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<IntegerLiteral> from(const Expr &parent);
+  static std::optional<IntegerLiteral> from(const ValueStmt &parent);
+  static std::optional<IntegerLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
 
 class InitListExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<InitListExpr> from(const Expr &parent);
+  static std::optional<InitListExpr> from(const ValueStmt &parent);
+  static std::optional<InitListExpr> from(const Stmt &parent);
   std::optional<FieldDecl> initialized_field_in_union(void) const noexcept;
   Token l_brace_token(void) const noexcept;
   Token r_brace_token(void) const noexcept;
@@ -6489,15 +8173,39 @@ class InitListExpr : public Expr {
 };
 
 class ImplicitValueInitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ImplicitValueInitExpr> from(const Expr &parent);
+  static std::optional<ImplicitValueInitExpr> from(const ValueStmt &parent);
+  static std::optional<ImplicitValueInitExpr> from(const Stmt &parent);
 };
 
 class ImaginaryLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ImaginaryLiteral> from(const Expr &parent);
+  static std::optional<ImaginaryLiteral> from(const ValueStmt &parent);
+  static std::optional<ImaginaryLiteral> from(const Stmt &parent);
 };
 
 class GenericSelectionExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<GenericSelectionExpr> from(const Expr &parent);
+  static std::optional<GenericSelectionExpr> from(const ValueStmt &parent);
+  static std::optional<GenericSelectionExpr> from(const Stmt &parent);
   Token default_token(void) const noexcept;
   Token generic_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
@@ -6505,64 +8213,150 @@ class GenericSelectionExpr : public Expr {
 };
 
 class GNUNullExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<GNUNullExpr> from(const Expr &parent);
+  static std::optional<GNUNullExpr> from(const ValueStmt &parent);
+  static std::optional<GNUNullExpr> from(const Stmt &parent);
   Token token_token(void) const noexcept;
 };
 
 class FunctionParmPackExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<FunctionParmPackExpr> from(const Expr &parent);
+  static std::optional<FunctionParmPackExpr> from(const ValueStmt &parent);
+  static std::optional<FunctionParmPackExpr> from(const Stmt &parent);
   VarDecl parameter_pack(void) const noexcept;
   Token parameter_pack_token(void) const noexcept;
   std::vector<VarDecl> expansions(void) const noexcept;
 };
 
 class FullExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<FullExpr> from(const Expr &parent);
+  static std::optional<FullExpr> from(const ValueStmt &parent);
+  static std::optional<FullExpr> from(const Stmt &parent);
 };
 
 class ExprWithCleanups : public FullExpr {
+ private:
+  friend class FragmentImpl;
+  friend class FullExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ExprWithCleanups> from(const FullExpr &parent);
+  static std::optional<ExprWithCleanups> from(const Expr &parent);
+  static std::optional<ExprWithCleanups> from(const ValueStmt &parent);
+  static std::optional<ExprWithCleanups> from(const Stmt &parent);
   bool cleanups_have_side_effects(void) const noexcept;
 };
 
 class ConstantExpr : public FullExpr {
+ private:
+  friend class FragmentImpl;
+  friend class FullExpr;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ConstantExpr> from(const FullExpr &parent);
+  static std::optional<ConstantExpr> from(const Expr &parent);
+  static std::optional<ConstantExpr> from(const ValueStmt &parent);
+  static std::optional<ConstantExpr> from(const Stmt &parent);
   ConstantExprResultStorageKind result_storage_kind(void) const noexcept;
   bool has_ap_value_result(void) const noexcept;
   bool is_immediate_invocation(void) const noexcept;
 };
 
 class FloatingLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<FloatingLiteral> from(const Expr &parent);
+  static std::optional<FloatingLiteral> from(const ValueStmt &parent);
+  static std::optional<FloatingLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool is_exact(void) const noexcept;
 };
 
 class FixedPointLiteral : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<FixedPointLiteral> from(const Expr &parent);
+  static std::optional<FixedPointLiteral> from(const ValueStmt &parent);
+  static std::optional<FixedPointLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
 
 class ExtVectorElementExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ExtVectorElementExpr> from(const Expr &parent);
+  static std::optional<ExtVectorElementExpr> from(const ValueStmt &parent);
+  static std::optional<ExtVectorElementExpr> from(const Stmt &parent);
   bool contains_duplicate_elements(void) const noexcept;
   Token accessor_token(void) const noexcept;
   bool is_arrow(void) const noexcept;
 };
 
 class ExpressionTraitExpr : public Expr {
+ private:
+  friend class FragmentImpl;
+  friend class Expr;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<ExpressionTraitExpr> from(const Expr &parent);
+  static std::optional<ExpressionTraitExpr> from(const ValueStmt &parent);
+  static std::optional<ExpressionTraitExpr> from(const Stmt &parent);
   ExpressionTrait trait(void) const noexcept;
   bool value(void) const noexcept;
 };
 
 class AttributedStmt : public ValueStmt {
+ private:
+  friend class FragmentImpl;
+  friend class ValueStmt;
+  friend class Stmt;
  public:
+  static std::optional<AttributedStmt> from(const ValueStmt &parent);
+  static std::optional<AttributedStmt> from(const Stmt &parent);
   Token attribute_token(void) const noexcept;
 };
 
 class SwitchStmt : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<SwitchStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
   Token l_paren_token(void) const noexcept;
@@ -6574,18 +8368,34 @@ class SwitchStmt : public Stmt {
 };
 
 class SwitchCase : public Stmt {
+ private:
+  friend class FragmentImpl;
+  friend class Stmt;
  public:
+  static std::optional<SwitchCase> from(const Stmt &parent);
   Token colon_token(void) const noexcept;
   Token keyword_token(void) const noexcept;
 };
 
 class DefaultStmt : public SwitchCase {
+ private:
+  friend class FragmentImpl;
+  friend class SwitchCase;
+  friend class Stmt;
  public:
+  static std::optional<DefaultStmt> from(const SwitchCase &parent);
+  static std::optional<DefaultStmt> from(const Stmt &parent);
   Token default_token(void) const noexcept;
 };
 
 class CaseStmt : public SwitchCase {
+ private:
+  friend class FragmentImpl;
+  friend class SwitchCase;
+  friend class Stmt;
  public:
+  static std::optional<CaseStmt> from(const SwitchCase &parent);
+  static std::optional<CaseStmt> from(const Stmt &parent);
   bool case_statement_is_gnu_range(void) const noexcept;
   Token case_token(void) const noexcept;
   Token ellipsis_token(void) const noexcept;
@@ -6593,15 +8403,22 @@ class CaseStmt : public SwitchCase {
 
 class Decl {
  protected:
+  friend class FragmentImpl;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
  public:
+  inline Decl(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+      : fragment(std::move(fragment_)),
+        offset(offset_) {}
+
   AccessSpecifier access(void) const noexcept;
   AccessSpecifier access_unsafe(void) const noexcept;
   AvailabilityResult availability(void) const noexcept;
   Token begin_token(void) const noexcept;
   Token body_r_brace(void) const noexcept;
+  std::optional<TemplateParameterList> described_template_parameters(void) const noexcept;
   Token end_token(void) const noexcept;
   DeclFriendObjectKind friend_object_kind(void) const noexcept;
   DeclModuleOwnershipKind module_ownership_kind(void) const noexcept;
@@ -6639,13 +8456,21 @@ class Decl {
 };
 
 class ClassScopeFunctionSpecializationDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
   CXXMethodDecl specialization(void) const noexcept;
   bool has_explicit_template_arguments(void) const noexcept;
 };
 
 class CapturedDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<CapturedDecl> from(const Decl &parent);
   ImplicitParamDecl context_parameter(void) const noexcept;
   bool is_nothrow(void) const noexcept;
   std::vector<ImplicitParamDecl> parameters(void) const noexcept;
@@ -6653,7 +8478,11 @@ class CapturedDecl : public Decl {
 };
 
 class BlockDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<BlockDecl> from(const Decl &parent);
   bool block_missing_return_type(void) const noexcept;
   bool can_avoid_copy_to_heap(void) const noexcept;
   bool captures_cxx_this(void) const noexcept;
@@ -6669,58 +8498,108 @@ class BlockDecl : public Decl {
 };
 
 class AccessSpecDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<AccessSpecDecl> from(const Decl &parent);
   Token access_specifier_token(void) const noexcept;
   Token colon_token(void) const noexcept;
 };
 
 class OMPDeclarativeDirectiveDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent);
 };
 
 class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
+ private:
+  friend class FragmentImpl;
+  friend class OMPDeclarativeDirectiveDecl;
+  friend class Decl;
  public:
+  static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
+  static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
 };
 
 class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
+ private:
+  friend class FragmentImpl;
+  friend class OMPDeclarativeDirectiveDecl;
+  friend class Decl;
  public:
+  static std::optional<OMPRequiresDecl> from(const OMPDeclarativeDirectiveDecl &parent);
+  static std::optional<OMPRequiresDecl> from(const Decl &parent);
 };
 
 class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
+ private:
+  friend class FragmentImpl;
+  friend class OMPDeclarativeDirectiveDecl;
+  friend class Decl;
  public:
+  static std::optional<OMPAllocateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
+  static std::optional<OMPAllocateDecl> from(const Decl &parent);
 };
 
 class TranslationUnitDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<TranslationUnitDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
 class StaticAssertDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<StaticAssertDecl> from(const Decl &parent);
   StringLiteral message(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_failed(void) const noexcept;
 };
 
 class RequiresExprBodyDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
 class PragmaDetectMismatchDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
   std::string_view name(void) const noexcept;
   std::string_view value(void) const noexcept;
 };
 
 class PragmaCommentDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<PragmaCommentDecl> from(const Decl &parent);
   std::string_view argument(void) const noexcept;
   PragmaMSCommentKind comment_kind(void) const noexcept;
 };
 
 class ObjCPropertyImplDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
   ObjCMethodDecl getter_method_declaration(void) const noexcept;
   ObjCPropertyDecl property_declaration(void) const noexcept;
   ObjCPropertyImplDeclKind property_implementation(void) const noexcept;
@@ -6731,7 +8610,11 @@ class ObjCPropertyImplDecl : public Decl {
 };
 
 class NamedDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<NamedDecl> from(const Decl &parent);
   Linkage formal_linkage(void) const noexcept;
   Linkage linkage_internal(void) const noexcept;
   std::string_view name(void) const noexcept;
@@ -6750,7 +8633,13 @@ class NamedDecl : public Decl {
 };
 
 class LabelDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<LabelDecl> from(const NamedDecl &parent);
+  static std::optional<LabelDecl> from(const Decl &parent);
   std::string_view ms_assembly_label(void) const noexcept;
   LabelStmt statement(void) const noexcept;
   bool is_gnu_local(void) const noexcept;
@@ -6759,31 +8648,67 @@ class LabelDecl : public NamedDecl {
 };
 
 class BaseUsingDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<BaseUsingDecl> from(const NamedDecl &parent);
+  static std::optional<BaseUsingDecl> from(const Decl &parent);
   std::vector<UsingShadowDecl> shadows(void) const noexcept;
 };
 
 class UsingEnumDecl : public BaseUsingDecl {
+ private:
+  friend class FragmentImpl;
+  friend class BaseUsingDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UsingEnumDecl> from(const BaseUsingDecl &parent);
+  static std::optional<UsingEnumDecl> from(const NamedDecl &parent);
+  static std::optional<UsingEnumDecl> from(const Decl &parent);
   EnumDecl enum_declaration(void) const noexcept;
   Token enum_token(void) const noexcept;
   Token using_token(void) const noexcept;
 };
 
 class UsingDecl : public BaseUsingDecl {
+ private:
+  friend class FragmentImpl;
+  friend class BaseUsingDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UsingDecl> from(const BaseUsingDecl &parent);
+  static std::optional<UsingDecl> from(const NamedDecl &parent);
+  static std::optional<UsingDecl> from(const Decl &parent);
   Token using_token(void) const noexcept;
   bool has_typename(void) const noexcept;
   bool is_access_declaration(void) const noexcept;
 };
 
 class ValueDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ValueDecl> from(const NamedDecl &parent);
+  static std::optional<ValueDecl> from(const Decl &parent);
   bool is_weak(void) const noexcept;
 };
 
 class UnresolvedUsingValueDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UnresolvedUsingValueDecl> from(const ValueDecl &parent);
+  static std::optional<UnresolvedUsingValueDecl> from(const NamedDecl &parent);
+  static std::optional<UnresolvedUsingValueDecl> from(const Decl &parent);
   Token ellipsis_token(void) const noexcept;
   Token using_token(void) const noexcept;
   bool is_access_declaration(void) const noexcept;
@@ -6791,33 +8716,81 @@ class UnresolvedUsingValueDecl : public ValueDecl {
 };
 
 class TemplateParamObjectDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TemplateParamObjectDecl> from(const ValueDecl &parent);
+  static std::optional<TemplateParamObjectDecl> from(const NamedDecl &parent);
+  static std::optional<TemplateParamObjectDecl> from(const Decl &parent);
 };
 
 class OMPDeclareReductionDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<OMPDeclareReductionDecl> from(const ValueDecl &parent);
+  static std::optional<OMPDeclareReductionDecl> from(const NamedDecl &parent);
+  static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
   OMPDeclareReductionDeclInitKind initializer_kind(void) const noexcept;
   OMPDeclareReductionDecl prev_declaration_in_scope(void) const noexcept;
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
 class MSGuidDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<MSGuidDecl> from(const ValueDecl &parent);
+  static std::optional<MSGuidDecl> from(const NamedDecl &parent);
+  static std::optional<MSGuidDecl> from(const Decl &parent);
 };
 
 class IndirectFieldDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<IndirectFieldDecl> from(const ValueDecl &parent);
+  static std::optional<IndirectFieldDecl> from(const NamedDecl &parent);
+  static std::optional<IndirectFieldDecl> from(const Decl &parent);
   std::vector<NamedDecl> chain(void) const noexcept;
   std::optional<FieldDecl> anonymous_field(void) const noexcept;
   std::optional<VarDecl> variable_declaration(void) const noexcept;
 };
 
 class EnumConstantDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<EnumConstantDecl> from(const ValueDecl &parent);
+  static std::optional<EnumConstantDecl> from(const NamedDecl &parent);
+  static std::optional<EnumConstantDecl> from(const Decl &parent);
 };
 
 class DeclaratorDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<DeclaratorDecl> from(const ValueDecl &parent);
+  static std::optional<DeclaratorDecl> from(const NamedDecl &parent);
+  static std::optional<DeclaratorDecl> from(const Decl &parent);
   Token inner_token_start(void) const noexcept;
   Token outer_token_start(void) const noexcept;
   Token type_spec_end_token(void) const noexcept;
@@ -6826,7 +8799,17 @@ class DeclaratorDecl : public ValueDecl {
 };
 
 class VarDecl : public DeclaratorDecl {
+ private:
+  friend class FragmentImpl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<VarDecl> from(const DeclaratorDecl &parent);
+  static std::optional<VarDecl> from(const ValueDecl &parent);
+  static std::optional<VarDecl> from(const NamedDecl &parent);
+  static std::optional<VarDecl> from(const Decl &parent);
   std::optional<VarDecl> acting_definition(void) const noexcept;
   VarDeclInitializationStyle initializer_style(void) const noexcept;
   std::optional<VarDecl> initializing_declaration(void) const noexcept;
@@ -6877,7 +8860,19 @@ class VarDecl : public DeclaratorDecl {
 };
 
 class ParmVarDecl : public VarDecl {
+ private:
+  friend class FragmentImpl;
+  friend class VarDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ParmVarDecl> from(const VarDecl &parent);
+  static std::optional<ParmVarDecl> from(const DeclaratorDecl &parent);
+  static std::optional<ParmVarDecl> from(const ValueDecl &parent);
+  static std::optional<ParmVarDecl> from(const NamedDecl &parent);
+  static std::optional<ParmVarDecl> from(const Decl &parent);
   TokenRange default_argument_range(void) const noexcept;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const noexcept;
   bool has_default_argument(void) const noexcept;
@@ -6890,21 +8885,69 @@ class ParmVarDecl : public VarDecl {
 };
 
 class OMPCapturedExprDecl : public VarDecl {
+ private:
+  friend class FragmentImpl;
+  friend class VarDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<OMPCapturedExprDecl> from(const VarDecl &parent);
+  static std::optional<OMPCapturedExprDecl> from(const DeclaratorDecl &parent);
+  static std::optional<OMPCapturedExprDecl> from(const ValueDecl &parent);
+  static std::optional<OMPCapturedExprDecl> from(const NamedDecl &parent);
+  static std::optional<OMPCapturedExprDecl> from(const Decl &parent);
 };
 
 class ImplicitParamDecl : public VarDecl {
+ private:
+  friend class FragmentImpl;
+  friend class VarDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ImplicitParamDecl> from(const VarDecl &parent);
+  static std::optional<ImplicitParamDecl> from(const DeclaratorDecl &parent);
+  static std::optional<ImplicitParamDecl> from(const ValueDecl &parent);
+  static std::optional<ImplicitParamDecl> from(const NamedDecl &parent);
+  static std::optional<ImplicitParamDecl> from(const Decl &parent);
   ImplicitParamDeclImplicitParamKind parameter_kind(void) const noexcept;
 };
 
 class DecompositionDecl : public VarDecl {
+ private:
+  friend class FragmentImpl;
+  friend class VarDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<DecompositionDecl> from(const VarDecl &parent);
+  static std::optional<DecompositionDecl> from(const DeclaratorDecl &parent);
+  static std::optional<DecompositionDecl> from(const ValueDecl &parent);
+  static std::optional<DecompositionDecl> from(const NamedDecl &parent);
+  static std::optional<DecompositionDecl> from(const Decl &parent);
   std::vector<BindingDecl> bindings(void) const noexcept;
 };
 
 class VarTemplateSpecializationDecl : public VarDecl {
+ private:
+  friend class FragmentImpl;
+  friend class VarDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<VarTemplateSpecializationDecl> from(const VarDecl &parent);
+  static std::optional<VarTemplateSpecializationDecl> from(const DeclaratorDecl &parent);
+  static std::optional<VarTemplateSpecializationDecl> from(const ValueDecl &parent);
+  static std::optional<VarTemplateSpecializationDecl> from(const NamedDecl &parent);
+  static std::optional<VarTemplateSpecializationDecl> from(const Decl &parent);
   Token extern_token(void) const noexcept;
   TemplateSpecializationKind specialization_kind(void) const noexcept;
   std::vector<TemplateArgument> template_arguments(void) const noexcept;
@@ -6916,11 +8959,35 @@ class VarTemplateSpecializationDecl : public VarDecl {
 };
 
 class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
+ private:
+  friend class FragmentImpl;
+  friend class VarTemplateSpecializationDecl;
+  friend class VarDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const VarTemplateSpecializationDecl &parent);
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const VarDecl &parent);
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const DeclaratorDecl &parent);
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const ValueDecl &parent);
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const NamedDecl &parent);
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const Decl &parent);
 };
 
 class NonTypeTemplateParmDecl : public DeclaratorDecl {
+ private:
+  friend class FragmentImpl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<NonTypeTemplateParmDecl> from(const DeclaratorDecl &parent);
+  static std::optional<NonTypeTemplateParmDecl> from(const ValueDecl &parent);
+  static std::optional<NonTypeTemplateParmDecl> from(const NamedDecl &parent);
+  static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent);
   bool default_argument_was_inherited(void) const noexcept;
   Token default_argument_token(void) const noexcept;
   bool has_default_argument(void) const noexcept;
@@ -6930,13 +8997,33 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
 };
 
 class MSPropertyDecl : public DeclaratorDecl {
+ private:
+  friend class FragmentImpl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<MSPropertyDecl> from(const DeclaratorDecl &parent);
+  static std::optional<MSPropertyDecl> from(const ValueDecl &parent);
+  static std::optional<MSPropertyDecl> from(const NamedDecl &parent);
+  static std::optional<MSPropertyDecl> from(const Decl &parent);
   bool has_getter(void) const noexcept;
   bool has_setter(void) const noexcept;
 };
 
 class FunctionDecl : public DeclaratorDecl {
+ private:
+  friend class FragmentImpl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<FunctionDecl> from(const DeclaratorDecl &parent);
+  static std::optional<FunctionDecl> from(const ValueDecl &parent);
+  static std::optional<FunctionDecl> from(const NamedDecl &parent);
+  static std::optional<FunctionDecl> from(const Decl &parent);
   bool does_this_declaration_have_a_body(void) const noexcept;
   ConstexprSpecKind constexpr_kind(void) const noexcept;
   std::optional<FunctionDecl> definition(void) const noexcept;
@@ -7007,7 +9094,19 @@ class FunctionDecl : public DeclaratorDecl {
 };
 
 class CXXMethodDecl : public FunctionDecl {
+ private:
+  friend class FragmentImpl;
+  friend class FunctionDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<CXXMethodDecl> from(const FunctionDecl &parent);
+  static std::optional<CXXMethodDecl> from(const DeclaratorDecl &parent);
+  static std::optional<CXXMethodDecl> from(const ValueDecl &parent);
+  static std::optional<CXXMethodDecl> from(const NamedDecl &parent);
+  static std::optional<CXXMethodDecl> from(const Decl &parent);
   CXXRecordDecl parent(void) const noexcept;
   RefQualifierKind reference_qualifier(void) const noexcept;
   bool has_inline_body(void) const noexcept;
@@ -7022,18 +9121,60 @@ class CXXMethodDecl : public FunctionDecl {
 };
 
 class CXXDestructorDecl : public CXXMethodDecl {
+ private:
+  friend class FragmentImpl;
+  friend class CXXMethodDecl;
+  friend class FunctionDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<CXXDestructorDecl> from(const CXXMethodDecl &parent);
+  static std::optional<CXXDestructorDecl> from(const FunctionDecl &parent);
+  static std::optional<CXXDestructorDecl> from(const DeclaratorDecl &parent);
+  static std::optional<CXXDestructorDecl> from(const ValueDecl &parent);
+  static std::optional<CXXDestructorDecl> from(const NamedDecl &parent);
+  static std::optional<CXXDestructorDecl> from(const Decl &parent);
   FunctionDecl operator_delete(void) const noexcept;
 };
 
 class CXXConversionDecl : public CXXMethodDecl {
+ private:
+  friend class FragmentImpl;
+  friend class CXXMethodDecl;
+  friend class FunctionDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<CXXConversionDecl> from(const CXXMethodDecl &parent);
+  static std::optional<CXXConversionDecl> from(const FunctionDecl &parent);
+  static std::optional<CXXConversionDecl> from(const DeclaratorDecl &parent);
+  static std::optional<CXXConversionDecl> from(const ValueDecl &parent);
+  static std::optional<CXXConversionDecl> from(const NamedDecl &parent);
+  static std::optional<CXXConversionDecl> from(const Decl &parent);
   bool is_explicit(void) const noexcept;
   bool is_lambda_to_block_pointer_conversion(void) const noexcept;
 };
 
 class CXXConstructorDecl : public CXXMethodDecl {
+ private:
+  friend class FragmentImpl;
+  friend class CXXMethodDecl;
+  friend class FunctionDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<CXXConstructorDecl> from(const CXXMethodDecl &parent);
+  static std::optional<CXXConstructorDecl> from(const FunctionDecl &parent);
+  static std::optional<CXXConstructorDecl> from(const DeclaratorDecl &parent);
+  static std::optional<CXXConstructorDecl> from(const ValueDecl &parent);
+  static std::optional<CXXConstructorDecl> from(const NamedDecl &parent);
+  static std::optional<CXXConstructorDecl> from(const Decl &parent);
   CXXConstructorDecl target_constructor(void) const noexcept;
   bool is_default_constructor(void) const noexcept;
   bool is_delegating_constructor(void) const noexcept;
@@ -7043,14 +9184,36 @@ class CXXConstructorDecl : public CXXMethodDecl {
 };
 
 class CXXDeductionGuideDecl : public FunctionDecl {
+ private:
+  friend class FragmentImpl;
+  friend class FunctionDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<CXXDeductionGuideDecl> from(const FunctionDecl &parent);
+  static std::optional<CXXDeductionGuideDecl> from(const DeclaratorDecl &parent);
+  static std::optional<CXXDeductionGuideDecl> from(const ValueDecl &parent);
+  static std::optional<CXXDeductionGuideDecl> from(const NamedDecl &parent);
+  static std::optional<CXXDeductionGuideDecl> from(const Decl &parent);
   CXXConstructorDecl corresponding_constructor(void) const noexcept;
   bool is_copy_deduction_candidate(void) const noexcept;
   bool is_explicit(void) const noexcept;
 };
 
 class FieldDecl : public DeclaratorDecl {
+ private:
+  friend class FragmentImpl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
+  static std::optional<FieldDecl> from(const ValueDecl &parent);
+  static std::optional<FieldDecl> from(const NamedDecl &parent);
+  static std::optional<FieldDecl> from(const Decl &parent);
   InClassInitStyle in_class_initializer_style(void) const noexcept;
   RecordDecl parent(void) const noexcept;
   bool has_captured_vla_type(void) const noexcept;
@@ -7064,7 +9227,19 @@ class FieldDecl : public DeclaratorDecl {
 };
 
 class ObjCIvarDecl : public FieldDecl {
+ private:
+  friend class FragmentImpl;
+  friend class FieldDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCIvarDecl> from(const FieldDecl &parent);
+  static std::optional<ObjCIvarDecl> from(const DeclaratorDecl &parent);
+  static std::optional<ObjCIvarDecl> from(const ValueDecl &parent);
+  static std::optional<ObjCIvarDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCIvarDecl> from(const Decl &parent);
   ObjCIvarDeclAccessControl access_control(void) const noexcept;
   ObjCIvarDeclAccessControl canonical_access_control(void) const noexcept;
   ObjCInterfaceDecl containing_interface(void) const noexcept;
@@ -7073,34 +9248,86 @@ class ObjCIvarDecl : public FieldDecl {
 };
 
 class ObjCAtDefsFieldDecl : public FieldDecl {
+ private:
+  friend class FragmentImpl;
+  friend class FieldDecl;
+  friend class DeclaratorDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCAtDefsFieldDecl> from(const FieldDecl &parent);
+  static std::optional<ObjCAtDefsFieldDecl> from(const DeclaratorDecl &parent);
+  static std::optional<ObjCAtDefsFieldDecl> from(const ValueDecl &parent);
+  static std::optional<ObjCAtDefsFieldDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent);
 };
 
 class BindingDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<BindingDecl> from(const ValueDecl &parent);
+  static std::optional<BindingDecl> from(const NamedDecl &parent);
+  static std::optional<BindingDecl> from(const Decl &parent);
   ValueDecl decomposed_declaration(void) const noexcept;
   VarDecl holding_variable(void) const noexcept;
 };
 
 class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<OMPDeclarativeDirectiveValueDecl> from(const ValueDecl &parent);
+  static std::optional<OMPDeclarativeDirectiveValueDecl> from(const NamedDecl &parent);
+  static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Decl &parent);
 };
 
 class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
+ private:
+  friend class FragmentImpl;
+  friend class OMPDeclarativeDirectiveValueDecl;
+  friend class ValueDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<OMPDeclareMapperDecl> from(const OMPDeclarativeDirectiveValueDecl &parent);
+  static std::optional<OMPDeclareMapperDecl> from(const ValueDecl &parent);
+  static std::optional<OMPDeclareMapperDecl> from(const NamedDecl &parent);
+  static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
   OMPDeclareMapperDecl prev_declaration_in_scope(void) const noexcept;
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
 class UsingShadowDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UsingShadowDecl> from(const NamedDecl &parent);
+  static std::optional<UsingShadowDecl> from(const Decl &parent);
   BaseUsingDecl introducer(void) const noexcept;
   UsingShadowDecl next_using_shadow_declaration(void) const noexcept;
   NamedDecl target_declaration(void) const noexcept;
 };
 
 class ConstructorUsingShadowDecl : public UsingShadowDecl {
+ private:
+  friend class FragmentImpl;
+  friend class UsingShadowDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ConstructorUsingShadowDecl> from(const UsingShadowDecl &parent);
+  static std::optional<ConstructorUsingShadowDecl> from(const NamedDecl &parent);
+  static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent);
   bool constructs_virtual_base(void) const noexcept;
   CXXRecordDecl constructed_base_class(void) const noexcept;
   std::optional<ConstructorUsingShadowDecl> constructed_base_class_shadow_declaration(void) const noexcept;
@@ -7110,13 +9337,25 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
 };
 
 class UsingPackDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UsingPackDecl> from(const NamedDecl &parent);
+  static std::optional<UsingPackDecl> from(const Decl &parent);
   std::vector<NamedDecl> expansions(void) const noexcept;
   NamedDecl instantiated_from_using_declaration(void) const noexcept;
 };
 
 class UsingDirectiveDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UsingDirectiveDecl> from(const NamedDecl &parent);
+  static std::optional<UsingDirectiveDecl> from(const Decl &parent);
   Token identifier_token(void) const noexcept;
   Token namespace_key_token(void) const noexcept;
   NamedDecl nominated_namespace_as_written(void) const noexcept;
@@ -7124,15 +9363,35 @@ class UsingDirectiveDecl : public NamedDecl {
 };
 
 class UnresolvedUsingIfExistsDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UnresolvedUsingIfExistsDecl> from(const NamedDecl &parent);
+  static std::optional<UnresolvedUsingIfExistsDecl> from(const Decl &parent);
 };
 
 class TypeDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TypeDecl> from(const NamedDecl &parent);
+  static std::optional<TypeDecl> from(const Decl &parent);
 };
 
 class TemplateTypeParmDecl : public TypeDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TemplateTypeParmDecl> from(const TypeDecl &parent);
+  static std::optional<TemplateTypeParmDecl> from(const NamedDecl &parent);
+  static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
   bool default_argument_was_inherited(void) const noexcept;
   Token default_argument_token(void) const noexcept;
   bool has_default_argument(void) const noexcept;
@@ -7143,7 +9402,15 @@ class TemplateTypeParmDecl : public TypeDecl {
 };
 
 class TagDecl : public TypeDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TagDecl> from(const TypeDecl &parent);
+  static std::optional<TagDecl> from(const NamedDecl &parent);
+  static std::optional<TagDecl> from(const Decl &parent);
   TokenRange brace_range(void) const noexcept;
   std::optional<TagDecl> definition(void) const noexcept;
   Token inner_token_start(void) const noexcept;
@@ -7169,7 +9436,17 @@ class TagDecl : public TypeDecl {
 };
 
 class RecordDecl : public TagDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TagDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<RecordDecl> from(const TagDecl &parent);
+  static std::optional<RecordDecl> from(const TypeDecl &parent);
+  static std::optional<RecordDecl> from(const NamedDecl &parent);
+  static std::optional<RecordDecl> from(const Decl &parent);
   bool can_pass_in_registers(void) const noexcept;
   std::vector<FieldDecl> fields(void) const noexcept;
   std::optional<FieldDecl> find_first_named_data_member(void) const noexcept;
@@ -7195,7 +9472,19 @@ class RecordDecl : public TagDecl {
 };
 
 class CXXRecordDecl : public RecordDecl {
+ private:
+  friend class FragmentImpl;
+  friend class RecordDecl;
+  friend class TagDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<CXXRecordDecl> from(const RecordDecl &parent);
+  static std::optional<CXXRecordDecl> from(const TagDecl &parent);
+  static std::optional<CXXRecordDecl> from(const TypeDecl &parent);
+  static std::optional<CXXRecordDecl> from(const NamedDecl &parent);
+  static std::optional<CXXRecordDecl> from(const Decl &parent);
   bool allow_const_default_initializer(void) const noexcept;
   std::vector<CXXBaseSpecifier> bases(void) const noexcept;
   MSInheritanceModel calculate_inheritance_model(void) const noexcept;
@@ -7207,6 +9496,7 @@ class CXXRecordDecl : public RecordDecl {
   bool defaulted_move_constructor_is_deleted(void) const noexcept;
   std::vector<FriendDecl> friends(void) const noexcept;
   std::optional<CXXDestructorDecl> destructor(void) const noexcept;
+  std::optional<TemplateParameterList> generic_lambda_template_parameter_list(void) const noexcept;
   std::optional<CXXRecordDecl> instantiated_from_member_class(void) const noexcept;
   std::optional<CXXMethodDecl> lambda_call_operator(void) const noexcept;
   LambdaCaptureDefault lambda_capture_default(void) const noexcept;
@@ -7313,7 +9603,21 @@ class CXXRecordDecl : public RecordDecl {
 };
 
 class ClassTemplateSpecializationDecl : public CXXRecordDecl {
+ private:
+  friend class FragmentImpl;
+  friend class CXXRecordDecl;
+  friend class RecordDecl;
+  friend class TagDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ClassTemplateSpecializationDecl> from(const CXXRecordDecl &parent);
+  static std::optional<ClassTemplateSpecializationDecl> from(const RecordDecl &parent);
+  static std::optional<ClassTemplateSpecializationDecl> from(const TagDecl &parent);
+  static std::optional<ClassTemplateSpecializationDecl> from(const TypeDecl &parent);
+  static std::optional<ClassTemplateSpecializationDecl> from(const NamedDecl &parent);
+  static std::optional<ClassTemplateSpecializationDecl> from(const Decl &parent);
   Token extern_token(void) const noexcept;
   Token point_of_instantiation(void) const noexcept;
   TemplateSpecializationKind specialization_kind(void) const noexcept;
@@ -7326,11 +9630,37 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
 };
 
 class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ClassTemplateSpecializationDecl;
+  friend class CXXRecordDecl;
+  friend class RecordDecl;
+  friend class TagDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const ClassTemplateSpecializationDecl &parent);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const CXXRecordDecl &parent);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const RecordDecl &parent);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const TagDecl &parent);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const TypeDecl &parent);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const NamedDecl &parent);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const Decl &parent);
 };
 
 class EnumDecl : public TagDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TagDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<EnumDecl> from(const TagDecl &parent);
+  static std::optional<EnumDecl> from(const TypeDecl &parent);
+  static std::optional<EnumDecl> from(const NamedDecl &parent);
+  static std::optional<EnumDecl> from(const Decl &parent);
   std::vector<EnumConstantDecl> enumerators(void) const noexcept;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const noexcept;
   TokenRange integer_type_range(void) const noexcept;
@@ -7346,7 +9676,15 @@ class EnumDecl : public TagDecl {
 };
 
 class UnresolvedUsingTypenameDecl : public TypeDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<UnresolvedUsingTypenameDecl> from(const TypeDecl &parent);
+  static std::optional<UnresolvedUsingTypenameDecl> from(const NamedDecl &parent);
+  static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent);
   Token ellipsis_token(void) const noexcept;
   Token typename_token(void) const noexcept;
   Token using_token(void) const noexcept;
@@ -7354,23 +9692,61 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
 };
 
 class TypedefNameDecl : public TypeDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TypedefNameDecl> from(const TypeDecl &parent);
+  static std::optional<TypedefNameDecl> from(const NamedDecl &parent);
+  static std::optional<TypedefNameDecl> from(const Decl &parent);
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const noexcept;
   bool is_moded(void) const noexcept;
   bool is_transparent_tag(void) const noexcept;
 };
 
 class TypedefDecl : public TypedefNameDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TypedefNameDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TypedefDecl> from(const TypedefNameDecl &parent);
+  static std::optional<TypedefDecl> from(const TypeDecl &parent);
+  static std::optional<TypedefDecl> from(const NamedDecl &parent);
+  static std::optional<TypedefDecl> from(const Decl &parent);
 };
 
 class TypeAliasDecl : public TypedefNameDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TypedefNameDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TypeAliasDecl> from(const TypedefNameDecl &parent);
+  static std::optional<TypeAliasDecl> from(const TypeDecl &parent);
+  static std::optional<TypeAliasDecl> from(const NamedDecl &parent);
+  static std::optional<TypeAliasDecl> from(const Decl &parent);
   std::optional<TypeAliasTemplateDecl> described_alias_template(void) const noexcept;
 };
 
 class ObjCTypeParamDecl : public TypedefNameDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TypedefNameDecl;
+  friend class TypeDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCTypeParamDecl> from(const TypedefNameDecl &parent);
+  static std::optional<ObjCTypeParamDecl> from(const TypeDecl &parent);
+  static std::optional<ObjCTypeParamDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCTypeParamDecl> from(const Decl &parent);
   Token colon_token(void) const noexcept;
   ObjCTypeParamVariance variance(void) const noexcept;
   Token variance_token(void) const noexcept;
@@ -7378,44 +9754,128 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
 };
 
 class TemplateDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TemplateDecl> from(const NamedDecl &parent);
+  static std::optional<TemplateDecl> from(const Decl &parent);
 };
 
 class RedeclarableTemplateDecl : public TemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<RedeclarableTemplateDecl> from(const TemplateDecl &parent);
+  static std::optional<RedeclarableTemplateDecl> from(const NamedDecl &parent);
+  static std::optional<RedeclarableTemplateDecl> from(const Decl &parent);
 };
 
 class FunctionTemplateDecl : public RedeclarableTemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class RedeclarableTemplateDecl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<FunctionTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+  static std::optional<FunctionTemplateDecl> from(const TemplateDecl &parent);
+  static std::optional<FunctionTemplateDecl> from(const NamedDecl &parent);
+  static std::optional<FunctionTemplateDecl> from(const Decl &parent);
 };
 
 class ClassTemplateDecl : public RedeclarableTemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class RedeclarableTemplateDecl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ClassTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+  static std::optional<ClassTemplateDecl> from(const TemplateDecl &parent);
+  static std::optional<ClassTemplateDecl> from(const NamedDecl &parent);
+  static std::optional<ClassTemplateDecl> from(const Decl &parent);
 };
 
 class VarTemplateDecl : public RedeclarableTemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class RedeclarableTemplateDecl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<VarTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+  static std::optional<VarTemplateDecl> from(const TemplateDecl &parent);
+  static std::optional<VarTemplateDecl> from(const NamedDecl &parent);
+  static std::optional<VarTemplateDecl> from(const Decl &parent);
 };
 
 class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class RedeclarableTemplateDecl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TypeAliasTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+  static std::optional<TypeAliasTemplateDecl> from(const TemplateDecl &parent);
+  static std::optional<TypeAliasTemplateDecl> from(const NamedDecl &parent);
+  static std::optional<TypeAliasTemplateDecl> from(const Decl &parent);
 };
 
 class ConceptDecl : public TemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ConceptDecl> from(const TemplateDecl &parent);
+  static std::optional<ConceptDecl> from(const NamedDecl &parent);
+  static std::optional<ConceptDecl> from(const Decl &parent);
   bool is_type_concept(void) const noexcept;
 };
 
 class BuiltinTemplateDecl : public TemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<BuiltinTemplateDecl> from(const TemplateDecl &parent);
+  static std::optional<BuiltinTemplateDecl> from(const NamedDecl &parent);
+  static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
 };
 
 class TemplateTemplateParmDecl : public TemplateDecl {
+ private:
+  friend class FragmentImpl;
+  friend class TemplateDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<TemplateTemplateParmDecl> from(const TemplateDecl &parent);
+  static std::optional<TemplateTemplateParmDecl> from(const NamedDecl &parent);
+  static std::optional<TemplateTemplateParmDecl> from(const Decl &parent);
 };
 
 class ObjCPropertyDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCPropertyDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCPropertyDecl> from(const Decl &parent);
   Token at_token(void) const noexcept;
   ObjCMethodDecl getter_method_declaration(void) const noexcept;
   Token getter_name_token(void) const noexcept;
@@ -7436,7 +9896,13 @@ class ObjCPropertyDecl : public NamedDecl {
 };
 
 class ObjCMethodDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCMethodDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCMethodDecl> from(const Decl &parent);
   bool defined_in_ns_object(void) const noexcept;
   ObjCPropertyDecl find_property_declaration(void) const noexcept;
   ObjCCategoryDecl category(void) const noexcept;
@@ -7471,7 +9937,13 @@ class ObjCMethodDecl : public NamedDecl {
 };
 
 class ObjCContainerDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCContainerDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCContainerDecl> from(const Decl &parent);
   std::vector<ObjCMethodDecl> class_methods(void) const noexcept;
   std::vector<ObjCPropertyDecl> class_properties(void) const noexcept;
   TokenRange at_end_range(void) const noexcept;
@@ -7484,7 +9956,15 @@ class ObjCContainerDecl : public NamedDecl {
 };
 
 class ObjCCategoryDecl : public ObjCContainerDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ObjCContainerDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCCategoryDecl> from(const ObjCContainerDecl &parent);
+  static std::optional<ObjCCategoryDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCCategoryDecl> from(const Decl &parent);
   bool is_class_extension(void) const noexcept;
   Token category_name_token(void) const noexcept;
   ObjCInterfaceDecl class_interface(void) const noexcept;
@@ -7499,7 +9979,15 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
 };
 
 class ObjCProtocolDecl : public ObjCContainerDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ObjCContainerDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
+  static std::optional<ObjCProtocolDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCProtocolDecl> from(const Decl &parent);
   ObjCProtocolDecl definition(void) const noexcept;
   std::string_view obj_c_runtime_name_as_string(void) const noexcept;
   bool has_definition(void) const noexcept;
@@ -7510,7 +9998,15 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
 };
 
 class ObjCInterfaceDecl : public ObjCContainerDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ObjCContainerDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
+  static std::optional<ObjCInterfaceDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
   std::vector<ObjCProtocolDecl> all_referenced_protocols(void) const noexcept;
   bool declares_or_inherits_designated_initializers(void) const noexcept;
   ObjCCategoryDecl category_list_raw(void) const noexcept;
@@ -7536,19 +10032,47 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
 };
 
 class ObjCImplDecl : public ObjCContainerDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ObjCContainerDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCImplDecl> from(const ObjCContainerDecl &parent);
+  static std::optional<ObjCImplDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCImplDecl> from(const Decl &parent);
   ObjCInterfaceDecl class_interface(void) const noexcept;
   std::vector<ObjCPropertyImplDecl> property_implementations(void) const noexcept;
 };
 
 class ObjCCategoryImplDecl : public ObjCImplDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ObjCImplDecl;
+  friend class ObjCContainerDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCCategoryImplDecl> from(const ObjCImplDecl &parent);
+  static std::optional<ObjCCategoryImplDecl> from(const ObjCContainerDecl &parent);
+  static std::optional<ObjCCategoryImplDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCCategoryImplDecl> from(const Decl &parent);
   ObjCCategoryDecl category_declaration(void) const noexcept;
   Token category_name_token(void) const noexcept;
 };
 
 class ObjCImplementationDecl : public ObjCImplDecl {
+ private:
+  friend class FragmentImpl;
+  friend class ObjCImplDecl;
+  friend class ObjCContainerDecl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCImplementationDecl> from(const ObjCImplDecl &parent);
+  static std::optional<ObjCImplementationDecl> from(const ObjCContainerDecl &parent);
+  static std::optional<ObjCImplementationDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCImplementationDecl> from(const Decl &parent);
   Token instance_variable_l_brace_token(void) const noexcept;
   Token instance_variable_r_brace_token(void) const noexcept;
   std::string_view obj_c_runtime_name_as_string(void) const noexcept;
@@ -7560,17 +10084,35 @@ class ObjCImplementationDecl : public ObjCImplDecl {
 };
 
 class ObjCCompatibleAliasDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<ObjCCompatibleAliasDecl> from(const NamedDecl &parent);
+  static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
   ObjCInterfaceDecl class_interface(void) const noexcept;
 };
 
 class NamespaceDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<NamespaceDecl> from(const NamedDecl &parent);
+  static std::optional<NamespaceDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
 class NamespaceAliasDecl : public NamedDecl {
+ private:
+  friend class FragmentImpl;
+  friend class NamedDecl;
+  friend class Decl;
  public:
+  static std::optional<NamespaceAliasDecl> from(const NamedDecl &parent);
+  static std::optional<NamespaceAliasDecl> from(const Decl &parent);
   Token alias_token(void) const noexcept;
   NamedDecl aliased_namespace(void) const noexcept;
   Token namespace_token(void) const noexcept;
@@ -7578,27 +10120,47 @@ class NamespaceAliasDecl : public NamedDecl {
 };
 
 class LinkageSpecDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<LinkageSpecDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
 class LifetimeExtendedTemporaryDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
   ValueDecl extending_declaration(void) const noexcept;
   StorageDuration storage_duration(void) const noexcept;
 };
 
 class ImportDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<ImportDecl> from(const Decl &parent);
   std::vector<Token> identifier_tokens(void) const noexcept;
 };
 
 class FriendTemplateDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<FriendTemplateDecl> from(const Decl &parent);
 };
 
 class FriendDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<FriendDecl> from(const Decl &parent);
   NamedDecl friend_declaration(void) const noexcept;
   Token friend_token(void) const noexcept;
   bool is_unsupported_friend(void) const noexcept;
@@ -7606,19 +10168,31 @@ class FriendDecl : public Decl {
 };
 
 class FileScopeAsmDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<FileScopeAsmDecl> from(const Decl &parent);
   Token assembly_token(void) const noexcept;
   StringLiteral assembly_string(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
 class ExternCContextDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<ExternCContextDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
 class ExportDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<ExportDecl> from(const Decl &parent);
   Token export_token(void) const noexcept;
   Token r_brace_token(void) const noexcept;
   bool has_braces(void) const noexcept;
@@ -7626,7 +10200,672 @@ class ExportDecl : public Decl {
 };
 
 class EmptyDecl : public Decl {
+ private:
+  friend class FragmentImpl;
+  friend class Decl;
  public:
+  static std::optional<EmptyDecl> from(const Decl &parent);
 };
 
+static_assert(sizeof(SEHTryStmt) == sizeof(Stmt));
+
+static_assert(sizeof(SEHLeaveStmt) == sizeof(Stmt));
+
+static_assert(sizeof(SEHFinallyStmt) == sizeof(Stmt));
+
+static_assert(sizeof(SEHExceptStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ReturnStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ObjCForCollectionStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ObjCAutoreleasePoolStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ObjCAtTryStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ObjCAtThrowStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ObjCAtSynchronizedStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ObjCAtFinallyStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ObjCAtCatchStmt) == sizeof(Stmt));
+
+static_assert(sizeof(OMPExecutableDirective) == sizeof(Stmt));
+
+static_assert(sizeof(OMPDispatchDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPDepobjDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPCriticalDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPCancellationPointDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPCancelDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPBarrierDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPAtomicDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTeamsDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTaskyieldDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTaskwaitDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTaskgroupDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTaskDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTargetUpdateDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTargetTeamsDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTargetParallelDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTargetExitDataDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTargetEnterDataDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTargetDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPTargetDataDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPSingleDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPSectionsDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPSectionDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPScanDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPParallelSectionsDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPParallelMasterDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPParallelDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPOrderedDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPMasterDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPMaskedDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPLoopBasedDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPUnrollDirective) == sizeof(OMPLoopBasedDirective));
+
+static_assert(sizeof(OMPTileDirective) == sizeof(OMPLoopBasedDirective));
+
+static_assert(sizeof(OMPLoopDirective) == sizeof(OMPLoopBasedDirective));
+
+static_assert(sizeof(OMPForSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPForDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPDistributeSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPDistributeParallelForSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPDistributeParallelForDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPDistributeDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTeamsDistributeSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTeamsDistributeParallelForSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTeamsDistributeParallelForDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTeamsDistributeDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTaskLoopSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTaskLoopDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTargetTeamsDistributeSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTargetTeamsDistributeParallelForSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTargetTeamsDistributeParallelForDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTargetTeamsDistributeDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTargetSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTargetParallelForSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPTargetParallelForDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPParallelMasterTaskLoopSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPParallelMasterTaskLoopDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPParallelForSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPParallelForDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPMasterTaskLoopSimdDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPMasterTaskLoopDirective) == sizeof(OMPLoopDirective));
+
+static_assert(sizeof(OMPInteropDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPFlushDirective) == sizeof(OMPExecutableDirective));
+
+static_assert(sizeof(OMPCanonicalLoop) == sizeof(Stmt));
+
+static_assert(sizeof(NullStmt) == sizeof(Stmt));
+
+static_assert(sizeof(MSDependentExistsStmt) == sizeof(Stmt));
+
+static_assert(sizeof(IndirectGotoStmt) == sizeof(Stmt));
+
+static_assert(sizeof(IfStmt) == sizeof(Stmt));
+
+static_assert(sizeof(GotoStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ForStmt) == sizeof(Stmt));
+
+static_assert(sizeof(DoStmt) == sizeof(Stmt));
+
+static_assert(sizeof(DeclStmt) == sizeof(Stmt));
+
+static_assert(sizeof(CoroutineBodyStmt) == sizeof(Stmt));
+
+static_assert(sizeof(CoreturnStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ContinueStmt) == sizeof(Stmt));
+
+static_assert(sizeof(CompoundStmt) == sizeof(Stmt));
+
+static_assert(sizeof(CapturedStmt) == sizeof(Stmt));
+
+static_assert(sizeof(CXXTryStmt) == sizeof(Stmt));
+
+static_assert(sizeof(CXXForRangeStmt) == sizeof(Stmt));
+
+static_assert(sizeof(CXXCatchStmt) == sizeof(Stmt));
+
+static_assert(sizeof(BreakStmt) == sizeof(Stmt));
+
+static_assert(sizeof(AsmStmt) == sizeof(Stmt));
+
+static_assert(sizeof(MSAsmStmt) == sizeof(AsmStmt));
+
+static_assert(sizeof(GCCAsmStmt) == sizeof(AsmStmt));
+
+static_assert(sizeof(WhileStmt) == sizeof(Stmt));
+
+static_assert(sizeof(ValueStmt) == sizeof(Stmt));
+
+static_assert(sizeof(LabelStmt) == sizeof(ValueStmt));
+
+static_assert(sizeof(Expr) == sizeof(ValueStmt));
+
+static_assert(sizeof(DesignatedInitUpdateExpr) == sizeof(Expr));
+
+static_assert(sizeof(DesignatedInitExpr) == sizeof(Expr));
+
+static_assert(sizeof(DependentScopeDeclRefExpr) == sizeof(Expr));
+
+static_assert(sizeof(DependentCoawaitExpr) == sizeof(Expr));
+
+static_assert(sizeof(DeclRefExpr) == sizeof(Expr));
+
+static_assert(sizeof(CoroutineSuspendExpr) == sizeof(Expr));
+
+static_assert(sizeof(CoawaitExpr) == sizeof(CoroutineSuspendExpr));
+
+static_assert(sizeof(CoyieldExpr) == sizeof(CoroutineSuspendExpr));
+
+static_assert(sizeof(ConvertVectorExpr) == sizeof(Expr));
+
+static_assert(sizeof(ConceptSpecializationExpr) == sizeof(Expr));
+
+static_assert(sizeof(CompoundLiteralExpr) == sizeof(Expr));
+
+static_assert(sizeof(ChooseExpr) == sizeof(Expr));
+
+static_assert(sizeof(CharacterLiteral) == sizeof(Expr));
+
+static_assert(sizeof(CastExpr) == sizeof(Expr));
+
+static_assert(sizeof(ImplicitCastExpr) == sizeof(CastExpr));
+
+static_assert(sizeof(ExplicitCastExpr) == sizeof(CastExpr));
+
+static_assert(sizeof(CXXNamedCastExpr) == sizeof(ExplicitCastExpr));
+
+static_assert(sizeof(CXXDynamicCastExpr) == sizeof(CXXNamedCastExpr));
+
+static_assert(sizeof(CXXConstCastExpr) == sizeof(CXXNamedCastExpr));
+
+static_assert(sizeof(CXXAddrspaceCastExpr) == sizeof(CXXNamedCastExpr));
+
+static_assert(sizeof(CXXStaticCastExpr) == sizeof(CXXNamedCastExpr));
+
+static_assert(sizeof(CXXReinterpretCastExpr) == sizeof(CXXNamedCastExpr));
+
+static_assert(sizeof(CXXFunctionalCastExpr) == sizeof(ExplicitCastExpr));
+
+static_assert(sizeof(CStyleCastExpr) == sizeof(ExplicitCastExpr));
+
+static_assert(sizeof(BuiltinBitCastExpr) == sizeof(ExplicitCastExpr));
+
+static_assert(sizeof(ObjCBridgedCastExpr) == sizeof(ExplicitCastExpr));
+
+static_assert(sizeof(CallExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXOperatorCallExpr) == sizeof(CallExpr));
+
+static_assert(sizeof(CXXMemberCallExpr) == sizeof(CallExpr));
+
+static_assert(sizeof(CUDAKernelCallExpr) == sizeof(CallExpr));
+
+static_assert(sizeof(UserDefinedLiteral) == sizeof(CallExpr));
+
+static_assert(sizeof(CXXUuidofExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXUnresolvedConstructExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXTypeidExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXThrowExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXThisExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXStdInitializerListExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXScalarValueInitExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXRewrittenBinaryOperator) == sizeof(Expr));
+
+static_assert(sizeof(CXXPseudoDestructorExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXNullPtrLiteralExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXNoexceptExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXNewExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXInheritedCtorInitExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXFoldExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXDependentScopeMemberExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXDeleteExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXDefaultInitExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXDefaultArgExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXConstructExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXTemporaryObjectExpr) == sizeof(CXXConstructExpr));
+
+static_assert(sizeof(CXXBoolLiteralExpr) == sizeof(Expr));
+
+static_assert(sizeof(CXXBindTemporaryExpr) == sizeof(Expr));
+
+static_assert(sizeof(BlockExpr) == sizeof(Expr));
+
+static_assert(sizeof(BinaryOperator) == sizeof(Expr));
+
+static_assert(sizeof(CompoundAssignOperator) == sizeof(BinaryOperator));
+
+static_assert(sizeof(AtomicExpr) == sizeof(Expr));
+
+static_assert(sizeof(AsTypeExpr) == sizeof(Expr));
+
+static_assert(sizeof(ArrayTypeTraitExpr) == sizeof(Expr));
+
+static_assert(sizeof(ArraySubscriptExpr) == sizeof(Expr));
+
+static_assert(sizeof(ArrayInitLoopExpr) == sizeof(Expr));
+
+static_assert(sizeof(ArrayInitIndexExpr) == sizeof(Expr));
+
+static_assert(sizeof(AddrLabelExpr) == sizeof(Expr));
+
+static_assert(sizeof(AbstractConditionalOperator) == sizeof(Expr));
+
+static_assert(sizeof(ConditionalOperator) == sizeof(AbstractConditionalOperator));
+
+static_assert(sizeof(BinaryConditionalOperator) == sizeof(AbstractConditionalOperator));
+
+static_assert(sizeof(VAArgExpr) == sizeof(Expr));
+
+static_assert(sizeof(UnaryOperator) == sizeof(Expr));
+
+static_assert(sizeof(UnaryExprOrTypeTraitExpr) == sizeof(Expr));
+
+static_assert(sizeof(TypoExpr) == sizeof(Expr));
+
+static_assert(sizeof(TypeTraitExpr) == sizeof(Expr));
+
+static_assert(sizeof(SubstNonTypeTemplateParmPackExpr) == sizeof(Expr));
+
+static_assert(sizeof(SubstNonTypeTemplateParmExpr) == sizeof(Expr));
+
+static_assert(sizeof(StringLiteral) == sizeof(Expr));
+
+static_assert(sizeof(StmtExpr) == sizeof(Expr));
+
+static_assert(sizeof(SourceLocExpr) == sizeof(Expr));
+
+static_assert(sizeof(SizeOfPackExpr) == sizeof(Expr));
+
+static_assert(sizeof(ShuffleVectorExpr) == sizeof(Expr));
+
+static_assert(sizeof(SYCLUniqueStableNameExpr) == sizeof(Expr));
+
+static_assert(sizeof(RequiresExpr) == sizeof(Expr));
+
+static_assert(sizeof(RecoveryExpr) == sizeof(Expr));
+
+static_assert(sizeof(PseudoObjectExpr) == sizeof(Expr));
+
+static_assert(sizeof(PredefinedExpr) == sizeof(Expr));
+
+static_assert(sizeof(ParenListExpr) == sizeof(Expr));
+
+static_assert(sizeof(ParenExpr) == sizeof(Expr));
+
+static_assert(sizeof(PackExpansionExpr) == sizeof(Expr));
+
+static_assert(sizeof(OverloadExpr) == sizeof(Expr));
+
+static_assert(sizeof(UnresolvedMemberExpr) == sizeof(OverloadExpr));
+
+static_assert(sizeof(UnresolvedLookupExpr) == sizeof(OverloadExpr));
+
+static_assert(sizeof(OpaqueValueExpr) == sizeof(Expr));
+
+static_assert(sizeof(OffsetOfExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCSubscriptRefExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCStringLiteral) == sizeof(Expr));
+
+static_assert(sizeof(ObjCSelectorExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCProtocolExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCPropertyRefExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCMessageExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCIvarRefExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCIsaExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCIndirectCopyRestoreExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCEncodeExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCDictionaryLiteral) == sizeof(Expr));
+
+static_assert(sizeof(ObjCBoxedExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCBoolLiteralExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCAvailabilityCheckExpr) == sizeof(Expr));
+
+static_assert(sizeof(ObjCArrayLiteral) == sizeof(Expr));
+
+static_assert(sizeof(OMPIteratorExpr) == sizeof(Expr));
+
+static_assert(sizeof(OMPArrayShapingExpr) == sizeof(Expr));
+
+static_assert(sizeof(OMPArraySectionExpr) == sizeof(Expr));
+
+static_assert(sizeof(NoInitExpr) == sizeof(Expr));
+
+static_assert(sizeof(MemberExpr) == sizeof(Expr));
+
+static_assert(sizeof(MatrixSubscriptExpr) == sizeof(Expr));
+
+static_assert(sizeof(MaterializeTemporaryExpr) == sizeof(Expr));
+
+static_assert(sizeof(MSPropertySubscriptExpr) == sizeof(Expr));
+
+static_assert(sizeof(MSPropertyRefExpr) == sizeof(Expr));
+
+static_assert(sizeof(LambdaExpr) == sizeof(Expr));
+
+static_assert(sizeof(IntegerLiteral) == sizeof(Expr));
+
+static_assert(sizeof(InitListExpr) == sizeof(Expr));
+
+static_assert(sizeof(ImplicitValueInitExpr) == sizeof(Expr));
+
+static_assert(sizeof(ImaginaryLiteral) == sizeof(Expr));
+
+static_assert(sizeof(GenericSelectionExpr) == sizeof(Expr));
+
+static_assert(sizeof(GNUNullExpr) == sizeof(Expr));
+
+static_assert(sizeof(FunctionParmPackExpr) == sizeof(Expr));
+
+static_assert(sizeof(FullExpr) == sizeof(Expr));
+
+static_assert(sizeof(ExprWithCleanups) == sizeof(FullExpr));
+
+static_assert(sizeof(ConstantExpr) == sizeof(FullExpr));
+
+static_assert(sizeof(FloatingLiteral) == sizeof(Expr));
+
+static_assert(sizeof(FixedPointLiteral) == sizeof(Expr));
+
+static_assert(sizeof(ExtVectorElementExpr) == sizeof(Expr));
+
+static_assert(sizeof(ExpressionTraitExpr) == sizeof(Expr));
+
+static_assert(sizeof(AttributedStmt) == sizeof(ValueStmt));
+
+static_assert(sizeof(SwitchStmt) == sizeof(Stmt));
+
+static_assert(sizeof(SwitchCase) == sizeof(Stmt));
+
+static_assert(sizeof(DefaultStmt) == sizeof(SwitchCase));
+
+static_assert(sizeof(CaseStmt) == sizeof(SwitchCase));
+
+static_assert(sizeof(ClassScopeFunctionSpecializationDecl) == sizeof(Decl));
+
+static_assert(sizeof(CapturedDecl) == sizeof(Decl));
+
+static_assert(sizeof(BlockDecl) == sizeof(Decl));
+
+static_assert(sizeof(AccessSpecDecl) == sizeof(Decl));
+
+static_assert(sizeof(OMPDeclarativeDirectiveDecl) == sizeof(Decl));
+
+static_assert(sizeof(OMPThreadPrivateDecl) == sizeof(OMPDeclarativeDirectiveDecl));
+
+static_assert(sizeof(OMPRequiresDecl) == sizeof(OMPDeclarativeDirectiveDecl));
+
+static_assert(sizeof(OMPAllocateDecl) == sizeof(OMPDeclarativeDirectiveDecl));
+
+static_assert(sizeof(TranslationUnitDecl) == sizeof(Decl));
+
+static_assert(sizeof(StaticAssertDecl) == sizeof(Decl));
+
+static_assert(sizeof(RequiresExprBodyDecl) == sizeof(Decl));
+
+static_assert(sizeof(PragmaDetectMismatchDecl) == sizeof(Decl));
+
+static_assert(sizeof(PragmaCommentDecl) == sizeof(Decl));
+
+static_assert(sizeof(ObjCPropertyImplDecl) == sizeof(Decl));
+
+static_assert(sizeof(NamedDecl) == sizeof(Decl));
+
+static_assert(sizeof(LabelDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(BaseUsingDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(UsingEnumDecl) == sizeof(BaseUsingDecl));
+
+static_assert(sizeof(UsingDecl) == sizeof(BaseUsingDecl));
+
+static_assert(sizeof(ValueDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(UnresolvedUsingValueDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(TemplateParamObjectDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(OMPDeclareReductionDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(MSGuidDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(IndirectFieldDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(EnumConstantDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(DeclaratorDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(VarDecl) == sizeof(DeclaratorDecl));
+
+static_assert(sizeof(ParmVarDecl) == sizeof(VarDecl));
+
+static_assert(sizeof(OMPCapturedExprDecl) == sizeof(VarDecl));
+
+static_assert(sizeof(ImplicitParamDecl) == sizeof(VarDecl));
+
+static_assert(sizeof(DecompositionDecl) == sizeof(VarDecl));
+
+static_assert(sizeof(VarTemplateSpecializationDecl) == sizeof(VarDecl));
+
+static_assert(sizeof(VarTemplatePartialSpecializationDecl) == sizeof(VarTemplateSpecializationDecl));
+
+static_assert(sizeof(NonTypeTemplateParmDecl) == sizeof(DeclaratorDecl));
+
+static_assert(sizeof(MSPropertyDecl) == sizeof(DeclaratorDecl));
+
+static_assert(sizeof(FunctionDecl) == sizeof(DeclaratorDecl));
+
+static_assert(sizeof(CXXMethodDecl) == sizeof(FunctionDecl));
+
+static_assert(sizeof(CXXDestructorDecl) == sizeof(CXXMethodDecl));
+
+static_assert(sizeof(CXXConversionDecl) == sizeof(CXXMethodDecl));
+
+static_assert(sizeof(CXXConstructorDecl) == sizeof(CXXMethodDecl));
+
+static_assert(sizeof(CXXDeductionGuideDecl) == sizeof(FunctionDecl));
+
+static_assert(sizeof(FieldDecl) == sizeof(DeclaratorDecl));
+
+static_assert(sizeof(ObjCIvarDecl) == sizeof(FieldDecl));
+
+static_assert(sizeof(ObjCAtDefsFieldDecl) == sizeof(FieldDecl));
+
+static_assert(sizeof(BindingDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(OMPDeclarativeDirectiveValueDecl) == sizeof(ValueDecl));
+
+static_assert(sizeof(OMPDeclareMapperDecl) == sizeof(OMPDeclarativeDirectiveValueDecl));
+
+static_assert(sizeof(UsingShadowDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(ConstructorUsingShadowDecl) == sizeof(UsingShadowDecl));
+
+static_assert(sizeof(UsingPackDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(UsingDirectiveDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(UnresolvedUsingIfExistsDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(TypeDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(TemplateTypeParmDecl) == sizeof(TypeDecl));
+
+static_assert(sizeof(TagDecl) == sizeof(TypeDecl));
+
+static_assert(sizeof(RecordDecl) == sizeof(TagDecl));
+
+static_assert(sizeof(CXXRecordDecl) == sizeof(RecordDecl));
+
+static_assert(sizeof(ClassTemplateSpecializationDecl) == sizeof(CXXRecordDecl));
+
+static_assert(sizeof(ClassTemplatePartialSpecializationDecl) == sizeof(ClassTemplateSpecializationDecl));
+
+static_assert(sizeof(EnumDecl) == sizeof(TagDecl));
+
+static_assert(sizeof(UnresolvedUsingTypenameDecl) == sizeof(TypeDecl));
+
+static_assert(sizeof(TypedefNameDecl) == sizeof(TypeDecl));
+
+static_assert(sizeof(TypedefDecl) == sizeof(TypedefNameDecl));
+
+static_assert(sizeof(TypeAliasDecl) == sizeof(TypedefNameDecl));
+
+static_assert(sizeof(ObjCTypeParamDecl) == sizeof(TypedefNameDecl));
+
+static_assert(sizeof(TemplateDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(RedeclarableTemplateDecl) == sizeof(TemplateDecl));
+
+static_assert(sizeof(FunctionTemplateDecl) == sizeof(RedeclarableTemplateDecl));
+
+static_assert(sizeof(ClassTemplateDecl) == sizeof(RedeclarableTemplateDecl));
+
+static_assert(sizeof(VarTemplateDecl) == sizeof(RedeclarableTemplateDecl));
+
+static_assert(sizeof(TypeAliasTemplateDecl) == sizeof(RedeclarableTemplateDecl));
+
+static_assert(sizeof(ConceptDecl) == sizeof(TemplateDecl));
+
+static_assert(sizeof(BuiltinTemplateDecl) == sizeof(TemplateDecl));
+
+static_assert(sizeof(TemplateTemplateParmDecl) == sizeof(TemplateDecl));
+
+static_assert(sizeof(ObjCPropertyDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(ObjCMethodDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(ObjCContainerDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(ObjCCategoryDecl) == sizeof(ObjCContainerDecl));
+
+static_assert(sizeof(ObjCProtocolDecl) == sizeof(ObjCContainerDecl));
+
+static_assert(sizeof(ObjCInterfaceDecl) == sizeof(ObjCContainerDecl));
+
+static_assert(sizeof(ObjCImplDecl) == sizeof(ObjCContainerDecl));
+
+static_assert(sizeof(ObjCCategoryImplDecl) == sizeof(ObjCImplDecl));
+
+static_assert(sizeof(ObjCImplementationDecl) == sizeof(ObjCImplDecl));
+
+static_assert(sizeof(ObjCCompatibleAliasDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(NamespaceDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(NamespaceAliasDecl) == sizeof(NamedDecl));
+
+static_assert(sizeof(LinkageSpecDecl) == sizeof(Decl));
+
+static_assert(sizeof(LifetimeExtendedTemporaryDecl) == sizeof(Decl));
+
+static_assert(sizeof(ImportDecl) == sizeof(Decl));
+
+static_assert(sizeof(FriendTemplateDecl) == sizeof(Decl));
+
+static_assert(sizeof(FriendDecl) == sizeof(Decl));
+
+static_assert(sizeof(FileScopeAsmDecl) == sizeof(Decl));
+
+static_assert(sizeof(ExternCContextDecl) == sizeof(Decl));
+
+static_assert(sizeof(ExportDecl) == sizeof(Decl));
+
+static_assert(sizeof(EmptyDecl) == sizeof(Decl));
+
+#endif  // MX_DISABLE_API
 }  // namespace mx

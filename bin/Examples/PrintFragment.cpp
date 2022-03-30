@@ -14,7 +14,7 @@
 DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
-DEFINE_uint64(id, 0, "ID of the fragment to print");
+DEFINE_uint64(fragment_id, 0, "ID of the fragment to print");
 DEFINE_bool(unparsed, false, "Show original source code?");
 
 static void PrintUnparsedTokens(mx::TokenSubstitutionList nodes) {
@@ -33,7 +33,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT]\n";
+    << " [--host HOST] [--port PORT] --fragment_id ID\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -46,9 +46,9 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::EntityProvider::Ptr api = mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port);
-  mx::Fragment fragment = api->fragment(FLAGS_id);
+  mx::Fragment fragment = api->fragment(FLAGS_fragment_id);
   if (!fragment) {
-    std::cerr << "Invalid file id " << FLAGS_id << std::endl;
+    std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
     return EXIT_FAILURE;
   }
 
