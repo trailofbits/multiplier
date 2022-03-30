@@ -67,6 +67,7 @@ add_custom_target("copy_headers"
 set(api_headers
   "${source_include_dir}/API.h"
   "${source_include_dir}/AST.h"
+  "${source_include_dir}/Compress.h"
   "${source_include_dir}/Types.h"
 )
 
@@ -78,6 +79,7 @@ add_library("mx-api"
     "AST.cpp"
     "API.h"
     "API.cpp"
+    "Compress.cpp"
     "Types.cpp"
     
     ${MX_RPC_SOURCES}
@@ -103,7 +105,8 @@ target_link_libraries("mx-api"
     glog::glog
     gflags::gflags
   PRIVATE
-    $<BUILD_INTERFACE:CapnProto::capnp-rpc>
+    CapnProto::capnp-rpc
+    ZLIB::ZLIB
 )
 
 set_target_properties("mx-api"
@@ -204,7 +207,7 @@ target_link_libraries("mx-util"
   PUBLIC
     glog::glog
     gflags::gflags
-    $<BUILD_INTERFACE:CapnProto::capnp-rpc>
+    CapnProto::capnp-rpc
 )
 
 set_target_properties("mx-util"

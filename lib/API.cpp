@@ -8,9 +8,10 @@
 
 #include <atomic>
 #include <cassert>
+#include <iostream>
+#include <multiplier/Compress.h>
 #include <sstream>
 #include <thread>
-#include <iostream>
 
 namespace mx {
 namespace {
@@ -23,6 +24,32 @@ static const std::shared_ptr<InvalidTokenReader> kInvalidTokenReader =
     std::make_shared<InvalidTokenReader>();
 
 }  // namespace
+
+PackedReaderState::PackedReaderState(capnp::Data::Reader data) {
+  auto begin = reinterpret_cast<const char *>(data.begin());
+  std::string_view untagged_data(begin, data.size() - 1u);
+
+  if (!data.back()) {  // Not compressed, just packed.
+    storage.insert(storage.end(), untagged_data.begin(), untagged_data.end());
+
+  } else {  // Compressed and packed.
+    auto maybe_uncompressed = TryUncompress(untagged_data);
+    if (!maybe_uncompressed.Succeeded()) {
+      throw kj::Exception(
+          kj::Exception::Type::FAILED, __FILE__, __LINE__,
+          kj::heapString(maybe_uncompressed.Error().message().c_str()));
+
+    } else {
+      maybe_uncompressed.TakeValue().swap(storage);
+    }
+  }
+
+  capnp::ReaderOptions options;
+  options.traversalLimitInWords = ~0ull;
+  stream.emplace(kj::arrayPtr(
+      reinterpret_cast<const kj::byte *>(&(storage[0])), storage.size()));
+  packed_reader.emplace(stream.value(), options);
+}
 
 TokenReader::~TokenReader(void) noexcept {}
 InvalidTokenReader::~InvalidTokenReader(void) noexcept {}
@@ -55,13 +82,13 @@ TokenReader::Ptr InvalidFileImpl::TokenReader(
   return TokenReader::Ptr(self, &empty_reader);
 }
 
-ResponseFileImpl::~ResponseFileImpl(void) noexcept {}
+PackedFileImpl::~PackedFileImpl(void) noexcept {}
 
-ResponseFileImpl::ResponseFileImpl(
-    FileId id_, EntityProvider::Ptr ep_, Response response_)
+PackedFileImpl::PackedFileImpl(
+    FileId id_, EntityProvider::Ptr ep_, Response response)
     : FileImpl(id_, std::move(ep_)),
-      response(kj::mv(response_)),
-      reader(response.getFile()) {
+      package(response.getFile()),
+      reader(package.Reader<rpc::File>()) {
 
   for (auto frag_id : response.getFragments()) {
     fragments.emplace_back().first = frag_id;
@@ -69,25 +96,25 @@ ResponseFileImpl::ResponseFileImpl(
 }
 
 // Return a reader for the tokens in the file.
-TokenReader::Ptr ResponseFileImpl::TokenReader(
+TokenReader::Ptr PackedFileImpl::TokenReader(
     const FileImpl::Ptr &self) const {
   return TokenReader::Ptr(self, static_cast<const class TokenReader *>(this));
 }
 
 // Return the number of tokens in the file.
-unsigned ResponseFileImpl::NumTokens(void) const noexcept {
+unsigned PackedFileImpl::NumTokens(void) const noexcept {
   return reader.getTokens().size();
 }
 
 // Return the kind of the Nth token.
-TokenKind ResponseFileImpl::NthTokenKind(unsigned index) const {
+TokenKind PackedFileImpl::NthTokenKind(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
   rpc::Token::Reader token_reader = tokens_list_reader[index];
   return static_cast<TokenKind>(token_reader.getKind());
 }
 
 // Return the data of the Nth token.
-std::string_view ResponseFileImpl::NthTokenData(unsigned index) const {
+std::string_view PackedFileImpl::NthTokenData(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
   rpc::Token::Reader token_reader = tokens_list_reader[index];
   capnp::Text::Reader data_reader = token_reader.getData();
@@ -95,7 +122,7 @@ std::string_view ResponseFileImpl::NthTokenData(unsigned index) const {
 }
 
 // Return the id of the Nth token.
-EntityId ResponseFileImpl::NthTokenId(unsigned index) const {
+EntityId PackedFileImpl::NthTokenId(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
   rpc::Token::Reader token_reader = tokens_list_reader[index];
   FileTokenId id;
@@ -183,17 +210,17 @@ Token InvalidFragmentImpl::TokenFor(
   return Token::invalid();
 }
 
-ResponseFragmentImpl::~ResponseFragmentImpl(void) noexcept {}
+PackedFragmentImpl::~PackedFragmentImpl(void) noexcept {}
 
-ResponseFragmentImpl::ResponseFragmentImpl(FragmentId id_,
+PackedFragmentImpl::PackedFragmentImpl(FragmentId id_,
                                            EntityProvider::Ptr ep_,
-                                           Response response_)
+                                           Response response)
     : FragmentImpl(id_, std::move(ep_)),
-      response(kj::mv(response_)),
-      reader(response.getFragment()) {}
+      package(response.getFragment()),
+      reader(package.Reader<rpc::Fragment>()) {}
 
 // Return the ID of the file containing the first token.
-FileId ResponseFragmentImpl::FileContaingFirstToken(void) const {
+FileId PackedFragmentImpl::FileContaingFirstToken(void) const {
   EntityId id(reader.getFileTokenId());
   if (VariantId unpacked_id = id.Unpack();
       std::holds_alternative<FileTokenId>(unpacked_id)) {
@@ -203,35 +230,35 @@ FileId ResponseFragmentImpl::FileContaingFirstToken(void) const {
   }
 }
 
-unsigned ResponseFragmentImpl::FirstLine(void) const {
+unsigned PackedFragmentImpl::FirstLine(void) const {
   return reader.getFirstLine();
 }
 
-unsigned ResponseFragmentImpl::LastLine(void) const {
+unsigned PackedFragmentImpl::LastLine(void) const {
   return reader.getLastLine();
 }
 
 // Return a reader for the parsed tokens in the fragment. This doesn't
 // include all tokens, i.e. macro use tokens, comments, etc.
-TokenReader::Ptr ResponseFragmentImpl::TokenReader(
+TokenReader::Ptr PackedFragmentImpl::TokenReader(
     const FragmentImpl::Ptr &self) const {
   return TokenReader::Ptr(self, static_cast<const class TokenReader *>(this));
 }
 
 // Return the number of tokens in the file.
-unsigned ResponseFragmentImpl::NumTokens(void) const noexcept {
+unsigned PackedFragmentImpl::NumTokens(void) const noexcept {
   return reader.getTokens().size();
 }
 
 // Return the kind of the Nth token.
-TokenKind ResponseFragmentImpl::NthTokenKind(unsigned index) const {
+TokenKind PackedFragmentImpl::NthTokenKind(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
   rpc::Token::Reader token_reader = tokens_list_reader[index];
   return static_cast<TokenKind>(token_reader.getKind());
 }
 
 // Return the data of the Nth token.
-std::string_view ResponseFragmentImpl::NthTokenData(unsigned index) const {
+std::string_view PackedFragmentImpl::NthTokenData(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
   rpc::Token::Reader token_reader = tokens_list_reader[index];
   capnp::Text::Reader data_reader = token_reader.getData();
@@ -239,7 +266,7 @@ std::string_view ResponseFragmentImpl::NthTokenData(unsigned index) const {
 }
 
 // Return the id of the Nth token.
-EntityId ResponseFragmentImpl::NthTokenId(unsigned index) const {
+EntityId PackedFragmentImpl::NthTokenId(unsigned index) const {
   auto tokens_list_reader = reader.getTokens();
   rpc::Token::Reader token_reader = tokens_list_reader[index];
   FragmentTokenId id;
@@ -250,17 +277,17 @@ EntityId ResponseFragmentImpl::NthTokenId(unsigned index) const {
 }
 
 // Return a reader for token nodes.
-NodeReader ResponseFragmentImpl::Nodes(void) const {
+NodeReader PackedFragmentImpl::Nodes(void) const {
   return reader.getUnparsedTokens();
 }
 
 // Return a reader for token substitutions.
-TokenSubstitutionsReader ResponseFragmentImpl::Substitutions(void) const {
+TokenSubstitutionsReader PackedFragmentImpl::Substitutions(void) const {
   return reader.getTokenSubstitutions();
 }
 
 // Return a reader for the entities in this fragment.
-EntityListReader ResponseFragmentImpl::Entities(void) const {
+EntityListReader PackedFragmentImpl::Entities(void) const {
   return reader.getEntities();
 }
 
@@ -376,7 +403,7 @@ File RemoteEntityProvider::file(FileId id) noexcept {
   request = cc.client.downloadFileRequest();
   request.setId(id);
   try {
-    auto ret = std::make_shared<ResponseFileImpl>(
+    auto ret = std::make_shared<PackedFileImpl>(
         id, std::move(self), request.send().wait(cc.connection.getWaitScope()));
     auto ret_ptr = ret.get();
     return File(FileImpl::Ptr(std::move(ret), ret_ptr));
@@ -399,7 +426,7 @@ Fragment RemoteEntityProvider::fragment(FragmentId id) noexcept {
       request = cc.client.downloadFragmentRequest();
   request.setId(id);
   try {
-    auto ret = std::make_shared<ResponseFragmentImpl>(
+    auto ret = std::make_shared<PackedFragmentImpl>(
         id, std::move(self), request.send().wait(cc.connection.getWaitScope()));
     auto ret_ptr = ret.get();
     return Fragment(FragmentImpl::Ptr(std::move(ret), ret_ptr));

@@ -82,7 +82,7 @@ class ServerContext {
   mx::PersistentSet<kFileIdToPath, mx::FileId, std::string> file_id_to_path;
 
   // Maps file IDs to a serialized `rpc::File` data structure.
-  mx::PersistentMap<kFileIdToSerializedFile, mx::FileId, kj::Array<capnp::word>>
+  mx::PersistentMap<kFileIdToSerializedFile, mx::FileId, std::string>
       file_id_to_serialized_file;
 
   // A set of `(file_id, fragment_id)` pairs for mapping from files to the
@@ -117,7 +117,7 @@ class ServerContext {
 
   // Maps a fragment ID to the serialized `rpc::Fragment` data structure.
   mx::PersistentMap<kFragmentIdToSerializedFragment,
-                    mx::FragmentId, kj::Array<capnp::word>>
+                    mx::FragmentId, std::string>
       fragment_id_to_serialized_fragment;
 
   void Flush(void);
@@ -193,11 +193,10 @@ class IndexingContext {
       uint64_t num_tokens);
 
   // Save the serialized contents of a file as a token list.
-  void PutSerializedFile(mx::FileId file_id, kj::Array<capnp::word> tokens);
+  void PutSerializedFile(mx::FileId file_id, std::string);
 
   // Save the serialized top-level entities and the parsed tokens.
-  void PutSerializedFragment(mx::FragmentId code_id,
-                             kj::Array<capnp::word> code);
+  void PutSerializedFragment(mx::FragmentId code_id, std::string);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out

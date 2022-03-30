@@ -10,7 +10,11 @@
 
 #include <capnp/ez-rpc.h>
 #include <capnp/message.h>
+#include <capnp/serialize.h>
+#include <capnp/serialize-packed.h>
 #include <kj/async.h>
+#include <kj/io.h>
+#include <optional>
 
 #include "AST.capnp.h"
 #include "RPC.capnp.h"
@@ -21,6 +25,23 @@ using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
                                              capnp::Kind::STRUCT>::Reader;
 using EntityListReader = capnp::List<ast::Entity, capnp::Kind::STRUCT>::Reader;
+
+struct PackedReaderState {
+ private:
+  std::string storage;
+  std::optional<kj::ArrayInputStream> stream;
+  std::optional<capnp::PackedMessageReader> packed_reader;
+
+  PackedReaderState(void) = delete;
+
+ public:
+  explicit PackedReaderState(capnp::Data::Reader data);
+
+  template <typename T>
+  auto Reader(void) -> typename T::Reader {
+    return packed_reader->getRoot<T>();
+  }
+};
 
 class TokenReader {
  public:
@@ -116,15 +137,16 @@ class InvalidFileImpl final : public FileImpl {
 };
 
 // A file downloaded as a result of a making an RPC.
-class ResponseFileImpl final : public FileImpl, public TokenReader {
+class PackedFileImpl final : public FileImpl, public TokenReader {
  public:
   using Response = capnp::Response<mx::rpc::Multiplier::DownloadFileResults>;
-  const Response response;
+
+  PackedReaderState package;
   const rpc::File::Reader reader;
 
-  virtual ~ResponseFileImpl(void) noexcept;
+  virtual ~PackedFileImpl(void) noexcept;
 
-  ResponseFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_);
+  PackedFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_);
 
   // Return a reader for the tokens in the file.
   TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const final;
@@ -207,18 +229,18 @@ class InvalidFragmentImpl : public FragmentImpl {
   Token TokenFor(const FragmentImpl::Ptr &, EntityId id) const final;
 };
 
-// A fragment of code downloaded from the server.
-class ResponseFragmentImpl final : public FragmentImpl, public TokenReader {
+// A packed fragment of code.
+class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
  public:
   using Response = capnp::Response<
       mx::rpc::Multiplier::DownloadFragmentResults>;
 
-  const Response response;
+  PackedReaderState package;
   const rpc::Fragment::Reader reader;
 
-  virtual ~ResponseFragmentImpl(void) noexcept;
+  virtual ~PackedFragmentImpl(void) noexcept;
 
-  ResponseFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
+  PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
                        Response response_);
 
   // Return the ID of the file containing the first token.

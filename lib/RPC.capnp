@@ -131,8 +131,8 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
 
   # Download a file by a file by an `mx::FileId`. Returns the file, and a list
   # of the fragment IDs associated with this file.
-  downloadFile @2 (id :UInt64) -> (file :File, fragments :List(UInt64));
+  downloadFile @2 (id :UInt64) -> (file :Data, fragments :List(UInt64));
 
   # Download a code fragment by an `mx::FragmentId`.
-  downloadFragment @3 (id: UInt64) -> (fragment :Fragment);
+  downloadFragment @3 (id: UInt64) -> (fragment :Data);
 }

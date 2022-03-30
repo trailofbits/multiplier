@@ -10,10 +10,13 @@
 #include <capnp/common.h>
 #include <capnp/message.h>
 #include <capnp/serialize.h>
+#include <capnp/serialize-packed.h>
 #include <fstream>
 #include <glog/logging.h>
+#include <kj/io.h>
 #include <kj/string-tree.h>
 #include <multiplier/AST.h>
+#include <multiplier/Compress.h>
 #include <multiplier/ProgressBar.h>
 #include <multiplier/RPC.capnp.h>
 #include <pasta/AST/AST.h>
@@ -26,26 +29,41 @@
 #include "Util.h"
 
 namespace indexer {
+namespace {
 
-void PersistFile(IndexingContext &context, mx::FileId file_id,
-                 std::string file_hash, pasta::File file) {
-  auto file_tokens = file.Tokens();
+// Compress a message.
+static std::string CompressedMessage(
+    const char *what, capnp::MessageBuilder &message) {
+  size_t old_size = message.sizeInWords() * sizeof(capnp::word);
+  kj::VectorOutputStream os(old_size);
+  capnp::writePackedMessage(os, message);
+  kj::ArrayPtr<kj::byte> packed_data = os.getArray();
+  auto packed_size = packed_data.size();
+  CHECK_LE(packed_size, old_size);
 
-  capnp::MallocMessageBuilder message;
-  auto fb = message.initRoot<mx::rpc::File>();
-  fb.setId(file_id);
-  fb.setHash(file_hash);
-  auto tsb = fb.initTokens(static_cast<unsigned>(file_tokens.Size()));
-  std::string tok_data;
-  for (pasta::FileToken ft : file_tokens) {
-    tok_data.clear();
-    tok_data.insert(tok_data.end(), ft.Data().begin(), ft.Data().end());
-    mx::rpc::Token::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
-    ftb.setKind(static_cast<unsigned short>(TokenKindFromPasta(ft)));
-    ftb.setData(tok_data);
+  std::string_view packed_data_sv(
+      reinterpret_cast<const char *>(packed_data.begin()), packed_size);
+  auto maybe_compressed = mx::TryCompress(packed_data_sv);
+  std::string output;
+  if (maybe_compressed.Succeeded()) {
+    output = maybe_compressed.TakeValue();
+    if (output.size() >= packed_size) {
+      output.clear();
+      goto use_uncompressed;
+    }
+    output.push_back('\1');
+
+  } else {
+    LOG(ERROR)
+        << "Unable to compress " << what << ": "
+        << maybe_compressed.TakeError().message();
+  use_uncompressed:
+    output.reserve(packed_size + 1u);
+    output.insert(output.end(), packed_data_sv.begin(), packed_data_sv.end());
+    output.push_back('\0');
   }
 
-  context.PutSerializedFile(file_id, capnp::messageToFlatArray(message));
+  return output;
 }
 
 static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
@@ -142,6 +160,29 @@ static void PersistTokens(EntitySerializer &serializer,
   }
 }
 
+}  // namespace
+
+void PersistFile(IndexingContext &context, mx::FileId file_id,
+                 std::string file_hash, pasta::File file) {
+  auto file_tokens = file.Tokens();
+
+  capnp::MallocMessageBuilder message;
+  auto fb = message.initRoot<mx::rpc::File>();
+  fb.setId(file_id);
+  fb.setHash(file_hash);
+  auto tsb = fb.initTokens(static_cast<unsigned>(file_tokens.Size()));
+  std::string tok_data;
+  for (pasta::FileToken ft : file_tokens) {
+    tok_data.clear();
+    tok_data.insert(tok_data.end(), ft.Data().begin(), ft.Data().end());
+    mx::rpc::Token::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
+    ftb.setKind(static_cast<unsigned short>(TokenKindFromPasta(ft)));
+    ftb.setData(tok_data);
+  }
+
+  context.PutSerializedFile(file_id, CompressedMessage("file", message));
+}
+
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
                      PendingFragment code_chunk) {
 
@@ -206,7 +247,8 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
       next_substitution_index);
   CHECK_EQ(next_substitution_index, num_substitutions);
 
-  context.PutSerializedFragment(code_id, capnp::messageToFlatArray(message));
+  context.PutSerializedFragment(
+      code_id, CompressedMessage("fragment", message));
 }
 
 }  // namespace indexer

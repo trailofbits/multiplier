@@ -189,15 +189,14 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
 }
 
 // Save the tokenized contents of a file.
-void IndexingContext::PutSerializedFile(
-    mx::FileId file_id, kj::Array<capnp::word> tokens) {
-  server_context.file_id_to_serialized_file.Set(file_id, kj::mv(tokens));
+void IndexingContext::PutSerializedFile(mx::FileId id, std::string data) {
+  server_context.file_id_to_serialized_file.Set(id, std::move(data));
 }
 
 // Save the serialized top-level entities and the parsed tokens.
-void IndexingContext::PutSerializedFragment(mx::FragmentId code_id,
-                                            kj::Array<capnp::word> code) {
-  server_context.fragment_id_to_serialized_fragment.Set(code_id, kj::mv(code));
+void IndexingContext::PutSerializedFragment(mx::FragmentId id,
+                                            std::string data) {
+  server_context.fragment_id_to_serialized_fragment.Set(id, std::move(data));
 }
 
 // Save an entries of the form `(file_id, line_number, fragment_id)` over
