@@ -4350,62 +4350,52 @@ TargetLanguage FromPasta(pasta::TargetLanguage e) {
 
 #ifndef MX_DISABLE_API
 unsigned TemplateParameterList::num_parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal0();
 }
 
 unsigned TemplateParameterList::num_required_parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal1();
 }
 
 unsigned TemplateParameterList::depth(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal2();
 }
 
 bool TemplateParameterList::has_unexpanded_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal3();
 }
 
 bool TemplateParameterList::has_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal4();
 }
 
 Token TemplateParameterList::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return fragment->TokenFor(fragment, self.getVal5());
 }
 
 Token TemplateParameterList::left_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return fragment->TokenFor(fragment, self.getVal6());
 }
 
 Token TemplateParameterList::right_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return fragment->TokenFor(fragment, self.getVal7());
 }
 
 TokenRange TemplateParameterList::token_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return fragment->TokenRangeFor(fragment, self.getVal8(), self.getVal9());
 }
 
 std::vector<NamedDecl> TemplateParameterList::parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   auto list = self.getVal10();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
@@ -4419,44 +4409,37 @@ std::vector<NamedDecl> TemplateParameterList::parameters(void) const noexcept {
 }
 
 TemplateArgumentKind TemplateArgument::kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return static_cast<TemplateArgumentKind>(self.getVal11());
 }
 
 bool TemplateArgument::is_null(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal3();
 }
 
 bool TemplateArgument::is_dependent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal4();
 }
 
 bool TemplateArgument::is_instantiation_dependent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal12();
 }
 
 bool TemplateArgument::contains_unexpanded_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal13();
 }
 
 bool TemplateArgument::is_pack_expansion(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal14();
 }
 
 std::optional<ValueDecl> TemplateArgument::as_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   if (!self.getVal15()) {
     return std::nullopt;
   } else {
@@ -4466,44 +4449,37 @@ std::optional<ValueDecl> TemplateArgument::as_declaration(void) const noexcept {
 }
 
 TokenRange CXXBaseSpecifier::token_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return fragment->TokenRangeFor(fragment, self.getVal5(), self.getVal6());
 }
 
 Token CXXBaseSpecifier::base_type_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return fragment->TokenFor(fragment, self.getVal7());
 }
 
 bool CXXBaseSpecifier::is_virtual(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal3();
 }
 
 TagTypeKind CXXBaseSpecifier::base_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return static_cast<TagTypeKind>(self.getVal11());
 }
 
 bool CXXBaseSpecifier::is_pack_expansion(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal4();
 }
 
 bool CXXBaseSpecifier::constructors_are_inherited(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return self.getVal12();
 }
 
 std::optional<Token> CXXBaseSpecifier::ellipsis(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   if (!self.getVal13()) {
     return std::nullopt;
   } else {
@@ -4513,39 +4489,33 @@ std::optional<Token> CXXBaseSpecifier::ellipsis(void) const noexcept {
 }
 
 AccessSpecifier CXXBaseSpecifier::semantic_access_specifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return static_cast<AccessSpecifier>(self.getVal16());
 }
 
 AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthPseudo(offset);
   return static_cast<AccessSpecifier>(self.getVal17());
 }
 
 Token Stmt::begin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal5());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal0());
 }
 
 Token Stmt::end_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal6());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal1());
 }
 
 TokenRange Stmt::token_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal7(), self.getVal8());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal2(), self.getVal3());
 }
 
 StmtKind Stmt::kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<StmtKind>(self.getVal11());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<StmtKind>(self.getVal4());
 }
 
 std::optional<SEHTryStmt> SEHTryStmt::from(const Stmt &parent) {
@@ -4557,15 +4527,13 @@ std::optional<SEHTryStmt> SEHTryStmt::from(const Stmt &parent) {
 }
 
 bool SEHTryStmt::is_cxx_try(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 Token SEHTryStmt::try_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const Stmt &parent) {
@@ -4577,9 +4545,8 @@ std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const Stmt &parent) {
 }
 
 Token SEHLeaveStmt::leave_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Stmt &parent) {
@@ -4591,9 +4558,8 @@ std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Stmt &parent) {
 }
 
 Token SEHFinallyStmt::finally_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::optional<SEHExceptStmt> SEHExceptStmt::from(const Stmt &parent) {
@@ -4605,9 +4571,8 @@ std::optional<SEHExceptStmt> SEHExceptStmt::from(const Stmt &parent) {
 }
 
 Token SEHExceptStmt::except_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
@@ -4619,20 +4584,18 @@ std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
 }
 
 std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal3()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal7()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal9());
+    EntityId id(self.getVal5());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 Token ReturnStmt::return_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &parent) {
@@ -4644,15 +4607,13 @@ std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &par
 }
 
 Token ObjCForCollectionStmt::for_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 Token ObjCForCollectionStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Stmt &parent) {
@@ -4664,9 +4625,8 @@ std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Stmt 
 }
 
 Token ObjCAutoreleasePoolStmt::at_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const Stmt &parent) {
@@ -4678,14 +4638,12 @@ std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const Stmt &parent) {
 }
 
 Token ObjCAtTryStmt::at_try_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::vector<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   auto list = self.getVal10();
   std::vector<ObjCAtCatchStmt> vec;
   vec.reserve(list.size());
@@ -4707,9 +4665,8 @@ std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Stmt &parent) {
 }
 
 Token ObjCAtThrowStmt::throw_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const Stmt &parent) {
@@ -4721,9 +4678,8 @@ std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const Stmt &p
 }
 
 Token ObjCAtSynchronizedStmt::at_synchronized_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Stmt &parent) {
@@ -4735,9 +4691,8 @@ std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Stmt &parent) {
 }
 
 Token ObjCAtFinallyStmt::at_finally_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const Stmt &parent) {
@@ -4749,21 +4704,18 @@ std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const Stmt &parent) {
 }
 
 Token ObjCAtCatchStmt::at_catch_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 Token ObjCAtCatchStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 bool ObjCAtCatchStmt::has_ellipsis(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &parent) {
@@ -4833,15 +4785,13 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
 }
 
 bool OMPExecutableDirective::has_associated_statement(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 bool OMPExecutableDirective::is_standalone_directive(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal4();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal11();
 }
 
 std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const OMPExecutableDirective &parent) {
@@ -4857,9 +4807,8 @@ std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const Stmt &paren
 }
 
 Token OMPDispatchDirective::target_call_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::optional<OMPDepobjDirective> OMPDepobjDirective::from(const OMPExecutableDirective &parent) {
@@ -4935,14 +4884,12 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const Stmt &parent) {
 }
 
 bool OMPAtomicDirective::is_postfix_update(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
 bool OMPAtomicDirective::is_xlhs_in_rhs_part(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal13();
 }
 
@@ -5007,8 +4954,7 @@ std::optional<OMPTaskDirective> OMPTaskDirective::from(const Stmt &parent) {
 }
 
 bool OMPTaskDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5049,8 +4995,7 @@ std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const
 }
 
 bool OMPTargetParallelDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5127,8 +5072,7 @@ std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const Stmt &paren
 }
 
 bool OMPSectionsDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5145,8 +5089,7 @@ std::optional<OMPSectionDirective> OMPSectionDirective::from(const Stmt &parent)
 }
 
 bool OMPSectionDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5175,8 +5118,7 @@ std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(c
 }
 
 bool OMPParallelSectionsDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5205,8 +5147,7 @@ std::optional<OMPParallelDirective> OMPParallelDirective::from(const Stmt &paren
 }
 
 bool OMPParallelDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5399,8 +5340,7 @@ std::optional<OMPForDirective> OMPForDirective::from(const Stmt &parent) {
 }
 
 bool OMPForDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5465,8 +5405,7 @@ std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirecti
 }
 
 bool OMPDistributeParallelForDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5551,8 +5490,7 @@ std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallel
 }
 
 bool OMPTeamsDistributeParallelForDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5617,8 +5555,7 @@ std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const Stmt &paren
 }
 
 bool OMPTaskLoopDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5683,8 +5620,7 @@ std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistri
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5769,8 +5705,7 @@ std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from
 }
 
 bool OMPTargetParallelForDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5835,8 +5770,7 @@ std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirec
 }
 
 bool OMPParallelMasterTaskLoopDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5881,8 +5815,7 @@ std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const Stmt 
 }
 
 bool OMPParallelForDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5927,8 +5860,7 @@ std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const
 }
 
 bool OMPMasterTaskLoopDirective::has_cancel(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -5973,15 +5905,13 @@ std::optional<NullStmt> NullStmt::from(const Stmt &parent) {
 }
 
 Token NullStmt::semi_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 bool NullStmt::has_leading_empty_macro(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const Stmt &parent) {
@@ -5993,21 +5923,18 @@ std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const Stmt &par
 }
 
 Token MSDependentExistsStmt::keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 bool MSDependentExistsStmt::is_if_exists(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 bool MSDependentExistsStmt::is_if_not_exists(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal4();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal11();
 }
 
 std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Stmt &parent) {
@@ -6019,15 +5946,13 @@ std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Stmt &parent) {
 }
 
 Token IndirectGotoStmt::goto_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 Token IndirectGotoStmt::star_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 std::optional<IfStmt> IfStmt::from(const Stmt &parent) {
@@ -6039,79 +5964,68 @@ std::optional<IfStmt> IfStmt::from(const Stmt &parent) {
 }
 
 std::optional<VarDecl> IfStmt::condition_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal3()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal7()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal9());
+    EntityId id(self.getVal5());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal4()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal11()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal18());
+    EntityId id(self.getVal6());
     return DeclStmt::from(fragment->StmtFor(fragment, id));
   }
 }
 
 Token IfStmt::else_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 Token IfStmt::if_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token IfStmt::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token IfStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool IfStmt::has_else_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
 bool IfStmt::has_initializer_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal13();
 }
 
 bool IfStmt::has_variable_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal14();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal16();
 }
 
 bool IfStmt::is_constexpr(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal15();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal17();
 }
 
 bool IfStmt::is_obj_c_availability_check(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal23();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal18();
 }
 
 std::optional<GotoStmt> GotoStmt::from(const Stmt &parent) {
@@ -6123,15 +6037,13 @@ std::optional<GotoStmt> GotoStmt::from(const Stmt &parent) {
 }
 
 Token GotoStmt::goto_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 Token GotoStmt::label_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 std::optional<ForStmt> ForStmt::from(const Stmt &parent) {
@@ -6143,43 +6055,38 @@ std::optional<ForStmt> ForStmt::from(const Stmt &parent) {
 }
 
 std::optional<VarDecl> ForStmt::condition_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal3()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal7()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal9());
+    EntityId id(self.getVal5());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal4()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal11()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal18());
+    EntityId id(self.getVal6());
     return DeclStmt::from(fragment->StmtFor(fragment, id));
   }
 }
 
 Token ForStmt::for_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 Token ForStmt::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ForStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<DoStmt> DoStmt::from(const Stmt &parent) {
@@ -6191,21 +6098,18 @@ std::optional<DoStmt> DoStmt::from(const Stmt &parent) {
 }
 
 Token DoStmt::do_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 Token DoStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 Token DoStmt::while_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 std::optional<DeclStmt> DeclStmt::from(const Stmt &parent) {
@@ -6217,9 +6121,8 @@ std::optional<DeclStmt> DeclStmt::from(const Stmt &parent) {
 }
 
 bool DeclStmt::is_single_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const Stmt &parent) {
@@ -6231,9 +6134,8 @@ std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const Stmt &parent) {
 }
 
 bool CoroutineBodyStmt::has_dependent_promise_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 std::optional<CoreturnStmt> CoreturnStmt::from(const Stmt &parent) {
@@ -6245,15 +6147,13 @@ std::optional<CoreturnStmt> CoreturnStmt::from(const Stmt &parent) {
 }
 
 Token CoreturnStmt::keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 bool CoreturnStmt::is_implicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 std::optional<ContinueStmt> ContinueStmt::from(const Stmt &parent) {
@@ -6265,9 +6165,8 @@ std::optional<ContinueStmt> ContinueStmt::from(const Stmt &parent) {
 }
 
 Token ContinueStmt::continue_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<CompoundStmt> CompoundStmt::from(const Stmt &parent) {
@@ -6279,15 +6178,13 @@ std::optional<CompoundStmt> CompoundStmt::from(const Stmt &parent) {
 }
 
 Token CompoundStmt::l_brac_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 Token CompoundStmt::r_brac_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
@@ -6299,9 +6196,8 @@ std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
 }
 
 CapturedRegionKind CapturedStmt::captured_region_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<CapturedRegionKind>(self.getVal16());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<CapturedRegionKind>(self.getVal19());
 }
 
 std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
@@ -6313,14 +6209,12 @@ std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
 }
 
 Token CXXTryStmt::try_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::vector<CXXCatchStmt> CXXTryStmt::handlers(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   auto list = self.getVal10();
   std::vector<CXXCatchStmt> vec;
   vec.reserve(list.size());
@@ -6342,27 +6236,23 @@ std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Stmt &parent) {
 }
 
 Token CXXForRangeStmt::coawait_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 Token CXXForRangeStmt::colon_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 Token CXXForRangeStmt::for_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token CXXForRangeStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal21());
 }
 
 std::optional<CXXCatchStmt> CXXCatchStmt::from(const Stmt &parent) {
@@ -6374,9 +6264,8 @@ std::optional<CXXCatchStmt> CXXCatchStmt::from(const Stmt &parent) {
 }
 
 Token CXXCatchStmt::catch_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<BreakStmt> BreakStmt::from(const Stmt &parent) {
@@ -6388,9 +6277,8 @@ std::optional<BreakStmt> BreakStmt::from(const Stmt &parent) {
 }
 
 Token BreakStmt::break_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<AsmStmt> AsmStmt::from(const Stmt &parent) {
@@ -6403,34 +6291,29 @@ std::optional<AsmStmt> AsmStmt::from(const Stmt &parent) {
 }
 
 std::string_view AsmStmt::generate_assembly_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token AsmStmt::assembly_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 bool AsmStmt::is_simple(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 bool AsmStmt::is_volatile(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal4();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal11();
 }
 
 std::vector<std::string_view> AsmStmt::output_constraints(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal28();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal24();
   std::vector<std::string_view> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6440,9 +6323,8 @@ vec.emplace_back(v.cStr(), v.size());
 }
 
 std::vector<std::string_view> AsmStmt::input_constraints(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal29();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal25();
   std::vector<std::string_view> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6452,9 +6334,8 @@ vec.emplace_back(v.cStr(), v.size());
 }
 
 std::vector<std::string_view> AsmStmt::clobbers(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal30();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal26();
   std::vector<std::string_view> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6476,9 +6357,8 @@ std::optional<MSAsmStmt> MSAsmStmt::from(const Stmt &parent) {
 }
 
 std::vector<std::string_view> MSAsmStmt::all_constraints(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal31();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal27();
   std::vector<std::string_view> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6488,21 +6368,18 @@ vec.emplace_back(v.cStr(), v.size());
 }
 
 std::string_view MSAsmStmt::assembly_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal32();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal28();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token MSAsmStmt::l_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 bool MSAsmStmt::has_braces(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -6519,20 +6396,17 @@ std::optional<GCCAsmStmt> GCCAsmStmt::from(const Stmt &parent) {
 }
 
 Token GCCAsmStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 bool GCCAsmStmt::is_assembly_goto(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
 std::vector<AddrLabelExpr> GCCAsmStmt::labels(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   auto list = self.getVal10();
   std::vector<AddrLabelExpr> vec;
   vec.reserve(list.size());
@@ -6546,9 +6420,8 @@ std::vector<AddrLabelExpr> GCCAsmStmt::labels(void) const noexcept {
 }
 
 std::vector<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal33();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal29();
   std::vector<StringLiteral> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6561,9 +6434,8 @@ std::vector<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const no
 }
 
 std::vector<std::string_view> GCCAsmStmt::output_names(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal31();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal27();
   std::vector<std::string_view> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6573,9 +6445,8 @@ vec.emplace_back(v.cStr(), v.size());
 }
 
 std::vector<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal34();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal30();
   std::vector<StringLiteral> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6588,9 +6459,8 @@ std::vector<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const noe
 }
 
 std::vector<std::string_view> GCCAsmStmt::input_names(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal35();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal31();
   std::vector<std::string_view> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6600,9 +6470,8 @@ vec.emplace_back(v.cStr(), v.size());
 }
 
 std::vector<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal36();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal32();
   std::vector<StringLiteral> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6615,9 +6484,8 @@ std::vector<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const noexc
 }
 
 std::vector<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal37();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal33();
   std::vector<AddrLabelExpr> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6630,9 +6498,8 @@ std::vector<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const noexcept {
 }
 
 std::vector<std::string_view> GCCAsmStmt::label_names(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal38();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal34();
   std::vector<std::string_view> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -6650,48 +6517,42 @@ std::optional<WhileStmt> WhileStmt::from(const Stmt &parent) {
 }
 
 std::optional<VarDecl> WhileStmt::condition_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal3()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal7()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal9());
+    EntityId id(self.getVal5());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<DeclStmt> WhileStmt::condition_variable_declaration_statement(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal4()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal11()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal18());
+    EntityId id(self.getVal6());
     return DeclStmt::from(fragment->StmtFor(fragment, id));
   }
 }
 
 Token WhileStmt::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 Token WhileStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token WhileStmt::while_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool WhileStmt::has_variable_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
@@ -6840,22 +6701,19 @@ std::optional<LabelStmt> LabelStmt::from(const Stmt &parent) {
 }
 
 Token LabelStmt::identifier_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::string_view LabelStmt::name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool LabelStmt::is_side_entry(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 std::optional<Expr> Expr::from(const ValueStmt &parent) {
@@ -6993,175 +6851,148 @@ std::optional<Expr> Expr::from(const Stmt &parent) {
 }
 
 bool Expr::has_side_effects(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 bool Expr::contains_errors(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal4();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal11();
 }
 
 bool Expr::contains_unexpanded_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
 Token Expr::expression_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   if (!self.getVal13()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal18());
+    EntityId id(self.getVal6());
     return ObjCPropertyRefExpr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 ExprObjectKind Expr::object_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ExprObjectKind>(self.getVal16());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ExprObjectKind>(self.getVal19());
 }
 
 std::optional<FieldDecl> Expr::source_bit_field(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal14()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal16()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal19());
+    EntityId id(self.getVal8());
     return FieldDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 ExprValueKind Expr::value_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ExprValueKind>(self.getVal17());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ExprValueKind>(self.getVal35());
 }
 
 bool Expr::has_non_trivial_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal15();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal17();
 }
 
 bool Expr::is_default_argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal23();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal18();
 }
 
 bool Expr::is_gl_value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal39();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal36();
 }
 
 bool Expr::is_implicit_cxx_this(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal40();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal37();
 }
 
 bool Expr::is_instantiation_dependent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal41();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal38();
 }
 
 bool Expr::is_known_to_have_boolean_value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal42();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal39();
 }
 
 bool Expr::is_l_value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal43();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal40();
 }
 
 bool Expr::is_objcgc_candidate(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal44();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal41();
 }
 
 bool Expr::is_obj_c_self_expression(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal45();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal42();
 }
 
 bool Expr::is_ordinary_or_bit_field_object(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal46();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal43();
 }
 
 bool Expr::is_pr_value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal47();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal44();
 }
 
 bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal48();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal45();
 }
 
 bool Expr::is_type_dependent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal49();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal46();
 }
 
 bool Expr::is_value_dependent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal50();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal47();
 }
 
 bool Expr::is_x_value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal51();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal48();
 }
 
 bool Expr::refers_to_bit_field(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal52();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal49();
 }
 
 bool Expr::refers_to_global_register_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal53();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal50();
 }
 
 bool Expr::refers_to_matrix_element(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal54();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal51();
 }
 
 bool Expr::refers_to_vector_element(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal55();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal52();
 }
 
 std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Expr &parent) {
@@ -7197,27 +7028,23 @@ std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Stmt &parent) {
 }
 
 TokenRange DesignatedInitExpr::designators_source_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal9(), self.getVal14());
 }
 
 Token DesignatedInitExpr::equal_or_colon_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool DesignatedInitExpr::uses_gnu_syntax(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const Expr &parent) {
@@ -7237,33 +7064,28 @@ std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const S
 }
 
 Token DependentScopeDeclRefExpr::l_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token DependentScopeDeclRefExpr::r_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token DependentScopeDeclRefExpr::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool DependentScopeDeclRefExpr::has_explicit_template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool DependentScopeDeclRefExpr::has_template_keyword(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Expr &parent) {
@@ -7283,9 +7105,8 @@ std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Stmt &paren
 }
 
 Token DependentCoawaitExpr::keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<DeclRefExpr> DeclRefExpr::from(const Expr &parent) {
@@ -7305,63 +7126,53 @@ std::optional<DeclRefExpr> DeclRefExpr::from(const Stmt &parent) {
 }
 
 Token DeclRefExpr::l_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 Token DeclRefExpr::r_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 Token DeclRefExpr::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal21());
 }
 
 bool DeclRefExpr::had_multiple_candidates(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool DeclRefExpr::has_explicit_template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool DeclRefExpr::has_qualifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool DeclRefExpr::has_template_kw_and_arguments_info(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool DeclRefExpr::has_template_keyword(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<NonOdrUseReason>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<NonOdrUseReason>(self.getVal58());
 }
 
 bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Expr &parent) {
@@ -7382,9 +7193,8 @@ std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Stmt &paren
 }
 
 Token CoroutineSuspendExpr::keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<CoawaitExpr> CoawaitExpr::from(const CoroutineSuspendExpr &parent) {
@@ -7408,9 +7218,8 @@ std::optional<CoawaitExpr> CoawaitExpr::from(const Stmt &parent) {
 }
 
 bool CoawaitExpr::is_implicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CoyieldExpr> CoyieldExpr::from(const CoroutineSuspendExpr &parent) {
@@ -7450,15 +7259,13 @@ std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const Stmt &parent) {
 }
 
 Token ConvertVectorExpr::builtin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ConvertVectorExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const Expr &parent) {
@@ -7478,9 +7285,8 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const S
 }
 
 std::vector<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal63();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal60();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -7490,9 +7296,8 @@ vec.emplace_back(fragment, v);
 }
 
 bool ConceptSpecializationExpr::is_satisfied(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Expr &parent) {
@@ -7512,15 +7317,13 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Stmt &parent)
 }
 
 Token CompoundLiteralExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool CompoundLiteralExpr::is_file_scope(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ChooseExpr> ChooseExpr::from(const Expr &parent) {
@@ -7540,27 +7343,23 @@ std::optional<ChooseExpr> ChooseExpr::from(const Stmt &parent) {
 }
 
 Token ChooseExpr::builtin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ChooseExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool ChooseExpr::is_condition_dependent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool ChooseExpr::is_condition_true(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<CharacterLiteral> CharacterLiteral::from(const Expr &parent) {
@@ -7580,9 +7379,8 @@ std::optional<CharacterLiteral> CharacterLiteral::from(const Stmt &parent) {
 }
 
 Token CharacterLiteral::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<CastExpr> CastExpr::from(const Expr &parent) {
@@ -7611,44 +7409,39 @@ std::optional<CastExpr> CastExpr::from(const Stmt &parent) {
 }
 
 CastKind CastExpr::cast_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<CastKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<CastKind>(self.getVal58());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NamedDecl> CastExpr::conversion_function(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal56()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal53()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal20());
+    EntityId id(self.getVal9());
     return NamedDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<FieldDecl> CastExpr::target_union_field(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal57()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal54()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal21());
+    EntityId id(self.getVal14());
     return FieldDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool CastExpr::has_stored_fp_features(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const CastExpr &parent) {
@@ -7672,9 +7465,8 @@ std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const Stmt &parent) {
 }
 
 bool ImplicitCastExpr::is_part_of_explicit_cast(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const CastExpr &parent) {
@@ -7734,28 +7526,24 @@ std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const Stmt &parent) {
 }
 
 TokenRange CXXNamedCastExpr::angle_brackets(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal22(), self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal15(), self.getVal20());
 }
 
 std::string_view CXXNamedCastExpr::cast_name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal32();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal28();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token CXXNamedCastExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal21());
 }
 
 Token CXXNamedCastExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal22());
 }
 
 std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const CXXNamedCastExpr &parent) {
@@ -7787,9 +7575,8 @@ std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const Stmt &parent) {
 }
 
 bool CXXDynamicCastExpr::is_always_null(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const CXXNamedCastExpr &parent) {
@@ -7929,21 +7716,18 @@ std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const Stmt &par
 }
 
 Token CXXFunctionalCastExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 Token CXXFunctionalCastExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 bool CXXFunctionalCastExpr::is_list_initialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 std::optional<CStyleCastExpr> CStyleCastExpr::from(const ExplicitCastExpr &parent) {
@@ -7971,15 +7755,13 @@ std::optional<CStyleCastExpr> CStyleCastExpr::from(const Stmt &parent) {
 }
 
 Token CStyleCastExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 Token CStyleCastExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const ExplicitCastExpr &parent) {
@@ -8031,28 +7813,24 @@ std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const Stmt &parent)
 }
 
 Token ObjCBridgedCastExpr::bridge_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCBridgeCastKind>(self.getVal64());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ObjCBridgeCastKind>(self.getVal61());
 }
 
 std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal32();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal28();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token ObjCBridgedCastExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 std::optional<CallExpr> CallExpr::from(const Expr &parent) {
@@ -8076,62 +7854,53 @@ std::optional<CallExpr> CallExpr::from(const Stmt &parent) {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<CallExprADLCallKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<CallExprADLCallKind>(self.getVal58());
 }
 
 std::optional<FunctionDecl> CallExpr::direct_callee(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal56()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal53()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal20());
+    EntityId id(self.getVal9());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 Token CallExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool CallExpr::has_stored_fp_features(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool CallExpr::has_unused_result_attribute(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool CallExpr::is_builtin_assume_false(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool CallExpr::is_call_to_std_move(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool CallExpr::is_unevaluated_builtin_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 bool CallExpr::uses_adl(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal62();
 }
 
 std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const CallExpr &parent) {
@@ -8155,33 +7924,28 @@ std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Stmt &parent)
 }
 
 OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<OverloadedOperatorKind>(self.getVal64());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<OverloadedOperatorKind>(self.getVal61());
 }
 
 Token CXXOperatorCallExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool CXXOperatorCallExpr::is_assignment_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal66();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal63();
 }
 
 bool CXXOperatorCallExpr::is_comparison_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal67();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal64();
 }
 
 bool CXXOperatorCallExpr::is_infix_binary_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal68();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal65();
 }
 
 std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const CallExpr &parent) {
@@ -8245,15 +8009,13 @@ std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const Stmt &parent) {
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<UserDefinedLiteralLiteralOperatorKind>(self.getVal64());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<UserDefinedLiteralLiteralOperatorKind>(self.getVal61());
 }
 
 Token UserDefinedLiteral::ud_suffix_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const Expr &parent) {
@@ -8273,9 +8035,8 @@ std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const Stmt &parent) {
 }
 
 bool CXXUuidofExpr::is_type_operand(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const Expr &parent) {
@@ -8295,21 +8056,18 @@ std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const
 }
 
 Token CXXUnresolvedConstructExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token CXXUnresolvedConstructExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool CXXUnresolvedConstructExpr::is_list_initialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Expr &parent) {
@@ -8329,21 +8087,18 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Stmt &parent) {
 }
 
 bool CXXTypeidExpr::is_most_derived(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool CXXTypeidExpr::is_potentially_evaluated(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool CXXTypeidExpr::is_type_operand(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 std::optional<CXXThrowExpr> CXXThrowExpr::from(const Expr &parent) {
@@ -8363,15 +8118,13 @@ std::optional<CXXThrowExpr> CXXThrowExpr::from(const Stmt &parent) {
 }
 
 Token CXXThrowExpr::throw_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool CXXThrowExpr::is_thrown_variable_in_scope(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CXXThisExpr> CXXThisExpr::from(const Expr &parent) {
@@ -8391,15 +8144,13 @@ std::optional<CXXThisExpr> CXXThisExpr::from(const Stmt &parent) {
 }
 
 Token CXXThisExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool CXXThisExpr::is_implicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const Expr &parent) {
@@ -8435,9 +8186,8 @@ std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Stmt &p
 }
 
 Token CXXScalarValueInitExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const Expr &parent) {
@@ -8457,46 +8207,39 @@ std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<BinaryOperatorKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<BinaryOperatorKind>(self.getVal58());
 }
 
 std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<BinaryOperatorKind>(self.getVal64());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<BinaryOperatorKind>(self.getVal61());
 }
 
 Token CXXRewrittenBinaryOperator::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool CXXRewrittenBinaryOperator::is_reversed(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Expr &parent) {
@@ -8516,39 +8259,33 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Stmt 
 }
 
 Token CXXPseudoDestructorExpr::colon_colon_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token CXXPseudoDestructorExpr::destroyed_type_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token CXXPseudoDestructorExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 Token CXXPseudoDestructorExpr::tilde_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 bool CXXPseudoDestructorExpr::has_qualifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool CXXPseudoDestructorExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Expr &parent) {
@@ -8568,9 +8305,8 @@ std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Stmt &par
 }
 
 Token CXXNullPtrLiteralExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Expr &parent) {
@@ -8590,9 +8326,8 @@ std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Stmt &parent) {
 }
 
 bool CXXNoexceptExpr::value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CXXNewExpr> CXXNewExpr::from(const Expr &parent) {
@@ -8612,63 +8347,53 @@ std::optional<CXXNewExpr> CXXNewExpr::from(const Stmt &parent) {
 }
 
 bool CXXNewExpr::does_usual_array_delete_want_size(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal21(), self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal14(), self.getVal15());
 }
 
 CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<CXXNewExprInitializationStyle>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<CXXNewExprInitializationStyle>(self.getVal58());
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal26(), self.getVal69());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal22(), self.getVal66());
 }
 
 bool CXXNewExpr::has_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool CXXNewExpr::is_array(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool CXXNewExpr::is_global_new(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool CXXNewExpr::is_parenthesis_type_id(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool CXXNewExpr::pass_alignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 bool CXXNewExpr::should_null_check_allocation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal62();
 }
 
 std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Expr &parent) {
@@ -8688,27 +8413,23 @@ std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Stm
 }
 
 bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<CXXConstructExprConstructionKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<CXXConstructExprConstructionKind>(self.getVal58());
 }
 
 Token CXXInheritedCtorInitExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<CXXFoldExpr> CXXFoldExpr::from(const Expr &parent) {
@@ -8728,39 +8449,33 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const Stmt &parent) {
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token CXXFoldExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 BinaryOperatorKind CXXFoldExpr::operator_(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<BinaryOperatorKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<BinaryOperatorKind>(self.getVal58());
 }
 
 Token CXXFoldExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 bool CXXFoldExpr::is_left_fold(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool CXXFoldExpr::is_right_fold(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const Expr &parent) {
@@ -8780,57 +8495,48 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
 }
 
 Token CXXDependentScopeMemberExpr::l_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token CXXDependentScopeMemberExpr::member_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 Token CXXDependentScopeMemberExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 Token CXXDependentScopeMemberExpr::r_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal21());
 }
 
 Token CXXDependentScopeMemberExpr::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal22());
 }
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool CXXDependentScopeMemberExpr::has_template_keyword(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool CXXDependentScopeMemberExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool CXXDependentScopeMemberExpr::is_implicit_access(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Expr &parent) {
@@ -8850,27 +8556,23 @@ std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Stmt &parent) {
 }
 
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool CXXDeleteExpr::is_array_form(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool CXXDeleteExpr::is_array_form_as_written(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool CXXDeleteExpr::is_global_delete(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Expr &parent) {
@@ -8890,9 +8592,8 @@ std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Stmt &parent) {
 }
 
 Token CXXDefaultInitExpr::used_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Expr &parent) {
@@ -8912,9 +8613,8 @@ std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Stmt &parent) {
 }
 
 Token CXXDefaultArgExpr::used_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<CXXConstructExpr> CXXConstructExpr::from(const Expr &parent) {
@@ -8935,51 +8635,43 @@ std::optional<CXXConstructExpr> CXXConstructExpr::from(const Stmt &parent) {
 }
 
 CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<CXXConstructExprConstructionKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<CXXConstructExprConstructionKind>(self.getVal58());
 }
 
 Token CXXConstructExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal22(), self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal15(), self.getVal20());
 }
 
 bool CXXConstructExpr::had_multiple_candidates(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool CXXConstructExpr::is_elidable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool CXXConstructExpr::is_list_initialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool CXXConstructExpr::is_std_initializer_list_initialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool CXXConstructExpr::requires_zero_initialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const CXXConstructExpr &parent) {
@@ -9019,15 +8711,13 @@ std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const Stmt &parent) {
 }
 
 Token CXXBoolLiteralExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool CXXBoolLiteralExpr::value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const Expr &parent) {
@@ -9063,9 +8753,8 @@ std::optional<BlockExpr> BlockExpr::from(const Stmt &parent) {
 }
 
 Token BlockExpr::caret_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<BinaryOperator> BinaryOperator::from(const Expr &parent) {
@@ -9086,106 +8775,89 @@ std::optional<BinaryOperator> BinaryOperator::from(const Stmt &parent) {
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<BinaryOperatorKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<BinaryOperatorKind>(self.getVal58());
 }
 
 std::string_view BinaryOperator::opcode_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token BinaryOperator::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool BinaryOperator::has_stored_fp_features(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool BinaryOperator::is_additive_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool BinaryOperator::is_assignment_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool BinaryOperator::is_bitwise_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool BinaryOperator::is_comma_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool BinaryOperator::is_comparison_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 bool BinaryOperator::is_compound_assignment_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal62();
 }
 
 bool BinaryOperator::is_equality_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal66();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal63();
 }
 
 bool BinaryOperator::is_logical_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal67();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal64();
 }
 
 bool BinaryOperator::is_multiplicative_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal68();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal65();
 }
 
 bool BinaryOperator::is_pointer_memory_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal70();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal67();
 }
 
 bool BinaryOperator::is_relational_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal71();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal68();
 }
 
 bool BinaryOperator::is_shift_assign_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal72();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal69();
 }
 
 bool BinaryOperator::is_shift_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal70();
 }
 
 std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const BinaryOperator &parent) {
@@ -9225,39 +8897,33 @@ std::optional<AtomicExpr> AtomicExpr::from(const Stmt &parent) {
 }
 
 Token AtomicExpr::builtin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<AtomicExprAtomicOp>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<AtomicExprAtomicOp>(self.getVal58());
 }
 
 Token AtomicExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool AtomicExpr::is_cmp_x_chg(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool AtomicExpr::is_open_cl(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool AtomicExpr::is_volatile(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 std::optional<AsTypeExpr> AsTypeExpr::from(const Expr &parent) {
@@ -9277,15 +8943,13 @@ std::optional<AsTypeExpr> AsTypeExpr::from(const Stmt &parent) {
 }
 
 Token AsTypeExpr::builtin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token AsTypeExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Expr &parent) {
@@ -9305,9 +8969,8 @@ std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Stmt &parent) {
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ArrayTypeTrait>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ArrayTypeTrait>(self.getVal58());
 }
 
 std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Expr &parent) {
@@ -9327,9 +8990,8 @@ std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Stmt &parent) {
 }
 
 Token ArraySubscriptExpr::r_bracket_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const Expr &parent) {
@@ -9381,15 +9043,13 @@ std::optional<AddrLabelExpr> AddrLabelExpr::from(const Stmt &parent) {
 }
 
 Token AddrLabelExpr::amp_amp_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token AddrLabelExpr::label_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const Expr &parent) {
@@ -9410,15 +9070,13 @@ std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(con
 }
 
 Token AbstractConditionalOperator::colon_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token AbstractConditionalOperator::question_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ConditionalOperator> ConditionalOperator::from(const AbstractConditionalOperator &parent) {
@@ -9478,21 +9136,18 @@ std::optional<VAArgExpr> VAArgExpr::from(const Stmt &parent) {
 }
 
 Token VAArgExpr::builtin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token VAArgExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool VAArgExpr::is_microsoft_abi(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<UnaryOperator> UnaryOperator::from(const Expr &parent) {
@@ -9512,63 +9167,53 @@ std::optional<UnaryOperator> UnaryOperator::from(const Stmt &parent) {
 }
 
 bool UnaryOperator::can_overflow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 UnaryOperatorKind UnaryOperator::opcode(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<UnaryOperatorKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<UnaryOperatorKind>(self.getVal58());
 }
 
 Token UnaryOperator::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool UnaryOperator::has_stored_fp_features(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool UnaryOperator::is_arithmetic_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool UnaryOperator::is_decrement_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool UnaryOperator::is_increment_decrement_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool UnaryOperator::is_increment_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 bool UnaryOperator::is_postfix(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal62();
 }
 
 bool UnaryOperator::is_prefix(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal66();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal63();
 }
 
 std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Expr &parent) {
@@ -9588,21 +9233,18 @@ std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Stm
 }
 
 Token UnaryExprOrTypeTraitExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token UnaryExprOrTypeTraitExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<TypoExpr> TypoExpr::from(const Expr &parent) {
@@ -9638,15 +9280,13 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const Stmt &parent) {
 }
 
 TypeTrait TypeTraitExpr::trait(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TypeTrait>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<TypeTrait>(self.getVal58());
 }
 
 bool TypeTraitExpr::value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const Expr &parent) {
@@ -9666,9 +9306,8 @@ std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr
 }
 
 Token SubstNonTypeTemplateParmPackExpr::parameter_pack_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const Expr &parent) {
@@ -9688,15 +9327,13 @@ std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(c
 }
 
 Token SubstNonTypeTemplateParmExpr::name_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<StringLiteral> StringLiteral::from(const Expr &parent) {
@@ -9716,65 +9353,55 @@ std::optional<StringLiteral> StringLiteral::from(const Stmt &parent) {
 }
 
 bool StringLiteral::contains_non_ascii(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool StringLiteral::contains_non_ascii_or_null(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::string_view StringLiteral::bytes(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view StringLiteral::string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal32();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal28();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool StringLiteral::is_ascii(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool StringLiteral::is_pascal(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool StringLiteral::is_utf16(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool StringLiteral::is_utf32(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 bool StringLiteral::is_utf8(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal62();
 }
 
 bool StringLiteral::is_wide(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal66();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal63();
 }
 
 std::optional<StmtExpr> StmtExpr::from(const Expr &parent) {
@@ -9794,15 +9421,13 @@ std::optional<StmtExpr> StmtExpr::from(const Stmt &parent) {
 }
 
 Token StmtExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token StmtExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<SourceLocExpr> SourceLocExpr::from(const Expr &parent) {
@@ -9822,34 +9447,29 @@ std::optional<SourceLocExpr> SourceLocExpr::from(const Stmt &parent) {
 }
 
 std::string_view SourceLocExpr::builtin_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<SourceLocExprIdentKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<SourceLocExprIdentKind>(self.getVal58());
 }
 
 Token SourceLocExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool SourceLocExpr::is_int_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool SourceLocExpr::is_string_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Expr &parent) {
@@ -9869,21 +9489,18 @@ std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Stmt &parent) {
 }
 
 Token SizeOfPackExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token SizeOfPackExpr::pack_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 std::vector<TemplateArgument> SizeOfPackExpr::partial_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal63();
+  auto self = fragment->NthStmt(offset);
+  auto list = self.getVal60();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -9893,15 +9510,13 @@ vec.emplace_back(fragment, v);
 }
 
 Token SizeOfPackExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 bool SizeOfPackExpr::is_partially_substituted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const Expr &parent) {
@@ -9921,15 +9536,13 @@ std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const Stmt &parent) {
 }
 
 Token ShuffleVectorExpr::builtin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ShuffleVectorExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Expr &parent) {
@@ -9949,28 +9562,24 @@ std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Stm
 }
 
 std::string_view SYCLUniqueStableNameExpr::compute_name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token SYCLUniqueStableNameExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token SYCLUniqueStableNameExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token SYCLUniqueStableNameExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 std::optional<RequiresExpr> RequiresExpr::from(const Expr &parent) {
@@ -9990,8 +9599,7 @@ std::optional<RequiresExpr> RequiresExpr::from(const Stmt &parent) {
 }
 
 std::vector<ParmVarDecl> RequiresExpr::local_parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   auto list = self.getVal10();
   std::vector<ParmVarDecl> vec;
   vec.reserve(list.size());
@@ -10005,21 +9613,18 @@ std::vector<ParmVarDecl> RequiresExpr::local_parameters(void) const noexcept {
 }
 
 Token RequiresExpr::r_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token RequiresExpr::requires_kw_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool RequiresExpr::is_satisfied(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<RecoveryExpr> RecoveryExpr::from(const Expr &parent) {
@@ -10071,22 +9676,19 @@ std::optional<PredefinedExpr> PredefinedExpr::from(const Stmt &parent) {
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<PredefinedExprIdentKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<PredefinedExprIdentKind>(self.getVal58());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthStmt(offset);
+  capnp::Text::Reader data = self.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token PredefinedExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ParenListExpr> ParenListExpr::from(const Expr &parent) {
@@ -10106,15 +9708,13 @@ std::optional<ParenListExpr> ParenListExpr::from(const Stmt &parent) {
 }
 
 Token ParenListExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ParenListExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ParenExpr> ParenExpr::from(const Expr &parent) {
@@ -10134,15 +9734,13 @@ std::optional<ParenExpr> ParenExpr::from(const Stmt &parent) {
 }
 
 Token ParenExpr::l_paren(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ParenExpr::r_paren(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<PackExpansionExpr> PackExpansionExpr::from(const Expr &parent) {
@@ -10162,9 +9760,8 @@ std::optional<PackExpansionExpr> PackExpansionExpr::from(const Stmt &parent) {
 }
 
 Token PackExpansionExpr::ellipsis_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<OverloadExpr> OverloadExpr::from(const Expr &parent) {
@@ -10185,39 +9782,33 @@ std::optional<OverloadExpr> OverloadExpr::from(const Stmt &parent) {
 }
 
 Token OverloadExpr::l_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token OverloadExpr::name_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token OverloadExpr::r_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 Token OverloadExpr::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal21());
 }
 
 bool OverloadExpr::has_explicit_template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool OverloadExpr::has_template_keyword(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const OverloadExpr &parent) {
@@ -10241,33 +9832,28 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Stmt &paren
 }
 
 Token UnresolvedMemberExpr::member_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal22());
 }
 
 Token UnresolvedMemberExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal69());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal66());
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool UnresolvedMemberExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool UnresolvedMemberExpr::is_implicit_access(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const OverloadExpr &parent) {
@@ -10291,15 +9877,13 @@ std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const Stmt &paren
 }
 
 bool UnresolvedLookupExpr::is_overloaded(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool UnresolvedLookupExpr::requires_adl(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const Expr &parent) {
@@ -10319,15 +9903,13 @@ std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const Stmt &parent) {
 }
 
 Token OpaqueValueExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool OpaqueValueExpr::is_unique(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<OffsetOfExpr> OffsetOfExpr::from(const Expr &parent) {
@@ -10347,15 +9929,13 @@ std::optional<OffsetOfExpr> OffsetOfExpr::from(const Stmt &parent) {
 }
 
 Token OffsetOfExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token OffsetOfExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Expr &parent) {
@@ -10375,15 +9955,13 @@ std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Stmt &paren
 }
 
 Token ObjCSubscriptRefExpr::r_bracket(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool ObjCSubscriptRefExpr::is_array_subscript_reference_expression(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Expr &parent) {
@@ -10403,9 +9981,8 @@ std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Stmt &parent) {
 }
 
 Token ObjCStringLiteral::at_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const Expr &parent) {
@@ -10425,15 +10002,13 @@ std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const Stmt &parent) {
 }
 
 Token ObjCSelectorExpr::at_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ObjCSelectorExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Expr &parent) {
@@ -10453,21 +10028,18 @@ std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Stmt &parent) {
 }
 
 Token ObjCProtocolExpr::at_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ObjCProtocolExpr::protocol_id_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 Token ObjCProtocolExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Expr &parent) {
@@ -10487,57 +10059,48 @@ std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Stmt &parent)
 }
 
 Token ObjCPropertyRefExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal21());
 }
 
 Token ObjCPropertyRefExpr::receiver_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal22());
 }
 
 bool ObjCPropertyRefExpr::is_class_receiver(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool ObjCPropertyRefExpr::is_explicit_property(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool ObjCPropertyRefExpr::is_implicit_property(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_getter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_setter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool ObjCPropertyRefExpr::is_object_receiver(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 bool ObjCPropertyRefExpr::is_super_receiver(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal62();
 }
 
 std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Expr &parent) {
@@ -10557,74 +10120,62 @@ std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Stmt &parent) {
 }
 
 Token ObjCMessageExpr::left_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCMethodFamily>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ObjCMethodFamily>(self.getVal58());
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCMessageExprReceiverKind>(self.getVal64());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ObjCMessageExprReceiverKind>(self.getVal61());
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal24(), self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
 }
 
 Token ObjCMessageExpr::right_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal22());
 }
 
 Token ObjCMessageExpr::selector_start_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal69());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal66());
 }
 
 Token ObjCMessageExpr::super_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal74());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal71());
 }
 
 bool ObjCMessageExpr::is_class_message(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool ObjCMessageExpr::is_delegate_initializer_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool ObjCMessageExpr::is_implicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool ObjCMessageExpr::is_instance_message(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 std::vector<Token> ObjCMessageExpr::selector_tokens(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   auto list = self.getVal10();
   std::vector<Token> vec;
   vec.reserve(list.size());
@@ -10652,27 +10203,23 @@ std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Stmt &parent) {
 }
 
 Token ObjCIvarRefExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token ObjCIvarRefExpr::operation_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool ObjCIvarRefExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool ObjCIvarRefExpr::is_free_instance_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Expr &parent) {
@@ -10692,27 +10239,23 @@ std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Stmt &parent) {
 }
 
 Token ObjCIsaExpr::base_token_end(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ObjCIsaExpr::isa_member_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token ObjCIsaExpr::operation_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool ObjCIsaExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const Expr &parent) {
@@ -10732,9 +10275,8 @@ std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(con
 }
 
 bool ObjCIndirectCopyRestoreExpr::should_copy(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const Expr &parent) {
@@ -10754,15 +10296,13 @@ std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const Stmt &parent) {
 }
 
 Token ObjCEncodeExpr::at_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token ObjCEncodeExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const Expr &parent) {
@@ -10798,15 +10338,13 @@ std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Stmt &parent) {
 }
 
 Token ObjCBoxedExpr::at_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const Expr &parent) {
@@ -10826,15 +10364,13 @@ std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const Stmt &parent)
 }
 
 Token ObjCBoolLiteralExpr::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool ObjCBoolLiteralExpr::value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const Expr &parent) {
@@ -10854,9 +10390,8 @@ std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const S
 }
 
 bool ObjCAvailabilityCheckExpr::has_version(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Expr &parent) {
@@ -10892,21 +10427,18 @@ std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Stmt &parent) {
 }
 
 Token OMPIteratorExpr::iterator_kw_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token OMPIteratorExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token OMPIteratorExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Expr &parent) {
@@ -10926,15 +10458,13 @@ std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Stmt &parent)
 }
 
 Token OMPArrayShapingExpr::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token OMPArrayShapingExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Expr &parent) {
@@ -10954,21 +10484,18 @@ std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Stmt &parent)
 }
 
 Token OMPArraySectionExpr::colon_token_first(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token OMPArraySectionExpr::colon_token_second(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token OMPArraySectionExpr::r_bracket_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 std::optional<NoInitExpr> NoInitExpr::from(const Expr &parent) {
@@ -11004,75 +10531,63 @@ std::optional<MemberExpr> MemberExpr::from(const Stmt &parent) {
 }
 
 Token MemberExpr::l_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token MemberExpr::member_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 Token MemberExpr::operator_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal20());
 }
 
 Token MemberExpr::r_angle_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal21());
 }
 
 Token MemberExpr::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal22());
 }
 
 bool MemberExpr::had_multiple_candidates(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool MemberExpr::has_explicit_template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool MemberExpr::has_qualifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool MemberExpr::has_template_keyword(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool MemberExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool MemberExpr::is_implicit_access(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<NonOdrUseReason>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<NonOdrUseReason>(self.getVal58());
 }
 
 std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Expr &parent) {
@@ -11092,15 +10607,13 @@ std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Stmt &parent)
 }
 
 Token MatrixSubscriptExpr::r_bracket_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool MatrixSubscriptExpr::is_incomplete(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Expr &parent) {
@@ -11120,21 +10633,18 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Stm
 }
 
 StorageDuration MaterializeTemporaryExpr::storage_duration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<StorageDuration>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<StorageDuration>(self.getVal58());
 }
 
 bool MaterializeTemporaryExpr::is_bound_to_lvalue_reference(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool MaterializeTemporaryExpr::is_usable_in_constant_expressions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Expr &parent) {
@@ -11154,9 +10664,8 @@ std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Stmt 
 }
 
 Token MSPropertySubscriptExpr::r_bracket_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Expr &parent) {
@@ -11176,21 +10685,18 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Stmt &parent) {
 }
 
 Token MSPropertyRefExpr::member_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool MSPropertyRefExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool MSPropertyRefExpr::is_implicit_access(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<LambdaExpr> LambdaExpr::from(const Expr &parent) {
@@ -11210,20 +10716,17 @@ std::optional<LambdaExpr> LambdaExpr::from(const Stmt &parent) {
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<LambdaCaptureDefault>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<LambdaCaptureDefault>(self.getVal58());
 }
 
 Token LambdaExpr::capture_default_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::vector<NamedDecl> LambdaExpr::explicit_template_parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   auto list = self.getVal10();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
@@ -11237,43 +10740,37 @@ std::vector<NamedDecl> LambdaExpr::explicit_template_parameters(void) const noex
 }
 
 TokenRange LambdaExpr::introducer_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal24(), self.getVal25());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
 }
 
 std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal56()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal53()) {
     return std::nullopt;
   } else {
-    return TemplateParameterList(fragment, self.getVal0());
+    return TemplateParameterList(fragment, self.getVal72());
   }
 }
 
 bool LambdaExpr::has_explicit_parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 bool LambdaExpr::has_explicit_result_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal55();
 }
 
 bool LambdaExpr::is_generic_lambda(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool LambdaExpr::is_mutable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 std::optional<IntegerLiteral> IntegerLiteral::from(const Expr &parent) {
@@ -11293,9 +10790,8 @@ std::optional<IntegerLiteral> IntegerLiteral::from(const Stmt &parent) {
 }
 
 Token IntegerLiteral::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<InitListExpr> InitListExpr::from(const Expr &parent) {
@@ -11315,90 +10811,78 @@ std::optional<InitListExpr> InitListExpr::from(const Stmt &parent) {
 }
 
 std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal56()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal53()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal20());
+    EntityId id(self.getVal9());
     return FieldDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 Token InitListExpr::l_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token InitListExpr::r_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 std::optional<InitListExpr> InitListExpr::semantic_form(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal57()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal54()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal24());
+    EntityId id(self.getVal20());
     return InitListExpr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 std::optional<InitListExpr> InitListExpr::syntactic_form(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal58()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal55()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal25());
+    EntityId id(self.getVal21());
     return InitListExpr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 bool InitListExpr::had_array_range_designator(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal56();
 }
 
 bool InitListExpr::has_array_filler(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal57();
 }
 
 bool InitListExpr::is_explicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal59();
 }
 
 bool InitListExpr::is_semantic_form(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal62();
 }
 
 bool InitListExpr::is_string_literal_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal66();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal63();
 }
 
 bool InitListExpr::is_syntactic_form(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal67();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal64();
 }
 
 bool InitListExpr::is_transparent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal68();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal65();
 }
 
 std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const Expr &parent) {
@@ -11450,27 +10934,23 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Stmt &paren
 }
 
 Token GenericSelectionExpr::default_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token GenericSelectionExpr::generic_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 Token GenericSelectionExpr::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal15());
 }
 
 bool GenericSelectionExpr::is_result_dependent(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<GNUNullExpr> GNUNullExpr::from(const Expr &parent) {
@@ -11490,9 +10970,8 @@ std::optional<GNUNullExpr> GNUNullExpr::from(const Stmt &parent) {
 }
 
 Token GNUNullExpr::token_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Expr &parent) {
@@ -11512,14 +10991,12 @@ std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Stmt &paren
 }
 
 Token FunctionParmPackExpr::parameter_pack_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 std::vector<VarDecl> FunctionParmPackExpr::expansions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   auto list = self.getVal10();
   std::vector<VarDecl> vec;
   vec.reserve(list.size());
@@ -11570,9 +11047,8 @@ std::optional<ExprWithCleanups> ExprWithCleanups::from(const Stmt &parent) {
 }
 
 bool ExprWithCleanups::cleanups_have_side_effects(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<ConstantExpr> ConstantExpr::from(const FullExpr &parent) {
@@ -11596,21 +11072,18 @@ std::optional<ConstantExpr> ConstantExpr::from(const Stmt &parent) {
 }
 
 ConstantExprResultStorageKind ConstantExpr::result_storage_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ConstantExprResultStorageKind>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ConstantExprResultStorageKind>(self.getVal58());
 }
 
 bool ConstantExpr::has_ap_value_result(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 bool ConstantExpr::is_immediate_invocation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<FloatingLiteral> FloatingLiteral::from(const Expr &parent) {
@@ -11630,15 +11103,13 @@ std::optional<FloatingLiteral> FloatingLiteral::from(const Stmt &parent) {
 }
 
 Token FloatingLiteral::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool FloatingLiteral::is_exact(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<FixedPointLiteral> FixedPointLiteral::from(const Expr &parent) {
@@ -11658,9 +11129,8 @@ std::optional<FixedPointLiteral> FixedPointLiteral::from(const Stmt &parent) {
 }
 
 Token FixedPointLiteral::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Expr &parent) {
@@ -11680,21 +11150,18 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Stmt &paren
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal54();
 }
 
 std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Expr &parent) {
@@ -11714,15 +11181,13 @@ std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Stmt &parent)
 }
 
 ExpressionTrait ExpressionTraitExpr::trait(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ExpressionTrait>(self.getVal61());
+  auto self = fragment->NthStmt(offset);
+  return static_cast<ExpressionTrait>(self.getVal58());
 }
 
 bool ExpressionTraitExpr::value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal53();
 }
 
 std::optional<AttributedStmt> AttributedStmt::from(const ValueStmt &parent) {
@@ -11738,9 +11203,8 @@ std::optional<AttributedStmt> AttributedStmt::from(const Stmt &parent) {
 }
 
 Token AttributedStmt::attribute_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
@@ -11752,61 +11216,53 @@ std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
 }
 
 std::optional<VarDecl> SwitchStmt::condition_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal3()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal7()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal9());
+    EntityId id(self.getVal5());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal4()) {
+  auto self = fragment->NthStmt(offset);
+  if (!self.getVal11()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal18());
+    EntityId id(self.getVal6());
     return DeclStmt::from(fragment->StmtFor(fragment, id));
   }
 }
 
 Token SwitchStmt::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 Token SwitchStmt::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token SwitchStmt::switch_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal14());
 }
 
 bool SwitchStmt::has_initializer_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal12();
 }
 
 bool SwitchStmt::has_variable_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthStmt(offset);
   return self.getVal13();
 }
 
 bool SwitchStmt::is_all_enum_cases_covered(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal14();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal16();
 }
 
 std::optional<SwitchCase> SwitchCase::from(const Stmt &parent) {
@@ -11819,15 +11275,13 @@ std::optional<SwitchCase> SwitchCase::from(const Stmt &parent) {
 }
 
 Token SwitchCase::colon_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal9());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal5());
 }
 
 Token SwitchCase::keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal18());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal6());
 }
 
 std::optional<DefaultStmt> DefaultStmt::from(const SwitchCase &parent) {
@@ -11843,9 +11297,8 @@ std::optional<DefaultStmt> DefaultStmt::from(const Stmt &parent) {
 }
 
 Token DefaultStmt::default_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 std::optional<CaseStmt> CaseStmt::from(const SwitchCase &parent) {
@@ -11861,265 +11314,222 @@ std::optional<CaseStmt> CaseStmt::from(const Stmt &parent) {
 }
 
 bool CaseStmt::case_statement_is_gnu_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal3();
+  auto self = fragment->NthStmt(offset);
+  return self.getVal7();
 }
 
 Token CaseStmt::case_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 Token CaseStmt::ellipsis_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthStmt(offset);
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 AccessSpecifier Decl::access(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<AccessSpecifier>(self.getVal11());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<AccessSpecifier>(self.getVal0());
 }
 
 AccessSpecifier Decl::access_unsafe(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<AccessSpecifier>(self.getVal16());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<AccessSpecifier>(self.getVal1());
 }
 
 AvailabilityResult Decl::availability(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<AvailabilityResult>(self.getVal17());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<AvailabilityResult>(self.getVal2());
 }
 
 Token Decl::begin_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal5());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal3());
 }
 
 Token Decl::body_r_brace(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal6());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal4());
 }
 
 std::optional<TemplateParameterList> Decl::described_template_parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal3()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal6()) {
     return std::nullopt;
   } else {
-    return TemplateParameterList(fragment, self.getVal0());
+    return TemplateParameterList(fragment, self.getVal5());
   }
 }
 
 Token Decl::end_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
+  auto self = fragment->NthDecl(offset);
   return fragment->TokenFor(fragment, self.getVal7());
 }
 
 DeclFriendObjectKind Decl::friend_object_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<DeclFriendObjectKind>(self.getVal61());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<DeclFriendObjectKind>(self.getVal8());
 }
 
 DeclModuleOwnershipKind Decl::module_ownership_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<DeclModuleOwnershipKind>(self.getVal64());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<DeclModuleOwnershipKind>(self.getVal9());
 }
 
 bool Decl::has_attributes(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal4();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal10();
 }
 
 bool Decl::has_defining_attribute(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal12();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal11();
 }
 
 bool Decl::has_owning_module(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal13();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal12();
 }
 
 bool Decl::has_tag_identifier_namespace(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal14();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal13();
 }
 
 bool Decl::is_canonical_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal15();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal14();
 }
 
 bool Decl::is_defined_outside_function_or_method(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal23();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal15();
 }
 
 bool Decl::is_deprecated(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal39();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal16();
 }
 
 bool Decl::is_first_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal40();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal17();
 }
 
 bool Decl::is_function_or_function_template(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal41();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal18();
 }
 
 bool Decl::is_implicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal42();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal19();
 }
 
 bool Decl::is_in_anonymous_namespace(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal43();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal20();
 }
 
 bool Decl::is_in_local_scope_for_instantiation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal44();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal21();
 }
 
 bool Decl::is_in_std_namespace(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal45();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal22();
 }
 
 bool Decl::is_invalid_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal46();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal23();
 }
 
 bool Decl::is_module_private(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal47();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal24();
 }
 
 bool Decl::is_out_of_line(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal48();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal25();
 }
 
 bool Decl::is_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal49();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal26();
 }
 
 bool Decl::is_referenced(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal50();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal27();
 }
 
 bool Decl::is_template_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal51();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal28();
 }
 
 bool Decl::is_template_parameter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal52();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal29();
 }
 
 bool Decl::is_template_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal53();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal30();
 }
 
 bool Decl::is_templated(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal54();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal31();
 }
 
 bool Decl::is_this_declaration_referenced(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal55();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal32();
 }
 
 bool Decl::is_top_level_declaration_in_obj_c_container(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal56();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal33();
 }
 
 bool Decl::is_unavailable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal57();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal34();
 }
 
 bool Decl::is_unconditionally_visible(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal58();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal35();
 }
 
 bool Decl::is_used(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal59();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal36();
 }
 
 bool Decl::is_weak_imported(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal60();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal37();
 }
 
 DeclKind Decl::kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<DeclKind>(self.getVal75());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<DeclKind>(self.getVal38());
 }
 
 Token Decl::token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal8());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal39());
 }
 
 TokenRange Decl::token_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal9(), self.getVal18());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal40(), self.getVal41());
 }
 
 std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const Decl &parent) {
@@ -12131,9 +11541,8 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 }
 
 bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
@@ -12145,15 +11554,13 @@ std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
 }
 
 bool CapturedDecl::is_nothrow(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 std::vector<ImplicitParamDecl> CapturedDecl::parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<ImplicitParamDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -12174,57 +11581,48 @@ std::optional<BlockDecl> BlockDecl::from(const Decl &parent) {
 }
 
 bool BlockDecl::block_missing_return_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 bool BlockDecl::can_avoid_copy_to_heap(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal46();
 }
 
 bool BlockDecl::captures_cxx_this(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal66();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal47();
 }
 
 bool BlockDecl::does_not_escape(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal67();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal48();
 }
 
 Token BlockDecl::caret_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal42());
 }
 
 bool BlockDecl::has_captures(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal68();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal50();
 }
 
 bool BlockDecl::is_conversion_from_lambda(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal70();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal51();
 }
 
 bool BlockDecl::is_variadic(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal71();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal52();
 }
 
 std::vector<ParmVarDecl> BlockDecl::parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<ParmVarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -12237,9 +11635,8 @@ std::vector<ParmVarDecl> BlockDecl::parameters(void) const noexcept {
 }
 
 std::vector<ParmVarDecl> BlockDecl::parameter_declarations(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal33();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal45();
   std::vector<ParmVarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -12260,15 +11657,13 @@ std::optional<AccessSpecDecl> AccessSpecDecl::from(const Decl &parent) {
 }
 
 Token AccessSpecDecl::access_specifier_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal42());
 }
 
 Token AccessSpecDecl::colon_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const Decl &parent) {
@@ -12334,15 +11729,13 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const Decl &parent) {
 }
 
 Token StaticAssertDecl::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 bool StaticAssertDecl::is_failed(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Decl &parent) {
@@ -12362,16 +11755,14 @@ std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Dec
 }
 
 std::string_view PragmaDetectMismatchDecl::name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal54();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view PragmaDetectMismatchDecl::value(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal32();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal55();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -12384,16 +11775,14 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Decl &parent) {
 }
 
 std::string_view PragmaCommentDecl::argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal54();
   return std::string_view(data.cStr(), data.size());
 }
 
 PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<PragmaMSCommentKind>(self.getVal76());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<PragmaMSCommentKind>(self.getVal56());
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &parent) {
@@ -12405,21 +11794,18 @@ std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &paren
 }
 
 ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCPropertyImplDeclKind>(self.getVal76());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCPropertyImplDeclKind>(self.getVal56());
 }
 
 Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
@@ -12502,89 +11888,75 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
 }
 
 Linkage NamedDecl::formal_linkage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<Linkage>(self.getVal76());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<Linkage>(self.getVal56());
 }
 
 Linkage NamedDecl::linkage_internal(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<Linkage>(self.getVal77());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<Linkage>(self.getVal60());
 }
 
 std::string_view NamedDecl::name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal27();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal54();
   return std::string_view(data.cStr(), data.size());
 }
 
 ObjCStringFormatFamily NamedDecl::obj_cf_string_formatting_family(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCStringFormatFamily>(self.getVal78());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCStringFormatFamily>(self.getVal61());
 }
 
 std::string_view NamedDecl::qualified_name_as_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal32();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal55();
   return std::string_view(data.cStr(), data.size());
 }
 
 Visibility NamedDecl::visibility(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<Visibility>(self.getVal79());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<Visibility>(self.getVal62());
 }
 
 bool NamedDecl::has_external_formal_linkage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 bool NamedDecl::has_linkage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal65();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal46();
 }
 
 bool NamedDecl::has_linkage_been_computed(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal66();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal47();
 }
 
 bool NamedDecl::is_cxx_class_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal67();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal48();
 }
 
 bool NamedDecl::is_cxx_instance_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal68();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal50();
 }
 
 bool NamedDecl::is_externally_declarable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal70();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal51();
 }
 
 bool NamedDecl::is_externally_visible(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal71();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal52();
 }
 
 bool NamedDecl::is_linkage_valid(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal72();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal63();
 }
 
 std::optional<LabelDecl> LabelDecl::from(const NamedDecl &parent) {
@@ -12600,28 +11972,24 @@ std::optional<LabelDecl> LabelDecl::from(const Decl &parent) {
 }
 
 std::string_view LabelDecl::ms_assembly_label(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal80();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal64();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool LabelDecl::is_gnu_local(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 bool LabelDecl::is_ms_assembly_label(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool LabelDecl::is_resolved_ms_assembly_label(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 std::optional<BaseUsingDecl> BaseUsingDecl::from(const NamedDecl &parent) {
@@ -12639,9 +12007,8 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const Decl &parent) {
 }
 
 std::vector<UsingShadowDecl> BaseUsingDecl::shadows(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<UsingShadowDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -12670,15 +12037,13 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const Decl &parent) {
 }
 
 Token UsingEnumDecl::enum_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal57());
 }
 
 Token UsingEnumDecl::using_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 std::optional<UsingDecl> UsingDecl::from(const BaseUsingDecl &parent) {
@@ -12698,21 +12063,18 @@ std::optional<UsingDecl> UsingDecl::from(const Decl &parent) {
 }
 
 Token UsingDecl::using_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 bool UsingDecl::has_typename(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 bool UsingDecl::is_access_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 std::optional<ValueDecl> ValueDecl::from(const NamedDecl &parent) {
@@ -12755,9 +12117,8 @@ std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
 }
 
 bool ValueDecl::is_weak(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const ValueDecl &parent) {
@@ -12777,27 +12138,23 @@ std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const Dec
 }
 
 Token UnresolvedUsingValueDecl::ellipsis_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 Token UnresolvedUsingValueDecl::using_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal57());
 }
 
 bool UnresolvedUsingValueDecl::is_access_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool UnresolvedUsingValueDecl::is_pack_expansion(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const ValueDecl &parent) {
@@ -12833,9 +12190,8 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Decl 
 }
 
 OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<OMPDeclareReductionDeclInitKind>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<OMPDeclareReductionDeclInitKind>(self.getVal68());
 }
 
 std::optional<MSGuidDecl> MSGuidDecl::from(const ValueDecl &parent) {
@@ -12871,9 +12227,8 @@ std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const Decl &parent) {
 }
 
 std::vector<NamedDecl> IndirectFieldDecl::chain(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -12886,23 +12241,21 @@ std::vector<NamedDecl> IndirectFieldDecl::chain(void) const noexcept {
 }
 
 std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal81()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal66()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal20());
+    EntityId id(self.getVal49());
     return FieldDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal82()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal67()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal21());
+    EntityId id(self.getVal57());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -12958,33 +12311,28 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const Decl &parent) {
 }
 
 Token DeclaratorDecl::inner_token_start(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 Token DeclaratorDecl::outer_token_start(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal57());
 }
 
 Token DeclaratorDecl::type_spec_end_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 Token DeclaratorDecl::type_spec_start_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal59());
 }
 
 std::vector<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal63();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal69();
   std::vector<TemplateParameterList> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -13020,305 +12368,258 @@ std::optional<VarDecl> VarDecl::from(const Decl &parent) {
 }
 
 std::optional<VarDecl> VarDecl::acting_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal81()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal66()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal25());
+    EntityId id(self.getVal70());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 VarDeclInitializationStyle VarDecl::initializer_style(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<VarDeclInitializationStyle>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<VarDeclInitializationStyle>(self.getVal68());
 }
 
 std::optional<VarDecl> VarDecl::initializing_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal82()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal67()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal26());
+    EntityId id(self.getVal71());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<VarDecl> VarDecl::instantiated_from_static_data_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal84()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal73()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal69());
+    EntityId id(self.getVal72());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 LanguageLinkage VarDecl::language_linkage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<LanguageLinkage>(self.getVal85());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<LanguageLinkage>(self.getVal74());
 }
 
 Token VarDecl::point_of_instantiation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal74());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal75());
 }
 
 StorageClass VarDecl::storage_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<StorageClass>(self.getVal86());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<StorageClass>(self.getVal76());
 }
 
 StorageDuration VarDecl::storage_duration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<StorageDuration>(self.getVal87());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<StorageDuration>(self.getVal77());
 }
 
 VarDeclTLSKind VarDecl::tls_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<VarDeclTLSKind>(self.getVal88());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<VarDeclTLSKind>(self.getVal78());
 }
 
 ThreadStorageClassSpecifier VarDecl::tsc_spec(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ThreadStorageClassSpecifier>(self.getVal89());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ThreadStorageClassSpecifier>(self.getVal79());
 }
 
 std::optional<VarDecl> VarDecl::template_instantiation_pattern(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal91()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal81()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal90());
+    EntityId id(self.getVal80());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind VarDecl::template_specialization_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal92());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal82());
 }
 
 TemplateSpecializationKind VarDecl::template_specialization_kind_for_instantiation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal93());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal83());
 }
 
 bool VarDecl::has_constant_initialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 bool VarDecl::has_dependent_alignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal95();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal85();
 }
 
 bool VarDecl::has_external_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal96();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal86();
 }
 
 bool VarDecl::has_global_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal97();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal87();
 }
 
 bool VarDecl::has_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal98();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal88();
 }
 
 bool VarDecl::has_local_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal99();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal89();
 }
 
 bool VarDecl::is_arc_pseudo_strong(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal100();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal90();
 }
 
 bool VarDecl::is_cxx_for_range_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal101();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal91();
 }
 
 bool VarDecl::is_constexpr(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal102();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal92();
 }
 
 bool VarDecl::is_direct_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal103();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal93();
 }
 
 bool VarDecl::is_escaping_byref(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal104();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal94();
 }
 
 bool VarDecl::is_exception_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal105();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal95();
 }
 
 bool VarDecl::is_extern_c(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal106();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal96();
 }
 
 bool VarDecl::is_file_variable_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal107();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal97();
 }
 
 bool VarDecl::is_function_or_method_variable_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal108();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal98();
 }
 
 bool VarDecl::is_in_extern_c_context(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal109();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal99();
 }
 
 bool VarDecl::is_in_extern_cxx_context(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal110();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal100();
 }
 
 bool VarDecl::is_initializer_capture(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal111();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal101();
 }
 
 bool VarDecl::is_inline(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal112();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal102();
 }
 
 bool VarDecl::is_inline_specified(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal113();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal103();
 }
 
 bool VarDecl::is_known_to_be_defined(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal114();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal104();
 }
 
 bool VarDecl::is_local_variable_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal115();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal105();
 }
 
 bool VarDecl::is_local_variable_declaration_or_parm(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal116();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal106();
 }
 
 bool VarDecl::is_nrvo_variable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal117();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal107();
 }
 
 bool VarDecl::is_no_destroy(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal118();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal108();
 }
 
 bool VarDecl::is_non_escaping_byref(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal119();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal109();
 }
 
 bool VarDecl::is_obj_c_for_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal120();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal110();
 }
 
 bool VarDecl::is_previous_declaration_in_same_block_scope(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal121();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal111();
 }
 
 bool VarDecl::is_static_data_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal122();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal112();
 }
 
 bool VarDecl::is_static_local(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal123();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal113();
 }
 
 bool VarDecl::is_this_declaration_a_demoted_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal124();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal114();
 }
 
 bool VarDecl::is_usable_in_constant_expressions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal125();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal115();
 }
 
 bool VarDecl::might_be_usable_in_constant_expressions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal126();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal116();
 }
 
 QualTypeDestructionKind VarDecl::needs_destruction(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<QualTypeDestructionKind>(self.getVal127());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<QualTypeDestructionKind>(self.getVal117());
 }
 
 std::optional<ParmVarDecl> ParmVarDecl::from(const VarDecl &parent) {
@@ -13346,57 +12647,48 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const Decl &parent) {
 }
 
 TokenRange ParmVarDecl::default_argument_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal128(), self.getVal129());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal118(), self.getVal119());
 }
 
 DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<DeclObjCDeclQualifier>(self.getVal130());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<DeclObjCDeclQualifier>(self.getVal120());
 }
 
 bool ParmVarDecl::has_default_argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal131();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal121();
 }
 
 bool ParmVarDecl::has_inherited_default_argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal132();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal122();
 }
 
 bool ParmVarDecl::has_uninstantiated_default_argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal133();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal123();
 }
 
 bool ParmVarDecl::has_unparsed_default_argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal134();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal124();
 }
 
 bool ParmVarDecl::is_destroyed_in_callee(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal135();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal125();
 }
 
 bool ParmVarDecl::is_knr_promoted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal136();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal126();
 }
 
 bool ParmVarDecl::is_obj_c_method_parameter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal137();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal127();
 }
 
 std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const VarDecl &parent) {
@@ -13448,9 +12740,8 @@ std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const Decl &parent) {
 }
 
 ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ImplicitParamDeclImplicitParamKind>(self.getVal130());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ImplicitParamDeclImplicitParamKind>(self.getVal120());
 }
 
 std::optional<DecompositionDecl> DecompositionDecl::from(const VarDecl &parent) {
@@ -13478,9 +12769,8 @@ std::optional<DecompositionDecl> DecompositionDecl::from(const Decl &parent) {
 }
 
 std::vector<BindingDecl> DecompositionDecl::bindings(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<BindingDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -13518,21 +12808,18 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
 }
 
 Token VarTemplateSpecializationDecl::extern_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal128());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal118());
 }
 
 TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal130());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal120());
 }
 
 std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal138();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal128();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -13542,9 +12829,8 @@ vec.emplace_back(fragment, v);
 }
 
 std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal139();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal129();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -13554,27 +12840,23 @@ vec.emplace_back(fragment, v);
 }
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal129());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal119());
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal131();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal121();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal132();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal122();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal133();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal123();
 }
 
 std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const VarTemplateSpecializationDecl &parent) {
@@ -13626,39 +12908,33 @@ std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Decl 
 }
 
 bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 Token NonTypeTemplateParmDecl::default_argument_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal70());
 }
 
 bool NonTypeTemplateParmDecl::has_default_argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 bool NonTypeTemplateParmDecl::has_placeholder_type_constraint(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal91();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal81();
 }
 
 bool NonTypeTemplateParmDecl::is_pack_expansion(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 std::optional<MSPropertyDecl> MSPropertyDecl::from(const DeclaratorDecl &parent) {
@@ -13682,15 +12958,13 @@ std::optional<MSPropertyDecl> MSPropertyDecl::from(const Decl &parent) {
 }
 
 bool MSPropertyDecl::has_getter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool MSPropertyDecl::has_setter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 std::optional<FunctionDecl> FunctionDecl::from(const DeclaratorDecl &parent) {
@@ -13719,402 +12993,338 @@ std::optional<FunctionDecl> FunctionDecl::from(const Decl &parent) {
 }
 
 bool FunctionDecl::does_this_declaration_have_a_body(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 ConstexprSpecKind FunctionDecl::constexpr_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ConstexprSpecKind>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ConstexprSpecKind>(self.getVal68());
 }
 
 std::optional<FunctionDecl> FunctionDecl::definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal82()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal67()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal25());
+    EntityId id(self.getVal70());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 Token FunctionDecl::ellipsis_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal71());
 }
 
 TokenRange FunctionDecl::exception_spec_source_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal69(), self.getVal74());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal72(), self.getVal75());
 }
 
 ExceptionSpecificationType FunctionDecl::exception_spec_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ExceptionSpecificationType>(self.getVal85());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ExceptionSpecificationType>(self.getVal74());
 }
 
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_member_function(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal84()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal73()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal90());
+    EntityId id(self.getVal80());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 LanguageLinkage FunctionDecl::language_linkage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<LanguageLinkage>(self.getVal86());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<LanguageLinkage>(self.getVal76());
 }
 
 MultiVersionKind FunctionDecl::multi_version_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<MultiVersionKind>(self.getVal87());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<MultiVersionKind>(self.getVal77());
 }
 
 OverloadedOperatorKind FunctionDecl::overloaded_operator(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<OverloadedOperatorKind>(self.getVal88());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<OverloadedOperatorKind>(self.getVal78());
 }
 
 TokenRange FunctionDecl::parameters_source_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal128(), self.getVal129());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal118(), self.getVal119());
 }
 
 Token FunctionDecl::point_of_instantiation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal140());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal130());
 }
 
 TokenRange FunctionDecl::return_type_source_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal141(), self.getVal142());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal131(), self.getVal132());
 }
 
 StorageClass FunctionDecl::storage_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<StorageClass>(self.getVal89());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<StorageClass>(self.getVal79());
 }
 
 std::optional<FunctionDecl> FunctionDecl::template_instantiation_pattern(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal91()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal81()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal143());
+    EntityId id(self.getVal133());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind FunctionDecl::template_specialization_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal92());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal82());
 }
 
 TemplateSpecializationKind FunctionDecl::template_specialization_kind_for_instantiation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal93());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal83());
 }
 
 FunctionDeclTemplatedKind FunctionDecl::templated_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<FunctionDeclTemplatedKind>(self.getVal127());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<FunctionDeclTemplatedKind>(self.getVal117());
 }
 
 bool FunctionDecl::has_implicit_return_zero(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 bool FunctionDecl::has_inherited_prototype(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal95();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal85();
 }
 
 bool FunctionDecl::has_one_parameter_or_default_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal96();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal86();
 }
 
 bool FunctionDecl::has_prototype(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal97();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal87();
 }
 
 bool FunctionDecl::has_skipped_body(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal98();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal88();
 }
 
 bool FunctionDecl::has_trivial_body(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal99();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal89();
 }
 
 bool FunctionDecl::has_written_prototype(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal100();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal90();
 }
 
 bool FunctionDecl::instantiation_is_pending(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal101();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal91();
 }
 
 bool FunctionDecl::is_cpu_dispatch_multi_version(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal102();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal92();
 }
 
 bool FunctionDecl::is_cpu_specific_multi_version(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal103();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal93();
 }
 
 bool FunctionDecl::is_consteval(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal104();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal94();
 }
 
 bool FunctionDecl::is_constexpr(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal105();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal95();
 }
 
 bool FunctionDecl::is_constexpr_specified(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal106();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal96();
 }
 
 bool FunctionDecl::is_defaulted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal107();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal97();
 }
 
 bool FunctionDecl::is_deleted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal108();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal98();
 }
 
 bool FunctionDecl::is_deleted_as_written(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal109();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal99();
 }
 
 bool FunctionDecl::is_destroying_operator_delete(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal110();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal100();
 }
 
 bool FunctionDecl::is_explicitly_defaulted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal111();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal101();
 }
 
 bool FunctionDecl::is_extern_c(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal112();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal102();
 }
 
 bool FunctionDecl::is_function_template_specialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal113();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal103();
 }
 
 bool FunctionDecl::is_global(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal114();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal104();
 }
 
 bool FunctionDecl::is_implicitly_instantiable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal115();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal105();
 }
 
 bool FunctionDecl::is_in_extern_c_context(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal116();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal106();
 }
 
 bool FunctionDecl::is_in_extern_cxx_context(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal117();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal107();
 }
 
 bool FunctionDecl::is_inline_builtin_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal118();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal108();
 }
 
 bool FunctionDecl::is_inline_specified(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal119();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal109();
 }
 
 bool FunctionDecl::is_inlined(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal120();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal110();
 }
 
 bool FunctionDecl::is_late_template_parsed(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal121();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal111();
 }
 
 bool FunctionDecl::is_msvcrt_entry_point(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal122();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal112();
 }
 
 bool FunctionDecl::is_main(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal123();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal113();
 }
 
 bool FunctionDecl::is_multi_version(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal124();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal114();
 }
 
 bool FunctionDecl::is_no_return(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal125();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal115();
 }
 
 bool FunctionDecl::is_overloaded_operator(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal126();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal116();
 }
 
 bool FunctionDecl::is_pure(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal131();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal121();
 }
 
 bool FunctionDecl::is_replaceable_global_allocation_function(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal132();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal122();
 }
 
 bool FunctionDecl::is_static(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal133();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal123();
 }
 
 bool FunctionDecl::is_target_multi_version(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal134();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal124();
 }
 
 bool FunctionDecl::is_template_instantiation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal135();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal125();
 }
 
 bool FunctionDecl::is_this_declaration_a_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal136();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal126();
 }
 
 bool FunctionDecl::is_this_declaration_instantiated_from_a_friend_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal137();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal127();
 }
 
 bool FunctionDecl::is_trivial(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal144();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal134();
 }
 
 bool FunctionDecl::is_trivial_for_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal145();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal135();
 }
 
 bool FunctionDecl::is_user_provided(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal146();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal136();
 }
 
 bool FunctionDecl::is_variadic(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal147();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal137();
 }
 
 bool FunctionDecl::is_virtual_as_written(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal148();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal138();
 }
 
 std::vector<ParmVarDecl> FunctionDecl::parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<ParmVarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -14127,15 +13337,13 @@ std::vector<ParmVarDecl> FunctionDecl::parameters(void) const noexcept {
 }
 
 bool FunctionDecl::uses_seh_try(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal149();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal139();
 }
 
 bool FunctionDecl::will_have_body(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal150();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal140();
 }
 
 std::optional<CXXMethodDecl> CXXMethodDecl::from(const FunctionDecl &parent) {
@@ -14166,63 +13374,53 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const Decl &parent) {
 }
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<RefQualifierKind>(self.getVal130());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<RefQualifierKind>(self.getVal120());
 }
 
 bool CXXMethodDecl::has_inline_body(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal152();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal142();
 }
 
 bool CXXMethodDecl::is_const(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal153();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal143();
 }
 
 bool CXXMethodDecl::is_copy_assignment_operator(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal154();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal144();
 }
 
 bool CXXMethodDecl::is_instance(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal155();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal145();
 }
 
 bool CXXMethodDecl::is_lambda_static_invoker(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal156();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal146();
 }
 
 bool CXXMethodDecl::is_move_assignment_operator(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal157();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal147();
 }
 
 bool CXXMethodDecl::is_virtual(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal158();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal148();
 }
 
 bool CXXMethodDecl::is_volatile(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal159();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal149();
 }
 
 std::vector<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal34();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal53();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -14291,15 +13489,13 @@ std::optional<CXXConversionDecl> CXXConversionDecl::from(const Decl &parent) {
 }
 
 bool CXXConversionDecl::is_explicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal161();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal151();
 }
 
 bool CXXConversionDecl::is_lambda_to_block_pointer_conversion(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal162();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal152();
 }
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const CXXMethodDecl &parent) {
@@ -14331,33 +13527,28 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const Decl &parent) {
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal161();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal151();
 }
 
 bool CXXConstructorDecl::is_delegating_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal162();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal152();
 }
 
 bool CXXConstructorDecl::is_explicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal163();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal153();
 }
 
 bool CXXConstructorDecl::is_inheriting_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal164();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal154();
 }
 
 bool CXXConstructorDecl::is_specialization_copying_object(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal165();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal155();
 }
 
 std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const FunctionDecl &parent) {
@@ -14385,15 +13576,13 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Decl &par
 }
 
 bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal152();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal142();
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal153();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal143();
 }
 
 std::optional<FieldDecl> FieldDecl::from(const DeclaratorDecl &parent) {
@@ -14419,57 +13608,48 @@ std::optional<FieldDecl> FieldDecl::from(const Decl &parent) {
 }
 
 InClassInitStyle FieldDecl::in_class_initializer_style(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<InClassInitStyle>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<InClassInitStyle>(self.getVal68());
 }
 
 bool FieldDecl::has_captured_vla_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool FieldDecl::has_in_class_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 bool FieldDecl::is_anonymous_struct_or_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 bool FieldDecl::is_bit_field(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal91();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal81();
 }
 
 bool FieldDecl::is_mutable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 bool FieldDecl::is_unnamed_bitfield(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal95();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal85();
 }
 
 bool FieldDecl::is_zero_length_bit_field(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal96();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal86();
 }
 
 bool FieldDecl::is_zero_size(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal97();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal87();
 }
 
 std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const FieldDecl &parent) {
@@ -14497,21 +13677,18 @@ std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const Decl &parent) {
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::access_control(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCIvarDeclAccessControl>(self.getVal85());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCIvarDeclAccessControl>(self.getVal74());
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCIvarDeclAccessControl>(self.getVal86());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCIvarDeclAccessControl>(self.getVal76());
 }
 
 bool ObjCIvarDecl::synthesize(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal98();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal88();
 }
 
 std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const FieldDecl &parent) {
@@ -14620,29 +13797,26 @@ std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const
 }
 
 bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal81()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal66()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal25());
+    EntityId id(self.getVal70());
     return ConstructorUsingShadowDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal82()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal67()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal69());
+    EntityId id(self.getVal72());
     return ConstructorUsingShadowDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -14660,9 +13834,8 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const Decl &parent) {
 }
 
 std::vector<NamedDecl> UsingPackDecl::expansions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -14687,21 +13860,18 @@ std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const Decl &parent) {
 }
 
 Token UsingDirectiveDecl::identifier_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 Token UsingDirectiveDecl::namespace_key_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal57());
 }
 
 Token UsingDirectiveDecl::using_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal59());
 }
 
 std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const NamedDecl &parent) {
@@ -14757,45 +13927,38 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const Decl &paren
 }
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 Token TemplateTypeParmDecl::default_argument_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 bool TemplateTypeParmDecl::has_default_argument(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool TemplateTypeParmDecl::has_type_constraint(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 bool TemplateTypeParmDecl::is_pack_expansion(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal91();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal81();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 std::optional<TagDecl> TagDecl::from(const TypeDecl &parent) {
@@ -14820,139 +13983,118 @@ std::optional<TagDecl> TagDecl::from(const Decl &parent) {
 }
 
 TokenRange TagDecl::brace_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal49(), self.getVal57());
 }
 
 std::optional<TagDecl> TagDecl::definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal73()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal65()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal22());
+    EntityId id(self.getVal58());
     return TagDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 Token TagDecl::inner_token_start(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal59());
 }
 
 Token TagDecl::outer_token_start(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal70());
 }
 
 TagTypeKind TagDecl::tag_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TagTypeKind>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TagTypeKind>(self.getVal68());
 }
 
 std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal81()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal66()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal26());
+    EntityId id(self.getVal71());
     return TypedefNameDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool TagDecl::has_name_for_linkage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 bool TagDecl::is_being_defined(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 bool TagDecl::is_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal91();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal81();
 }
 
 bool TagDecl::is_complete_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 bool TagDecl::is_complete_definition_required(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal95();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal85();
 }
 
 bool TagDecl::is_dependent_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal96();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal86();
 }
 
 bool TagDecl::is_embedded_in_declarator(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal97();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal87();
 }
 
 bool TagDecl::is_enum(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal98();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal88();
 }
 
 bool TagDecl::is_free_standing(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal99();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal89();
 }
 
 bool TagDecl::is_interface(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal100();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal90();
 }
 
 bool TagDecl::is_struct(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal101();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal91();
 }
 
 bool TagDecl::is_this_declaration_a_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal102();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal92();
 }
 
 bool TagDecl::is_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal103();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal93();
 }
 
 bool TagDecl::may_have_out_of_date_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal104();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal94();
 }
 
 std::vector<TemplateParameterList> TagDecl::template_parameter_lists(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal63();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal69();
   std::vector<TemplateParameterList> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -14985,15 +14127,13 @@ std::optional<RecordDecl> RecordDecl::from(const Decl &parent) {
 }
 
 bool RecordDecl::can_pass_in_registers(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal105();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal95();
 }
 
 std::vector<FieldDecl> RecordDecl::fields(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal33();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal45();
   std::vector<FieldDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15006,128 +14146,108 @@ std::vector<FieldDecl> RecordDecl::fields(void) const noexcept {
 }
 
 std::optional<FieldDecl> RecordDecl::find_first_named_data_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal106()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal96()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal69());
+    EntityId id(self.getVal72());
     return FieldDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 RecordDeclArgPassingKind RecordDecl::argument_passing_restrictions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<RecordDeclArgPassingKind>(self.getVal85());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<RecordDeclArgPassingKind>(self.getVal74());
 }
 
 bool RecordDecl::has_flexible_array_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal107();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal97();
 }
 
 bool RecordDecl::has_loaded_fields_from_external_storage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal108();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal98();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_copy_c_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal109();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal99();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_default_initialize_c_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal110();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal100();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_destruct_c_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal111();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal101();
 }
 
 bool RecordDecl::has_object_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal112();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal102();
 }
 
 bool RecordDecl::has_volatile_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal113();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal103();
 }
 
 bool RecordDecl::is_anonymous_struct_or_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal114();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal104();
 }
 
 bool RecordDecl::is_captured_record(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal115();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal105();
 }
 
 bool RecordDecl::is_injected_class_name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal116();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal106();
 }
 
 bool RecordDecl::is_lambda(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal117();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal107();
 }
 
 bool RecordDecl::is_ms_struct(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal118();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal108();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_copy(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal119();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal109();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_default_initialize(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal120();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal110();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_destroy(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal121();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal111();
 }
 
 bool RecordDecl::is_or_contains_union(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal122();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal112();
 }
 
 bool RecordDecl::is_parameter_destroyed_in_callee(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal123();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal113();
 }
 
 bool RecordDecl::may_insert_extra_padding(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal124();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal114();
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::from(const RecordDecl &parent) {
@@ -15157,15 +14277,13 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const Decl &parent) {
 }
 
 bool CXXRecordDecl::allow_const_default_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal125();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal115();
 }
 
 std::vector<CXXBaseSpecifier> CXXRecordDecl::bases(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal138();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal128();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15175,15 +14293,13 @@ vec.emplace_back(fragment, v);
 }
 
 MSInheritanceModel CXXRecordDecl::calculate_inheritance_model(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<MSInheritanceModel>(self.getVal86());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<MSInheritanceModel>(self.getVal76());
 }
 
 std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal34();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal53();
   std::vector<CXXConstructorDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15196,39 +14312,33 @@ std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const noexcept
 }
 
 bool CXXRecordDecl::defaulted_copy_constructor_is_deleted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal126();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal116();
 }
 
 bool CXXRecordDecl::defaulted_default_constructor_is_constexpr(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal131();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal121();
 }
 
 bool CXXRecordDecl::defaulted_destructor_is_constexpr(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal132();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal122();
 }
 
 bool CXXRecordDecl::defaulted_destructor_is_deleted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal133();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal123();
 }
 
 bool CXXRecordDecl::defaulted_move_constructor_is_deleted(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal134();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal124();
 }
 
 std::vector<FriendDecl> CXXRecordDecl::friends(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal36();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal156();
   std::vector<FriendDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15241,58 +14351,52 @@ std::vector<FriendDecl> CXXRecordDecl::friends(void) const noexcept {
 }
 
 std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal135()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal125()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal74());
+    EntityId id(self.getVal75());
     return CXXDestructorDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal136()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal126()) {
     return std::nullopt;
   } else {
-    return TemplateParameterList(fragment, self.getVal1());
+    return TemplateParameterList(fragment, self.getVal157());
   }
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal137()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal127()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal90());
+    EntityId id(self.getVal80());
     return CXXRecordDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal144()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal134()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal128());
+    EntityId id(self.getVal118());
     return CXXMethodDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 LambdaCaptureDefault CXXRecordDecl::lambda_capture_default(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<LambdaCaptureDefault>(self.getVal87());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<LambdaCaptureDefault>(self.getVal77());
 }
 
 std::vector<NamedDecl> CXXRecordDecl::lambda_explicit_template_parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal37();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal158();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15305,523 +14409,438 @@ std::vector<NamedDecl> CXXRecordDecl::lambda_explicit_template_parameters(void) 
 }
 
 MSInheritanceModel CXXRecordDecl::ms_inheritance_model(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<MSInheritanceModel>(self.getVal88());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<MSInheritanceModel>(self.getVal78());
 }
 
 MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<MSVtorDispMode>(self.getVal89());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<MSVtorDispMode>(self.getVal79());
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal145()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal135()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal140());
+    EntityId id(self.getVal130());
     return CXXRecordDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal92());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal82());
 }
 
 bool CXXRecordDecl::has_any_dependent_bases(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal146();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal136();
 }
 
 bool CXXRecordDecl::has_constexpr_default_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal147();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal137();
 }
 
 bool CXXRecordDecl::has_constexpr_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal148();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal138();
 }
 
 bool CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal149();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal139();
 }
 
 bool CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal150();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal140();
 }
 
 bool CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal152();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal142();
 }
 
 bool CXXRecordDecl::has_default_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal153();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal143();
 }
 
 bool CXXRecordDecl::has_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal154();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal144();
 }
 
 bool CXXRecordDecl::has_direct_fields(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal155();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal145();
 }
 
 bool CXXRecordDecl::has_friends(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal156();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal146();
 }
 
 bool CXXRecordDecl::has_in_class_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal157();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal147();
 }
 
 bool CXXRecordDecl::has_inherited_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal158();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal148();
 }
 
 bool CXXRecordDecl::has_inherited_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal159();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal149();
 }
 
 bool CXXRecordDecl::has_irrelevant_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal161();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal151();
 }
 
 bool CXXRecordDecl::has_known_lambda_internal_linkage(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal162();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal152();
 }
 
 bool CXXRecordDecl::has_move_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal163();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal153();
 }
 
 bool CXXRecordDecl::has_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal164();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal154();
 }
 
 bool CXXRecordDecl::has_mutable_fields(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal165();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal155();
 }
 
 bool CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal166();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal159();
 }
 
 bool CXXRecordDecl::has_non_trivial_copy_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal167();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal160();
 }
 
 bool CXXRecordDecl::has_non_trivial_copy_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal168();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal161();
 }
 
 bool CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal169();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal162();
 }
 
 bool CXXRecordDecl::has_non_trivial_default_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal170();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal163();
 }
 
 bool CXXRecordDecl::has_non_trivial_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal171();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal164();
 }
 
 bool CXXRecordDecl::has_non_trivial_destructor_for_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal172();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal165();
 }
 
 bool CXXRecordDecl::has_non_trivial_move_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal173();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal166();
 }
 
 bool CXXRecordDecl::has_non_trivial_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal174();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal167();
 }
 
 bool CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal175();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal168();
 }
 
 bool CXXRecordDecl::has_private_fields(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal176();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal169();
 }
 
 bool CXXRecordDecl::has_protected_fields(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal177();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal170();
 }
 
 bool CXXRecordDecl::has_simple_copy_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal178();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal171();
 }
 
 bool CXXRecordDecl::has_simple_copy_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal179();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal172();
 }
 
 bool CXXRecordDecl::has_simple_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal180();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal173();
 }
 
 bool CXXRecordDecl::has_simple_move_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal181();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal174();
 }
 
 bool CXXRecordDecl::has_simple_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal182();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal175();
 }
 
 bool CXXRecordDecl::has_trivial_copy_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal183();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal176();
 }
 
 bool CXXRecordDecl::has_trivial_copy_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal184();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal177();
 }
 
 bool CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal185();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal178();
 }
 
 bool CXXRecordDecl::has_trivial_default_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal186();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal179();
 }
 
 bool CXXRecordDecl::has_trivial_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal187();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal180();
 }
 
 bool CXXRecordDecl::has_trivial_destructor_for_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal188();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal181();
 }
 
 bool CXXRecordDecl::has_trivial_move_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal189();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal182();
 }
 
 bool CXXRecordDecl::has_trivial_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal190();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal183();
 }
 
 bool CXXRecordDecl::has_trivial_move_constructor_for_call(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal191();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal184();
 }
 
 bool CXXRecordDecl::has_uninitialized_reference_member(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal192();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal185();
 }
 
 bool CXXRecordDecl::has_user_declared_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal193();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal186();
 }
 
 bool CXXRecordDecl::has_user_declared_copy_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal194();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal187();
 }
 
 bool CXXRecordDecl::has_user_declared_copy_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal195();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal188();
 }
 
 bool CXXRecordDecl::has_user_declared_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal196();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal189();
 }
 
 bool CXXRecordDecl::has_user_declared_move_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal197();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal190();
 }
 
 bool CXXRecordDecl::has_user_declared_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal198();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal191();
 }
 
 bool CXXRecordDecl::has_user_declared_move_operation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal199();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal192();
 }
 
 bool CXXRecordDecl::has_user_provided_default_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal200();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal193();
 }
 
 bool CXXRecordDecl::has_variant_members(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal201();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal194();
 }
 
 bool CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal202();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal195();
 }
 
 bool CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal203();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal196();
 }
 
 bool CXXRecordDecl::is_abstract(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal204();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal197();
 }
 
 bool CXXRecordDecl::is_aggregate(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal205();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal198();
 }
 
 bool CXXRecordDecl::is_any_destructor_no_return(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal206();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal199();
 }
 
 bool CXXRecordDecl::is_c_like(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal207();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal200();
 }
 
 bool CXXRecordDecl::is_cxx11_standard_layout(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal208();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal201();
 }
 
 bool CXXRecordDecl::is_dependent_lambda(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal209();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal202();
 }
 
 bool CXXRecordDecl::is_dynamic_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal210();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal203();
 }
 
 bool CXXRecordDecl::is_effectively_final(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal211();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal204();
 }
 
 bool CXXRecordDecl::is_empty(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal212();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal205();
 }
 
 bool CXXRecordDecl::is_generic_lambda(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal213();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal206();
 }
 
 bool CXXRecordDecl::is_interface_like(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal214();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal207();
 }
 
 bool CXXRecordDecl::is_literal(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal215();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal208();
 }
 
 std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal216()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal209()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal141());
+    EntityId id(self.getVal131());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool CXXRecordDecl::is_pod(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal217();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal210();
 }
 
 bool CXXRecordDecl::is_parsing_base_specifiers(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal218();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal211();
 }
 
 bool CXXRecordDecl::is_polymorphic(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal219();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal212();
 }
 
 bool CXXRecordDecl::is_standard_layout(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal220();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal213();
 }
 
 bool CXXRecordDecl::is_structural(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal221();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal214();
 }
 
 bool CXXRecordDecl::is_trivial(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal222();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal215();
 }
 
 bool CXXRecordDecl::is_trivially_copyable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal223();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal216();
 }
 
 bool CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal224();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal217();
 }
 
 bool CXXRecordDecl::may_be_abstract(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal225();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal218();
 }
 
 bool CXXRecordDecl::may_be_dynamic_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal226();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal219();
 }
 
 bool CXXRecordDecl::may_be_non_dynamic_class(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal227();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal220();
 }
 
 std::vector<CXXMethodDecl> CXXRecordDecl::methods(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal228();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal221();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15834,81 +14853,68 @@ std::vector<CXXMethodDecl> CXXRecordDecl::methods(void) const noexcept {
 }
 
 bool CXXRecordDecl::needs_implicit_copy_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal229();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal222();
 }
 
 bool CXXRecordDecl::needs_implicit_copy_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal230();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal223();
 }
 
 bool CXXRecordDecl::needs_implicit_default_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal231();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal224();
 }
 
 bool CXXRecordDecl::needs_implicit_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal232();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal225();
 }
 
 bool CXXRecordDecl::needs_implicit_move_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal233();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal226();
 }
 
 bool CXXRecordDecl::needs_implicit_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal234();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal227();
 }
 
 bool CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal235();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal228();
 }
 
 bool CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal236();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal229();
 }
 
 bool CXXRecordDecl::needs_overload_resolution_for_destructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal237();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal230();
 }
 
 bool CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal238();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal231();
 }
 
 bool CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal239();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal232();
 }
 
 bool CXXRecordDecl::null_field_offset_is_zero(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal240();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal233();
 }
 
 std::vector<CXXBaseSpecifier> CXXRecordDecl::virtual_bases(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal139();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal129();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15947,27 +14953,23 @@ std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::
 }
 
 Token ClassTemplateSpecializationDecl::extern_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal142());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal132());
 }
 
 Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal143());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal133());
 }
 
 TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal93());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal83());
 }
 
 std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal241();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal234();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15977,9 +14979,8 @@ vec.emplace_back(fragment, v);
 }
 
 std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal242();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal235();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -15989,27 +14990,23 @@ vec.emplace_back(fragment, v);
 }
 
 Token ClassTemplateSpecializationDecl::template_keyword_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal151());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal141());
 }
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal243();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal236();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal244();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal237();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal245();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal238();
 }
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const ClassTemplateSpecializationDecl &parent) {
@@ -16065,9 +15062,8 @@ std::optional<EnumDecl> EnumDecl::from(const Decl &parent) {
 }
 
 std::vector<EnumConstantDecl> EnumDecl::enumerators(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal33();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal45();
   std::vector<EnumConstantDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16080,79 +15076,68 @@ std::vector<EnumConstantDecl> EnumDecl::enumerators(void) const noexcept {
 }
 
 std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal105()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal95()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal69());
+    EntityId id(self.getVal72());
     return EnumDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TokenRange EnumDecl::integer_type_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal74(), self.getVal90());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal75(), self.getVal80());
 }
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal106()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal96()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal128());
+    EntityId id(self.getVal118());
     return EnumDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<TemplateSpecializationKind>(self.getVal85());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<TemplateSpecializationKind>(self.getVal74());
 }
 
 bool EnumDecl::is_closed(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal107();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal97();
 }
 
 bool EnumDecl::is_closed_flag(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal108();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal98();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal109();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal99();
 }
 
 bool EnumDecl::is_complete(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal110();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal100();
 }
 
 bool EnumDecl::is_fixed(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal111();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal101();
 }
 
 bool EnumDecl::is_scoped(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal112();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal102();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal113();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal103();
 }
 
 std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(const TypeDecl &parent) {
@@ -16172,27 +15157,23 @@ std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(con
 }
 
 Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 Token UnresolvedUsingTypenameDecl::typename_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal57());
 }
 
 Token UnresolvedUsingTypenameDecl::using_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 std::optional<TypedefNameDecl> TypedefNameDecl::from(const TypeDecl &parent) {
@@ -16215,26 +15196,23 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const Decl &parent) {
 }
 
 std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal73()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal65()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal20());
+    EntityId id(self.getVal49());
     return TagDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool TypedefNameDecl::is_moded(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool TypedefNameDecl::is_transparent_tag(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 std::optional<TypedefDecl> TypedefDecl::from(const TypedefNameDecl &parent) {
@@ -16278,12 +15256,11 @@ std::optional<TypeAliasDecl> TypeAliasDecl::from(const Decl &parent) {
 }
 
 std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  if (!self.getVal84()) {
+  auto self = fragment->NthDecl(offset);
+  if (!self.getVal73()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal21());
+    EntityId id(self.getVal57());
     return TypeAliasTemplateDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -16309,27 +15286,23 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const Decl &parent) {
 }
 
 Token ObjCTypeParamDecl::colon_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal57());
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCTypeParamVariance>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCTypeParamVariance>(self.getVal68());
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 bool ObjCTypeParamDecl::has_explicit_bound(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 std::optional<TemplateDecl> TemplateDecl::from(const NamedDecl &parent) {
@@ -16469,9 +15442,8 @@ std::optional<ConceptDecl> ConceptDecl::from(const Decl &parent) {
 }
 
 bool ConceptDecl::is_type_concept(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const TemplateDecl &parent) {
@@ -16519,87 +15491,73 @@ std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const Decl &parent) {
 }
 
 Token ObjCPropertyDecl::at_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 Token ObjCPropertyDecl::getter_name_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 Token ObjCPropertyDecl::l_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal59());
 }
 
 ObjCPropertyDeclPropertyControl ObjCPropertyDecl::property_implementation(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCPropertyDeclPropertyControl>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCPropertyDeclPropertyControl>(self.getVal68());
 }
 
 ObjCPropertyQueryKind ObjCPropertyDecl::query_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCPropertyQueryKind>(self.getVal85());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCPropertyQueryKind>(self.getVal74());
 }
 
 ObjCPropertyDeclSetterKind ObjCPropertyDecl::setter_kind(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCPropertyDeclSetterKind>(self.getVal86());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCPropertyDeclSetterKind>(self.getVal76());
 }
 
 Token ObjCPropertyDecl::setter_name_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal69());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal72());
 }
 
 bool ObjCPropertyDecl::is_atomic(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 bool ObjCPropertyDecl::is_class_property(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool ObjCPropertyDecl::is_direct_property(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 bool ObjCPropertyDecl::is_instance_property(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 bool ObjCPropertyDecl::is_optional(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal91();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal81();
 }
 
 bool ObjCPropertyDecl::is_read_only(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 bool ObjCPropertyDecl::is_retaining(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal95();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal85();
 }
 
 std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const NamedDecl &parent) {
@@ -16615,147 +15573,123 @@ std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Decl &parent) {
 }
 
 bool ObjCMethodDecl::defined_in_ns_object(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 Token ObjCMethodDecl::declarator_end_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal70());
 }
 
 ObjCMethodDeclImplementationControl ObjCMethodDecl::implementation_control(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCMethodDeclImplementationControl>(self.getVal83());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCMethodDeclImplementationControl>(self.getVal68());
 }
 
 ObjCMethodFamily ObjCMethodDecl::method_family(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<ObjCMethodFamily>(self.getVal85());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<ObjCMethodFamily>(self.getVal74());
 }
 
 DeclObjCDeclQualifier ObjCMethodDecl::obj_c_decl_qualifier(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<DeclObjCDeclQualifier>(self.getVal86());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<DeclObjCDeclQualifier>(self.getVal76());
 }
 
 TokenRange ObjCMethodDecl::return_type_source_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal26(), self.getVal69());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal71(), self.getVal72());
 }
 
 Token ObjCMethodDecl::selector_start_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal74());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal75());
 }
 
 bool ObjCMethodDecl::has_redeclaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool ObjCMethodDecl::has_related_result_type(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 bool ObjCMethodDecl::has_skipped_body(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 bool ObjCMethodDecl::is_class_method(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal91();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal81();
 }
 
 bool ObjCMethodDecl::is_defined(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 bool ObjCMethodDecl::is_designated_initializer_for_the_interface(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal95();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal85();
 }
 
 bool ObjCMethodDecl::is_direct_method(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal96();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal86();
 }
 
 bool ObjCMethodDecl::is_instance_method(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal97();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal87();
 }
 
 bool ObjCMethodDecl::is_optional(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal98();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal88();
 }
 
 bool ObjCMethodDecl::is_overriding(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal99();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal89();
 }
 
 bool ObjCMethodDecl::is_property_accessor(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal100();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal90();
 }
 
 bool ObjCMethodDecl::is_redeclaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal101();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal91();
 }
 
 bool ObjCMethodDecl::is_synthesized_accessor_stub(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal102();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal92();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal103();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal93();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_designated_initializer(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal104();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal94();
 }
 
 bool ObjCMethodDecl::is_variadic(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal105();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal95();
 }
 
 std::vector<ParmVarDecl> ObjCMethodDecl::parameters(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<ParmVarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16768,9 +15702,8 @@ std::vector<ParmVarDecl> ObjCMethodDecl::parameters(void) const noexcept {
 }
 
 std::vector<Token> ObjCMethodDecl::selector_tokens(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal33();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal45();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16799,9 +15732,8 @@ std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Decl &parent) {
 }
 
 std::vector<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<ObjCMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16814,9 +15746,8 @@ std::vector<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const noexcep
 }
 
 std::vector<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal33();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal45();
   std::vector<ObjCPropertyDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16829,21 +15760,18 @@ std::vector<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const no
 }
 
 TokenRange ObjCContainerDecl::at_end_range(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenRangeFor(fragment, self.getVal20(), self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenRangeFor(fragment, self.getVal49(), self.getVal57());
 }
 
 Token ObjCContainerDecl::at_start_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 std::vector<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal34();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal53();
   std::vector<ObjCMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16856,9 +15784,8 @@ std::vector<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const noex
 }
 
 std::vector<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal36();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal156();
   std::vector<ObjCPropertyDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16871,9 +15798,8 @@ std::vector<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const
 }
 
 std::vector<ObjCMethodDecl> ObjCContainerDecl::methods(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal37();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal158();
   std::vector<ObjCMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16886,9 +15812,8 @@ std::vector<ObjCMethodDecl> ObjCContainerDecl::methods(void) const noexcept {
 }
 
 std::vector<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal228();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal221();
   std::vector<ObjCPropertyDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16917,33 +15842,28 @@ std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const Decl &parent) {
 }
 
 bool ObjCCategoryDecl::is_class_extension(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 Token ObjCCategoryDecl::category_name_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal59());
 }
 
 Token ObjCCategoryDecl::instance_variable_l_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal69());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal72());
 }
 
 Token ObjCCategoryDecl::instance_variable_r_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal74());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal75());
 }
 
 std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal247();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal240();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16956,9 +15876,8 @@ std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const noexc
 }
 
 std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal248();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal241();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -16969,9 +15888,8 @@ std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const noexcept {
 }
 
 std::vector<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal249();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal242();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17000,34 +15918,29 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const Decl &parent) {
 }
 
 std::string_view ObjCProtocolDecl::obj_c_runtime_name_as_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal80();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal64();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool ObjCProtocolDecl::has_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 bool ObjCProtocolDecl::is_non_runtime_protocol(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal247();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal240();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17038,9 +15951,8 @@ std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const noexcept {
 }
 
 std::vector<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal248();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal241();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17069,9 +15981,8 @@ std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Decl &parent) {
 }
 
 std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal247();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal240();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17084,64 +15995,54 @@ std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) 
 }
 
 bool ObjCInterfaceDecl::declares_or_inherits_designated_initializers(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 Token ObjCInterfaceDecl::end_of_definition_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal71());
 }
 
 std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal80();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal64();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token ObjCInterfaceDecl::super_class_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal90());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal80());
 }
 
 bool ObjCInterfaceDecl::has_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 bool ObjCInterfaceDecl::has_designated_initializers(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal82();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal67();
 }
 
 bool ObjCInterfaceDecl::is_arc_weakref_unavailable(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal84();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal73();
 }
 
 bool ObjCInterfaceDecl::is_implicit_interface_declaration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal91();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal81();
 }
 
 bool ObjCInterfaceDecl::is_this_declaration_a_definition(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal94();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal84();
 }
 
 std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal248();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal241();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17154,9 +16055,8 @@ std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const noex
 }
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal249();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal242();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17169,9 +16069,8 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const no
 }
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal250();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal243();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17184,9 +16083,8 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const no
 }
 
 std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal251();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal244();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17197,9 +16095,8 @@ std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const noexcept {
 }
 
 std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal252();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal245();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17212,9 +16109,8 @@ std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const noexcept 
 }
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal253();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal246();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17227,9 +16123,8 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const 
 }
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal254();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal247();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17260,9 +16155,8 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const Decl &parent) {
 }
 
 std::vector<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal247();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal240();
   std::vector<ObjCPropertyImplDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17295,9 +16189,8 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Decl &paren
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal71());
 }
 
 std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const ObjCImplDecl &parent) {
@@ -17321,46 +16214,39 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Decl &p
 }
 
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal25());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal70());
 }
 
 Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal26());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal71());
 }
 
 std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  capnp::Text::Reader data = self.getVal80();
+  auto self = fragment->NthDecl(offset);
+  capnp::Text::Reader data = self.getVal64();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal74());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal75());
 }
 
 bool ObjCImplementationDecl::has_destructors(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal73();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal65();
 }
 
 bool ObjCImplementationDecl::has_non_zero_constructors(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal81();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal66();
 }
 
 std::vector<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal248();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal241();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17409,21 +16295,18 @@ std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const Decl &parent) {
 }
 
 Token NamespaceAliasDecl::alias_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 Token NamespaceAliasDecl::namespace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal22());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal58());
 }
 
 Token NamespaceAliasDecl::target_name_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal24());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal59());
 }
 
 std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const Decl &parent) {
@@ -17443,9 +16326,8 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return static_cast<StorageDuration>(self.getVal76());
+  auto self = fragment->NthDecl(offset);
+  return static_cast<StorageDuration>(self.getVal56());
 }
 
 std::optional<ImportDecl> ImportDecl::from(const Decl &parent) {
@@ -17457,9 +16339,8 @@ std::optional<ImportDecl> ImportDecl::from(const Decl &parent) {
 }
 
 std::vector<Token> ImportDecl::identifier_tokens(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal10();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal44();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17486,21 +16367,18 @@ std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
 }
 
 Token FriendDecl::friend_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 bool FriendDecl::is_unsupported_friend(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 std::vector<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  auto list = self.getVal63();
+  auto self = fragment->NthDecl(offset);
+  auto list = self.getVal69();
   std::vector<TemplateParameterList> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -17518,15 +16396,13 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Decl &parent) {
 }
 
 Token FileScopeAsmDecl::assembly_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal42());
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal21());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal57());
 }
 
 std::optional<ExternCContextDecl> ExternCContextDecl::from(const Decl &parent) {
@@ -17546,21 +16422,18 @@ std::optional<ExportDecl> ExportDecl::from(const Decl &parent) {
 }
 
 Token ExportDecl::export_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal19());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal42());
 }
 
 Token ExportDecl::r_brace_token(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return fragment->TokenFor(fragment, self.getVal20());
+  auto self = fragment->NthDecl(offset);
+  return fragment->TokenFor(fragment, self.getVal49());
 }
 
 bool ExportDecl::has_braces(void) const noexcept {
-  EntityListReader entities = fragment->Entities();
-  mx::ast::Entity::Reader self = entities[offset];
-  return self.getVal62();
+  auto self = fragment->NthDecl(offset);
+  return self.getVal43();
 }
 
 std::optional<EmptyDecl> EmptyDecl::from(const Decl &parent) {

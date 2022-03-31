@@ -96,10 +96,10 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
   llvm::json::Array tokens;
   llvm::json::Array fragment_ids;
 
-  for(mx::Fragment frag : file.fragments()) {
+  for(mx::Fragment frag : mx::Fragment::in(file)) {
     fragment_ids.push_back(frag.id());
 
-    for (mx::Token token : frag.tokens()) {
+    for (mx::Token token : mx::Token::in(frag)) {
       llvm::json::Object tok;
       tok["data"] = token.data().data();
       tok["id"] = static_cast<uint64_t>(token.id());
@@ -126,7 +126,7 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
     file_os << file_data;
   }
 
-  for (mx::Token token : file.tokens()) {
+  for (mx::Token token : mx::Token::in(file)) {
     llvm::json::Object tok;
     tok["data"] = token.data().data();
     tok["id"] = static_cast<uint64_t>(token.id());
@@ -175,10 +175,12 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
 
-  mx::EntityProvider::Ptr api = mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port);
-  for (auto [path, id] : api->list_files()) {
-    OutputFileInfo(api->file(id), std::move(path));
+  mx::Index index(mx::EntityProvider::from_remote(
+      FLAGS_host, FLAGS_port));
+  for (auto [path, id] : index.file_paths()) {
+    if (auto maybe_file = index.file(id)) {
+      OutputFileInfo(std::move(*maybe_file), std::move(path));
+    }
   }
 
   return EXIT_SUCCESS;

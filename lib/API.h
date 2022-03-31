@@ -24,7 +24,13 @@ namespace mx {
 using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
                                              capnp::Kind::STRUCT>::Reader;
-using EntityListReader = capnp::List<ast::Entity, capnp::Kind::STRUCT>::Reader;
+using FragmentReader = rpc::Fragment::Reader;
+using DeclReader = ast::Decl::Reader;
+using StmtReader = ast::Stmt::Reader;
+using PseudoReader = ast::Pseudo::Reader;
+using DeclListReader = capnp::List<ast::Decl, capnp::Kind::STRUCT>::Reader;
+using StmtListReader = capnp::List<ast::Stmt, capnp::Kind::STRUCT>::Reader;
+using PseudoListReader = capnp::List<ast::Pseudo, capnp::Kind::STRUCT>::Reader;
 using TopLevelDeclListReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 
 struct PackedReaderState {
@@ -51,7 +57,7 @@ class TokenReader {
   virtual ~TokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
-  virtual unsigned NumTokens(void) const noexcept = 0;
+  virtual unsigned NumTokens(void) const = 0;
 
   // Return the kind of the Nth token.
   virtual TokenKind NthTokenKind(unsigned token_index) const = 0;
@@ -86,7 +92,7 @@ class InvalidTokenReader final : public TokenReader {
   virtual ~InvalidTokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
-  unsigned NumTokens(void) const noexcept final;
+  unsigned NumTokens(void) const final;
 
   // Return the kind of the Nth token.
   TokenKind NthTokenKind(unsigned) const final;
@@ -102,6 +108,7 @@ class InvalidTokenReader final : public TokenReader {
 class FileImpl {
  public:
   using Ptr = std::shared_ptr<const FileImpl>;
+  using WeakPtr = std::weak_ptr<const FileImpl>;
 
   const FileId id;
 
@@ -124,19 +131,6 @@ class FileImpl {
   virtual TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
 };
 
-// An invalid file. This exists to handle some failure somewhere, e.g. a failure
-// to get a response from the database.
-class InvalidFileImpl final : public FileImpl {
- private:
-  InvalidTokenReader empty_reader;
-
- public:
-  using FileImpl::FileImpl;
-
-  // Return a reader for the tokens in the file.
-  TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const final;
-};
-
 // A file downloaded as a result of a making an RPC.
 class PackedFileImpl final : public FileImpl, public TokenReader {
  public:
@@ -153,7 +147,7 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
   TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const final;
 
   // Return the number of tokens in the file.
-  unsigned NumTokens(void) const noexcept final;
+  unsigned NumTokens(void) const final;
 
   // Return the kind of the Nth token.
   TokenKind NthTokenKind(unsigned index) const final;
@@ -195,23 +189,17 @@ class FragmentImpl {
   // include all tokens, i.e. macro use tokens, comments, etc.
   virtual TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const = 0;
 
-  virtual unsigned FirstLine(void) const = 0;
-  virtual unsigned LastLine(void) const = 0;
+  // Return a reader for the whole fragment.
+  virtual const FragmentReader &Fragment(void) const = 0;
 
-  // Return a reader for token nodes.
-  virtual NodeReader Nodes(void) const = 0;
-
-  // Return a reader for token substitutions.
-  virtual TokenSubstitutionsReader Substitutions(void) const = 0;
-
-  // Return a reader for the entities in this fragment.
-  virtual EntityListReader Entities(void) const = 0;
-
-  // Return a reader for the top-level declarations of this fragment.
-  virtual TopLevelDeclListReader TopLevelDeclarations(void) const = 0;
+  // Return a specific type of entity.
+  virtual DeclReader NthDecl(unsigned offset) const = 0;
+  virtual StmtReader NthStmt(unsigned offset) const = 0;
+  virtual PseudoReader NthPseudo(unsigned offset) const = 0;
 
   // Return the token associated with a specific entity ID.
-  Token TokenFor(const FragmentImpl::Ptr &, EntityId id) const;
+  Token TokenFor(const FragmentImpl::Ptr &, EntityId id,
+                 bool can_fail=false) const;
 
   // Return the inclusive token range associated with two entity IDs.
   TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
@@ -222,25 +210,6 @@ class FragmentImpl {
 
   // Return the statement associated with a specific entity ID.
   Stmt StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
-};
-
-class InvalidFragmentImpl : public FragmentImpl {
- private:
-  InvalidTokenReader empty_reader;
-
- public:
-  using FragmentImpl::FragmentImpl;
-
-  virtual ~InvalidFragmentImpl(void) noexcept;
-
-  FileId FileContaingFirstToken(void) const final;
-  TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
-  unsigned FirstLine(void) const final;
-  unsigned LastLine(void) const final;
-  NodeReader Nodes(void) const final;
-  TokenSubstitutionsReader Substitutions(void) const final;
-  EntityListReader Entities(void) const final;
-  TopLevelDeclListReader TopLevelDeclarations(void) const final;
 };
 
 // A packed fragment of code.
@@ -255,20 +224,17 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   virtual ~PackedFragmentImpl(void) noexcept;
 
   PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                       Response response_);
+                     Response response_);
 
   // Return the ID of the file containing the first token.
   FileId FileContaingFirstToken(void) const final;
-
-  unsigned FirstLine(void) const final;
-  unsigned LastLine(void) const final;
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
   TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
 
   // Return the number of tokens in the file.
-  unsigned NumTokens(void) const noexcept final;
+  unsigned NumTokens(void) const final;
 
   // Return the kind of the Nth token.
   TokenKind NthTokenKind(unsigned index) const final;
@@ -279,17 +245,13 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const final;
 
-  // Return a reader for token nodes.
-  NodeReader Nodes(void) const final;
+  // Return a reader for the whole fragment.
+  const FragmentReader &Fragment(void) const final;
 
-  // Return a reader for token substitutions.
-  TokenSubstitutionsReader Substitutions(void) const final;
-
-  // Return a reader for the entities in this fragment.
-  EntityListReader Entities(void) const final;
-
-  // Return a reader for the top-level declarations of this fragment.
-  TopLevelDeclListReader TopLevelDeclarations(void) const final;
+  // Return a specific type of entity.
+  DeclReader NthDecl(unsigned offset) const final;
+  StmtReader NthStmt(unsigned offset) const final;
+  PseudoReader NthPseudo(unsigned offset) const final;
 };
 
 // Provides entities from a remote source, i.e. a remote
@@ -323,13 +285,36 @@ class RemoteEntityProvider final : public EntityProvider {
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  FileList list_files(void) noexcept final;
+  FilePathList ListFiles(void) final;
 
   // Download a file by its unique ID.
-  File file(FileId id) noexcept final;
+  FileImpl::Ptr FileFor(const Ptr &, FileId id) final;
 
   // Download a fragment by its unique ID.
-  Fragment fragment(FragmentId id) noexcept final;
+  FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
+};
+
+class InvalidEntityProvider final : public EntityProvider {
+ public:
+  virtual ~InvalidEntityProvider(void) noexcept;
+
+  // Get the current list of parsed files, where the minimum ID
+  // in the returned list of fetched files will be `start_at`.
+  FilePathList ListFiles(void) final;
+
+  // Download a file by its unique ID.
+  FileImpl::Ptr FileFor(const Ptr &, FileId id) final;
+
+  // Download a fragment by its unique ID.
+  FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
+};
+
+class FileListImpl {
+ public:
+  const EntityProvider::Ptr ep;
+  std::vector<std::pair<mx::FileId, FileImpl::WeakPtr>> files;
+
+  explicit FileListImpl(EntityProvider::Ptr ep_);
 };
 
 }  // namespace mx

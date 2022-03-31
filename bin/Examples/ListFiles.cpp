@@ -30,9 +30,9 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::EntityProvider::Ptr api = mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port);
-  for (auto [path, id] : api->list_files()) {
+  mx::Index index(mx::EntityProvider::from_remote(
+      FLAGS_host, FLAGS_port));
+  for (auto [path, id] : index.file_paths()) {
     std::cout << id << '\t' << path.generic_string() << std::endl;
   }
 

@@ -498,7 +498,9 @@ class CodeGenerator {
 
   void RunOnEnum(pasta::EnumDecl enum_decl);
 
-  AnyEntityStorage root_storage;
+  AnyEntityStorage root_decl_storage;
+  AnyEntityStorage root_stmt_storage;
+  AnyEntityStorage root_pseudo_storage;
   std::unordered_map<ClassHierarchy *, SpecificEntityStorage> specific_storage;
 
   MethodListPtr RunOnClass(ClassHierarchy *, MethodListPtr parent_methods);
@@ -668,8 +670,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   if (cls->base) {
     specific_storage.try_emplace(cls, specific_storage.find(cls->base)->second);
+  } else if (gDeclNames.count(class_name)) {
+    specific_storage.try_emplace(cls, root_decl_storage);
+  } else if (gStmtNames.count(class_name)) {
+    specific_storage.try_emplace(cls, root_stmt_storage);
   } else {
-    specific_storage.try_emplace(cls, root_storage);
+    specific_storage.try_emplace(cls, root_pseudo_storage);
   }
 
   auto &storage = specific_storage.find(cls)->second;
@@ -683,10 +689,32 @@ MethodListPtr CodeGenerator::RunOnClass(
   include_h_os
       << "class " << class_name;
 
-  serialize_cpp_os
-      << "void Serialize" << class_name
-      << "(EntitySerializer &es, mx::ast::Entity::Builder b, const pasta::"
-      << class_name << " &e) {\n";
+  const char *nth_entity_reader = nullptr;
+
+  if (gDeclNames.count(class_name)) {
+    serialize_cpp_os
+        << "void Serialize" << class_name
+        << "(EntitySerializer &es, mx::ast::Decl::Builder b, const pasta::"
+        << class_name << " &e) {\n";
+
+    nth_entity_reader = "NthDecl";
+
+  } else if (gStmtNames.count(class_name)) {
+    serialize_cpp_os
+        << "void Serialize" << class_name
+        << "(EntitySerializer &es, mx::ast::Stmt::Builder b, const pasta::"
+        << class_name << " &e) {\n";
+
+    nth_entity_reader = "NthStmt";
+
+  } else {
+    serialize_cpp_os
+        << "void Serialize" << class_name
+        << "(EntitySerializer &es, mx::ast::Pseudo::Builder b, const pasta::"
+        << class_name << " &e) {\n";
+
+    nth_entity_reader = "NthPseudo";
+  }
 
 //  std::stringstream dummy_ss;
 //  std::ostream &maybe_serialize_cpp_os =
@@ -741,6 +769,20 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)\n"
         << "      : fragment(std::move(fragment_)),\n"
         << "        offset(offset_) {}\n\n";
+
+    if (class_name == "Decl") {
+      include_h_os
+          << "  inline static std::optional<Decl> from(const Decl &self) {\n"
+          << "    return self;\n"
+          << "  }\n\n";
+
+    } else if (class_name == "Stmt") {
+      include_h_os
+          << "  inline static std::optional<Stmt> from(const Stmt &self) {\n"
+          << "    return self;\n"
+          << "  }\n\n";
+
+    }
 
   } else if (gEntityClassNames.count(class_name)) {
     abort();
@@ -864,6 +906,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         method_name_ref.startswith("~")) {
       continue;  // E.g. `Decl::KindName()`, `operator==`.
     }
+
     if (!seen_methods->emplace(method_name).second) {
       continue;
     }
@@ -900,8 +943,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "Token " << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return fragment->TokenFor(fragment, self." << getter_name
             << "());\n"
             << "}\n\n";
@@ -923,8 +965,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "TokenRange " << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return fragment->TokenRangeFor(fragment, self."
             << begin_getter_name << "(), self." << end_getter_name << "());\n"
             << "}\n\n";
@@ -950,8 +991,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
             << "  return std::string_view(data.cStr(), data.size());\n"
@@ -974,8 +1014,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
             << "  return std::string_view(data.cStr(), data.size());\n"
@@ -1016,8 +1055,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::filesystem::path " << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
             << "  return data.cStr();\n"
@@ -1079,8 +1117,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "std::optional<" << cxx_element_name << "> "
             << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  if (!self." << ip_getter_name << "()) {\n"
             << "    return std::nullopt;\n"
             << "  } else {\n";
@@ -1199,7 +1236,7 @@ MethodListPtr CodeGenerator::RunOnClass(
               << "  if (v" << i << ") {\n"
               << "    auto o" << i << " = es.next_pseudo_entity_offset++;\n"
               << "    Serialize" << (*element_name)
-              << "(es, es.entity_builder[o" << i << "], v" << i
+              << "(es, es.pseudo_builder[o" << i << "], v" << i
               << ".value());\n"
               << "    b." << setter_name << "(o" << i << ");\n"
               << "    b." << ip_setter_name << "(true);\n"
@@ -1267,8 +1304,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "std::vector<" << cxx_element_name << "> "
             << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  auto list = self." << getter_name << "();\n"
             << "  std::vector<" << cxx_element_name << "> vec;\n"
             << "  vec.reserve(list.size());\n"
@@ -1356,7 +1392,7 @@ MethodListPtr CodeGenerator::RunOnClass(
               << "    auto o" << i << " = es.next_pseudo_entity_offset++;\n"
               << "    sv" << i << ".set(i" << i << ", o" << i << ");\n"
               << "    Serialize" << (*element_name)
-              << "(es, es.entity_builder[o" << i << "], e" << i << ");\n";
+              << "(es, es.pseudo_builder[o" << i << "], e" << i << ");\n";
 
           lib_cpp_os
               << "vec.emplace_back(fragment, v);\n";
@@ -1400,8 +1436,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << record_name << " " << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return " << record_name << "(fragment, self." << getter_name
             << "());\n"
             << "}\n\n";
@@ -1410,7 +1445,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  auto o" << i << " = es.next_pseudo_entity_offset++;\n"
             << "  sv" << i << ".set(i" << i << ", o" << i << ");\n"
             << "  Serialize" << record_name
-            << "(es, es.entity_builder[o" << i << "], e" << i << ");\n";
+            << "(es, es.pseudo_builder[o" << i << "], e" << i << ");\n";
 
       } else if (gNotReferenceTypes.count(record_name)) {
         abort();
@@ -1440,8 +1475,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << enum_name << " " << class_name << "::" << api_name
             << "(void) const noexcept {\n"
-            << "  EntityListReader entities = fragment->Entities();\n"
-            << "  mx::ast::Entity::Reader self = entities[offset];\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return static_cast<" << enum_name << ">(self." << getter_name
             << "());\n"
             << "}\n\n";
@@ -1464,10 +1498,8 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << CxxIntType(return_type) << " " << class_name << "::" << api_name
           << "(void) const noexcept {\n"
-          << "  EntityListReader entities = fragment->Entities();\n"
-          << "  mx::ast::Entity::Reader self = entities[offset];\n"
-          << "  return self." << getter_name
-          << "();\n"
+          << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+          << "  return self." << getter_name << "();\n"
           << "}\n\n";
 
       serialize_cpp_os
@@ -1526,7 +1558,12 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "# Auto-generated file; do not modify!\n\n"
       << "@0xa04be7b45e95b659;\n\n"
       << "using Cxx = import \"/capnp/c++.capnp\";\n"
-      << "$Cxx.namespace(\"mx::ast\");\n\n";
+      << "$Cxx.namespace(\"mx::ast\");\n\n"
+      << NameAndHash("struct TokenContext") << " {\n"
+      << "  parentIndex @0 :UInt32;\n"
+      << "  parentOffset @1 :UInt16;\n"
+      << "  aliasOffsetAndKind @2 :UInt16;\n"
+      << "}\n\n";
 
   lib_cpp_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -1571,9 +1608,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "    PendingFragment code, FragmentBuilder &builder) {\n"
       << "  serialized_entities.clear();\n"
       << "  code_id = code.fragment_id;\n"
-      << "  next_pseudo_entity_offset = code.num_entities;\n"
-      << "  entity_builder = builder.initEntities(\n"
-      << "      code.num_entities + code.num_pseudo_entities);\n";
+      << "  next_pseudo_entity_offset = 0;\n"
+      << "  decl_builder = builder.initDeclarations(code.num_decl_entities);\n"
+      << "  stmt_builder = builder.initStatements(code.num_stmt_entities);\n"
+      << "  pseudo_builder = builder.initOthers(code.num_pseudo_entities);\n";
 
   include_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -1654,16 +1692,17 @@ int CodeGenerator::RunOnClassHierarchies(void) {
         << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
-        << "(EntitySerializer &, mx::ast::Entity::Builder, const pasta::"
+        << "(EntitySerializer &, mx::ast::Decl::Builder, const pasta::"
         << name << " &);\n";
   }
+
   for (const pasta::CXXRecordDecl &record : stmts) {
     auto name = record.Name();
     include_h_os
         << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
-        << "(EntitySerializer &, mx::ast::Entity::Builder, const pasta::"
+        << "(EntitySerializer &, mx::ast::Stmt::Builder, const pasta::"
         << name << " &);\n";
   }
 
@@ -1674,20 +1713,22 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "}\n\n";
 
   for (const pasta::CXXRecordDecl &record : types) {
+    abort();  // Not handled yet!
     auto name = record.Name();
     include_h_os
         << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
-        << "(EntitySerializer &, mx::ast::Entity::Builder, const pasta::"
+        << "(EntitySerializer &, mx::ast::Type::Builder, const pasta::"
         << name << " &);\n";
   }
+
   for (const pasta::CXXRecordDecl &record : tokens) {
     auto name = record.Name();
     if (name != "Token" && name != "TokenRange" && name != "FileToken") {
       serialize_h_os
           << "void Serialize" << name
-          << "(EntitySerializer &, mx::ast::Entity::Builder, const pasta::"
+          << "(EntitySerializer &, mx::ast::Pseudo::Builder, const pasta::"
           << name << " &);\n";
     }
   }
@@ -1711,10 +1752,11 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   schema_os
-      << NameAndHash("struct Entity") << " {\n";
+      << NameAndHash("struct Decl") << " {\n"
+      << "  tokenContexts @0 :List(TokenContext);\n";
 
-  auto i = 0u;
-  for (const auto &[type, ids] : root_storage.max_method_count) {
+  auto i = 1u;
+  for (const auto &[type, ids] : root_decl_storage.max_method_count) {
     for (auto id : ids) {
       schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
     }
@@ -1722,7 +1764,28 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
   // The entity list is a storage for zero-or-more entities.
   schema_os
+      << "}\n\n"
+      << NameAndHash("struct Stmt") << " {\n"
+      << "  tokenContexts @0 :List(TokenContext);\n";
+
+  i = 1u;
+  for (const auto &[type, ids] : root_stmt_storage.max_method_count) {
+    for (auto id : ids) {
+      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
+    }
+  }
+  schema_os
+      << "}\n\n"
+      << NameAndHash("struct Pseudo") << " {\n";
+  i = 0u;
+  for (const auto &[type, ids] : root_pseudo_storage.max_method_count) {
+    for (auto id : ids) {
+      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
+    }
+  }
+  schema_os
       << "}\n\n";
+
 //  auto i = 0u;
 //  for (const auto &class_name : gEntityClassNames) {
 //    if (class_name != "FileToken") {

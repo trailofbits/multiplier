@@ -19,7 +19,7 @@ DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
 DEFINE_bool(unparsed, false, "Show original source code?");
 
 static void PrintFunctionNames(mx::Fragment fragment) {
-  for (mx::Decl decl : fragment.declarations()) {
+  for (mx::Decl decl : fragment.top_level_declarations()) {
     if (auto func = mx::FunctionDecl::from(decl)) {
       std::cout << fragment.id() << '\t' << func->name() << '\n';
     }
@@ -41,27 +41,25 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::EntityProvider::Ptr api = mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port);
+  mx::Index index(mx::EntityProvider::from_remote(
+      FLAGS_host, FLAGS_port));
 
   if (FLAGS_fragment_id) {
-    mx::Fragment fragment = api->fragment(FLAGS_fragment_id);
+    auto fragment = index.fragment(FLAGS_fragment_id);
     if (!fragment) {
       std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
       return EXIT_FAILURE;
     }
-    PrintFunctionNames(std::move(fragment));
+    PrintFunctionNames(std::move(*fragment));
 
   } else if (FLAGS_file_id) {
-    mx::File file = api->file(FLAGS_file_id);
+    auto file = index.file(FLAGS_file_id);
     if (!file) {
       std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
       return EXIT_FAILURE;
     }
-    for (mx::Fragment fragment : file.fragments()) {
-      if (fragment) {
-        PrintFunctionNames(std::move(fragment));
-      }
+    for (mx::Fragment fragment : mx::Fragment::in(*file)) {
+      PrintFunctionNames(std::move(fragment));
     }
 
   } else {

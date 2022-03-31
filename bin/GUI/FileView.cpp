@@ -15,7 +15,7 @@ namespace mx::gui {
 
 struct FileView::PrivateData {
   std::optional<File> file;
-
+  bool failed{false};
   QVBoxLayout *layout{nullptr};
   QSplitter *splitter{nullptr};
 };
@@ -23,17 +23,17 @@ struct FileView::PrivateData {
 DownloadFileThread::~DownloadFileThread(void) {}
 
 void DownloadFileThread::run(void) {
-  emit DownloadedFile(ep->file(file_id));
+  emit DownloadedFile(index.file(file_id));
 }
 
 FileView::~FileView(void) {}
 
-FileView::FileView(EntityProvider::Ptr ep, std::filesystem::path file_path,
+FileView::FileView(Index index_, std::filesystem::path file_path,
                    FileId file_id, QWidget *parent)
     : QTabWidget(parent),
       d(std::make_unique<PrivateData>()) {
 
-  DownloadFileInBackground(std::move(ep), file_id);
+  DownloadFileInBackground(std::move(index_), file_id);
 
   d->layout = new QVBoxLayout;
   d->splitter = new QSplitter(Qt::Horizontal);
@@ -52,9 +52,8 @@ FileView::FileView(EntityProvider::Ptr ep, std::filesystem::path file_path,
   InitializeWidgets();
 }
 
-void FileView::DownloadFileInBackground(
-    EntityProvider::Ptr ep, FileId file_id) {
-  auto downloader = new DownloadFileThread(std::move(ep), file_id);
+void FileView::DownloadFileInBackground(Index index, FileId file_id) {
+  auto downloader = new DownloadFileThread(std::move(index), file_id);
   downloader->setAutoDelete(true);
 
   connect(downloader, &DownloadFileThread::DownloadedFile,
@@ -74,8 +73,10 @@ void FileView::InitializeWidgets(void) {
 void FileView::OnDownloadedFile(std::optional<File> file) {
   if (file.has_value()) {
     d->file = std::move(file.value());
-    update();
+  } else {
+    d->failed = true;
   }
+  update();
 }
 
 void FileView::paintEvent(QPaintEvent *event) {
@@ -85,8 +86,12 @@ void FileView::paintEvent(QPaintEvent *event) {
   }
 
   static const auto kTextFlags = Qt::AlignCenter | Qt::TextSingleLine;
-
-  QString message = tr("Downloading...");
+  QString message;
+  if (d->failed) {
+    message = tr("Failed");
+  } else {
+    message = tr("Downloading...");
+  }
   QFont message_font = font();
   message_font.setPointSizeF(message_font.pointSizeF() * 2.0);
   message_font.setBold(true);

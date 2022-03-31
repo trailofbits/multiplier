@@ -17,7 +17,6 @@ namespace indexer {
 
 using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
 
-using EntityListBuilder = capnp::List<mx::ast::Entity, capnp::Kind::STRUCT>::Builder;
 using FragmentBuilder = mx::rpc::Fragment::Builder;
 
 // Summary information about a group of top-level declarations that are
@@ -40,7 +39,8 @@ struct PendingFragment {
   // identifiable via an `mx::EntityId`, whereas a pseudo entity is not uniquely
   // identifiable, but is attached to some other entity. For example, a
   // `TemplateParamterList` or a `TemplateArgument` is a pseudo entity.
-  unsigned num_entities{0u};
+  unsigned num_decl_entities{0u};
+  unsigned num_stmt_entities{0u};
   unsigned num_pseudo_entities{0u};
 };
 
@@ -52,8 +52,12 @@ class EntitySerializer final : public EntityVisitor {
   std::unordered_set<uint64_t> serialized_entities;
   const std::unordered_map<pasta::File, mx::FileId> &file_ids;
 
-  ::capnp::List<::mx::ast::Entity, ::capnp::Kind::STRUCT>::Builder
-      entity_builder;
+  ::capnp::List<::mx::ast::Decl, ::capnp::Kind::STRUCT>::Builder
+      decl_builder;
+  ::capnp::List<::mx::ast::Stmt, ::capnp::Kind::STRUCT>::Builder
+      stmt_builder;
+  ::capnp::List<::mx::ast::Pseudo, ::capnp::Kind::STRUCT>::Builder
+      pseudo_builder;
 
   const pasta::TokenRange range;
 

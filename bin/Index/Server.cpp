@@ -262,7 +262,8 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
      (num_fragments + 1u)),
     0u};
 
-  auto results = context.initResults(size);
+  mx::rpc::Multiplier::DownloadFileResults::Builder results =
+      context.initResults(size);
   capnp::Data::Reader contents_reader(
       reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
       maybe_contents.value().size());
@@ -293,11 +294,11 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   }
 
   capnp::MessageSize size{maybe_contents->size() + 7u / 8u, 0u};
-  auto results = context.initResults(size);
-  capnp::Data::Reader contents_reader(
+  mx::rpc::Multiplier::DownloadFragmentResults::Builder results =
+      context.initResults(size);
+  results.setFragment(kj::arrayPtr(
       reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
-      maybe_contents.value().size());
-  results.setFragment(contents_reader);
+      maybe_contents.value().size()));
 
   return kj::READY_NOW;
 }

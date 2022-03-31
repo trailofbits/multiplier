@@ -5077,6 +5077,10 @@ class Stmt {
       : fragment(std::move(fragment_)),
         offset(offset_) {}
 
+  inline static std::optional<Stmt> from(const Stmt &self) {
+    return self;
+  }
+
   Token begin_token(void) const noexcept;
   Token end_token(void) const noexcept;
   TokenRange token_range(void) const noexcept;
@@ -8412,6 +8416,10 @@ class Decl {
   inline Decl(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
       : fragment(std::move(fragment_)),
         offset(offset_) {}
+
+  inline static std::optional<Decl> from(const Decl &self) {
+    return self;
+  }
 
   AccessSpecifier access(void) const noexcept;
   AccessSpecifier access_unsafe(void) const noexcept;

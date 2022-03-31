@@ -21,15 +21,15 @@ class DownloadFileListThread final : public QObject, public QRunnable {
   Q_OBJECT
 
  private:
-  const EntityProvider::Ptr ep;
+  const Index index;
   void run(void);
 
  public:
-  inline explicit DownloadFileListThread(EntityProvider::Ptr ep_)
-      : ep(std::move(ep_)) {}
+  inline explicit DownloadFileListThread(Index index_)
+      : index(std::move(index_)) {}
 
  signals:
-  void DownloadedFileList(FileList list);
+  void DownloadedFileList(FilePathList list);
 };
 
 class FileBrowserView final : public QWidget {
@@ -39,7 +39,7 @@ class FileBrowserView final : public QWidget {
   FileBrowserView(MainWindow *mw, QWidget *parent=nullptr);
   virtual ~FileBrowserView(void);
 
-  void DownloadFileListInBackground(EntityProvider::Ptr ep);
+  void DownloadFileListInBackground(Index index);
   void Clear(void);
 
  private:
@@ -49,7 +49,7 @@ class FileBrowserView final : public QWidget {
   void InitializeWidgets(void);
 
  private slots:
-  void OnDownloadedFileList(FileList files);
+  void OnDownloadedFileList(FilePathList files);
   void OnTreeWidgetItemActivated(QTreeWidgetItem *item, int);
 
  signals:

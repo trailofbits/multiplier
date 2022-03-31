@@ -21,11 +21,13 @@ namespace mx {
 
 class EntityProvider;
 class File;
-class FileFragmentList;
+class FragmentList;
 class FileFragmentListIterator;
 class FileImpl;
+class FileListImpl;
 class Fragment;
 class FragmentImpl;
+class Index;
 class RemoteEntityProvider;
 class Token;
 class TokenList;
@@ -36,7 +38,7 @@ class TokenSubstitution;
 class TokenSubstitutionList;
 class TokenSubstitutionListImpl;
 
-using FileList = std::map<std::filesystem::path, FileId>;
+using FilePathList = std::map<std::filesystem::path, FileId>;
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
@@ -56,20 +58,26 @@ class Token {
         index(index_) {}
 
  public:
-  // Return an invalid token.
-  static Token invalid(void) noexcept;
+  Token(void);
 
   // Return `true` if this is a valid token.
-  operator bool(void) const noexcept;
+  operator bool(void) const;
+
+  // Return the list of parsed tokens in the fragment. This doesn't
+  // include all tokens, i.e. macro use tokens, comments, etc.
+  static TokenList in(const Fragment &);
+
+  // Return the list of tokens in this file.
+  static TokenList in(const File &);
 
   // Kind of this token.
-  TokenKind kind(void) const noexcept;
+  TokenKind kind(void) const;
 
   // Return the data of this token.
-  std::string_view data(void) const noexcept;
+  std::string_view data(void) const;
 
   // Return the ID of this token.
-  EntityId id(void) const noexcept;
+  EntityId id(void) const;
 };
 
 class TokenListEnd {};
@@ -121,12 +129,13 @@ class TokenListIterator {
   }
 };
 
-
+// A range of tokens.
 class TokenRange {
  protected:
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class TokenList;
   friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
@@ -148,7 +157,7 @@ class TokenRange {
   }
 
   // Return the token at index `index`.
-  Token operator[](size_t index) const noexcept;
+  Token operator[](size_t index) const;
 
   // Return an iterator pointing at the first token in this list.
   inline TokenListIterator begin(void) const noexcept {
@@ -166,6 +175,7 @@ class TokenList : public TokenRange {
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class Token;
   friend class TokenSubstitutionListIterator;
 
   inline TokenList(std::shared_ptr<const TokenReader> impl_,
@@ -173,8 +183,13 @@ class TokenList : public TokenRange {
       : TokenRange(std::move(impl_), 0, num_tokens_) {}
 
  public:
+  TokenList(void) = default;
+
   // Return the token list containing a particular token.
-  static TokenList containing(Token tok) noexcept;
+  static TokenList containing(Token tok);
+
+  // Return the token list containing a particular token range.
+  static TokenList containing(const TokenRange &range);
 };
 
 class FileFragmentListEnd {};
@@ -183,9 +198,10 @@ class FileFragmentListEnd {};
 class FileFragmentListIterator {
  private:
   friend class File;
-  friend class FileFragmentList;
+  friend class FragmentList;
 
   std::shared_ptr<const FileImpl> impl;
+  std::shared_ptr<const FragmentImpl> frag;
   unsigned index;
   unsigned num_fragments;
 
@@ -193,20 +209,24 @@ class FileFragmentListIterator {
                                   unsigned index_, unsigned num_fragments_)
       : impl(std::move(impl_)),
         index(index_),
-        num_fragments(num_fragments_) {}
+        num_fragments(num_fragments_) {
+    Advance();
+  }
+
+  void Advance(void);
 
  public:
-
-  Fragment operator*(void) const noexcept;
+  inline Fragment operator*(void) const noexcept;
 
   // Pre-increment.
-  inline FileFragmentListIterator &operator++(void) noexcept {
+  inline FileFragmentListIterator &operator++(void) {
     ++index;
+    Advance();
     return *this;
   }
 
   // Post-increment.
-  inline FileFragmentListIterator operator++(int) noexcept {
+  inline FileFragmentListIterator operator++(int) {
     return FileFragmentListIterator(impl, index++, num_fragments);
   }
 
@@ -220,15 +240,16 @@ class FileFragmentListIterator {
 };
 
 // List of fragments asociated with a file.
-class FileFragmentList {
+class FragmentList {
  private:
   friend class File;
+  friend class Fragment;
 
   std::shared_ptr<const FileImpl> impl;
   unsigned num_fragments;
 
-  inline FileFragmentList(std::shared_ptr<const FileImpl> impl_,
-                          unsigned num_fragments_)
+  inline FragmentList(std::shared_ptr<const FileImpl> impl_,
+                      unsigned num_fragments_)
       : impl(std::move(impl_)),
         num_fragments(num_fragments_) {}
 
@@ -248,6 +269,72 @@ class FileFragmentList {
   }
 };
 
+class FileListIteratorEnd {};
+
+class FileListIterator {
+ private:
+  friend class FileList;
+
+  std::shared_ptr<FileListImpl> impl;
+  std::shared_ptr<const FileImpl> file;
+  unsigned index;
+  unsigned num_files;
+
+  void Advance(void);
+
+  FileListIterator(std::shared_ptr<FileListImpl> impl_, unsigned index_,
+               unsigned num_files_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_files(num_files_) {
+    Advance();
+  }
+
+ public:
+  inline File operator*(void) const noexcept;
+
+  // Pre-increment.
+  inline FileListIterator &operator++(void) noexcept {
+    ++index;
+    Advance();
+    return *this;
+  }
+
+  // Post-increment.
+  inline FileListIterator operator++(int) noexcept {
+    FileListIterator ret(impl, index, num_files);
+    ++index;
+    Advance();
+    return ret;
+  }
+
+  inline bool operator==(FileListIteratorEnd) const noexcept {
+    return index == num_files;
+  }
+
+  inline bool operator!=(FileListIteratorEnd) const noexcept {
+    return index != num_files;
+  }
+};
+
+// A range of all files.
+class FileList {
+ private:
+  friend class File;
+
+  std::shared_ptr<FileListImpl> impl;
+
+  inline FileList(std::shared_ptr<FileListImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+ public:
+  FileListIterator begin(void) const;
+
+  inline FileListIteratorEnd end(void) const {
+    return {};
+  }
+};
+
 // Represents a file. A given file may have many associated paths. We
 // de-duplicate via a hash of the contents.
 class File {
@@ -255,8 +342,11 @@ class File {
   using Ptr = std::shared_ptr<const FileImpl>;
 
   friend class EntityProvider;
-  friend class FileFragmentList;
+  friend class Fragment;
+  friend class FragmentList;
+  friend class FileListIterator;
   friend class FragmentImpl;
+  friend class Index;
   friend class RemoteEntityProvider;
   friend class Token;
   friend class TokenSubstitutionListIterator;
@@ -268,24 +358,18 @@ class File {
 
  public:
 
-  inline static File containing(const FileFragmentList &fragment_list) {
+  inline static File containing(const FragmentList &fragment_list) {
     return File(fragment_list.impl);
   }
 
   // Return the file containing a specific fragment.
   static File containing(const Fragment &fragment);
 
-  // Return `true` if this is a valid file.
-  operator bool(void) const noexcept;
+  // Return all files in a given index.
+  static FileList in(const Index &index);
 
   // Return the ID of this file.
   FileId id(void) const noexcept;
-
-  // Return the list of tokens in this file.
-  TokenList tokens(void) const noexcept;
-
-  // Return the list of fragments in this file.
-  FileFragmentList fragments(void) const noexcept;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();
@@ -319,8 +403,8 @@ class TokenSubstitution {
     return kind_;
   }
 
-  TokenSubstitutionList before(void) const noexcept;
-  TokenSubstitutionList after(void) const noexcept;
+  TokenSubstitutionList before(void) const;
+  TokenSubstitutionList after(void) const;
 };
 
 class TokenSubstitutionListIterator;
@@ -347,7 +431,7 @@ class TokenSubstitutionListIterator {
         num_nodes(num_nodes_) {}
 
  public:
-  std::variant<Token, TokenSubstitution> operator*(void) const noexcept;
+  std::variant<Token, TokenSubstitution> operator*(void) const;
 
   // Pre-increment.
   inline TokenSubstitutionListIterator &operator++(void) noexcept {
@@ -402,8 +486,10 @@ class Fragment {
   friend class EntityProvider;
   friend class File;
   friend class FileFragmentListIterator;
-  friend class RemoteEntityProvider;
   friend class FragmentImpl;
+  friend class FragmentList;
+  friend class Index;
+  friend class RemoteEntityProvider;
   friend class Token;
   friend class TokenSubstitutionListIterator;
 
@@ -413,29 +499,25 @@ class Fragment {
       : impl(std::move(impl_)) {}
 
  public:
-  // Return `true` if this is a valid fragment.
-  operator bool(void) const noexcept;
+  // Return the list of fragments in a file.
+  static FragmentList in(const File &);
 
   // Return the ID of this fragment.
   FragmentId id(void) const noexcept;
 
   // The smallest line of the file for which one of the tokens from this
   // fragment resides.
-  unsigned first_line(void) const noexcept;
+  unsigned first_line(void) const;
 
   // The largest line of the file for which one of the tokens from this
   // fragment resides.
-  unsigned last_line(void) const noexcept;
-
-  // Return the list of parsed tokens in the fragment. This doesn't
-  // include all tokens, i.e. macro use tokens, comments, etc.
-  TokenList tokens(void) const noexcept;
+  unsigned last_line(void) const;
 
   // Return the list of token substitutions.
-  TokenSubstitutionList unparsed_tokens(void) const noexcept;
+  TokenSubstitutionList unparsed_tokens(void) const;
 
   // Return the list of top-level declarations in this fragment.
-  std::vector<Decl> declarations(void) const noexcept;
+  std::vector<Decl> top_level_declarations(void) const;
 
   inline bool operator==(const Fragment &that) const noexcept {
     return id() == that.id();
@@ -446,10 +528,17 @@ class Fragment {
   }
 };
 
-// Provides the APIs with entities.
-class EntityProvider : public std::enable_shared_from_this<EntityProvider> {
- public:
+inline Fragment FileFragmentListIterator::operator*(void) const noexcept {
+  return Fragment(frag);
+}
 
+inline File FileListIterator::operator*(void) const noexcept {
+  return File(file);
+}
+
+// Provides the APIs with entities.
+class EntityProvider {
+ public:
   using Ptr = std::shared_ptr<EntityProvider>;
 
   virtual ~EntityProvider(void) noexcept;
@@ -460,18 +549,58 @@ class EntityProvider : public std::enable_shared_from_this<EntityProvider> {
   // Returns an entity provider that gets entities from a UNIX domain socket.
   static Ptr from_socket(std::filesystem::path path);
 
+ private:
+  friend class Index;
+  friend class File;
+  friend class FileImpl;
+  friend class FileListIterator;
+  friend class FileFragmentListIterator;
+  friend class FileListImpl;
+  friend class Fragment;
+  friend class FragmentImpl;
+  friend class PackedFileImpl;
+  friend class PackedFragmentImpl;
+
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  virtual FileList list_files(void) noexcept = 0;
+  virtual FilePathList ListFiles(void) = 0;
 
   // Download a file by its unique ID.
-  virtual File file(FileId id) noexcept = 0;
+  virtual std::shared_ptr<const FileImpl>
+  FileFor(const Ptr &, FileId id) = 0;
 
   // Download a fragment by its unique ID.
-  virtual Fragment fragment(FragmentId id) noexcept = 0;
+  virtual std::shared_ptr<const FragmentImpl>
+  FragmentFor(const Ptr &, FragmentId id) = 0;
+};
+
+// Access to the indexed code.
+class Index {
+ private:
+  friend class File;
+  friend class Fragment;
+
+  EntityProvider::Ptr impl;
+
+ public:
+  ~Index(void);
+  Index(void);
+
+  /* implicit */ inline Index(EntityProvider::Ptr impl_)
+      : impl(std::move(impl_)) {}
+
+  // Get the current list of parsed files, where the minimum ID
+  // in the returned list of fetched files will be `start_at`.
+  FilePathList file_paths(void) const;
+
+  // Download a file by its unique ID.
+  std::optional<File> file(FileId id) const;
+
+  // Download a fragment by its unique ID.
+  std::optional<Fragment> fragment(FragmentId id) const;
 
   // Download a fragment based off of an entity ID.
-  Fragment fragment_containing(EntityId) noexcept;
+  std::optional<Fragment> fragment_containing(EntityId) const;
 };
 
 class FileManager {

@@ -14,7 +14,7 @@
 DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
-DEFINE_uint64(id, 0, "ID of the file from which to print fragments.");
+DEFINE_uint64(file_id, 0, "ID of the file from which to print fragments.");
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
@@ -31,15 +31,15 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::EntityProvider::Ptr api = mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port);
-  mx::File file = api->file(FLAGS_id);
+  mx::Index index(mx::EntityProvider::from_remote(
+      FLAGS_host, FLAGS_port));
+  auto file = index.file(FLAGS_file_id);
   if (!file) {
-    std::cerr << "Invalid file id " << FLAGS_id << std::endl;
+    std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
     return EXIT_FAILURE;
   }
 
-  for (mx::Fragment frag : file.fragments()) {
+  for (mx::Fragment frag : mx::Fragment::in(*file)) {
     std::cout
         << frag.id() << '\t' << frag.first_line() << '\t'
         << frag.last_line() << '\n';

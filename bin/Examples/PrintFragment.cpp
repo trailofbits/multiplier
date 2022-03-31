@@ -44,9 +44,9 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::EntityProvider::Ptr api = mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port);
-  mx::Fragment fragment = api->fragment(FLAGS_fragment_id);
+  mx::Index index(mx::EntityProvider::from_remote(
+      FLAGS_host, FLAGS_port));
+  auto fragment = index.fragment(FLAGS_fragment_id);
   if (!fragment) {
     std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
     return EXIT_FAILURE;
@@ -54,13 +54,13 @@ extern "C" int main(int argc, char *argv[]) {
 
   // Print our the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
-    PrintUnparsedTokens(fragment.unparsed_tokens());
+    PrintUnparsedTokens(fragment->unparsed_tokens());
 
   // Print out the tokens of this fragment that were actually parsed. These
   // are post-macro expansion tokens, and generally don't include whitespace
   // or comments. There can be empty tokens, however.
   } else {
-    for (mx::Token token : fragment.tokens()) {
+    for (mx::Token token : mx::Token::in(*fragment)) {
       std::cout << ' ' << token.data();
     }
   }

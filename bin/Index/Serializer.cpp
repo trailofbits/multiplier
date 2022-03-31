@@ -111,7 +111,7 @@ bool EntitySerializer::Enter(const pasta::Decl &entity) {
     case pasta::DeclKind::k ## decl: { \
       Serialize ## decl ## Decl( \
          *this, \
-         entity_builder[offset], \
+         decl_builder[offset], \
          reinterpret_cast<const pasta::decl ## Decl &>(entity)); \
       return true; \
     }
@@ -156,7 +156,7 @@ bool EntitySerializer::Enter(const pasta::Stmt &entity) {
     case pasta::StmtKind::k ## stmt: { \
       Serialize ## stmt( \
           *this, \
-          entity_builder[offset], \
+          stmt_builder[offset], \
           reinterpret_cast<const pasta::stmt &>(entity)); \
       return true; \
     }

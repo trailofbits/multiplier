@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     initializeTheme();
   }
 
-  qRegisterMetaType<mx::FileList>("FileList");
+  qRegisterMetaType<mx::FilePathList>("FileList");
   qRegisterMetaType<std::optional<mx::File>>("std::optional<File>");
 
   mx::gui::MainWindow main_window;

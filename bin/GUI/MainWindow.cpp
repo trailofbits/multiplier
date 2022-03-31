@@ -60,7 +60,7 @@ struct MainWindow::PrivateData final {
   FileBrowserView *file_list_view{nullptr};
   QDockWidget *file_list_dock{nullptr};
 
-  EntityProvider::Ptr entity_provider;
+  mx::Index index;
 
   std::unordered_map<FileId, FileView *> file_views;
 
@@ -231,7 +231,7 @@ void MainWindow::OnConnected(void) {
 void MainWindow::OnSourceFileDoubleClicked(
     std::filesystem::path path, mx::FileId file_id) {
   d->central_widget->addTab(
-      new FileView(d->entity_provider, path, file_id), path.c_str());
+      new FileView(d->index, path, file_id), path.c_str());
 }
 
 void MainWindow::OnFileConnectAction(void) {
@@ -243,16 +243,16 @@ void MainWindow::OnFileConnectAction(void) {
   d->connection_state = ConnectionState::kConnecting;
   UpdateUI();
 
-  d->entity_provider = EntityProvider::from_remote(
+  d->index = EntityProvider::from_remote(
       connect_settings->host.toStdString(),
       connect_settings->port.toStdString());
 
-  d->file_list_view->DownloadFileListInBackground(d->entity_provider);
+  d->file_list_view->DownloadFileListInBackground(d->index);
 }
 
 void MainWindow::OnFileDisconnectAction(void) {
   d->connection_state = ConnectionState::kNotConnected;
-  d->entity_provider.reset();
+  d->index = mx::Index();
   UpdateUI();
 }
 

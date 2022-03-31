@@ -110,16 +110,145 @@ static void PersistTokenTree(EntitySerializer &serializer,
 }
 
 static void PersistTokens(EntitySerializer &serializer,
-                          const PendingFragment &code,
+                          uint64_t begin_index, uint64_t end_index,
                           FragmentBuilder &builder) {
   auto num_toks = static_cast<unsigned>(
-      (code.end_index - code.begin_index) + 1u);
+      (end_index - begin_index) + 1u);
   auto tok_builder = builder.initTokens(num_toks);
-  for (auto i = code.begin_index; i <= code.end_index; ++i) {
+  for (auto i = begin_index; i <= end_index; ++i) {
     serializer.Serialize(
-        tok_builder[static_cast<unsigned>(i - code.begin_index)],
+        tok_builder[static_cast<unsigned>(i - begin_index)],
         serializer.range[i]);
   }
+}
+
+static void PersistTokenContexts(EntitySerializer &serializer,
+                                 uint64_t begin_index, uint64_t end_index,
+                                 FragmentBuilder &builder) {
+
+//  using DeclContextSet = std::unordered_set<pasta::TokenContext>;
+//  std::unordered_map<uint64_t, DeclContextSet> contexts;
+//
+//  // First, collect only the relevant contexts for this fragment. Group them by
+//  // entity ID, as we store the context list inline inside of the entities.
+//  for (auto i = begin_index; i <= end_index; ++i) {
+//    for (auto context = serializer.range[i].Context();
+//         context; context = context->Parent()) {
+//
+//      auto c = *context;
+//      if (auto alias_context = context->Aliasee()) {
+//        c = *alias_context;
+//      }
+//
+//      if (auto decl = pasta::Decl::From(c)) {
+//        if (auto eid = serializer.EntityId(*decl);
+//            eid != mx::kInvalidEntityId) {
+//          contexts[eid].insert(*context);
+//        }
+//
+//      } else if (auto stmt = pasta::Stmt::From(c)) {
+//        if (auto eid = serializer.EntityId(*stmt);
+//            eid != mx::kInvalidEntityId) {
+//          contexts[eid].insert(*context);
+//        }
+//      }
+//
+//      // TODO(pag): Types!
+//    }
+//  }
+//
+//  struct PendingTokenContext {
+//    enum Kind {
+//      kInvalid,
+//      kDecl,
+//      kDeclAlias,
+//      kStmt,
+//      kStmtAlias,
+//    } kind{kInvalid};
+//
+//    uint32_t index{0};
+//    uint16_t offset{0};
+//    uint16_t alias_offset{0};
+//  };
+//
+//  std::unordered_map<pasta::TokenContext, PendingTokenContext>
+//      pending_contexts;
+//
+//  // Figure out the kinds of the contexts (stmt, decl), the index into the
+//  // respective entity list in the serialized fragment where the contexts will
+//  // be placed, the offset at which each context will reside within an entity-
+//  // specific list, etc.
+//  for (const auto &entry : contexts) {
+//    mx::VariantId vid = mx::EntityId(entry.first).Unpack();
+//    const DeclContextSet &entity_contexts = entry.second;
+//
+//    // First, make a "template" of the context info, based on the entity kind
+//    // and fragment info.
+//    PendingTokenContext tpl;
+//    if (std::holds_alternative<mx::DeclarationId>(vid)) {
+//      auto id = std::get<mx::DeclarationId>(vid);
+//      if (id.fragment_id != serializer.code_id) {
+//        continue;
+//      }
+//
+//      tpl.index = id.offset;
+//      tpl.kind = PendingTokenContext::kDecl;
+//
+//    } else if (std::holds_alternative<mx::StatementId>(vid)) {
+//      auto id = std::get<mx::StatementId>(vid);
+//      if (id.fragment_id != serializer.code_id) {
+//        continue;
+//      }
+//
+//      tpl.index = id.offset;
+//      tpl.kind = PendingTokenContext::kStmt;
+//    }
+//
+//    // Then, specialize this template for each context we encounter.
+//    uint16_t offset = 0;
+//    for (pasta::TokenContext &context : entity_contexts) {
+//      PendingTokenContext &info = pending_contexts[context];
+//      info = tpl;
+//
+//      // Adjust the kind to be an aliasee.
+//      if (context.Aliasee()) {
+//        info.kind = static_cast<PendingTokenContext::Kind>(
+//            static_cast<int>(tpl.kind) + 1);
+//      }
+//
+//      info.offset = offset++;
+//    }
+//  }
+//
+//  // Now resolve the aliasee targets, if any. Token contexts and their aliases
+//  // will end up in the same entity-specific lists. This is because the entity
+//  // in which the context resides will tell us its type.
+//  for (const auto &entry : contexts) {
+//    for (pasta::TokenContext &context : entry.second) {
+//      PendingTokenContext &info = pending_contexts[context];
+//      if (auto alias_context = context.Aliasee()) {
+//        PendingTokenContext &alias_info = pending_contexts[*alias_context];
+//        CHECK(alias_info.kind != PendingTokenContext::kInvalid);
+//        CHECK_EQ(info.index, alias_info.index);
+//        CHECK_NE(info.offset, alias_info.offset);
+//        info.alias_offset = alias_info.offset;
+//      }
+//    }
+//  }
+//
+//  // TODO(pag): Initialize
+//
+//  // Finally, serialize the contexts.
+//  for (auto i = begin_index; i <= end_index; ++i) {
+//    for (auto context = serializer.range[i].Context();
+//         context; context = context->Parent()) {
+//
+//      auto c = *context;
+//      if (auto alias_context = context->Aliasee()) {
+//        c = *alias_context;
+//      }
+//    }
+//  }
 }
 
 }  // namespace
@@ -193,9 +322,13 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
     tlds.set(i, serializer.EntityId(code_chunk.decls[i]));
   }
 
-  PersistTokens(serializer, code_chunk, builder);
+  const auto begin_index = code_chunk.begin_index;
+  const auto end_index = code_chunk.end_index;
 
   serializer.SerializeCodeEntities(std::move(code_chunk), builder);
+
+  PersistTokens(serializer, begin_index, end_index, builder);
+  PersistTokenContexts(serializer, begin_index, end_index, builder);
 
   unsigned next_substitution_index = 0u;
   SubstitutionListBuilder substitutions_builder =

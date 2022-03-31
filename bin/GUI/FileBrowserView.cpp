@@ -27,7 +27,7 @@ struct FileBrowserView::PrivateData final {
 };
 
 void DownloadFileListThread::run(void) {
-  emit DownloadedFileList(ep->list_files());
+  emit DownloadedFileList(index.file_paths());
 }
 
 FileBrowserView::FileBrowserView(MainWindow *mw, QWidget *parent)
@@ -58,8 +58,8 @@ void FileBrowserView::Clear(void) {
   d->source_file_tree->clear();
 }
 
-void FileBrowserView::DownloadFileListInBackground(EntityProvider::Ptr ep) {
-  auto downloader = new DownloadFileListThread(std::move(ep));
+void FileBrowserView::DownloadFileListInBackground(Index index) {
+  auto downloader = new DownloadFileListThread(std::move(index));
   downloader->setAutoDelete(true);
 
   connect(downloader, &DownloadFileListThread::DownloadedFileList,
@@ -78,7 +78,7 @@ void FileBrowserView::InitializeWidgets(void) {
           &FileBrowserView::OnTreeWidgetItemActivated);
 }
 
-void FileBrowserView::OnDownloadedFileList(FileList files) {
+void FileBrowserView::OnDownloadedFileList(FilePathList files) {
   QTreeWidgetItem *root_item = nullptr;
 
   // Build up the items.

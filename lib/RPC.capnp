@@ -105,19 +105,25 @@ struct Fragment @0xe5f27760091f9a3a {
   lastLine @3 :UInt32;
   
   # Entities embedded in this code sequence.
-  entities @4 :List(AST.Entity);
+  declarations @4 :List(AST.Decl);
+  statements @5 :List(AST.Stmt);
+  others @6 :List(AST.Pseudo);
   
   # List of top-level declarations in this code chunk.
-  topLevelDeclarations @5 :List(UInt64);
+  topLevelDeclarations @7 :List(UInt64);
   
   # List of token substitutions in this fragment.
-  tokenSubstitutions @6 :List(TokenSubstitution);
+  tokenSubstitutions @8 :List(TokenSubstitution);
   
   # List of parsed tokens in this fragment.
-  tokens @7 :List(Token);
+  tokens @9 :List(Token);
+  
+  # List of token contexts. There is a 1:1 correspondence between these and
+  # `tokens`.
+  tokenContexts @10 :List(AST.TokenContext);
   
   # List of tokens/substitution IDs in the top level.
-  unparsedTokens @8 :List(UInt64);
+  unparsedTokens @11 :List(UInt64);
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {

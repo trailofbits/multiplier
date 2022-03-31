@@ -47,8 +47,6 @@ void ServerContext::Flush(void) {
   meta_to_id.Set(MetadataName::kNextBigCodeId, next_big_fragment_id.load());
 }
 
-static constexpr size_t kNumFragmentCacheShards = 1024u;
-
 IndexingContext::IndexingContext(ServerContext &server_context_,
                                  const mx::Executor &exe_)
     : server_context(server_context_),

@@ -32,7 +32,8 @@ class EntityLabeller final : public EntityVisitor {
   PendingFragment code;
 
   // The next offset of an entity in `rpc::Fragment::entities`.
-  std::unordered_map<mx::FragmentId, unsigned> next_entity_offset;
+  std::unordered_map<mx::FragmentId, unsigned> next_decl_offset;
+  std::unordered_map<mx::FragmentId, unsigned> next_stmt_offset;
 
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;
