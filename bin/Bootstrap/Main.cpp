@@ -149,8 +149,8 @@ static const std::unordered_set<std::string> gConcreteClassNames{
 static const std::unordered_set<std::string> gEntityClassNames{
   "Token",
   "FileToken",
-  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
-  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
+  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, STR_NAME)
+  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME)
 };
 
 // These methods can trigger asserts deep in their internals that are hard
@@ -187,6 +187,7 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 
+  // NOTE(kumarak): Nullptr-returning things temporarily go here!!!
 };
 
 struct ClassHierarchy {
@@ -229,7 +230,7 @@ struct SpecificEntityStorage {
 
 static std::string SnakeCaseToAPICase(std::string name) {
   if (name == "operator" || name == "namespace" || name == "struct" ||
-      name == "class") {
+      name == "class" || name == "if" || name == "else" || name == "default") {
     name.push_back('_');
   }
   return name;

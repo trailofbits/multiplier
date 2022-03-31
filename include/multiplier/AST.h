@@ -5020,6 +5020,7 @@ class TemplateParameterList {
   unsigned depth(void) const;
   bool has_unexpanded_parameter_pack(void) const;
   bool has_parameter_pack(void) const;
+  std::optional<Expr> requires_clause(void) const;
   Token template_keyword_token(void) const;
   Token left_angle_token(void) const;
   Token right_angle_token(void) const;
@@ -5112,10 +5113,13 @@ class Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  Stmt ignore_containers(void) const;
+  std::vector<Stmt> children(void) const;
   Token begin_token(void) const;
   Token end_token(void) const;
   TokenRange token_range(void) const;
   StmtKind kind(void) const;
+  Stmt strip_label_like_statements(void) const;
 };
 
 using SEHTryStmtRange = DerivedEntityRange<StmtIterator, SEHTryStmt>;
@@ -5138,6 +5142,7 @@ class SEHTryStmt : public Stmt {
   static std::optional<SEHTryStmt> from(const Stmt &parent);
   SEHExceptStmt except_handler(void) const;
   SEHFinallyStmt finally_handler(void) const;
+  Stmt handler(void) const;
   bool is_cxx_try(void) const;
   CompoundStmt try_block(void) const;
   Token try_token(void) const;
@@ -5206,6 +5211,7 @@ class SEHExceptStmt : public Stmt {
   static std::optional<SEHExceptStmt> from(const Stmt &parent);
   CompoundStmt block(void) const;
   Token except_token(void) const;
+  Expr filter_expression(void) const;
 };
 
 using ReturnStmtRange = DerivedEntityRange<StmtIterator, ReturnStmt>;
@@ -5227,6 +5233,7 @@ class ReturnStmt : public Stmt {
   static std::optional<ReturnStmt> from(const TokenContext &c);
   static std::optional<ReturnStmt> from(const Stmt &parent);
   std::optional<VarDecl> nrvo_candidate(void) const;
+  std::optional<Expr> return_value(void) const;
   Token return_token(void) const;
 };
 
@@ -5248,6 +5255,9 @@ class ObjCForCollectionStmt : public Stmt {
 
   static std::optional<ObjCForCollectionStmt> from(const TokenContext &c);
   static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
+  Stmt body(void) const;
+  Expr collection(void) const;
+  Stmt element(void) const;
   Token for_token(void) const;
   Token r_paren_token(void) const;
 };
@@ -5271,6 +5281,7 @@ class ObjCAutoreleasePoolStmt : public Stmt {
   static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &c);
   static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent);
   Token at_token(void) const;
+  Stmt sub_statement(void) const;
 };
 
 using ObjCAtTryStmtRange = DerivedEntityRange<StmtIterator, ObjCAtTryStmt>;
@@ -5293,6 +5304,7 @@ class ObjCAtTryStmt : public Stmt {
   static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
   Token at_try_token(void) const;
   ObjCAtFinallyStmt finally_statement(void) const;
+  Stmt try_body(void) const;
   std::vector<ObjCAtCatchStmt> catch_statements(void) const;
 };
 
@@ -5314,6 +5326,7 @@ class ObjCAtThrowStmt : public Stmt {
 
   static std::optional<ObjCAtThrowStmt> from(const TokenContext &c);
   static std::optional<ObjCAtThrowStmt> from(const Stmt &parent);
+  Expr throw_expression(void) const;
   Token throw_token(void) const;
 };
 
@@ -5337,6 +5350,7 @@ class ObjCAtSynchronizedStmt : public Stmt {
   static std::optional<ObjCAtSynchronizedStmt> from(const Stmt &parent);
   Token at_synchronized_token(void) const;
   CompoundStmt synch_body(void) const;
+  Expr synch_expression(void) const;
 };
 
 using ObjCAtFinallyStmtRange = DerivedEntityRange<StmtIterator, ObjCAtFinallyStmt>;
@@ -5358,6 +5372,7 @@ class ObjCAtFinallyStmt : public Stmt {
   static std::optional<ObjCAtFinallyStmt> from(const TokenContext &c);
   static std::optional<ObjCAtFinallyStmt> from(const Stmt &parent);
   Token at_finally_token(void) const;
+  Stmt finally_body(void) const;
 };
 
 using ObjCAtCatchStmtRange = DerivedEntityRange<StmtIterator, ObjCAtCatchStmt>;
@@ -5379,6 +5394,7 @@ class ObjCAtCatchStmt : public Stmt {
   static std::optional<ObjCAtCatchStmt> from(const TokenContext &c);
   static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
   Token at_catch_token(void) const;
+  Stmt catch_body(void) const;
   VarDecl catch_parameter_declaration(void) const;
   Token r_paren_token(void) const;
   bool has_ellipsis(void) const;
@@ -5402,7 +5418,10 @@ class OMPExecutableDirective : public Stmt {
 
   static std::optional<OMPExecutableDirective> from(const TokenContext &c);
   static std::optional<OMPExecutableDirective> from(const Stmt &parent);
+  Stmt associated_statement(void) const;
   CapturedStmt innermost_captured_statement(void) const;
+  Stmt raw_statement(void) const;
+  Stmt structured_block(void) const;
   bool has_associated_statement(void) const;
   bool is_standalone_directive(void) const;
 };
@@ -5560,6 +5579,10 @@ class OMPAtomicDirective : public OMPExecutableDirective {
   static std::optional<OMPAtomicDirective> from(const TokenContext &c);
   static std::optional<OMPAtomicDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPAtomicDirective> from(const Stmt &parent);
+  Expr expression(void) const;
+  Expr update_expression(void) const;
+  Expr v(void) const;
+  Expr x(void) const;
   bool is_postfix_update(void) const;
   bool is_xlhs_in_rhs_part(void) const;
 };
@@ -5650,6 +5673,7 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
   static std::optional<OMPTaskgroupDirective> from(const TokenContext &c);
   static std::optional<OMPTaskgroupDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskgroupDirective> from(const Stmt &parent);
+  Expr reduction_reference(void) const;
 };
 
 using OMPTaskDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskDirective>;
@@ -5739,6 +5763,7 @@ class OMPTargetParallelDirective : public OMPExecutableDirective {
   static std::optional<OMPTargetParallelDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetParallelDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -5872,6 +5897,7 @@ class OMPSectionsDirective : public OMPExecutableDirective {
   static std::optional<OMPSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPSectionsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSectionsDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -5940,6 +5966,7 @@ class OMPParallelSectionsDirective : public OMPExecutableDirective {
   static std::optional<OMPParallelSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPParallelSectionsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelSectionsDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -5963,6 +5990,7 @@ class OMPParallelMasterDirective : public OMPExecutableDirective {
   static std::optional<OMPParallelMasterDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelMasterDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
 };
 
 using OMPParallelDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelDirective>;
@@ -5985,6 +6013,7 @@ class OMPParallelDirective : public OMPExecutableDirective {
   static std::optional<OMPParallelDirective> from(const TokenContext &c);
   static std::optional<OMPParallelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -6098,6 +6127,8 @@ class OMPUnrollDirective : public OMPLoopBasedDirective {
   static std::optional<OMPUnrollDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPUnrollDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPUnrollDirective> from(const Stmt &parent);
+  Stmt pre_initializers(void) const;
+  Stmt transformed_statement(void) const;
 };
 
 using OMPTileDirectiveRange = DerivedEntityRange<StmtIterator, OMPTileDirective>;
@@ -6122,6 +6153,8 @@ class OMPTileDirective : public OMPLoopBasedDirective {
   static std::optional<OMPTileDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTileDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTileDirective> from(const Stmt &parent);
+  Stmt pre_initializers(void) const;
+  Stmt transformed_statement(void) const;
 };
 
 using OMPLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopDirective>;
@@ -6146,6 +6179,44 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPLoopDirective> from(const Stmt &parent);
+  std::vector<Expr> counters(void) const;
+  std::vector<Expr> dependent_counters(void) const;
+  std::vector<Expr> dependent_initializers(void) const;
+  std::vector<Expr> finals(void) const;
+  std::vector<Expr> finals_conditions(void) const;
+  Stmt body(void) const;
+  Expr calculate_last_iteration(void) const;
+  Expr combined_condition(void) const;
+  Expr combined_distance_condition(void) const;
+  Expr combined_ensure_upper_bound(void) const;
+  Expr combined_initializer(void) const;
+  Expr combined_lower_bound_variable(void) const;
+  Expr combined_next_lower_bound(void) const;
+  Expr combined_next_upper_bound(void) const;
+  Expr combined_parallel_for_in_distance_condition(void) const;
+  Expr combined_upper_bound_variable(void) const;
+  Expr condition(void) const;
+  Expr distance_increment(void) const;
+  Expr ensure_upper_bound(void) const;
+  Expr increment(void) const;
+  Expr initializer(void) const;
+  Expr is_last_iteration_variable(void) const;
+  Expr iteration_variable(void) const;
+  Expr last_iteration(void) const;
+  Expr lower_bound_variable(void) const;
+  Expr next_lower_bound(void) const;
+  Expr next_upper_bound(void) const;
+  Expr num_iterations(void) const;
+  Expr pre_condition(void) const;
+  Stmt pre_initializers(void) const;
+  Expr prev_ensure_upper_bound(void) const;
+  Expr prev_lower_bound_variable(void) const;
+  Expr prev_upper_bound_variable(void) const;
+  Expr stride_variable(void) const;
+  Expr upper_bound_variable(void) const;
+  std::vector<Expr> initializers(void) const;
+  std::vector<Expr> private_counters(void) const;
+  std::vector<Expr> updates(void) const;
 };
 
 using OMPForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPForSimdDirective>;
@@ -6198,6 +6269,7 @@ class OMPForDirective : public OMPLoopDirective {
   static std::optional<OMPForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPForDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -6277,6 +6349,7 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -6382,6 +6455,7 @@ class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -6540,6 +6614,7 @@ class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -6645,6 +6720,7 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -6777,6 +6853,7 @@ class OMPParallelForDirective : public OMPLoopDirective {
   static std::optional<OMPParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelForDirective> from(const Stmt &parent);
+  Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
 
@@ -6896,6 +6973,7 @@ class OMPCanonicalLoop : public Stmt {
   static std::optional<OMPCanonicalLoop> from(const TokenContext &c);
   static std::optional<OMPCanonicalLoop> from(const Stmt &parent);
   CapturedStmt distance_func(void) const;
+  Stmt loop_statement(void) const;
   CapturedStmt loop_variable_func(void) const;
   DeclRefExpr loop_variable_reference(void) const;
 };
@@ -6967,6 +7045,7 @@ class IndirectGotoStmt : public Stmt {
   LabelDecl constant_target(void) const;
   Token goto_token(void) const;
   Token star_token(void) const;
+  Expr target(void) const;
 };
 
 using IfStmtRange = DerivedEntityRange<StmtIterator, IfStmt>;
@@ -6987,12 +7066,16 @@ class IfStmt : public Stmt {
 
   static std::optional<IfStmt> from(const TokenContext &c);
   static std::optional<IfStmt> from(const Stmt &parent);
+  Expr condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
+  std::optional<Stmt> else_(void) const;
   Token else_token(void) const;
   Token if_token(void) const;
+  std::optional<Stmt> initializer(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
+  Stmt then(void) const;
   bool has_else_storage(void) const;
   bool has_initializer_storage(void) const;
   bool has_variable_storage(void) const;
@@ -7041,9 +7124,13 @@ class ForStmt : public Stmt {
 
   static std::optional<ForStmt> from(const TokenContext &c);
   static std::optional<ForStmt> from(const Stmt &parent);
+  Stmt body(void) const;
+  std::optional<Expr> condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
   Token for_token(void) const;
+  std::optional<Expr> increment(void) const;
+  std::optional<Stmt> initializer(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
 };
@@ -7066,6 +7153,8 @@ class DoStmt : public Stmt {
 
   static std::optional<DoStmt> from(const TokenContext &c);
   static std::optional<DoStmt> from(const Stmt &parent);
+  Stmt body(void) const;
+  Expr condition(void) const;
   Token do_token(void) const;
   Token r_paren_token(void) const;
   Token while_token(void) const;
@@ -7089,6 +7178,8 @@ class DeclStmt : public Stmt {
 
   static std::optional<DeclStmt> from(const TokenContext &c);
   static std::optional<DeclStmt> from(const Stmt &parent);
+  std::vector<Decl> declarations(void) const;
+  std::optional<Decl> single_declaration(void) const;
   bool is_single_declaration(void) const;
 };
 
@@ -7110,7 +7201,20 @@ class CoroutineBodyStmt : public Stmt {
 
   static std::optional<CoroutineBodyStmt> from(const TokenContext &c);
   static std::optional<CoroutineBodyStmt> from(const Stmt &parent);
+  Expr allocate(void) const;
+  Stmt body(void) const;
+  Expr deallocate(void) const;
+  Stmt exception_handler(void) const;
+  Stmt fallthrough_handler(void) const;
+  Stmt final_suspend_statement(void) const;
+  Stmt initializer_suspend_statement(void) const;
+  std::vector<Stmt> parameter_moves(void) const;
   VarDecl promise_declaration(void) const;
+  Stmt promise_declaration_statement(void) const;
+  Stmt result_declaration(void) const;
+  Stmt return_statement(void) const;
+  Stmt return_statement_on_alloc_failure(void) const;
+  Expr return_value_initializer(void) const;
   bool has_dependent_promise_type(void) const;
 };
 
@@ -7133,6 +7237,8 @@ class CoreturnStmt : public Stmt {
   static std::optional<CoreturnStmt> from(const TokenContext &c);
   static std::optional<CoreturnStmt> from(const Stmt &parent);
   Token keyword_token(void) const;
+  Expr operand(void) const;
+  Expr promise_call(void) const;
   bool is_implicit(void) const;
 };
 
@@ -7175,8 +7281,9 @@ class CompoundStmt : public Stmt {
 
   static std::optional<CompoundStmt> from(const TokenContext &c);
   static std::optional<CompoundStmt> from(const Stmt &parent);
-  Token l_brac_token(void) const;
-  Token r_brac_token(void) const;
+  Token left_brace_token(void) const;
+  Token right_brace_token(void) const;
+  std::optional<Stmt> statement_expression_result(void) const;
 };
 
 using CapturedStmtRange = DerivedEntityRange<StmtIterator, CapturedStmt>;
@@ -7200,6 +7307,7 @@ class CapturedStmt : public Stmt {
   CapturedDecl captured_declaration(void) const;
   RecordDecl captured_record_declaration(void) const;
   CapturedRegionKind captured_region_kind(void) const;
+  Stmt captured_statement(void) const;
 };
 
 using CXXTryStmtRange = DerivedEntityRange<StmtIterator, CXXTryStmt>;
@@ -7244,13 +7352,18 @@ class CXXForRangeStmt : public Stmt {
   static std::optional<CXXForRangeStmt> from(const TokenContext &c);
   static std::optional<CXXForRangeStmt> from(const Stmt &parent);
   DeclStmt begin_statement(void) const;
+  Stmt body(void) const;
   Token coawait_token(void) const;
   Token colon_token(void) const;
+  Expr condition(void) const;
   DeclStmt end_statement(void) const;
   Token for_token(void) const;
+  Expr increment(void) const;
+  Stmt initializer(void) const;
   DeclStmt loop_variable_statement(void) const;
   VarDecl loop_variable(void) const;
   Token r_paren_token(void) const;
+  Expr range_initializer(void) const;
   DeclStmt range_statement(void) const;
 };
 
@@ -7274,6 +7387,7 @@ class CXXCatchStmt : public Stmt {
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
   Token catch_token(void) const;
   VarDecl exception_declaration(void) const;
+  Stmt handler_block(void) const;
 };
 
 using BreakStmtRange = DerivedEntityRange<StmtIterator, BreakStmt>;
@@ -7317,10 +7431,14 @@ class AsmStmt : public Stmt {
   static std::optional<AsmStmt> from(const Stmt &parent);
   std::string_view generate_assembly_string(void) const;
   Token assembly_token(void) const;
+  std::vector<Expr> inputs(void) const;
   bool is_simple(void) const;
   bool is_volatile(void) const;
+  std::vector<Expr> outputs(void) const;
   std::vector<std::string_view> output_constraints(void) const;
+  std::vector<Expr> output_expressions(void) const;
   std::vector<std::string_view> input_constraints(void) const;
+  std::vector<Expr> input_expressions(void) const;
   std::vector<std::string_view> clobbers(void) const;
 };
 
@@ -7345,6 +7463,7 @@ class MSAsmStmt : public AsmStmt {
   static std::optional<MSAsmStmt> from(const AsmStmt &parent);
   static std::optional<MSAsmStmt> from(const Stmt &parent);
   std::vector<std::string_view> all_constraints(void) const;
+  std::vector<Expr> all_expressions(void) const;
   std::string_view assembly_string(void) const;
   Token l_brace_token(void) const;
   bool has_braces(void) const;
@@ -7401,6 +7520,8 @@ class WhileStmt : public Stmt {
 
   static std::optional<WhileStmt> from(const TokenContext &c);
   static std::optional<WhileStmt> from(const Stmt &parent);
+  Stmt body(void) const;
+  Expr condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
   Token l_paren_token(void) const;
@@ -7427,6 +7548,7 @@ class ValueStmt : public Stmt {
 
   static std::optional<ValueStmt> from(const TokenContext &c);
   static std::optional<ValueStmt> from(const Stmt &parent);
+  std::optional<Expr> expression_statement(void) const;
 };
 
 using LabelStmtRange = DerivedEntityRange<StmtIterator, LabelStmt>;
@@ -7452,6 +7574,7 @@ class LabelStmt : public ValueStmt {
   LabelDecl declaration(void) const;
   Token identifier_token(void) const;
   std::string_view name(void) const;
+  Stmt sub_statement(void) const;
   bool is_side_entry(void) const;
 };
 
@@ -7476,11 +7599,25 @@ class Expr : public ValueStmt {
   static std::optional<Expr> from(const ValueStmt &parent);
   static std::optional<Expr> from(const Stmt &parent);
   bool has_side_effects(void) const;
+  Expr ignore_casts(void) const;
+  Expr ignore_conversion_operator_single_step(void) const;
+  Expr ignore_imp_casts(void) const;
+  Expr ignore_implicit(void) const;
+  Expr ignore_implicit_as_written(void) const;
+  Expr ignore_parenthesis_base_casts(void) const;
+  Expr ignore_parenthesis_casts(void) const;
+  Expr ignore_parenthesis_imp_casts(void) const;
+  Expr ignore_parenthesis_l_value_casts(void) const;
+  Expr ignore_parenthesis_noop_casts(void) const;
+  Expr ignore_parentheses(void) const;
+  Expr ignore_unless_spelled_in_source(void) const;
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
+  Expr best_dynamic_class_type_expression(void) const;
   Token expression_token(void) const;
   std::optional<ObjCPropertyRefExpr> obj_c_property(void) const;
   ExprObjectKind object_kind(void) const;
+  std::optional<Decl> referenced_declaration_of_callee(void) const;
   std::optional<FieldDecl> source_bit_field(void) const;
   ExprValueKind value_kind(void) const;
   bool has_non_trivial_call(void) const;
@@ -7526,6 +7663,7 @@ class DesignatedInitUpdateExpr : public Expr {
   static std::optional<DesignatedInitUpdateExpr> from(const Expr &parent);
   static std::optional<DesignatedInitUpdateExpr> from(const ValueStmt &parent);
   static std::optional<DesignatedInitUpdateExpr> from(const Stmt &parent);
+  Expr base(void) const;
   InitListExpr updater(void) const;
 };
 
@@ -7553,8 +7691,10 @@ class DesignatedInitExpr : public Expr {
   static std::optional<DesignatedInitExpr> from(const Stmt &parent);
   TokenRange designators_source_range(void) const;
   Token equal_or_colon_token(void) const;
+  Expr initializer(void) const;
   bool is_direct_initializer(void) const;
   bool uses_gnu_syntax(void) const;
+  std::vector<Expr> sub_expressions(void) const;
 };
 
 using DependentScopeDeclRefExprRange = DerivedEntityRange<StmtIterator, DependentScopeDeclRefExpr>;
@@ -7609,6 +7749,7 @@ class DependentCoawaitExpr : public Expr {
   static std::optional<DependentCoawaitExpr> from(const ValueStmt &parent);
   static std::optional<DependentCoawaitExpr> from(const Stmt &parent);
   Token keyword_token(void) const;
+  Expr operand(void) const;
   UnresolvedLookupExpr operator_coawait_lookup(void) const;
 };
 
@@ -7670,8 +7811,12 @@ class CoroutineSuspendExpr : public Expr {
   static std::optional<CoroutineSuspendExpr> from(const Expr &parent);
   static std::optional<CoroutineSuspendExpr> from(const ValueStmt &parent);
   static std::optional<CoroutineSuspendExpr> from(const Stmt &parent);
+  Expr common_expression(void) const;
   Token keyword_token(void) const;
   OpaqueValueExpr opaque_value(void) const;
+  Expr ready_expression(void) const;
+  Expr resume_expression(void) const;
+  Expr suspend_expression(void) const;
 };
 
 using CoawaitExprRange = DerivedEntityRange<StmtIterator, CoawaitExpr>;
@@ -7698,6 +7843,7 @@ class CoawaitExpr : public CoroutineSuspendExpr {
   static std::optional<CoawaitExpr> from(const Expr &parent);
   static std::optional<CoawaitExpr> from(const ValueStmt &parent);
   static std::optional<CoawaitExpr> from(const Stmt &parent);
+  Expr operand(void) const;
   bool is_implicit(void) const;
 };
 
@@ -7725,6 +7871,7 @@ class CoyieldExpr : public CoroutineSuspendExpr {
   static std::optional<CoyieldExpr> from(const Expr &parent);
   static std::optional<CoyieldExpr> from(const ValueStmt &parent);
   static std::optional<CoyieldExpr> from(const Stmt &parent);
+  Expr operand(void) const;
 };
 
 using ConvertVectorExprRange = DerivedEntityRange<StmtIterator, ConvertVectorExpr>;
@@ -7751,6 +7898,7 @@ class ConvertVectorExpr : public Expr {
   static std::optional<ConvertVectorExpr> from(const Stmt &parent);
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
+  Expr src_expression(void) const;
 };
 
 using ConceptSpecializationExprRange = DerivedEntityRange<StmtIterator, ConceptSpecializationExpr>;
@@ -7801,6 +7949,7 @@ class CompoundLiteralExpr : public Expr {
   static std::optional<CompoundLiteralExpr> from(const Expr &parent);
   static std::optional<CompoundLiteralExpr> from(const ValueStmt &parent);
   static std::optional<CompoundLiteralExpr> from(const Stmt &parent);
+  Expr initializer(void) const;
   Token l_paren_token(void) const;
   bool is_file_scope(void) const;
 };
@@ -7828,6 +7977,10 @@ class ChooseExpr : public Expr {
   static std::optional<ChooseExpr> from(const ValueStmt &parent);
   static std::optional<ChooseExpr> from(const Stmt &parent);
   Token builtin_token(void) const;
+  Expr chosen_sub_expression(void) const;
+  Expr condition(void) const;
+  Expr lhs(void) const;
+  Expr rhs(void) const;
   Token r_paren_token(void) const;
   bool is_condition_dependent(void) const;
   bool is_condition_true(void) const;
@@ -7883,6 +8036,8 @@ class CastExpr : public Expr {
   CastKind cast_kind(void) const;
   std::string_view cast_kind_name(void) const;
   std::optional<NamedDecl> conversion_function(void) const;
+  Expr sub_expression(void) const;
+  Expr sub_expression_as_written(void) const;
   std::optional<FieldDecl> target_union_field(void) const;
   bool has_stored_fp_features(void) const;
 };
@@ -8266,7 +8421,10 @@ class CallExpr : public Expr {
   static std::optional<CallExpr> from(const Expr &parent);
   static std::optional<CallExpr> from(const ValueStmt &parent);
   static std::optional<CallExpr> from(const Stmt &parent);
+  std::vector<Expr> arguments(void) const;
   CallExprADLCallKind adl_call_kind(void) const;
+  Expr callee(void) const;
+  std::optional<Decl> callee_declaration(void) const;
   std::optional<FunctionDecl> direct_callee(void) const;
   Token r_paren_token(void) const;
   bool has_stored_fp_features(void) const;
@@ -8332,6 +8490,7 @@ class CXXMemberCallExpr : public CallExpr {
   static std::optional<CXXMemberCallExpr> from(const Expr &parent);
   static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
   static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
+  Expr implicit_object_argument(void) const;
   CXXMethodDecl method_declaration(void) const;
   CXXRecordDecl record_declaration(void) const;
 };
@@ -8387,6 +8546,7 @@ class UserDefinedLiteral : public CallExpr {
   static std::optional<UserDefinedLiteral> from(const Expr &parent);
   static std::optional<UserDefinedLiteral> from(const ValueStmt &parent);
   static std::optional<UserDefinedLiteral> from(const Stmt &parent);
+  Expr cooked_literal(void) const;
   UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const;
   Token ud_suffix_token(void) const;
 };
@@ -8413,6 +8573,7 @@ class CXXUuidofExpr : public Expr {
   static std::optional<CXXUuidofExpr> from(const Expr &parent);
   static std::optional<CXXUuidofExpr> from(const ValueStmt &parent);
   static std::optional<CXXUuidofExpr> from(const Stmt &parent);
+  Expr expression_operand(void) const;
   MSGuidDecl guid_declaration(void) const;
   bool is_type_operand(void) const;
 };
@@ -8439,6 +8600,7 @@ class CXXUnresolvedConstructExpr : public Expr {
   static std::optional<CXXUnresolvedConstructExpr> from(const Expr &parent);
   static std::optional<CXXUnresolvedConstructExpr> from(const ValueStmt &parent);
   static std::optional<CXXUnresolvedConstructExpr> from(const Stmt &parent);
+  std::vector<Expr> arguments(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   bool is_list_initialization(void) const;
@@ -8466,6 +8628,7 @@ class CXXTypeidExpr : public Expr {
   static std::optional<CXXTypeidExpr> from(const Expr &parent);
   static std::optional<CXXTypeidExpr> from(const ValueStmt &parent);
   static std::optional<CXXTypeidExpr> from(const Stmt &parent);
+  Expr expression_operand(void) const;
   bool is_most_derived(void) const;
   bool is_potentially_evaluated(void) const;
   bool is_type_operand(void) const;
@@ -8493,6 +8656,7 @@ class CXXThrowExpr : public Expr {
   static std::optional<CXXThrowExpr> from(const Expr &parent);
   static std::optional<CXXThrowExpr> from(const ValueStmt &parent);
   static std::optional<CXXThrowExpr> from(const Stmt &parent);
+  Expr sub_expression(void) const;
   Token throw_token(void) const;
   bool is_thrown_variable_in_scope(void) const;
 };
@@ -8545,6 +8709,7 @@ class CXXStdInitializerListExpr : public Expr {
   static std::optional<CXXStdInitializerListExpr> from(const Expr &parent);
   static std::optional<CXXStdInitializerListExpr> from(const ValueStmt &parent);
   static std::optional<CXXStdInitializerListExpr> from(const Stmt &parent);
+  Expr sub_expression(void) const;
 };
 
 using CXXScalarValueInitExprRange = DerivedEntityRange<StmtIterator, CXXScalarValueInitExpr>;
@@ -8594,10 +8759,13 @@ class CXXRewrittenBinaryOperator : public Expr {
   static std::optional<CXXRewrittenBinaryOperator> from(const Expr &parent);
   static std::optional<CXXRewrittenBinaryOperator> from(const ValueStmt &parent);
   static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent);
+  Expr lhs(void) const;
   BinaryOperatorKind opcode(void) const;
   std::string_view opcode_string(void) const;
   BinaryOperatorKind operator_(void) const;
   Token operator_token(void) const;
+  Expr rhs(void) const;
+  Expr semantic_form(void) const;
   bool is_assignment_operation(void) const;
   bool is_comparison_operation(void) const;
   bool is_reversed(void) const;
@@ -8625,6 +8793,7 @@ class CXXPseudoDestructorExpr : public Expr {
   static std::optional<CXXPseudoDestructorExpr> from(const Expr &parent);
   static std::optional<CXXPseudoDestructorExpr> from(const ValueStmt &parent);
   static std::optional<CXXPseudoDestructorExpr> from(const Stmt &parent);
+  Expr base(void) const;
   Token colon_colon_token(void) const;
   Token destroyed_type_token(void) const;
   Token operator_token(void) const;
@@ -8680,6 +8849,7 @@ class CXXNoexceptExpr : public Expr {
   static std::optional<CXXNoexceptExpr> from(const Expr &parent);
   static std::optional<CXXNoexceptExpr> from(const ValueStmt &parent);
   static std::optional<CXXNoexceptExpr> from(const Stmt &parent);
+  Expr operand(void) const;
   bool value(void) const;
 };
 
@@ -8706,9 +8876,11 @@ class CXXNewExpr : public Expr {
   static std::optional<CXXNewExpr> from(const ValueStmt &parent);
   static std::optional<CXXNewExpr> from(const Stmt &parent);
   bool does_usual_array_delete_want_size(void) const;
+  std::optional<Expr> array_size(void) const;
   CXXConstructExpr construct_expression(void) const;
   TokenRange direct_initializer_range(void) const;
   CXXNewExprInitializationStyle initialization_style(void) const;
+  Expr initializer(void) const;
   FunctionDecl operator_delete(void) const;
   FunctionDecl operator_new(void) const;
   TokenRange type_id_parentheses(void) const;
@@ -8717,6 +8889,7 @@ class CXXNewExpr : public Expr {
   bool is_global_new(void) const;
   bool is_parenthesis_type_id(void) const;
   bool pass_alignment(void) const;
+  std::vector<Expr> placement_arguments(void) const;
   bool should_null_check_allocation(void) const;
 };
 
@@ -8773,8 +8946,12 @@ class CXXFoldExpr : public Expr {
   static std::optional<CXXFoldExpr> from(const Stmt &parent);
   UnresolvedLookupExpr callee(void) const;
   Token ellipsis_token(void) const;
+  Expr initializer(void) const;
+  Expr lhs(void) const;
   Token l_paren_token(void) const;
   BinaryOperatorKind operator_(void) const;
+  Expr pattern(void) const;
+  Expr rhs(void) const;
   Token r_paren_token(void) const;
   bool is_left_fold(void) const;
   bool is_right_fold(void) const;
@@ -8802,6 +8979,7 @@ class CXXDependentScopeMemberExpr : public Expr {
   static std::optional<CXXDependentScopeMemberExpr> from(const Expr &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
+  Expr base(void) const;
   NamedDecl first_qualifier_found_in_scope(void) const;
   Token l_angle_token(void) const;
   Token member_token(void) const;
@@ -8837,6 +9015,7 @@ class CXXDeleteExpr : public Expr {
   static std::optional<CXXDeleteExpr> from(const ValueStmt &parent);
   static std::optional<CXXDeleteExpr> from(const Stmt &parent);
   bool does_usual_array_delete_want_size(void) const;
+  Expr argument(void) const;
   FunctionDecl operator_delete(void) const;
   bool is_array_form(void) const;
   bool is_array_form_as_written(void) const;
@@ -8865,6 +9044,7 @@ class CXXDefaultInitExpr : public Expr {
   static std::optional<CXXDefaultInitExpr> from(const Expr &parent);
   static std::optional<CXXDefaultInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXDefaultInitExpr> from(const Stmt &parent);
+  Expr expression(void) const;
   FieldDecl field(void) const;
   Token used_token(void) const;
 };
@@ -8891,6 +9071,7 @@ class CXXDefaultArgExpr : public Expr {
   static std::optional<CXXDefaultArgExpr> from(const Expr &parent);
   static std::optional<CXXDefaultArgExpr> from(const ValueStmt &parent);
   static std::optional<CXXDefaultArgExpr> from(const Stmt &parent);
+  Expr expression(void) const;
   ParmVarDecl parameter(void) const;
   Token used_token(void) const;
 };
@@ -8917,6 +9098,7 @@ class CXXConstructExpr : public Expr {
   static std::optional<CXXConstructExpr> from(const Expr &parent);
   static std::optional<CXXConstructExpr> from(const ValueStmt &parent);
   static std::optional<CXXConstructExpr> from(const Stmt &parent);
+  std::vector<Expr> arguments(void) const;
   CXXConstructExprConstructionKind construction_kind(void) const;
   CXXConstructorDecl constructor(void) const;
   Token token(void) const;
@@ -9002,6 +9184,7 @@ class CXXBindTemporaryExpr : public Expr {
   static std::optional<CXXBindTemporaryExpr> from(const Expr &parent);
   static std::optional<CXXBindTemporaryExpr> from(const ValueStmt &parent);
   static std::optional<CXXBindTemporaryExpr> from(const Stmt &parent);
+  Expr sub_expression(void) const;
 };
 
 using BlockExprRange = DerivedEntityRange<StmtIterator, BlockExpr>;
@@ -9027,6 +9210,7 @@ class BlockExpr : public Expr {
   static std::optional<BlockExpr> from(const ValueStmt &parent);
   static std::optional<BlockExpr> from(const Stmt &parent);
   BlockDecl block_declaration(void) const;
+  Stmt body(void) const;
   Token caret_token(void) const;
 };
 
@@ -9052,9 +9236,11 @@ class BinaryOperator : public Expr {
   static std::optional<BinaryOperator> from(const Expr &parent);
   static std::optional<BinaryOperator> from(const ValueStmt &parent);
   static std::optional<BinaryOperator> from(const Stmt &parent);
+  Expr lhs(void) const;
   BinaryOperatorKind opcode(void) const;
   std::string_view opcode_string(void) const;
   Token operator_token(void) const;
+  Expr rhs(void) const;
   bool has_stored_fp_features(void) const;
   bool is_additive_operation(void) const;
   bool is_assignment_operation(void) const;
@@ -9121,10 +9307,18 @@ class AtomicExpr : public Expr {
   static std::optional<AtomicExpr> from(const Stmt &parent);
   Token builtin_token(void) const;
   AtomicExprAtomicOp operation(void) const;
+  Expr order(void) const;
+  Expr order_fail(void) const;
+  Expr pointer(void) const;
   Token r_paren_token(void) const;
+  Expr scope(void) const;
+  Expr val1(void) const;
+  Expr val2(void) const;
+  Expr weak(void) const;
   bool is_cmp_x_chg(void) const;
   bool is_open_cl(void) const;
   bool is_volatile(void) const;
+  std::vector<Expr> sub_expressions(void) const;
 };
 
 using AsTypeExprRange = DerivedEntityRange<StmtIterator, AsTypeExpr>;
@@ -9151,6 +9345,7 @@ class AsTypeExpr : public Expr {
   static std::optional<AsTypeExpr> from(const Stmt &parent);
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
+  Expr src_expression(void) const;
 };
 
 using ArrayTypeTraitExprRange = DerivedEntityRange<StmtIterator, ArrayTypeTraitExpr>;
@@ -9175,6 +9370,7 @@ class ArrayTypeTraitExpr : public Expr {
   static std::optional<ArrayTypeTraitExpr> from(const Expr &parent);
   static std::optional<ArrayTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
+  Expr dimension_expression(void) const;
   ArrayTypeTrait trait(void) const;
 };
 
@@ -9200,7 +9396,11 @@ class ArraySubscriptExpr : public Expr {
   static std::optional<ArraySubscriptExpr> from(const Expr &parent);
   static std::optional<ArraySubscriptExpr> from(const ValueStmt &parent);
   static std::optional<ArraySubscriptExpr> from(const Stmt &parent);
+  Expr base(void) const;
+  Expr index(void) const;
+  Expr lhs(void) const;
   Token r_bracket_token(void) const;
+  Expr rhs(void) const;
 };
 
 using ArrayInitLoopExprRange = DerivedEntityRange<StmtIterator, ArrayInitLoopExpr>;
@@ -9226,6 +9426,7 @@ class ArrayInitLoopExpr : public Expr {
   static std::optional<ArrayInitLoopExpr> from(const ValueStmt &parent);
   static std::optional<ArrayInitLoopExpr> from(const Stmt &parent);
   OpaqueValueExpr common_expression(void) const;
+  Expr sub_expression(void) const;
 };
 
 using ArrayInitIndexExprRange = DerivedEntityRange<StmtIterator, ArrayInitIndexExpr>;
@@ -9302,7 +9503,10 @@ class AbstractConditionalOperator : public Expr {
   static std::optional<AbstractConditionalOperator> from(const ValueStmt &parent);
   static std::optional<AbstractConditionalOperator> from(const Stmt &parent);
   Token colon_token(void) const;
+  Expr condition(void) const;
+  Expr false_expression(void) const;
   Token question_token(void) const;
+  Expr true_expression(void) const;
 };
 
 using ConditionalOperatorRange = DerivedEntityRange<StmtIterator, ConditionalOperator>;
@@ -9329,6 +9533,8 @@ class ConditionalOperator : public AbstractConditionalOperator {
   static std::optional<ConditionalOperator> from(const Expr &parent);
   static std::optional<ConditionalOperator> from(const ValueStmt &parent);
   static std::optional<ConditionalOperator> from(const Stmt &parent);
+  Expr lhs(void) const;
+  Expr rhs(void) const;
 };
 
 using BinaryConditionalOperatorRange = DerivedEntityRange<StmtIterator, BinaryConditionalOperator>;
@@ -9355,6 +9561,7 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   static std::optional<BinaryConditionalOperator> from(const Expr &parent);
   static std::optional<BinaryConditionalOperator> from(const ValueStmt &parent);
   static std::optional<BinaryConditionalOperator> from(const Stmt &parent);
+  Expr common(void) const;
   OpaqueValueExpr opaque_value(void) const;
 };
 
@@ -9382,6 +9589,7 @@ class VAArgExpr : public Expr {
   static std::optional<VAArgExpr> from(const Stmt &parent);
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
+  Expr sub_expression(void) const;
   bool is_microsoft_abi(void) const;
 };
 
@@ -9410,6 +9618,7 @@ class UnaryOperator : public Expr {
   bool can_overflow(void) const;
   UnaryOperatorKind opcode(void) const;
   Token operator_token(void) const;
+  Expr sub_expression(void) const;
   bool has_stored_fp_features(void) const;
   bool is_arithmetic_operation(void) const;
   bool is_decrement_operation(void) const;
@@ -9441,6 +9650,7 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Expr &parent);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Stmt &parent);
+  std::optional<Expr> argument_expression(void) const;
   Token operator_token(void) const;
   Token r_paren_token(void) const;
   bool is_argument_type(void) const;
@@ -9546,6 +9756,7 @@ class SubstNonTypeTemplateParmExpr : public Expr {
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent);
   Token name_token(void) const;
   NonTypeTemplateParmDecl parameter(void) const;
+  Expr replacement(void) const;
   bool is_reference_parameter(void) const;
 };
 
@@ -9774,6 +9985,7 @@ class RecoveryExpr : public Expr {
   static std::optional<RecoveryExpr> from(const Expr &parent);
   static std::optional<RecoveryExpr> from(const ValueStmt &parent);
   static std::optional<RecoveryExpr> from(const Stmt &parent);
+  std::vector<Expr> sub_expressions(void) const;
 };
 
 using PseudoObjectExprRange = DerivedEntityRange<StmtIterator, PseudoObjectExpr>;
@@ -9798,6 +10010,10 @@ class PseudoObjectExpr : public Expr {
   static std::optional<PseudoObjectExpr> from(const Expr &parent);
   static std::optional<PseudoObjectExpr> from(const ValueStmt &parent);
   static std::optional<PseudoObjectExpr> from(const Stmt &parent);
+  Expr result_expression(void) const;
+  Expr syntactic_form(void) const;
+  std::vector<Expr> semantics(void) const;
+  std::vector<Expr> semantic_expressions(void) const;
 };
 
 using PredefinedExprRange = DerivedEntityRange<StmtIterator, PredefinedExpr>;
@@ -9852,6 +10068,7 @@ class ParenListExpr : public Expr {
   static std::optional<ParenListExpr> from(const Stmt &parent);
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
+  std::vector<Expr> expressions(void) const;
 };
 
 using ParenExprRange = DerivedEntityRange<StmtIterator, ParenExpr>;
@@ -9878,6 +10095,7 @@ class ParenExpr : public Expr {
   static std::optional<ParenExpr> from(const Stmt &parent);
   Token l_paren(void) const;
   Token r_paren(void) const;
+  Expr sub_expression(void) const;
 };
 
 using PackExpansionExprRange = DerivedEntityRange<StmtIterator, PackExpansionExpr>;
@@ -9903,6 +10121,7 @@ class PackExpansionExpr : public Expr {
   static std::optional<PackExpansionExpr> from(const ValueStmt &parent);
   static std::optional<PackExpansionExpr> from(const Stmt &parent);
   Token ellipsis_token(void) const;
+  Expr pattern(void) const;
 };
 
 using OverloadExprRange = DerivedEntityRange<StmtIterator, OverloadExpr>;
@@ -9960,6 +10179,7 @@ class UnresolvedMemberExpr : public OverloadExpr {
   static std::optional<UnresolvedMemberExpr> from(const Expr &parent);
   static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
   static std::optional<UnresolvedMemberExpr> from(const Stmt &parent);
+  Expr base(void) const;
   Token member_token(void) const;
   Token operator_token(void) const;
   bool has_unresolved_using(void) const;
@@ -10018,6 +10238,7 @@ class OpaqueValueExpr : public Expr {
   static std::optional<OpaqueValueExpr> from(const ValueStmt &parent);
   static std::optional<OpaqueValueExpr> from(const Stmt &parent);
   Token token(void) const;
+  Expr source_expression(void) const;
   bool is_unique(void) const;
 };
 
@@ -10070,6 +10291,8 @@ class ObjCSubscriptRefExpr : public Expr {
   static std::optional<ObjCSubscriptRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent);
   ObjCMethodDecl at_index_method_declaration(void) const;
+  Expr base_expression(void) const;
+  Expr key_expression(void) const;
   Token r_bracket(void) const;
   bool is_array_subscript_reference_expression(void) const;
 };
@@ -10176,6 +10399,7 @@ class ObjCPropertyRefExpr : public Expr {
   static std::optional<ObjCPropertyRefExpr> from(const Expr &parent);
   static std::optional<ObjCPropertyRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCPropertyRefExpr> from(const Stmt &parent);
+  Expr base(void) const;
   ObjCInterfaceDecl class_receiver(void) const;
   ObjCPropertyDecl explicit_property(void) const;
   ObjCMethodDecl implicit_property_getter(void) const;
@@ -10213,6 +10437,8 @@ class ObjCMessageExpr : public Expr {
   static std::optional<ObjCMessageExpr> from(const Expr &parent);
   static std::optional<ObjCMessageExpr> from(const ValueStmt &parent);
   static std::optional<ObjCMessageExpr> from(const Stmt &parent);
+  std::vector<Expr> arguments(void) const;
+  Expr instance_receiver(void) const;
   Token left_token(void) const;
   ObjCMethodDecl method_declaration(void) const;
   ObjCMethodFamily method_family(void) const;
@@ -10251,6 +10477,7 @@ class ObjCIvarRefExpr : public Expr {
   static std::optional<ObjCIvarRefExpr> from(const Expr &parent);
   static std::optional<ObjCIvarRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIvarRefExpr> from(const Stmt &parent);
+  Expr base(void) const;
   ObjCIvarDecl declaration(void) const;
   Token token(void) const;
   Token operation_token(void) const;
@@ -10280,6 +10507,7 @@ class ObjCIsaExpr : public Expr {
   static std::optional<ObjCIsaExpr> from(const Expr &parent);
   static std::optional<ObjCIsaExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIsaExpr> from(const Stmt &parent);
+  Expr base(void) const;
   Token base_token_end(void) const;
   Token isa_member_token(void) const;
   Token operation_token(void) const;
@@ -10308,6 +10536,7 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Expr &parent);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Stmt &parent);
+  Expr sub_expression(void) const;
   bool should_copy(void) const;
 };
 
@@ -10386,6 +10615,7 @@ class ObjCBoxedExpr : public Expr {
   static std::optional<ObjCBoxedExpr> from(const Stmt &parent);
   Token at_token(void) const;
   ObjCMethodDecl boxing_method(void) const;
+  Expr sub_expression(void) const;
   bool is_expressible_as_constant_initializer(void) const;
 };
 
@@ -10463,6 +10693,7 @@ class ObjCArrayLiteral : public Expr {
   static std::optional<ObjCArrayLiteral> from(const ValueStmt &parent);
   static std::optional<ObjCArrayLiteral> from(const Stmt &parent);
   ObjCMethodDecl array_with_objects_method(void) const;
+  std::vector<Expr> elements(void) const;
 };
 
 using OMPIteratorExprRange = DerivedEntityRange<StmtIterator, OMPIteratorExpr>;
@@ -10514,6 +10745,8 @@ class OMPArrayShapingExpr : public Expr {
   static std::optional<OMPArrayShapingExpr> from(const Expr &parent);
   static std::optional<OMPArrayShapingExpr> from(const ValueStmt &parent);
   static std::optional<OMPArrayShapingExpr> from(const Stmt &parent);
+  Expr base(void) const;
+  std::vector<Expr> dimensions(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
 };
@@ -10540,9 +10773,13 @@ class OMPArraySectionExpr : public Expr {
   static std::optional<OMPArraySectionExpr> from(const Expr &parent);
   static std::optional<OMPArraySectionExpr> from(const ValueStmt &parent);
   static std::optional<OMPArraySectionExpr> from(const Stmt &parent);
+  Expr base(void) const;
   Token colon_token_first(void) const;
   Token colon_token_second(void) const;
+  Expr length(void) const;
+  Expr lower_bound(void) const;
   Token r_bracket_token(void) const;
+  Expr stride(void) const;
 };
 
 using NoInitExprRange = DerivedEntityRange<StmtIterator, NoInitExpr>;
@@ -10591,6 +10828,7 @@ class MemberExpr : public Expr {
   static std::optional<MemberExpr> from(const Expr &parent);
   static std::optional<MemberExpr> from(const ValueStmt &parent);
   static std::optional<MemberExpr> from(const Stmt &parent);
+  Expr base(void) const;
   Token l_angle_token(void) const;
   ValueDecl member_declaration(void) const;
   Token member_token(void) const;
@@ -10628,7 +10866,10 @@ class MatrixSubscriptExpr : public Expr {
   static std::optional<MatrixSubscriptExpr> from(const Expr &parent);
   static std::optional<MatrixSubscriptExpr> from(const ValueStmt &parent);
   static std::optional<MatrixSubscriptExpr> from(const Stmt &parent);
+  Expr base(void) const;
+  Expr column_index(void) const;
   Token r_bracket_token(void) const;
+  Expr row_index(void) const;
   bool is_incomplete(void) const;
 };
 
@@ -10657,6 +10898,7 @@ class MaterializeTemporaryExpr : public Expr {
   ValueDecl extending_declaration(void) const;
   LifetimeExtendedTemporaryDecl lifetime_extended_temporary_declaration(void) const;
   StorageDuration storage_duration(void) const;
+  Expr sub_expression(void) const;
   bool is_bound_to_lvalue_reference(void) const;
   bool is_usable_in_constant_expressions(void) const;
 };
@@ -10683,6 +10925,8 @@ class MSPropertySubscriptExpr : public Expr {
   static std::optional<MSPropertySubscriptExpr> from(const Expr &parent);
   static std::optional<MSPropertySubscriptExpr> from(const ValueStmt &parent);
   static std::optional<MSPropertySubscriptExpr> from(const Stmt &parent);
+  Expr base(void) const;
+  Expr index(void) const;
   Token r_bracket_token(void) const;
 };
 
@@ -10708,6 +10952,7 @@ class MSPropertyRefExpr : public Expr {
   static std::optional<MSPropertyRefExpr> from(const Expr &parent);
   static std::optional<MSPropertyRefExpr> from(const ValueStmt &parent);
   static std::optional<MSPropertyRefExpr> from(const Stmt &parent);
+  Expr base_expression(void) const;
   Token member_token(void) const;
   MSPropertyDecl property_declaration(void) const;
   bool is_arrow(void) const;
@@ -10736,6 +10981,7 @@ class LambdaExpr : public Expr {
   static std::optional<LambdaExpr> from(const Expr &parent);
   static std::optional<LambdaExpr> from(const ValueStmt &parent);
   static std::optional<LambdaExpr> from(const Stmt &parent);
+  Stmt body(void) const;
   CXXMethodDecl call_operator(void) const;
   LambdaCaptureDefault capture_default(void) const;
   Token capture_default_token(void) const;
@@ -10744,6 +10990,7 @@ class LambdaExpr : public Expr {
   TokenRange introducer_range(void) const;
   CXXRecordDecl lambda_class(void) const;
   std::optional<TemplateParameterList> template_parameter_list(void) const;
+  std::optional<Expr> trailing_requires_clause(void) const;
   bool has_explicit_parameters(void) const;
   bool has_explicit_result_type(void) const;
   bool is_generic_lambda(void) const;
@@ -10797,6 +11044,7 @@ class InitListExpr : public Expr {
   static std::optional<InitListExpr> from(const Expr &parent);
   static std::optional<InitListExpr> from(const ValueStmt &parent);
   static std::optional<InitListExpr> from(const Stmt &parent);
+  std::optional<Expr> array_filler(void) const;
   std::optional<FieldDecl> initialized_field_in_union(void) const;
   Token l_brace_token(void) const;
   Token r_brace_token(void) const;
@@ -10804,6 +11052,7 @@ class InitListExpr : public Expr {
   std::optional<InitListExpr> syntactic_form(void) const;
   bool had_array_range_designator(void) const;
   bool has_array_filler(void) const;
+  std::vector<Expr> initializers(void) const;
   bool is_explicit(void) const;
   bool is_semantic_form(void) const;
   bool is_string_literal_initializer(void) const;
@@ -10857,6 +11106,7 @@ class ImaginaryLiteral : public Expr {
   static std::optional<ImaginaryLiteral> from(const Expr &parent);
   static std::optional<ImaginaryLiteral> from(const ValueStmt &parent);
   static std::optional<ImaginaryLiteral> from(const Stmt &parent);
+  Expr sub_expression(void) const;
 };
 
 using GenericSelectionExprRange = DerivedEntityRange<StmtIterator, GenericSelectionExpr>;
@@ -10881,9 +11131,12 @@ class GenericSelectionExpr : public Expr {
   static std::optional<GenericSelectionExpr> from(const Expr &parent);
   static std::optional<GenericSelectionExpr> from(const ValueStmt &parent);
   static std::optional<GenericSelectionExpr> from(const Stmt &parent);
+  std::vector<Expr> association_expressions(void) const;
+  Expr controlling_expression(void) const;
   Token default_token(void) const;
   Token generic_token(void) const;
   Token r_paren_token(void) const;
+  Expr result_expression(void) const;
   bool is_result_dependent(void) const;
 };
 
@@ -10961,6 +11214,7 @@ class FullExpr : public Expr {
   static std::optional<FullExpr> from(const Expr &parent);
   static std::optional<FullExpr> from(const ValueStmt &parent);
   static std::optional<FullExpr> from(const Stmt &parent);
+  Expr sub_expression(void) const;
 };
 
 using ExprWithCleanupsRange = DerivedEntityRange<StmtIterator, ExprWithCleanups>;
@@ -11094,6 +11348,7 @@ class ExtVectorElementExpr : public Expr {
   static std::optional<ExtVectorElementExpr> from(const Stmt &parent);
   bool contains_duplicate_elements(void) const;
   Token accessor_token(void) const;
+  Expr base(void) const;
   bool is_arrow(void) const;
 };
 
@@ -11119,6 +11374,7 @@ class ExpressionTraitExpr : public Expr {
   static std::optional<ExpressionTraitExpr> from(const Expr &parent);
   static std::optional<ExpressionTraitExpr> from(const ValueStmt &parent);
   static std::optional<ExpressionTraitExpr> from(const Stmt &parent);
+  Expr queried_expression(void) const;
   ExpressionTrait trait(void) const;
   bool value(void) const;
 };
@@ -11144,6 +11400,7 @@ class AttributedStmt : public ValueStmt {
   static std::optional<AttributedStmt> from(const ValueStmt &parent);
   static std::optional<AttributedStmt> from(const Stmt &parent);
   Token attribute_token(void) const;
+  Stmt sub_statement(void) const;
 };
 
 using SwitchStmtRange = DerivedEntityRange<StmtIterator, SwitchStmt>;
@@ -11164,10 +11421,14 @@ class SwitchStmt : public Stmt {
 
   static std::optional<SwitchStmt> from(const TokenContext &c);
   static std::optional<SwitchStmt> from(const Stmt &parent);
+  Stmt body(void) const;
+  Expr condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
+  std::optional<Stmt> initializer(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
+  std::optional<SwitchCase> first_switch_case(void) const;
   Token switch_token(void) const;
   bool has_initializer_storage(void) const;
   bool has_variable_storage(void) const;
@@ -11194,6 +11455,8 @@ class SwitchCase : public Stmt {
   static std::optional<SwitchCase> from(const Stmt &parent);
   Token colon_token(void) const;
   Token keyword_token(void) const;
+  std::optional<SwitchCase> next_switch_case(void) const;
+  Stmt sub_statement(void) const;
 };
 
 using DefaultStmtRange = DerivedEntityRange<StmtIterator, DefaultStmt>;
@@ -11242,6 +11505,8 @@ class CaseStmt : public SwitchCase {
   bool case_statement_is_gnu_range(void) const;
   Token case_token(void) const;
   Token ellipsis_token(void) const;
+  Expr lhs(void) const;
+  std::optional<Expr> rhs(void) const;
 };
 
 using DeclRange = DerivedEntityRange<DeclIterator, Decl>;
@@ -11286,10 +11551,15 @@ class Decl {
   AvailabilityResult availability(void) const;
   Token begin_token(void) const;
   Token body_r_brace(void) const;
+  Decl canonical_declaration(void) const;
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   Token end_token(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
+  Decl most_recent_declaration(void) const;
+  std::optional<Decl> next_declaration_in_context(void) const;
+  std::optional<Decl> non_closure_context(void) const;
+  std::optional<Decl> previous_declaration(void) const;
   bool has_attributes(void) const;
   bool has_defining_attribute(void) const;
   bool has_owning_module(void) const;
@@ -11318,6 +11588,7 @@ class Decl {
   bool is_unconditionally_visible(void) const;
   bool is_used(void) const;
   bool is_weak_imported(void) const;
+  std::vector<Decl> redeclarations(void) const;
   DeclKind kind(void) const;
   Token token(void) const;
   TokenRange token_range(void) const;
@@ -11391,6 +11662,7 @@ class BlockDecl : public Decl {
   bool can_avoid_copy_to_heap(void) const;
   bool captures_cxx_this(void) const;
   bool does_not_escape(void) const;
+  Decl block_mangling_context_declaration(void) const;
   Token caret_token(void) const;
   CompoundStmt compound_body(void) const;
   bool has_captures(void) const;
@@ -11463,6 +11735,7 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   static std::optional<OMPThreadPrivateDecl> from(const TokenContext &c);
   static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
+  std::vector<Expr> varlists(void) const;
 };
 
 using OMPRequiresDeclRange = DerivedEntityRange<DeclIterator, OMPRequiresDecl>;
@@ -11507,6 +11780,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   static std::optional<OMPAllocateDecl> from(const TokenContext &c);
   static std::optional<OMPAllocateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPAllocateDecl> from(const Decl &parent);
+  std::vector<Expr> varlists(void) const;
 };
 
 using TranslationUnitDeclRange = DerivedEntityRange<DeclIterator, TranslationUnitDecl>;
@@ -11548,6 +11822,7 @@ class StaticAssertDecl : public Decl {
 
   static std::optional<StaticAssertDecl> from(const TokenContext &c);
   static std::optional<StaticAssertDecl> from(const Decl &parent);
+  Expr assert_expression(void) const;
   StringLiteral message(void) const;
   Token r_paren_token(void) const;
   bool is_failed(void) const;
@@ -11636,11 +11911,13 @@ class ObjCPropertyImplDecl : public Decl {
 
   static std::optional<ObjCPropertyImplDecl> from(const TokenContext &c);
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
+  Expr getter_cxx_constructor(void) const;
   ObjCMethodDecl getter_method_declaration(void) const;
   ObjCPropertyDecl property_declaration(void) const;
   ObjCPropertyImplDeclKind property_implementation(void) const;
   ObjCIvarDecl property_instance_variable_declaration(void) const;
   Token property_instance_variable_declaration_token(void) const;
+  Expr setter_cxx_assignment(void) const;
   ObjCMethodDecl setter_method_declaration(void) const;
   bool is_instance_variable_name_specified(void) const;
 };
@@ -11881,6 +12158,12 @@ class OMPDeclareReductionDecl : public ValueDecl {
   static std::optional<OMPDeclareReductionDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclareReductionDecl> from(const NamedDecl &parent);
   static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
+  Expr combiner(void) const;
+  Expr combiner_in(void) const;
+  Expr combiner_out(void) const;
+  Expr initializer_original(void) const;
+  Expr initializer_private(void) const;
+  Expr initializer(void) const;
   OMPDeclareReductionDeclInitKind initializer_kind(void) const;
   OMPDeclareReductionDecl prev_declaration_in_scope(void) const;
   std::vector<Decl> declarations_in_context(void) const;
@@ -11959,6 +12242,7 @@ class EnumConstantDecl : public ValueDecl {
   static std::optional<EnumConstantDecl> from(const ValueDecl &parent);
   static std::optional<EnumConstantDecl> from(const NamedDecl &parent);
   static std::optional<EnumConstantDecl> from(const Decl &parent);
+  std::optional<Expr> initializer_expression(void) const;
 };
 
 using DeclaratorDeclRange = DerivedEntityRange<DeclIterator, DeclaratorDecl>;
@@ -11985,6 +12269,7 @@ class DeclaratorDecl : public ValueDecl {
   static std::optional<DeclaratorDecl> from(const Decl &parent);
   Token inner_token_start(void) const;
   Token outer_token_start(void) const;
+  std::optional<Expr> trailing_requires_clause(void) const;
   Token type_spec_end_token(void) const;
   Token type_spec_start_token(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;
@@ -12015,6 +12300,7 @@ class VarDecl : public DeclaratorDecl {
   static std::optional<VarDecl> from(const NamedDecl &parent);
   static std::optional<VarDecl> from(const Decl &parent);
   std::optional<VarDecl> acting_definition(void) const;
+  std::optional<Expr> initializer(void) const;
   VarDeclInitializationStyle initializer_style(void) const;
   std::optional<VarDecl> initializing_declaration(void) const;
   std::optional<VarDecl> instantiated_from_static_data_member(void) const;
@@ -12089,8 +12375,10 @@ class ParmVarDecl : public VarDecl {
   static std::optional<ParmVarDecl> from(const ValueDecl &parent);
   static std::optional<ParmVarDecl> from(const NamedDecl &parent);
   static std::optional<ParmVarDecl> from(const Decl &parent);
+  std::optional<Expr> default_argument(void) const;
   TokenRange default_argument_range(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
+  std::optional<Expr> uninstantiated_default_argument(void) const;
   bool has_default_argument(void) const;
   bool has_inherited_default_argument(void) const;
   bool has_uninstantiated_default_argument(void) const;
@@ -12277,7 +12565,9 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   static std::optional<NonTypeTemplateParmDecl> from(const NamedDecl &parent);
   static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent);
   bool default_argument_was_inherited(void) const;
+  Expr default_argument(void) const;
   Token default_argument_token(void) const;
+  Expr placeholder_type_constraint(void) const;
   bool has_default_argument(void) const;
   bool has_placeholder_type_constraint(void) const;
   bool is_expanded_parameter_pack(void) const;
@@ -12402,6 +12692,7 @@ class FunctionDecl : public DeclaratorDecl {
   std::vector<ParmVarDecl> parameters(void) const;
   bool uses_seh_try(void) const;
   bool will_have_body(void) const;
+  std::optional<Stmt> body(void) const;
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -12473,6 +12764,7 @@ class CXXDestructorDecl : public CXXMethodDecl {
   static std::optional<CXXDestructorDecl> from(const NamedDecl &parent);
   static std::optional<CXXDestructorDecl> from(const Decl &parent);
   FunctionDecl operator_delete(void) const;
+  Expr operator_delete_this_argument(void) const;
 };
 
 using CXXConversionDeclRange = DerivedEntityRange<DeclIterator, CXXConversionDecl>;
@@ -12598,7 +12890,9 @@ class FieldDecl : public DeclaratorDecl {
   static std::optional<FieldDecl> from(const ValueDecl &parent);
   static std::optional<FieldDecl> from(const NamedDecl &parent);
   static std::optional<FieldDecl> from(const Decl &parent);
+  std::optional<Expr> bit_width(void) const;
   InClassInitStyle in_class_initializer_style(void) const;
+  std::optional<Expr> in_class_initializer(void) const;
   RecordDecl parent(void) const;
   bool has_captured_vla_type(void) const;
   bool has_in_class_initializer(void) const;
@@ -12693,6 +12987,7 @@ class BindingDecl : public ValueDecl {
   static std::optional<BindingDecl> from(const ValueDecl &parent);
   static std::optional<BindingDecl> from(const NamedDecl &parent);
   static std::optional<BindingDecl> from(const Decl &parent);
+  Expr binding(void) const;
   ValueDecl decomposed_declaration(void) const;
   VarDecl holding_variable(void) const;
 };
@@ -12745,6 +13040,7 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   static std::optional<OMPDeclareMapperDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclareMapperDecl> from(const NamedDecl &parent);
   static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
+  Expr mapper_variable_reference(void) const;
   OMPDeclareMapperDecl prev_declaration_in_scope(void) const;
   std::vector<Decl> declarations_in_context(void) const;
 };
@@ -13064,6 +13360,7 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<CXXRecordDecl> instantiated_from_member_class(void) const;
   std::optional<CXXMethodDecl> lambda_call_operator(void) const;
   LambdaCaptureDefault lambda_capture_default(void) const;
+  Decl lambda_context_declaration(void) const;
   std::vector<NamedDecl> lambda_explicit_template_parameters(void) const;
   MSInheritanceModel ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
@@ -13585,6 +13882,7 @@ class ConceptDecl : public TemplateDecl {
   static std::optional<ConceptDecl> from(const TemplateDecl &parent);
   static std::optional<ConceptDecl> from(const NamedDecl &parent);
   static std::optional<ConceptDecl> from(const Decl &parent);
+  Expr constraint_expression(void) const;
   bool is_type_concept(void) const;
 };
 
@@ -14070,8 +14368,10 @@ class LifetimeExtendedTemporaryDecl : public Decl {
 
   static std::optional<LifetimeExtendedTemporaryDecl> from(const TokenContext &c);
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
+  std::vector<Stmt> children_expression(void) const;
   ValueDecl extending_declaration(void) const;
   StorageDuration storage_duration(void) const;
+  Expr temporary_expression(void) const;
 };
 
 using ImportDeclRange = DerivedEntityRange<DeclIterator, ImportDecl>;
