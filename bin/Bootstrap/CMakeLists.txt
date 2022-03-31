@@ -22,6 +22,12 @@ target_link_libraries("${exe_name}"
     pasta::pasta
 )
 
+
+target_compile_features("${exe_name}"
+  PUBLIC
+    cxx_std_20
+)
+
 # `mx-bootstrap` works by running PASTA on itself. To be successful at this, it
 # needs to know the actual include directories of Multiplier and its
 # dependencies. We pass those in at the first two arguments.

@@ -364,7 +364,8 @@ void IndexCompileJobAction::MaybePersistFile(
 
 // Build and index the AST.
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
-  mx::ProgressBarWork progress_tracker(context->ast_progress.get());
+  std::optional<mx::ProgressBarWork> parsing_progress_tracker(
+      context->ast_progress.get());
 
   auto main_file_path =
       job.SourceFile().Path().lexically_normal().generic_string();
@@ -378,11 +379,23 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   }
 
   pasta::AST ast = maybe_ast.TakeValue();
-  for (pasta::File file : ast.ParsedFiles()) {
-    MaybePersistFile(worker_id, exe, std::move(file));
+  parsing_progress_tracker.reset();
+
+  {
+    mx::ProgressBarWork progress_tracker(context->file_progress.get());
+    auto parsed_files = ast.ParsedFiles();
+    for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
+         it != end; ++it) {
+      MaybePersistFile(worker_id, exe, std::move(*it));
+    }
   }
 
+  std::optional<mx::ProgressBarWork> partitioning_progress_tracker(
+      context->partitioning_progress.get());
+
   using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
+  using DeclGroupRange = std::tuple<std::vector<pasta::Decl>, uint64_t, uint64_t>;
+
   std::vector<DeclRange> decl_ranges;
   decl_ranges.reserve(8192u);
 
@@ -456,15 +469,14 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
                      }
                    });
 
-  EntityLabeller labeller;
+  partitioning_progress_tracker.reset();
 
-  std::vector<pasta::Decl> decls_for_chunk;
-  std::vector<CodeChunk> code_chunks;
-
+  std::vector<DeclGroupRange> decl_group_ranges;
   for (size_t i = 0u, max_i = decl_ranges.size(); i < max_i; ) {
     auto [decl, begin_index, end_index] = std::move(decl_ranges[i++]);
-    decls_for_chunk.clear();
-    decls_for_chunk.push_back(decl);
+
+    std::vector<pasta::Decl> decls_for_group;
+    decls_for_group.push_back(decl);
 
     // Try to accumulate the nearby top-level declarations whose token ranges
     // overlap with `decl` into `decls_for_chunk`. For example, this process
@@ -487,7 +499,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
               << " is repeated in top-level decl list for job on file "
               << " on main job file " << main_file_path;
         } else {
-          decls_for_chunk.push_back(std::move(next_decl));
+          decls_for_group.push_back(std::move(next_decl));
         }
 
         // Make sure we definitely enclose over the next decl.
@@ -499,11 +511,28 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
       }
     }
 
-    // Don't create token `decls_for_chunk` if the decl is already seen. This
+    decl_group_ranges.emplace_back(
+        std::move(decls_for_group), begin_index, end_index);
+  }
+
+  // Create code chunks in reverse order that we see them in the AST. The hope
+  // is that this will reduce contention in trying to create fragment IDs for
+  // the redundant declarations that are likely to appear early in ASTs, i.e.
+  // in `#include`d headers.
+  std::optional<mx::ProgressBarWork> identification_progress_tracker(
+      context->identification_progress.get());
+  EntityLabeller labeller;
+  std::vector<PendingFragment> pending_fragments;
+  for (auto it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
+       it != end; ++it) {
+
+    auto [decls_for_group, begin_index, end_index] = std::move(*it);
+
+    // Don't create token `decls_for_group` if the decl is already seen. This
     // means it's already been indexed.
     auto [code_id, is_new] = context->GetOrCreateFragmentId(
         worker_id,
-        CodeHash(file_hashes, decls_for_chunk, tok_range,
+        CodeHash(file_hashes, decls_for_group, tok_range,
                  begin_index, end_index),
         end_index - begin_index + 1u);
 
@@ -514,20 +543,22 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     // (decls, statements, etc.) in a uniform and deterministic way so that
     // other threads doing similar indexing will form identically labelled
     // chunks for the same logical entities.
-    CodeChunk code_chunk = labeller.EnterCode(
-        code_id, std::move(decls_for_chunk), tok_range, begin_index, end_index);
+    PendingFragment pending_fragment = labeller.EnterCode(
+        code_id, std::move(decls_for_group), tok_range, begin_index, end_index);
 
     if (is_new) {
-      code_chunks.emplace_back(std::move(code_chunk));
+      pending_fragments.emplace_back(std::move(pending_fragment));
     }
   }
-
-  EntitySerializer serializer(std::move(tok_range), labeller.TakeEntityIds(),
-                              file_ids);
+  identification_progress_tracker.reset();
 
   // Serialize the new code chunks.
-  for (CodeChunk &code_chunk : code_chunks) {
-    PersistFragment(*context, serializer, std::move(code_chunk));
+  mx::ProgressBarWork fragment_progress_tracker(
+      context->serialization_progress.get());
+  EntitySerializer serializer(std::move(tok_range), labeller.TakeEntityIds(),
+                              file_ids);
+  for (PendingFragment &pending_fragment : pending_fragments) {
+    PersistFragment(*context, serializer, std::move(pending_fragment));
   }
 }
 

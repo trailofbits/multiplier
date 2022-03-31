@@ -60,15 +60,21 @@ IndexingContext::~IndexingContext(void) {
 }
 
 void IndexingContext::InitializeProgressBars(void) {
-  command_progress.reset(new mx::ProgressBar("Command parsing",
+  command_progress.reset(new mx::ProgressBar("1) Command interpretation",
                                              std::chrono::seconds(1)));
-  ast_progress.reset(new mx::ProgressBar("AST building",
+  ast_progress.reset(new mx::ProgressBar("2) Parsing / AST building",
                                          std::chrono::seconds(1)));
-  tokenizer_progress.reset(new mx::ProgressBar("Tokenizer",
-                                               std::chrono::seconds(1)));
+  partitioning_progress.reset(new mx::ProgressBar("4) Fragment partitioning",
+                                                  std::chrono::seconds(1)));
+  identification_progress.reset(new mx::ProgressBar("5) Fragment identification",
+                                                    std::chrono::seconds(1)));
+  serialization_progress.reset(new mx::ProgressBar("6) Fragment serialization",
+                                              std::chrono::seconds(1)));
+  file_progress.reset(new mx::ProgressBar("3) File serialization",
+                                          std::chrono::seconds(1)));
   command_progress->SetNumWorkers(num_workers);
   ast_progress->SetNumWorkers(num_workers);
-  tokenizer_progress->SetNumWorkers(num_workers);
+  file_progress->SetNumWorkers(num_workers);
 }
 
 // Get or create a file ID for the file at `file_path` with contents
@@ -111,10 +117,27 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
     mx::WorkerId worker_id_, const std::string &code_hash,
     uint64_t num_tokens) {
 
-  const auto worker_id = static_cast<unsigned>(worker_id_);
-  mx::FragmentId code_id = 0u;
+  std::string prefix;
+  prefix.reserve(32);
+  if (code_hash.size() > 32) {
+    prefix.insert(prefix.end(), &(code_hash[0]), &(code_hash[32]));
+  } else {
+    prefix = code_hash;
+  }
 
-  // "Big codes" have IDs in the range [1, mx::kMaxNumBigCodeChunks)`.
+  code_hash_to_fragment_id_maps.lock();
+  auto &cache = code_hash_to_fragment_id_maps[std::move(prefix)];
+  code_hash_to_fragment_id_maps.unlock();
+
+  std::unique_lock<std::mutex> locker(cache);
+  mx::FragmentId &code_id = cache[code_hash];
+  if (code_id != mx::kInvalidEntityId) {
+    return {code_id, false};
+  }
+
+  const auto worker_id = static_cast<unsigned>(worker_id_);
+
+  // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   if (num_tokens >= mx::kNumTokensInBigFragment) {
     auto &maybe_id = this->local_next_big_fragment_id[worker_id].id;
     mx::FileId created_id = mx::kInvalidEntityId;
@@ -138,7 +161,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
       return {code_id, false};
     }
 
-  // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigCodeChunks, ...)`.
+  // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigPendingFragments, ...)`.
   } else {
     auto &maybe_id = this->local_next_small_fragment_id[worker_id].id;
     mx::FileId created_id = mx::kInvalidEntityId;
@@ -164,15 +187,14 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
 }
 
 // Save the tokenized contents of a file.
-void IndexingContext::PutSerializedFile(
-    mx::FileId file_id, kj::Array<capnp::word> tokens) {
-  server_context.file_id_to_serialized_file.Set(file_id, kj::mv(tokens));
+void IndexingContext::PutSerializedFile(mx::FileId id, std::string data) {
+  server_context.file_id_to_serialized_file.Set(id, std::move(data));
 }
 
 // Save the serialized top-level entities and the parsed tokens.
-void IndexingContext::PutSerializedFragment(mx::FragmentId code_id,
-                                            kj::Array<capnp::word> code) {
-  server_context.fragment_id_to_serialized_fragment.Set(code_id, kj::mv(code));
+void IndexingContext::PutSerializedFragment(mx::FragmentId id,
+                                            std::string data) {
+  server_context.fragment_id_to_serialized_fragment.Set(id, std::move(data));
 }
 
 // Save an entries of the form `(file_id, line_number, fragment_id)` over

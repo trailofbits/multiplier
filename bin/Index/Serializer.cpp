@@ -111,7 +111,7 @@ bool EntitySerializer::Enter(const pasta::Decl &entity) {
     case pasta::DeclKind::k ## decl: { \
       Serialize ## decl ## Decl( \
          *this, \
-         decl ## Decl_builder[offset], \
+         decl_builder[offset], \
          reinterpret_cast<const pasta::decl ## Decl &>(entity)); \
       return true; \
     }
@@ -156,7 +156,7 @@ bool EntitySerializer::Enter(const pasta::Stmt &entity) {
     case pasta::StmtKind::k ## stmt: { \
       Serialize ## stmt( \
           *this, \
-          stmt ## _builder[offset], \
+          stmt_builder[offset], \
           reinterpret_cast<const pasta::stmt &>(entity)); \
       return true; \
     }
@@ -172,10 +172,23 @@ bool EntitySerializer::Enter(const pasta::Stmt &entity) {
   }
 }
 
-void EntitySerializer::Serialize(mx::ast::Token::Builder token,
+void EntitySerializer::Enter(
+    const pasta::Decl &, std::vector<pasta::TemplateArgument>) {}
+void EntitySerializer::Enter(
+    const pasta::Stmt &, std::vector<pasta::TemplateArgument>) {}
+void EntitySerializer::Enter(
+    const pasta::Decl &, std::vector<pasta::CXXBaseSpecifier>) {}
+void EntitySerializer::Enter(
+    const pasta::Decl &, std::vector<pasta::TemplateParameterList>) {}
+void EntitySerializer::Enter(
+    const pasta::Decl &, const pasta::TemplateParameterList &) {}
+void EntitySerializer::Enter(
+    const pasta::Stmt &, const pasta::TemplateParameterList &) {}
+
+void EntitySerializer::Serialize(mx::rpc::Token::Builder token,
                                  const pasta::Token &entity) {
   std::string data(entity.Data().data(), entity.Data().size());
-  token.setKind(static_cast<mx::ast::TokenKind>(mx::FromPasta(entity.Kind())));
+  token.setKind(static_cast<unsigned short>(mx::FromPasta(entity.Kind())));
   token.setData(data);
 }
 

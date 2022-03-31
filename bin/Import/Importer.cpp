@@ -281,16 +281,16 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   }
 }
 
-static mx::ast::CompilerName FromPasta(pasta::CompilerName name) {
-  return static_cast<mx::ast::CompilerName>(mx::FromPasta(name));
+static mx::rpc::CompilerName FromPasta(pasta::CompilerName name) {
+  return static_cast<mx::rpc::CompilerName>(mx::FromPasta(name));
 }
 
-static mx::ast::TargetLanguage FromPasta(pasta::TargetLanguage tl) {
-  return static_cast<mx::ast::TargetLanguage>(mx::FromPasta(tl));
+static mx::rpc::TargetLanguage FromPasta(pasta::TargetLanguage tl) {
+  return static_cast<mx::rpc::TargetLanguage>(mx::FromPasta(tl));
 }
 
-static mx::ast::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
-  return static_cast<mx::ast::IncludePathLocation>(mx::FromPasta(ipl));
+static mx::rpc::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
+  return static_cast<mx::rpc::IncludePathLocation>(mx::FromPasta(ipl));
 }
 
 kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {

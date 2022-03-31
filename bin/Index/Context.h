@@ -15,9 +15,8 @@
 #include <multiplier/PersistentMap.h>
 #include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
-
+#include <mutex>
 #include <pasta/Util/FileManager.h>
-
 #include <string>
 #include <unordered_map>
 
@@ -83,7 +82,7 @@ class ServerContext {
   mx::PersistentSet<kFileIdToPath, mx::FileId, std::string> file_id_to_path;
 
   // Maps file IDs to a serialized `rpc::File` data structure.
-  mx::PersistentMap<kFileIdToSerializedFile, mx::FileId, kj::Array<capnp::word>>
+  mx::PersistentMap<kFileIdToSerializedFile, mx::FileId, std::string>
       file_id_to_serialized_file;
 
   // A set of `(file_id, fragment_id)` pairs for mapping from files to the
@@ -118,7 +117,7 @@ class ServerContext {
 
   // Maps a fragment ID to the serialized `rpc::Fragment` data structure.
   mx::PersistentMap<kFragmentIdToSerializedFragment,
-                    mx::FragmentId, kj::Array<capnp::word>>
+                    mx::FragmentId, std::string>
       fragment_id_to_serialized_fragment;
 
   void Flush(void);
@@ -127,6 +126,10 @@ class ServerContext {
 
   explicit ServerContext(std::filesystem::path workspace_dir_);
 };
+
+template <typename K, typename V>
+struct alignas(64) AtomicMap
+    : public std::unordered_map<K, V>, public std::mutex {};
 
 // State that needs to live only as long as there are active indexing jobs
 // underway.
@@ -141,10 +144,29 @@ class IndexingContext {
   // Tracks progress in running compile jobs to produce ASTs.
   std::unique_ptr<mx::ProgressBar> ast_progress;
 
+  // Tracks progress in partitioning an AST into fragments.
+  std::unique_ptr<mx::ProgressBar> partitioning_progress;
+
+  // Tracks progress in identifying fragments with IDs.
+  std::unique_ptr<mx::ProgressBar> identification_progress;
+
+  // Tracks progress in serializing fragments.
+  std::unique_ptr<mx::ProgressBar> serialization_progress;
+
   // Tracks progress in saving tokenized files.
-  std::unique_ptr<mx::ProgressBar> tokenizer_progress;
+  std::unique_ptr<mx::ProgressBar> file_progress;
 
   const unsigned num_workers;
+
+  // In-memory caches that gate read/write access to
+  // `ServerContext::code_hash_to_fragment_id`, because a lot of CPU is spent
+  // there.
+  //
+  // TODO(pag): Perhaps its related to RocksDB trying to maintain ordering?
+  //            Would be nice to use a separate `rocksdb::ColumnFamily` and tell
+  //            it to optimize for point queries.
+  AtomicMap<std::string, AtomicMap<std::string, mx::FragmentId>>
+      code_hash_to_fragment_id_maps;
 
   // Worker-local next counters for IDs.
   std::vector<NextId<mx::FileId>> local_next_file_id;
@@ -171,11 +193,10 @@ class IndexingContext {
       uint64_t num_tokens);
 
   // Save the serialized contents of a file as a token list.
-  void PutSerializedFile(mx::FileId file_id, kj::Array<capnp::word> tokens);
+  void PutSerializedFile(mx::FileId file_id, std::string);
 
   // Save the serialized top-level entities and the parsed tokens.
-  void PutSerializedFragment(mx::FragmentId code_id,
-                             kj::Array<capnp::word> code);
+  void PutSerializedFragment(mx::FragmentId code_id, std::string);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out

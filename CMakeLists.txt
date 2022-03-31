@@ -36,13 +36,7 @@ endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
 
-# TODO(pag): Ugh this is ughly. I misunderstood how `ExternalProject_Add`
-#            works and so this is just a dumb way of trying to go and get
-#            things.
-if(NOT MX_ENABLE_BOOTSTRAP)
-  find_package(CapnProto CONFIG REQUIRED)
-endif()
-
+find_package(CapnProto CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(gflags CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)

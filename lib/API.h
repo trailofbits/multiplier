@@ -9,21 +9,55 @@
 #include <multiplier/API.h>
 
 #include <capnp/ez-rpc.h>
+#include <capnp/message.h>
+#include <capnp/serialize.h>
+#include <capnp/serialize-packed.h>
 #include <kj/async.h>
+#include <kj/io.h>
+#include <optional>
 
 #include "AST.capnp.h"
 #include "RPC.capnp.h"
 
 namespace mx {
 
-class TokenReaderImpl {
- public:
-  using Ptr = std::shared_ptr<const TokenReaderImpl>;
+using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
+using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
+                                             capnp::Kind::STRUCT>::Reader;
+using FragmentReader = rpc::Fragment::Reader;
+using DeclReader = ast::Decl::Reader;
+using StmtReader = ast::Stmt::Reader;
+using PseudoReader = ast::Pseudo::Reader;
+using DeclListReader = capnp::List<ast::Decl, capnp::Kind::STRUCT>::Reader;
+using StmtListReader = capnp::List<ast::Stmt, capnp::Kind::STRUCT>::Reader;
+using PseudoListReader = capnp::List<ast::Pseudo, capnp::Kind::STRUCT>::Reader;
+using TopLevelDeclListReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 
-  virtual ~TokenReaderImpl(void) noexcept;
+struct PackedReaderState {
+ private:
+  std::string storage;
+  std::optional<kj::ArrayInputStream> stream;
+  std::optional<capnp::PackedMessageReader> packed_reader;
+
+  PackedReaderState(void) = delete;
+
+ public:
+  explicit PackedReaderState(capnp::Data::Reader data);
+
+  template <typename T>
+  auto Reader(void) -> typename T::Reader {
+    return packed_reader->getRoot<T>();
+  }
+};
+
+class TokenReader {
+ public:
+  using Ptr = std::shared_ptr<const TokenReader>;
+
+  virtual ~TokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
-  virtual unsigned NumTokens(void) const noexcept = 0;
+  virtual unsigned NumTokens(void) const = 0;
 
   // Return the kind of the Nth token.
   virtual TokenKind NthTokenKind(unsigned token_index) const = 0;
@@ -35,13 +69,30 @@ class TokenReaderImpl {
   virtual EntityId NthTokenId(unsigned token_index) const = 0;
 };
 
-// Used for invalid tokens.
-class InvalidTokenReaderImpl final : public TokenReaderImpl {
+struct BeforeTag {};
+struct AfterTag {};
+
+class TokenSubstitutionListImpl {
  public:
-  virtual ~InvalidTokenReaderImpl(void) noexcept;
+  const std::shared_ptr<const FragmentImpl> fragment;
+  const NodeReader nodes;
+
+  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_);
+
+  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+                            unsigned offset, BeforeTag);
+
+  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+                            unsigned offset, AfterTag);
+};
+
+// Used for invalid tokens.
+class InvalidTokenReader final : public TokenReader {
+ public:
+  virtual ~InvalidTokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
-  unsigned NumTokens(void) const noexcept final;
+  unsigned NumTokens(void) const final;
 
   // Return the kind of the Nth token.
   TokenKind NthTokenKind(unsigned) const final;
@@ -57,6 +108,7 @@ class InvalidTokenReaderImpl final : public TokenReaderImpl {
 class FileImpl {
  public:
   using Ptr = std::shared_ptr<const FileImpl>;
+  using WeakPtr = std::weak_ptr<const FileImpl>;
 
   const FileId id;
 
@@ -76,38 +128,26 @@ class FileImpl {
         ep(std::move(ep_)) {}
 
   // Return a reader for the tokens in the file.
-  virtual TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
-};
-
-// An invalid file. This exists to handle some failure somewhere, e.g. a failure
-// to get a response from the database.
-class InvalidFileImpl final : public FileImpl {
- private:
-  InvalidTokenReaderImpl empty_reader;
-
- public:
-  using FileImpl::FileImpl;
-
-  // Return a reader for the tokens in the file.
-  TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const final;
+  virtual TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const = 0;
 };
 
 // A file downloaded as a result of a making an RPC.
-class ResponseFileImpl final : public FileImpl, public TokenReaderImpl {
+class PackedFileImpl final : public FileImpl, public TokenReader {
  public:
   using Response = capnp::Response<mx::rpc::Multiplier::DownloadFileResults>;
-  const Response response;
+
+  PackedReaderState package;
   const rpc::File::Reader reader;
 
-  virtual ~ResponseFileImpl(void) noexcept;
+  virtual ~PackedFileImpl(void) noexcept;
 
-  ResponseFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_);
+  PackedFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_);
 
   // Return a reader for the tokens in the file.
-  TokenReaderImpl::Ptr TokenReader(const FileImpl::Ptr &) const final;
+  TokenReader::Ptr TokenReader(const FileImpl::Ptr &) const final;
 
   // Return the number of tokens in the file.
-  unsigned NumTokens(void) const noexcept final;
+  unsigned NumTokens(void) const final;
 
   // Return the kind of the Nth token.
   TokenKind NthTokenKind(unsigned index) const final;
@@ -147,53 +187,54 @@ class FragmentImpl {
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
-  virtual TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const = 0;
+  virtual TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const = 0;
 
-  virtual unsigned FirstLine(void) const = 0;
-  virtual unsigned LastLine(void) const = 0;
+  // Return a reader for the whole fragment.
+  virtual const FragmentReader &Fragment(void) const = 0;
+
+  // Return a specific type of entity.
+  virtual DeclReader NthDecl(unsigned offset) const = 0;
+  virtual StmtReader NthStmt(unsigned offset) const = 0;
+  virtual PseudoReader NthPseudo(unsigned offset) const = 0;
+
+  // Return the token associated with a specific entity ID.
+  Token TokenFor(const FragmentImpl::Ptr &, EntityId id,
+                 bool can_fail=false) const;
+
+  // Return the inclusive token range associated with two entity IDs.
+  TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
+                           EntityId end_id) const;
+
+  // Return the declaration associated with a specific entity ID.
+  Decl DeclFor(const FragmentImpl::Ptr &, EntityId id) const;
+
+  // Return the statement associated with a specific entity ID.
+  Stmt StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
 };
 
-class InvalidFragmentImpl : public FragmentImpl {
- private:
-  InvalidTokenReaderImpl empty_reader;
-
- public:
-  using FragmentImpl::FragmentImpl;
-
-  virtual ~InvalidFragmentImpl(void) noexcept;
-
-  FileId FileContaingFirstToken(void) const final;
-  TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
-  unsigned FirstLine(void) const final;
-  unsigned LastLine(void) const final;
-};
-
-// A fragment of code downloaded from the server.
-class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
+// A packed fragment of code.
+class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
  public:
   using Response = capnp::Response<
       mx::rpc::Multiplier::DownloadFragmentResults>;
 
-  const Response response;
+  PackedReaderState package;
   const rpc::Fragment::Reader reader;
 
-  virtual ~ResponseFragmentImpl(void) noexcept;
+  virtual ~PackedFragmentImpl(void) noexcept;
 
-  ResponseFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                       Response response_);
+  PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
+                     Response response_);
 
   // Return the ID of the file containing the first token.
   FileId FileContaingFirstToken(void) const final;
 
-  unsigned FirstLine(void) const final;
-  unsigned LastLine(void) const final;
-
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
-  TokenReaderImpl::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
+  TokenReader::Ptr TokenReader(const FragmentImpl::Ptr &) const final;
 
   // Return the number of tokens in the file.
-  unsigned NumTokens(void) const noexcept final;
+  unsigned NumTokens(void) const final;
 
   // Return the kind of the Nth token.
   TokenKind NthTokenKind(unsigned index) const final;
@@ -203,6 +244,14 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
 
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const final;
+
+  // Return a reader for the whole fragment.
+  const FragmentReader &Fragment(void) const final;
+
+  // Return a specific type of entity.
+  DeclReader NthDecl(unsigned offset) const final;
+  StmtReader NthStmt(unsigned offset) const final;
+  PseudoReader NthPseudo(unsigned offset) const final;
 };
 
 // Provides entities from a remote source, i.e. a remote
@@ -210,32 +259,62 @@ class ResponseFragmentImpl final : public FragmentImpl, public TokenReaderImpl {
 // available over a UNIX domain socket `unix:/path`.
 class RemoteEntityProvider final : public EntityProvider {
  private:
-  // TODO(pag): Consider eventually running the client on a separate thread,
-  //            and talking to it via `kj::Executor::executeSync`. Performance-
-  //            wise this won't be great; however, it means that client/server
-  //            stuff would happen on a single (background) thread, rather than
-  //            from whatever thread the user of the API has to be on. It's not
-  //            clear if the current API is thread-safe.
-  capnp::EzRpcClient client;
-  mx::rpc::Multiplier::Client multiplier;
+
+  struct ClientConnection
+      : public std::enable_shared_from_this<ClientConnection> {
+
+    capnp::ReaderOptions options;
+    capnp::EzRpcClient connection;
+    mx::rpc::Multiplier::Client client;
+
+    ClientConnection(const std::string &host_port);
+  };
+
+  const std::string host_port;
+
+  // Thread-local connections.
+  std::deque<std::unique_ptr<ClientConnection>> tls_connections;
+  std::mutex tls_connections_lock;
+
+  ClientConnection &Connection(void);
 
  public:
-  RemoteEntityProvider(std::string host, std::string port)
-      : client(host + ':' + port),
-        multiplier(client.getMain<mx::rpc::Multiplier>()) {}
+  RemoteEntityProvider(std::string host, std::string port);
 
   virtual ~RemoteEntityProvider(void) noexcept;
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  std::set<std::pair<std::filesystem::path, FileId>>
-  list_files(void) noexcept final;
+  FilePathList ListFiles(void) final;
 
   // Download a file by its unique ID.
-  File file(FileId id) noexcept final;
+  FileImpl::Ptr FileFor(const Ptr &, FileId id) final;
 
   // Download a fragment by its unique ID.
-  Fragment fragment(FragmentId id) noexcept final;
+  FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
+};
+
+class InvalidEntityProvider final : public EntityProvider {
+ public:
+  virtual ~InvalidEntityProvider(void) noexcept;
+
+  // Get the current list of parsed files, where the minimum ID
+  // in the returned list of fetched files will be `start_at`.
+  FilePathList ListFiles(void) final;
+
+  // Download a file by its unique ID.
+  FileImpl::Ptr FileFor(const Ptr &, FileId id) final;
+
+  // Download a fragment by its unique ID.
+  FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
+};
+
+class FileListImpl {
+ public:
+  const EntityProvider::Ptr ep;
+  std::vector<std::pair<mx::FileId, FileImpl::WeakPtr>> files;
+
+  explicit FileListImpl(EntityProvider::Ptr ep_);
 };
 
 }  // namespace mx

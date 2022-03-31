@@ -15,7 +15,7 @@ EntityLabeller::~EntityLabeller(void) {}
 
 bool EntityLabeller::Enter(const pasta::Decl &entity) {
   auto kind = entity.Kind();
-  auto &next_offset = next_decl_offset[{code.fragment_id, kind}];
+  auto &next_offset = next_decl_offset[code.fragment_id];
   mx::DeclarationId id;
   id.fragment_id = code.fragment_id;
   id.offset = next_offset;
@@ -23,7 +23,7 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
 
   if (entity_ids.emplace(entity.RawDecl(), id).second) {
     ++next_offset;
-    code.num_decls_of_kind[kind] = next_offset;
+    ++code.num_decl_entities;
     return true;
   } else {
     return false;
@@ -32,7 +32,7 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
 
 bool EntityLabeller::Enter(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
-  auto &next_offset = next_stmt_offset[{code.fragment_id, kind}];
+  auto &next_offset = next_stmt_offset[code.fragment_id];
   mx::StatementId id;
   id.fragment_id = code.fragment_id;
   id.offset = next_offset;
@@ -40,11 +40,42 @@ bool EntityLabeller::Enter(const pasta::Stmt &entity) {
 
   if (entity_ids.emplace(entity.RawStmt(), id).second) {
     ++next_offset;
-    code.num_stmts_of_kind[kind] = next_offset;
+    ++code.num_stmt_entities;
     return true;
   } else {
     return false;
   }
+}
+
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, std::vector<pasta::TemplateArgument> args) {
+  code.num_pseudo_entities += static_cast<unsigned>(args.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Stmt &, std::vector<pasta::TemplateArgument> args) {
+  code.num_pseudo_entities += static_cast<unsigned>(args.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, std::vector<pasta::CXXBaseSpecifier> bases) {
+  code.num_pseudo_entities += static_cast<unsigned>(bases.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, std::vector<pasta::TemplateParameterList> params) {
+  code.num_pseudo_entities += static_cast<unsigned>(params.size());
+}
+
+void EntityLabeller::Enter(
+    const pasta::Decl &, const pasta::TemplateParameterList &) {
+  code.num_pseudo_entities += 1u;
+}
+
+void EntityLabeller::Enter(
+    const pasta::Stmt &, const pasta::TemplateParameterList &) {
+  code.num_pseudo_entities += 1u;
 }
 
 bool EntityLabeller::Label(const pasta::Token &entity) {
@@ -64,7 +95,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
   }
 }
 
-CodeChunk EntityLabeller::EnterCode(
+PendingFragment EntityLabeller::EnterCode(
     mx::FragmentId code_id_, std::vector<pasta::Decl> tlds,
     const pasta::TokenRange &range, uint64_t begin_index_,
     uint64_t end_index_) {

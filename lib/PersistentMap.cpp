@@ -107,9 +107,9 @@ PersistentMapImpl::PersistentMapImpl(std::string path_)
 
   std::vector<rocksdb::ColumnFamilyDescriptor> cf_descs;
   rocksdb::ColumnFamilyOptions cf_options;
-  cf_options.compression = rocksdb::kZlibCompression;
-  cf_options.bottommost_compression = rocksdb::kZlibCompression;
-  cf_options.compression_opts.enabled = true;
+//  cf_options.compression = rocksdb::kZlibCompression;
+//  cf_options.bottommost_compression = rocksdb::kZlibCompression;
+//  cf_options.compression_opts.enabled = true;
   cf_descs.emplace_back(rocksdb::kDefaultColumnFamilyName, cf_options);
 
   std::vector<rocksdb::ColumnFamilyHandle *> cf_handles;

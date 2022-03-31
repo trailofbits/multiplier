@@ -155,10 +155,10 @@ kj::Promise<void> Server::indexCompileCommands(
 
   auto cc = maybe_cc.TakeValue();
   auto cxx = maybe_cxx.TakeValue();
-  auto which_cc = [&cc, &cxx] (mx::ast::TargetLanguage tl) {
+  auto which_cc = [&cc, &cxx] (mx::rpc::TargetLanguage tl) {
     switch (tl) {
-      case mx::ast::TargetLanguage::C: return cc;
-      case mx::ast::TargetLanguage::CXX: return cxx;
+      case mx::rpc::TargetLanguage::C: return cc;
+      case mx::rpc::TargetLanguage::CXX: return cxx;
     }
   };
 
@@ -233,7 +233,7 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
       context.getParams();
 
   mx::FileId file_id = params.getId();
-  auto maybe_contents =
+  std::optional<std::string> maybe_contents =
       d->server_context.file_id_to_serialized_file.TryGet(file_id);
   if (!maybe_contents) {
     std::stringstream err;
@@ -253,13 +253,22 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
         return file_id == found_file_id;
       });
 
-  capnp::FlatArrayMessageReader reader(maybe_contents.value());
-  mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
-
-  auto results = context.initResults(file.totalSize());
-  results.setFile(file);
 
   auto num_fragments = static_cast<unsigned>(fragment_ids.size());
+
+  // TODO(pag): This is a yolo-ducated of a guess.
+  capnp::MessageSize size{
+    ((maybe_contents->size() + 7u / 8u) +
+     (num_fragments + 1u)),
+    0u};
+
+  mx::rpc::Multiplier::DownloadFileResults::Builder results =
+      context.initResults(size);
+  capnp::Data::Reader contents_reader(
+      reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
+      maybe_contents.value().size());
+  results.setFile(contents_reader);
+
   auto fragments = results.initFragments(num_fragments);
   for (auto i = 0u; i < num_fragments; ++i) {
     fragments.set(i, fragment_ids[i]);
@@ -276,7 +285,7 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   std::stringstream err;
   mx::FragmentId fragment_id = params.getId();
 
-  auto maybe_contents =
+  std::optional<std::string> maybe_contents =
       d->server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
   if (!maybe_contents) {
     err << "Invalid fragment id " << fragment_id;
@@ -284,11 +293,12 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
                          kj::heapString(err.str()));
   }
 
-  capnp::FlatArrayMessageReader reader(maybe_contents.value());
-  mx::rpc::Fragment::Reader fragment = reader.getRoot<mx::rpc::Fragment>();
-
-  auto results = context.initResults(fragment.totalSize());
-  results.setFragment(fragment);
+  capnp::MessageSize size{maybe_contents->size() + 7u / 8u, 0u};
+  mx::rpc::Multiplier::DownloadFragmentResults::Builder results =
+      context.initResults(size);
+  results.setFragment(kj::arrayPtr(
+      reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
+      maybe_contents.value().size()));
 
   return kj::READY_NOW;
 }
