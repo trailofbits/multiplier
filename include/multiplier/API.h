@@ -46,6 +46,7 @@ class Token {
  private:
   friend class Fragment;
   friend class FragmentImpl;
+  friend class TokenContext;
   friend class TokenList;
   friend class TokenListIterator;
   friend class TokenRange;

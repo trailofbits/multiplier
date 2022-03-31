@@ -40,6 +40,7 @@ define_example("mx-print-file" "PrintFile.cpp")
 define_example("mx-list-fragments" "ListFragments.cpp")
 define_example("mx-print-fragment" "PrintFragment.cpp")
 define_example("mx-print-function-names" "PrintFunctionNames.cpp")
+define_example("mx-print-uses" "PrintUses.cpp")
 define_example("mx-dump-json" "DumpJSON.cpp")
 
 target_link_libraries("mx-dump-json"

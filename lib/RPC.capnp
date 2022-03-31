@@ -81,6 +81,12 @@ struct Token @0xdf7bccc629d6dcf9 {
   data @1 :Text;
 }
 
+struct TokenContext @0xb9ff75e040124cb3 {
+  parentIndexAndKind @0 :UInt32;
+  parentOffset @1 :UInt32;
+  aliasOffset @2 :UInt32;
+}
+
 struct File @0x987f05f6a48636d5 {
   id @0 :UInt64;
   hash @1 :Text;
@@ -118,9 +124,9 @@ struct Fragment @0xe5f27760091f9a3a {
   # List of parsed tokens in this fragment.
   tokens @9 :List(Token);
   
-  # List of token contexts. There is a 1:1 correspondence between these and
-  # `tokens`.
-  tokenContexts @10 :List(AST.TokenContext);
+  # List of token contexts. The first N token contexts correspond to the
+  # tokens themselves.
+  tokenContexts @10 :List(TokenContext);
   
   # List of tokens/substitution IDs in the top level.
   unparsedTokens @11 :List(UInt64);

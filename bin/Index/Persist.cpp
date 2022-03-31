@@ -168,12 +168,15 @@ static void PersistTokenContexts(EntitySerializer &serializer,
 
     uint64_t entity_id{0};
     unsigned index{0};
-    uint16_t offset{0};
-    uint16_t alias_offset{0};
+    unsigned offset{0};
+    unsigned alias_offset{0};
   };
 
   std::unordered_map<pasta::TokenContext, PendingTokenContext>
       pending_contexts;
+
+  unsigned num_tokens = static_cast<unsigned>(end_index - begin_index + 1u);
+  unsigned num_contexts = num_tokens;
 
   // Figure out the kinds of the contexts (stmt, decl), the index into the
   // respective entity list in the serialized fragment where the contexts will
@@ -190,7 +193,7 @@ static void PersistTokenContexts(EntitySerializer &serializer,
 
     // Declarations.
     if (std::holds_alternative<mx::DeclarationId>(vid)) {
-      auto id = std::get<mx::DeclarationId>(vid);
+      mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
       if (id.fragment_id != serializer.code_id) {
         continue;  // E.g. translation unit.
       }
@@ -200,7 +203,7 @@ static void PersistTokenContexts(EntitySerializer &serializer,
 
     // Statements.
     } else if (std::holds_alternative<mx::StatementId>(vid)) {
-      auto id = std::get<mx::StatementId>(vid);
+      mx::StatementId id = std::get<mx::StatementId>(vid);
       if (id.fragment_id != serializer.code_id) {
         continue;  // Not sure how but oh well.
       }
@@ -214,7 +217,6 @@ static void PersistTokenContexts(EntitySerializer &serializer,
     }
 
     // Then, specialize this template for each context we encounter.
-    uint16_t offset = 0;
     for (const pasta::TokenContext &context : entity_contexts) {
       PendingTokenContext &info = pending_contexts[context];
       CHECK(info.kind == PendingTokenContext::kInvalid);
@@ -227,21 +229,14 @@ static void PersistTokenContexts(EntitySerializer &serializer,
             static_cast<int>(tpl.kind) + 1);
       }
 
-      info.offset = offset++;
+      info.offset = num_contexts++;
     }
   }
-
-  using TokenContextList = capnp::List<mx::ast::TokenContext, capnp::Kind::STRUCT>;
-  std::unordered_map<uint64_t, TokenContextList::Builder> builders;
-
-  auto decls = builder.getDeclarations();
-  auto stmts = builder.getStatements();
 
   // Now resolve the aliasee targets, if any. Token contexts and their aliases
   // will end up in the same entity-specific lists. This is because the entity
   // in which the context resides will tell us its type.
   for (const auto &entry : contexts) {
-    PendingTokenContext *last_context = nullptr;
     for (const pasta::TokenContext &context : entry.second) {
       auto pc_it = pending_contexts.find(context);
       if (pc_it == pending_contexts.end()) {
@@ -258,45 +253,19 @@ static void PersistTokenContexts(EntitySerializer &serializer,
         CHECK_NE(info.offset, alias_info.offset);
         info.alias_offset = alias_info.offset;
       }
-      last_context = &info;
-    }
-
-    // This token is only related to something outside of the fragment.
-    if (!last_context) {
-      continue;
-    }
-
-    // Reserve space in the fragment's entities for the token contexts.
-    auto num_contexts = static_cast<unsigned>(entry.second.size());
-    switch (last_context->kind) {
-      case PendingTokenContext::kDecl:
-      case PendingTokenContext::kDeclAlias: {
-        mx::ast::Decl::Builder decl = decls[last_context->index];
-        builders.try_emplace(entry.first, decl.initTokenContexts(num_contexts));
-        break;
-      }
-      case PendingTokenContext::kStmt:
-      case PendingTokenContext::kStmtAlias: {
-        mx::ast::Stmt::Builder stmt = stmts[last_context->index];
-        builders.try_emplace(entry.first, stmt.initTokenContexts(num_contexts));
-        break;
-      }
-      default:
-        LOG(FATAL)
-            << "Unsupported context kind";
     }
   }
 
   // Allocate as many token contexts as there are parsed tokens.
-  auto entry_contexts = builder.initTokenContexts(
-      static_cast<unsigned>(end_index - begin_index + 1u));
+  CHECK_LE(begin_index, end_index);
+  auto tc_list = builder.initTokenContexts(num_contexts);
 
   // Finally, serialize the contexts.
   auto j = 0u;
   for (auto i = begin_index; i <= end_index; ++i) {
 
-    std::optional<mx::ast::TokenContext::Builder> tcb;
-    tcb.emplace(entry_contexts[j++]);
+    std::optional<mx::rpc::TokenContext::Builder> tcb;
+    tcb.emplace(tc_list[j++]);
 
     for (auto context = serializer.range[i].Context();
          context; context = context->Parent()) {
@@ -308,6 +277,8 @@ static void PersistTokenContexts(EntitySerializer &serializer,
       }
 
       const PendingTokenContext &info = pc_it->second;
+
+      CHECK_GE(info.offset, num_tokens);
 
       tcb->setParentOffset(info.offset);
       tcb->setAliasOffset(info.alias_offset);
@@ -334,11 +305,8 @@ static void PersistTokenContexts(EntitySerializer &serializer,
       }
 
       // Set up the next link in the chain.
-      auto builders_it = builders.find(info.entity_id);
-      CHECK(builders_it != builders.end());
-      TokenContextList::Builder &list_builder = builders_it->second;
       tcb.reset();
-      tcb.emplace(list_builder[info.offset]);
+      tcb.emplace(tc_list[info.offset]);
     }
   }
 }
@@ -421,6 +389,9 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
 
   PersistTokens(serializer, begin_index, end_index, builder);
   PersistTokenContexts(serializer, begin_index, end_index, builder);
+
+  DCHECK_GT(builder.getTokens().size(), 0u);
+  DCHECK_GE(builder.getTokenContexts().size(), builder.getTokens().size());
 
   unsigned next_substitution_index = 0u;
   SubstitutionListBuilder substitutions_builder =

@@ -265,6 +265,7 @@ class FragmentImpl;
 class FileImpl;
 class StmtIterator;
 class Token;
+class TokenContext;class TokenContextIterator;
 class TokenRange;
 
 enum class DeclKind : unsigned short {
@@ -5005,7 +5006,7 @@ class TemplateParameterList {
   friend class DeclIterator;
   friend class FragmentImpl;
   friend class StmtIterator;
-
+  friend class TokenContext;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -5014,16 +5015,16 @@ class TemplateParameterList {
       : fragment(std::move(fragment_)),
         offset(offset_) {}
 
-  unsigned num_parameters(void) const noexcept;
-  unsigned num_required_parameters(void) const noexcept;
-  unsigned depth(void) const noexcept;
-  bool has_unexpanded_parameter_pack(void) const noexcept;
-  bool has_parameter_pack(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  Token left_angle_token(void) const noexcept;
-  Token right_angle_token(void) const noexcept;
-  TokenRange token_range(void) const noexcept;
-  std::vector<NamedDecl> parameters(void) const noexcept;
+  unsigned num_parameters(void) const;
+  unsigned num_required_parameters(void) const;
+  unsigned depth(void) const;
+  bool has_unexpanded_parameter_pack(void) const;
+  bool has_parameter_pack(void) const;
+  Token template_keyword_token(void) const;
+  Token left_angle_token(void) const;
+  Token right_angle_token(void) const;
+  TokenRange token_range(void) const;
+  std::vector<NamedDecl> parameters(void) const;
 };
 
 class TemplateArgument {
@@ -5031,7 +5032,7 @@ class TemplateArgument {
   friend class DeclIterator;
   friend class FragmentImpl;
   friend class StmtIterator;
-
+  friend class TokenContext;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -5040,13 +5041,13 @@ class TemplateArgument {
       : fragment(std::move(fragment_)),
         offset(offset_) {}
 
-  TemplateArgumentKind kind(void) const noexcept;
-  bool is_null(void) const noexcept;
-  bool is_dependent(void) const noexcept;
-  bool is_instantiation_dependent(void) const noexcept;
-  bool contains_unexpanded_parameter_pack(void) const noexcept;
-  bool is_pack_expansion(void) const noexcept;
-  std::optional<ValueDecl> as_declaration(void) const noexcept;
+  TemplateArgumentKind kind(void) const;
+  bool is_null(void) const;
+  bool is_dependent(void) const;
+  bool is_instantiation_dependent(void) const;
+  bool contains_unexpanded_parameter_pack(void) const;
+  bool is_pack_expansion(void) const;
+  std::optional<ValueDecl> as_declaration(void) const;
 };
 
 class CXXBaseSpecifier {
@@ -5054,7 +5055,7 @@ class CXXBaseSpecifier {
   friend class DeclIterator;
   friend class FragmentImpl;
   friend class StmtIterator;
-
+  friend class TokenContext;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -5063,25 +5064,26 @@ class CXXBaseSpecifier {
       : fragment(std::move(fragment_)),
         offset(offset_) {}
 
-  TokenRange token_range(void) const noexcept;
-  Token base_type_token(void) const noexcept;
-  bool is_virtual(void) const noexcept;
-  TagTypeKind base_kind(void) const noexcept;
-  bool is_pack_expansion(void) const noexcept;
-  bool constructors_are_inherited(void) const noexcept;
-  std::optional<Token> ellipsis(void) const noexcept;
-  AccessSpecifier semantic_access_specifier(void) const noexcept;
-  AccessSpecifier lexical_access_specifier(void) const noexcept;
+  TokenRange token_range(void) const;
+  Token base_type_token(void) const;
+  bool is_virtual(void) const;
+  TagTypeKind base_kind(void) const;
+  bool is_pack_expansion(void) const;
+  bool constructors_are_inherited(void) const;
+  std::optional<Token> ellipsis(void) const;
+  AccessSpecifier semantic_access_specifier(void) const;
+  AccessSpecifier lexical_access_specifier(void) const;
 };
 
 using StmtRange = DerivedEntityRange<StmtIterator, Stmt>;
+using StmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, Stmt>;
 
 class Stmt {
  protected:
   friend class DeclIterator;
   friend class FragmentImpl;
   friend class StmtIterator;
-
+  friend class TokenContext;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -5094,6 +5096,10 @@ class Stmt {
     return self;
   }
 
+  inline static std::optional<Stmt> from(const TokenContext &c) {
+    return c.as_stmt();
+  }
+
  protected:
   static StmtIterator in_internal(const Fragment &fragment);
 
@@ -5102,13 +5108,18 @@ class Stmt {
     return in_internal(frag);
   }
 
-  Token begin_token(void) const noexcept;
-  Token end_token(void) const noexcept;
-  TokenRange token_range(void) const noexcept;
-  StmtKind kind(void) const noexcept;
+  inline static StmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  Token begin_token(void) const;
+  Token end_token(void) const;
+  TokenRange token_range(void) const;
+  StmtKind kind(void) const;
 };
 
 using SEHTryStmtRange = DerivedEntityRange<StmtIterator, SEHTryStmt>;
+using SEHTryStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHTryStmt>;
 
 class SEHTryStmt : public Stmt {
  private:
@@ -5119,15 +5130,21 @@ class SEHTryStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static SEHTryStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SEHTryStmt> from(const TokenContext &c);
   static std::optional<SEHTryStmt> from(const Stmt &parent);
-  SEHExceptStmt except_handler(void) const noexcept;
-  SEHFinallyStmt finally_handler(void) const noexcept;
-  bool is_cxx_try(void) const noexcept;
-  CompoundStmt try_block(void) const noexcept;
-  Token try_token(void) const noexcept;
+  SEHExceptStmt except_handler(void) const;
+  SEHFinallyStmt finally_handler(void) const;
+  bool is_cxx_try(void) const;
+  CompoundStmt try_block(void) const;
+  Token try_token(void) const;
 };
 
 using SEHLeaveStmtRange = DerivedEntityRange<StmtIterator, SEHLeaveStmt>;
+using SEHLeaveStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHLeaveStmt>;
 
 class SEHLeaveStmt : public Stmt {
  private:
@@ -5138,11 +5155,17 @@ class SEHLeaveStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static SEHLeaveStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SEHLeaveStmt> from(const TokenContext &c);
   static std::optional<SEHLeaveStmt> from(const Stmt &parent);
-  Token leave_token(void) const noexcept;
+  Token leave_token(void) const;
 };
 
 using SEHFinallyStmtRange = DerivedEntityRange<StmtIterator, SEHFinallyStmt>;
+using SEHFinallyStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHFinallyStmt>;
 
 class SEHFinallyStmt : public Stmt {
  private:
@@ -5153,12 +5176,18 @@ class SEHFinallyStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static SEHFinallyStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SEHFinallyStmt> from(const TokenContext &c);
   static std::optional<SEHFinallyStmt> from(const Stmt &parent);
-  CompoundStmt block(void) const noexcept;
-  Token finally_token(void) const noexcept;
+  CompoundStmt block(void) const;
+  Token finally_token(void) const;
 };
 
 using SEHExceptStmtRange = DerivedEntityRange<StmtIterator, SEHExceptStmt>;
+using SEHExceptStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHExceptStmt>;
 
 class SEHExceptStmt : public Stmt {
  private:
@@ -5169,12 +5198,18 @@ class SEHExceptStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static SEHExceptStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SEHExceptStmt> from(const TokenContext &c);
   static std::optional<SEHExceptStmt> from(const Stmt &parent);
-  CompoundStmt block(void) const noexcept;
-  Token except_token(void) const noexcept;
+  CompoundStmt block(void) const;
+  Token except_token(void) const;
 };
 
 using ReturnStmtRange = DerivedEntityRange<StmtIterator, ReturnStmt>;
+using ReturnStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReturnStmt>;
 
 class ReturnStmt : public Stmt {
  private:
@@ -5185,12 +5220,18 @@ class ReturnStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ReturnStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ReturnStmt> from(const TokenContext &c);
   static std::optional<ReturnStmt> from(const Stmt &parent);
-  std::optional<VarDecl> nrvo_candidate(void) const noexcept;
-  Token return_token(void) const noexcept;
+  std::optional<VarDecl> nrvo_candidate(void) const;
+  Token return_token(void) const;
 };
 
 using ObjCForCollectionStmtRange = DerivedEntityRange<StmtIterator, ObjCForCollectionStmt>;
+using ObjCForCollectionStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCForCollectionStmt>;
 
 class ObjCForCollectionStmt : public Stmt {
  private:
@@ -5201,12 +5242,18 @@ class ObjCForCollectionStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ObjCForCollectionStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCForCollectionStmt> from(const TokenContext &c);
   static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
-  Token for_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token for_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ObjCAutoreleasePoolStmtRange = DerivedEntityRange<StmtIterator, ObjCAutoreleasePoolStmt>;
+using ObjCAutoreleasePoolStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAutoreleasePoolStmt>;
 
 class ObjCAutoreleasePoolStmt : public Stmt {
  private:
@@ -5217,11 +5264,17 @@ class ObjCAutoreleasePoolStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ObjCAutoreleasePoolStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &c);
   static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent);
-  Token at_token(void) const noexcept;
+  Token at_token(void) const;
 };
 
 using ObjCAtTryStmtRange = DerivedEntityRange<StmtIterator, ObjCAtTryStmt>;
+using ObjCAtTryStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtTryStmt>;
 
 class ObjCAtTryStmt : public Stmt {
  private:
@@ -5232,13 +5285,19 @@ class ObjCAtTryStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ObjCAtTryStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAtTryStmt> from(const TokenContext &c);
   static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
-  Token at_try_token(void) const noexcept;
-  ObjCAtFinallyStmt finally_statement(void) const noexcept;
-  std::vector<ObjCAtCatchStmt> catch_statements(void) const noexcept;
+  Token at_try_token(void) const;
+  ObjCAtFinallyStmt finally_statement(void) const;
+  std::vector<ObjCAtCatchStmt> catch_statements(void) const;
 };
 
 using ObjCAtThrowStmtRange = DerivedEntityRange<StmtIterator, ObjCAtThrowStmt>;
+using ObjCAtThrowStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtThrowStmt>;
 
 class ObjCAtThrowStmt : public Stmt {
  private:
@@ -5249,11 +5308,17 @@ class ObjCAtThrowStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ObjCAtThrowStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAtThrowStmt> from(const TokenContext &c);
   static std::optional<ObjCAtThrowStmt> from(const Stmt &parent);
-  Token throw_token(void) const noexcept;
+  Token throw_token(void) const;
 };
 
 using ObjCAtSynchronizedStmtRange = DerivedEntityRange<StmtIterator, ObjCAtSynchronizedStmt>;
+using ObjCAtSynchronizedStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtSynchronizedStmt>;
 
 class ObjCAtSynchronizedStmt : public Stmt {
  private:
@@ -5264,12 +5329,18 @@ class ObjCAtSynchronizedStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ObjCAtSynchronizedStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAtSynchronizedStmt> from(const TokenContext &c);
   static std::optional<ObjCAtSynchronizedStmt> from(const Stmt &parent);
-  Token at_synchronized_token(void) const noexcept;
-  CompoundStmt synch_body(void) const noexcept;
+  Token at_synchronized_token(void) const;
+  CompoundStmt synch_body(void) const;
 };
 
 using ObjCAtFinallyStmtRange = DerivedEntityRange<StmtIterator, ObjCAtFinallyStmt>;
+using ObjCAtFinallyStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtFinallyStmt>;
 
 class ObjCAtFinallyStmt : public Stmt {
  private:
@@ -5280,11 +5351,17 @@ class ObjCAtFinallyStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ObjCAtFinallyStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAtFinallyStmt> from(const TokenContext &c);
   static std::optional<ObjCAtFinallyStmt> from(const Stmt &parent);
-  Token at_finally_token(void) const noexcept;
+  Token at_finally_token(void) const;
 };
 
 using ObjCAtCatchStmtRange = DerivedEntityRange<StmtIterator, ObjCAtCatchStmt>;
+using ObjCAtCatchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtCatchStmt>;
 
 class ObjCAtCatchStmt : public Stmt {
  private:
@@ -5295,14 +5372,20 @@ class ObjCAtCatchStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ObjCAtCatchStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAtCatchStmt> from(const TokenContext &c);
   static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
-  Token at_catch_token(void) const noexcept;
-  VarDecl catch_parameter_declaration(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool has_ellipsis(void) const noexcept;
+  Token at_catch_token(void) const;
+  VarDecl catch_parameter_declaration(void) const;
+  Token r_paren_token(void) const;
+  bool has_ellipsis(void) const;
 };
 
 using OMPExecutableDirectiveRange = DerivedEntityRange<StmtIterator, OMPExecutableDirective>;
+using OMPExecutableDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPExecutableDirective>;
 
 class OMPExecutableDirective : public Stmt {
  private:
@@ -5313,13 +5396,19 @@ class OMPExecutableDirective : public Stmt {
     return in_internal(frag);
   }
 
+  inline static OMPExecutableDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPExecutableDirective> from(const TokenContext &c);
   static std::optional<OMPExecutableDirective> from(const Stmt &parent);
-  CapturedStmt innermost_captured_statement(void) const noexcept;
-  bool has_associated_statement(void) const noexcept;
-  bool is_standalone_directive(void) const noexcept;
+  CapturedStmt innermost_captured_statement(void) const;
+  bool has_associated_statement(void) const;
+  bool is_standalone_directive(void) const;
 };
 
 using OMPDispatchDirectiveRange = DerivedEntityRange<StmtIterator, OMPDispatchDirective>;
+using OMPDispatchDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDispatchDirective>;
 
 class OMPDispatchDirective : public OMPExecutableDirective {
  private:
@@ -5331,12 +5420,18 @@ class OMPDispatchDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPDispatchDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDispatchDirective> from(const TokenContext &c);
   static std::optional<OMPDispatchDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDispatchDirective> from(const Stmt &parent);
-  Token target_call_token(void) const noexcept;
+  Token target_call_token(void) const;
 };
 
 using OMPDepobjDirectiveRange = DerivedEntityRange<StmtIterator, OMPDepobjDirective>;
+using OMPDepobjDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDepobjDirective>;
 
 class OMPDepobjDirective : public OMPExecutableDirective {
  private:
@@ -5348,11 +5443,17 @@ class OMPDepobjDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPDepobjDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDepobjDirective> from(const TokenContext &c);
   static std::optional<OMPDepobjDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDepobjDirective> from(const Stmt &parent);
 };
 
 using OMPCriticalDirectiveRange = DerivedEntityRange<StmtIterator, OMPCriticalDirective>;
+using OMPCriticalDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCriticalDirective>;
 
 class OMPCriticalDirective : public OMPExecutableDirective {
  private:
@@ -5364,11 +5465,17 @@ class OMPCriticalDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPCriticalDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPCriticalDirective> from(const TokenContext &c);
   static std::optional<OMPCriticalDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPCriticalDirective> from(const Stmt &parent);
 };
 
 using OMPCancellationPointDirectiveRange = DerivedEntityRange<StmtIterator, OMPCancellationPointDirective>;
+using OMPCancellationPointDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCancellationPointDirective>;
 
 class OMPCancellationPointDirective : public OMPExecutableDirective {
  private:
@@ -5380,11 +5487,17 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPCancellationPointDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPCancellationPointDirective> from(const TokenContext &c);
   static std::optional<OMPCancellationPointDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPCancellationPointDirective> from(const Stmt &parent);
 };
 
 using OMPCancelDirectiveRange = DerivedEntityRange<StmtIterator, OMPCancelDirective>;
+using OMPCancelDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCancelDirective>;
 
 class OMPCancelDirective : public OMPExecutableDirective {
  private:
@@ -5396,11 +5509,17 @@ class OMPCancelDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPCancelDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPCancelDirective> from(const TokenContext &c);
   static std::optional<OMPCancelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPCancelDirective> from(const Stmt &parent);
 };
 
 using OMPBarrierDirectiveRange = DerivedEntityRange<StmtIterator, OMPBarrierDirective>;
+using OMPBarrierDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPBarrierDirective>;
 
 class OMPBarrierDirective : public OMPExecutableDirective {
  private:
@@ -5412,11 +5531,17 @@ class OMPBarrierDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPBarrierDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPBarrierDirective> from(const TokenContext &c);
   static std::optional<OMPBarrierDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPBarrierDirective> from(const Stmt &parent);
 };
 
 using OMPAtomicDirectiveRange = DerivedEntityRange<StmtIterator, OMPAtomicDirective>;
+using OMPAtomicDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPAtomicDirective>;
 
 class OMPAtomicDirective : public OMPExecutableDirective {
  private:
@@ -5428,13 +5553,19 @@ class OMPAtomicDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPAtomicDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPAtomicDirective> from(const TokenContext &c);
   static std::optional<OMPAtomicDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPAtomicDirective> from(const Stmt &parent);
-  bool is_postfix_update(void) const noexcept;
-  bool is_xlhs_in_rhs_part(void) const noexcept;
+  bool is_postfix_update(void) const;
+  bool is_xlhs_in_rhs_part(void) const;
 };
 
 using OMPTeamsDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDirective>;
+using OMPTeamsDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTeamsDirective>;
 
 class OMPTeamsDirective : public OMPExecutableDirective {
  private:
@@ -5446,11 +5577,17 @@ class OMPTeamsDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTeamsDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTeamsDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDirective> from(const Stmt &parent);
 };
 
 using OMPTaskyieldDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskyieldDirective>;
+using OMPTaskyieldDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTaskyieldDirective>;
 
 class OMPTaskyieldDirective : public OMPExecutableDirective {
  private:
@@ -5462,11 +5599,17 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTaskyieldDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTaskyieldDirective> from(const TokenContext &c);
   static std::optional<OMPTaskyieldDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskyieldDirective> from(const Stmt &parent);
 };
 
 using OMPTaskwaitDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskwaitDirective>;
+using OMPTaskwaitDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTaskwaitDirective>;
 
 class OMPTaskwaitDirective : public OMPExecutableDirective {
  private:
@@ -5478,11 +5621,17 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTaskwaitDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTaskwaitDirective> from(const TokenContext &c);
   static std::optional<OMPTaskwaitDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskwaitDirective> from(const Stmt &parent);
 };
 
 using OMPTaskgroupDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskgroupDirective>;
+using OMPTaskgroupDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTaskgroupDirective>;
 
 class OMPTaskgroupDirective : public OMPExecutableDirective {
  private:
@@ -5494,11 +5643,17 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTaskgroupDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTaskgroupDirective> from(const TokenContext &c);
   static std::optional<OMPTaskgroupDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskgroupDirective> from(const Stmt &parent);
 };
 
 using OMPTaskDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskDirective>;
+using OMPTaskDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTaskDirective>;
 
 class OMPTaskDirective : public OMPExecutableDirective {
  private:
@@ -5510,12 +5665,18 @@ class OMPTaskDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTaskDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTaskDirective> from(const TokenContext &c);
   static std::optional<OMPTaskDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPTargetUpdateDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetUpdateDirective>;
+using OMPTargetUpdateDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetUpdateDirective>;
 
 class OMPTargetUpdateDirective : public OMPExecutableDirective {
  private:
@@ -5527,11 +5688,17 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetUpdateDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetUpdateDirective> from(const TokenContext &c);
   static std::optional<OMPTargetUpdateDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetUpdateDirective> from(const Stmt &parent);
 };
 
 using OMPTargetTeamsDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDirective>;
+using OMPTargetTeamsDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetTeamsDirective>;
 
 class OMPTargetTeamsDirective : public OMPExecutableDirective {
  private:
@@ -5543,11 +5710,17 @@ class OMPTargetTeamsDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetTeamsDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetTeamsDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDirective> from(const Stmt &parent);
 };
 
 using OMPTargetParallelDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelDirective>;
+using OMPTargetParallelDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetParallelDirective>;
 
 class OMPTargetParallelDirective : public OMPExecutableDirective {
  private:
@@ -5559,12 +5732,18 @@ class OMPTargetParallelDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetParallelDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetParallelDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetParallelDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPTargetExitDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetExitDataDirective>;
+using OMPTargetExitDataDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetExitDataDirective>;
 
 class OMPTargetExitDataDirective : public OMPExecutableDirective {
  private:
@@ -5576,11 +5755,17 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetExitDataDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetExitDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetExitDataDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetExitDataDirective> from(const Stmt &parent);
 };
 
 using OMPTargetEnterDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetEnterDataDirective>;
+using OMPTargetEnterDataDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetEnterDataDirective>;
 
 class OMPTargetEnterDataDirective : public OMPExecutableDirective {
  private:
@@ -5592,11 +5777,17 @@ class OMPTargetEnterDataDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetEnterDataDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetEnterDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetEnterDataDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetEnterDataDirective> from(const Stmt &parent);
 };
 
 using OMPTargetDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetDirective>;
+using OMPTargetDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetDirective>;
 
 class OMPTargetDirective : public OMPExecutableDirective {
  private:
@@ -5608,11 +5799,17 @@ class OMPTargetDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetDirective> from(const TokenContext &c);
   static std::optional<OMPTargetDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetDirective> from(const Stmt &parent);
 };
 
 using OMPTargetDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetDataDirective>;
+using OMPTargetDataDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetDataDirective>;
 
 class OMPTargetDataDirective : public OMPExecutableDirective {
  private:
@@ -5624,11 +5821,17 @@ class OMPTargetDataDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetDataDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetDataDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetDataDirective> from(const Stmt &parent);
 };
 
 using OMPSingleDirectiveRange = DerivedEntityRange<StmtIterator, OMPSingleDirective>;
+using OMPSingleDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPSingleDirective>;
 
 class OMPSingleDirective : public OMPExecutableDirective {
  private:
@@ -5640,11 +5843,17 @@ class OMPSingleDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPSingleDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPSingleDirective> from(const TokenContext &c);
   static std::optional<OMPSingleDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSingleDirective> from(const Stmt &parent);
 };
 
 using OMPSectionsDirectiveRange = DerivedEntityRange<StmtIterator, OMPSectionsDirective>;
+using OMPSectionsDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPSectionsDirective>;
 
 class OMPSectionsDirective : public OMPExecutableDirective {
  private:
@@ -5656,12 +5865,18 @@ class OMPSectionsDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPSectionsDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPSectionsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSectionsDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPSectionDirectiveRange = DerivedEntityRange<StmtIterator, OMPSectionDirective>;
+using OMPSectionDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPSectionDirective>;
 
 class OMPSectionDirective : public OMPExecutableDirective {
  private:
@@ -5673,12 +5888,18 @@ class OMPSectionDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPSectionDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPSectionDirective> from(const TokenContext &c);
   static std::optional<OMPSectionDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSectionDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPScanDirectiveRange = DerivedEntityRange<StmtIterator, OMPScanDirective>;
+using OMPScanDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPScanDirective>;
 
 class OMPScanDirective : public OMPExecutableDirective {
  private:
@@ -5690,11 +5911,17 @@ class OMPScanDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPScanDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPScanDirective> from(const TokenContext &c);
   static std::optional<OMPScanDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPScanDirective> from(const Stmt &parent);
 };
 
 using OMPParallelSectionsDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelSectionsDirective>;
+using OMPParallelSectionsDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelSectionsDirective>;
 
 class OMPParallelSectionsDirective : public OMPExecutableDirective {
  private:
@@ -5706,12 +5933,18 @@ class OMPParallelSectionsDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPParallelSectionsDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPParallelSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPParallelSectionsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelSectionsDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPParallelMasterDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterDirective>;
+using OMPParallelMasterDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelMasterDirective>;
 
 class OMPParallelMasterDirective : public OMPExecutableDirective {
  private:
@@ -5723,11 +5956,17 @@ class OMPParallelMasterDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPParallelMasterDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPParallelMasterDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelMasterDirective> from(const Stmt &parent);
 };
 
 using OMPParallelDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelDirective>;
+using OMPParallelDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelDirective>;
 
 class OMPParallelDirective : public OMPExecutableDirective {
  private:
@@ -5739,12 +5978,18 @@ class OMPParallelDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPParallelDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPParallelDirective> from(const TokenContext &c);
   static std::optional<OMPParallelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPOrderedDirectiveRange = DerivedEntityRange<StmtIterator, OMPOrderedDirective>;
+using OMPOrderedDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPOrderedDirective>;
 
 class OMPOrderedDirective : public OMPExecutableDirective {
  private:
@@ -5756,11 +6001,17 @@ class OMPOrderedDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPOrderedDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPOrderedDirective> from(const TokenContext &c);
   static std::optional<OMPOrderedDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPOrderedDirective> from(const Stmt &parent);
 };
 
 using OMPMasterDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterDirective>;
+using OMPMasterDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMasterDirective>;
 
 class OMPMasterDirective : public OMPExecutableDirective {
  private:
@@ -5772,11 +6023,17 @@ class OMPMasterDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPMasterDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPMasterDirective> from(const TokenContext &c);
   static std::optional<OMPMasterDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPMasterDirective> from(const Stmt &parent);
 };
 
 using OMPMaskedDirectiveRange = DerivedEntityRange<StmtIterator, OMPMaskedDirective>;
+using OMPMaskedDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMaskedDirective>;
 
 class OMPMaskedDirective : public OMPExecutableDirective {
  private:
@@ -5788,11 +6045,17 @@ class OMPMaskedDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPMaskedDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPMaskedDirective> from(const TokenContext &c);
   static std::optional<OMPMaskedDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPMaskedDirective> from(const Stmt &parent);
 };
 
 using OMPLoopBasedDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopBasedDirective>;
+using OMPLoopBasedDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPLoopBasedDirective>;
 
 class OMPLoopBasedDirective : public OMPExecutableDirective {
  private:
@@ -5804,11 +6067,17 @@ class OMPLoopBasedDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPLoopBasedDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPLoopBasedDirective> from(const TokenContext &c);
   static std::optional<OMPLoopBasedDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPLoopBasedDirective> from(const Stmt &parent);
 };
 
 using OMPUnrollDirectiveRange = DerivedEntityRange<StmtIterator, OMPUnrollDirective>;
+using OMPUnrollDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPUnrollDirective>;
 
 class OMPUnrollDirective : public OMPLoopBasedDirective {
  private:
@@ -5821,12 +6090,18 @@ class OMPUnrollDirective : public OMPLoopBasedDirective {
     return in_internal(frag);
   }
 
+  inline static OMPUnrollDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPUnrollDirective> from(const TokenContext &c);
   static std::optional<OMPUnrollDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPUnrollDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPUnrollDirective> from(const Stmt &parent);
 };
 
 using OMPTileDirectiveRange = DerivedEntityRange<StmtIterator, OMPTileDirective>;
+using OMPTileDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTileDirective>;
 
 class OMPTileDirective : public OMPLoopBasedDirective {
  private:
@@ -5839,12 +6114,18 @@ class OMPTileDirective : public OMPLoopBasedDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTileDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTileDirective> from(const TokenContext &c);
   static std::optional<OMPTileDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTileDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTileDirective> from(const Stmt &parent);
 };
 
 using OMPLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopDirective>;
+using OMPLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPLoopDirective>;
 
 class OMPLoopDirective : public OMPLoopBasedDirective {
  private:
@@ -5857,12 +6138,18 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
     return in_internal(frag);
   }
 
+  inline static OMPLoopDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPLoopDirective> from(const TokenContext &c);
   static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPLoopDirective> from(const Stmt &parent);
 };
 
 using OMPForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPForSimdDirective>;
+using OMPForSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPForSimdDirective>;
 
 class OMPForSimdDirective : public OMPLoopDirective {
  private:
@@ -5876,6 +6163,11 @@ class OMPForSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPForSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPForSimdDirective> from(const OMPExecutableDirective &parent);
@@ -5883,6 +6175,7 @@ class OMPForSimdDirective : public OMPLoopDirective {
 };
 
 using OMPForDirectiveRange = DerivedEntityRange<StmtIterator, OMPForDirective>;
+using OMPForDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPForDirective>;
 
 class OMPForDirective : public OMPLoopDirective {
  private:
@@ -5896,14 +6189,20 @@ class OMPForDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPForDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPForDirective> from(const TokenContext &c);
   static std::optional<OMPForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPForDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPDistributeSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeSimdDirective>;
+using OMPDistributeSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDistributeSimdDirective>;
 
 class OMPDistributeSimdDirective : public OMPLoopDirective {
  private:
@@ -5917,6 +6216,11 @@ class OMPDistributeSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPDistributeSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeSimdDirective> from(const OMPExecutableDirective &parent);
@@ -5924,6 +6228,7 @@ class OMPDistributeSimdDirective : public OMPLoopDirective {
 };
 
 using OMPDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeParallelForSimdDirective>;
+using OMPDistributeParallelForSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDistributeParallelForSimdDirective>;
 
 class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -5937,6 +6242,11 @@ class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPDistributeParallelForSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
@@ -5944,6 +6254,7 @@ class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
 };
 
 using OMPDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeParallelForDirective>;
+using OMPDistributeParallelForDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDistributeParallelForDirective>;
 
 class OMPDistributeParallelForDirective : public OMPLoopDirective {
  private:
@@ -5957,14 +6268,20 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPDistributeParallelForDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPDistributeDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeDirective>;
+using OMPDistributeDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDistributeDirective>;
 
 class OMPDistributeDirective : public OMPLoopDirective {
  private:
@@ -5978,6 +6295,11 @@ class OMPDistributeDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPDistributeDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeDirective> from(const OMPExecutableDirective &parent);
@@ -5985,6 +6307,7 @@ class OMPDistributeDirective : public OMPLoopDirective {
 };
 
 using OMPTeamsDistributeSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeSimdDirective>;
+using OMPTeamsDistributeSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTeamsDistributeSimdDirective>;
 
 class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
  private:
@@ -5998,6 +6321,11 @@ class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTeamsDistributeSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTeamsDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6005,6 +6333,7 @@ class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
 };
 
 using OMPTeamsDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeParallelForSimdDirective>;
+using OMPTeamsDistributeParallelForSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTeamsDistributeParallelForSimdDirective>;
 
 class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -6018,6 +6347,11 @@ class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTeamsDistributeParallelForSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6025,6 +6359,7 @@ class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
 };
 
 using OMPTeamsDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeParallelForDirective>;
+using OMPTeamsDistributeParallelForDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTeamsDistributeParallelForDirective>;
 
 class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
  private:
@@ -6038,14 +6373,20 @@ class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTeamsDistributeParallelForDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTeamsDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPTeamsDistributeDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeDirective>;
+using OMPTeamsDistributeDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTeamsDistributeDirective>;
 
 class OMPTeamsDistributeDirective : public OMPLoopDirective {
  private:
@@ -6059,6 +6400,11 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTeamsDistributeDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTeamsDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
@@ -6066,6 +6412,7 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
 };
 
 using OMPTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskLoopSimdDirective>;
+using OMPTaskLoopSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTaskLoopSimdDirective>;
 
 class OMPTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -6079,6 +6426,11 @@ class OMPTaskLoopSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTaskLoopSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6086,6 +6438,7 @@ class OMPTaskLoopSimdDirective : public OMPLoopDirective {
 };
 
 using OMPTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskLoopDirective>;
+using OMPTaskLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTaskLoopDirective>;
 
 class OMPTaskLoopDirective : public OMPLoopDirective {
  private:
@@ -6099,14 +6452,20 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTaskLoopDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPTaskLoopDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTaskLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskLoopDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPTargetTeamsDistributeSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeSimdDirective>;
+using OMPTargetTeamsDistributeSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetTeamsDistributeSimdDirective>;
 
 class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
  private:
@@ -6120,6 +6479,11 @@ class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetTeamsDistributeSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6127,6 +6491,7 @@ class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
 };
 
 using OMPTargetTeamsDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeParallelForSimdDirective>;
+using OMPTargetTeamsDistributeParallelForSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetTeamsDistributeParallelForSimdDirective>;
 
 class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -6140,6 +6505,11 @@ class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective
     return in_internal(frag);
   }
 
+  inline static OMPTargetTeamsDistributeParallelForSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6147,6 +6517,7 @@ class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective
 };
 
 using OMPTargetTeamsDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeParallelForDirective>;
+using OMPTargetTeamsDistributeParallelForDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetTeamsDistributeParallelForDirective>;
 
 class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
  private:
@@ -6160,14 +6531,20 @@ class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetTeamsDistributeParallelForDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPTargetTeamsDistributeDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeDirective>;
+using OMPTargetTeamsDistributeDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetTeamsDistributeDirective>;
 
 class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
  private:
@@ -6181,6 +6558,11 @@ class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetTeamsDistributeDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetTeamsDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
@@ -6188,6 +6570,7 @@ class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
 };
 
 using OMPTargetSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetSimdDirective>;
+using OMPTargetSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetSimdDirective>;
 
 class OMPTargetSimdDirective : public OMPLoopDirective {
  private:
@@ -6201,6 +6584,11 @@ class OMPTargetSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6208,6 +6596,7 @@ class OMPTargetSimdDirective : public OMPLoopDirective {
 };
 
 using OMPTargetParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelForSimdDirective>;
+using OMPTargetParallelForSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetParallelForSimdDirective>;
 
 class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -6221,6 +6610,11 @@ class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetParallelForSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6228,6 +6622,7 @@ class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
 };
 
 using OMPTargetParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelForDirective>;
+using OMPTargetParallelForDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetParallelForDirective>;
 
 class OMPTargetParallelForDirective : public OMPLoopDirective {
  private:
@@ -6241,14 +6636,20 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPTargetParallelForDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPTargetParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPSimdDirective>;
+using OMPSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPSimdDirective>;
 
 class OMPSimdDirective : public OMPLoopDirective {
  private:
@@ -6262,6 +6663,11 @@ class OMPSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPSimdDirective> from(const TokenContext &c);
   static std::optional<OMPSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6269,6 +6675,7 @@ class OMPSimdDirective : public OMPLoopDirective {
 };
 
 using OMPParallelMasterTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterTaskLoopSimdDirective>;
+using OMPParallelMasterTaskLoopSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelMasterTaskLoopSimdDirective>;
 
 class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -6282,6 +6689,11 @@ class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPParallelMasterTaskLoopSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6289,6 +6701,7 @@ class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
 };
 
 using OMPParallelMasterTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterTaskLoopDirective>;
+using OMPParallelMasterTaskLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelMasterTaskLoopDirective>;
 
 class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
  private:
@@ -6302,14 +6715,20 @@ class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPParallelMasterTaskLoopDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPParallelMasterTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelForSimdDirective>;
+using OMPParallelForSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelForSimdDirective>;
 
 class OMPParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -6323,6 +6742,11 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPParallelForSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelForSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6330,6 +6754,7 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
 };
 
 using OMPParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelForDirective>;
+using OMPParallelForDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelForDirective>;
 
 class OMPParallelForDirective : public OMPLoopDirective {
  private:
@@ -6343,14 +6768,20 @@ class OMPParallelForDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPParallelForDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelForDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPMasterTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterTaskLoopSimdDirective>;
+using OMPMasterTaskLoopSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMasterTaskLoopSimdDirective>;
 
 class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -6364,6 +6795,11 @@ class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPMasterTaskLoopSimdDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPMasterTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
@@ -6371,6 +6807,7 @@ class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
 };
 
 using OMPMasterTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterTaskLoopDirective>;
+using OMPMasterTaskLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMasterTaskLoopDirective>;
 
 class OMPMasterTaskLoopDirective : public OMPLoopDirective {
  private:
@@ -6384,14 +6821,20 @@ class OMPMasterTaskLoopDirective : public OMPLoopDirective {
     return in_internal(frag);
   }
 
+  inline static OMPMasterTaskLoopDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPMasterTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPMasterTaskLoopDirective> from(const Stmt &parent);
-  bool has_cancel(void) const noexcept;
+  bool has_cancel(void) const;
 };
 
 using OMPInteropDirectiveRange = DerivedEntityRange<StmtIterator, OMPInteropDirective>;
+using OMPInteropDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPInteropDirective>;
 
 class OMPInteropDirective : public OMPExecutableDirective {
  private:
@@ -6403,11 +6846,17 @@ class OMPInteropDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPInteropDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPInteropDirective> from(const TokenContext &c);
   static std::optional<OMPInteropDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPInteropDirective> from(const Stmt &parent);
 };
 
 using OMPFlushDirectiveRange = DerivedEntityRange<StmtIterator, OMPFlushDirective>;
+using OMPFlushDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPFlushDirective>;
 
 class OMPFlushDirective : public OMPExecutableDirective {
  private:
@@ -6419,11 +6868,17 @@ class OMPFlushDirective : public OMPExecutableDirective {
     return in_internal(frag);
   }
 
+  inline static OMPFlushDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPFlushDirective> from(const TokenContext &c);
   static std::optional<OMPFlushDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPFlushDirective> from(const Stmt &parent);
 };
 
 using OMPCanonicalLoopRange = DerivedEntityRange<StmtIterator, OMPCanonicalLoop>;
+using OMPCanonicalLoopContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCanonicalLoop>;
 
 class OMPCanonicalLoop : public Stmt {
  private:
@@ -6434,13 +6889,19 @@ class OMPCanonicalLoop : public Stmt {
     return in_internal(frag);
   }
 
+  inline static OMPCanonicalLoopContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPCanonicalLoop> from(const TokenContext &c);
   static std::optional<OMPCanonicalLoop> from(const Stmt &parent);
-  CapturedStmt distance_func(void) const noexcept;
-  CapturedStmt loop_variable_func(void) const noexcept;
-  DeclRefExpr loop_variable_reference(void) const noexcept;
+  CapturedStmt distance_func(void) const;
+  CapturedStmt loop_variable_func(void) const;
+  DeclRefExpr loop_variable_reference(void) const;
 };
 
 using NullStmtRange = DerivedEntityRange<StmtIterator, NullStmt>;
+using NullStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, NullStmt>;
 
 class NullStmt : public Stmt {
  private:
@@ -6451,12 +6912,18 @@ class NullStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static NullStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<NullStmt> from(const TokenContext &c);
   static std::optional<NullStmt> from(const Stmt &parent);
-  Token semi_token(void) const noexcept;
-  bool has_leading_empty_macro(void) const noexcept;
+  Token semi_token(void) const;
+  bool has_leading_empty_macro(void) const;
 };
 
 using MSDependentExistsStmtRange = DerivedEntityRange<StmtIterator, MSDependentExistsStmt>;
+using MSDependentExistsStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSDependentExistsStmt>;
 
 class MSDependentExistsStmt : public Stmt {
  private:
@@ -6467,14 +6934,20 @@ class MSDependentExistsStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static MSDependentExistsStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MSDependentExistsStmt> from(const TokenContext &c);
   static std::optional<MSDependentExistsStmt> from(const Stmt &parent);
-  Token keyword_token(void) const noexcept;
-  CompoundStmt sub_statement(void) const noexcept;
-  bool is_if_exists(void) const noexcept;
-  bool is_if_not_exists(void) const noexcept;
+  Token keyword_token(void) const;
+  CompoundStmt sub_statement(void) const;
+  bool is_if_exists(void) const;
+  bool is_if_not_exists(void) const;
 };
 
 using IndirectGotoStmtRange = DerivedEntityRange<StmtIterator, IndirectGotoStmt>;
+using IndirectGotoStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, IndirectGotoStmt>;
 
 class IndirectGotoStmt : public Stmt {
  private:
@@ -6485,13 +6958,19 @@ class IndirectGotoStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static IndirectGotoStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<IndirectGotoStmt> from(const TokenContext &c);
   static std::optional<IndirectGotoStmt> from(const Stmt &parent);
-  LabelDecl constant_target(void) const noexcept;
-  Token goto_token(void) const noexcept;
-  Token star_token(void) const noexcept;
+  LabelDecl constant_target(void) const;
+  Token goto_token(void) const;
+  Token star_token(void) const;
 };
 
 using IfStmtRange = DerivedEntityRange<StmtIterator, IfStmt>;
+using IfStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, IfStmt>;
 
 class IfStmt : public Stmt {
  private:
@@ -6502,21 +6981,27 @@ class IfStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static IfStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<IfStmt> from(const TokenContext &c);
   static std::optional<IfStmt> from(const Stmt &parent);
-  std::optional<VarDecl> condition_variable(void) const noexcept;
-  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
-  Token else_token(void) const noexcept;
-  Token if_token(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool has_else_storage(void) const noexcept;
-  bool has_initializer_storage(void) const noexcept;
-  bool has_variable_storage(void) const noexcept;
-  bool is_constexpr(void) const noexcept;
-  bool is_obj_c_availability_check(void) const noexcept;
+  std::optional<VarDecl> condition_variable(void) const;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
+  Token else_token(void) const;
+  Token if_token(void) const;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
+  bool has_else_storage(void) const;
+  bool has_initializer_storage(void) const;
+  bool has_variable_storage(void) const;
+  bool is_constexpr(void) const;
+  bool is_obj_c_availability_check(void) const;
 };
 
 using GotoStmtRange = DerivedEntityRange<StmtIterator, GotoStmt>;
+using GotoStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, GotoStmt>;
 
 class GotoStmt : public Stmt {
  private:
@@ -6527,13 +7012,19 @@ class GotoStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static GotoStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<GotoStmt> from(const TokenContext &c);
   static std::optional<GotoStmt> from(const Stmt &parent);
-  Token goto_token(void) const noexcept;
-  LabelDecl label(void) const noexcept;
-  Token label_token(void) const noexcept;
+  Token goto_token(void) const;
+  LabelDecl label(void) const;
+  Token label_token(void) const;
 };
 
 using ForStmtRange = DerivedEntityRange<StmtIterator, ForStmt>;
+using ForStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ForStmt>;
 
 class ForStmt : public Stmt {
  private:
@@ -6544,15 +7035,21 @@ class ForStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ForStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ForStmt> from(const TokenContext &c);
   static std::optional<ForStmt> from(const Stmt &parent);
-  std::optional<VarDecl> condition_variable(void) const noexcept;
-  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
-  Token for_token(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  std::optional<VarDecl> condition_variable(void) const;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
+  Token for_token(void) const;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using DoStmtRange = DerivedEntityRange<StmtIterator, DoStmt>;
+using DoStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, DoStmt>;
 
 class DoStmt : public Stmt {
  private:
@@ -6563,13 +7060,19 @@ class DoStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static DoStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DoStmt> from(const TokenContext &c);
   static std::optional<DoStmt> from(const Stmt &parent);
-  Token do_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  Token while_token(void) const noexcept;
+  Token do_token(void) const;
+  Token r_paren_token(void) const;
+  Token while_token(void) const;
 };
 
 using DeclStmtRange = DerivedEntityRange<StmtIterator, DeclStmt>;
+using DeclStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeclStmt>;
 
 class DeclStmt : public Stmt {
  private:
@@ -6580,11 +7083,17 @@ class DeclStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static DeclStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DeclStmt> from(const TokenContext &c);
   static std::optional<DeclStmt> from(const Stmt &parent);
-  bool is_single_declaration(void) const noexcept;
+  bool is_single_declaration(void) const;
 };
 
 using CoroutineBodyStmtRange = DerivedEntityRange<StmtIterator, CoroutineBodyStmt>;
+using CoroutineBodyStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoroutineBodyStmt>;
 
 class CoroutineBodyStmt : public Stmt {
  private:
@@ -6595,12 +7104,18 @@ class CoroutineBodyStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static CoroutineBodyStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CoroutineBodyStmt> from(const TokenContext &c);
   static std::optional<CoroutineBodyStmt> from(const Stmt &parent);
-  VarDecl promise_declaration(void) const noexcept;
-  bool has_dependent_promise_type(void) const noexcept;
+  VarDecl promise_declaration(void) const;
+  bool has_dependent_promise_type(void) const;
 };
 
 using CoreturnStmtRange = DerivedEntityRange<StmtIterator, CoreturnStmt>;
+using CoreturnStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoreturnStmt>;
 
 class CoreturnStmt : public Stmt {
  private:
@@ -6611,12 +7126,18 @@ class CoreturnStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static CoreturnStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CoreturnStmt> from(const TokenContext &c);
   static std::optional<CoreturnStmt> from(const Stmt &parent);
-  Token keyword_token(void) const noexcept;
-  bool is_implicit(void) const noexcept;
+  Token keyword_token(void) const;
+  bool is_implicit(void) const;
 };
 
 using ContinueStmtRange = DerivedEntityRange<StmtIterator, ContinueStmt>;
+using ContinueStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ContinueStmt>;
 
 class ContinueStmt : public Stmt {
  private:
@@ -6627,11 +7148,17 @@ class ContinueStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ContinueStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ContinueStmt> from(const TokenContext &c);
   static std::optional<ContinueStmt> from(const Stmt &parent);
-  Token continue_token(void) const noexcept;
+  Token continue_token(void) const;
 };
 
 using CompoundStmtRange = DerivedEntityRange<StmtIterator, CompoundStmt>;
+using CompoundStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CompoundStmt>;
 
 class CompoundStmt : public Stmt {
  private:
@@ -6642,12 +7169,18 @@ class CompoundStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static CompoundStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CompoundStmt> from(const TokenContext &c);
   static std::optional<CompoundStmt> from(const Stmt &parent);
-  Token l_brac_token(void) const noexcept;
-  Token r_brac_token(void) const noexcept;
+  Token l_brac_token(void) const;
+  Token r_brac_token(void) const;
 };
 
 using CapturedStmtRange = DerivedEntityRange<StmtIterator, CapturedStmt>;
+using CapturedStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CapturedStmt>;
 
 class CapturedStmt : public Stmt {
  private:
@@ -6658,13 +7191,19 @@ class CapturedStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static CapturedStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CapturedStmt> from(const TokenContext &c);
   static std::optional<CapturedStmt> from(const Stmt &parent);
-  CapturedDecl captured_declaration(void) const noexcept;
-  RecordDecl captured_record_declaration(void) const noexcept;
-  CapturedRegionKind captured_region_kind(void) const noexcept;
+  CapturedDecl captured_declaration(void) const;
+  RecordDecl captured_record_declaration(void) const;
+  CapturedRegionKind captured_region_kind(void) const;
 };
 
 using CXXTryStmtRange = DerivedEntityRange<StmtIterator, CXXTryStmt>;
+using CXXTryStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXTryStmt>;
 
 class CXXTryStmt : public Stmt {
  private:
@@ -6675,13 +7214,19 @@ class CXXTryStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static CXXTryStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXTryStmt> from(const TokenContext &c);
   static std::optional<CXXTryStmt> from(const Stmt &parent);
-  CompoundStmt try_block(void) const noexcept;
-  Token try_token(void) const noexcept;
-  std::vector<CXXCatchStmt> handlers(void) const noexcept;
+  CompoundStmt try_block(void) const;
+  Token try_token(void) const;
+  std::vector<CXXCatchStmt> handlers(void) const;
 };
 
 using CXXForRangeStmtRange = DerivedEntityRange<StmtIterator, CXXForRangeStmt>;
+using CXXForRangeStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXForRangeStmt>;
 
 class CXXForRangeStmt : public Stmt {
  private:
@@ -6692,19 +7237,25 @@ class CXXForRangeStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static CXXForRangeStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXForRangeStmt> from(const TokenContext &c);
   static std::optional<CXXForRangeStmt> from(const Stmt &parent);
-  DeclStmt begin_statement(void) const noexcept;
-  Token coawait_token(void) const noexcept;
-  Token colon_token(void) const noexcept;
-  DeclStmt end_statement(void) const noexcept;
-  Token for_token(void) const noexcept;
-  DeclStmt loop_variable_statement(void) const noexcept;
-  VarDecl loop_variable(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  DeclStmt range_statement(void) const noexcept;
+  DeclStmt begin_statement(void) const;
+  Token coawait_token(void) const;
+  Token colon_token(void) const;
+  DeclStmt end_statement(void) const;
+  Token for_token(void) const;
+  DeclStmt loop_variable_statement(void) const;
+  VarDecl loop_variable(void) const;
+  Token r_paren_token(void) const;
+  DeclStmt range_statement(void) const;
 };
 
 using CXXCatchStmtRange = DerivedEntityRange<StmtIterator, CXXCatchStmt>;
+using CXXCatchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXCatchStmt>;
 
 class CXXCatchStmt : public Stmt {
  private:
@@ -6715,12 +7266,18 @@ class CXXCatchStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static CXXCatchStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXCatchStmt> from(const TokenContext &c);
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
-  Token catch_token(void) const noexcept;
-  VarDecl exception_declaration(void) const noexcept;
+  Token catch_token(void) const;
+  VarDecl exception_declaration(void) const;
 };
 
 using BreakStmtRange = DerivedEntityRange<StmtIterator, BreakStmt>;
+using BreakStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, BreakStmt>;
 
 class BreakStmt : public Stmt {
  private:
@@ -6731,11 +7288,17 @@ class BreakStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static BreakStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BreakStmt> from(const TokenContext &c);
   static std::optional<BreakStmt> from(const Stmt &parent);
-  Token break_token(void) const noexcept;
+  Token break_token(void) const;
 };
 
 using AsmStmtRange = DerivedEntityRange<StmtIterator, AsmStmt>;
+using AsmStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, AsmStmt>;
 
 class AsmStmt : public Stmt {
  private:
@@ -6746,17 +7309,23 @@ class AsmStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static AsmStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AsmStmt> from(const TokenContext &c);
   static std::optional<AsmStmt> from(const Stmt &parent);
-  std::string_view generate_assembly_string(void) const noexcept;
-  Token assembly_token(void) const noexcept;
-  bool is_simple(void) const noexcept;
-  bool is_volatile(void) const noexcept;
-  std::vector<std::string_view> output_constraints(void) const noexcept;
-  std::vector<std::string_view> input_constraints(void) const noexcept;
-  std::vector<std::string_view> clobbers(void) const noexcept;
+  std::string_view generate_assembly_string(void) const;
+  Token assembly_token(void) const;
+  bool is_simple(void) const;
+  bool is_volatile(void) const;
+  std::vector<std::string_view> output_constraints(void) const;
+  std::vector<std::string_view> input_constraints(void) const;
+  std::vector<std::string_view> clobbers(void) const;
 };
 
 using MSAsmStmtRange = DerivedEntityRange<StmtIterator, MSAsmStmt>;
+using MSAsmStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSAsmStmt>;
 
 class MSAsmStmt : public AsmStmt {
  private:
@@ -6768,15 +7337,21 @@ class MSAsmStmt : public AsmStmt {
     return in_internal(frag);
   }
 
+  inline static MSAsmStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MSAsmStmt> from(const TokenContext &c);
   static std::optional<MSAsmStmt> from(const AsmStmt &parent);
   static std::optional<MSAsmStmt> from(const Stmt &parent);
-  std::vector<std::string_view> all_constraints(void) const noexcept;
-  std::string_view assembly_string(void) const noexcept;
-  Token l_brace_token(void) const noexcept;
-  bool has_braces(void) const noexcept;
+  std::vector<std::string_view> all_constraints(void) const;
+  std::string_view assembly_string(void) const;
+  Token l_brace_token(void) const;
+  bool has_braces(void) const;
 };
 
 using GCCAsmStmtRange = DerivedEntityRange<StmtIterator, GCCAsmStmt>;
+using GCCAsmStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, GCCAsmStmt>;
 
 class GCCAsmStmt : public AsmStmt {
  private:
@@ -6788,22 +7363,28 @@ class GCCAsmStmt : public AsmStmt {
     return in_internal(frag);
   }
 
+  inline static GCCAsmStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<GCCAsmStmt> from(const TokenContext &c);
   static std::optional<GCCAsmStmt> from(const AsmStmt &parent);
   static std::optional<GCCAsmStmt> from(const Stmt &parent);
-  StringLiteral assembly_string(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_assembly_goto(void) const noexcept;
-  std::vector<AddrLabelExpr> labels(void) const noexcept;
-  std::vector<StringLiteral> output_constraint_literals(void) const noexcept;
-  std::vector<std::string_view> output_names(void) const noexcept;
-  std::vector<StringLiteral> input_constraint_literals(void) const noexcept;
-  std::vector<std::string_view> input_names(void) const noexcept;
-  std::vector<StringLiteral> clobber_string_literals(void) const noexcept;
-  std::vector<AddrLabelExpr> label_expressions(void) const noexcept;
-  std::vector<std::string_view> label_names(void) const noexcept;
+  StringLiteral assembly_string(void) const;
+  Token r_paren_token(void) const;
+  bool is_assembly_goto(void) const;
+  std::vector<AddrLabelExpr> labels(void) const;
+  std::vector<StringLiteral> output_constraint_literals(void) const;
+  std::vector<std::string_view> output_names(void) const;
+  std::vector<StringLiteral> input_constraint_literals(void) const;
+  std::vector<std::string_view> input_names(void) const;
+  std::vector<StringLiteral> clobber_string_literals(void) const;
+  std::vector<AddrLabelExpr> label_expressions(void) const;
+  std::vector<std::string_view> label_names(void) const;
 };
 
 using WhileStmtRange = DerivedEntityRange<StmtIterator, WhileStmt>;
+using WhileStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, WhileStmt>;
 
 class WhileStmt : public Stmt {
  private:
@@ -6814,16 +7395,22 @@ class WhileStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static WhileStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<WhileStmt> from(const TokenContext &c);
   static std::optional<WhileStmt> from(const Stmt &parent);
-  std::optional<VarDecl> condition_variable(void) const noexcept;
-  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  Token while_token(void) const noexcept;
-  bool has_variable_storage(void) const noexcept;
+  std::optional<VarDecl> condition_variable(void) const;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
+  Token while_token(void) const;
+  bool has_variable_storage(void) const;
 };
 
 using ValueStmtRange = DerivedEntityRange<StmtIterator, ValueStmt>;
+using ValueStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ValueStmt>;
 
 class ValueStmt : public Stmt {
  private:
@@ -6834,10 +7421,16 @@ class ValueStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static ValueStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ValueStmt> from(const TokenContext &c);
   static std::optional<ValueStmt> from(const Stmt &parent);
 };
 
 using LabelStmtRange = DerivedEntityRange<StmtIterator, LabelStmt>;
+using LabelStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, LabelStmt>;
 
 class LabelStmt : public ValueStmt {
  private:
@@ -6849,15 +7442,21 @@ class LabelStmt : public ValueStmt {
     return in_internal(frag);
   }
 
+  inline static LabelStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<LabelStmt> from(const TokenContext &c);
   static std::optional<LabelStmt> from(const ValueStmt &parent);
   static std::optional<LabelStmt> from(const Stmt &parent);
-  LabelDecl declaration(void) const noexcept;
-  Token identifier_token(void) const noexcept;
-  std::string_view name(void) const noexcept;
-  bool is_side_entry(void) const noexcept;
+  LabelDecl declaration(void) const;
+  Token identifier_token(void) const;
+  std::string_view name(void) const;
+  bool is_side_entry(void) const;
 };
 
 using ExprRange = DerivedEntityRange<StmtIterator, Expr>;
+using ExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, Expr>;
 
 class Expr : public ValueStmt {
  private:
@@ -6869,38 +7468,44 @@ class Expr : public ValueStmt {
     return in_internal(frag);
   }
 
+  inline static ExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<Expr> from(const TokenContext &c);
   static std::optional<Expr> from(const ValueStmt &parent);
   static std::optional<Expr> from(const Stmt &parent);
-  bool has_side_effects(void) const noexcept;
-  bool contains_errors(void) const noexcept;
-  bool contains_unexpanded_parameter_pack(void) const noexcept;
-  Token expression_token(void) const noexcept;
-  std::optional<ObjCPropertyRefExpr> obj_c_property(void) const noexcept;
-  ExprObjectKind object_kind(void) const noexcept;
-  std::optional<FieldDecl> source_bit_field(void) const noexcept;
-  ExprValueKind value_kind(void) const noexcept;
-  bool has_non_trivial_call(void) const noexcept;
-  bool is_default_argument(void) const noexcept;
-  bool is_gl_value(void) const noexcept;
-  bool is_implicit_cxx_this(void) const noexcept;
-  bool is_instantiation_dependent(void) const noexcept;
-  bool is_known_to_have_boolean_value(void) const noexcept;
-  bool is_l_value(void) const noexcept;
-  bool is_objcgc_candidate(void) const noexcept;
-  bool is_obj_c_self_expression(void) const noexcept;
-  bool is_ordinary_or_bit_field_object(void) const noexcept;
-  bool is_pr_value(void) const noexcept;
-  bool is_read_if_discarded_in_c_plus_plus11(void) const noexcept;
-  bool is_type_dependent(void) const noexcept;
-  bool is_value_dependent(void) const noexcept;
-  bool is_x_value(void) const noexcept;
-  bool refers_to_bit_field(void) const noexcept;
-  bool refers_to_global_register_variable(void) const noexcept;
-  bool refers_to_matrix_element(void) const noexcept;
-  bool refers_to_vector_element(void) const noexcept;
+  bool has_side_effects(void) const;
+  bool contains_errors(void) const;
+  bool contains_unexpanded_parameter_pack(void) const;
+  Token expression_token(void) const;
+  std::optional<ObjCPropertyRefExpr> obj_c_property(void) const;
+  ExprObjectKind object_kind(void) const;
+  std::optional<FieldDecl> source_bit_field(void) const;
+  ExprValueKind value_kind(void) const;
+  bool has_non_trivial_call(void) const;
+  bool is_default_argument(void) const;
+  bool is_gl_value(void) const;
+  bool is_implicit_cxx_this(void) const;
+  bool is_instantiation_dependent(void) const;
+  bool is_known_to_have_boolean_value(void) const;
+  bool is_l_value(void) const;
+  bool is_objcgc_candidate(void) const;
+  bool is_obj_c_self_expression(void) const;
+  bool is_ordinary_or_bit_field_object(void) const;
+  bool is_pr_value(void) const;
+  bool is_read_if_discarded_in_c_plus_plus11(void) const;
+  bool is_type_dependent(void) const;
+  bool is_value_dependent(void) const;
+  bool is_x_value(void) const;
+  bool refers_to_bit_field(void) const;
+  bool refers_to_global_register_variable(void) const;
+  bool refers_to_matrix_element(void) const;
+  bool refers_to_vector_element(void) const;
 };
 
 using DesignatedInitUpdateExprRange = DerivedEntityRange<StmtIterator, DesignatedInitUpdateExpr>;
+using DesignatedInitUpdateExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DesignatedInitUpdateExpr>;
 
 class DesignatedInitUpdateExpr : public Expr {
  private:
@@ -6913,13 +7518,19 @@ class DesignatedInitUpdateExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static DesignatedInitUpdateExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DesignatedInitUpdateExpr> from(const TokenContext &c);
   static std::optional<DesignatedInitUpdateExpr> from(const Expr &parent);
   static std::optional<DesignatedInitUpdateExpr> from(const ValueStmt &parent);
   static std::optional<DesignatedInitUpdateExpr> from(const Stmt &parent);
-  InitListExpr updater(void) const noexcept;
+  InitListExpr updater(void) const;
 };
 
 using DesignatedInitExprRange = DerivedEntityRange<StmtIterator, DesignatedInitExpr>;
+using DesignatedInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DesignatedInitExpr>;
 
 class DesignatedInitExpr : public Expr {
  private:
@@ -6932,16 +7543,22 @@ class DesignatedInitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static DesignatedInitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DesignatedInitExpr> from(const TokenContext &c);
   static std::optional<DesignatedInitExpr> from(const Expr &parent);
   static std::optional<DesignatedInitExpr> from(const ValueStmt &parent);
   static std::optional<DesignatedInitExpr> from(const Stmt &parent);
-  TokenRange designators_source_range(void) const noexcept;
-  Token equal_or_colon_token(void) const noexcept;
-  bool is_direct_initializer(void) const noexcept;
-  bool uses_gnu_syntax(void) const noexcept;
+  TokenRange designators_source_range(void) const;
+  Token equal_or_colon_token(void) const;
+  bool is_direct_initializer(void) const;
+  bool uses_gnu_syntax(void) const;
 };
 
 using DependentScopeDeclRefExprRange = DerivedEntityRange<StmtIterator, DependentScopeDeclRefExpr>;
+using DependentScopeDeclRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentScopeDeclRefExpr>;
 
 class DependentScopeDeclRefExpr : public Expr {
  private:
@@ -6954,17 +7571,23 @@ class DependentScopeDeclRefExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static DependentScopeDeclRefExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentScopeDeclRefExpr> from(const TokenContext &c);
   static std::optional<DependentScopeDeclRefExpr> from(const Expr &parent);
   static std::optional<DependentScopeDeclRefExpr> from(const ValueStmt &parent);
   static std::optional<DependentScopeDeclRefExpr> from(const Stmt &parent);
-  Token l_angle_token(void) const noexcept;
-  Token r_angle_token(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  bool has_explicit_template_arguments(void) const noexcept;
-  bool has_template_keyword(void) const noexcept;
+  Token l_angle_token(void) const;
+  Token r_angle_token(void) const;
+  Token template_keyword_token(void) const;
+  bool has_explicit_template_arguments(void) const;
+  bool has_template_keyword(void) const;
 };
 
 using DependentCoawaitExprRange = DerivedEntityRange<StmtIterator, DependentCoawaitExpr>;
+using DependentCoawaitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentCoawaitExpr>;
 
 class DependentCoawaitExpr : public Expr {
  private:
@@ -6977,14 +7600,20 @@ class DependentCoawaitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static DependentCoawaitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentCoawaitExpr> from(const TokenContext &c);
   static std::optional<DependentCoawaitExpr> from(const Expr &parent);
   static std::optional<DependentCoawaitExpr> from(const ValueStmt &parent);
   static std::optional<DependentCoawaitExpr> from(const Stmt &parent);
-  Token keyword_token(void) const noexcept;
-  UnresolvedLookupExpr operator_coawait_lookup(void) const noexcept;
+  Token keyword_token(void) const;
+  UnresolvedLookupExpr operator_coawait_lookup(void) const;
 };
 
 using DeclRefExprRange = DerivedEntityRange<StmtIterator, DeclRefExpr>;
+using DeclRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeclRefExpr>;
 
 class DeclRefExpr : public Expr {
  private:
@@ -6997,24 +7626,30 @@ class DeclRefExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static DeclRefExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DeclRefExpr> from(const TokenContext &c);
   static std::optional<DeclRefExpr> from(const Expr &parent);
   static std::optional<DeclRefExpr> from(const ValueStmt &parent);
   static std::optional<DeclRefExpr> from(const Stmt &parent);
-  ValueDecl declaration(void) const noexcept;
-  NamedDecl found_declaration(void) const noexcept;
-  Token l_angle_token(void) const noexcept;
-  Token r_angle_token(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  bool had_multiple_candidates(void) const noexcept;
-  bool has_explicit_template_arguments(void) const noexcept;
-  bool has_qualifier(void) const noexcept;
-  bool has_template_kw_and_arguments_info(void) const noexcept;
-  bool has_template_keyword(void) const noexcept;
-  NonOdrUseReason is_non_odr_use(void) const noexcept;
-  bool refers_to_enclosing_variable_or_capture(void) const noexcept;
+  ValueDecl declaration(void) const;
+  NamedDecl found_declaration(void) const;
+  Token l_angle_token(void) const;
+  Token r_angle_token(void) const;
+  Token template_keyword_token(void) const;
+  bool had_multiple_candidates(void) const;
+  bool has_explicit_template_arguments(void) const;
+  bool has_qualifier(void) const;
+  bool has_template_kw_and_arguments_info(void) const;
+  bool has_template_keyword(void) const;
+  NonOdrUseReason is_non_odr_use(void) const;
+  bool refers_to_enclosing_variable_or_capture(void) const;
 };
 
 using CoroutineSuspendExprRange = DerivedEntityRange<StmtIterator, CoroutineSuspendExpr>;
+using CoroutineSuspendExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoroutineSuspendExpr>;
 
 class CoroutineSuspendExpr : public Expr {
  private:
@@ -7027,14 +7662,20 @@ class CoroutineSuspendExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CoroutineSuspendExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CoroutineSuspendExpr> from(const TokenContext &c);
   static std::optional<CoroutineSuspendExpr> from(const Expr &parent);
   static std::optional<CoroutineSuspendExpr> from(const ValueStmt &parent);
   static std::optional<CoroutineSuspendExpr> from(const Stmt &parent);
-  Token keyword_token(void) const noexcept;
-  OpaqueValueExpr opaque_value(void) const noexcept;
+  Token keyword_token(void) const;
+  OpaqueValueExpr opaque_value(void) const;
 };
 
 using CoawaitExprRange = DerivedEntityRange<StmtIterator, CoawaitExpr>;
+using CoawaitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoawaitExpr>;
 
 class CoawaitExpr : public CoroutineSuspendExpr {
  private:
@@ -7048,14 +7689,20 @@ class CoawaitExpr : public CoroutineSuspendExpr {
     return in_internal(frag);
   }
 
+  inline static CoawaitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CoawaitExpr> from(const TokenContext &c);
   static std::optional<CoawaitExpr> from(const CoroutineSuspendExpr &parent);
   static std::optional<CoawaitExpr> from(const Expr &parent);
   static std::optional<CoawaitExpr> from(const ValueStmt &parent);
   static std::optional<CoawaitExpr> from(const Stmt &parent);
-  bool is_implicit(void) const noexcept;
+  bool is_implicit(void) const;
 };
 
 using CoyieldExprRange = DerivedEntityRange<StmtIterator, CoyieldExpr>;
+using CoyieldExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoyieldExpr>;
 
 class CoyieldExpr : public CoroutineSuspendExpr {
  private:
@@ -7069,6 +7716,11 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     return in_internal(frag);
   }
 
+  inline static CoyieldExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CoyieldExpr> from(const TokenContext &c);
   static std::optional<CoyieldExpr> from(const CoroutineSuspendExpr &parent);
   static std::optional<CoyieldExpr> from(const Expr &parent);
   static std::optional<CoyieldExpr> from(const ValueStmt &parent);
@@ -7076,6 +7728,7 @@ class CoyieldExpr : public CoroutineSuspendExpr {
 };
 
 using ConvertVectorExprRange = DerivedEntityRange<StmtIterator, ConvertVectorExpr>;
+using ConvertVectorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConvertVectorExpr>;
 
 class ConvertVectorExpr : public Expr {
  private:
@@ -7088,14 +7741,20 @@ class ConvertVectorExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ConvertVectorExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConvertVectorExpr> from(const TokenContext &c);
   static std::optional<ConvertVectorExpr> from(const Expr &parent);
   static std::optional<ConvertVectorExpr> from(const ValueStmt &parent);
   static std::optional<ConvertVectorExpr> from(const Stmt &parent);
-  Token builtin_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token builtin_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ConceptSpecializationExprRange = DerivedEntityRange<StmtIterator, ConceptSpecializationExpr>;
+using ConceptSpecializationExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConceptSpecializationExpr>;
 
 class ConceptSpecializationExpr : public Expr {
  private:
@@ -7108,14 +7767,20 @@ class ConceptSpecializationExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ConceptSpecializationExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConceptSpecializationExpr> from(const TokenContext &c);
   static std::optional<ConceptSpecializationExpr> from(const Expr &parent);
   static std::optional<ConceptSpecializationExpr> from(const ValueStmt &parent);
   static std::optional<ConceptSpecializationExpr> from(const Stmt &parent);
-  std::vector<TemplateArgument> template_arguments(void) const noexcept;
-  bool is_satisfied(void) const noexcept;
+  std::vector<TemplateArgument> template_arguments(void) const;
+  bool is_satisfied(void) const;
 };
 
 using CompoundLiteralExprRange = DerivedEntityRange<StmtIterator, CompoundLiteralExpr>;
+using CompoundLiteralExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CompoundLiteralExpr>;
 
 class CompoundLiteralExpr : public Expr {
  private:
@@ -7128,14 +7793,20 @@ class CompoundLiteralExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CompoundLiteralExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CompoundLiteralExpr> from(const TokenContext &c);
   static std::optional<CompoundLiteralExpr> from(const Expr &parent);
   static std::optional<CompoundLiteralExpr> from(const ValueStmt &parent);
   static std::optional<CompoundLiteralExpr> from(const Stmt &parent);
-  Token l_paren_token(void) const noexcept;
-  bool is_file_scope(void) const noexcept;
+  Token l_paren_token(void) const;
+  bool is_file_scope(void) const;
 };
 
 using ChooseExprRange = DerivedEntityRange<StmtIterator, ChooseExpr>;
+using ChooseExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ChooseExpr>;
 
 class ChooseExpr : public Expr {
  private:
@@ -7148,16 +7819,22 @@ class ChooseExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ChooseExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ChooseExpr> from(const TokenContext &c);
   static std::optional<ChooseExpr> from(const Expr &parent);
   static std::optional<ChooseExpr> from(const ValueStmt &parent);
   static std::optional<ChooseExpr> from(const Stmt &parent);
-  Token builtin_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_condition_dependent(void) const noexcept;
-  bool is_condition_true(void) const noexcept;
+  Token builtin_token(void) const;
+  Token r_paren_token(void) const;
+  bool is_condition_dependent(void) const;
+  bool is_condition_true(void) const;
 };
 
 using CharacterLiteralRange = DerivedEntityRange<StmtIterator, CharacterLiteral>;
+using CharacterLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, CharacterLiteral>;
 
 class CharacterLiteral : public Expr {
  private:
@@ -7170,13 +7847,19 @@ class CharacterLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static CharacterLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CharacterLiteral> from(const TokenContext &c);
   static std::optional<CharacterLiteral> from(const Expr &parent);
   static std::optional<CharacterLiteral> from(const ValueStmt &parent);
   static std::optional<CharacterLiteral> from(const Stmt &parent);
-  Token token(void) const noexcept;
+  Token token(void) const;
 };
 
 using CastExprRange = DerivedEntityRange<StmtIterator, CastExpr>;
+using CastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CastExpr>;
 
 class CastExpr : public Expr {
  private:
@@ -7189,17 +7872,23 @@ class CastExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CastExpr> from(const TokenContext &c);
   static std::optional<CastExpr> from(const Expr &parent);
   static std::optional<CastExpr> from(const ValueStmt &parent);
   static std::optional<CastExpr> from(const Stmt &parent);
-  CastKind cast_kind(void) const noexcept;
-  std::string_view cast_kind_name(void) const noexcept;
-  std::optional<NamedDecl> conversion_function(void) const noexcept;
-  std::optional<FieldDecl> target_union_field(void) const noexcept;
-  bool has_stored_fp_features(void) const noexcept;
+  CastKind cast_kind(void) const;
+  std::string_view cast_kind_name(void) const;
+  std::optional<NamedDecl> conversion_function(void) const;
+  std::optional<FieldDecl> target_union_field(void) const;
+  bool has_stored_fp_features(void) const;
 };
 
 using ImplicitCastExprRange = DerivedEntityRange<StmtIterator, ImplicitCastExpr>;
+using ImplicitCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImplicitCastExpr>;
 
 class ImplicitCastExpr : public CastExpr {
  private:
@@ -7213,14 +7902,20 @@ class ImplicitCastExpr : public CastExpr {
     return in_internal(frag);
   }
 
+  inline static ImplicitCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ImplicitCastExpr> from(const TokenContext &c);
   static std::optional<ImplicitCastExpr> from(const CastExpr &parent);
   static std::optional<ImplicitCastExpr> from(const Expr &parent);
   static std::optional<ImplicitCastExpr> from(const ValueStmt &parent);
   static std::optional<ImplicitCastExpr> from(const Stmt &parent);
-  bool is_part_of_explicit_cast(void) const noexcept;
+  bool is_part_of_explicit_cast(void) const;
 };
 
 using ExplicitCastExprRange = DerivedEntityRange<StmtIterator, ExplicitCastExpr>;
+using ExplicitCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExplicitCastExpr>;
 
 class ExplicitCastExpr : public CastExpr {
  private:
@@ -7234,6 +7929,11 @@ class ExplicitCastExpr : public CastExpr {
     return in_internal(frag);
   }
 
+  inline static ExplicitCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExplicitCastExpr> from(const TokenContext &c);
   static std::optional<ExplicitCastExpr> from(const CastExpr &parent);
   static std::optional<ExplicitCastExpr> from(const Expr &parent);
   static std::optional<ExplicitCastExpr> from(const ValueStmt &parent);
@@ -7241,6 +7941,7 @@ class ExplicitCastExpr : public CastExpr {
 };
 
 using CXXNamedCastExprRange = DerivedEntityRange<StmtIterator, CXXNamedCastExpr>;
+using CXXNamedCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXNamedCastExpr>;
 
 class CXXNamedCastExpr : public ExplicitCastExpr {
  private:
@@ -7255,18 +7956,24 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
     return in_internal(frag);
   }
 
+  inline static CXXNamedCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXNamedCastExpr> from(const TokenContext &c);
   static std::optional<CXXNamedCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXNamedCastExpr> from(const CastExpr &parent);
   static std::optional<CXXNamedCastExpr> from(const Expr &parent);
   static std::optional<CXXNamedCastExpr> from(const ValueStmt &parent);
   static std::optional<CXXNamedCastExpr> from(const Stmt &parent);
-  TokenRange angle_brackets(void) const noexcept;
-  std::string_view cast_name(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  TokenRange angle_brackets(void) const;
+  std::string_view cast_name(void) const;
+  Token operator_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using CXXDynamicCastExprRange = DerivedEntityRange<StmtIterator, CXXDynamicCastExpr>;
+using CXXDynamicCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDynamicCastExpr>;
 
 class CXXDynamicCastExpr : public CXXNamedCastExpr {
  private:
@@ -7282,16 +7989,22 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
     return in_internal(frag);
   }
 
+  inline static CXXDynamicCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXDynamicCastExpr> from(const TokenContext &c);
   static std::optional<CXXDynamicCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXDynamicCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXDynamicCastExpr> from(const CastExpr &parent);
   static std::optional<CXXDynamicCastExpr> from(const Expr &parent);
   static std::optional<CXXDynamicCastExpr> from(const ValueStmt &parent);
   static std::optional<CXXDynamicCastExpr> from(const Stmt &parent);
-  bool is_always_null(void) const noexcept;
+  bool is_always_null(void) const;
 };
 
 using CXXConstCastExprRange = DerivedEntityRange<StmtIterator, CXXConstCastExpr>;
+using CXXConstCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXConstCastExpr>;
 
 class CXXConstCastExpr : public CXXNamedCastExpr {
  private:
@@ -7307,6 +8020,11 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
     return in_internal(frag);
   }
 
+  inline static CXXConstCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXConstCastExpr> from(const TokenContext &c);
   static std::optional<CXXConstCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXConstCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXConstCastExpr> from(const CastExpr &parent);
@@ -7316,6 +8034,7 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
 };
 
 using CXXAddrspaceCastExprRange = DerivedEntityRange<StmtIterator, CXXAddrspaceCastExpr>;
+using CXXAddrspaceCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXAddrspaceCastExpr>;
 
 class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
  private:
@@ -7331,6 +8050,11 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
     return in_internal(frag);
   }
 
+  inline static CXXAddrspaceCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXAddrspaceCastExpr> from(const TokenContext &c);
   static std::optional<CXXAddrspaceCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXAddrspaceCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXAddrspaceCastExpr> from(const CastExpr &parent);
@@ -7340,6 +8064,7 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
 };
 
 using CXXStaticCastExprRange = DerivedEntityRange<StmtIterator, CXXStaticCastExpr>;
+using CXXStaticCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXStaticCastExpr>;
 
 class CXXStaticCastExpr : public CXXNamedCastExpr {
  private:
@@ -7355,6 +8080,11 @@ class CXXStaticCastExpr : public CXXNamedCastExpr {
     return in_internal(frag);
   }
 
+  inline static CXXStaticCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXStaticCastExpr> from(const TokenContext &c);
   static std::optional<CXXStaticCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXStaticCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXStaticCastExpr> from(const CastExpr &parent);
@@ -7364,6 +8094,7 @@ class CXXStaticCastExpr : public CXXNamedCastExpr {
 };
 
 using CXXReinterpretCastExprRange = DerivedEntityRange<StmtIterator, CXXReinterpretCastExpr>;
+using CXXReinterpretCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXReinterpretCastExpr>;
 
 class CXXReinterpretCastExpr : public CXXNamedCastExpr {
  private:
@@ -7379,6 +8110,11 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
     return in_internal(frag);
   }
 
+  inline static CXXReinterpretCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXReinterpretCastExpr> from(const TokenContext &c);
   static std::optional<CXXReinterpretCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXReinterpretCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXReinterpretCastExpr> from(const CastExpr &parent);
@@ -7388,6 +8124,7 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
 };
 
 using CXXFunctionalCastExprRange = DerivedEntityRange<StmtIterator, CXXFunctionalCastExpr>;
+using CXXFunctionalCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXFunctionalCastExpr>;
 
 class CXXFunctionalCastExpr : public ExplicitCastExpr {
  private:
@@ -7402,17 +8139,23 @@ class CXXFunctionalCastExpr : public ExplicitCastExpr {
     return in_internal(frag);
   }
 
+  inline static CXXFunctionalCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXFunctionalCastExpr> from(const TokenContext &c);
   static std::optional<CXXFunctionalCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXFunctionalCastExpr> from(const CastExpr &parent);
   static std::optional<CXXFunctionalCastExpr> from(const Expr &parent);
   static std::optional<CXXFunctionalCastExpr> from(const ValueStmt &parent);
   static std::optional<CXXFunctionalCastExpr> from(const Stmt &parent);
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_list_initialization(void) const noexcept;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
+  bool is_list_initialization(void) const;
 };
 
 using CStyleCastExprRange = DerivedEntityRange<StmtIterator, CStyleCastExpr>;
+using CStyleCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CStyleCastExpr>;
 
 class CStyleCastExpr : public ExplicitCastExpr {
  private:
@@ -7427,16 +8170,22 @@ class CStyleCastExpr : public ExplicitCastExpr {
     return in_internal(frag);
   }
 
+  inline static CStyleCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CStyleCastExpr> from(const TokenContext &c);
   static std::optional<CStyleCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CStyleCastExpr> from(const CastExpr &parent);
   static std::optional<CStyleCastExpr> from(const Expr &parent);
   static std::optional<CStyleCastExpr> from(const ValueStmt &parent);
   static std::optional<CStyleCastExpr> from(const Stmt &parent);
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using BuiltinBitCastExprRange = DerivedEntityRange<StmtIterator, BuiltinBitCastExpr>;
+using BuiltinBitCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, BuiltinBitCastExpr>;
 
 class BuiltinBitCastExpr : public ExplicitCastExpr {
  private:
@@ -7451,6 +8200,11 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
     return in_internal(frag);
   }
 
+  inline static BuiltinBitCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BuiltinBitCastExpr> from(const TokenContext &c);
   static std::optional<BuiltinBitCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<BuiltinBitCastExpr> from(const CastExpr &parent);
   static std::optional<BuiltinBitCastExpr> from(const Expr &parent);
@@ -7459,6 +8213,7 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
 };
 
 using ObjCBridgedCastExprRange = DerivedEntityRange<StmtIterator, ObjCBridgedCastExpr>;
+using ObjCBridgedCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBridgedCastExpr>;
 
 class ObjCBridgedCastExpr : public ExplicitCastExpr {
  private:
@@ -7473,18 +8228,24 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
     return in_internal(frag);
   }
 
+  inline static ObjCBridgedCastExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCBridgedCastExpr> from(const TokenContext &c);
   static std::optional<ObjCBridgedCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<ObjCBridgedCastExpr> from(const CastExpr &parent);
   static std::optional<ObjCBridgedCastExpr> from(const Expr &parent);
   static std::optional<ObjCBridgedCastExpr> from(const ValueStmt &parent);
   static std::optional<ObjCBridgedCastExpr> from(const Stmt &parent);
-  Token bridge_keyword_token(void) const noexcept;
-  ObjCBridgeCastKind bridge_kind(void) const noexcept;
-  std::string_view bridge_kind_name(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
+  Token bridge_keyword_token(void) const;
+  ObjCBridgeCastKind bridge_kind(void) const;
+  std::string_view bridge_kind_name(void) const;
+  Token l_paren_token(void) const;
 };
 
 using CallExprRange = DerivedEntityRange<StmtIterator, CallExpr>;
+using CallExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CallExpr>;
 
 class CallExpr : public Expr {
  private:
@@ -7497,21 +8258,27 @@ class CallExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CallExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CallExpr> from(const TokenContext &c);
   static std::optional<CallExpr> from(const Expr &parent);
   static std::optional<CallExpr> from(const ValueStmt &parent);
   static std::optional<CallExpr> from(const Stmt &parent);
-  CallExprADLCallKind adl_call_kind(void) const noexcept;
-  std::optional<FunctionDecl> direct_callee(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool has_stored_fp_features(void) const noexcept;
-  bool has_unused_result_attribute(void) const noexcept;
-  bool is_builtin_assume_false(void) const noexcept;
-  bool is_call_to_std_move(void) const noexcept;
-  bool is_unevaluated_builtin_call(void) const noexcept;
-  bool uses_adl(void) const noexcept;
+  CallExprADLCallKind adl_call_kind(void) const;
+  std::optional<FunctionDecl> direct_callee(void) const;
+  Token r_paren_token(void) const;
+  bool has_stored_fp_features(void) const;
+  bool has_unused_result_attribute(void) const;
+  bool is_builtin_assume_false(void) const;
+  bool is_call_to_std_move(void) const;
+  bool is_unevaluated_builtin_call(void) const;
+  bool uses_adl(void) const;
 };
 
 using CXXOperatorCallExprRange = DerivedEntityRange<StmtIterator, CXXOperatorCallExpr>;
+using CXXOperatorCallExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXOperatorCallExpr>;
 
 class CXXOperatorCallExpr : public CallExpr {
  private:
@@ -7525,18 +8292,24 @@ class CXXOperatorCallExpr : public CallExpr {
     return in_internal(frag);
   }
 
+  inline static CXXOperatorCallExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXOperatorCallExpr> from(const TokenContext &c);
   static std::optional<CXXOperatorCallExpr> from(const CallExpr &parent);
   static std::optional<CXXOperatorCallExpr> from(const Expr &parent);
   static std::optional<CXXOperatorCallExpr> from(const ValueStmt &parent);
   static std::optional<CXXOperatorCallExpr> from(const Stmt &parent);
-  OverloadedOperatorKind operator_(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  bool is_assignment_operation(void) const noexcept;
-  bool is_comparison_operation(void) const noexcept;
-  bool is_infix_binary_operation(void) const noexcept;
+  OverloadedOperatorKind operator_(void) const;
+  Token operator_token(void) const;
+  bool is_assignment_operation(void) const;
+  bool is_comparison_operation(void) const;
+  bool is_infix_binary_operation(void) const;
 };
 
 using CXXMemberCallExprRange = DerivedEntityRange<StmtIterator, CXXMemberCallExpr>;
+using CXXMemberCallExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXMemberCallExpr>;
 
 class CXXMemberCallExpr : public CallExpr {
  private:
@@ -7550,15 +8323,21 @@ class CXXMemberCallExpr : public CallExpr {
     return in_internal(frag);
   }
 
+  inline static CXXMemberCallExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXMemberCallExpr> from(const TokenContext &c);
   static std::optional<CXXMemberCallExpr> from(const CallExpr &parent);
   static std::optional<CXXMemberCallExpr> from(const Expr &parent);
   static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
   static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
-  CXXMethodDecl method_declaration(void) const noexcept;
-  CXXRecordDecl record_declaration(void) const noexcept;
+  CXXMethodDecl method_declaration(void) const;
+  CXXRecordDecl record_declaration(void) const;
 };
 
 using CUDAKernelCallExprRange = DerivedEntityRange<StmtIterator, CUDAKernelCallExpr>;
+using CUDAKernelCallExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDAKernelCallExpr>;
 
 class CUDAKernelCallExpr : public CallExpr {
  private:
@@ -7572,14 +8351,20 @@ class CUDAKernelCallExpr : public CallExpr {
     return in_internal(frag);
   }
 
+  inline static CUDAKernelCallExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CUDAKernelCallExpr> from(const TokenContext &c);
   static std::optional<CUDAKernelCallExpr> from(const CallExpr &parent);
   static std::optional<CUDAKernelCallExpr> from(const Expr &parent);
   static std::optional<CUDAKernelCallExpr> from(const ValueStmt &parent);
   static std::optional<CUDAKernelCallExpr> from(const Stmt &parent);
-  CallExpr config(void) const noexcept;
+  CallExpr config(void) const;
 };
 
 using UserDefinedLiteralRange = DerivedEntityRange<StmtIterator, UserDefinedLiteral>;
+using UserDefinedLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, UserDefinedLiteral>;
 
 class UserDefinedLiteral : public CallExpr {
  private:
@@ -7593,15 +8378,21 @@ class UserDefinedLiteral : public CallExpr {
     return in_internal(frag);
   }
 
+  inline static UserDefinedLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UserDefinedLiteral> from(const TokenContext &c);
   static std::optional<UserDefinedLiteral> from(const CallExpr &parent);
   static std::optional<UserDefinedLiteral> from(const Expr &parent);
   static std::optional<UserDefinedLiteral> from(const ValueStmt &parent);
   static std::optional<UserDefinedLiteral> from(const Stmt &parent);
-  UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const noexcept;
-  Token ud_suffix_token(void) const noexcept;
+  UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const;
+  Token ud_suffix_token(void) const;
 };
 
 using CXXUuidofExprRange = DerivedEntityRange<StmtIterator, CXXUuidofExpr>;
+using CXXUuidofExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXUuidofExpr>;
 
 class CXXUuidofExpr : public Expr {
  private:
@@ -7614,14 +8405,20 @@ class CXXUuidofExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXUuidofExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXUuidofExpr> from(const TokenContext &c);
   static std::optional<CXXUuidofExpr> from(const Expr &parent);
   static std::optional<CXXUuidofExpr> from(const ValueStmt &parent);
   static std::optional<CXXUuidofExpr> from(const Stmt &parent);
-  MSGuidDecl guid_declaration(void) const noexcept;
-  bool is_type_operand(void) const noexcept;
+  MSGuidDecl guid_declaration(void) const;
+  bool is_type_operand(void) const;
 };
 
 using CXXUnresolvedConstructExprRange = DerivedEntityRange<StmtIterator, CXXUnresolvedConstructExpr>;
+using CXXUnresolvedConstructExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXUnresolvedConstructExpr>;
 
 class CXXUnresolvedConstructExpr : public Expr {
  private:
@@ -7634,15 +8431,21 @@ class CXXUnresolvedConstructExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXUnresolvedConstructExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXUnresolvedConstructExpr> from(const TokenContext &c);
   static std::optional<CXXUnresolvedConstructExpr> from(const Expr &parent);
   static std::optional<CXXUnresolvedConstructExpr> from(const ValueStmt &parent);
   static std::optional<CXXUnresolvedConstructExpr> from(const Stmt &parent);
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_list_initialization(void) const noexcept;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
+  bool is_list_initialization(void) const;
 };
 
 using CXXTypeidExprRange = DerivedEntityRange<StmtIterator, CXXTypeidExpr>;
+using CXXTypeidExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXTypeidExpr>;
 
 class CXXTypeidExpr : public Expr {
  private:
@@ -7655,15 +8458,21 @@ class CXXTypeidExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXTypeidExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXTypeidExpr> from(const TokenContext &c);
   static std::optional<CXXTypeidExpr> from(const Expr &parent);
   static std::optional<CXXTypeidExpr> from(const ValueStmt &parent);
   static std::optional<CXXTypeidExpr> from(const Stmt &parent);
-  bool is_most_derived(void) const noexcept;
-  bool is_potentially_evaluated(void) const noexcept;
-  bool is_type_operand(void) const noexcept;
+  bool is_most_derived(void) const;
+  bool is_potentially_evaluated(void) const;
+  bool is_type_operand(void) const;
 };
 
 using CXXThrowExprRange = DerivedEntityRange<StmtIterator, CXXThrowExpr>;
+using CXXThrowExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXThrowExpr>;
 
 class CXXThrowExpr : public Expr {
  private:
@@ -7676,14 +8485,20 @@ class CXXThrowExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXThrowExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXThrowExpr> from(const TokenContext &c);
   static std::optional<CXXThrowExpr> from(const Expr &parent);
   static std::optional<CXXThrowExpr> from(const ValueStmt &parent);
   static std::optional<CXXThrowExpr> from(const Stmt &parent);
-  Token throw_token(void) const noexcept;
-  bool is_thrown_variable_in_scope(void) const noexcept;
+  Token throw_token(void) const;
+  bool is_thrown_variable_in_scope(void) const;
 };
 
 using CXXThisExprRange = DerivedEntityRange<StmtIterator, CXXThisExpr>;
+using CXXThisExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXThisExpr>;
 
 class CXXThisExpr : public Expr {
  private:
@@ -7696,14 +8511,20 @@ class CXXThisExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXThisExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXThisExpr> from(const TokenContext &c);
   static std::optional<CXXThisExpr> from(const Expr &parent);
   static std::optional<CXXThisExpr> from(const ValueStmt &parent);
   static std::optional<CXXThisExpr> from(const Stmt &parent);
-  Token token(void) const noexcept;
-  bool is_implicit(void) const noexcept;
+  Token token(void) const;
+  bool is_implicit(void) const;
 };
 
 using CXXStdInitializerListExprRange = DerivedEntityRange<StmtIterator, CXXStdInitializerListExpr>;
+using CXXStdInitializerListExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXStdInitializerListExpr>;
 
 class CXXStdInitializerListExpr : public Expr {
  private:
@@ -7716,12 +8537,18 @@ class CXXStdInitializerListExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXStdInitializerListExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXStdInitializerListExpr> from(const TokenContext &c);
   static std::optional<CXXStdInitializerListExpr> from(const Expr &parent);
   static std::optional<CXXStdInitializerListExpr> from(const ValueStmt &parent);
   static std::optional<CXXStdInitializerListExpr> from(const Stmt &parent);
 };
 
 using CXXScalarValueInitExprRange = DerivedEntityRange<StmtIterator, CXXScalarValueInitExpr>;
+using CXXScalarValueInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXScalarValueInitExpr>;
 
 class CXXScalarValueInitExpr : public Expr {
  private:
@@ -7734,13 +8561,19 @@ class CXXScalarValueInitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXScalarValueInitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXScalarValueInitExpr> from(const TokenContext &c);
   static std::optional<CXXScalarValueInitExpr> from(const Expr &parent);
   static std::optional<CXXScalarValueInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXScalarValueInitExpr> from(const Stmt &parent);
-  Token r_paren_token(void) const noexcept;
+  Token r_paren_token(void) const;
 };
 
 using CXXRewrittenBinaryOperatorRange = DerivedEntityRange<StmtIterator, CXXRewrittenBinaryOperator>;
+using CXXRewrittenBinaryOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXRewrittenBinaryOperator>;
 
 class CXXRewrittenBinaryOperator : public Expr {
  private:
@@ -7753,19 +8586,25 @@ class CXXRewrittenBinaryOperator : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXRewrittenBinaryOperatorContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXRewrittenBinaryOperator> from(const TokenContext &c);
   static std::optional<CXXRewrittenBinaryOperator> from(const Expr &parent);
   static std::optional<CXXRewrittenBinaryOperator> from(const ValueStmt &parent);
   static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent);
-  BinaryOperatorKind opcode(void) const noexcept;
-  std::string_view opcode_string(void) const noexcept;
-  BinaryOperatorKind operator_(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  bool is_assignment_operation(void) const noexcept;
-  bool is_comparison_operation(void) const noexcept;
-  bool is_reversed(void) const noexcept;
+  BinaryOperatorKind opcode(void) const;
+  std::string_view opcode_string(void) const;
+  BinaryOperatorKind operator_(void) const;
+  Token operator_token(void) const;
+  bool is_assignment_operation(void) const;
+  bool is_comparison_operation(void) const;
+  bool is_reversed(void) const;
 };
 
 using CXXPseudoDestructorExprRange = DerivedEntityRange<StmtIterator, CXXPseudoDestructorExpr>;
+using CXXPseudoDestructorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXPseudoDestructorExpr>;
 
 class CXXPseudoDestructorExpr : public Expr {
  private:
@@ -7778,18 +8617,24 @@ class CXXPseudoDestructorExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXPseudoDestructorExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXPseudoDestructorExpr> from(const TokenContext &c);
   static std::optional<CXXPseudoDestructorExpr> from(const Expr &parent);
   static std::optional<CXXPseudoDestructorExpr> from(const ValueStmt &parent);
   static std::optional<CXXPseudoDestructorExpr> from(const Stmt &parent);
-  Token colon_colon_token(void) const noexcept;
-  Token destroyed_type_token(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  Token tilde_token(void) const noexcept;
-  bool has_qualifier(void) const noexcept;
-  bool is_arrow(void) const noexcept;
+  Token colon_colon_token(void) const;
+  Token destroyed_type_token(void) const;
+  Token operator_token(void) const;
+  Token tilde_token(void) const;
+  bool has_qualifier(void) const;
+  bool is_arrow(void) const;
 };
 
 using CXXNullPtrLiteralExprRange = DerivedEntityRange<StmtIterator, CXXNullPtrLiteralExpr>;
+using CXXNullPtrLiteralExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXNullPtrLiteralExpr>;
 
 class CXXNullPtrLiteralExpr : public Expr {
  private:
@@ -7802,13 +8647,19 @@ class CXXNullPtrLiteralExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXNullPtrLiteralExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXNullPtrLiteralExpr> from(const TokenContext &c);
   static std::optional<CXXNullPtrLiteralExpr> from(const Expr &parent);
   static std::optional<CXXNullPtrLiteralExpr> from(const ValueStmt &parent);
   static std::optional<CXXNullPtrLiteralExpr> from(const Stmt &parent);
-  Token token(void) const noexcept;
+  Token token(void) const;
 };
 
 using CXXNoexceptExprRange = DerivedEntityRange<StmtIterator, CXXNoexceptExpr>;
+using CXXNoexceptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXNoexceptExpr>;
 
 class CXXNoexceptExpr : public Expr {
  private:
@@ -7821,13 +8672,19 @@ class CXXNoexceptExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXNoexceptExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXNoexceptExpr> from(const TokenContext &c);
   static std::optional<CXXNoexceptExpr> from(const Expr &parent);
   static std::optional<CXXNoexceptExpr> from(const ValueStmt &parent);
   static std::optional<CXXNoexceptExpr> from(const Stmt &parent);
-  bool value(void) const noexcept;
+  bool value(void) const;
 };
 
 using CXXNewExprRange = DerivedEntityRange<StmtIterator, CXXNewExpr>;
+using CXXNewExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXNewExpr>;
 
 class CXXNewExpr : public Expr {
  private:
@@ -7840,25 +8697,31 @@ class CXXNewExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXNewExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXNewExpr> from(const TokenContext &c);
   static std::optional<CXXNewExpr> from(const Expr &parent);
   static std::optional<CXXNewExpr> from(const ValueStmt &parent);
   static std::optional<CXXNewExpr> from(const Stmt &parent);
-  bool does_usual_array_delete_want_size(void) const noexcept;
-  CXXConstructExpr construct_expression(void) const noexcept;
-  TokenRange direct_initializer_range(void) const noexcept;
-  CXXNewExprInitializationStyle initialization_style(void) const noexcept;
-  FunctionDecl operator_delete(void) const noexcept;
-  FunctionDecl operator_new(void) const noexcept;
-  TokenRange type_id_parentheses(void) const noexcept;
-  bool has_initializer(void) const noexcept;
-  bool is_array(void) const noexcept;
-  bool is_global_new(void) const noexcept;
-  bool is_parenthesis_type_id(void) const noexcept;
-  bool pass_alignment(void) const noexcept;
-  bool should_null_check_allocation(void) const noexcept;
+  bool does_usual_array_delete_want_size(void) const;
+  CXXConstructExpr construct_expression(void) const;
+  TokenRange direct_initializer_range(void) const;
+  CXXNewExprInitializationStyle initialization_style(void) const;
+  FunctionDecl operator_delete(void) const;
+  FunctionDecl operator_new(void) const;
+  TokenRange type_id_parentheses(void) const;
+  bool has_initializer(void) const;
+  bool is_array(void) const;
+  bool is_global_new(void) const;
+  bool is_parenthesis_type_id(void) const;
+  bool pass_alignment(void) const;
+  bool should_null_check_allocation(void) const;
 };
 
 using CXXInheritedCtorInitExprRange = DerivedEntityRange<StmtIterator, CXXInheritedCtorInitExpr>;
+using CXXInheritedCtorInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXInheritedCtorInitExpr>;
 
 class CXXInheritedCtorInitExpr : public Expr {
  private:
@@ -7871,17 +8734,23 @@ class CXXInheritedCtorInitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXInheritedCtorInitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &c);
   static std::optional<CXXInheritedCtorInitExpr> from(const Expr &parent);
   static std::optional<CXXInheritedCtorInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXInheritedCtorInitExpr> from(const Stmt &parent);
-  bool constructs_virtual_base(void) const noexcept;
-  CXXConstructExprConstructionKind construction_kind(void) const noexcept;
-  CXXConstructorDecl constructor(void) const noexcept;
-  Token token(void) const noexcept;
-  bool inherited_from_virtual_base(void) const noexcept;
+  bool constructs_virtual_base(void) const;
+  CXXConstructExprConstructionKind construction_kind(void) const;
+  CXXConstructorDecl constructor(void) const;
+  Token token(void) const;
+  bool inherited_from_virtual_base(void) const;
 };
 
 using CXXFoldExprRange = DerivedEntityRange<StmtIterator, CXXFoldExpr>;
+using CXXFoldExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXFoldExpr>;
 
 class CXXFoldExpr : public Expr {
  private:
@@ -7894,19 +8763,25 @@ class CXXFoldExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXFoldExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXFoldExpr> from(const TokenContext &c);
   static std::optional<CXXFoldExpr> from(const Expr &parent);
   static std::optional<CXXFoldExpr> from(const ValueStmt &parent);
   static std::optional<CXXFoldExpr> from(const Stmt &parent);
-  UnresolvedLookupExpr callee(void) const noexcept;
-  Token ellipsis_token(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  BinaryOperatorKind operator_(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_left_fold(void) const noexcept;
-  bool is_right_fold(void) const noexcept;
+  UnresolvedLookupExpr callee(void) const;
+  Token ellipsis_token(void) const;
+  Token l_paren_token(void) const;
+  BinaryOperatorKind operator_(void) const;
+  Token r_paren_token(void) const;
+  bool is_left_fold(void) const;
+  bool is_right_fold(void) const;
 };
 
 using CXXDependentScopeMemberExprRange = DerivedEntityRange<StmtIterator, CXXDependentScopeMemberExpr>;
+using CXXDependentScopeMemberExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDependentScopeMemberExpr>;
 
 class CXXDependentScopeMemberExpr : public Expr {
  private:
@@ -7919,22 +8794,28 @@ class CXXDependentScopeMemberExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXDependentScopeMemberExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXDependentScopeMemberExpr> from(const TokenContext &c);
   static std::optional<CXXDependentScopeMemberExpr> from(const Expr &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
-  NamedDecl first_qualifier_found_in_scope(void) const noexcept;
-  Token l_angle_token(void) const noexcept;
-  Token member_token(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  Token r_angle_token(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  bool has_explicit_template_arguments(void) const noexcept;
-  bool has_template_keyword(void) const noexcept;
-  bool is_arrow(void) const noexcept;
-  bool is_implicit_access(void) const noexcept;
+  NamedDecl first_qualifier_found_in_scope(void) const;
+  Token l_angle_token(void) const;
+  Token member_token(void) const;
+  Token operator_token(void) const;
+  Token r_angle_token(void) const;
+  Token template_keyword_token(void) const;
+  bool has_explicit_template_arguments(void) const;
+  bool has_template_keyword(void) const;
+  bool is_arrow(void) const;
+  bool is_implicit_access(void) const;
 };
 
 using CXXDeleteExprRange = DerivedEntityRange<StmtIterator, CXXDeleteExpr>;
+using CXXDeleteExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDeleteExpr>;
 
 class CXXDeleteExpr : public Expr {
  private:
@@ -7947,17 +8828,23 @@ class CXXDeleteExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXDeleteExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXDeleteExpr> from(const TokenContext &c);
   static std::optional<CXXDeleteExpr> from(const Expr &parent);
   static std::optional<CXXDeleteExpr> from(const ValueStmt &parent);
   static std::optional<CXXDeleteExpr> from(const Stmt &parent);
-  bool does_usual_array_delete_want_size(void) const noexcept;
-  FunctionDecl operator_delete(void) const noexcept;
-  bool is_array_form(void) const noexcept;
-  bool is_array_form_as_written(void) const noexcept;
-  bool is_global_delete(void) const noexcept;
+  bool does_usual_array_delete_want_size(void) const;
+  FunctionDecl operator_delete(void) const;
+  bool is_array_form(void) const;
+  bool is_array_form_as_written(void) const;
+  bool is_global_delete(void) const;
 };
 
 using CXXDefaultInitExprRange = DerivedEntityRange<StmtIterator, CXXDefaultInitExpr>;
+using CXXDefaultInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDefaultInitExpr>;
 
 class CXXDefaultInitExpr : public Expr {
  private:
@@ -7970,14 +8857,20 @@ class CXXDefaultInitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXDefaultInitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXDefaultInitExpr> from(const TokenContext &c);
   static std::optional<CXXDefaultInitExpr> from(const Expr &parent);
   static std::optional<CXXDefaultInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXDefaultInitExpr> from(const Stmt &parent);
-  FieldDecl field(void) const noexcept;
-  Token used_token(void) const noexcept;
+  FieldDecl field(void) const;
+  Token used_token(void) const;
 };
 
 using CXXDefaultArgExprRange = DerivedEntityRange<StmtIterator, CXXDefaultArgExpr>;
+using CXXDefaultArgExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDefaultArgExpr>;
 
 class CXXDefaultArgExpr : public Expr {
  private:
@@ -7990,14 +8883,20 @@ class CXXDefaultArgExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXDefaultArgExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXDefaultArgExpr> from(const TokenContext &c);
   static std::optional<CXXDefaultArgExpr> from(const Expr &parent);
   static std::optional<CXXDefaultArgExpr> from(const ValueStmt &parent);
   static std::optional<CXXDefaultArgExpr> from(const Stmt &parent);
-  ParmVarDecl parameter(void) const noexcept;
-  Token used_token(void) const noexcept;
+  ParmVarDecl parameter(void) const;
+  Token used_token(void) const;
 };
 
 using CXXConstructExprRange = DerivedEntityRange<StmtIterator, CXXConstructExpr>;
+using CXXConstructExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXConstructExpr>;
 
 class CXXConstructExpr : public Expr {
  private:
@@ -8010,21 +8909,27 @@ class CXXConstructExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXConstructExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXConstructExpr> from(const TokenContext &c);
   static std::optional<CXXConstructExpr> from(const Expr &parent);
   static std::optional<CXXConstructExpr> from(const ValueStmt &parent);
   static std::optional<CXXConstructExpr> from(const Stmt &parent);
-  CXXConstructExprConstructionKind construction_kind(void) const noexcept;
-  CXXConstructorDecl constructor(void) const noexcept;
-  Token token(void) const noexcept;
-  TokenRange parenthesis_or_brace_range(void) const noexcept;
-  bool had_multiple_candidates(void) const noexcept;
-  bool is_elidable(void) const noexcept;
-  bool is_list_initialization(void) const noexcept;
-  bool is_std_initializer_list_initialization(void) const noexcept;
-  bool requires_zero_initialization(void) const noexcept;
+  CXXConstructExprConstructionKind construction_kind(void) const;
+  CXXConstructorDecl constructor(void) const;
+  Token token(void) const;
+  TokenRange parenthesis_or_brace_range(void) const;
+  bool had_multiple_candidates(void) const;
+  bool is_elidable(void) const;
+  bool is_list_initialization(void) const;
+  bool is_std_initializer_list_initialization(void) const;
+  bool requires_zero_initialization(void) const;
 };
 
 using CXXTemporaryObjectExprRange = DerivedEntityRange<StmtIterator, CXXTemporaryObjectExpr>;
+using CXXTemporaryObjectExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXTemporaryObjectExpr>;
 
 class CXXTemporaryObjectExpr : public CXXConstructExpr {
  private:
@@ -8038,6 +8943,11 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
     return in_internal(frag);
   }
 
+  inline static CXXTemporaryObjectExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXTemporaryObjectExpr> from(const TokenContext &c);
   static std::optional<CXXTemporaryObjectExpr> from(const CXXConstructExpr &parent);
   static std::optional<CXXTemporaryObjectExpr> from(const Expr &parent);
   static std::optional<CXXTemporaryObjectExpr> from(const ValueStmt &parent);
@@ -8045,6 +8955,7 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
 };
 
 using CXXBoolLiteralExprRange = DerivedEntityRange<StmtIterator, CXXBoolLiteralExpr>;
+using CXXBoolLiteralExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXBoolLiteralExpr>;
 
 class CXXBoolLiteralExpr : public Expr {
  private:
@@ -8057,14 +8968,20 @@ class CXXBoolLiteralExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXBoolLiteralExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXBoolLiteralExpr> from(const TokenContext &c);
   static std::optional<CXXBoolLiteralExpr> from(const Expr &parent);
   static std::optional<CXXBoolLiteralExpr> from(const ValueStmt &parent);
   static std::optional<CXXBoolLiteralExpr> from(const Stmt &parent);
-  Token token(void) const noexcept;
-  bool value(void) const noexcept;
+  Token token(void) const;
+  bool value(void) const;
 };
 
 using CXXBindTemporaryExprRange = DerivedEntityRange<StmtIterator, CXXBindTemporaryExpr>;
+using CXXBindTemporaryExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXBindTemporaryExpr>;
 
 class CXXBindTemporaryExpr : public Expr {
  private:
@@ -8077,12 +8994,18 @@ class CXXBindTemporaryExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static CXXBindTemporaryExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXBindTemporaryExpr> from(const TokenContext &c);
   static std::optional<CXXBindTemporaryExpr> from(const Expr &parent);
   static std::optional<CXXBindTemporaryExpr> from(const ValueStmt &parent);
   static std::optional<CXXBindTemporaryExpr> from(const Stmt &parent);
 };
 
 using BlockExprRange = DerivedEntityRange<StmtIterator, BlockExpr>;
+using BlockExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, BlockExpr>;
 
 class BlockExpr : public Expr {
  private:
@@ -8095,14 +9018,20 @@ class BlockExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static BlockExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BlockExpr> from(const TokenContext &c);
   static std::optional<BlockExpr> from(const Expr &parent);
   static std::optional<BlockExpr> from(const ValueStmt &parent);
   static std::optional<BlockExpr> from(const Stmt &parent);
-  BlockDecl block_declaration(void) const noexcept;
-  Token caret_token(void) const noexcept;
+  BlockDecl block_declaration(void) const;
+  Token caret_token(void) const;
 };
 
 using BinaryOperatorRange = DerivedEntityRange<StmtIterator, BinaryOperator>;
+using BinaryOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, BinaryOperator>;
 
 class BinaryOperator : public Expr {
  private:
@@ -8115,29 +9044,35 @@ class BinaryOperator : public Expr {
     return in_internal(frag);
   }
 
+  inline static BinaryOperatorContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BinaryOperator> from(const TokenContext &c);
   static std::optional<BinaryOperator> from(const Expr &parent);
   static std::optional<BinaryOperator> from(const ValueStmt &parent);
   static std::optional<BinaryOperator> from(const Stmt &parent);
-  BinaryOperatorKind opcode(void) const noexcept;
-  std::string_view opcode_string(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  bool has_stored_fp_features(void) const noexcept;
-  bool is_additive_operation(void) const noexcept;
-  bool is_assignment_operation(void) const noexcept;
-  bool is_bitwise_operation(void) const noexcept;
-  bool is_comma_operation(void) const noexcept;
-  bool is_comparison_operation(void) const noexcept;
-  bool is_compound_assignment_operation(void) const noexcept;
-  bool is_equality_operation(void) const noexcept;
-  bool is_logical_operation(void) const noexcept;
-  bool is_multiplicative_operation(void) const noexcept;
-  bool is_pointer_memory_operation(void) const noexcept;
-  bool is_relational_operation(void) const noexcept;
-  bool is_shift_assign_operation(void) const noexcept;
-  bool is_shift_operation(void) const noexcept;
+  BinaryOperatorKind opcode(void) const;
+  std::string_view opcode_string(void) const;
+  Token operator_token(void) const;
+  bool has_stored_fp_features(void) const;
+  bool is_additive_operation(void) const;
+  bool is_assignment_operation(void) const;
+  bool is_bitwise_operation(void) const;
+  bool is_comma_operation(void) const;
+  bool is_comparison_operation(void) const;
+  bool is_compound_assignment_operation(void) const;
+  bool is_equality_operation(void) const;
+  bool is_logical_operation(void) const;
+  bool is_multiplicative_operation(void) const;
+  bool is_pointer_memory_operation(void) const;
+  bool is_relational_operation(void) const;
+  bool is_shift_assign_operation(void) const;
+  bool is_shift_operation(void) const;
 };
 
 using CompoundAssignOperatorRange = DerivedEntityRange<StmtIterator, CompoundAssignOperator>;
+using CompoundAssignOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, CompoundAssignOperator>;
 
 class CompoundAssignOperator : public BinaryOperator {
  private:
@@ -8151,6 +9086,11 @@ class CompoundAssignOperator : public BinaryOperator {
     return in_internal(frag);
   }
 
+  inline static CompoundAssignOperatorContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CompoundAssignOperator> from(const TokenContext &c);
   static std::optional<CompoundAssignOperator> from(const BinaryOperator &parent);
   static std::optional<CompoundAssignOperator> from(const Expr &parent);
   static std::optional<CompoundAssignOperator> from(const ValueStmt &parent);
@@ -8158,6 +9098,7 @@ class CompoundAssignOperator : public BinaryOperator {
 };
 
 using AtomicExprRange = DerivedEntityRange<StmtIterator, AtomicExpr>;
+using AtomicExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, AtomicExpr>;
 
 class AtomicExpr : public Expr {
  private:
@@ -8170,18 +9111,24 @@ class AtomicExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static AtomicExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AtomicExpr> from(const TokenContext &c);
   static std::optional<AtomicExpr> from(const Expr &parent);
   static std::optional<AtomicExpr> from(const ValueStmt &parent);
   static std::optional<AtomicExpr> from(const Stmt &parent);
-  Token builtin_token(void) const noexcept;
-  AtomicExprAtomicOp operation(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_cmp_x_chg(void) const noexcept;
-  bool is_open_cl(void) const noexcept;
-  bool is_volatile(void) const noexcept;
+  Token builtin_token(void) const;
+  AtomicExprAtomicOp operation(void) const;
+  Token r_paren_token(void) const;
+  bool is_cmp_x_chg(void) const;
+  bool is_open_cl(void) const;
+  bool is_volatile(void) const;
 };
 
 using AsTypeExprRange = DerivedEntityRange<StmtIterator, AsTypeExpr>;
+using AsTypeExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, AsTypeExpr>;
 
 class AsTypeExpr : public Expr {
  private:
@@ -8194,14 +9141,20 @@ class AsTypeExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static AsTypeExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AsTypeExpr> from(const TokenContext &c);
   static std::optional<AsTypeExpr> from(const Expr &parent);
   static std::optional<AsTypeExpr> from(const ValueStmt &parent);
   static std::optional<AsTypeExpr> from(const Stmt &parent);
-  Token builtin_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token builtin_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ArrayTypeTraitExprRange = DerivedEntityRange<StmtIterator, ArrayTypeTraitExpr>;
+using ArrayTypeTraitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArrayTypeTraitExpr>;
 
 class ArrayTypeTraitExpr : public Expr {
  private:
@@ -8214,13 +9167,19 @@ class ArrayTypeTraitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ArrayTypeTraitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ArrayTypeTraitExpr> from(const TokenContext &c);
   static std::optional<ArrayTypeTraitExpr> from(const Expr &parent);
   static std::optional<ArrayTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
-  ArrayTypeTrait trait(void) const noexcept;
+  ArrayTypeTrait trait(void) const;
 };
 
 using ArraySubscriptExprRange = DerivedEntityRange<StmtIterator, ArraySubscriptExpr>;
+using ArraySubscriptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArraySubscriptExpr>;
 
 class ArraySubscriptExpr : public Expr {
  private:
@@ -8233,13 +9192,19 @@ class ArraySubscriptExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ArraySubscriptExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ArraySubscriptExpr> from(const TokenContext &c);
   static std::optional<ArraySubscriptExpr> from(const Expr &parent);
   static std::optional<ArraySubscriptExpr> from(const ValueStmt &parent);
   static std::optional<ArraySubscriptExpr> from(const Stmt &parent);
-  Token r_bracket_token(void) const noexcept;
+  Token r_bracket_token(void) const;
 };
 
 using ArrayInitLoopExprRange = DerivedEntityRange<StmtIterator, ArrayInitLoopExpr>;
+using ArrayInitLoopExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArrayInitLoopExpr>;
 
 class ArrayInitLoopExpr : public Expr {
  private:
@@ -8252,13 +9217,19 @@ class ArrayInitLoopExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ArrayInitLoopExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ArrayInitLoopExpr> from(const TokenContext &c);
   static std::optional<ArrayInitLoopExpr> from(const Expr &parent);
   static std::optional<ArrayInitLoopExpr> from(const ValueStmt &parent);
   static std::optional<ArrayInitLoopExpr> from(const Stmt &parent);
-  OpaqueValueExpr common_expression(void) const noexcept;
+  OpaqueValueExpr common_expression(void) const;
 };
 
 using ArrayInitIndexExprRange = DerivedEntityRange<StmtIterator, ArrayInitIndexExpr>;
+using ArrayInitIndexExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArrayInitIndexExpr>;
 
 class ArrayInitIndexExpr : public Expr {
  private:
@@ -8271,12 +9242,18 @@ class ArrayInitIndexExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ArrayInitIndexExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ArrayInitIndexExpr> from(const TokenContext &c);
   static std::optional<ArrayInitIndexExpr> from(const Expr &parent);
   static std::optional<ArrayInitIndexExpr> from(const ValueStmt &parent);
   static std::optional<ArrayInitIndexExpr> from(const Stmt &parent);
 };
 
 using AddrLabelExprRange = DerivedEntityRange<StmtIterator, AddrLabelExpr>;
+using AddrLabelExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, AddrLabelExpr>;
 
 class AddrLabelExpr : public Expr {
  private:
@@ -8289,15 +9266,21 @@ class AddrLabelExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static AddrLabelExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AddrLabelExpr> from(const TokenContext &c);
   static std::optional<AddrLabelExpr> from(const Expr &parent);
   static std::optional<AddrLabelExpr> from(const ValueStmt &parent);
   static std::optional<AddrLabelExpr> from(const Stmt &parent);
-  Token amp_amp_token(void) const noexcept;
-  LabelDecl label(void) const noexcept;
-  Token label_token(void) const noexcept;
+  Token amp_amp_token(void) const;
+  LabelDecl label(void) const;
+  Token label_token(void) const;
 };
 
 using AbstractConditionalOperatorRange = DerivedEntityRange<StmtIterator, AbstractConditionalOperator>;
+using AbstractConditionalOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, AbstractConditionalOperator>;
 
 class AbstractConditionalOperator : public Expr {
  private:
@@ -8310,14 +9293,20 @@ class AbstractConditionalOperator : public Expr {
     return in_internal(frag);
   }
 
+  inline static AbstractConditionalOperatorContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AbstractConditionalOperator> from(const TokenContext &c);
   static std::optional<AbstractConditionalOperator> from(const Expr &parent);
   static std::optional<AbstractConditionalOperator> from(const ValueStmt &parent);
   static std::optional<AbstractConditionalOperator> from(const Stmt &parent);
-  Token colon_token(void) const noexcept;
-  Token question_token(void) const noexcept;
+  Token colon_token(void) const;
+  Token question_token(void) const;
 };
 
 using ConditionalOperatorRange = DerivedEntityRange<StmtIterator, ConditionalOperator>;
+using ConditionalOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConditionalOperator>;
 
 class ConditionalOperator : public AbstractConditionalOperator {
  private:
@@ -8331,6 +9320,11 @@ class ConditionalOperator : public AbstractConditionalOperator {
     return in_internal(frag);
   }
 
+  inline static ConditionalOperatorContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConditionalOperator> from(const TokenContext &c);
   static std::optional<ConditionalOperator> from(const AbstractConditionalOperator &parent);
   static std::optional<ConditionalOperator> from(const Expr &parent);
   static std::optional<ConditionalOperator> from(const ValueStmt &parent);
@@ -8338,6 +9332,7 @@ class ConditionalOperator : public AbstractConditionalOperator {
 };
 
 using BinaryConditionalOperatorRange = DerivedEntityRange<StmtIterator, BinaryConditionalOperator>;
+using BinaryConditionalOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, BinaryConditionalOperator>;
 
 class BinaryConditionalOperator : public AbstractConditionalOperator {
  private:
@@ -8351,14 +9346,20 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
     return in_internal(frag);
   }
 
+  inline static BinaryConditionalOperatorContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BinaryConditionalOperator> from(const TokenContext &c);
   static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
   static std::optional<BinaryConditionalOperator> from(const Expr &parent);
   static std::optional<BinaryConditionalOperator> from(const ValueStmt &parent);
   static std::optional<BinaryConditionalOperator> from(const Stmt &parent);
-  OpaqueValueExpr opaque_value(void) const noexcept;
+  OpaqueValueExpr opaque_value(void) const;
 };
 
 using VAArgExprRange = DerivedEntityRange<StmtIterator, VAArgExpr>;
+using VAArgExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, VAArgExpr>;
 
 class VAArgExpr : public Expr {
  private:
@@ -8371,15 +9372,21 @@ class VAArgExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static VAArgExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<VAArgExpr> from(const TokenContext &c);
   static std::optional<VAArgExpr> from(const Expr &parent);
   static std::optional<VAArgExpr> from(const ValueStmt &parent);
   static std::optional<VAArgExpr> from(const Stmt &parent);
-  Token builtin_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_microsoft_abi(void) const noexcept;
+  Token builtin_token(void) const;
+  Token r_paren_token(void) const;
+  bool is_microsoft_abi(void) const;
 };
 
 using UnaryOperatorRange = DerivedEntityRange<StmtIterator, UnaryOperator>;
+using UnaryOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnaryOperator>;
 
 class UnaryOperator : public Expr {
  private:
@@ -8392,22 +9399,28 @@ class UnaryOperator : public Expr {
     return in_internal(frag);
   }
 
+  inline static UnaryOperatorContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnaryOperator> from(const TokenContext &c);
   static std::optional<UnaryOperator> from(const Expr &parent);
   static std::optional<UnaryOperator> from(const ValueStmt &parent);
   static std::optional<UnaryOperator> from(const Stmt &parent);
-  bool can_overflow(void) const noexcept;
-  UnaryOperatorKind opcode(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  bool has_stored_fp_features(void) const noexcept;
-  bool is_arithmetic_operation(void) const noexcept;
-  bool is_decrement_operation(void) const noexcept;
-  bool is_increment_decrement_operation(void) const noexcept;
-  bool is_increment_operation(void) const noexcept;
-  bool is_postfix(void) const noexcept;
-  bool is_prefix(void) const noexcept;
+  bool can_overflow(void) const;
+  UnaryOperatorKind opcode(void) const;
+  Token operator_token(void) const;
+  bool has_stored_fp_features(void) const;
+  bool is_arithmetic_operation(void) const;
+  bool is_decrement_operation(void) const;
+  bool is_increment_decrement_operation(void) const;
+  bool is_increment_operation(void) const;
+  bool is_postfix(void) const;
+  bool is_prefix(void) const;
 };
 
 using UnaryExprOrTypeTraitExprRange = DerivedEntityRange<StmtIterator, UnaryExprOrTypeTraitExpr>;
+using UnaryExprOrTypeTraitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnaryExprOrTypeTraitExpr>;
 
 class UnaryExprOrTypeTraitExpr : public Expr {
  private:
@@ -8420,15 +9433,21 @@ class UnaryExprOrTypeTraitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static UnaryExprOrTypeTraitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const TokenContext &c);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Expr &parent);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Stmt &parent);
-  Token operator_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_argument_type(void) const noexcept;
+  Token operator_token(void) const;
+  Token r_paren_token(void) const;
+  bool is_argument_type(void) const;
 };
 
 using TypoExprRange = DerivedEntityRange<StmtIterator, TypoExpr>;
+using TypoExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypoExpr>;
 
 class TypoExpr : public Expr {
  private:
@@ -8441,12 +9460,18 @@ class TypoExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static TypoExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypoExpr> from(const TokenContext &c);
   static std::optional<TypoExpr> from(const Expr &parent);
   static std::optional<TypoExpr> from(const ValueStmt &parent);
   static std::optional<TypoExpr> from(const Stmt &parent);
 };
 
 using TypeTraitExprRange = DerivedEntityRange<StmtIterator, TypeTraitExpr>;
+using TypeTraitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeTraitExpr>;
 
 class TypeTraitExpr : public Expr {
  private:
@@ -8459,14 +9484,20 @@ class TypeTraitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static TypeTraitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypeTraitExpr> from(const TokenContext &c);
   static std::optional<TypeTraitExpr> from(const Expr &parent);
   static std::optional<TypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<TypeTraitExpr> from(const Stmt &parent);
-  TypeTrait trait(void) const noexcept;
-  bool value(void) const noexcept;
+  TypeTrait trait(void) const;
+  bool value(void) const;
 };
 
 using SubstNonTypeTemplateParmPackExprRange = DerivedEntityRange<StmtIterator, SubstNonTypeTemplateParmPackExpr>;
+using SubstNonTypeTemplateParmPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SubstNonTypeTemplateParmPackExpr>;
 
 class SubstNonTypeTemplateParmPackExpr : public Expr {
  private:
@@ -8479,14 +9510,20 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static SubstNonTypeTemplateParmPackExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SubstNonTypeTemplateParmPackExpr> from(const TokenContext &c);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Expr &parent);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const ValueStmt &parent);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Stmt &parent);
-  NonTypeTemplateParmDecl parameter_pack(void) const noexcept;
-  Token parameter_pack_token(void) const noexcept;
+  NonTypeTemplateParmDecl parameter_pack(void) const;
+  Token parameter_pack_token(void) const;
 };
 
 using SubstNonTypeTemplateParmExprRange = DerivedEntityRange<StmtIterator, SubstNonTypeTemplateParmExpr>;
+using SubstNonTypeTemplateParmExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SubstNonTypeTemplateParmExpr>;
 
 class SubstNonTypeTemplateParmExpr : public Expr {
  private:
@@ -8499,15 +9536,21 @@ class SubstNonTypeTemplateParmExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static SubstNonTypeTemplateParmExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SubstNonTypeTemplateParmExpr> from(const TokenContext &c);
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Expr &parent);
   static std::optional<SubstNonTypeTemplateParmExpr> from(const ValueStmt &parent);
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent);
-  Token name_token(void) const noexcept;
-  NonTypeTemplateParmDecl parameter(void) const noexcept;
-  bool is_reference_parameter(void) const noexcept;
+  Token name_token(void) const;
+  NonTypeTemplateParmDecl parameter(void) const;
+  bool is_reference_parameter(void) const;
 };
 
 using StringLiteralRange = DerivedEntityRange<StmtIterator, StringLiteral>;
+using StringLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, StringLiteral>;
 
 class StringLiteral : public Expr {
  private:
@@ -8520,22 +9563,28 @@ class StringLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static StringLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<StringLiteral> from(const TokenContext &c);
   static std::optional<StringLiteral> from(const Expr &parent);
   static std::optional<StringLiteral> from(const ValueStmt &parent);
   static std::optional<StringLiteral> from(const Stmt &parent);
-  bool contains_non_ascii(void) const noexcept;
-  bool contains_non_ascii_or_null(void) const noexcept;
-  std::string_view bytes(void) const noexcept;
-  std::string_view string(void) const noexcept;
-  bool is_ascii(void) const noexcept;
-  bool is_pascal(void) const noexcept;
-  bool is_utf16(void) const noexcept;
-  bool is_utf32(void) const noexcept;
-  bool is_utf8(void) const noexcept;
-  bool is_wide(void) const noexcept;
+  bool contains_non_ascii(void) const;
+  bool contains_non_ascii_or_null(void) const;
+  std::string_view bytes(void) const;
+  std::string_view string(void) const;
+  bool is_ascii(void) const;
+  bool is_pascal(void) const;
+  bool is_utf16(void) const;
+  bool is_utf32(void) const;
+  bool is_utf8(void) const;
+  bool is_wide(void) const;
 };
 
 using StmtExprRange = DerivedEntityRange<StmtIterator, StmtExpr>;
+using StmtExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, StmtExpr>;
 
 class StmtExpr : public Expr {
  private:
@@ -8548,15 +9597,21 @@ class StmtExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static StmtExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<StmtExpr> from(const TokenContext &c);
   static std::optional<StmtExpr> from(const Expr &parent);
   static std::optional<StmtExpr> from(const ValueStmt &parent);
   static std::optional<StmtExpr> from(const Stmt &parent);
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  CompoundStmt sub_statement(void) const noexcept;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
+  CompoundStmt sub_statement(void) const;
 };
 
 using SourceLocExprRange = DerivedEntityRange<StmtIterator, SourceLocExpr>;
+using SourceLocExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SourceLocExpr>;
 
 class SourceLocExpr : public Expr {
  private:
@@ -8569,17 +9624,23 @@ class SourceLocExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static SourceLocExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SourceLocExpr> from(const TokenContext &c);
   static std::optional<SourceLocExpr> from(const Expr &parent);
   static std::optional<SourceLocExpr> from(const ValueStmt &parent);
   static std::optional<SourceLocExpr> from(const Stmt &parent);
-  std::string_view builtin_string(void) const noexcept;
-  SourceLocExprIdentKind identifier_kind(void) const noexcept;
-  Token token(void) const noexcept;
-  bool is_int_type(void) const noexcept;
-  bool is_string_type(void) const noexcept;
+  std::string_view builtin_string(void) const;
+  SourceLocExprIdentKind identifier_kind(void) const;
+  Token token(void) const;
+  bool is_int_type(void) const;
+  bool is_string_type(void) const;
 };
 
 using SizeOfPackExprRange = DerivedEntityRange<StmtIterator, SizeOfPackExpr>;
+using SizeOfPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SizeOfPackExpr>;
 
 class SizeOfPackExpr : public Expr {
  private:
@@ -8592,18 +9653,24 @@ class SizeOfPackExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static SizeOfPackExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SizeOfPackExpr> from(const TokenContext &c);
   static std::optional<SizeOfPackExpr> from(const Expr &parent);
   static std::optional<SizeOfPackExpr> from(const ValueStmt &parent);
   static std::optional<SizeOfPackExpr> from(const Stmt &parent);
-  Token operator_token(void) const noexcept;
-  NamedDecl pack(void) const noexcept;
-  Token pack_token(void) const noexcept;
-  std::vector<TemplateArgument> partial_arguments(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_partially_substituted(void) const noexcept;
+  Token operator_token(void) const;
+  NamedDecl pack(void) const;
+  Token pack_token(void) const;
+  std::vector<TemplateArgument> partial_arguments(void) const;
+  Token r_paren_token(void) const;
+  bool is_partially_substituted(void) const;
 };
 
 using ShuffleVectorExprRange = DerivedEntityRange<StmtIterator, ShuffleVectorExpr>;
+using ShuffleVectorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ShuffleVectorExpr>;
 
 class ShuffleVectorExpr : public Expr {
  private:
@@ -8616,14 +9683,20 @@ class ShuffleVectorExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ShuffleVectorExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ShuffleVectorExpr> from(const TokenContext &c);
   static std::optional<ShuffleVectorExpr> from(const Expr &parent);
   static std::optional<ShuffleVectorExpr> from(const ValueStmt &parent);
   static std::optional<ShuffleVectorExpr> from(const Stmt &parent);
-  Token builtin_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token builtin_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using SYCLUniqueStableNameExprRange = DerivedEntityRange<StmtIterator, SYCLUniqueStableNameExpr>;
+using SYCLUniqueStableNameExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SYCLUniqueStableNameExpr>;
 
 class SYCLUniqueStableNameExpr : public Expr {
  private:
@@ -8636,16 +9709,22 @@ class SYCLUniqueStableNameExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static SYCLUniqueStableNameExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SYCLUniqueStableNameExpr> from(const TokenContext &c);
   static std::optional<SYCLUniqueStableNameExpr> from(const Expr &parent);
   static std::optional<SYCLUniqueStableNameExpr> from(const ValueStmt &parent);
   static std::optional<SYCLUniqueStableNameExpr> from(const Stmt &parent);
-  std::string_view compute_name(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  Token token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  std::string_view compute_name(void) const;
+  Token l_paren_token(void) const;
+  Token token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using RequiresExprRange = DerivedEntityRange<StmtIterator, RequiresExpr>;
+using RequiresExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, RequiresExpr>;
 
 class RequiresExpr : public Expr {
  private:
@@ -8658,17 +9737,23 @@ class RequiresExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static RequiresExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<RequiresExpr> from(const TokenContext &c);
   static std::optional<RequiresExpr> from(const Expr &parent);
   static std::optional<RequiresExpr> from(const ValueStmt &parent);
   static std::optional<RequiresExpr> from(const Stmt &parent);
-  RequiresExprBodyDecl body(void) const noexcept;
-  std::vector<ParmVarDecl> local_parameters(void) const noexcept;
-  Token r_brace_token(void) const noexcept;
-  Token requires_kw_token(void) const noexcept;
-  bool is_satisfied(void) const noexcept;
+  RequiresExprBodyDecl body(void) const;
+  std::vector<ParmVarDecl> local_parameters(void) const;
+  Token r_brace_token(void) const;
+  Token requires_kw_token(void) const;
+  bool is_satisfied(void) const;
 };
 
 using RecoveryExprRange = DerivedEntityRange<StmtIterator, RecoveryExpr>;
+using RecoveryExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, RecoveryExpr>;
 
 class RecoveryExpr : public Expr {
  private:
@@ -8681,12 +9766,18 @@ class RecoveryExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static RecoveryExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<RecoveryExpr> from(const TokenContext &c);
   static std::optional<RecoveryExpr> from(const Expr &parent);
   static std::optional<RecoveryExpr> from(const ValueStmt &parent);
   static std::optional<RecoveryExpr> from(const Stmt &parent);
 };
 
 using PseudoObjectExprRange = DerivedEntityRange<StmtIterator, PseudoObjectExpr>;
+using PseudoObjectExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, PseudoObjectExpr>;
 
 class PseudoObjectExpr : public Expr {
  private:
@@ -8699,12 +9790,18 @@ class PseudoObjectExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static PseudoObjectExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PseudoObjectExpr> from(const TokenContext &c);
   static std::optional<PseudoObjectExpr> from(const Expr &parent);
   static std::optional<PseudoObjectExpr> from(const ValueStmt &parent);
   static std::optional<PseudoObjectExpr> from(const Stmt &parent);
 };
 
 using PredefinedExprRange = DerivedEntityRange<StmtIterator, PredefinedExpr>;
+using PredefinedExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, PredefinedExpr>;
 
 class PredefinedExpr : public Expr {
  private:
@@ -8717,16 +9814,22 @@ class PredefinedExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static PredefinedExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PredefinedExpr> from(const TokenContext &c);
   static std::optional<PredefinedExpr> from(const Expr &parent);
   static std::optional<PredefinedExpr> from(const ValueStmt &parent);
   static std::optional<PredefinedExpr> from(const Stmt &parent);
-  StringLiteral function_name(void) const noexcept;
-  PredefinedExprIdentKind identifier_kind(void) const noexcept;
-  std::string_view identifier_kind_name(void) const noexcept;
-  Token token(void) const noexcept;
+  StringLiteral function_name(void) const;
+  PredefinedExprIdentKind identifier_kind(void) const;
+  std::string_view identifier_kind_name(void) const;
+  Token token(void) const;
 };
 
 using ParenListExprRange = DerivedEntityRange<StmtIterator, ParenListExpr>;
+using ParenListExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParenListExpr>;
 
 class ParenListExpr : public Expr {
  private:
@@ -8739,14 +9842,20 @@ class ParenListExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ParenListExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ParenListExpr> from(const TokenContext &c);
   static std::optional<ParenListExpr> from(const Expr &parent);
   static std::optional<ParenListExpr> from(const ValueStmt &parent);
   static std::optional<ParenListExpr> from(const Stmt &parent);
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ParenExprRange = DerivedEntityRange<StmtIterator, ParenExpr>;
+using ParenExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParenExpr>;
 
 class ParenExpr : public Expr {
  private:
@@ -8759,14 +9868,20 @@ class ParenExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ParenExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ParenExpr> from(const TokenContext &c);
   static std::optional<ParenExpr> from(const Expr &parent);
   static std::optional<ParenExpr> from(const ValueStmt &parent);
   static std::optional<ParenExpr> from(const Stmt &parent);
-  Token l_paren(void) const noexcept;
-  Token r_paren(void) const noexcept;
+  Token l_paren(void) const;
+  Token r_paren(void) const;
 };
 
 using PackExpansionExprRange = DerivedEntityRange<StmtIterator, PackExpansionExpr>;
+using PackExpansionExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, PackExpansionExpr>;
 
 class PackExpansionExpr : public Expr {
  private:
@@ -8779,13 +9894,19 @@ class PackExpansionExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static PackExpansionExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PackExpansionExpr> from(const TokenContext &c);
   static std::optional<PackExpansionExpr> from(const Expr &parent);
   static std::optional<PackExpansionExpr> from(const ValueStmt &parent);
   static std::optional<PackExpansionExpr> from(const Stmt &parent);
-  Token ellipsis_token(void) const noexcept;
+  Token ellipsis_token(void) const;
 };
 
 using OverloadExprRange = DerivedEntityRange<StmtIterator, OverloadExpr>;
+using OverloadExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OverloadExpr>;
 
 class OverloadExpr : public Expr {
  private:
@@ -8798,19 +9919,25 @@ class OverloadExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static OverloadExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OverloadExpr> from(const TokenContext &c);
   static std::optional<OverloadExpr> from(const Expr &parent);
   static std::optional<OverloadExpr> from(const ValueStmt &parent);
   static std::optional<OverloadExpr> from(const Stmt &parent);
-  Token l_angle_token(void) const noexcept;
-  Token name_token(void) const noexcept;
-  CXXRecordDecl naming_class(void) const noexcept;
-  Token r_angle_token(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  bool has_explicit_template_arguments(void) const noexcept;
-  bool has_template_keyword(void) const noexcept;
+  Token l_angle_token(void) const;
+  Token name_token(void) const;
+  CXXRecordDecl naming_class(void) const;
+  Token r_angle_token(void) const;
+  Token template_keyword_token(void) const;
+  bool has_explicit_template_arguments(void) const;
+  bool has_template_keyword(void) const;
 };
 
 using UnresolvedMemberExprRange = DerivedEntityRange<StmtIterator, UnresolvedMemberExpr>;
+using UnresolvedMemberExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedMemberExpr>;
 
 class UnresolvedMemberExpr : public OverloadExpr {
  private:
@@ -8824,18 +9951,24 @@ class UnresolvedMemberExpr : public OverloadExpr {
     return in_internal(frag);
   }
 
+  inline static UnresolvedMemberExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnresolvedMemberExpr> from(const TokenContext &c);
   static std::optional<UnresolvedMemberExpr> from(const OverloadExpr &parent);
   static std::optional<UnresolvedMemberExpr> from(const Expr &parent);
   static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
   static std::optional<UnresolvedMemberExpr> from(const Stmt &parent);
-  Token member_token(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  bool has_unresolved_using(void) const noexcept;
-  bool is_arrow(void) const noexcept;
-  bool is_implicit_access(void) const noexcept;
+  Token member_token(void) const;
+  Token operator_token(void) const;
+  bool has_unresolved_using(void) const;
+  bool is_arrow(void) const;
+  bool is_implicit_access(void) const;
 };
 
 using UnresolvedLookupExprRange = DerivedEntityRange<StmtIterator, UnresolvedLookupExpr>;
+using UnresolvedLookupExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedLookupExpr>;
 
 class UnresolvedLookupExpr : public OverloadExpr {
  private:
@@ -8849,15 +9982,21 @@ class UnresolvedLookupExpr : public OverloadExpr {
     return in_internal(frag);
   }
 
+  inline static UnresolvedLookupExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnresolvedLookupExpr> from(const TokenContext &c);
   static std::optional<UnresolvedLookupExpr> from(const OverloadExpr &parent);
   static std::optional<UnresolvedLookupExpr> from(const Expr &parent);
   static std::optional<UnresolvedLookupExpr> from(const ValueStmt &parent);
   static std::optional<UnresolvedLookupExpr> from(const Stmt &parent);
-  bool is_overloaded(void) const noexcept;
-  bool requires_adl(void) const noexcept;
+  bool is_overloaded(void) const;
+  bool requires_adl(void) const;
 };
 
 using OpaqueValueExprRange = DerivedEntityRange<StmtIterator, OpaqueValueExpr>;
+using OpaqueValueExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpaqueValueExpr>;
 
 class OpaqueValueExpr : public Expr {
  private:
@@ -8870,14 +10009,20 @@ class OpaqueValueExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static OpaqueValueExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OpaqueValueExpr> from(const TokenContext &c);
   static std::optional<OpaqueValueExpr> from(const Expr &parent);
   static std::optional<OpaqueValueExpr> from(const ValueStmt &parent);
   static std::optional<OpaqueValueExpr> from(const Stmt &parent);
-  Token token(void) const noexcept;
-  bool is_unique(void) const noexcept;
+  Token token(void) const;
+  bool is_unique(void) const;
 };
 
 using OffsetOfExprRange = DerivedEntityRange<StmtIterator, OffsetOfExpr>;
+using OffsetOfExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OffsetOfExpr>;
 
 class OffsetOfExpr : public Expr {
  private:
@@ -8890,14 +10035,20 @@ class OffsetOfExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static OffsetOfExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OffsetOfExpr> from(const TokenContext &c);
   static std::optional<OffsetOfExpr> from(const Expr &parent);
   static std::optional<OffsetOfExpr> from(const ValueStmt &parent);
   static std::optional<OffsetOfExpr> from(const Stmt &parent);
-  Token operator_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token operator_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ObjCSubscriptRefExprRange = DerivedEntityRange<StmtIterator, ObjCSubscriptRefExpr>;
+using ObjCSubscriptRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCSubscriptRefExpr>;
 
 class ObjCSubscriptRefExpr : public Expr {
  private:
@@ -8910,15 +10061,21 @@ class ObjCSubscriptRefExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCSubscriptRefExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCSubscriptRefExpr> from(const TokenContext &c);
   static std::optional<ObjCSubscriptRefExpr> from(const Expr &parent);
   static std::optional<ObjCSubscriptRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent);
-  ObjCMethodDecl at_index_method_declaration(void) const noexcept;
-  Token r_bracket(void) const noexcept;
-  bool is_array_subscript_reference_expression(void) const noexcept;
+  ObjCMethodDecl at_index_method_declaration(void) const;
+  Token r_bracket(void) const;
+  bool is_array_subscript_reference_expression(void) const;
 };
 
 using ObjCStringLiteralRange = DerivedEntityRange<StmtIterator, ObjCStringLiteral>;
+using ObjCStringLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCStringLiteral>;
 
 class ObjCStringLiteral : public Expr {
  private:
@@ -8931,14 +10088,20 @@ class ObjCStringLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCStringLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCStringLiteral> from(const TokenContext &c);
   static std::optional<ObjCStringLiteral> from(const Expr &parent);
   static std::optional<ObjCStringLiteral> from(const ValueStmt &parent);
   static std::optional<ObjCStringLiteral> from(const Stmt &parent);
-  Token at_token(void) const noexcept;
-  StringLiteral string(void) const noexcept;
+  Token at_token(void) const;
+  StringLiteral string(void) const;
 };
 
 using ObjCSelectorExprRange = DerivedEntityRange<StmtIterator, ObjCSelectorExpr>;
+using ObjCSelectorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCSelectorExpr>;
 
 class ObjCSelectorExpr : public Expr {
  private:
@@ -8951,14 +10114,20 @@ class ObjCSelectorExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCSelectorExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCSelectorExpr> from(const TokenContext &c);
   static std::optional<ObjCSelectorExpr> from(const Expr &parent);
   static std::optional<ObjCSelectorExpr> from(const ValueStmt &parent);
   static std::optional<ObjCSelectorExpr> from(const Stmt &parent);
-  Token at_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token at_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ObjCProtocolExprRange = DerivedEntityRange<StmtIterator, ObjCProtocolExpr>;
+using ObjCProtocolExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCProtocolExpr>;
 
 class ObjCProtocolExpr : public Expr {
  private:
@@ -8971,16 +10140,22 @@ class ObjCProtocolExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCProtocolExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCProtocolExpr> from(const TokenContext &c);
   static std::optional<ObjCProtocolExpr> from(const Expr &parent);
   static std::optional<ObjCProtocolExpr> from(const ValueStmt &parent);
   static std::optional<ObjCProtocolExpr> from(const Stmt &parent);
-  Token at_token(void) const noexcept;
-  ObjCProtocolDecl protocol(void) const noexcept;
-  Token protocol_id_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token at_token(void) const;
+  ObjCProtocolDecl protocol(void) const;
+  Token protocol_id_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ObjCPropertyRefExprRange = DerivedEntityRange<StmtIterator, ObjCPropertyRefExpr>;
+using ObjCPropertyRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCPropertyRefExpr>;
 
 class ObjCPropertyRefExpr : public Expr {
  private:
@@ -8993,25 +10168,31 @@ class ObjCPropertyRefExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCPropertyRefExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCPropertyRefExpr> from(const TokenContext &c);
   static std::optional<ObjCPropertyRefExpr> from(const Expr &parent);
   static std::optional<ObjCPropertyRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCPropertyRefExpr> from(const Stmt &parent);
-  ObjCInterfaceDecl class_receiver(void) const noexcept;
-  ObjCPropertyDecl explicit_property(void) const noexcept;
-  ObjCMethodDecl implicit_property_getter(void) const noexcept;
-  ObjCMethodDecl implicit_property_setter(void) const noexcept;
-  Token token(void) const noexcept;
-  Token receiver_token(void) const noexcept;
-  bool is_class_receiver(void) const noexcept;
-  bool is_explicit_property(void) const noexcept;
-  bool is_implicit_property(void) const noexcept;
-  bool is_messaging_getter(void) const noexcept;
-  bool is_messaging_setter(void) const noexcept;
-  bool is_object_receiver(void) const noexcept;
-  bool is_super_receiver(void) const noexcept;
+  ObjCInterfaceDecl class_receiver(void) const;
+  ObjCPropertyDecl explicit_property(void) const;
+  ObjCMethodDecl implicit_property_getter(void) const;
+  ObjCMethodDecl implicit_property_setter(void) const;
+  Token token(void) const;
+  Token receiver_token(void) const;
+  bool is_class_receiver(void) const;
+  bool is_explicit_property(void) const;
+  bool is_implicit_property(void) const;
+  bool is_messaging_getter(void) const;
+  bool is_messaging_setter(void) const;
+  bool is_object_receiver(void) const;
+  bool is_super_receiver(void) const;
 };
 
 using ObjCMessageExprRange = DerivedEntityRange<StmtIterator, ObjCMessageExpr>;
+using ObjCMessageExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCMessageExpr>;
 
 class ObjCMessageExpr : public Expr {
  private:
@@ -9024,26 +10205,32 @@ class ObjCMessageExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCMessageExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCMessageExpr> from(const TokenContext &c);
   static std::optional<ObjCMessageExpr> from(const Expr &parent);
   static std::optional<ObjCMessageExpr> from(const ValueStmt &parent);
   static std::optional<ObjCMessageExpr> from(const Stmt &parent);
-  Token left_token(void) const noexcept;
-  ObjCMethodDecl method_declaration(void) const noexcept;
-  ObjCMethodFamily method_family(void) const noexcept;
-  ObjCInterfaceDecl receiver_interface(void) const noexcept;
-  ObjCMessageExprReceiverKind receiver_kind(void) const noexcept;
-  TokenRange receiver_range(void) const noexcept;
-  Token right_token(void) const noexcept;
-  Token selector_start_token(void) const noexcept;
-  Token super_token(void) const noexcept;
-  bool is_class_message(void) const noexcept;
-  bool is_delegate_initializer_call(void) const noexcept;
-  bool is_implicit(void) const noexcept;
-  bool is_instance_message(void) const noexcept;
-  std::vector<Token> selector_tokens(void) const noexcept;
+  Token left_token(void) const;
+  ObjCMethodDecl method_declaration(void) const;
+  ObjCMethodFamily method_family(void) const;
+  ObjCInterfaceDecl receiver_interface(void) const;
+  ObjCMessageExprReceiverKind receiver_kind(void) const;
+  TokenRange receiver_range(void) const;
+  Token right_token(void) const;
+  Token selector_start_token(void) const;
+  Token super_token(void) const;
+  bool is_class_message(void) const;
+  bool is_delegate_initializer_call(void) const;
+  bool is_implicit(void) const;
+  bool is_instance_message(void) const;
+  std::vector<Token> selector_tokens(void) const;
 };
 
 using ObjCIvarRefExprRange = DerivedEntityRange<StmtIterator, ObjCIvarRefExpr>;
+using ObjCIvarRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIvarRefExpr>;
 
 class ObjCIvarRefExpr : public Expr {
  private:
@@ -9056,17 +10243,23 @@ class ObjCIvarRefExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCIvarRefExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCIvarRefExpr> from(const TokenContext &c);
   static std::optional<ObjCIvarRefExpr> from(const Expr &parent);
   static std::optional<ObjCIvarRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIvarRefExpr> from(const Stmt &parent);
-  ObjCIvarDecl declaration(void) const noexcept;
-  Token token(void) const noexcept;
-  Token operation_token(void) const noexcept;
-  bool is_arrow(void) const noexcept;
-  bool is_free_instance_variable(void) const noexcept;
+  ObjCIvarDecl declaration(void) const;
+  Token token(void) const;
+  Token operation_token(void) const;
+  bool is_arrow(void) const;
+  bool is_free_instance_variable(void) const;
 };
 
 using ObjCIsaExprRange = DerivedEntityRange<StmtIterator, ObjCIsaExpr>;
+using ObjCIsaExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIsaExpr>;
 
 class ObjCIsaExpr : public Expr {
  private:
@@ -9079,16 +10272,22 @@ class ObjCIsaExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCIsaExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCIsaExpr> from(const TokenContext &c);
   static std::optional<ObjCIsaExpr> from(const Expr &parent);
   static std::optional<ObjCIsaExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIsaExpr> from(const Stmt &parent);
-  Token base_token_end(void) const noexcept;
-  Token isa_member_token(void) const noexcept;
-  Token operation_token(void) const noexcept;
-  bool is_arrow(void) const noexcept;
+  Token base_token_end(void) const;
+  Token isa_member_token(void) const;
+  Token operation_token(void) const;
+  bool is_arrow(void) const;
 };
 
 using ObjCIndirectCopyRestoreExprRange = DerivedEntityRange<StmtIterator, ObjCIndirectCopyRestoreExpr>;
+using ObjCIndirectCopyRestoreExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIndirectCopyRestoreExpr>;
 
 class ObjCIndirectCopyRestoreExpr : public Expr {
  private:
@@ -9101,13 +10300,19 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCIndirectCopyRestoreExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCIndirectCopyRestoreExpr> from(const TokenContext &c);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Expr &parent);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Stmt &parent);
-  bool should_copy(void) const noexcept;
+  bool should_copy(void) const;
 };
 
 using ObjCEncodeExprRange = DerivedEntityRange<StmtIterator, ObjCEncodeExpr>;
+using ObjCEncodeExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCEncodeExpr>;
 
 class ObjCEncodeExpr : public Expr {
  private:
@@ -9120,14 +10325,20 @@ class ObjCEncodeExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCEncodeExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCEncodeExpr> from(const TokenContext &c);
   static std::optional<ObjCEncodeExpr> from(const Expr &parent);
   static std::optional<ObjCEncodeExpr> from(const ValueStmt &parent);
   static std::optional<ObjCEncodeExpr> from(const Stmt &parent);
-  Token at_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token at_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ObjCDictionaryLiteralRange = DerivedEntityRange<StmtIterator, ObjCDictionaryLiteral>;
+using ObjCDictionaryLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCDictionaryLiteral>;
 
 class ObjCDictionaryLiteral : public Expr {
  private:
@@ -9140,13 +10351,19 @@ class ObjCDictionaryLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCDictionaryLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCDictionaryLiteral> from(const TokenContext &c);
   static std::optional<ObjCDictionaryLiteral> from(const Expr &parent);
   static std::optional<ObjCDictionaryLiteral> from(const ValueStmt &parent);
   static std::optional<ObjCDictionaryLiteral> from(const Stmt &parent);
-  ObjCMethodDecl dictionary_with_objects_method(void) const noexcept;
+  ObjCMethodDecl dictionary_with_objects_method(void) const;
 };
 
 using ObjCBoxedExprRange = DerivedEntityRange<StmtIterator, ObjCBoxedExpr>;
+using ObjCBoxedExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBoxedExpr>;
 
 class ObjCBoxedExpr : public Expr {
  private:
@@ -9159,15 +10376,21 @@ class ObjCBoxedExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCBoxedExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCBoxedExpr> from(const TokenContext &c);
   static std::optional<ObjCBoxedExpr> from(const Expr &parent);
   static std::optional<ObjCBoxedExpr> from(const ValueStmt &parent);
   static std::optional<ObjCBoxedExpr> from(const Stmt &parent);
-  Token at_token(void) const noexcept;
-  ObjCMethodDecl boxing_method(void) const noexcept;
-  bool is_expressible_as_constant_initializer(void) const noexcept;
+  Token at_token(void) const;
+  ObjCMethodDecl boxing_method(void) const;
+  bool is_expressible_as_constant_initializer(void) const;
 };
 
 using ObjCBoolLiteralExprRange = DerivedEntityRange<StmtIterator, ObjCBoolLiteralExpr>;
+using ObjCBoolLiteralExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBoolLiteralExpr>;
 
 class ObjCBoolLiteralExpr : public Expr {
  private:
@@ -9180,14 +10403,20 @@ class ObjCBoolLiteralExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCBoolLiteralExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCBoolLiteralExpr> from(const TokenContext &c);
   static std::optional<ObjCBoolLiteralExpr> from(const Expr &parent);
   static std::optional<ObjCBoolLiteralExpr> from(const ValueStmt &parent);
   static std::optional<ObjCBoolLiteralExpr> from(const Stmt &parent);
-  Token token(void) const noexcept;
-  bool value(void) const noexcept;
+  Token token(void) const;
+  bool value(void) const;
 };
 
 using ObjCAvailabilityCheckExprRange = DerivedEntityRange<StmtIterator, ObjCAvailabilityCheckExpr>;
+using ObjCAvailabilityCheckExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAvailabilityCheckExpr>;
 
 class ObjCAvailabilityCheckExpr : public Expr {
  private:
@@ -9200,13 +10429,19 @@ class ObjCAvailabilityCheckExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCAvailabilityCheckExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAvailabilityCheckExpr> from(const TokenContext &c);
   static std::optional<ObjCAvailabilityCheckExpr> from(const Expr &parent);
   static std::optional<ObjCAvailabilityCheckExpr> from(const ValueStmt &parent);
   static std::optional<ObjCAvailabilityCheckExpr> from(const Stmt &parent);
-  bool has_version(void) const noexcept;
+  bool has_version(void) const;
 };
 
 using ObjCArrayLiteralRange = DerivedEntityRange<StmtIterator, ObjCArrayLiteral>;
+using ObjCArrayLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCArrayLiteral>;
 
 class ObjCArrayLiteral : public Expr {
  private:
@@ -9219,13 +10454,19 @@ class ObjCArrayLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static ObjCArrayLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCArrayLiteral> from(const TokenContext &c);
   static std::optional<ObjCArrayLiteral> from(const Expr &parent);
   static std::optional<ObjCArrayLiteral> from(const ValueStmt &parent);
   static std::optional<ObjCArrayLiteral> from(const Stmt &parent);
-  ObjCMethodDecl array_with_objects_method(void) const noexcept;
+  ObjCMethodDecl array_with_objects_method(void) const;
 };
 
 using OMPIteratorExprRange = DerivedEntityRange<StmtIterator, OMPIteratorExpr>;
+using OMPIteratorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPIteratorExpr>;
 
 class OMPIteratorExpr : public Expr {
  private:
@@ -9238,15 +10479,21 @@ class OMPIteratorExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static OMPIteratorExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPIteratorExpr> from(const TokenContext &c);
   static std::optional<OMPIteratorExpr> from(const Expr &parent);
   static std::optional<OMPIteratorExpr> from(const ValueStmt &parent);
   static std::optional<OMPIteratorExpr> from(const Stmt &parent);
-  Token iterator_kw_token(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token iterator_kw_token(void) const;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using OMPArrayShapingExprRange = DerivedEntityRange<StmtIterator, OMPArrayShapingExpr>;
+using OMPArrayShapingExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPArrayShapingExpr>;
 
 class OMPArrayShapingExpr : public Expr {
  private:
@@ -9259,14 +10506,20 @@ class OMPArrayShapingExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static OMPArrayShapingExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPArrayShapingExpr> from(const TokenContext &c);
   static std::optional<OMPArrayShapingExpr> from(const Expr &parent);
   static std::optional<OMPArrayShapingExpr> from(const ValueStmt &parent);
   static std::optional<OMPArrayShapingExpr> from(const Stmt &parent);
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
 };
 
 using OMPArraySectionExprRange = DerivedEntityRange<StmtIterator, OMPArraySectionExpr>;
+using OMPArraySectionExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPArraySectionExpr>;
 
 class OMPArraySectionExpr : public Expr {
  private:
@@ -9279,15 +10532,21 @@ class OMPArraySectionExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static OMPArraySectionExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPArraySectionExpr> from(const TokenContext &c);
   static std::optional<OMPArraySectionExpr> from(const Expr &parent);
   static std::optional<OMPArraySectionExpr> from(const ValueStmt &parent);
   static std::optional<OMPArraySectionExpr> from(const Stmt &parent);
-  Token colon_token_first(void) const noexcept;
-  Token colon_token_second(void) const noexcept;
-  Token r_bracket_token(void) const noexcept;
+  Token colon_token_first(void) const;
+  Token colon_token_second(void) const;
+  Token r_bracket_token(void) const;
 };
 
 using NoInitExprRange = DerivedEntityRange<StmtIterator, NoInitExpr>;
+using NoInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoInitExpr>;
 
 class NoInitExpr : public Expr {
  private:
@@ -9300,12 +10559,18 @@ class NoInitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static NoInitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<NoInitExpr> from(const TokenContext &c);
   static std::optional<NoInitExpr> from(const Expr &parent);
   static std::optional<NoInitExpr> from(const ValueStmt &parent);
   static std::optional<NoInitExpr> from(const Stmt &parent);
 };
 
 using MemberExprRange = DerivedEntityRange<StmtIterator, MemberExpr>;
+using MemberExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MemberExpr>;
 
 class MemberExpr : public Expr {
  private:
@@ -9318,25 +10583,31 @@ class MemberExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static MemberExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MemberExpr> from(const TokenContext &c);
   static std::optional<MemberExpr> from(const Expr &parent);
   static std::optional<MemberExpr> from(const ValueStmt &parent);
   static std::optional<MemberExpr> from(const Stmt &parent);
-  Token l_angle_token(void) const noexcept;
-  ValueDecl member_declaration(void) const noexcept;
-  Token member_token(void) const noexcept;
-  Token operator_token(void) const noexcept;
-  Token r_angle_token(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  bool had_multiple_candidates(void) const noexcept;
-  bool has_explicit_template_arguments(void) const noexcept;
-  bool has_qualifier(void) const noexcept;
-  bool has_template_keyword(void) const noexcept;
-  bool is_arrow(void) const noexcept;
-  bool is_implicit_access(void) const noexcept;
-  NonOdrUseReason is_non_odr_use(void) const noexcept;
+  Token l_angle_token(void) const;
+  ValueDecl member_declaration(void) const;
+  Token member_token(void) const;
+  Token operator_token(void) const;
+  Token r_angle_token(void) const;
+  Token template_keyword_token(void) const;
+  bool had_multiple_candidates(void) const;
+  bool has_explicit_template_arguments(void) const;
+  bool has_qualifier(void) const;
+  bool has_template_keyword(void) const;
+  bool is_arrow(void) const;
+  bool is_implicit_access(void) const;
+  NonOdrUseReason is_non_odr_use(void) const;
 };
 
 using MatrixSubscriptExprRange = DerivedEntityRange<StmtIterator, MatrixSubscriptExpr>;
+using MatrixSubscriptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MatrixSubscriptExpr>;
 
 class MatrixSubscriptExpr : public Expr {
  private:
@@ -9349,14 +10620,20 @@ class MatrixSubscriptExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static MatrixSubscriptExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MatrixSubscriptExpr> from(const TokenContext &c);
   static std::optional<MatrixSubscriptExpr> from(const Expr &parent);
   static std::optional<MatrixSubscriptExpr> from(const ValueStmt &parent);
   static std::optional<MatrixSubscriptExpr> from(const Stmt &parent);
-  Token r_bracket_token(void) const noexcept;
-  bool is_incomplete(void) const noexcept;
+  Token r_bracket_token(void) const;
+  bool is_incomplete(void) const;
 };
 
 using MaterializeTemporaryExprRange = DerivedEntityRange<StmtIterator, MaterializeTemporaryExpr>;
+using MaterializeTemporaryExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MaterializeTemporaryExpr>;
 
 class MaterializeTemporaryExpr : public Expr {
  private:
@@ -9369,17 +10646,23 @@ class MaterializeTemporaryExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static MaterializeTemporaryExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MaterializeTemporaryExpr> from(const TokenContext &c);
   static std::optional<MaterializeTemporaryExpr> from(const Expr &parent);
   static std::optional<MaterializeTemporaryExpr> from(const ValueStmt &parent);
   static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent);
-  ValueDecl extending_declaration(void) const noexcept;
-  LifetimeExtendedTemporaryDecl lifetime_extended_temporary_declaration(void) const noexcept;
-  StorageDuration storage_duration(void) const noexcept;
-  bool is_bound_to_lvalue_reference(void) const noexcept;
-  bool is_usable_in_constant_expressions(void) const noexcept;
+  ValueDecl extending_declaration(void) const;
+  LifetimeExtendedTemporaryDecl lifetime_extended_temporary_declaration(void) const;
+  StorageDuration storage_duration(void) const;
+  bool is_bound_to_lvalue_reference(void) const;
+  bool is_usable_in_constant_expressions(void) const;
 };
 
 using MSPropertySubscriptExprRange = DerivedEntityRange<StmtIterator, MSPropertySubscriptExpr>;
+using MSPropertySubscriptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSPropertySubscriptExpr>;
 
 class MSPropertySubscriptExpr : public Expr {
  private:
@@ -9392,13 +10675,19 @@ class MSPropertySubscriptExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static MSPropertySubscriptExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MSPropertySubscriptExpr> from(const TokenContext &c);
   static std::optional<MSPropertySubscriptExpr> from(const Expr &parent);
   static std::optional<MSPropertySubscriptExpr> from(const ValueStmt &parent);
   static std::optional<MSPropertySubscriptExpr> from(const Stmt &parent);
-  Token r_bracket_token(void) const noexcept;
+  Token r_bracket_token(void) const;
 };
 
 using MSPropertyRefExprRange = DerivedEntityRange<StmtIterator, MSPropertyRefExpr>;
+using MSPropertyRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSPropertyRefExpr>;
 
 class MSPropertyRefExpr : public Expr {
  private:
@@ -9411,16 +10700,22 @@ class MSPropertyRefExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static MSPropertyRefExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MSPropertyRefExpr> from(const TokenContext &c);
   static std::optional<MSPropertyRefExpr> from(const Expr &parent);
   static std::optional<MSPropertyRefExpr> from(const ValueStmt &parent);
   static std::optional<MSPropertyRefExpr> from(const Stmt &parent);
-  Token member_token(void) const noexcept;
-  MSPropertyDecl property_declaration(void) const noexcept;
-  bool is_arrow(void) const noexcept;
-  bool is_implicit_access(void) const noexcept;
+  Token member_token(void) const;
+  MSPropertyDecl property_declaration(void) const;
+  bool is_arrow(void) const;
+  bool is_implicit_access(void) const;
 };
 
 using LambdaExprRange = DerivedEntityRange<StmtIterator, LambdaExpr>;
+using LambdaExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, LambdaExpr>;
 
 class LambdaExpr : public Expr {
  private:
@@ -9433,24 +10728,30 @@ class LambdaExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static LambdaExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<LambdaExpr> from(const TokenContext &c);
   static std::optional<LambdaExpr> from(const Expr &parent);
   static std::optional<LambdaExpr> from(const ValueStmt &parent);
   static std::optional<LambdaExpr> from(const Stmt &parent);
-  CXXMethodDecl call_operator(void) const noexcept;
-  LambdaCaptureDefault capture_default(void) const noexcept;
-  Token capture_default_token(void) const noexcept;
-  CompoundStmt compound_statement_body(void) const noexcept;
-  std::vector<NamedDecl> explicit_template_parameters(void) const noexcept;
-  TokenRange introducer_range(void) const noexcept;
-  CXXRecordDecl lambda_class(void) const noexcept;
-  std::optional<TemplateParameterList> template_parameter_list(void) const noexcept;
-  bool has_explicit_parameters(void) const noexcept;
-  bool has_explicit_result_type(void) const noexcept;
-  bool is_generic_lambda(void) const noexcept;
-  bool is_mutable(void) const noexcept;
+  CXXMethodDecl call_operator(void) const;
+  LambdaCaptureDefault capture_default(void) const;
+  Token capture_default_token(void) const;
+  CompoundStmt compound_statement_body(void) const;
+  std::vector<NamedDecl> explicit_template_parameters(void) const;
+  TokenRange introducer_range(void) const;
+  CXXRecordDecl lambda_class(void) const;
+  std::optional<TemplateParameterList> template_parameter_list(void) const;
+  bool has_explicit_parameters(void) const;
+  bool has_explicit_result_type(void) const;
+  bool is_generic_lambda(void) const;
+  bool is_mutable(void) const;
 };
 
 using IntegerLiteralRange = DerivedEntityRange<StmtIterator, IntegerLiteral>;
+using IntegerLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, IntegerLiteral>;
 
 class IntegerLiteral : public Expr {
  private:
@@ -9463,13 +10764,19 @@ class IntegerLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static IntegerLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<IntegerLiteral> from(const TokenContext &c);
   static std::optional<IntegerLiteral> from(const Expr &parent);
   static std::optional<IntegerLiteral> from(const ValueStmt &parent);
   static std::optional<IntegerLiteral> from(const Stmt &parent);
-  Token token(void) const noexcept;
+  Token token(void) const;
 };
 
 using InitListExprRange = DerivedEntityRange<StmtIterator, InitListExpr>;
+using InitListExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, InitListExpr>;
 
 class InitListExpr : public Expr {
  private:
@@ -9482,24 +10789,30 @@ class InitListExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static InitListExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<InitListExpr> from(const TokenContext &c);
   static std::optional<InitListExpr> from(const Expr &parent);
   static std::optional<InitListExpr> from(const ValueStmt &parent);
   static std::optional<InitListExpr> from(const Stmt &parent);
-  std::optional<FieldDecl> initialized_field_in_union(void) const noexcept;
-  Token l_brace_token(void) const noexcept;
-  Token r_brace_token(void) const noexcept;
-  std::optional<InitListExpr> semantic_form(void) const noexcept;
-  std::optional<InitListExpr> syntactic_form(void) const noexcept;
-  bool had_array_range_designator(void) const noexcept;
-  bool has_array_filler(void) const noexcept;
-  bool is_explicit(void) const noexcept;
-  bool is_semantic_form(void) const noexcept;
-  bool is_string_literal_initializer(void) const noexcept;
-  bool is_syntactic_form(void) const noexcept;
-  bool is_transparent(void) const noexcept;
+  std::optional<FieldDecl> initialized_field_in_union(void) const;
+  Token l_brace_token(void) const;
+  Token r_brace_token(void) const;
+  std::optional<InitListExpr> semantic_form(void) const;
+  std::optional<InitListExpr> syntactic_form(void) const;
+  bool had_array_range_designator(void) const;
+  bool has_array_filler(void) const;
+  bool is_explicit(void) const;
+  bool is_semantic_form(void) const;
+  bool is_string_literal_initializer(void) const;
+  bool is_syntactic_form(void) const;
+  bool is_transparent(void) const;
 };
 
 using ImplicitValueInitExprRange = DerivedEntityRange<StmtIterator, ImplicitValueInitExpr>;
+using ImplicitValueInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImplicitValueInitExpr>;
 
 class ImplicitValueInitExpr : public Expr {
  private:
@@ -9512,12 +10825,18 @@ class ImplicitValueInitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ImplicitValueInitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ImplicitValueInitExpr> from(const TokenContext &c);
   static std::optional<ImplicitValueInitExpr> from(const Expr &parent);
   static std::optional<ImplicitValueInitExpr> from(const ValueStmt &parent);
   static std::optional<ImplicitValueInitExpr> from(const Stmt &parent);
 };
 
 using ImaginaryLiteralRange = DerivedEntityRange<StmtIterator, ImaginaryLiteral>;
+using ImaginaryLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImaginaryLiteral>;
 
 class ImaginaryLiteral : public Expr {
  private:
@@ -9530,12 +10849,18 @@ class ImaginaryLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static ImaginaryLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ImaginaryLiteral> from(const TokenContext &c);
   static std::optional<ImaginaryLiteral> from(const Expr &parent);
   static std::optional<ImaginaryLiteral> from(const ValueStmt &parent);
   static std::optional<ImaginaryLiteral> from(const Stmt &parent);
 };
 
 using GenericSelectionExprRange = DerivedEntityRange<StmtIterator, GenericSelectionExpr>;
+using GenericSelectionExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, GenericSelectionExpr>;
 
 class GenericSelectionExpr : public Expr {
  private:
@@ -9548,16 +10873,22 @@ class GenericSelectionExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static GenericSelectionExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<GenericSelectionExpr> from(const TokenContext &c);
   static std::optional<GenericSelectionExpr> from(const Expr &parent);
   static std::optional<GenericSelectionExpr> from(const ValueStmt &parent);
   static std::optional<GenericSelectionExpr> from(const Stmt &parent);
-  Token default_token(void) const noexcept;
-  Token generic_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_result_dependent(void) const noexcept;
+  Token default_token(void) const;
+  Token generic_token(void) const;
+  Token r_paren_token(void) const;
+  bool is_result_dependent(void) const;
 };
 
 using GNUNullExprRange = DerivedEntityRange<StmtIterator, GNUNullExpr>;
+using GNUNullExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, GNUNullExpr>;
 
 class GNUNullExpr : public Expr {
  private:
@@ -9570,13 +10901,19 @@ class GNUNullExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static GNUNullExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<GNUNullExpr> from(const TokenContext &c);
   static std::optional<GNUNullExpr> from(const Expr &parent);
   static std::optional<GNUNullExpr> from(const ValueStmt &parent);
   static std::optional<GNUNullExpr> from(const Stmt &parent);
-  Token token_token(void) const noexcept;
+  Token token_token(void) const;
 };
 
 using FunctionParmPackExprRange = DerivedEntityRange<StmtIterator, FunctionParmPackExpr>;
+using FunctionParmPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionParmPackExpr>;
 
 class FunctionParmPackExpr : public Expr {
  private:
@@ -9589,15 +10926,21 @@ class FunctionParmPackExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static FunctionParmPackExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FunctionParmPackExpr> from(const TokenContext &c);
   static std::optional<FunctionParmPackExpr> from(const Expr &parent);
   static std::optional<FunctionParmPackExpr> from(const ValueStmt &parent);
   static std::optional<FunctionParmPackExpr> from(const Stmt &parent);
-  VarDecl parameter_pack(void) const noexcept;
-  Token parameter_pack_token(void) const noexcept;
-  std::vector<VarDecl> expansions(void) const noexcept;
+  VarDecl parameter_pack(void) const;
+  Token parameter_pack_token(void) const;
+  std::vector<VarDecl> expansions(void) const;
 };
 
 using FullExprRange = DerivedEntityRange<StmtIterator, FullExpr>;
+using FullExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, FullExpr>;
 
 class FullExpr : public Expr {
  private:
@@ -9610,12 +10953,18 @@ class FullExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static FullExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FullExpr> from(const TokenContext &c);
   static std::optional<FullExpr> from(const Expr &parent);
   static std::optional<FullExpr> from(const ValueStmt &parent);
   static std::optional<FullExpr> from(const Stmt &parent);
 };
 
 using ExprWithCleanupsRange = DerivedEntityRange<StmtIterator, ExprWithCleanups>;
+using ExprWithCleanupsContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExprWithCleanups>;
 
 class ExprWithCleanups : public FullExpr {
  private:
@@ -9629,14 +10978,20 @@ class ExprWithCleanups : public FullExpr {
     return in_internal(frag);
   }
 
+  inline static ExprWithCleanupsContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExprWithCleanups> from(const TokenContext &c);
   static std::optional<ExprWithCleanups> from(const FullExpr &parent);
   static std::optional<ExprWithCleanups> from(const Expr &parent);
   static std::optional<ExprWithCleanups> from(const ValueStmt &parent);
   static std::optional<ExprWithCleanups> from(const Stmt &parent);
-  bool cleanups_have_side_effects(void) const noexcept;
+  bool cleanups_have_side_effects(void) const;
 };
 
 using ConstantExprRange = DerivedEntityRange<StmtIterator, ConstantExpr>;
+using ConstantExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstantExpr>;
 
 class ConstantExpr : public FullExpr {
  private:
@@ -9650,16 +11005,22 @@ class ConstantExpr : public FullExpr {
     return in_internal(frag);
   }
 
+  inline static ConstantExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConstantExpr> from(const TokenContext &c);
   static std::optional<ConstantExpr> from(const FullExpr &parent);
   static std::optional<ConstantExpr> from(const Expr &parent);
   static std::optional<ConstantExpr> from(const ValueStmt &parent);
   static std::optional<ConstantExpr> from(const Stmt &parent);
-  ConstantExprResultStorageKind result_storage_kind(void) const noexcept;
-  bool has_ap_value_result(void) const noexcept;
-  bool is_immediate_invocation(void) const noexcept;
+  ConstantExprResultStorageKind result_storage_kind(void) const;
+  bool has_ap_value_result(void) const;
+  bool is_immediate_invocation(void) const;
 };
 
 using FloatingLiteralRange = DerivedEntityRange<StmtIterator, FloatingLiteral>;
+using FloatingLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, FloatingLiteral>;
 
 class FloatingLiteral : public Expr {
  private:
@@ -9672,14 +11033,20 @@ class FloatingLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static FloatingLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FloatingLiteral> from(const TokenContext &c);
   static std::optional<FloatingLiteral> from(const Expr &parent);
   static std::optional<FloatingLiteral> from(const ValueStmt &parent);
   static std::optional<FloatingLiteral> from(const Stmt &parent);
-  Token token(void) const noexcept;
-  bool is_exact(void) const noexcept;
+  Token token(void) const;
+  bool is_exact(void) const;
 };
 
 using FixedPointLiteralRange = DerivedEntityRange<StmtIterator, FixedPointLiteral>;
+using FixedPointLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, FixedPointLiteral>;
 
 class FixedPointLiteral : public Expr {
  private:
@@ -9692,13 +11059,19 @@ class FixedPointLiteral : public Expr {
     return in_internal(frag);
   }
 
+  inline static FixedPointLiteralContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FixedPointLiteral> from(const TokenContext &c);
   static std::optional<FixedPointLiteral> from(const Expr &parent);
   static std::optional<FixedPointLiteral> from(const ValueStmt &parent);
   static std::optional<FixedPointLiteral> from(const Stmt &parent);
-  Token token(void) const noexcept;
+  Token token(void) const;
 };
 
 using ExtVectorElementExprRange = DerivedEntityRange<StmtIterator, ExtVectorElementExpr>;
+using ExtVectorElementExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExtVectorElementExpr>;
 
 class ExtVectorElementExpr : public Expr {
  private:
@@ -9711,15 +11084,21 @@ class ExtVectorElementExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ExtVectorElementExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExtVectorElementExpr> from(const TokenContext &c);
   static std::optional<ExtVectorElementExpr> from(const Expr &parent);
   static std::optional<ExtVectorElementExpr> from(const ValueStmt &parent);
   static std::optional<ExtVectorElementExpr> from(const Stmt &parent);
-  bool contains_duplicate_elements(void) const noexcept;
-  Token accessor_token(void) const noexcept;
-  bool is_arrow(void) const noexcept;
+  bool contains_duplicate_elements(void) const;
+  Token accessor_token(void) const;
+  bool is_arrow(void) const;
 };
 
 using ExpressionTraitExprRange = DerivedEntityRange<StmtIterator, ExpressionTraitExpr>;
+using ExpressionTraitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExpressionTraitExpr>;
 
 class ExpressionTraitExpr : public Expr {
  private:
@@ -9732,14 +11111,20 @@ class ExpressionTraitExpr : public Expr {
     return in_internal(frag);
   }
 
+  inline static ExpressionTraitExprContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExpressionTraitExpr> from(const TokenContext &c);
   static std::optional<ExpressionTraitExpr> from(const Expr &parent);
   static std::optional<ExpressionTraitExpr> from(const ValueStmt &parent);
   static std::optional<ExpressionTraitExpr> from(const Stmt &parent);
-  ExpressionTrait trait(void) const noexcept;
-  bool value(void) const noexcept;
+  ExpressionTrait trait(void) const;
+  bool value(void) const;
 };
 
 using AttributedStmtRange = DerivedEntityRange<StmtIterator, AttributedStmt>;
+using AttributedStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, AttributedStmt>;
 
 class AttributedStmt : public ValueStmt {
  private:
@@ -9751,12 +11136,18 @@ class AttributedStmt : public ValueStmt {
     return in_internal(frag);
   }
 
+  inline static AttributedStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AttributedStmt> from(const TokenContext &c);
   static std::optional<AttributedStmt> from(const ValueStmt &parent);
   static std::optional<AttributedStmt> from(const Stmt &parent);
-  Token attribute_token(void) const noexcept;
+  Token attribute_token(void) const;
 };
 
 using SwitchStmtRange = DerivedEntityRange<StmtIterator, SwitchStmt>;
+using SwitchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwitchStmt>;
 
 class SwitchStmt : public Stmt {
  private:
@@ -9767,18 +11158,24 @@ class SwitchStmt : public Stmt {
     return in_internal(frag);
   }
 
+  inline static SwitchStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SwitchStmt> from(const TokenContext &c);
   static std::optional<SwitchStmt> from(const Stmt &parent);
-  std::optional<VarDecl> condition_variable(void) const noexcept;
-  std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  Token switch_token(void) const noexcept;
-  bool has_initializer_storage(void) const noexcept;
-  bool has_variable_storage(void) const noexcept;
-  bool is_all_enum_cases_covered(void) const noexcept;
+  std::optional<VarDecl> condition_variable(void) const;
+  std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
+  Token switch_token(void) const;
+  bool has_initializer_storage(void) const;
+  bool has_variable_storage(void) const;
+  bool is_all_enum_cases_covered(void) const;
 };
 
 using SwitchCaseRange = DerivedEntityRange<StmtIterator, SwitchCase>;
+using SwitchCaseContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwitchCase>;
 
 class SwitchCase : public Stmt {
  private:
@@ -9789,12 +11186,18 @@ class SwitchCase : public Stmt {
     return in_internal(frag);
   }
 
+  inline static SwitchCaseContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SwitchCase> from(const TokenContext &c);
   static std::optional<SwitchCase> from(const Stmt &parent);
-  Token colon_token(void) const noexcept;
-  Token keyword_token(void) const noexcept;
+  Token colon_token(void) const;
+  Token keyword_token(void) const;
 };
 
 using DefaultStmtRange = DerivedEntityRange<StmtIterator, DefaultStmt>;
+using DefaultStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, DefaultStmt>;
 
 class DefaultStmt : public SwitchCase {
  private:
@@ -9806,12 +11209,18 @@ class DefaultStmt : public SwitchCase {
     return in_internal(frag);
   }
 
+  inline static DefaultStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DefaultStmt> from(const TokenContext &c);
   static std::optional<DefaultStmt> from(const SwitchCase &parent);
   static std::optional<DefaultStmt> from(const Stmt &parent);
-  Token default_token(void) const noexcept;
+  Token default_token(void) const;
 };
 
 using CaseStmtRange = DerivedEntityRange<StmtIterator, CaseStmt>;
+using CaseStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CaseStmt>;
 
 class CaseStmt : public SwitchCase {
  private:
@@ -9823,21 +11232,27 @@ class CaseStmt : public SwitchCase {
     return in_internal(frag);
   }
 
+  inline static CaseStmtContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CaseStmt> from(const TokenContext &c);
   static std::optional<CaseStmt> from(const SwitchCase &parent);
   static std::optional<CaseStmt> from(const Stmt &parent);
-  bool case_statement_is_gnu_range(void) const noexcept;
-  Token case_token(void) const noexcept;
-  Token ellipsis_token(void) const noexcept;
+  bool case_statement_is_gnu_range(void) const;
+  Token case_token(void) const;
+  Token ellipsis_token(void) const;
 };
 
 using DeclRange = DerivedEntityRange<DeclIterator, Decl>;
+using DeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, Decl>;
 
 class Decl {
  protected:
   friend class DeclIterator;
   friend class FragmentImpl;
   friend class StmtIterator;
-
+  friend class TokenContext;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -9850,6 +11265,10 @@ class Decl {
     return self;
   }
 
+  inline static std::optional<Decl> from(const TokenContext &c) {
+    return c.as_decl();
+  }
+
  protected:
   static DeclIterator in_internal(const Fragment &fragment);
 
@@ -9858,49 +11277,54 @@ class Decl {
     return in_internal(frag);
   }
 
-  AccessSpecifier access(void) const noexcept;
-  AccessSpecifier access_unsafe(void) const noexcept;
-  AvailabilityResult availability(void) const noexcept;
-  Token begin_token(void) const noexcept;
-  Token body_r_brace(void) const noexcept;
-  std::optional<TemplateParameterList> described_template_parameters(void) const noexcept;
-  Token end_token(void) const noexcept;
-  DeclFriendObjectKind friend_object_kind(void) const noexcept;
-  DeclModuleOwnershipKind module_ownership_kind(void) const noexcept;
-  bool has_attributes(void) const noexcept;
-  bool has_defining_attribute(void) const noexcept;
-  bool has_owning_module(void) const noexcept;
-  bool has_tag_identifier_namespace(void) const noexcept;
-  bool is_canonical_declaration(void) const noexcept;
-  bool is_defined_outside_function_or_method(void) const noexcept;
-  bool is_deprecated(void) const noexcept;
-  bool is_first_declaration(void) const noexcept;
-  bool is_function_or_function_template(void) const noexcept;
-  bool is_implicit(void) const noexcept;
-  bool is_in_anonymous_namespace(void) const noexcept;
-  bool is_in_local_scope_for_instantiation(void) const noexcept;
-  bool is_in_std_namespace(void) const noexcept;
-  bool is_invalid_declaration(void) const noexcept;
-  bool is_module_private(void) const noexcept;
-  bool is_out_of_line(void) const noexcept;
-  bool is_parameter_pack(void) const noexcept;
-  bool is_referenced(void) const noexcept;
-  bool is_template_declaration(void) const noexcept;
-  bool is_template_parameter(void) const noexcept;
-  bool is_template_parameter_pack(void) const noexcept;
-  bool is_templated(void) const noexcept;
-  bool is_this_declaration_referenced(void) const noexcept;
-  bool is_top_level_declaration_in_obj_c_container(void) const noexcept;
-  bool is_unavailable(void) const noexcept;
-  bool is_unconditionally_visible(void) const noexcept;
-  bool is_used(void) const noexcept;
-  bool is_weak_imported(void) const noexcept;
-  DeclKind kind(void) const noexcept;
-  Token token(void) const noexcept;
-  TokenRange token_range(void) const noexcept;
+  inline static DeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  AccessSpecifier access(void) const;
+  AccessSpecifier access_unsafe(void) const;
+  AvailabilityResult availability(void) const;
+  Token begin_token(void) const;
+  Token body_r_brace(void) const;
+  std::optional<TemplateParameterList> described_template_parameters(void) const;
+  Token end_token(void) const;
+  DeclFriendObjectKind friend_object_kind(void) const;
+  DeclModuleOwnershipKind module_ownership_kind(void) const;
+  bool has_attributes(void) const;
+  bool has_defining_attribute(void) const;
+  bool has_owning_module(void) const;
+  bool has_tag_identifier_namespace(void) const;
+  bool is_canonical_declaration(void) const;
+  bool is_defined_outside_function_or_method(void) const;
+  bool is_deprecated(void) const;
+  bool is_first_declaration(void) const;
+  bool is_function_or_function_template(void) const;
+  bool is_implicit(void) const;
+  bool is_in_anonymous_namespace(void) const;
+  bool is_in_local_scope_for_instantiation(void) const;
+  bool is_in_std_namespace(void) const;
+  bool is_invalid_declaration(void) const;
+  bool is_module_private(void) const;
+  bool is_out_of_line(void) const;
+  bool is_parameter_pack(void) const;
+  bool is_referenced(void) const;
+  bool is_template_declaration(void) const;
+  bool is_template_parameter(void) const;
+  bool is_template_parameter_pack(void) const;
+  bool is_templated(void) const;
+  bool is_this_declaration_referenced(void) const;
+  bool is_top_level_declaration_in_obj_c_container(void) const;
+  bool is_unavailable(void) const;
+  bool is_unconditionally_visible(void) const;
+  bool is_used(void) const;
+  bool is_weak_imported(void) const;
+  DeclKind kind(void) const;
+  Token token(void) const;
+  TokenRange token_range(void) const;
 };
 
 using ClassScopeFunctionSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassScopeFunctionSpecializationDecl>;
+using ClassScopeFunctionSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassScopeFunctionSpecializationDecl>;
 
 class ClassScopeFunctionSpecializationDecl : public Decl {
  private:
@@ -9911,12 +11335,18 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static ClassScopeFunctionSpecializationDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
-  CXXMethodDecl specialization(void) const noexcept;
-  bool has_explicit_template_arguments(void) const noexcept;
+  CXXMethodDecl specialization(void) const;
+  bool has_explicit_template_arguments(void) const;
 };
 
 using CapturedDeclRange = DerivedEntityRange<DeclIterator, CapturedDecl>;
+using CapturedDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CapturedDecl>;
 
 class CapturedDecl : public Decl {
  private:
@@ -9927,14 +11357,20 @@ class CapturedDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static CapturedDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CapturedDecl> from(const TokenContext &c);
   static std::optional<CapturedDecl> from(const Decl &parent);
-  ImplicitParamDecl context_parameter(void) const noexcept;
-  bool is_nothrow(void) const noexcept;
-  std::vector<ImplicitParamDecl> parameters(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  ImplicitParamDecl context_parameter(void) const;
+  bool is_nothrow(void) const;
+  std::vector<ImplicitParamDecl> parameters(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using BlockDeclRange = DerivedEntityRange<DeclIterator, BlockDecl>;
+using BlockDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, BlockDecl>;
 
 class BlockDecl : public Decl {
  private:
@@ -9945,22 +11381,28 @@ class BlockDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static BlockDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BlockDecl> from(const TokenContext &c);
   static std::optional<BlockDecl> from(const Decl &parent);
-  bool block_missing_return_type(void) const noexcept;
-  bool can_avoid_copy_to_heap(void) const noexcept;
-  bool captures_cxx_this(void) const noexcept;
-  bool does_not_escape(void) const noexcept;
-  Token caret_token(void) const noexcept;
-  CompoundStmt compound_body(void) const noexcept;
-  bool has_captures(void) const noexcept;
-  bool is_conversion_from_lambda(void) const noexcept;
-  bool is_variadic(void) const noexcept;
-  std::vector<ParmVarDecl> parameters(void) const noexcept;
-  std::vector<ParmVarDecl> parameter_declarations(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  bool block_missing_return_type(void) const;
+  bool can_avoid_copy_to_heap(void) const;
+  bool captures_cxx_this(void) const;
+  bool does_not_escape(void) const;
+  Token caret_token(void) const;
+  CompoundStmt compound_body(void) const;
+  bool has_captures(void) const;
+  bool is_conversion_from_lambda(void) const;
+  bool is_variadic(void) const;
+  std::vector<ParmVarDecl> parameters(void) const;
+  std::vector<ParmVarDecl> parameter_declarations(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using AccessSpecDeclRange = DerivedEntityRange<DeclIterator, AccessSpecDecl>;
+using AccessSpecDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, AccessSpecDecl>;
 
 class AccessSpecDecl : public Decl {
  private:
@@ -9971,12 +11413,18 @@ class AccessSpecDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static AccessSpecDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AccessSpecDecl> from(const TokenContext &c);
   static std::optional<AccessSpecDecl> from(const Decl &parent);
-  Token access_specifier_token(void) const noexcept;
-  Token colon_token(void) const noexcept;
+  Token access_specifier_token(void) const;
+  Token colon_token(void) const;
 };
 
 using OMPDeclarativeDirectiveDeclRange = DerivedEntityRange<DeclIterator, OMPDeclarativeDirectiveDecl>;
+using OMPDeclarativeDirectiveDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclarativeDirectiveDecl>;
 
 class OMPDeclarativeDirectiveDecl : public Decl {
  private:
@@ -9987,10 +11435,16 @@ class OMPDeclarativeDirectiveDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static OMPDeclarativeDirectiveDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDeclarativeDirectiveDecl> from(const TokenContext &c);
   static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent);
 };
 
 using OMPThreadPrivateDeclRange = DerivedEntityRange<DeclIterator, OMPThreadPrivateDecl>;
+using OMPThreadPrivateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPThreadPrivateDecl>;
 
 class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -10002,11 +11456,17 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
     return in_internal(frag);
   }
 
+  inline static OMPThreadPrivateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPThreadPrivateDecl> from(const TokenContext &c);
   static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
 };
 
 using OMPRequiresDeclRange = DerivedEntityRange<DeclIterator, OMPRequiresDecl>;
+using OMPRequiresDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPRequiresDecl>;
 
 class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -10018,11 +11478,17 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     return in_internal(frag);
   }
 
+  inline static OMPRequiresDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPRequiresDecl> from(const TokenContext &c);
   static std::optional<OMPRequiresDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPRequiresDecl> from(const Decl &parent);
 };
 
 using OMPAllocateDeclRange = DerivedEntityRange<DeclIterator, OMPAllocateDecl>;
+using OMPAllocateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPAllocateDecl>;
 
 class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -10034,11 +11500,17 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     return in_internal(frag);
   }
 
+  inline static OMPAllocateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPAllocateDecl> from(const TokenContext &c);
   static std::optional<OMPAllocateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPAllocateDecl> from(const Decl &parent);
 };
 
 using TranslationUnitDeclRange = DerivedEntityRange<DeclIterator, TranslationUnitDecl>;
+using TranslationUnitDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TranslationUnitDecl>;
 
 class TranslationUnitDecl : public Decl {
  private:
@@ -10049,11 +11521,17 @@ class TranslationUnitDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static TranslationUnitDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TranslationUnitDecl> from(const TokenContext &c);
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using StaticAssertDeclRange = DerivedEntityRange<DeclIterator, StaticAssertDecl>;
+using StaticAssertDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, StaticAssertDecl>;
 
 class StaticAssertDecl : public Decl {
  private:
@@ -10064,13 +11542,19 @@ class StaticAssertDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static StaticAssertDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<StaticAssertDecl> from(const TokenContext &c);
   static std::optional<StaticAssertDecl> from(const Decl &parent);
-  StringLiteral message(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
-  bool is_failed(void) const noexcept;
+  StringLiteral message(void) const;
+  Token r_paren_token(void) const;
+  bool is_failed(void) const;
 };
 
 using RequiresExprBodyDeclRange = DerivedEntityRange<DeclIterator, RequiresExprBodyDecl>;
+using RequiresExprBodyDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, RequiresExprBodyDecl>;
 
 class RequiresExprBodyDecl : public Decl {
  private:
@@ -10081,11 +11565,17 @@ class RequiresExprBodyDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static RequiresExprBodyDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<RequiresExprBodyDecl> from(const TokenContext &c);
   static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using PragmaDetectMismatchDeclRange = DerivedEntityRange<DeclIterator, PragmaDetectMismatchDecl>;
+using PragmaDetectMismatchDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaDetectMismatchDecl>;
 
 class PragmaDetectMismatchDecl : public Decl {
  private:
@@ -10096,12 +11586,18 @@ class PragmaDetectMismatchDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static PragmaDetectMismatchDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &c);
   static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
-  std::string_view name(void) const noexcept;
-  std::string_view value(void) const noexcept;
+  std::string_view name(void) const;
+  std::string_view value(void) const;
 };
 
 using PragmaCommentDeclRange = DerivedEntityRange<DeclIterator, PragmaCommentDecl>;
+using PragmaCommentDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaCommentDecl>;
 
 class PragmaCommentDecl : public Decl {
  private:
@@ -10112,12 +11608,18 @@ class PragmaCommentDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static PragmaCommentDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PragmaCommentDecl> from(const TokenContext &c);
   static std::optional<PragmaCommentDecl> from(const Decl &parent);
-  std::string_view argument(void) const noexcept;
-  PragmaMSCommentKind comment_kind(void) const noexcept;
+  std::string_view argument(void) const;
+  PragmaMSCommentKind comment_kind(void) const;
 };
 
 using ObjCPropertyImplDeclRange = DerivedEntityRange<DeclIterator, ObjCPropertyImplDecl>;
+using ObjCPropertyImplDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCPropertyImplDecl>;
 
 class ObjCPropertyImplDecl : public Decl {
  private:
@@ -10128,17 +11630,23 @@ class ObjCPropertyImplDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static ObjCPropertyImplDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCPropertyImplDecl> from(const TokenContext &c);
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
-  ObjCMethodDecl getter_method_declaration(void) const noexcept;
-  ObjCPropertyDecl property_declaration(void) const noexcept;
-  ObjCPropertyImplDeclKind property_implementation(void) const noexcept;
-  ObjCIvarDecl property_instance_variable_declaration(void) const noexcept;
-  Token property_instance_variable_declaration_token(void) const noexcept;
-  ObjCMethodDecl setter_method_declaration(void) const noexcept;
-  bool is_instance_variable_name_specified(void) const noexcept;
+  ObjCMethodDecl getter_method_declaration(void) const;
+  ObjCPropertyDecl property_declaration(void) const;
+  ObjCPropertyImplDeclKind property_implementation(void) const;
+  ObjCIvarDecl property_instance_variable_declaration(void) const;
+  Token property_instance_variable_declaration_token(void) const;
+  ObjCMethodDecl setter_method_declaration(void) const;
+  bool is_instance_variable_name_specified(void) const;
 };
 
 using NamedDeclRange = DerivedEntityRange<DeclIterator, NamedDecl>;
+using NamedDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, NamedDecl>;
 
 class NamedDecl : public Decl {
  private:
@@ -10149,25 +11657,31 @@ class NamedDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static NamedDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<NamedDecl> from(const TokenContext &c);
   static std::optional<NamedDecl> from(const Decl &parent);
-  Linkage formal_linkage(void) const noexcept;
-  Linkage linkage_internal(void) const noexcept;
-  std::string_view name(void) const noexcept;
-  ObjCStringFormatFamily obj_cf_string_formatting_family(void) const noexcept;
-  std::string_view qualified_name_as_string(void) const noexcept;
-  NamedDecl underlying_declaration(void) const noexcept;
-  Visibility visibility(void) const noexcept;
-  bool has_external_formal_linkage(void) const noexcept;
-  bool has_linkage(void) const noexcept;
-  bool has_linkage_been_computed(void) const noexcept;
-  bool is_cxx_class_member(void) const noexcept;
-  bool is_cxx_instance_member(void) const noexcept;
-  bool is_externally_declarable(void) const noexcept;
-  bool is_externally_visible(void) const noexcept;
-  bool is_linkage_valid(void) const noexcept;
+  Linkage formal_linkage(void) const;
+  Linkage linkage_internal(void) const;
+  std::string_view name(void) const;
+  ObjCStringFormatFamily obj_cf_string_formatting_family(void) const;
+  std::string_view qualified_name_as_string(void) const;
+  NamedDecl underlying_declaration(void) const;
+  Visibility visibility(void) const;
+  bool has_external_formal_linkage(void) const;
+  bool has_linkage(void) const;
+  bool has_linkage_been_computed(void) const;
+  bool is_cxx_class_member(void) const;
+  bool is_cxx_instance_member(void) const;
+  bool is_externally_declarable(void) const;
+  bool is_externally_visible(void) const;
+  bool is_linkage_valid(void) const;
 };
 
 using LabelDeclRange = DerivedEntityRange<DeclIterator, LabelDecl>;
+using LabelDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, LabelDecl>;
 
 class LabelDecl : public NamedDecl {
  private:
@@ -10179,16 +11693,22 @@ class LabelDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static LabelDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<LabelDecl> from(const TokenContext &c);
   static std::optional<LabelDecl> from(const NamedDecl &parent);
   static std::optional<LabelDecl> from(const Decl &parent);
-  std::string_view ms_assembly_label(void) const noexcept;
-  LabelStmt statement(void) const noexcept;
-  bool is_gnu_local(void) const noexcept;
-  bool is_ms_assembly_label(void) const noexcept;
-  bool is_resolved_ms_assembly_label(void) const noexcept;
+  std::string_view ms_assembly_label(void) const;
+  LabelStmt statement(void) const;
+  bool is_gnu_local(void) const;
+  bool is_ms_assembly_label(void) const;
+  bool is_resolved_ms_assembly_label(void) const;
 };
 
 using BaseUsingDeclRange = DerivedEntityRange<DeclIterator, BaseUsingDecl>;
+using BaseUsingDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, BaseUsingDecl>;
 
 class BaseUsingDecl : public NamedDecl {
  private:
@@ -10200,12 +11720,18 @@ class BaseUsingDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static BaseUsingDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BaseUsingDecl> from(const TokenContext &c);
   static std::optional<BaseUsingDecl> from(const NamedDecl &parent);
   static std::optional<BaseUsingDecl> from(const Decl &parent);
-  std::vector<UsingShadowDecl> shadows(void) const noexcept;
+  std::vector<UsingShadowDecl> shadows(void) const;
 };
 
 using UsingEnumDeclRange = DerivedEntityRange<DeclIterator, UsingEnumDecl>;
+using UsingEnumDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingEnumDecl>;
 
 class UsingEnumDecl : public BaseUsingDecl {
  private:
@@ -10218,15 +11744,21 @@ class UsingEnumDecl : public BaseUsingDecl {
     return in_internal(frag);
   }
 
+  inline static UsingEnumDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UsingEnumDecl> from(const TokenContext &c);
   static std::optional<UsingEnumDecl> from(const BaseUsingDecl &parent);
   static std::optional<UsingEnumDecl> from(const NamedDecl &parent);
   static std::optional<UsingEnumDecl> from(const Decl &parent);
-  EnumDecl enum_declaration(void) const noexcept;
-  Token enum_token(void) const noexcept;
-  Token using_token(void) const noexcept;
+  EnumDecl enum_declaration(void) const;
+  Token enum_token(void) const;
+  Token using_token(void) const;
 };
 
 using UsingDeclRange = DerivedEntityRange<DeclIterator, UsingDecl>;
+using UsingDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingDecl>;
 
 class UsingDecl : public BaseUsingDecl {
  private:
@@ -10239,15 +11771,21 @@ class UsingDecl : public BaseUsingDecl {
     return in_internal(frag);
   }
 
+  inline static UsingDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UsingDecl> from(const TokenContext &c);
   static std::optional<UsingDecl> from(const BaseUsingDecl &parent);
   static std::optional<UsingDecl> from(const NamedDecl &parent);
   static std::optional<UsingDecl> from(const Decl &parent);
-  Token using_token(void) const noexcept;
-  bool has_typename(void) const noexcept;
-  bool is_access_declaration(void) const noexcept;
+  Token using_token(void) const;
+  bool has_typename(void) const;
+  bool is_access_declaration(void) const;
 };
 
 using ValueDeclRange = DerivedEntityRange<DeclIterator, ValueDecl>;
+using ValueDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ValueDecl>;
 
 class ValueDecl : public NamedDecl {
  private:
@@ -10259,12 +11797,18 @@ class ValueDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static ValueDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ValueDecl> from(const TokenContext &c);
   static std::optional<ValueDecl> from(const NamedDecl &parent);
   static std::optional<ValueDecl> from(const Decl &parent);
-  bool is_weak(void) const noexcept;
+  bool is_weak(void) const;
 };
 
 using UnresolvedUsingValueDeclRange = DerivedEntityRange<DeclIterator, UnresolvedUsingValueDecl>;
+using UnresolvedUsingValueDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingValueDecl>;
 
 class UnresolvedUsingValueDecl : public ValueDecl {
  private:
@@ -10277,16 +11821,22 @@ class UnresolvedUsingValueDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static UnresolvedUsingValueDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingValueDecl> from(const ValueDecl &parent);
   static std::optional<UnresolvedUsingValueDecl> from(const NamedDecl &parent);
   static std::optional<UnresolvedUsingValueDecl> from(const Decl &parent);
-  Token ellipsis_token(void) const noexcept;
-  Token using_token(void) const noexcept;
-  bool is_access_declaration(void) const noexcept;
-  bool is_pack_expansion(void) const noexcept;
+  Token ellipsis_token(void) const;
+  Token using_token(void) const;
+  bool is_access_declaration(void) const;
+  bool is_pack_expansion(void) const;
 };
 
 using TemplateParamObjectDeclRange = DerivedEntityRange<DeclIterator, TemplateParamObjectDecl>;
+using TemplateParamObjectDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateParamObjectDecl>;
 
 class TemplateParamObjectDecl : public ValueDecl {
  private:
@@ -10299,12 +11849,18 @@ class TemplateParamObjectDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static TemplateParamObjectDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TemplateParamObjectDecl> from(const TokenContext &c);
   static std::optional<TemplateParamObjectDecl> from(const ValueDecl &parent);
   static std::optional<TemplateParamObjectDecl> from(const NamedDecl &parent);
   static std::optional<TemplateParamObjectDecl> from(const Decl &parent);
 };
 
 using OMPDeclareReductionDeclRange = DerivedEntityRange<DeclIterator, OMPDeclareReductionDecl>;
+using OMPDeclareReductionDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareReductionDecl>;
 
 class OMPDeclareReductionDecl : public ValueDecl {
  private:
@@ -10317,15 +11873,21 @@ class OMPDeclareReductionDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static OMPDeclareReductionDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDeclareReductionDecl> from(const TokenContext &c);
   static std::optional<OMPDeclareReductionDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclareReductionDecl> from(const NamedDecl &parent);
   static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
-  OMPDeclareReductionDeclInitKind initializer_kind(void) const noexcept;
-  OMPDeclareReductionDecl prev_declaration_in_scope(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  OMPDeclareReductionDeclInitKind initializer_kind(void) const;
+  OMPDeclareReductionDecl prev_declaration_in_scope(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using MSGuidDeclRange = DerivedEntityRange<DeclIterator, MSGuidDecl>;
+using MSGuidDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSGuidDecl>;
 
 class MSGuidDecl : public ValueDecl {
  private:
@@ -10338,12 +11900,18 @@ class MSGuidDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static MSGuidDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MSGuidDecl> from(const TokenContext &c);
   static std::optional<MSGuidDecl> from(const ValueDecl &parent);
   static std::optional<MSGuidDecl> from(const NamedDecl &parent);
   static std::optional<MSGuidDecl> from(const Decl &parent);
 };
 
 using IndirectFieldDeclRange = DerivedEntityRange<DeclIterator, IndirectFieldDecl>;
+using IndirectFieldDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, IndirectFieldDecl>;
 
 class IndirectFieldDecl : public ValueDecl {
  private:
@@ -10356,15 +11924,21 @@ class IndirectFieldDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static IndirectFieldDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<IndirectFieldDecl> from(const TokenContext &c);
   static std::optional<IndirectFieldDecl> from(const ValueDecl &parent);
   static std::optional<IndirectFieldDecl> from(const NamedDecl &parent);
   static std::optional<IndirectFieldDecl> from(const Decl &parent);
-  std::vector<NamedDecl> chain(void) const noexcept;
-  std::optional<FieldDecl> anonymous_field(void) const noexcept;
-  std::optional<VarDecl> variable_declaration(void) const noexcept;
+  std::vector<NamedDecl> chain(void) const;
+  std::optional<FieldDecl> anonymous_field(void) const;
+  std::optional<VarDecl> variable_declaration(void) const;
 };
 
 using EnumConstantDeclRange = DerivedEntityRange<DeclIterator, EnumConstantDecl>;
+using EnumConstantDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnumConstantDecl>;
 
 class EnumConstantDecl : public ValueDecl {
  private:
@@ -10377,12 +11951,18 @@ class EnumConstantDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static EnumConstantDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<EnumConstantDecl> from(const TokenContext &c);
   static std::optional<EnumConstantDecl> from(const ValueDecl &parent);
   static std::optional<EnumConstantDecl> from(const NamedDecl &parent);
   static std::optional<EnumConstantDecl> from(const Decl &parent);
 };
 
 using DeclaratorDeclRange = DerivedEntityRange<DeclIterator, DeclaratorDecl>;
+using DeclaratorDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeclaratorDecl>;
 
 class DeclaratorDecl : public ValueDecl {
  private:
@@ -10395,17 +11975,23 @@ class DeclaratorDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static DeclaratorDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DeclaratorDecl> from(const TokenContext &c);
   static std::optional<DeclaratorDecl> from(const ValueDecl &parent);
   static std::optional<DeclaratorDecl> from(const NamedDecl &parent);
   static std::optional<DeclaratorDecl> from(const Decl &parent);
-  Token inner_token_start(void) const noexcept;
-  Token outer_token_start(void) const noexcept;
-  Token type_spec_end_token(void) const noexcept;
-  Token type_spec_start_token(void) const noexcept;
-  std::vector<TemplateParameterList> template_parameter_lists(void) const noexcept;
+  Token inner_token_start(void) const;
+  Token outer_token_start(void) const;
+  Token type_spec_end_token(void) const;
+  Token type_spec_start_token(void) const;
+  std::vector<TemplateParameterList> template_parameter_lists(void) const;
 };
 
 using VarDeclRange = DerivedEntityRange<DeclIterator, VarDecl>;
+using VarDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, VarDecl>;
 
 class VarDecl : public DeclaratorDecl {
  private:
@@ -10419,60 +12005,66 @@ class VarDecl : public DeclaratorDecl {
     return in_internal(frag);
   }
 
+  inline static VarDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<VarDecl> from(const TokenContext &c);
   static std::optional<VarDecl> from(const DeclaratorDecl &parent);
   static std::optional<VarDecl> from(const ValueDecl &parent);
   static std::optional<VarDecl> from(const NamedDecl &parent);
   static std::optional<VarDecl> from(const Decl &parent);
-  std::optional<VarDecl> acting_definition(void) const noexcept;
-  VarDeclInitializationStyle initializer_style(void) const noexcept;
-  std::optional<VarDecl> initializing_declaration(void) const noexcept;
-  std::optional<VarDecl> instantiated_from_static_data_member(void) const noexcept;
-  LanguageLinkage language_linkage(void) const noexcept;
-  Token point_of_instantiation(void) const noexcept;
-  StorageClass storage_class(void) const noexcept;
-  StorageDuration storage_duration(void) const noexcept;
-  VarDeclTLSKind tls_kind(void) const noexcept;
-  ThreadStorageClassSpecifier tsc_spec(void) const noexcept;
-  std::optional<VarDecl> template_instantiation_pattern(void) const noexcept;
-  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
-  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const noexcept;
-  bool has_constant_initialization(void) const noexcept;
-  bool has_dependent_alignment(void) const noexcept;
-  bool has_external_storage(void) const noexcept;
-  bool has_global_storage(void) const noexcept;
-  bool has_initializer(void) const noexcept;
-  bool has_local_storage(void) const noexcept;
-  bool is_arc_pseudo_strong(void) const noexcept;
-  bool is_cxx_for_range_declaration(void) const noexcept;
-  bool is_constexpr(void) const noexcept;
-  bool is_direct_initializer(void) const noexcept;
-  bool is_escaping_byref(void) const noexcept;
-  bool is_exception_variable(void) const noexcept;
-  bool is_extern_c(void) const noexcept;
-  bool is_file_variable_declaration(void) const noexcept;
-  bool is_function_or_method_variable_declaration(void) const noexcept;
-  bool is_in_extern_c_context(void) const noexcept;
-  bool is_in_extern_cxx_context(void) const noexcept;
-  bool is_initializer_capture(void) const noexcept;
-  bool is_inline(void) const noexcept;
-  bool is_inline_specified(void) const noexcept;
-  bool is_known_to_be_defined(void) const noexcept;
-  bool is_local_variable_declaration(void) const noexcept;
-  bool is_local_variable_declaration_or_parm(void) const noexcept;
-  bool is_nrvo_variable(void) const noexcept;
-  bool is_no_destroy(void) const noexcept;
-  bool is_non_escaping_byref(void) const noexcept;
-  bool is_obj_c_for_declaration(void) const noexcept;
-  bool is_previous_declaration_in_same_block_scope(void) const noexcept;
-  bool is_static_data_member(void) const noexcept;
-  bool is_static_local(void) const noexcept;
-  bool is_this_declaration_a_demoted_definition(void) const noexcept;
-  bool is_usable_in_constant_expressions(void) const noexcept;
-  bool might_be_usable_in_constant_expressions(void) const noexcept;
-  QualTypeDestructionKind needs_destruction(void) const noexcept;
+  std::optional<VarDecl> acting_definition(void) const;
+  VarDeclInitializationStyle initializer_style(void) const;
+  std::optional<VarDecl> initializing_declaration(void) const;
+  std::optional<VarDecl> instantiated_from_static_data_member(void) const;
+  LanguageLinkage language_linkage(void) const;
+  Token point_of_instantiation(void) const;
+  StorageClass storage_class(void) const;
+  StorageDuration storage_duration(void) const;
+  VarDeclTLSKind tls_kind(void) const;
+  ThreadStorageClassSpecifier tsc_spec(void) const;
+  std::optional<VarDecl> template_instantiation_pattern(void) const;
+  TemplateSpecializationKind template_specialization_kind(void) const;
+  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const;
+  bool has_constant_initialization(void) const;
+  bool has_dependent_alignment(void) const;
+  bool has_external_storage(void) const;
+  bool has_global_storage(void) const;
+  bool has_initializer(void) const;
+  bool has_local_storage(void) const;
+  bool is_arc_pseudo_strong(void) const;
+  bool is_cxx_for_range_declaration(void) const;
+  bool is_constexpr(void) const;
+  bool is_direct_initializer(void) const;
+  bool is_escaping_byref(void) const;
+  bool is_exception_variable(void) const;
+  bool is_extern_c(void) const;
+  bool is_file_variable_declaration(void) const;
+  bool is_function_or_method_variable_declaration(void) const;
+  bool is_in_extern_c_context(void) const;
+  bool is_in_extern_cxx_context(void) const;
+  bool is_initializer_capture(void) const;
+  bool is_inline(void) const;
+  bool is_inline_specified(void) const;
+  bool is_known_to_be_defined(void) const;
+  bool is_local_variable_declaration(void) const;
+  bool is_local_variable_declaration_or_parm(void) const;
+  bool is_nrvo_variable(void) const;
+  bool is_no_destroy(void) const;
+  bool is_non_escaping_byref(void) const;
+  bool is_obj_c_for_declaration(void) const;
+  bool is_previous_declaration_in_same_block_scope(void) const;
+  bool is_static_data_member(void) const;
+  bool is_static_local(void) const;
+  bool is_this_declaration_a_demoted_definition(void) const;
+  bool is_usable_in_constant_expressions(void) const;
+  bool might_be_usable_in_constant_expressions(void) const;
+  QualTypeDestructionKind needs_destruction(void) const;
 };
 
 using ParmVarDeclRange = DerivedEntityRange<DeclIterator, ParmVarDecl>;
+using ParmVarDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParmVarDecl>;
 
 class ParmVarDecl : public VarDecl {
  private:
@@ -10487,23 +12079,29 @@ class ParmVarDecl : public VarDecl {
     return in_internal(frag);
   }
 
+  inline static ParmVarDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ParmVarDecl> from(const TokenContext &c);
   static std::optional<ParmVarDecl> from(const VarDecl &parent);
   static std::optional<ParmVarDecl> from(const DeclaratorDecl &parent);
   static std::optional<ParmVarDecl> from(const ValueDecl &parent);
   static std::optional<ParmVarDecl> from(const NamedDecl &parent);
   static std::optional<ParmVarDecl> from(const Decl &parent);
-  TokenRange default_argument_range(void) const noexcept;
-  DeclObjCDeclQualifier obj_c_decl_qualifier(void) const noexcept;
-  bool has_default_argument(void) const noexcept;
-  bool has_inherited_default_argument(void) const noexcept;
-  bool has_uninstantiated_default_argument(void) const noexcept;
-  bool has_unparsed_default_argument(void) const noexcept;
-  bool is_destroyed_in_callee(void) const noexcept;
-  bool is_knr_promoted(void) const noexcept;
-  bool is_obj_c_method_parameter(void) const noexcept;
+  TokenRange default_argument_range(void) const;
+  DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
+  bool has_default_argument(void) const;
+  bool has_inherited_default_argument(void) const;
+  bool has_uninstantiated_default_argument(void) const;
+  bool has_unparsed_default_argument(void) const;
+  bool is_destroyed_in_callee(void) const;
+  bool is_knr_promoted(void) const;
+  bool is_obj_c_method_parameter(void) const;
 };
 
 using OMPCapturedExprDeclRange = DerivedEntityRange<DeclIterator, OMPCapturedExprDecl>;
+using OMPCapturedExprDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCapturedExprDecl>;
 
 class OMPCapturedExprDecl : public VarDecl {
  private:
@@ -10518,6 +12116,11 @@ class OMPCapturedExprDecl : public VarDecl {
     return in_internal(frag);
   }
 
+  inline static OMPCapturedExprDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPCapturedExprDecl> from(const TokenContext &c);
   static std::optional<OMPCapturedExprDecl> from(const VarDecl &parent);
   static std::optional<OMPCapturedExprDecl> from(const DeclaratorDecl &parent);
   static std::optional<OMPCapturedExprDecl> from(const ValueDecl &parent);
@@ -10526,6 +12129,7 @@ class OMPCapturedExprDecl : public VarDecl {
 };
 
 using ImplicitParamDeclRange = DerivedEntityRange<DeclIterator, ImplicitParamDecl>;
+using ImplicitParamDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImplicitParamDecl>;
 
 class ImplicitParamDecl : public VarDecl {
  private:
@@ -10540,15 +12144,21 @@ class ImplicitParamDecl : public VarDecl {
     return in_internal(frag);
   }
 
+  inline static ImplicitParamDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ImplicitParamDecl> from(const TokenContext &c);
   static std::optional<ImplicitParamDecl> from(const VarDecl &parent);
   static std::optional<ImplicitParamDecl> from(const DeclaratorDecl &parent);
   static std::optional<ImplicitParamDecl> from(const ValueDecl &parent);
   static std::optional<ImplicitParamDecl> from(const NamedDecl &parent);
   static std::optional<ImplicitParamDecl> from(const Decl &parent);
-  ImplicitParamDeclImplicitParamKind parameter_kind(void) const noexcept;
+  ImplicitParamDeclImplicitParamKind parameter_kind(void) const;
 };
 
 using DecompositionDeclRange = DerivedEntityRange<DeclIterator, DecompositionDecl>;
+using DecompositionDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, DecompositionDecl>;
 
 class DecompositionDecl : public VarDecl {
  private:
@@ -10563,15 +12173,21 @@ class DecompositionDecl : public VarDecl {
     return in_internal(frag);
   }
 
+  inline static DecompositionDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DecompositionDecl> from(const TokenContext &c);
   static std::optional<DecompositionDecl> from(const VarDecl &parent);
   static std::optional<DecompositionDecl> from(const DeclaratorDecl &parent);
   static std::optional<DecompositionDecl> from(const ValueDecl &parent);
   static std::optional<DecompositionDecl> from(const NamedDecl &parent);
   static std::optional<DecompositionDecl> from(const Decl &parent);
-  std::vector<BindingDecl> bindings(void) const noexcept;
+  std::vector<BindingDecl> bindings(void) const;
 };
 
 using VarTemplateSpecializationDeclRange = DerivedEntityRange<DeclIterator, VarTemplateSpecializationDecl>;
+using VarTemplateSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, VarTemplateSpecializationDecl>;
 
 class VarTemplateSpecializationDecl : public VarDecl {
  private:
@@ -10586,22 +12202,28 @@ class VarTemplateSpecializationDecl : public VarDecl {
     return in_internal(frag);
   }
 
+  inline static VarTemplateSpecializationDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &c);
   static std::optional<VarTemplateSpecializationDecl> from(const VarDecl &parent);
   static std::optional<VarTemplateSpecializationDecl> from(const DeclaratorDecl &parent);
   static std::optional<VarTemplateSpecializationDecl> from(const ValueDecl &parent);
   static std::optional<VarTemplateSpecializationDecl> from(const NamedDecl &parent);
   static std::optional<VarTemplateSpecializationDecl> from(const Decl &parent);
-  Token extern_token(void) const noexcept;
-  TemplateSpecializationKind specialization_kind(void) const noexcept;
-  std::vector<TemplateArgument> template_arguments(void) const noexcept;
-  std::vector<TemplateArgument> template_instantiation_arguments(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  bool is_class_scope_explicit_specialization(void) const noexcept;
-  bool is_explicit_instantiation_or_specialization(void) const noexcept;
-  bool is_explicit_specialization(void) const noexcept;
+  Token extern_token(void) const;
+  TemplateSpecializationKind specialization_kind(void) const;
+  std::vector<TemplateArgument> template_arguments(void) const;
+  std::vector<TemplateArgument> template_instantiation_arguments(void) const;
+  Token template_keyword_token(void) const;
+  bool is_class_scope_explicit_specialization(void) const;
+  bool is_explicit_instantiation_or_specialization(void) const;
+  bool is_explicit_specialization(void) const;
 };
 
 using VarTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, VarTemplatePartialSpecializationDecl>;
+using VarTemplatePartialSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, VarTemplatePartialSpecializationDecl>;
 
 class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
  private:
@@ -10617,6 +12239,11 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     return in_internal(frag);
   }
 
+  inline static VarTemplatePartialSpecializationDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &c);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarTemplateSpecializationDecl &parent);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarDecl &parent);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const DeclaratorDecl &parent);
@@ -10626,6 +12253,7 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
 };
 
 using NonTypeTemplateParmDeclRange = DerivedEntityRange<DeclIterator, NonTypeTemplateParmDecl>;
+using NonTypeTemplateParmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, NonTypeTemplateParmDecl>;
 
 class NonTypeTemplateParmDecl : public DeclaratorDecl {
  private:
@@ -10639,19 +12267,25 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
     return in_internal(frag);
   }
 
+  inline static NonTypeTemplateParmDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<NonTypeTemplateParmDecl> from(const TokenContext &c);
   static std::optional<NonTypeTemplateParmDecl> from(const DeclaratorDecl &parent);
   static std::optional<NonTypeTemplateParmDecl> from(const ValueDecl &parent);
   static std::optional<NonTypeTemplateParmDecl> from(const NamedDecl &parent);
   static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent);
-  bool default_argument_was_inherited(void) const noexcept;
-  Token default_argument_token(void) const noexcept;
-  bool has_default_argument(void) const noexcept;
-  bool has_placeholder_type_constraint(void) const noexcept;
-  bool is_expanded_parameter_pack(void) const noexcept;
-  bool is_pack_expansion(void) const noexcept;
+  bool default_argument_was_inherited(void) const;
+  Token default_argument_token(void) const;
+  bool has_default_argument(void) const;
+  bool has_placeholder_type_constraint(void) const;
+  bool is_expanded_parameter_pack(void) const;
+  bool is_pack_expansion(void) const;
 };
 
 using MSPropertyDeclRange = DerivedEntityRange<DeclIterator, MSPropertyDecl>;
+using MSPropertyDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSPropertyDecl>;
 
 class MSPropertyDecl : public DeclaratorDecl {
  private:
@@ -10665,15 +12299,21 @@ class MSPropertyDecl : public DeclaratorDecl {
     return in_internal(frag);
   }
 
+  inline static MSPropertyDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MSPropertyDecl> from(const TokenContext &c);
   static std::optional<MSPropertyDecl> from(const DeclaratorDecl &parent);
   static std::optional<MSPropertyDecl> from(const ValueDecl &parent);
   static std::optional<MSPropertyDecl> from(const NamedDecl &parent);
   static std::optional<MSPropertyDecl> from(const Decl &parent);
-  bool has_getter(void) const noexcept;
-  bool has_setter(void) const noexcept;
+  bool has_getter(void) const;
+  bool has_setter(void) const;
 };
 
 using FunctionDeclRange = DerivedEntityRange<DeclIterator, FunctionDecl>;
+using FunctionDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionDecl>;
 
 class FunctionDecl : public DeclaratorDecl {
  private:
@@ -10687,80 +12327,86 @@ class FunctionDecl : public DeclaratorDecl {
     return in_internal(frag);
   }
 
+  inline static FunctionDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FunctionDecl> from(const TokenContext &c);
   static std::optional<FunctionDecl> from(const DeclaratorDecl &parent);
   static std::optional<FunctionDecl> from(const ValueDecl &parent);
   static std::optional<FunctionDecl> from(const NamedDecl &parent);
   static std::optional<FunctionDecl> from(const Decl &parent);
-  bool does_this_declaration_have_a_body(void) const noexcept;
-  ConstexprSpecKind constexpr_kind(void) const noexcept;
-  std::optional<FunctionDecl> definition(void) const noexcept;
-  Token ellipsis_token(void) const noexcept;
-  TokenRange exception_spec_source_range(void) const noexcept;
-  ExceptionSpecificationType exception_spec_type(void) const noexcept;
-  std::optional<FunctionDecl> instantiated_from_member_function(void) const noexcept;
-  LanguageLinkage language_linkage(void) const noexcept;
-  MultiVersionKind multi_version_kind(void) const noexcept;
-  OverloadedOperatorKind overloaded_operator(void) const noexcept;
-  TokenRange parameters_source_range(void) const noexcept;
-  Token point_of_instantiation(void) const noexcept;
-  TokenRange return_type_source_range(void) const noexcept;
-  StorageClass storage_class(void) const noexcept;
-  std::optional<FunctionDecl> template_instantiation_pattern(void) const noexcept;
-  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
-  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const noexcept;
-  FunctionDeclTemplatedKind templated_kind(void) const noexcept;
-  bool has_implicit_return_zero(void) const noexcept;
-  bool has_inherited_prototype(void) const noexcept;
-  bool has_one_parameter_or_default_arguments(void) const noexcept;
-  bool has_prototype(void) const noexcept;
-  bool has_skipped_body(void) const noexcept;
-  bool has_trivial_body(void) const noexcept;
-  bool has_written_prototype(void) const noexcept;
-  bool instantiation_is_pending(void) const noexcept;
-  bool is_cpu_dispatch_multi_version(void) const noexcept;
-  bool is_cpu_specific_multi_version(void) const noexcept;
-  bool is_consteval(void) const noexcept;
-  bool is_constexpr(void) const noexcept;
-  bool is_constexpr_specified(void) const noexcept;
-  bool is_defaulted(void) const noexcept;
-  bool is_deleted(void) const noexcept;
-  bool is_deleted_as_written(void) const noexcept;
-  bool is_destroying_operator_delete(void) const noexcept;
-  bool is_explicitly_defaulted(void) const noexcept;
-  bool is_extern_c(void) const noexcept;
-  bool is_function_template_specialization(void) const noexcept;
-  bool is_global(void) const noexcept;
-  bool is_implicitly_instantiable(void) const noexcept;
-  bool is_in_extern_c_context(void) const noexcept;
-  bool is_in_extern_cxx_context(void) const noexcept;
-  bool is_inline_builtin_declaration(void) const noexcept;
-  bool is_inline_specified(void) const noexcept;
-  bool is_inlined(void) const noexcept;
-  bool is_late_template_parsed(void) const noexcept;
-  bool is_msvcrt_entry_point(void) const noexcept;
-  bool is_main(void) const noexcept;
-  bool is_multi_version(void) const noexcept;
-  bool is_no_return(void) const noexcept;
-  bool is_overloaded_operator(void) const noexcept;
-  bool is_pure(void) const noexcept;
-  bool is_replaceable_global_allocation_function(void) const noexcept;
-  bool is_static(void) const noexcept;
-  bool is_target_multi_version(void) const noexcept;
-  bool is_template_instantiation(void) const noexcept;
-  bool is_this_declaration_a_definition(void) const noexcept;
-  bool is_this_declaration_instantiated_from_a_friend_definition(void) const noexcept;
-  bool is_trivial(void) const noexcept;
-  bool is_trivial_for_call(void) const noexcept;
-  bool is_user_provided(void) const noexcept;
-  bool is_variadic(void) const noexcept;
-  bool is_virtual_as_written(void) const noexcept;
-  std::vector<ParmVarDecl> parameters(void) const noexcept;
-  bool uses_seh_try(void) const noexcept;
-  bool will_have_body(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  bool does_this_declaration_have_a_body(void) const;
+  ConstexprSpecKind constexpr_kind(void) const;
+  std::optional<FunctionDecl> definition(void) const;
+  Token ellipsis_token(void) const;
+  TokenRange exception_spec_source_range(void) const;
+  ExceptionSpecificationType exception_spec_type(void) const;
+  std::optional<FunctionDecl> instantiated_from_member_function(void) const;
+  LanguageLinkage language_linkage(void) const;
+  MultiVersionKind multi_version_kind(void) const;
+  OverloadedOperatorKind overloaded_operator(void) const;
+  TokenRange parameters_source_range(void) const;
+  Token point_of_instantiation(void) const;
+  TokenRange return_type_source_range(void) const;
+  StorageClass storage_class(void) const;
+  std::optional<FunctionDecl> template_instantiation_pattern(void) const;
+  TemplateSpecializationKind template_specialization_kind(void) const;
+  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const;
+  FunctionDeclTemplatedKind templated_kind(void) const;
+  bool has_implicit_return_zero(void) const;
+  bool has_inherited_prototype(void) const;
+  bool has_one_parameter_or_default_arguments(void) const;
+  bool has_prototype(void) const;
+  bool has_skipped_body(void) const;
+  bool has_trivial_body(void) const;
+  bool has_written_prototype(void) const;
+  bool instantiation_is_pending(void) const;
+  bool is_cpu_dispatch_multi_version(void) const;
+  bool is_cpu_specific_multi_version(void) const;
+  bool is_consteval(void) const;
+  bool is_constexpr(void) const;
+  bool is_constexpr_specified(void) const;
+  bool is_defaulted(void) const;
+  bool is_deleted(void) const;
+  bool is_deleted_as_written(void) const;
+  bool is_destroying_operator_delete(void) const;
+  bool is_explicitly_defaulted(void) const;
+  bool is_extern_c(void) const;
+  bool is_function_template_specialization(void) const;
+  bool is_global(void) const;
+  bool is_implicitly_instantiable(void) const;
+  bool is_in_extern_c_context(void) const;
+  bool is_in_extern_cxx_context(void) const;
+  bool is_inline_builtin_declaration(void) const;
+  bool is_inline_specified(void) const;
+  bool is_inlined(void) const;
+  bool is_late_template_parsed(void) const;
+  bool is_msvcrt_entry_point(void) const;
+  bool is_main(void) const;
+  bool is_multi_version(void) const;
+  bool is_no_return(void) const;
+  bool is_overloaded_operator(void) const;
+  bool is_pure(void) const;
+  bool is_replaceable_global_allocation_function(void) const;
+  bool is_static(void) const;
+  bool is_target_multi_version(void) const;
+  bool is_template_instantiation(void) const;
+  bool is_this_declaration_a_definition(void) const;
+  bool is_this_declaration_instantiated_from_a_friend_definition(void) const;
+  bool is_trivial(void) const;
+  bool is_trivial_for_call(void) const;
+  bool is_user_provided(void) const;
+  bool is_variadic(void) const;
+  bool is_virtual_as_written(void) const;
+  std::vector<ParmVarDecl> parameters(void) const;
+  bool uses_seh_try(void) const;
+  bool will_have_body(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using CXXMethodDeclRange = DerivedEntityRange<DeclIterator, CXXMethodDecl>;
+using CXXMethodDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXMethodDecl>;
 
 class CXXMethodDecl : public FunctionDecl {
  private:
@@ -10775,25 +12421,31 @@ class CXXMethodDecl : public FunctionDecl {
     return in_internal(frag);
   }
 
+  inline static CXXMethodDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXMethodDecl> from(const TokenContext &c);
   static std::optional<CXXMethodDecl> from(const FunctionDecl &parent);
   static std::optional<CXXMethodDecl> from(const DeclaratorDecl &parent);
   static std::optional<CXXMethodDecl> from(const ValueDecl &parent);
   static std::optional<CXXMethodDecl> from(const NamedDecl &parent);
   static std::optional<CXXMethodDecl> from(const Decl &parent);
-  CXXRecordDecl parent(void) const noexcept;
-  RefQualifierKind reference_qualifier(void) const noexcept;
-  bool has_inline_body(void) const noexcept;
-  bool is_const(void) const noexcept;
-  bool is_copy_assignment_operator(void) const noexcept;
-  bool is_instance(void) const noexcept;
-  bool is_lambda_static_invoker(void) const noexcept;
-  bool is_move_assignment_operator(void) const noexcept;
-  bool is_virtual(void) const noexcept;
-  bool is_volatile(void) const noexcept;
-  std::vector<CXXMethodDecl> overridden_methods(void) const noexcept;
+  CXXRecordDecl parent(void) const;
+  RefQualifierKind reference_qualifier(void) const;
+  bool has_inline_body(void) const;
+  bool is_const(void) const;
+  bool is_copy_assignment_operator(void) const;
+  bool is_instance(void) const;
+  bool is_lambda_static_invoker(void) const;
+  bool is_move_assignment_operator(void) const;
+  bool is_virtual(void) const;
+  bool is_volatile(void) const;
+  std::vector<CXXMethodDecl> overridden_methods(void) const;
 };
 
 using CXXDestructorDeclRange = DerivedEntityRange<DeclIterator, CXXDestructorDecl>;
+using CXXDestructorDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDestructorDecl>;
 
 class CXXDestructorDecl : public CXXMethodDecl {
  private:
@@ -10809,16 +12461,22 @@ class CXXDestructorDecl : public CXXMethodDecl {
     return in_internal(frag);
   }
 
+  inline static CXXDestructorDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXDestructorDecl> from(const TokenContext &c);
   static std::optional<CXXDestructorDecl> from(const CXXMethodDecl &parent);
   static std::optional<CXXDestructorDecl> from(const FunctionDecl &parent);
   static std::optional<CXXDestructorDecl> from(const DeclaratorDecl &parent);
   static std::optional<CXXDestructorDecl> from(const ValueDecl &parent);
   static std::optional<CXXDestructorDecl> from(const NamedDecl &parent);
   static std::optional<CXXDestructorDecl> from(const Decl &parent);
-  FunctionDecl operator_delete(void) const noexcept;
+  FunctionDecl operator_delete(void) const;
 };
 
 using CXXConversionDeclRange = DerivedEntityRange<DeclIterator, CXXConversionDecl>;
+using CXXConversionDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXConversionDecl>;
 
 class CXXConversionDecl : public CXXMethodDecl {
  private:
@@ -10834,17 +12492,23 @@ class CXXConversionDecl : public CXXMethodDecl {
     return in_internal(frag);
   }
 
+  inline static CXXConversionDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXConversionDecl> from(const TokenContext &c);
   static std::optional<CXXConversionDecl> from(const CXXMethodDecl &parent);
   static std::optional<CXXConversionDecl> from(const FunctionDecl &parent);
   static std::optional<CXXConversionDecl> from(const DeclaratorDecl &parent);
   static std::optional<CXXConversionDecl> from(const ValueDecl &parent);
   static std::optional<CXXConversionDecl> from(const NamedDecl &parent);
   static std::optional<CXXConversionDecl> from(const Decl &parent);
-  bool is_explicit(void) const noexcept;
-  bool is_lambda_to_block_pointer_conversion(void) const noexcept;
+  bool is_explicit(void) const;
+  bool is_lambda_to_block_pointer_conversion(void) const;
 };
 
 using CXXConstructorDeclRange = DerivedEntityRange<DeclIterator, CXXConstructorDecl>;
+using CXXConstructorDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXConstructorDecl>;
 
 class CXXConstructorDecl : public CXXMethodDecl {
  private:
@@ -10860,21 +12524,27 @@ class CXXConstructorDecl : public CXXMethodDecl {
     return in_internal(frag);
   }
 
+  inline static CXXConstructorDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXConstructorDecl> from(const TokenContext &c);
   static std::optional<CXXConstructorDecl> from(const CXXMethodDecl &parent);
   static std::optional<CXXConstructorDecl> from(const FunctionDecl &parent);
   static std::optional<CXXConstructorDecl> from(const DeclaratorDecl &parent);
   static std::optional<CXXConstructorDecl> from(const ValueDecl &parent);
   static std::optional<CXXConstructorDecl> from(const NamedDecl &parent);
   static std::optional<CXXConstructorDecl> from(const Decl &parent);
-  CXXConstructorDecl target_constructor(void) const noexcept;
-  bool is_default_constructor(void) const noexcept;
-  bool is_delegating_constructor(void) const noexcept;
-  bool is_explicit(void) const noexcept;
-  bool is_inheriting_constructor(void) const noexcept;
-  bool is_specialization_copying_object(void) const noexcept;
+  CXXConstructorDecl target_constructor(void) const;
+  bool is_default_constructor(void) const;
+  bool is_delegating_constructor(void) const;
+  bool is_explicit(void) const;
+  bool is_inheriting_constructor(void) const;
+  bool is_specialization_copying_object(void) const;
 };
 
 using CXXDeductionGuideDeclRange = DerivedEntityRange<DeclIterator, CXXDeductionGuideDecl>;
+using CXXDeductionGuideDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDeductionGuideDecl>;
 
 class CXXDeductionGuideDecl : public FunctionDecl {
  private:
@@ -10889,17 +12559,23 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     return in_internal(frag);
   }
 
+  inline static CXXDeductionGuideDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXDeductionGuideDecl> from(const TokenContext &c);
   static std::optional<CXXDeductionGuideDecl> from(const FunctionDecl &parent);
   static std::optional<CXXDeductionGuideDecl> from(const DeclaratorDecl &parent);
   static std::optional<CXXDeductionGuideDecl> from(const ValueDecl &parent);
   static std::optional<CXXDeductionGuideDecl> from(const NamedDecl &parent);
   static std::optional<CXXDeductionGuideDecl> from(const Decl &parent);
-  CXXConstructorDecl corresponding_constructor(void) const noexcept;
-  bool is_copy_deduction_candidate(void) const noexcept;
-  bool is_explicit(void) const noexcept;
+  CXXConstructorDecl corresponding_constructor(void) const;
+  bool is_copy_deduction_candidate(void) const;
+  bool is_explicit(void) const;
 };
 
 using FieldDeclRange = DerivedEntityRange<DeclIterator, FieldDecl>;
+using FieldDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FieldDecl>;
 
 class FieldDecl : public DeclaratorDecl {
  private:
@@ -10913,23 +12589,29 @@ class FieldDecl : public DeclaratorDecl {
     return in_internal(frag);
   }
 
+  inline static FieldDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FieldDecl> from(const TokenContext &c);
   static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
   static std::optional<FieldDecl> from(const ValueDecl &parent);
   static std::optional<FieldDecl> from(const NamedDecl &parent);
   static std::optional<FieldDecl> from(const Decl &parent);
-  InClassInitStyle in_class_initializer_style(void) const noexcept;
-  RecordDecl parent(void) const noexcept;
-  bool has_captured_vla_type(void) const noexcept;
-  bool has_in_class_initializer(void) const noexcept;
-  bool is_anonymous_struct_or_union(void) const noexcept;
-  bool is_bit_field(void) const noexcept;
-  bool is_mutable(void) const noexcept;
-  bool is_unnamed_bitfield(void) const noexcept;
-  bool is_zero_length_bit_field(void) const noexcept;
-  bool is_zero_size(void) const noexcept;
+  InClassInitStyle in_class_initializer_style(void) const;
+  RecordDecl parent(void) const;
+  bool has_captured_vla_type(void) const;
+  bool has_in_class_initializer(void) const;
+  bool is_anonymous_struct_or_union(void) const;
+  bool is_bit_field(void) const;
+  bool is_mutable(void) const;
+  bool is_unnamed_bitfield(void) const;
+  bool is_zero_length_bit_field(void) const;
+  bool is_zero_size(void) const;
 };
 
 using ObjCIvarDeclRange = DerivedEntityRange<DeclIterator, ObjCIvarDecl>;
+using ObjCIvarDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIvarDecl>;
 
 class ObjCIvarDecl : public FieldDecl {
  private:
@@ -10944,19 +12626,25 @@ class ObjCIvarDecl : public FieldDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCIvarDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCIvarDecl> from(const TokenContext &c);
   static std::optional<ObjCIvarDecl> from(const FieldDecl &parent);
   static std::optional<ObjCIvarDecl> from(const DeclaratorDecl &parent);
   static std::optional<ObjCIvarDecl> from(const ValueDecl &parent);
   static std::optional<ObjCIvarDecl> from(const NamedDecl &parent);
   static std::optional<ObjCIvarDecl> from(const Decl &parent);
-  ObjCIvarDeclAccessControl access_control(void) const noexcept;
-  ObjCIvarDeclAccessControl canonical_access_control(void) const noexcept;
-  ObjCInterfaceDecl containing_interface(void) const noexcept;
-  ObjCIvarDecl next_instance_variable(void) const noexcept;
-  bool synthesize(void) const noexcept;
+  ObjCIvarDeclAccessControl access_control(void) const;
+  ObjCIvarDeclAccessControl canonical_access_control(void) const;
+  ObjCInterfaceDecl containing_interface(void) const;
+  ObjCIvarDecl next_instance_variable(void) const;
+  bool synthesize(void) const;
 };
 
 using ObjCAtDefsFieldDeclRange = DerivedEntityRange<DeclIterator, ObjCAtDefsFieldDecl>;
+using ObjCAtDefsFieldDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtDefsFieldDecl>;
 
 class ObjCAtDefsFieldDecl : public FieldDecl {
  private:
@@ -10971,6 +12659,11 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCAtDefsFieldDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCAtDefsFieldDecl> from(const TokenContext &c);
   static std::optional<ObjCAtDefsFieldDecl> from(const FieldDecl &parent);
   static std::optional<ObjCAtDefsFieldDecl> from(const DeclaratorDecl &parent);
   static std::optional<ObjCAtDefsFieldDecl> from(const ValueDecl &parent);
@@ -10979,6 +12672,7 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
 };
 
 using BindingDeclRange = DerivedEntityRange<DeclIterator, BindingDecl>;
+using BindingDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, BindingDecl>;
 
 class BindingDecl : public ValueDecl {
  private:
@@ -10991,14 +12685,20 @@ class BindingDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static BindingDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BindingDecl> from(const TokenContext &c);
   static std::optional<BindingDecl> from(const ValueDecl &parent);
   static std::optional<BindingDecl> from(const NamedDecl &parent);
   static std::optional<BindingDecl> from(const Decl &parent);
-  ValueDecl decomposed_declaration(void) const noexcept;
-  VarDecl holding_variable(void) const noexcept;
+  ValueDecl decomposed_declaration(void) const;
+  VarDecl holding_variable(void) const;
 };
 
 using OMPDeclarativeDirectiveValueDeclRange = DerivedEntityRange<DeclIterator, OMPDeclarativeDirectiveValueDecl>;
+using OMPDeclarativeDirectiveValueDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclarativeDirectiveValueDecl>;
 
 class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
  private:
@@ -11011,12 +12711,18 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
     return in_internal(frag);
   }
 
+  inline static OMPDeclarativeDirectiveValueDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDeclarativeDirectiveValueDecl> from(const TokenContext &c);
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const NamedDecl &parent);
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Decl &parent);
 };
 
 using OMPDeclareMapperDeclRange = DerivedEntityRange<DeclIterator, OMPDeclareMapperDecl>;
+using OMPDeclareMapperDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareMapperDecl>;
 
 class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
  private:
@@ -11030,15 +12736,21 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
     return in_internal(frag);
   }
 
+  inline static OMPDeclareMapperDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<OMPDeclareMapperDecl> from(const TokenContext &c);
   static std::optional<OMPDeclareMapperDecl> from(const OMPDeclarativeDirectiveValueDecl &parent);
   static std::optional<OMPDeclareMapperDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclareMapperDecl> from(const NamedDecl &parent);
   static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
-  OMPDeclareMapperDecl prev_declaration_in_scope(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  OMPDeclareMapperDecl prev_declaration_in_scope(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using UsingShadowDeclRange = DerivedEntityRange<DeclIterator, UsingShadowDecl>;
+using UsingShadowDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingShadowDecl>;
 
 class UsingShadowDecl : public NamedDecl {
  private:
@@ -11050,14 +12762,20 @@ class UsingShadowDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static UsingShadowDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UsingShadowDecl> from(const TokenContext &c);
   static std::optional<UsingShadowDecl> from(const NamedDecl &parent);
   static std::optional<UsingShadowDecl> from(const Decl &parent);
-  BaseUsingDecl introducer(void) const noexcept;
-  UsingShadowDecl next_using_shadow_declaration(void) const noexcept;
-  NamedDecl target_declaration(void) const noexcept;
+  BaseUsingDecl introducer(void) const;
+  UsingShadowDecl next_using_shadow_declaration(void) const;
+  NamedDecl target_declaration(void) const;
 };
 
 using ConstructorUsingShadowDeclRange = DerivedEntityRange<DeclIterator, ConstructorUsingShadowDecl>;
+using ConstructorUsingShadowDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstructorUsingShadowDecl>;
 
 class ConstructorUsingShadowDecl : public UsingShadowDecl {
  private:
@@ -11070,18 +12788,24 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
     return in_internal(frag);
   }
 
+  inline static ConstructorUsingShadowDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConstructorUsingShadowDecl> from(const TokenContext &c);
   static std::optional<ConstructorUsingShadowDecl> from(const UsingShadowDecl &parent);
   static std::optional<ConstructorUsingShadowDecl> from(const NamedDecl &parent);
   static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent);
-  bool constructs_virtual_base(void) const noexcept;
-  CXXRecordDecl constructed_base_class(void) const noexcept;
-  std::optional<ConstructorUsingShadowDecl> constructed_base_class_shadow_declaration(void) const noexcept;
-  CXXRecordDecl nominated_base_class(void) const noexcept;
-  std::optional<ConstructorUsingShadowDecl> nominated_base_class_shadow_declaration(void) const noexcept;
-  CXXRecordDecl parent(void) const noexcept;
+  bool constructs_virtual_base(void) const;
+  CXXRecordDecl constructed_base_class(void) const;
+  std::optional<ConstructorUsingShadowDecl> constructed_base_class_shadow_declaration(void) const;
+  CXXRecordDecl nominated_base_class(void) const;
+  std::optional<ConstructorUsingShadowDecl> nominated_base_class_shadow_declaration(void) const;
+  CXXRecordDecl parent(void) const;
 };
 
 using UsingPackDeclRange = DerivedEntityRange<DeclIterator, UsingPackDecl>;
+using UsingPackDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingPackDecl>;
 
 class UsingPackDecl : public NamedDecl {
  private:
@@ -11093,13 +12817,19 @@ class UsingPackDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static UsingPackDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UsingPackDecl> from(const TokenContext &c);
   static std::optional<UsingPackDecl> from(const NamedDecl &parent);
   static std::optional<UsingPackDecl> from(const Decl &parent);
-  std::vector<NamedDecl> expansions(void) const noexcept;
-  NamedDecl instantiated_from_using_declaration(void) const noexcept;
+  std::vector<NamedDecl> expansions(void) const;
+  NamedDecl instantiated_from_using_declaration(void) const;
 };
 
 using UsingDirectiveDeclRange = DerivedEntityRange<DeclIterator, UsingDirectiveDecl>;
+using UsingDirectiveDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingDirectiveDecl>;
 
 class UsingDirectiveDecl : public NamedDecl {
  private:
@@ -11111,15 +12841,21 @@ class UsingDirectiveDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static UsingDirectiveDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UsingDirectiveDecl> from(const TokenContext &c);
   static std::optional<UsingDirectiveDecl> from(const NamedDecl &parent);
   static std::optional<UsingDirectiveDecl> from(const Decl &parent);
-  Token identifier_token(void) const noexcept;
-  Token namespace_key_token(void) const noexcept;
-  NamedDecl nominated_namespace_as_written(void) const noexcept;
-  Token using_token(void) const noexcept;
+  Token identifier_token(void) const;
+  Token namespace_key_token(void) const;
+  NamedDecl nominated_namespace_as_written(void) const;
+  Token using_token(void) const;
 };
 
 using UnresolvedUsingIfExistsDeclRange = DerivedEntityRange<DeclIterator, UnresolvedUsingIfExistsDecl>;
+using UnresolvedUsingIfExistsDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingIfExistsDecl>;
 
 class UnresolvedUsingIfExistsDecl : public NamedDecl {
  private:
@@ -11131,11 +12867,17 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static UnresolvedUsingIfExistsDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnresolvedUsingIfExistsDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingIfExistsDecl> from(const NamedDecl &parent);
   static std::optional<UnresolvedUsingIfExistsDecl> from(const Decl &parent);
 };
 
 using TypeDeclRange = DerivedEntityRange<DeclIterator, TypeDecl>;
+using TypeDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeDecl>;
 
 class TypeDecl : public NamedDecl {
  private:
@@ -11147,11 +12889,17 @@ class TypeDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static TypeDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypeDecl> from(const TokenContext &c);
   static std::optional<TypeDecl> from(const NamedDecl &parent);
   static std::optional<TypeDecl> from(const Decl &parent);
 };
 
 using TemplateTypeParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTypeParmDecl>;
+using TemplateTypeParmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateTypeParmDecl>;
 
 class TemplateTypeParmDecl : public TypeDecl {
  private:
@@ -11164,19 +12912,25 @@ class TemplateTypeParmDecl : public TypeDecl {
     return in_internal(frag);
   }
 
+  inline static TemplateTypeParmDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TemplateTypeParmDecl> from(const TokenContext &c);
   static std::optional<TemplateTypeParmDecl> from(const TypeDecl &parent);
   static std::optional<TemplateTypeParmDecl> from(const NamedDecl &parent);
   static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
-  bool default_argument_was_inherited(void) const noexcept;
-  Token default_argument_token(void) const noexcept;
-  bool has_default_argument(void) const noexcept;
-  bool has_type_constraint(void) const noexcept;
-  bool is_expanded_parameter_pack(void) const noexcept;
-  bool is_pack_expansion(void) const noexcept;
-  bool was_declared_with_typename(void) const noexcept;
+  bool default_argument_was_inherited(void) const;
+  Token default_argument_token(void) const;
+  bool has_default_argument(void) const;
+  bool has_type_constraint(void) const;
+  bool is_expanded_parameter_pack(void) const;
+  bool is_pack_expansion(void) const;
+  bool was_declared_with_typename(void) const;
 };
 
 using TagDeclRange = DerivedEntityRange<DeclIterator, TagDecl>;
+using TagDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TagDecl>;
 
 class TagDecl : public TypeDecl {
  private:
@@ -11189,34 +12943,40 @@ class TagDecl : public TypeDecl {
     return in_internal(frag);
   }
 
+  inline static TagDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TagDecl> from(const TokenContext &c);
   static std::optional<TagDecl> from(const TypeDecl &parent);
   static std::optional<TagDecl> from(const NamedDecl &parent);
   static std::optional<TagDecl> from(const Decl &parent);
-  TokenRange brace_range(void) const noexcept;
-  std::optional<TagDecl> definition(void) const noexcept;
-  Token inner_token_start(void) const noexcept;
-  Token outer_token_start(void) const noexcept;
-  TagTypeKind tag_kind(void) const noexcept;
-  std::optional<TypedefNameDecl> typedef_name_for_anonymous_declaration(void) const noexcept;
-  bool has_name_for_linkage(void) const noexcept;
-  bool is_being_defined(void) const noexcept;
-  bool is_class(void) const noexcept;
-  bool is_complete_definition(void) const noexcept;
-  bool is_complete_definition_required(void) const noexcept;
-  bool is_dependent_type(void) const noexcept;
-  bool is_embedded_in_declarator(void) const noexcept;
-  bool is_enum(void) const noexcept;
-  bool is_free_standing(void) const noexcept;
-  bool is_interface(void) const noexcept;
-  bool is_struct(void) const noexcept;
-  bool is_this_declaration_a_definition(void) const noexcept;
-  bool is_union(void) const noexcept;
-  bool may_have_out_of_date_definition(void) const noexcept;
-  std::vector<TemplateParameterList> template_parameter_lists(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  TokenRange brace_range(void) const;
+  std::optional<TagDecl> definition(void) const;
+  Token inner_token_start(void) const;
+  Token outer_token_start(void) const;
+  TagTypeKind tag_kind(void) const;
+  std::optional<TypedefNameDecl> typedef_name_for_anonymous_declaration(void) const;
+  bool has_name_for_linkage(void) const;
+  bool is_being_defined(void) const;
+  bool is_class(void) const;
+  bool is_complete_definition(void) const;
+  bool is_complete_definition_required(void) const;
+  bool is_dependent_type(void) const;
+  bool is_embedded_in_declarator(void) const;
+  bool is_enum(void) const;
+  bool is_free_standing(void) const;
+  bool is_interface(void) const;
+  bool is_struct(void) const;
+  bool is_this_declaration_a_definition(void) const;
+  bool is_union(void) const;
+  bool may_have_out_of_date_definition(void) const;
+  std::vector<TemplateParameterList> template_parameter_lists(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using RecordDeclRange = DerivedEntityRange<DeclIterator, RecordDecl>;
+using RecordDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, RecordDecl>;
 
 class RecordDecl : public TagDecl {
  private:
@@ -11230,35 +12990,41 @@ class RecordDecl : public TagDecl {
     return in_internal(frag);
   }
 
+  inline static RecordDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<RecordDecl> from(const TokenContext &c);
   static std::optional<RecordDecl> from(const TagDecl &parent);
   static std::optional<RecordDecl> from(const TypeDecl &parent);
   static std::optional<RecordDecl> from(const NamedDecl &parent);
   static std::optional<RecordDecl> from(const Decl &parent);
-  bool can_pass_in_registers(void) const noexcept;
-  std::vector<FieldDecl> fields(void) const noexcept;
-  std::optional<FieldDecl> find_first_named_data_member(void) const noexcept;
-  RecordDeclArgPassingKind argument_passing_restrictions(void) const noexcept;
-  bool has_flexible_array_member(void) const noexcept;
-  bool has_loaded_fields_from_external_storage(void) const noexcept;
-  bool has_non_trivial_to_primitive_copy_c_union(void) const noexcept;
-  bool has_non_trivial_to_primitive_default_initialize_c_union(void) const noexcept;
-  bool has_non_trivial_to_primitive_destruct_c_union(void) const noexcept;
-  bool has_object_member(void) const noexcept;
-  bool has_volatile_member(void) const noexcept;
-  bool is_anonymous_struct_or_union(void) const noexcept;
-  bool is_captured_record(void) const noexcept;
-  bool is_injected_class_name(void) const noexcept;
-  bool is_lambda(void) const noexcept;
-  bool is_ms_struct(void) const noexcept;
-  bool is_non_trivial_to_primitive_copy(void) const noexcept;
-  bool is_non_trivial_to_primitive_default_initialize(void) const noexcept;
-  bool is_non_trivial_to_primitive_destroy(void) const noexcept;
-  bool is_or_contains_union(void) const noexcept;
-  bool is_parameter_destroyed_in_callee(void) const noexcept;
-  bool may_insert_extra_padding(void) const noexcept;
+  bool can_pass_in_registers(void) const;
+  std::vector<FieldDecl> fields(void) const;
+  std::optional<FieldDecl> find_first_named_data_member(void) const;
+  RecordDeclArgPassingKind argument_passing_restrictions(void) const;
+  bool has_flexible_array_member(void) const;
+  bool has_loaded_fields_from_external_storage(void) const;
+  bool has_non_trivial_to_primitive_copy_c_union(void) const;
+  bool has_non_trivial_to_primitive_default_initialize_c_union(void) const;
+  bool has_non_trivial_to_primitive_destruct_c_union(void) const;
+  bool has_object_member(void) const;
+  bool has_volatile_member(void) const;
+  bool is_anonymous_struct_or_union(void) const;
+  bool is_captured_record(void) const;
+  bool is_injected_class_name(void) const;
+  bool is_lambda(void) const;
+  bool is_ms_struct(void) const;
+  bool is_non_trivial_to_primitive_copy(void) const;
+  bool is_non_trivial_to_primitive_default_initialize(void) const;
+  bool is_non_trivial_to_primitive_destroy(void) const;
+  bool is_or_contains_union(void) const;
+  bool is_parameter_destroyed_in_callee(void) const;
+  bool may_insert_extra_padding(void) const;
 };
 
 using CXXRecordDeclRange = DerivedEntityRange<DeclIterator, CXXRecordDecl>;
+using CXXRecordDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXRecordDecl>;
 
 class CXXRecordDecl : public RecordDecl {
  private:
@@ -11273,129 +13039,135 @@ class CXXRecordDecl : public RecordDecl {
     return in_internal(frag);
   }
 
+  inline static CXXRecordDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<CXXRecordDecl> from(const TokenContext &c);
   static std::optional<CXXRecordDecl> from(const RecordDecl &parent);
   static std::optional<CXXRecordDecl> from(const TagDecl &parent);
   static std::optional<CXXRecordDecl> from(const TypeDecl &parent);
   static std::optional<CXXRecordDecl> from(const NamedDecl &parent);
   static std::optional<CXXRecordDecl> from(const Decl &parent);
-  bool allow_const_default_initializer(void) const noexcept;
-  std::vector<CXXBaseSpecifier> bases(void) const noexcept;
-  MSInheritanceModel calculate_inheritance_model(void) const noexcept;
-  std::vector<CXXConstructorDecl> constructors(void) const noexcept;
-  bool defaulted_copy_constructor_is_deleted(void) const noexcept;
-  bool defaulted_default_constructor_is_constexpr(void) const noexcept;
-  bool defaulted_destructor_is_constexpr(void) const noexcept;
-  bool defaulted_destructor_is_deleted(void) const noexcept;
-  bool defaulted_move_constructor_is_deleted(void) const noexcept;
-  std::vector<FriendDecl> friends(void) const noexcept;
-  std::optional<CXXDestructorDecl> destructor(void) const noexcept;
-  std::optional<TemplateParameterList> generic_lambda_template_parameter_list(void) const noexcept;
-  std::optional<CXXRecordDecl> instantiated_from_member_class(void) const noexcept;
-  std::optional<CXXMethodDecl> lambda_call_operator(void) const noexcept;
-  LambdaCaptureDefault lambda_capture_default(void) const noexcept;
-  std::vector<NamedDecl> lambda_explicit_template_parameters(void) const noexcept;
-  MSInheritanceModel ms_inheritance_model(void) const noexcept;
-  MSVtorDispMode ms_vtor_disp_mode(void) const noexcept;
-  CXXRecordDecl most_recent_non_injected_declaration(void) const noexcept;
-  std::optional<CXXRecordDecl> template_instantiation_pattern(void) const noexcept;
-  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
-  bool has_any_dependent_bases(void) const noexcept;
-  bool has_constexpr_default_constructor(void) const noexcept;
-  bool has_constexpr_destructor(void) const noexcept;
-  bool has_constexpr_non_copy_move_constructor(void) const noexcept;
-  bool has_copy_assignment_with_const_parameter(void) const noexcept;
-  bool has_copy_constructor_with_const_parameter(void) const noexcept;
-  bool has_default_constructor(void) const noexcept;
-  bool has_definition(void) const noexcept;
-  bool has_direct_fields(void) const noexcept;
-  bool has_friends(void) const noexcept;
-  bool has_in_class_initializer(void) const noexcept;
-  bool has_inherited_assignment(void) const noexcept;
-  bool has_inherited_constructor(void) const noexcept;
-  bool has_irrelevant_destructor(void) const noexcept;
-  bool has_known_lambda_internal_linkage(void) const noexcept;
-  bool has_move_assignment(void) const noexcept;
-  bool has_move_constructor(void) const noexcept;
-  bool has_mutable_fields(void) const noexcept;
-  bool has_non_literal_type_fields_or_bases(void) const noexcept;
-  bool has_non_trivial_copy_assignment(void) const noexcept;
-  bool has_non_trivial_copy_constructor(void) const noexcept;
-  bool has_non_trivial_copy_constructor_for_call(void) const noexcept;
-  bool has_non_trivial_default_constructor(void) const noexcept;
-  bool has_non_trivial_destructor(void) const noexcept;
-  bool has_non_trivial_destructor_for_call(void) const noexcept;
-  bool has_non_trivial_move_assignment(void) const noexcept;
-  bool has_non_trivial_move_constructor(void) const noexcept;
-  bool has_non_trivial_move_constructor_for_call(void) const noexcept;
-  bool has_private_fields(void) const noexcept;
-  bool has_protected_fields(void) const noexcept;
-  bool has_simple_copy_assignment(void) const noexcept;
-  bool has_simple_copy_constructor(void) const noexcept;
-  bool has_simple_destructor(void) const noexcept;
-  bool has_simple_move_assignment(void) const noexcept;
-  bool has_simple_move_constructor(void) const noexcept;
-  bool has_trivial_copy_assignment(void) const noexcept;
-  bool has_trivial_copy_constructor(void) const noexcept;
-  bool has_trivial_copy_constructor_for_call(void) const noexcept;
-  bool has_trivial_default_constructor(void) const noexcept;
-  bool has_trivial_destructor(void) const noexcept;
-  bool has_trivial_destructor_for_call(void) const noexcept;
-  bool has_trivial_move_assignment(void) const noexcept;
-  bool has_trivial_move_constructor(void) const noexcept;
-  bool has_trivial_move_constructor_for_call(void) const noexcept;
-  bool has_uninitialized_reference_member(void) const noexcept;
-  bool has_user_declared_constructor(void) const noexcept;
-  bool has_user_declared_copy_assignment(void) const noexcept;
-  bool has_user_declared_copy_constructor(void) const noexcept;
-  bool has_user_declared_destructor(void) const noexcept;
-  bool has_user_declared_move_assignment(void) const noexcept;
-  bool has_user_declared_move_constructor(void) const noexcept;
-  bool has_user_declared_move_operation(void) const noexcept;
-  bool has_user_provided_default_constructor(void) const noexcept;
-  bool has_variant_members(void) const noexcept;
-  bool implicit_copy_assignment_has_const_parameter(void) const noexcept;
-  bool implicit_copy_constructor_has_const_parameter(void) const noexcept;
-  bool is_abstract(void) const noexcept;
-  bool is_aggregate(void) const noexcept;
-  bool is_any_destructor_no_return(void) const noexcept;
-  bool is_c_like(void) const noexcept;
-  bool is_cxx11_standard_layout(void) const noexcept;
-  bool is_dependent_lambda(void) const noexcept;
-  bool is_dynamic_class(void) const noexcept;
-  bool is_effectively_final(void) const noexcept;
-  bool is_empty(void) const noexcept;
-  bool is_generic_lambda(void) const noexcept;
-  bool is_interface_like(void) const noexcept;
-  bool is_literal(void) const noexcept;
-  std::optional<FunctionDecl> is_local_class(void) const noexcept;
-  bool is_pod(void) const noexcept;
-  bool is_parsing_base_specifiers(void) const noexcept;
-  bool is_polymorphic(void) const noexcept;
-  bool is_standard_layout(void) const noexcept;
-  bool is_structural(void) const noexcept;
-  bool is_trivial(void) const noexcept;
-  bool is_trivially_copyable(void) const noexcept;
-  bool lambda_is_default_constructible_and_assignable(void) const noexcept;
-  bool may_be_abstract(void) const noexcept;
-  bool may_be_dynamic_class(void) const noexcept;
-  bool may_be_non_dynamic_class(void) const noexcept;
-  std::vector<CXXMethodDecl> methods(void) const noexcept;
-  bool needs_implicit_copy_assignment(void) const noexcept;
-  bool needs_implicit_copy_constructor(void) const noexcept;
-  bool needs_implicit_default_constructor(void) const noexcept;
-  bool needs_implicit_destructor(void) const noexcept;
-  bool needs_implicit_move_assignment(void) const noexcept;
-  bool needs_implicit_move_constructor(void) const noexcept;
-  bool needs_overload_resolution_for_copy_assignment(void) const noexcept;
-  bool needs_overload_resolution_for_copy_constructor(void) const noexcept;
-  bool needs_overload_resolution_for_destructor(void) const noexcept;
-  bool needs_overload_resolution_for_move_assignment(void) const noexcept;
-  bool needs_overload_resolution_for_move_constructor(void) const noexcept;
-  bool null_field_offset_is_zero(void) const noexcept;
-  std::vector<CXXBaseSpecifier> virtual_bases(void) const noexcept;
+  bool allow_const_default_initializer(void) const;
+  std::vector<CXXBaseSpecifier> bases(void) const;
+  MSInheritanceModel calculate_inheritance_model(void) const;
+  std::vector<CXXConstructorDecl> constructors(void) const;
+  bool defaulted_copy_constructor_is_deleted(void) const;
+  bool defaulted_default_constructor_is_constexpr(void) const;
+  bool defaulted_destructor_is_constexpr(void) const;
+  bool defaulted_destructor_is_deleted(void) const;
+  bool defaulted_move_constructor_is_deleted(void) const;
+  std::vector<FriendDecl> friends(void) const;
+  std::optional<CXXDestructorDecl> destructor(void) const;
+  std::optional<TemplateParameterList> generic_lambda_template_parameter_list(void) const;
+  std::optional<CXXRecordDecl> instantiated_from_member_class(void) const;
+  std::optional<CXXMethodDecl> lambda_call_operator(void) const;
+  LambdaCaptureDefault lambda_capture_default(void) const;
+  std::vector<NamedDecl> lambda_explicit_template_parameters(void) const;
+  MSInheritanceModel ms_inheritance_model(void) const;
+  MSVtorDispMode ms_vtor_disp_mode(void) const;
+  CXXRecordDecl most_recent_non_injected_declaration(void) const;
+  std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
+  TemplateSpecializationKind template_specialization_kind(void) const;
+  bool has_any_dependent_bases(void) const;
+  bool has_constexpr_default_constructor(void) const;
+  bool has_constexpr_destructor(void) const;
+  bool has_constexpr_non_copy_move_constructor(void) const;
+  bool has_copy_assignment_with_const_parameter(void) const;
+  bool has_copy_constructor_with_const_parameter(void) const;
+  bool has_default_constructor(void) const;
+  bool has_definition(void) const;
+  bool has_direct_fields(void) const;
+  bool has_friends(void) const;
+  bool has_in_class_initializer(void) const;
+  bool has_inherited_assignment(void) const;
+  bool has_inherited_constructor(void) const;
+  bool has_irrelevant_destructor(void) const;
+  bool has_known_lambda_internal_linkage(void) const;
+  bool has_move_assignment(void) const;
+  bool has_move_constructor(void) const;
+  bool has_mutable_fields(void) const;
+  bool has_non_literal_type_fields_or_bases(void) const;
+  bool has_non_trivial_copy_assignment(void) const;
+  bool has_non_trivial_copy_constructor(void) const;
+  bool has_non_trivial_copy_constructor_for_call(void) const;
+  bool has_non_trivial_default_constructor(void) const;
+  bool has_non_trivial_destructor(void) const;
+  bool has_non_trivial_destructor_for_call(void) const;
+  bool has_non_trivial_move_assignment(void) const;
+  bool has_non_trivial_move_constructor(void) const;
+  bool has_non_trivial_move_constructor_for_call(void) const;
+  bool has_private_fields(void) const;
+  bool has_protected_fields(void) const;
+  bool has_simple_copy_assignment(void) const;
+  bool has_simple_copy_constructor(void) const;
+  bool has_simple_destructor(void) const;
+  bool has_simple_move_assignment(void) const;
+  bool has_simple_move_constructor(void) const;
+  bool has_trivial_copy_assignment(void) const;
+  bool has_trivial_copy_constructor(void) const;
+  bool has_trivial_copy_constructor_for_call(void) const;
+  bool has_trivial_default_constructor(void) const;
+  bool has_trivial_destructor(void) const;
+  bool has_trivial_destructor_for_call(void) const;
+  bool has_trivial_move_assignment(void) const;
+  bool has_trivial_move_constructor(void) const;
+  bool has_trivial_move_constructor_for_call(void) const;
+  bool has_uninitialized_reference_member(void) const;
+  bool has_user_declared_constructor(void) const;
+  bool has_user_declared_copy_assignment(void) const;
+  bool has_user_declared_copy_constructor(void) const;
+  bool has_user_declared_destructor(void) const;
+  bool has_user_declared_move_assignment(void) const;
+  bool has_user_declared_move_constructor(void) const;
+  bool has_user_declared_move_operation(void) const;
+  bool has_user_provided_default_constructor(void) const;
+  bool has_variant_members(void) const;
+  bool implicit_copy_assignment_has_const_parameter(void) const;
+  bool implicit_copy_constructor_has_const_parameter(void) const;
+  bool is_abstract(void) const;
+  bool is_aggregate(void) const;
+  bool is_any_destructor_no_return(void) const;
+  bool is_c_like(void) const;
+  bool is_cxx11_standard_layout(void) const;
+  bool is_dependent_lambda(void) const;
+  bool is_dynamic_class(void) const;
+  bool is_effectively_final(void) const;
+  bool is_empty(void) const;
+  bool is_generic_lambda(void) const;
+  bool is_interface_like(void) const;
+  bool is_literal(void) const;
+  std::optional<FunctionDecl> is_local_class(void) const;
+  bool is_pod(void) const;
+  bool is_parsing_base_specifiers(void) const;
+  bool is_polymorphic(void) const;
+  bool is_standard_layout(void) const;
+  bool is_structural(void) const;
+  bool is_trivial(void) const;
+  bool is_trivially_copyable(void) const;
+  bool lambda_is_default_constructible_and_assignable(void) const;
+  bool may_be_abstract(void) const;
+  bool may_be_dynamic_class(void) const;
+  bool may_be_non_dynamic_class(void) const;
+  std::vector<CXXMethodDecl> methods(void) const;
+  bool needs_implicit_copy_assignment(void) const;
+  bool needs_implicit_copy_constructor(void) const;
+  bool needs_implicit_default_constructor(void) const;
+  bool needs_implicit_destructor(void) const;
+  bool needs_implicit_move_assignment(void) const;
+  bool needs_implicit_move_constructor(void) const;
+  bool needs_overload_resolution_for_copy_assignment(void) const;
+  bool needs_overload_resolution_for_copy_constructor(void) const;
+  bool needs_overload_resolution_for_destructor(void) const;
+  bool needs_overload_resolution_for_move_assignment(void) const;
+  bool needs_overload_resolution_for_move_constructor(void) const;
+  bool null_field_offset_is_zero(void) const;
+  std::vector<CXXBaseSpecifier> virtual_bases(void) const;
 };
 
 using ClassTemplateSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplateSpecializationDecl>;
+using ClassTemplateSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassTemplateSpecializationDecl>;
 
 class ClassTemplateSpecializationDecl : public CXXRecordDecl {
  private:
@@ -11411,24 +13183,30 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
     return in_internal(frag);
   }
 
+  inline static ClassTemplateSpecializationDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassTemplateSpecializationDecl> from(const CXXRecordDecl &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const RecordDecl &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const TagDecl &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const TypeDecl &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const NamedDecl &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const Decl &parent);
-  Token extern_token(void) const noexcept;
-  Token point_of_instantiation(void) const noexcept;
-  TemplateSpecializationKind specialization_kind(void) const noexcept;
-  std::vector<TemplateArgument> template_arguments(void) const noexcept;
-  std::vector<TemplateArgument> template_instantiation_arguments(void) const noexcept;
-  Token template_keyword_token(void) const noexcept;
-  bool is_class_scope_explicit_specialization(void) const noexcept;
-  bool is_explicit_instantiation_or_specialization(void) const noexcept;
-  bool is_explicit_specialization(void) const noexcept;
+  Token extern_token(void) const;
+  Token point_of_instantiation(void) const;
+  TemplateSpecializationKind specialization_kind(void) const;
+  std::vector<TemplateArgument> template_arguments(void) const;
+  std::vector<TemplateArgument> template_instantiation_arguments(void) const;
+  Token template_keyword_token(void) const;
+  bool is_class_scope_explicit_specialization(void) const;
+  bool is_explicit_instantiation_or_specialization(void) const;
+  bool is_explicit_specialization(void) const;
 };
 
 using ClassTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplatePartialSpecializationDecl>;
+using ClassTemplatePartialSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassTemplatePartialSpecializationDecl>;
 
 class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
  private:
@@ -11445,6 +13223,11 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     return in_internal(frag);
   }
 
+  inline static ClassTemplatePartialSpecializationDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const ClassTemplateSpecializationDecl &parent);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const CXXRecordDecl &parent);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const RecordDecl &parent);
@@ -11455,6 +13238,7 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
 };
 
 using EnumDeclRange = DerivedEntityRange<DeclIterator, EnumDecl>;
+using EnumDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnumDecl>;
 
 class EnumDecl : public TagDecl {
  private:
@@ -11468,25 +13252,31 @@ class EnumDecl : public TagDecl {
     return in_internal(frag);
   }
 
+  inline static EnumDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<EnumDecl> from(const TokenContext &c);
   static std::optional<EnumDecl> from(const TagDecl &parent);
   static std::optional<EnumDecl> from(const TypeDecl &parent);
   static std::optional<EnumDecl> from(const NamedDecl &parent);
   static std::optional<EnumDecl> from(const Decl &parent);
-  std::vector<EnumConstantDecl> enumerators(void) const noexcept;
-  std::optional<EnumDecl> instantiated_from_member_enum(void) const noexcept;
-  TokenRange integer_type_range(void) const noexcept;
-  std::optional<EnumDecl> template_instantiation_pattern(void) const noexcept;
-  TemplateSpecializationKind template_specialization_kind(void) const noexcept;
-  bool is_closed(void) const noexcept;
-  bool is_closed_flag(void) const noexcept;
-  bool is_closed_non_flag(void) const noexcept;
-  bool is_complete(void) const noexcept;
-  bool is_fixed(void) const noexcept;
-  bool is_scoped(void) const noexcept;
-  bool is_scoped_using_class_tag(void) const noexcept;
+  std::vector<EnumConstantDecl> enumerators(void) const;
+  std::optional<EnumDecl> instantiated_from_member_enum(void) const;
+  TokenRange integer_type_range(void) const;
+  std::optional<EnumDecl> template_instantiation_pattern(void) const;
+  TemplateSpecializationKind template_specialization_kind(void) const;
+  bool is_closed(void) const;
+  bool is_closed_flag(void) const;
+  bool is_closed_non_flag(void) const;
+  bool is_complete(void) const;
+  bool is_fixed(void) const;
+  bool is_scoped(void) const;
+  bool is_scoped_using_class_tag(void) const;
 };
 
 using UnresolvedUsingTypenameDeclRange = DerivedEntityRange<DeclIterator, UnresolvedUsingTypenameDecl>;
+using UnresolvedUsingTypenameDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingTypenameDecl>;
 
 class UnresolvedUsingTypenameDecl : public TypeDecl {
  private:
@@ -11499,16 +13289,22 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
     return in_internal(frag);
   }
 
+  inline static UnresolvedUsingTypenameDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnresolvedUsingTypenameDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingTypenameDecl> from(const TypeDecl &parent);
   static std::optional<UnresolvedUsingTypenameDecl> from(const NamedDecl &parent);
   static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent);
-  Token ellipsis_token(void) const noexcept;
-  Token typename_token(void) const noexcept;
-  Token using_token(void) const noexcept;
-  bool is_pack_expansion(void) const noexcept;
+  Token ellipsis_token(void) const;
+  Token typename_token(void) const;
+  Token using_token(void) const;
+  bool is_pack_expansion(void) const;
 };
 
 using TypedefNameDeclRange = DerivedEntityRange<DeclIterator, TypedefNameDecl>;
+using TypedefNameDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypedefNameDecl>;
 
 class TypedefNameDecl : public TypeDecl {
  private:
@@ -11521,15 +13317,21 @@ class TypedefNameDecl : public TypeDecl {
     return in_internal(frag);
   }
 
+  inline static TypedefNameDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypedefNameDecl> from(const TokenContext &c);
   static std::optional<TypedefNameDecl> from(const TypeDecl &parent);
   static std::optional<TypedefNameDecl> from(const NamedDecl &parent);
   static std::optional<TypedefNameDecl> from(const Decl &parent);
-  std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const noexcept;
-  bool is_moded(void) const noexcept;
-  bool is_transparent_tag(void) const noexcept;
+  std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;
+  bool is_moded(void) const;
+  bool is_transparent_tag(void) const;
 };
 
 using TypedefDeclRange = DerivedEntityRange<DeclIterator, TypedefDecl>;
+using TypedefDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypedefDecl>;
 
 class TypedefDecl : public TypedefNameDecl {
  private:
@@ -11543,6 +13345,11 @@ class TypedefDecl : public TypedefNameDecl {
     return in_internal(frag);
   }
 
+  inline static TypedefDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypedefDecl> from(const TokenContext &c);
   static std::optional<TypedefDecl> from(const TypedefNameDecl &parent);
   static std::optional<TypedefDecl> from(const TypeDecl &parent);
   static std::optional<TypedefDecl> from(const NamedDecl &parent);
@@ -11550,6 +13357,7 @@ class TypedefDecl : public TypedefNameDecl {
 };
 
 using TypeAliasDeclRange = DerivedEntityRange<DeclIterator, TypeAliasDecl>;
+using TypeAliasDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeAliasDecl>;
 
 class TypeAliasDecl : public TypedefNameDecl {
  private:
@@ -11563,14 +13371,20 @@ class TypeAliasDecl : public TypedefNameDecl {
     return in_internal(frag);
   }
 
+  inline static TypeAliasDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypeAliasDecl> from(const TokenContext &c);
   static std::optional<TypeAliasDecl> from(const TypedefNameDecl &parent);
   static std::optional<TypeAliasDecl> from(const TypeDecl &parent);
   static std::optional<TypeAliasDecl> from(const NamedDecl &parent);
   static std::optional<TypeAliasDecl> from(const Decl &parent);
-  std::optional<TypeAliasTemplateDecl> described_alias_template(void) const noexcept;
+  std::optional<TypeAliasTemplateDecl> described_alias_template(void) const;
 };
 
 using ObjCTypeParamDeclRange = DerivedEntityRange<DeclIterator, ObjCTypeParamDecl>;
+using ObjCTypeParamDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCTypeParamDecl>;
 
 class ObjCTypeParamDecl : public TypedefNameDecl {
  private:
@@ -11584,17 +13398,23 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCTypeParamDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCTypeParamDecl> from(const TokenContext &c);
   static std::optional<ObjCTypeParamDecl> from(const TypedefNameDecl &parent);
   static std::optional<ObjCTypeParamDecl> from(const TypeDecl &parent);
   static std::optional<ObjCTypeParamDecl> from(const NamedDecl &parent);
   static std::optional<ObjCTypeParamDecl> from(const Decl &parent);
-  Token colon_token(void) const noexcept;
-  ObjCTypeParamVariance variance(void) const noexcept;
-  Token variance_token(void) const noexcept;
-  bool has_explicit_bound(void) const noexcept;
+  Token colon_token(void) const;
+  ObjCTypeParamVariance variance(void) const;
+  Token variance_token(void) const;
+  bool has_explicit_bound(void) const;
 };
 
 using TemplateDeclRange = DerivedEntityRange<DeclIterator, TemplateDecl>;
+using TemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateDecl>;
 
 class TemplateDecl : public NamedDecl {
  private:
@@ -11606,11 +13426,17 @@ class TemplateDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static TemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TemplateDecl> from(const TokenContext &c);
   static std::optional<TemplateDecl> from(const NamedDecl &parent);
   static std::optional<TemplateDecl> from(const Decl &parent);
 };
 
 using RedeclarableTemplateDeclRange = DerivedEntityRange<DeclIterator, RedeclarableTemplateDecl>;
+using RedeclarableTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, RedeclarableTemplateDecl>;
 
 class RedeclarableTemplateDecl : public TemplateDecl {
  private:
@@ -11623,12 +13449,18 @@ class RedeclarableTemplateDecl : public TemplateDecl {
     return in_internal(frag);
   }
 
+  inline static RedeclarableTemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<RedeclarableTemplateDecl> from(const TokenContext &c);
   static std::optional<RedeclarableTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<RedeclarableTemplateDecl> from(const NamedDecl &parent);
   static std::optional<RedeclarableTemplateDecl> from(const Decl &parent);
 };
 
 using FunctionTemplateDeclRange = DerivedEntityRange<DeclIterator, FunctionTemplateDecl>;
+using FunctionTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionTemplateDecl>;
 
 class FunctionTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -11642,6 +13474,11 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
     return in_internal(frag);
   }
 
+  inline static FunctionTemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FunctionTemplateDecl> from(const TokenContext &c);
   static std::optional<FunctionTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<FunctionTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<FunctionTemplateDecl> from(const NamedDecl &parent);
@@ -11649,6 +13486,7 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
 };
 
 using ClassTemplateDeclRange = DerivedEntityRange<DeclIterator, ClassTemplateDecl>;
+using ClassTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassTemplateDecl>;
 
 class ClassTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -11662,6 +13500,11 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
     return in_internal(frag);
   }
 
+  inline static ClassTemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ClassTemplateDecl> from(const TokenContext &c);
   static std::optional<ClassTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<ClassTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<ClassTemplateDecl> from(const NamedDecl &parent);
@@ -11669,6 +13512,7 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
 };
 
 using VarTemplateDeclRange = DerivedEntityRange<DeclIterator, VarTemplateDecl>;
+using VarTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, VarTemplateDecl>;
 
 class VarTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -11682,6 +13526,11 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
     return in_internal(frag);
   }
 
+  inline static VarTemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<VarTemplateDecl> from(const TokenContext &c);
   static std::optional<VarTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<VarTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<VarTemplateDecl> from(const NamedDecl &parent);
@@ -11689,6 +13538,7 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
 };
 
 using TypeAliasTemplateDeclRange = DerivedEntityRange<DeclIterator, TypeAliasTemplateDecl>;
+using TypeAliasTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeAliasTemplateDecl>;
 
 class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -11702,6 +13552,11 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
     return in_internal(frag);
   }
 
+  inline static TypeAliasTemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypeAliasTemplateDecl> from(const TokenContext &c);
   static std::optional<TypeAliasTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<TypeAliasTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<TypeAliasTemplateDecl> from(const NamedDecl &parent);
@@ -11709,6 +13564,7 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
 };
 
 using ConceptDeclRange = DerivedEntityRange<DeclIterator, ConceptDecl>;
+using ConceptDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConceptDecl>;
 
 class ConceptDecl : public TemplateDecl {
  private:
@@ -11721,13 +13577,19 @@ class ConceptDecl : public TemplateDecl {
     return in_internal(frag);
   }
 
+  inline static ConceptDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConceptDecl> from(const TokenContext &c);
   static std::optional<ConceptDecl> from(const TemplateDecl &parent);
   static std::optional<ConceptDecl> from(const NamedDecl &parent);
   static std::optional<ConceptDecl> from(const Decl &parent);
-  bool is_type_concept(void) const noexcept;
+  bool is_type_concept(void) const;
 };
 
 using BuiltinTemplateDeclRange = DerivedEntityRange<DeclIterator, BuiltinTemplateDecl>;
+using BuiltinTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, BuiltinTemplateDecl>;
 
 class BuiltinTemplateDecl : public TemplateDecl {
  private:
@@ -11740,12 +13602,18 @@ class BuiltinTemplateDecl : public TemplateDecl {
     return in_internal(frag);
   }
 
+  inline static BuiltinTemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BuiltinTemplateDecl> from(const TokenContext &c);
   static std::optional<BuiltinTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<BuiltinTemplateDecl> from(const NamedDecl &parent);
   static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
 };
 
 using TemplateTemplateParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTemplateParmDecl>;
+using TemplateTemplateParmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateTemplateParmDecl>;
 
 class TemplateTemplateParmDecl : public TemplateDecl {
  private:
@@ -11758,12 +13626,18 @@ class TemplateTemplateParmDecl : public TemplateDecl {
     return in_internal(frag);
   }
 
+  inline static TemplateTemplateParmDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TemplateTemplateParmDecl> from(const TokenContext &c);
   static std::optional<TemplateTemplateParmDecl> from(const TemplateDecl &parent);
   static std::optional<TemplateTemplateParmDecl> from(const NamedDecl &parent);
   static std::optional<TemplateTemplateParmDecl> from(const Decl &parent);
 };
 
 using ObjCPropertyDeclRange = DerivedEntityRange<DeclIterator, ObjCPropertyDecl>;
+using ObjCPropertyDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCPropertyDecl>;
 
 class ObjCPropertyDecl : public NamedDecl {
  private:
@@ -11775,28 +13649,34 @@ class ObjCPropertyDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCPropertyDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCPropertyDecl> from(const TokenContext &c);
   static std::optional<ObjCPropertyDecl> from(const NamedDecl &parent);
   static std::optional<ObjCPropertyDecl> from(const Decl &parent);
-  Token at_token(void) const noexcept;
-  ObjCMethodDecl getter_method_declaration(void) const noexcept;
-  Token getter_name_token(void) const noexcept;
-  Token l_paren_token(void) const noexcept;
-  ObjCPropertyDeclPropertyControl property_implementation(void) const noexcept;
-  ObjCIvarDecl property_instance_variable_declaration(void) const noexcept;
-  ObjCPropertyQueryKind query_kind(void) const noexcept;
-  ObjCPropertyDeclSetterKind setter_kind(void) const noexcept;
-  ObjCMethodDecl setter_method_declaration(void) const noexcept;
-  Token setter_name_token(void) const noexcept;
-  bool is_atomic(void) const noexcept;
-  bool is_class_property(void) const noexcept;
-  bool is_direct_property(void) const noexcept;
-  bool is_instance_property(void) const noexcept;
-  bool is_optional(void) const noexcept;
-  bool is_read_only(void) const noexcept;
-  bool is_retaining(void) const noexcept;
+  Token at_token(void) const;
+  ObjCMethodDecl getter_method_declaration(void) const;
+  Token getter_name_token(void) const;
+  Token l_paren_token(void) const;
+  ObjCPropertyDeclPropertyControl property_implementation(void) const;
+  ObjCIvarDecl property_instance_variable_declaration(void) const;
+  ObjCPropertyQueryKind query_kind(void) const;
+  ObjCPropertyDeclSetterKind setter_kind(void) const;
+  ObjCMethodDecl setter_method_declaration(void) const;
+  Token setter_name_token(void) const;
+  bool is_atomic(void) const;
+  bool is_class_property(void) const;
+  bool is_direct_property(void) const;
+  bool is_instance_property(void) const;
+  bool is_optional(void) const;
+  bool is_read_only(void) const;
+  bool is_retaining(void) const;
 };
 
 using ObjCMethodDeclRange = DerivedEntityRange<DeclIterator, ObjCMethodDecl>;
+using ObjCMethodDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCMethodDecl>;
 
 class ObjCMethodDecl : public NamedDecl {
  private:
@@ -11808,42 +13688,48 @@ class ObjCMethodDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCMethodDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCMethodDecl> from(const TokenContext &c);
   static std::optional<ObjCMethodDecl> from(const NamedDecl &parent);
   static std::optional<ObjCMethodDecl> from(const Decl &parent);
-  bool defined_in_ns_object(void) const noexcept;
-  ObjCPropertyDecl find_property_declaration(void) const noexcept;
-  ObjCCategoryDecl category(void) const noexcept;
-  ObjCInterfaceDecl class_interface(void) const noexcept;
-  ImplicitParamDecl cmd_declaration(void) const noexcept;
-  Token declarator_end_token(void) const noexcept;
-  ObjCMethodDeclImplementationControl implementation_control(void) const noexcept;
-  ObjCMethodFamily method_family(void) const noexcept;
-  DeclObjCDeclQualifier obj_c_decl_qualifier(void) const noexcept;
-  TokenRange return_type_source_range(void) const noexcept;
-  Token selector_start_token(void) const noexcept;
-  ImplicitParamDecl self_declaration(void) const noexcept;
-  bool has_redeclaration(void) const noexcept;
-  bool has_related_result_type(void) const noexcept;
-  bool has_skipped_body(void) const noexcept;
-  bool is_class_method(void) const noexcept;
-  bool is_defined(void) const noexcept;
-  bool is_designated_initializer_for_the_interface(void) const noexcept;
-  bool is_direct_method(void) const noexcept;
-  bool is_instance_method(void) const noexcept;
-  bool is_optional(void) const noexcept;
-  bool is_overriding(void) const noexcept;
-  bool is_property_accessor(void) const noexcept;
-  bool is_redeclaration(void) const noexcept;
-  bool is_synthesized_accessor_stub(void) const noexcept;
-  bool is_this_declaration_a_definition(void) const noexcept;
-  bool is_this_declaration_a_designated_initializer(void) const noexcept;
-  bool is_variadic(void) const noexcept;
-  std::vector<ParmVarDecl> parameters(void) const noexcept;
-  std::vector<Token> selector_tokens(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  bool defined_in_ns_object(void) const;
+  ObjCPropertyDecl find_property_declaration(void) const;
+  ObjCCategoryDecl category(void) const;
+  ObjCInterfaceDecl class_interface(void) const;
+  ImplicitParamDecl cmd_declaration(void) const;
+  Token declarator_end_token(void) const;
+  ObjCMethodDeclImplementationControl implementation_control(void) const;
+  ObjCMethodFamily method_family(void) const;
+  DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
+  TokenRange return_type_source_range(void) const;
+  Token selector_start_token(void) const;
+  ImplicitParamDecl self_declaration(void) const;
+  bool has_redeclaration(void) const;
+  bool has_related_result_type(void) const;
+  bool has_skipped_body(void) const;
+  bool is_class_method(void) const;
+  bool is_defined(void) const;
+  bool is_designated_initializer_for_the_interface(void) const;
+  bool is_direct_method(void) const;
+  bool is_instance_method(void) const;
+  bool is_optional(void) const;
+  bool is_overriding(void) const;
+  bool is_property_accessor(void) const;
+  bool is_redeclaration(void) const;
+  bool is_synthesized_accessor_stub(void) const;
+  bool is_this_declaration_a_definition(void) const;
+  bool is_this_declaration_a_designated_initializer(void) const;
+  bool is_variadic(void) const;
+  std::vector<ParmVarDecl> parameters(void) const;
+  std::vector<Token> selector_tokens(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using ObjCContainerDeclRange = DerivedEntityRange<DeclIterator, ObjCContainerDecl>;
+using ObjCContainerDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCContainerDecl>;
 
 class ObjCContainerDecl : public NamedDecl {
  private:
@@ -11855,20 +13741,26 @@ class ObjCContainerDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCContainerDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCContainerDecl> from(const TokenContext &c);
   static std::optional<ObjCContainerDecl> from(const NamedDecl &parent);
   static std::optional<ObjCContainerDecl> from(const Decl &parent);
-  std::vector<ObjCMethodDecl> class_methods(void) const noexcept;
-  std::vector<ObjCPropertyDecl> class_properties(void) const noexcept;
-  TokenRange at_end_range(void) const noexcept;
-  Token at_start_token(void) const noexcept;
-  std::vector<ObjCMethodDecl> instance_methods(void) const noexcept;
-  std::vector<ObjCPropertyDecl> instance_properties(void) const noexcept;
-  std::vector<ObjCMethodDecl> methods(void) const noexcept;
-  std::vector<ObjCPropertyDecl> properties(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  std::vector<ObjCMethodDecl> class_methods(void) const;
+  std::vector<ObjCPropertyDecl> class_properties(void) const;
+  TokenRange at_end_range(void) const;
+  Token at_start_token(void) const;
+  std::vector<ObjCMethodDecl> instance_methods(void) const;
+  std::vector<ObjCPropertyDecl> instance_properties(void) const;
+  std::vector<ObjCMethodDecl> methods(void) const;
+  std::vector<ObjCPropertyDecl> properties(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using ObjCCategoryDeclRange = DerivedEntityRange<DeclIterator, ObjCCategoryDecl>;
+using ObjCCategoryDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCCategoryDecl>;
 
 class ObjCCategoryDecl : public ObjCContainerDecl {
  private:
@@ -11881,23 +13773,29 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCCategoryDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCCategoryDecl> from(const TokenContext &c);
   static std::optional<ObjCCategoryDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCCategoryDecl> from(const NamedDecl &parent);
   static std::optional<ObjCCategoryDecl> from(const Decl &parent);
-  bool is_class_extension(void) const noexcept;
-  Token category_name_token(void) const noexcept;
-  ObjCInterfaceDecl class_interface(void) const noexcept;
-  ObjCCategoryImplDecl implementation(void) const noexcept;
-  Token instance_variable_l_brace_token(void) const noexcept;
-  Token instance_variable_r_brace_token(void) const noexcept;
-  ObjCCategoryDecl next_class_category(void) const noexcept;
-  ObjCCategoryDecl next_class_category_raw(void) const noexcept;
-  std::vector<ObjCIvarDecl> instance_variables(void) const noexcept;
-  std::vector<Token> protocol_tokens(void) const noexcept;
-  std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
+  bool is_class_extension(void) const;
+  Token category_name_token(void) const;
+  ObjCInterfaceDecl class_interface(void) const;
+  ObjCCategoryImplDecl implementation(void) const;
+  Token instance_variable_l_brace_token(void) const;
+  Token instance_variable_r_brace_token(void) const;
+  ObjCCategoryDecl next_class_category(void) const;
+  ObjCCategoryDecl next_class_category_raw(void) const;
+  std::vector<ObjCIvarDecl> instance_variables(void) const;
+  std::vector<Token> protocol_tokens(void) const;
+  std::vector<ObjCProtocolDecl> protocols(void) const;
 };
 
 using ObjCProtocolDeclRange = DerivedEntityRange<DeclIterator, ObjCProtocolDecl>;
+using ObjCProtocolDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCProtocolDecl>;
 
 class ObjCProtocolDecl : public ObjCContainerDecl {
  private:
@@ -11910,19 +13808,25 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCProtocolDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCProtocolDecl> from(const TokenContext &c);
   static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCProtocolDecl> from(const NamedDecl &parent);
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
-  ObjCProtocolDecl definition(void) const noexcept;
-  std::string_view obj_c_runtime_name_as_string(void) const noexcept;
-  bool has_definition(void) const noexcept;
-  bool is_non_runtime_protocol(void) const noexcept;
-  bool is_this_declaration_a_definition(void) const noexcept;
-  std::vector<Token> protocol_tokens(void) const noexcept;
-  std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
+  ObjCProtocolDecl definition(void) const;
+  std::string_view obj_c_runtime_name_as_string(void) const;
+  bool has_definition(void) const;
+  bool is_non_runtime_protocol(void) const;
+  bool is_this_declaration_a_definition(void) const;
+  std::vector<Token> protocol_tokens(void) const;
+  std::vector<ObjCProtocolDecl> protocols(void) const;
 };
 
 using ObjCInterfaceDeclRange = DerivedEntityRange<DeclIterator, ObjCInterfaceDecl>;
+using ObjCInterfaceDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCInterfaceDecl>;
 
 class ObjCInterfaceDecl : public ObjCContainerDecl {
  private:
@@ -11935,34 +13839,40 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCInterfaceDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCInterfaceDecl> from(const TokenContext &c);
   static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCInterfaceDecl> from(const NamedDecl &parent);
   static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
-  std::vector<ObjCProtocolDecl> all_referenced_protocols(void) const noexcept;
-  bool declares_or_inherits_designated_initializers(void) const noexcept;
-  ObjCCategoryDecl category_list_raw(void) const noexcept;
-  ObjCInterfaceDecl definition(void) const noexcept;
-  Token end_of_definition_token(void) const noexcept;
-  ObjCImplementationDecl implementation(void) const noexcept;
-  std::string_view obj_c_runtime_name_as_string(void) const noexcept;
-  ObjCInterfaceDecl super_class(void) const noexcept;
-  Token super_class_token(void) const noexcept;
-  bool has_definition(void) const noexcept;
-  bool has_designated_initializers(void) const noexcept;
-  bool is_arc_weakref_unavailable(void) const noexcept;
-  bool is_implicit_interface_declaration(void) const noexcept;
-  ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const noexcept;
-  bool is_this_declaration_a_definition(void) const noexcept;
-  std::vector<ObjCIvarDecl> instance_variables(void) const noexcept;
-  std::vector<ObjCCategoryDecl> known_categories(void) const noexcept;
-  std::vector<ObjCCategoryDecl> known_extensions(void) const noexcept;
-  std::vector<Token> protocol_tokens(void) const noexcept;
-  std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
-  std::vector<ObjCCategoryDecl> visible_categories(void) const noexcept;
-  std::vector<ObjCCategoryDecl> visible_extensions(void) const noexcept;
+  std::vector<ObjCProtocolDecl> all_referenced_protocols(void) const;
+  bool declares_or_inherits_designated_initializers(void) const;
+  ObjCCategoryDecl category_list_raw(void) const;
+  ObjCInterfaceDecl definition(void) const;
+  Token end_of_definition_token(void) const;
+  ObjCImplementationDecl implementation(void) const;
+  std::string_view obj_c_runtime_name_as_string(void) const;
+  ObjCInterfaceDecl super_class(void) const;
+  Token super_class_token(void) const;
+  bool has_definition(void) const;
+  bool has_designated_initializers(void) const;
+  bool is_arc_weakref_unavailable(void) const;
+  bool is_implicit_interface_declaration(void) const;
+  ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
+  bool is_this_declaration_a_definition(void) const;
+  std::vector<ObjCIvarDecl> instance_variables(void) const;
+  std::vector<ObjCCategoryDecl> known_categories(void) const;
+  std::vector<ObjCCategoryDecl> known_extensions(void) const;
+  std::vector<Token> protocol_tokens(void) const;
+  std::vector<ObjCProtocolDecl> protocols(void) const;
+  std::vector<ObjCCategoryDecl> visible_categories(void) const;
+  std::vector<ObjCCategoryDecl> visible_extensions(void) const;
 };
 
 using ObjCImplDeclRange = DerivedEntityRange<DeclIterator, ObjCImplDecl>;
+using ObjCImplDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCImplDecl>;
 
 class ObjCImplDecl : public ObjCContainerDecl {
  private:
@@ -11975,14 +13885,20 @@ class ObjCImplDecl : public ObjCContainerDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCImplDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCImplDecl> from(const TokenContext &c);
   static std::optional<ObjCImplDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCImplDecl> from(const NamedDecl &parent);
   static std::optional<ObjCImplDecl> from(const Decl &parent);
-  ObjCInterfaceDecl class_interface(void) const noexcept;
-  std::vector<ObjCPropertyImplDecl> property_implementations(void) const noexcept;
+  ObjCInterfaceDecl class_interface(void) const;
+  std::vector<ObjCPropertyImplDecl> property_implementations(void) const;
 };
 
 using ObjCCategoryImplDeclRange = DerivedEntityRange<DeclIterator, ObjCCategoryImplDecl>;
+using ObjCCategoryImplDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCCategoryImplDecl>;
 
 class ObjCCategoryImplDecl : public ObjCImplDecl {
  private:
@@ -11996,15 +13912,21 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCCategoryImplDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCCategoryImplDecl> from(const TokenContext &c);
   static std::optional<ObjCCategoryImplDecl> from(const ObjCImplDecl &parent);
   static std::optional<ObjCCategoryImplDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCCategoryImplDecl> from(const NamedDecl &parent);
   static std::optional<ObjCCategoryImplDecl> from(const Decl &parent);
-  ObjCCategoryDecl category_declaration(void) const noexcept;
-  Token category_name_token(void) const noexcept;
+  ObjCCategoryDecl category_declaration(void) const;
+  Token category_name_token(void) const;
 };
 
 using ObjCImplementationDeclRange = DerivedEntityRange<DeclIterator, ObjCImplementationDecl>;
+using ObjCImplementationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCImplementationDecl>;
 
 class ObjCImplementationDecl : public ObjCImplDecl {
  private:
@@ -12018,21 +13940,27 @@ class ObjCImplementationDecl : public ObjCImplDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCImplementationDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCImplementationDecl> from(const TokenContext &c);
   static std::optional<ObjCImplementationDecl> from(const ObjCImplDecl &parent);
   static std::optional<ObjCImplementationDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCImplementationDecl> from(const NamedDecl &parent);
   static std::optional<ObjCImplementationDecl> from(const Decl &parent);
-  Token instance_variable_l_brace_token(void) const noexcept;
-  Token instance_variable_r_brace_token(void) const noexcept;
-  std::string_view obj_c_runtime_name_as_string(void) const noexcept;
-  ObjCInterfaceDecl super_class(void) const noexcept;
-  Token super_class_token(void) const noexcept;
-  bool has_destructors(void) const noexcept;
-  bool has_non_zero_constructors(void) const noexcept;
-  std::vector<ObjCIvarDecl> instance_variables(void) const noexcept;
+  Token instance_variable_l_brace_token(void) const;
+  Token instance_variable_r_brace_token(void) const;
+  std::string_view obj_c_runtime_name_as_string(void) const;
+  ObjCInterfaceDecl super_class(void) const;
+  Token super_class_token(void) const;
+  bool has_destructors(void) const;
+  bool has_non_zero_constructors(void) const;
+  std::vector<ObjCIvarDecl> instance_variables(void) const;
 };
 
 using ObjCCompatibleAliasDeclRange = DerivedEntityRange<DeclIterator, ObjCCompatibleAliasDecl>;
+using ObjCCompatibleAliasDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCCompatibleAliasDecl>;
 
 class ObjCCompatibleAliasDecl : public NamedDecl {
  private:
@@ -12044,12 +13972,18 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static ObjCCompatibleAliasDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCCompatibleAliasDecl> from(const TokenContext &c);
   static std::optional<ObjCCompatibleAliasDecl> from(const NamedDecl &parent);
   static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
-  ObjCInterfaceDecl class_interface(void) const noexcept;
+  ObjCInterfaceDecl class_interface(void) const;
 };
 
 using NamespaceDeclRange = DerivedEntityRange<DeclIterator, NamespaceDecl>;
+using NamespaceDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, NamespaceDecl>;
 
 class NamespaceDecl : public NamedDecl {
  private:
@@ -12061,12 +13995,18 @@ class NamespaceDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static NamespaceDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<NamespaceDecl> from(const TokenContext &c);
   static std::optional<NamespaceDecl> from(const NamedDecl &parent);
   static std::optional<NamespaceDecl> from(const Decl &parent);
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using NamespaceAliasDeclRange = DerivedEntityRange<DeclIterator, NamespaceAliasDecl>;
+using NamespaceAliasDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, NamespaceAliasDecl>;
 
 class NamespaceAliasDecl : public NamedDecl {
  private:
@@ -12078,15 +14018,21 @@ class NamespaceAliasDecl : public NamedDecl {
     return in_internal(frag);
   }
 
+  inline static NamespaceAliasDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<NamespaceAliasDecl> from(const TokenContext &c);
   static std::optional<NamespaceAliasDecl> from(const NamedDecl &parent);
   static std::optional<NamespaceAliasDecl> from(const Decl &parent);
-  Token alias_token(void) const noexcept;
-  NamedDecl aliased_namespace(void) const noexcept;
-  Token namespace_token(void) const noexcept;
-  Token target_name_token(void) const noexcept;
+  Token alias_token(void) const;
+  NamedDecl aliased_namespace(void) const;
+  Token namespace_token(void) const;
+  Token target_name_token(void) const;
 };
 
 using LinkageSpecDeclRange = DerivedEntityRange<DeclIterator, LinkageSpecDecl>;
+using LinkageSpecDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, LinkageSpecDecl>;
 
 class LinkageSpecDecl : public Decl {
  private:
@@ -12097,11 +14043,17 @@ class LinkageSpecDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static LinkageSpecDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<LinkageSpecDecl> from(const TokenContext &c);
   static std::optional<LinkageSpecDecl> from(const Decl &parent);
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using LifetimeExtendedTemporaryDeclRange = DerivedEntityRange<DeclIterator, LifetimeExtendedTemporaryDecl>;
+using LifetimeExtendedTemporaryDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, LifetimeExtendedTemporaryDecl>;
 
 class LifetimeExtendedTemporaryDecl : public Decl {
  private:
@@ -12112,12 +14064,18 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static LifetimeExtendedTemporaryDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<LifetimeExtendedTemporaryDecl> from(const TokenContext &c);
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
-  ValueDecl extending_declaration(void) const noexcept;
-  StorageDuration storage_duration(void) const noexcept;
+  ValueDecl extending_declaration(void) const;
+  StorageDuration storage_duration(void) const;
 };
 
 using ImportDeclRange = DerivedEntityRange<DeclIterator, ImportDecl>;
+using ImportDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImportDecl>;
 
 class ImportDecl : public Decl {
  private:
@@ -12128,11 +14086,17 @@ class ImportDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static ImportDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ImportDecl> from(const TokenContext &c);
   static std::optional<ImportDecl> from(const Decl &parent);
-  std::vector<Token> identifier_tokens(void) const noexcept;
+  std::vector<Token> identifier_tokens(void) const;
 };
 
 using FriendTemplateDeclRange = DerivedEntityRange<DeclIterator, FriendTemplateDecl>;
+using FriendTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FriendTemplateDecl>;
 
 class FriendTemplateDecl : public Decl {
  private:
@@ -12143,10 +14107,16 @@ class FriendTemplateDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static FriendTemplateDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FriendTemplateDecl> from(const TokenContext &c);
   static std::optional<FriendTemplateDecl> from(const Decl &parent);
 };
 
 using FriendDeclRange = DerivedEntityRange<DeclIterator, FriendDecl>;
+using FriendDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FriendDecl>;
 
 class FriendDecl : public Decl {
  private:
@@ -12157,14 +14127,20 @@ class FriendDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static FriendDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FriendDecl> from(const TokenContext &c);
   static std::optional<FriendDecl> from(const Decl &parent);
-  NamedDecl friend_declaration(void) const noexcept;
-  Token friend_token(void) const noexcept;
-  bool is_unsupported_friend(void) const noexcept;
-  std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const noexcept;
+  NamedDecl friend_declaration(void) const;
+  Token friend_token(void) const;
+  bool is_unsupported_friend(void) const;
+  std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const;
 };
 
 using FileScopeAsmDeclRange = DerivedEntityRange<DeclIterator, FileScopeAsmDecl>;
+using FileScopeAsmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FileScopeAsmDecl>;
 
 class FileScopeAsmDecl : public Decl {
  private:
@@ -12175,13 +14151,19 @@ class FileScopeAsmDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static FileScopeAsmDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FileScopeAsmDecl> from(const TokenContext &c);
   static std::optional<FileScopeAsmDecl> from(const Decl &parent);
-  Token assembly_token(void) const noexcept;
-  StringLiteral assembly_string(void) const noexcept;
-  Token r_paren_token(void) const noexcept;
+  Token assembly_token(void) const;
+  StringLiteral assembly_string(void) const;
+  Token r_paren_token(void) const;
 };
 
 using ExternCContextDeclRange = DerivedEntityRange<DeclIterator, ExternCContextDecl>;
+using ExternCContextDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExternCContextDecl>;
 
 class ExternCContextDecl : public Decl {
  private:
@@ -12192,11 +14174,17 @@ class ExternCContextDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static ExternCContextDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExternCContextDecl> from(const TokenContext &c);
   static std::optional<ExternCContextDecl> from(const Decl &parent);
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using ExportDeclRange = DerivedEntityRange<DeclIterator, ExportDecl>;
+using ExportDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExportDecl>;
 
 class ExportDecl : public Decl {
  private:
@@ -12207,14 +14195,20 @@ class ExportDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static ExportDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExportDecl> from(const TokenContext &c);
   static std::optional<ExportDecl> from(const Decl &parent);
-  Token export_token(void) const noexcept;
-  Token r_brace_token(void) const noexcept;
-  bool has_braces(void) const noexcept;
-  std::vector<Decl> declarations_in_context(void) const noexcept;
+  Token export_token(void) const;
+  Token r_brace_token(void) const;
+  bool has_braces(void) const;
+  std::vector<Decl> declarations_in_context(void) const;
 };
 
 using EmptyDeclRange = DerivedEntityRange<DeclIterator, EmptyDecl>;
+using EmptyDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, EmptyDecl>;
 
 class EmptyDecl : public Decl {
  private:
@@ -12225,6 +14219,11 @@ class EmptyDecl : public Decl {
     return in_internal(frag);
   }
 
+  inline static EmptyDeclContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<EmptyDecl> from(const TokenContext &c);
   static std::optional<EmptyDecl> from(const Decl &parent);
 };
 

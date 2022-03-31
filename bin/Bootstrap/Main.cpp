@@ -668,11 +668,14 @@ MethodListPtr CodeGenerator::RunOnClass(
   auto seen_methods = std::make_shared<MethodList>(*parent_methods);
   auto class_name = cls->record.Name();
 
+  const auto is_decl = gDeclNames.count(class_name);
+  const auto is_stmt = gStmtNames.count(class_name);
+
   if (cls->base) {
     specific_storage.try_emplace(cls, specific_storage.find(cls->base)->second);
-  } else if (gDeclNames.count(class_name)) {
+  } else if (is_decl) {
     specific_storage.try_emplace(cls, root_decl_storage);
-  } else if (gStmtNames.count(class_name)) {
+  } else if (is_stmt) {
     specific_storage.try_emplace(cls, root_stmt_storage);
   } else {
     specific_storage.try_emplace(cls, root_pseudo_storage);
@@ -688,11 +691,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   const char *nth_entity_reader = nullptr;
 
-  if (gDeclNames.count(class_name)) {
+  if (is_decl) {
     include_h_os
         << "using " << class_name
         << "Range = DerivedEntityRange<DeclIterator, " << class_name
-        << ">;\n\n";
+        << ">;\n"
+        << "using " << class_name
+        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
+        << class_name << ">;\n\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -701,11 +707,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthDecl";
 
-  } else if (gStmtNames.count(class_name)) {
+  } else if (is_stmt) {
     include_h_os
         << "using " << class_name
         << "Range = DerivedEntityRange<StmtIterator, " << class_name
-        << ">;\n\n";
+        << ">;\n"
+        << "using " << class_name
+        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
+        << class_name << ">;\n\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -773,7 +782,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << " protected:\n"
         << "  friend class DeclIterator;\n"
         << "  friend class FragmentImpl;\n"
-        << "  friend class StmtIterator;\n\n"
+        << "  friend class StmtIterator;\n"
+        << "  friend class TokenContext;\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset;\n\n"
         << " public:\n"
@@ -787,6 +797,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Decl> from(const Decl &self) {\n"
           << "    return self;\n"
           << "  }\n\n"
+          << "  inline static std::optional<Decl> from(const TokenContext &c) {\n"
+          << "    return c.as_decl();\n"
+          << "  }\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -795,6 +808,9 @@ MethodListPtr CodeGenerator::RunOnClass(
       include_h_os
           << "  inline static std::optional<Stmt> from(const Stmt &self) {\n"
           << "    return self;\n"
+          << "  }\n\n"
+          << "  inline static std::optional<Stmt> from(const TokenContext &c) {\n"
+          << "    return c.as_stmt();\n"
           << "  }\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
@@ -815,12 +831,46 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   // TODO(pag): Types.
-  if (gDeclNames.count(class_name) || gStmtNames.count(class_name)) {
+  if (is_decl || is_stmt) {
     include_h_os
         << "  inline static " << class_name
         << "Range in(const Fragment &frag) {\n"
         << "    return in_internal(frag);\n"
+        << "  }\n\n"
+        << "  inline static " << class_name
+        << "ContainingTokenRange containing(const Token &tok) {\n"
+        << "    return TokenContextIterator(TokenContext::of(tok));\n"
         << "  }\n\n";
+
+    if (is_decl && class_name != "Decl") {
+      include_h_os
+          << "  static std::optional<" << class_name
+          << "> from(const TokenContext &c);\n";
+      lib_cpp_os
+          << "std::optional<" << class_name
+          << "> " << class_name << "::from(const TokenContext &c) {\n"
+          << "  if (auto d = c.as_decl()) {\n"
+          << "    return from(*d);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n";
+
+    } else if (is_stmt && class_name != "Stmt") {
+      include_h_os
+          << "  static std::optional<" << class_name
+          << "> from(const TokenContext &c);\n";
+
+      lib_cpp_os
+          << "std::optional<" << class_name
+          << "> " << class_name << "::from(const TokenContext &c) {\n"
+          << "  if (auto d = c.as_stmt()) {\n"
+          << "    return from(*d);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n";
+    }
   }
 
   // Derived classes have optional conversion operators with all of their
@@ -965,11 +1015,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
         include_h_os
-            << "  Token " << api_name << "(void) const noexcept;\n";
+            << "  Token " << api_name << "(void) const;\n";
 
         lib_cpp_os
             << "Token " << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return fragment->TokenFor(fragment, self." << getter_name
             << "());\n"
@@ -987,11 +1037,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         auto [end_getter_name, end_setter_name, end_init_name] = NamesFor(end_i);
 
         include_h_os
-            << "  TokenRange " << api_name << "(void) const noexcept;\n";
+            << "  TokenRange " << api_name << "(void) const;\n";
 
         lib_cpp_os
             << "TokenRange " << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return fragment->TokenRangeFor(fragment, self."
             << begin_getter_name << "(), self." << end_getter_name << "());\n"
@@ -1013,11 +1063,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
         include_h_os
-            << "  std::string_view " << api_name << "(void) const noexcept;\n";
+            << "  std::string_view " << api_name << "(void) const;\n";
 
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
@@ -1036,11 +1086,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
         include_h_os
-            << "  std::string_view " << api_name << "(void) const noexcept;\n";
+            << "  std::string_view " << api_name << "(void) const;\n";
 
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
@@ -1061,7 +1111,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 //
 //        include_h_os
 //            << "  std::vector<std::string_view> "
-//            << api_name << "(void) const noexcept;\n";
+//            << api_name << "(void) const;\n";
 //
 //        serialize_cpp_os
 //            << "  const auto &v" << i << " = e." << method_name << "();\n"
@@ -1077,11 +1127,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         const auto i = storage.AddMethod("Text");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
         include_h_os
-            << "  std::filesystem::path " << api_name << "(void) const noexcept;\n";
+            << "  std::filesystem::path " << api_name << "(void) const;\n";
 
         lib_cpp_os
             << "std::filesystem::path " << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
@@ -1138,12 +1188,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         include_h_os
             << "  std::optional<" << cxx_element_name << "> "
-            << api_name << "(void) const noexcept;\n";
+            << api_name << "(void) const;\n";
 
         lib_cpp_os
             << "std::optional<" << cxx_element_name << "> "
             << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  if (!self." << ip_getter_name << "()) {\n"
             << "    return std::nullopt;\n"
@@ -1325,12 +1375,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         include_h_os
             << "  std::vector<" << cxx_element_name << "> "
-            << api_name << "(void) const noexcept;\n";
+            << api_name << "(void) const;\n";
 
         lib_cpp_os
             << "std::vector<" << cxx_element_name << "> "
             << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  auto list = self." << getter_name << "();\n"
             << "  std::vector<" << cxx_element_name << "> vec;\n"
@@ -1445,11 +1495,44 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         include_h_os
             << "  " << record_name << " " << api_name
-            << "(void) const noexcept;\n";
+            << "(void) const;\n";
 
         serialize_cpp_os
             << "  b." << setter_name << "(es.EntityId(e." << method_name
             << "()));\n";
+
+        lib_cpp_os
+            << record_name << " " << class_name << "::" << api_name
+            << "(void) const {\n"
+            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+            << "  EntityId id(self." << getter_name
+            << "());\n";
+
+        if (record_name == "Decl") {
+          lib_cpp_os
+              << "  return Decl(fragment->DeclFor(fragment, id));\n";
+
+        } else if (record_name == "Stmt") {
+          lib_cpp_os
+              << "  return Stmt(fragment->StmtFor(fragment, id));\n";
+
+        } else if (gDeclNames.count(record_name)) {
+          lib_cpp_os
+              << "  return " << record_name
+              << "::from(fragment->DeclFor(fragment, id)).value();\n";
+
+        } else if (gStmtNames.count(record_name)) {
+          lib_cpp_os
+              << "  return " << record_name
+              << "::from(fragment->StmtFor(fragment, id)).value();\n";
+
+        } else {
+          std::cerr << "??? record " << record_name << '\n';
+          abort();
+        }
+
+        lib_cpp_os
+            << "}\n\n";
 
       // E.g. `TemplateParameterList`.
       } else if (gNotReferenceTypesRelatedToEntities.count(record_name)) {
@@ -1458,11 +1541,11 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         include_h_os
             << "  " << record_name << " " << api_name
-            << "(void) const noexcept;\n";
+            << "(void) const;\n";
 
         lib_cpp_os
             << record_name << " " << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return " << record_name << "(fragment, self." << getter_name
             << "());\n"
@@ -1481,7 +1564,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 //
 //        include_h_os
 //            << "  " << record_name << " " << api_name
-//            << "(void) const noexcept;\n";
+//            << "(void) const;\n";
 //
 //        serialize_cpp_os
 //            << "  Serialize" << record_name << "(es, b." << init_name
@@ -1497,11 +1580,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         std::string enum_name = enum_decl->Name();
         include_h_os
             << "  " << enum_name << " " << api_name
-            << "(void) const noexcept;\n";
+            << "(void) const;\n";
 
         lib_cpp_os
             << enum_name << " " << class_name << "::" << api_name
-            << "(void) const noexcept {\n"
+            << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
             << "  return static_cast<" << enum_name << ">(self." << getter_name
             << "());\n"
@@ -1520,11 +1603,11 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       include_h_os
           << "  " << CxxIntType(return_type) << " " << api_name
-          << "(void) const noexcept;\n";
+          << "(void) const;\n";
 
       lib_cpp_os
           << CxxIntType(return_type) << " " << class_name << "::" << api_name
-          << "(void) const noexcept {\n"
+          << "(void) const {\n"
           << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
           << "  return self." << getter_name << "();\n"
           << "}\n\n";
@@ -1548,7 +1631,22 @@ MethodListPtr CodeGenerator::RunOnClass(
 //      static const std::string camel_name = "declarationsInContext";
 
       include_h_os
-          << "  std::vector<Decl> " << snake_name << "(void) const noexcept;\n";
+          << "  std::vector<Decl> " << snake_name << "(void) const;\n";
+
+      lib_cpp_os
+          << "std::vector<Decl> "
+          << class_name << "::" << snake_name
+          << "(void) const {\n"
+          << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+          << "  auto list = self." << getter_name << "();\n"
+          << "  std::vector<Decl> vec;\n"
+          << "  vec.reserve(list.size());\n"
+          << "  for (auto v : list) {\n"
+          << "    EntityId id(v);\n"
+          << "    vec.emplace_back(fragment->DeclFor(fragment, id));\n"
+          << "  }\n"
+          << "  return vec;\n"
+          << "}\n\n";
 
       serialize_cpp_os
           << "  pasta::DeclContext dc" << i << "(e);\n"
@@ -1585,12 +1683,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "# Auto-generated file; do not modify!\n\n"
       << "@0xa04be7b45e95b659;\n\n"
       << "using Cxx = import \"/capnp/c++.capnp\";\n"
-      << "$Cxx.namespace(\"mx::ast\");\n\n"
-      << NameAndHash("struct TokenContext") << " {\n"
-      << "  parentIndexAndKind @0 :UInt32;\n"
-      << "  parentOffset @1 :UInt16;\n"
-      << "  aliasOffset @2 :UInt16;\n"
-      << "}\n\n";
+      << "$Cxx.namespace(\"mx::ast\");\n\n";
 
   lib_cpp_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -1687,6 +1780,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "class FileImpl;\n"
       << "class StmtIterator;\n"
       << "class Token;\n"
+      << "class TokenContext;"
+      << "class TokenContextIterator;\n"
       << "class TokenRange;\n\n";
 
   std::vector<std::string> class_names;
@@ -1782,10 +1877,9 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   schema_os
-      << NameAndHash("struct Decl") << " {\n"
-      << "  tokenContexts @0 :List(TokenContext);\n";
+      << NameAndHash("struct Decl") << " {\n";
 
-  auto i = 1u;
+  auto i = 0u;
   for (const auto &[type, ids] : root_decl_storage.max_method_count) {
     for (auto id : ids) {
       schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
@@ -1795,10 +1889,9 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   // The entity list is a storage for zero-or-more entities.
   schema_os
       << "}\n\n"
-      << NameAndHash("struct Stmt") << " {\n"
-      << "  tokenContexts @0 :List(TokenContext);\n";
+      << NameAndHash("struct Stmt") << " {\n";
 
-  i = 1u;
+  i = 0u;
   for (const auto &[type, ids] : root_stmt_storage.max_method_count) {
     for (auto id : ids) {
       schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
