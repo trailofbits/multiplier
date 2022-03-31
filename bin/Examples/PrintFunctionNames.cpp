@@ -19,10 +19,8 @@ DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
 DEFINE_bool(unparsed, false, "Show original source code?");
 
 static void PrintFunctionNames(mx::Fragment fragment) {
-  for (mx::Decl decl : fragment.top_level_declarations()) {
-    if (auto func = mx::FunctionDecl::from(decl)) {
-      std::cout << fragment.id() << '\t' << func->name() << '\n';
-    }
+  for (mx::FunctionDecl func : mx::FunctionDecl::in(fragment)) {
+    std::cout << fragment.id() << '\t' << func.name() << '\n';
   }
 }
 

@@ -686,12 +686,14 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
-  include_h_os
-      << "class " << class_name;
-
   const char *nth_entity_reader = nullptr;
 
   if (gDeclNames.count(class_name)) {
+    include_h_os
+        << "using " << class_name
+        << "Range = DerivedEntityRange<DeclIterator, " << class_name
+        << ">;\n\n";
+
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(EntitySerializer &es, mx::ast::Decl::Builder b, const pasta::"
@@ -700,6 +702,11 @@ MethodListPtr CodeGenerator::RunOnClass(
     nth_entity_reader = "NthDecl";
 
   } else if (gStmtNames.count(class_name)) {
+    include_h_os
+        << "using " << class_name
+        << "Range = DerivedEntityRange<StmtIterator, " << class_name
+        << ">;\n\n";
+
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(EntitySerializer &es, mx::ast::Stmt::Builder b, const pasta::"
@@ -715,6 +722,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthPseudo";
   }
+
+  include_h_os
+      << "class " << class_name;
 
 //  std::stringstream dummy_ss;
 //  std::ostream &maybe_serialize_cpp_os =
@@ -761,7 +771,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     include_h_os
         << " {\n"
         << " protected:\n"
-        << "  friend class FragmentImpl;\n\n"
+        << "  friend class DeclIterator;\n"
+        << "  friend class FragmentImpl;\n"
+        << "  friend class StmtIterator;\n\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset;\n\n"
         << " public:\n"
@@ -774,13 +786,19 @@ MethodListPtr CodeGenerator::RunOnClass(
       include_h_os
           << "  inline static std::optional<Decl> from(const Decl &self) {\n"
           << "    return self;\n"
-          << "  }\n\n";
+          << "  }\n\n"
+          << " protected:\n"
+          << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
+          << " public:\n";
 
     } else if (class_name == "Stmt") {
       include_h_os
           << "  inline static std::optional<Stmt> from(const Stmt &self) {\n"
           << "    return self;\n"
-          << "  }\n\n";
+          << "  }\n\n"
+          << " protected:\n"
+          << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
+          << " public:\n";
 
     }
 
@@ -794,6 +812,15 @@ MethodListPtr CodeGenerator::RunOnClass(
 //        << " {\n"
 //        << " protected:\n"
 //        << "  std::shared_ptr<ast::" << class_name << "> data;\n\n";
+  }
+
+  // TODO(pag): Types.
+  if (gDeclNames.count(class_name) || gStmtNames.count(class_name)) {
+    include_h_os
+        << "  inline static " << class_name
+        << "Range in(const Fragment &frag) {\n"
+        << "    return in_internal(frag);\n"
+        << "  }\n\n";
   }
 
   // Derived classes have optional conversion operators with all of their
@@ -1560,9 +1587,9 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "using Cxx = import \"/capnp/c++.capnp\";\n"
       << "$Cxx.namespace(\"mx::ast\");\n\n"
       << NameAndHash("struct TokenContext") << " {\n"
-      << "  parentIndex @0 :UInt32;\n"
+      << "  parentIndexAndKind @0 :UInt32;\n"
       << "  parentOffset @1 :UInt16;\n"
-      << "  aliasOffsetAndKind @2 :UInt16;\n"
+      << "  aliasOffset @2 :UInt16;\n"
       << "}\n\n";
 
   lib_cpp_os
@@ -1626,6 +1653,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <memory>\n"
       << "#include <optional>\n"
       << "#include <vector>\n\n"
+      << "#include \"Iterator.h\"\n"
       << "#include \"Types.h\"\n\n"
       << "namespace pasta {\n";
 
@@ -1654,8 +1682,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   include_h_os
       << "}  // namespace pasta\n"
       << "namespace mx {\n\n"
+      << "class DeclIterator;\n"
       << "class FragmentImpl;\n"
       << "class FileImpl;\n"
+      << "class StmtIterator;\n"
       << "class Token;\n"
       << "class TokenRange;\n\n";
 

@@ -67,6 +67,7 @@ add_custom_target("copy_headers"
 set(api_headers
   "${source_include_dir}/API.h"
   "${source_include_dir}/AST.h"
+  "${source_include_dir}/Iterator.h"
   "${source_include_dir}/Compress.h"
   "${source_include_dir}/Types.h"
 )
@@ -152,6 +153,7 @@ set(util_headers
   "${source_include_dir}/Endian.h"
   "${source_include_dir}/Executor.h"
   "${source_include_dir}/Int.h"
+  "${source_include_dir}/Iterator.h"
   "${source_include_dir}/PersistentMap.h"
   "${source_include_dir}/ProgressBar.h"
   "${source_include_dir}/Result.h"

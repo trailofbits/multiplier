@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include "Iterator.h"
 #include "Types.h"
 
 namespace pasta {
@@ -259,8 +260,10 @@ enum class TargetLanguage : unsigned;
 }  // namespace pasta
 namespace mx {
 
+class DeclIterator;
 class FragmentImpl;
 class FileImpl;
+class StmtIterator;
 class Token;
 class TokenRange;
 
@@ -4999,7 +5002,9 @@ class CXXDynamicCastExpr;
 #ifndef MX_DISABLE_API
 class TemplateParameterList {
  protected:
+  friend class DeclIterator;
   friend class FragmentImpl;
+  friend class StmtIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
@@ -5023,7 +5028,9 @@ class TemplateParameterList {
 
 class TemplateArgument {
  protected:
+  friend class DeclIterator;
   friend class FragmentImpl;
+  friend class StmtIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
@@ -5044,7 +5051,9 @@ class TemplateArgument {
 
 class CXXBaseSpecifier {
  protected:
+  friend class DeclIterator;
   friend class FragmentImpl;
+  friend class StmtIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
@@ -5065,9 +5074,13 @@ class CXXBaseSpecifier {
   AccessSpecifier lexical_access_specifier(void) const noexcept;
 };
 
+using StmtRange = DerivedEntityRange<StmtIterator, Stmt>;
+
 class Stmt {
  protected:
+  friend class DeclIterator;
   friend class FragmentImpl;
+  friend class StmtIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
@@ -5081,17 +5094,31 @@ class Stmt {
     return self;
   }
 
+ protected:
+  static StmtIterator in_internal(const Fragment &fragment);
+
+ public:
+  inline static StmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   Token begin_token(void) const noexcept;
   Token end_token(void) const noexcept;
   TokenRange token_range(void) const noexcept;
   StmtKind kind(void) const noexcept;
 };
 
+using SEHTryStmtRange = DerivedEntityRange<StmtIterator, SEHTryStmt>;
+
 class SEHTryStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static SEHTryStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SEHTryStmt> from(const Stmt &parent);
   SEHExceptStmt except_handler(void) const noexcept;
   SEHFinallyStmt finally_handler(void) const noexcept;
@@ -5100,108 +5127,174 @@ class SEHTryStmt : public Stmt {
   Token try_token(void) const noexcept;
 };
 
+using SEHLeaveStmtRange = DerivedEntityRange<StmtIterator, SEHLeaveStmt>;
+
 class SEHLeaveStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static SEHLeaveStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SEHLeaveStmt> from(const Stmt &parent);
   Token leave_token(void) const noexcept;
 };
+
+using SEHFinallyStmtRange = DerivedEntityRange<StmtIterator, SEHFinallyStmt>;
 
 class SEHFinallyStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static SEHFinallyStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SEHFinallyStmt> from(const Stmt &parent);
   CompoundStmt block(void) const noexcept;
   Token finally_token(void) const noexcept;
 };
+
+using SEHExceptStmtRange = DerivedEntityRange<StmtIterator, SEHExceptStmt>;
 
 class SEHExceptStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static SEHExceptStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SEHExceptStmt> from(const Stmt &parent);
   CompoundStmt block(void) const noexcept;
   Token except_token(void) const noexcept;
 };
+
+using ReturnStmtRange = DerivedEntityRange<StmtIterator, ReturnStmt>;
 
 class ReturnStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ReturnStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ReturnStmt> from(const Stmt &parent);
   std::optional<VarDecl> nrvo_candidate(void) const noexcept;
   Token return_token(void) const noexcept;
 };
+
+using ObjCForCollectionStmtRange = DerivedEntityRange<StmtIterator, ObjCForCollectionStmt>;
 
 class ObjCForCollectionStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ObjCForCollectionStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
   Token for_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using ObjCAutoreleasePoolStmtRange = DerivedEntityRange<StmtIterator, ObjCAutoreleasePoolStmt>;
 
 class ObjCAutoreleasePoolStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ObjCAutoreleasePoolStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent);
   Token at_token(void) const noexcept;
 };
+
+using ObjCAtTryStmtRange = DerivedEntityRange<StmtIterator, ObjCAtTryStmt>;
 
 class ObjCAtTryStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ObjCAtTryStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
   Token at_try_token(void) const noexcept;
   ObjCAtFinallyStmt finally_statement(void) const noexcept;
   std::vector<ObjCAtCatchStmt> catch_statements(void) const noexcept;
 };
 
+using ObjCAtThrowStmtRange = DerivedEntityRange<StmtIterator, ObjCAtThrowStmt>;
+
 class ObjCAtThrowStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ObjCAtThrowStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAtThrowStmt> from(const Stmt &parent);
   Token throw_token(void) const noexcept;
 };
+
+using ObjCAtSynchronizedStmtRange = DerivedEntityRange<StmtIterator, ObjCAtSynchronizedStmt>;
 
 class ObjCAtSynchronizedStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ObjCAtSynchronizedStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAtSynchronizedStmt> from(const Stmt &parent);
   Token at_synchronized_token(void) const noexcept;
   CompoundStmt synch_body(void) const noexcept;
 };
+
+using ObjCAtFinallyStmtRange = DerivedEntityRange<StmtIterator, ObjCAtFinallyStmt>;
 
 class ObjCAtFinallyStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ObjCAtFinallyStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAtFinallyStmt> from(const Stmt &parent);
   Token at_finally_token(void) const noexcept;
 };
+
+using ObjCAtCatchStmtRange = DerivedEntityRange<StmtIterator, ObjCAtCatchStmt>;
 
 class ObjCAtCatchStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ObjCAtCatchStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
   Token at_catch_token(void) const noexcept;
   VarDecl catch_parameter_declaration(void) const noexcept;
@@ -5209,16 +5302,24 @@ class ObjCAtCatchStmt : public Stmt {
   bool has_ellipsis(void) const noexcept;
 };
 
+using OMPExecutableDirectiveRange = DerivedEntityRange<StmtIterator, OMPExecutableDirective>;
+
 class OMPExecutableDirective : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static OMPExecutableDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPExecutableDirective> from(const Stmt &parent);
   CapturedStmt innermost_captured_statement(void) const noexcept;
   bool has_associated_statement(void) const noexcept;
   bool is_standalone_directive(void) const noexcept;
 };
+
+using OMPDispatchDirectiveRange = DerivedEntityRange<StmtIterator, OMPDispatchDirective>;
 
 class OMPDispatchDirective : public OMPExecutableDirective {
  private:
@@ -5226,10 +5327,16 @@ class OMPDispatchDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPDispatchDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDispatchDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDispatchDirective> from(const Stmt &parent);
   Token target_call_token(void) const noexcept;
 };
+
+using OMPDepobjDirectiveRange = DerivedEntityRange<StmtIterator, OMPDepobjDirective>;
 
 class OMPDepobjDirective : public OMPExecutableDirective {
  private:
@@ -5237,9 +5344,15 @@ class OMPDepobjDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPDepobjDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDepobjDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDepobjDirective> from(const Stmt &parent);
 };
+
+using OMPCriticalDirectiveRange = DerivedEntityRange<StmtIterator, OMPCriticalDirective>;
 
 class OMPCriticalDirective : public OMPExecutableDirective {
  private:
@@ -5247,9 +5360,15 @@ class OMPCriticalDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPCriticalDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPCriticalDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPCriticalDirective> from(const Stmt &parent);
 };
+
+using OMPCancellationPointDirectiveRange = DerivedEntityRange<StmtIterator, OMPCancellationPointDirective>;
 
 class OMPCancellationPointDirective : public OMPExecutableDirective {
  private:
@@ -5257,9 +5376,15 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPCancellationPointDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPCancellationPointDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPCancellationPointDirective> from(const Stmt &parent);
 };
+
+using OMPCancelDirectiveRange = DerivedEntityRange<StmtIterator, OMPCancelDirective>;
 
 class OMPCancelDirective : public OMPExecutableDirective {
  private:
@@ -5267,9 +5392,15 @@ class OMPCancelDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPCancelDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPCancelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPCancelDirective> from(const Stmt &parent);
 };
+
+using OMPBarrierDirectiveRange = DerivedEntityRange<StmtIterator, OMPBarrierDirective>;
 
 class OMPBarrierDirective : public OMPExecutableDirective {
  private:
@@ -5277,9 +5408,15 @@ class OMPBarrierDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPBarrierDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPBarrierDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPBarrierDirective> from(const Stmt &parent);
 };
+
+using OMPAtomicDirectiveRange = DerivedEntityRange<StmtIterator, OMPAtomicDirective>;
 
 class OMPAtomicDirective : public OMPExecutableDirective {
  private:
@@ -5287,11 +5424,17 @@ class OMPAtomicDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPAtomicDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPAtomicDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPAtomicDirective> from(const Stmt &parent);
   bool is_postfix_update(void) const noexcept;
   bool is_xlhs_in_rhs_part(void) const noexcept;
 };
+
+using OMPTeamsDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDirective>;
 
 class OMPTeamsDirective : public OMPExecutableDirective {
  private:
@@ -5299,9 +5442,15 @@ class OMPTeamsDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTeamsDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTeamsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDirective> from(const Stmt &parent);
 };
+
+using OMPTaskyieldDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskyieldDirective>;
 
 class OMPTaskyieldDirective : public OMPExecutableDirective {
  private:
@@ -5309,9 +5458,15 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTaskyieldDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTaskyieldDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskyieldDirective> from(const Stmt &parent);
 };
+
+using OMPTaskwaitDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskwaitDirective>;
 
 class OMPTaskwaitDirective : public OMPExecutableDirective {
  private:
@@ -5319,9 +5474,15 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTaskwaitDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTaskwaitDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskwaitDirective> from(const Stmt &parent);
 };
+
+using OMPTaskgroupDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskgroupDirective>;
 
 class OMPTaskgroupDirective : public OMPExecutableDirective {
  private:
@@ -5329,9 +5490,15 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTaskgroupDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTaskgroupDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskgroupDirective> from(const Stmt &parent);
 };
+
+using OMPTaskDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskDirective>;
 
 class OMPTaskDirective : public OMPExecutableDirective {
  private:
@@ -5339,10 +5506,16 @@ class OMPTaskDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTaskDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTaskDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPTargetUpdateDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetUpdateDirective>;
 
 class OMPTargetUpdateDirective : public OMPExecutableDirective {
  private:
@@ -5350,9 +5523,15 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetUpdateDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetUpdateDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetUpdateDirective> from(const Stmt &parent);
 };
+
+using OMPTargetTeamsDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDirective>;
 
 class OMPTargetTeamsDirective : public OMPExecutableDirective {
  private:
@@ -5360,9 +5539,15 @@ class OMPTargetTeamsDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetTeamsDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetTeamsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDirective> from(const Stmt &parent);
 };
+
+using OMPTargetParallelDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelDirective>;
 
 class OMPTargetParallelDirective : public OMPExecutableDirective {
  private:
@@ -5370,10 +5555,16 @@ class OMPTargetParallelDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetParallelDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetParallelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetParallelDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPTargetExitDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetExitDataDirective>;
 
 class OMPTargetExitDataDirective : public OMPExecutableDirective {
  private:
@@ -5381,9 +5572,15 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetExitDataDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetExitDataDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetExitDataDirective> from(const Stmt &parent);
 };
+
+using OMPTargetEnterDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetEnterDataDirective>;
 
 class OMPTargetEnterDataDirective : public OMPExecutableDirective {
  private:
@@ -5391,9 +5588,15 @@ class OMPTargetEnterDataDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetEnterDataDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetEnterDataDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetEnterDataDirective> from(const Stmt &parent);
 };
+
+using OMPTargetDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetDirective>;
 
 class OMPTargetDirective : public OMPExecutableDirective {
  private:
@@ -5401,9 +5604,15 @@ class OMPTargetDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetDirective> from(const Stmt &parent);
 };
+
+using OMPTargetDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetDataDirective>;
 
 class OMPTargetDataDirective : public OMPExecutableDirective {
  private:
@@ -5411,9 +5620,15 @@ class OMPTargetDataDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetDataDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetDataDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetDataDirective> from(const Stmt &parent);
 };
+
+using OMPSingleDirectiveRange = DerivedEntityRange<StmtIterator, OMPSingleDirective>;
 
 class OMPSingleDirective : public OMPExecutableDirective {
  private:
@@ -5421,9 +5636,15 @@ class OMPSingleDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPSingleDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPSingleDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSingleDirective> from(const Stmt &parent);
 };
+
+using OMPSectionsDirectiveRange = DerivedEntityRange<StmtIterator, OMPSectionsDirective>;
 
 class OMPSectionsDirective : public OMPExecutableDirective {
  private:
@@ -5431,10 +5652,16 @@ class OMPSectionsDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPSectionsDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPSectionsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSectionsDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPSectionDirectiveRange = DerivedEntityRange<StmtIterator, OMPSectionDirective>;
 
 class OMPSectionDirective : public OMPExecutableDirective {
  private:
@@ -5442,10 +5669,16 @@ class OMPSectionDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPSectionDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPSectionDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSectionDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPScanDirectiveRange = DerivedEntityRange<StmtIterator, OMPScanDirective>;
 
 class OMPScanDirective : public OMPExecutableDirective {
  private:
@@ -5453,9 +5686,15 @@ class OMPScanDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPScanDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPScanDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPScanDirective> from(const Stmt &parent);
 };
+
+using OMPParallelSectionsDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelSectionsDirective>;
 
 class OMPParallelSectionsDirective : public OMPExecutableDirective {
  private:
@@ -5463,10 +5702,16 @@ class OMPParallelSectionsDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPParallelSectionsDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPParallelSectionsDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelSectionsDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPParallelMasterDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterDirective>;
 
 class OMPParallelMasterDirective : public OMPExecutableDirective {
  private:
@@ -5474,9 +5719,15 @@ class OMPParallelMasterDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPParallelMasterDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPParallelMasterDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelMasterDirective> from(const Stmt &parent);
 };
+
+using OMPParallelDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelDirective>;
 
 class OMPParallelDirective : public OMPExecutableDirective {
  private:
@@ -5484,10 +5735,16 @@ class OMPParallelDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPParallelDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPParallelDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPOrderedDirectiveRange = DerivedEntityRange<StmtIterator, OMPOrderedDirective>;
 
 class OMPOrderedDirective : public OMPExecutableDirective {
  private:
@@ -5495,9 +5752,15 @@ class OMPOrderedDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPOrderedDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPOrderedDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPOrderedDirective> from(const Stmt &parent);
 };
+
+using OMPMasterDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterDirective>;
 
 class OMPMasterDirective : public OMPExecutableDirective {
  private:
@@ -5505,9 +5768,15 @@ class OMPMasterDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPMasterDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPMasterDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPMasterDirective> from(const Stmt &parent);
 };
+
+using OMPMaskedDirectiveRange = DerivedEntityRange<StmtIterator, OMPMaskedDirective>;
 
 class OMPMaskedDirective : public OMPExecutableDirective {
  private:
@@ -5515,9 +5784,15 @@ class OMPMaskedDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPMaskedDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPMaskedDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPMaskedDirective> from(const Stmt &parent);
 };
+
+using OMPLoopBasedDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopBasedDirective>;
 
 class OMPLoopBasedDirective : public OMPExecutableDirective {
  private:
@@ -5525,9 +5800,15 @@ class OMPLoopBasedDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPLoopBasedDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPLoopBasedDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPLoopBasedDirective> from(const Stmt &parent);
 };
+
+using OMPUnrollDirectiveRange = DerivedEntityRange<StmtIterator, OMPUnrollDirective>;
 
 class OMPUnrollDirective : public OMPLoopBasedDirective {
  private:
@@ -5536,10 +5817,16 @@ class OMPUnrollDirective : public OMPLoopBasedDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPUnrollDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPUnrollDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPUnrollDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPUnrollDirective> from(const Stmt &parent);
 };
+
+using OMPTileDirectiveRange = DerivedEntityRange<StmtIterator, OMPTileDirective>;
 
 class OMPTileDirective : public OMPLoopBasedDirective {
  private:
@@ -5548,10 +5835,16 @@ class OMPTileDirective : public OMPLoopBasedDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTileDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTileDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTileDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTileDirective> from(const Stmt &parent);
 };
+
+using OMPLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopDirective>;
 
 class OMPLoopDirective : public OMPLoopBasedDirective {
  private:
@@ -5560,10 +5853,16 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPLoopDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPLoopDirective> from(const Stmt &parent);
 };
+
+using OMPForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPForSimdDirective>;
 
 class OMPForSimdDirective : public OMPLoopDirective {
  private:
@@ -5573,11 +5872,17 @@ class OMPForSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPForSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPForSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPForSimdDirective> from(const Stmt &parent);
 };
+
+using OMPForDirectiveRange = DerivedEntityRange<StmtIterator, OMPForDirective>;
 
 class OMPForDirective : public OMPLoopDirective {
  private:
@@ -5587,12 +5892,18 @@ class OMPForDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPForDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPDistributeSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeSimdDirective>;
 
 class OMPDistributeSimdDirective : public OMPLoopDirective {
  private:
@@ -5602,11 +5913,17 @@ class OMPDistributeSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPDistributeSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDistributeSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDistributeSimdDirective> from(const Stmt &parent);
 };
+
+using OMPDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeParallelForSimdDirective>;
 
 class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -5616,11 +5933,17 @@ class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPDistributeParallelForSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const Stmt &parent);
 };
+
+using OMPDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeParallelForDirective>;
 
 class OMPDistributeParallelForDirective : public OMPLoopDirective {
  private:
@@ -5630,12 +5953,18 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPDistributeParallelForDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDistributeParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPDistributeDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeDirective>;
 
 class OMPDistributeDirective : public OMPLoopDirective {
  private:
@@ -5645,11 +5974,17 @@ class OMPDistributeDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPDistributeDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDistributeDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPDistributeDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPDistributeDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPDistributeDirective> from(const Stmt &parent);
 };
+
+using OMPTeamsDistributeSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeSimdDirective>;
 
 class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
  private:
@@ -5659,11 +5994,17 @@ class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTeamsDistributeSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const Stmt &parent);
 };
+
+using OMPTeamsDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeParallelForSimdDirective>;
 
 class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -5673,11 +6014,17 @@ class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTeamsDistributeParallelForSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const Stmt &parent);
 };
+
+using OMPTeamsDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeParallelForDirective>;
 
 class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
  private:
@@ -5687,12 +6034,18 @@ class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTeamsDistributeParallelForDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPTeamsDistributeDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeDirective>;
 
 class OMPTeamsDistributeDirective : public OMPLoopDirective {
  private:
@@ -5702,11 +6055,17 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTeamsDistributeDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTeamsDistributeDirective> from(const Stmt &parent);
 };
+
+using OMPTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskLoopSimdDirective>;
 
 class OMPTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -5716,11 +6075,17 @@ class OMPTaskLoopSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTaskLoopSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskLoopSimdDirective> from(const Stmt &parent);
 };
+
+using OMPTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskLoopDirective>;
 
 class OMPTaskLoopDirective : public OMPLoopDirective {
  private:
@@ -5730,12 +6095,18 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTaskLoopDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTaskLoopDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTaskLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTaskLoopDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPTargetTeamsDistributeSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeSimdDirective>;
 
 class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
  private:
@@ -5745,11 +6116,17 @@ class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetTeamsDistributeSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const Stmt &parent);
 };
+
+using OMPTargetTeamsDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeParallelForSimdDirective>;
 
 class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -5759,11 +6136,17 @@ class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetTeamsDistributeParallelForSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const Stmt &parent);
 };
+
+using OMPTargetTeamsDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeParallelForDirective>;
 
 class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
  private:
@@ -5773,12 +6156,18 @@ class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetTeamsDistributeParallelForDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPTargetTeamsDistributeDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeDirective>;
 
 class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
  private:
@@ -5788,11 +6177,17 @@ class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetTeamsDistributeDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const Stmt &parent);
 };
+
+using OMPTargetSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetSimdDirective>;
 
 class OMPTargetSimdDirective : public OMPLoopDirective {
  private:
@@ -5802,11 +6197,17 @@ class OMPTargetSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetSimdDirective> from(const Stmt &parent);
 };
+
+using OMPTargetParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelForSimdDirective>;
 
 class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -5816,11 +6217,17 @@ class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetParallelForSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetParallelForSimdDirective> from(const Stmt &parent);
 };
+
+using OMPTargetParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelForDirective>;
 
 class OMPTargetParallelForDirective : public OMPLoopDirective {
  private:
@@ -5830,12 +6237,18 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPTargetParallelForDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPTargetParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPSimdDirective>;
 
 class OMPSimdDirective : public OMPLoopDirective {
  private:
@@ -5845,11 +6258,17 @@ class OMPSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPSimdDirective> from(const Stmt &parent);
 };
+
+using OMPParallelMasterTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterTaskLoopSimdDirective>;
 
 class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -5859,11 +6278,17 @@ class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPParallelMasterTaskLoopSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const Stmt &parent);
 };
+
+using OMPParallelMasterTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterTaskLoopDirective>;
 
 class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
  private:
@@ -5873,12 +6298,18 @@ class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPParallelMasterTaskLoopDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelForSimdDirective>;
 
 class OMPParallelForSimdDirective : public OMPLoopDirective {
  private:
@@ -5888,11 +6319,17 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPParallelForSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPParallelForSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelForSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelForSimdDirective> from(const Stmt &parent);
 };
+
+using OMPParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelForDirective>;
 
 class OMPParallelForDirective : public OMPLoopDirective {
  private:
@@ -5902,12 +6339,18 @@ class OMPParallelForDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPParallelForDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPParallelForDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPParallelForDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPParallelForDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPParallelForDirective> from(const Stmt &parent);
   bool has_cancel(void) const noexcept;
 };
+
+using OMPMasterTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterTaskLoopSimdDirective>;
 
 class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -5917,11 +6360,17 @@ class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPMasterTaskLoopSimdDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const Stmt &parent);
 };
+
+using OMPMasterTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterTaskLoopDirective>;
 
 class OMPMasterTaskLoopDirective : public OMPLoopDirective {
  private:
@@ -5931,6 +6380,10 @@ class OMPMasterTaskLoopDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPMasterTaskLoopDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
@@ -5938,15 +6391,23 @@ class OMPMasterTaskLoopDirective : public OMPLoopDirective {
   bool has_cancel(void) const noexcept;
 };
 
+using OMPInteropDirectiveRange = DerivedEntityRange<StmtIterator, OMPInteropDirective>;
+
 class OMPInteropDirective : public OMPExecutableDirective {
  private:
   friend class FragmentImpl;
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPInteropDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPInteropDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPInteropDirective> from(const Stmt &parent);
 };
+
+using OMPFlushDirectiveRange = DerivedEntityRange<StmtIterator, OMPFlushDirective>;
 
 class OMPFlushDirective : public OMPExecutableDirective {
  private:
@@ -5954,36 +6415,58 @@ class OMPFlushDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
+  inline static OMPFlushDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPFlushDirective> from(const OMPExecutableDirective &parent);
   static std::optional<OMPFlushDirective> from(const Stmt &parent);
 };
+
+using OMPCanonicalLoopRange = DerivedEntityRange<StmtIterator, OMPCanonicalLoop>;
 
 class OMPCanonicalLoop : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static OMPCanonicalLoopRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPCanonicalLoop> from(const Stmt &parent);
   CapturedStmt distance_func(void) const noexcept;
   CapturedStmt loop_variable_func(void) const noexcept;
   DeclRefExpr loop_variable_reference(void) const noexcept;
 };
 
+using NullStmtRange = DerivedEntityRange<StmtIterator, NullStmt>;
+
 class NullStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static NullStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<NullStmt> from(const Stmt &parent);
   Token semi_token(void) const noexcept;
   bool has_leading_empty_macro(void) const noexcept;
 };
+
+using MSDependentExistsStmtRange = DerivedEntityRange<StmtIterator, MSDependentExistsStmt>;
 
 class MSDependentExistsStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static MSDependentExistsStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MSDependentExistsStmt> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   CompoundStmt sub_statement(void) const noexcept;
@@ -5991,22 +6474,34 @@ class MSDependentExistsStmt : public Stmt {
   bool is_if_not_exists(void) const noexcept;
 };
 
+using IndirectGotoStmtRange = DerivedEntityRange<StmtIterator, IndirectGotoStmt>;
+
 class IndirectGotoStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static IndirectGotoStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<IndirectGotoStmt> from(const Stmt &parent);
   LabelDecl constant_target(void) const noexcept;
   Token goto_token(void) const noexcept;
   Token star_token(void) const noexcept;
 };
 
+using IfStmtRange = DerivedEntityRange<StmtIterator, IfStmt>;
+
 class IfStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static IfStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<IfStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
@@ -6021,22 +6516,34 @@ class IfStmt : public Stmt {
   bool is_obj_c_availability_check(void) const noexcept;
 };
 
+using GotoStmtRange = DerivedEntityRange<StmtIterator, GotoStmt>;
+
 class GotoStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static GotoStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<GotoStmt> from(const Stmt &parent);
   Token goto_token(void) const noexcept;
   LabelDecl label(void) const noexcept;
   Token label_token(void) const noexcept;
 };
 
+using ForStmtRange = DerivedEntityRange<StmtIterator, ForStmt>;
+
 class ForStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ForStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ForStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
@@ -6045,92 +6552,146 @@ class ForStmt : public Stmt {
   Token r_paren_token(void) const noexcept;
 };
 
+using DoStmtRange = DerivedEntityRange<StmtIterator, DoStmt>;
+
 class DoStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static DoStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DoStmt> from(const Stmt &parent);
   Token do_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   Token while_token(void) const noexcept;
 };
 
+using DeclStmtRange = DerivedEntityRange<StmtIterator, DeclStmt>;
+
 class DeclStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static DeclStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DeclStmt> from(const Stmt &parent);
   bool is_single_declaration(void) const noexcept;
 };
+
+using CoroutineBodyStmtRange = DerivedEntityRange<StmtIterator, CoroutineBodyStmt>;
 
 class CoroutineBodyStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static CoroutineBodyStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CoroutineBodyStmt> from(const Stmt &parent);
   VarDecl promise_declaration(void) const noexcept;
   bool has_dependent_promise_type(void) const noexcept;
 };
+
+using CoreturnStmtRange = DerivedEntityRange<StmtIterator, CoreturnStmt>;
 
 class CoreturnStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static CoreturnStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CoreturnStmt> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   bool is_implicit(void) const noexcept;
 };
+
+using ContinueStmtRange = DerivedEntityRange<StmtIterator, ContinueStmt>;
 
 class ContinueStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ContinueStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ContinueStmt> from(const Stmt &parent);
   Token continue_token(void) const noexcept;
 };
+
+using CompoundStmtRange = DerivedEntityRange<StmtIterator, CompoundStmt>;
 
 class CompoundStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static CompoundStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CompoundStmt> from(const Stmt &parent);
   Token l_brac_token(void) const noexcept;
   Token r_brac_token(void) const noexcept;
 };
+
+using CapturedStmtRange = DerivedEntityRange<StmtIterator, CapturedStmt>;
 
 class CapturedStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static CapturedStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CapturedStmt> from(const Stmt &parent);
   CapturedDecl captured_declaration(void) const noexcept;
   RecordDecl captured_record_declaration(void) const noexcept;
   CapturedRegionKind captured_region_kind(void) const noexcept;
 };
 
+using CXXTryStmtRange = DerivedEntityRange<StmtIterator, CXXTryStmt>;
+
 class CXXTryStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static CXXTryStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXTryStmt> from(const Stmt &parent);
   CompoundStmt try_block(void) const noexcept;
   Token try_token(void) const noexcept;
   std::vector<CXXCatchStmt> handlers(void) const noexcept;
 };
 
+using CXXForRangeStmtRange = DerivedEntityRange<StmtIterator, CXXForRangeStmt>;
+
 class CXXForRangeStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static CXXForRangeStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXForRangeStmt> from(const Stmt &parent);
   DeclStmt begin_statement(void) const noexcept;
   Token coawait_token(void) const noexcept;
@@ -6143,30 +6704,48 @@ class CXXForRangeStmt : public Stmt {
   DeclStmt range_statement(void) const noexcept;
 };
 
+using CXXCatchStmtRange = DerivedEntityRange<StmtIterator, CXXCatchStmt>;
+
 class CXXCatchStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static CXXCatchStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
   Token catch_token(void) const noexcept;
   VarDecl exception_declaration(void) const noexcept;
 };
+
+using BreakStmtRange = DerivedEntityRange<StmtIterator, BreakStmt>;
 
 class BreakStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static BreakStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BreakStmt> from(const Stmt &parent);
   Token break_token(void) const noexcept;
 };
+
+using AsmStmtRange = DerivedEntityRange<StmtIterator, AsmStmt>;
 
 class AsmStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static AsmStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<AsmStmt> from(const Stmt &parent);
   std::string_view generate_assembly_string(void) const noexcept;
   Token assembly_token(void) const noexcept;
@@ -6177,12 +6756,18 @@ class AsmStmt : public Stmt {
   std::vector<std::string_view> clobbers(void) const noexcept;
 };
 
+using MSAsmStmtRange = DerivedEntityRange<StmtIterator, MSAsmStmt>;
+
 class MSAsmStmt : public AsmStmt {
  private:
   friend class FragmentImpl;
   friend class AsmStmt;
   friend class Stmt;
  public:
+  inline static MSAsmStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MSAsmStmt> from(const AsmStmt &parent);
   static std::optional<MSAsmStmt> from(const Stmt &parent);
   std::vector<std::string_view> all_constraints(void) const noexcept;
@@ -6191,12 +6776,18 @@ class MSAsmStmt : public AsmStmt {
   bool has_braces(void) const noexcept;
 };
 
+using GCCAsmStmtRange = DerivedEntityRange<StmtIterator, GCCAsmStmt>;
+
 class GCCAsmStmt : public AsmStmt {
  private:
   friend class FragmentImpl;
   friend class AsmStmt;
   friend class Stmt;
  public:
+  inline static GCCAsmStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<GCCAsmStmt> from(const AsmStmt &parent);
   static std::optional<GCCAsmStmt> from(const Stmt &parent);
   StringLiteral assembly_string(void) const noexcept;
@@ -6212,11 +6803,17 @@ class GCCAsmStmt : public AsmStmt {
   std::vector<std::string_view> label_names(void) const noexcept;
 };
 
+using WhileStmtRange = DerivedEntityRange<StmtIterator, WhileStmt>;
+
 class WhileStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static WhileStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<WhileStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
@@ -6226,13 +6823,21 @@ class WhileStmt : public Stmt {
   bool has_variable_storage(void) const noexcept;
 };
 
+using ValueStmtRange = DerivedEntityRange<StmtIterator, ValueStmt>;
+
 class ValueStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static ValueStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ValueStmt> from(const Stmt &parent);
 };
+
+using LabelStmtRange = DerivedEntityRange<StmtIterator, LabelStmt>;
 
 class LabelStmt : public ValueStmt {
  private:
@@ -6240,6 +6845,10 @@ class LabelStmt : public ValueStmt {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static LabelStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<LabelStmt> from(const ValueStmt &parent);
   static std::optional<LabelStmt> from(const Stmt &parent);
   LabelDecl declaration(void) const noexcept;
@@ -6248,12 +6857,18 @@ class LabelStmt : public ValueStmt {
   bool is_side_entry(void) const noexcept;
 };
 
+using ExprRange = DerivedEntityRange<StmtIterator, Expr>;
+
 class Expr : public ValueStmt {
  private:
   friend class FragmentImpl;
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<Expr> from(const ValueStmt &parent);
   static std::optional<Expr> from(const Stmt &parent);
   bool has_side_effects(void) const noexcept;
@@ -6285,6 +6900,8 @@ class Expr : public ValueStmt {
   bool refers_to_vector_element(void) const noexcept;
 };
 
+using DesignatedInitUpdateExprRange = DerivedEntityRange<StmtIterator, DesignatedInitUpdateExpr>;
+
 class DesignatedInitUpdateExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6292,11 +6909,17 @@ class DesignatedInitUpdateExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static DesignatedInitUpdateExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DesignatedInitUpdateExpr> from(const Expr &parent);
   static std::optional<DesignatedInitUpdateExpr> from(const ValueStmt &parent);
   static std::optional<DesignatedInitUpdateExpr> from(const Stmt &parent);
   InitListExpr updater(void) const noexcept;
 };
+
+using DesignatedInitExprRange = DerivedEntityRange<StmtIterator, DesignatedInitExpr>;
 
 class DesignatedInitExpr : public Expr {
  private:
@@ -6305,6 +6928,10 @@ class DesignatedInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static DesignatedInitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DesignatedInitExpr> from(const Expr &parent);
   static std::optional<DesignatedInitExpr> from(const ValueStmt &parent);
   static std::optional<DesignatedInitExpr> from(const Stmt &parent);
@@ -6314,6 +6941,8 @@ class DesignatedInitExpr : public Expr {
   bool uses_gnu_syntax(void) const noexcept;
 };
 
+using DependentScopeDeclRefExprRange = DerivedEntityRange<StmtIterator, DependentScopeDeclRefExpr>;
+
 class DependentScopeDeclRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6321,6 +6950,10 @@ class DependentScopeDeclRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static DependentScopeDeclRefExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DependentScopeDeclRefExpr> from(const Expr &parent);
   static std::optional<DependentScopeDeclRefExpr> from(const ValueStmt &parent);
   static std::optional<DependentScopeDeclRefExpr> from(const Stmt &parent);
@@ -6331,6 +6964,8 @@ class DependentScopeDeclRefExpr : public Expr {
   bool has_template_keyword(void) const noexcept;
 };
 
+using DependentCoawaitExprRange = DerivedEntityRange<StmtIterator, DependentCoawaitExpr>;
+
 class DependentCoawaitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6338,12 +6973,18 @@ class DependentCoawaitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static DependentCoawaitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DependentCoawaitExpr> from(const Expr &parent);
   static std::optional<DependentCoawaitExpr> from(const ValueStmt &parent);
   static std::optional<DependentCoawaitExpr> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   UnresolvedLookupExpr operator_coawait_lookup(void) const noexcept;
 };
+
+using DeclRefExprRange = DerivedEntityRange<StmtIterator, DeclRefExpr>;
 
 class DeclRefExpr : public Expr {
  private:
@@ -6352,6 +6993,10 @@ class DeclRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static DeclRefExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DeclRefExpr> from(const Expr &parent);
   static std::optional<DeclRefExpr> from(const ValueStmt &parent);
   static std::optional<DeclRefExpr> from(const Stmt &parent);
@@ -6369,6 +7014,8 @@ class DeclRefExpr : public Expr {
   bool refers_to_enclosing_variable_or_capture(void) const noexcept;
 };
 
+using CoroutineSuspendExprRange = DerivedEntityRange<StmtIterator, CoroutineSuspendExpr>;
+
 class CoroutineSuspendExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6376,12 +7023,18 @@ class CoroutineSuspendExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CoroutineSuspendExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CoroutineSuspendExpr> from(const Expr &parent);
   static std::optional<CoroutineSuspendExpr> from(const ValueStmt &parent);
   static std::optional<CoroutineSuspendExpr> from(const Stmt &parent);
   Token keyword_token(void) const noexcept;
   OpaqueValueExpr opaque_value(void) const noexcept;
 };
+
+using CoawaitExprRange = DerivedEntityRange<StmtIterator, CoawaitExpr>;
 
 class CoawaitExpr : public CoroutineSuspendExpr {
  private:
@@ -6391,12 +7044,18 @@ class CoawaitExpr : public CoroutineSuspendExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CoawaitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CoawaitExpr> from(const CoroutineSuspendExpr &parent);
   static std::optional<CoawaitExpr> from(const Expr &parent);
   static std::optional<CoawaitExpr> from(const ValueStmt &parent);
   static std::optional<CoawaitExpr> from(const Stmt &parent);
   bool is_implicit(void) const noexcept;
 };
+
+using CoyieldExprRange = DerivedEntityRange<StmtIterator, CoyieldExpr>;
 
 class CoyieldExpr : public CoroutineSuspendExpr {
  private:
@@ -6406,11 +7065,17 @@ class CoyieldExpr : public CoroutineSuspendExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CoyieldExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CoyieldExpr> from(const CoroutineSuspendExpr &parent);
   static std::optional<CoyieldExpr> from(const Expr &parent);
   static std::optional<CoyieldExpr> from(const ValueStmt &parent);
   static std::optional<CoyieldExpr> from(const Stmt &parent);
 };
+
+using ConvertVectorExprRange = DerivedEntityRange<StmtIterator, ConvertVectorExpr>;
 
 class ConvertVectorExpr : public Expr {
  private:
@@ -6419,12 +7084,18 @@ class ConvertVectorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ConvertVectorExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ConvertVectorExpr> from(const Expr &parent);
   static std::optional<ConvertVectorExpr> from(const ValueStmt &parent);
   static std::optional<ConvertVectorExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using ConceptSpecializationExprRange = DerivedEntityRange<StmtIterator, ConceptSpecializationExpr>;
 
 class ConceptSpecializationExpr : public Expr {
  private:
@@ -6433,12 +7104,18 @@ class ConceptSpecializationExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ConceptSpecializationExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ConceptSpecializationExpr> from(const Expr &parent);
   static std::optional<ConceptSpecializationExpr> from(const ValueStmt &parent);
   static std::optional<ConceptSpecializationExpr> from(const Stmt &parent);
   std::vector<TemplateArgument> template_arguments(void) const noexcept;
   bool is_satisfied(void) const noexcept;
 };
+
+using CompoundLiteralExprRange = DerivedEntityRange<StmtIterator, CompoundLiteralExpr>;
 
 class CompoundLiteralExpr : public Expr {
  private:
@@ -6447,12 +7124,18 @@ class CompoundLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CompoundLiteralExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CompoundLiteralExpr> from(const Expr &parent);
   static std::optional<CompoundLiteralExpr> from(const ValueStmt &parent);
   static std::optional<CompoundLiteralExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   bool is_file_scope(void) const noexcept;
 };
+
+using ChooseExprRange = DerivedEntityRange<StmtIterator, ChooseExpr>;
 
 class ChooseExpr : public Expr {
  private:
@@ -6461,6 +7144,10 @@ class ChooseExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ChooseExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ChooseExpr> from(const Expr &parent);
   static std::optional<ChooseExpr> from(const ValueStmt &parent);
   static std::optional<ChooseExpr> from(const Stmt &parent);
@@ -6470,6 +7157,8 @@ class ChooseExpr : public Expr {
   bool is_condition_true(void) const noexcept;
 };
 
+using CharacterLiteralRange = DerivedEntityRange<StmtIterator, CharacterLiteral>;
+
 class CharacterLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -6477,11 +7166,17 @@ class CharacterLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CharacterLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CharacterLiteral> from(const Expr &parent);
   static std::optional<CharacterLiteral> from(const ValueStmt &parent);
   static std::optional<CharacterLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
+
+using CastExprRange = DerivedEntityRange<StmtIterator, CastExpr>;
 
 class CastExpr : public Expr {
  private:
@@ -6490,6 +7185,10 @@ class CastExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CastExpr> from(const Expr &parent);
   static std::optional<CastExpr> from(const ValueStmt &parent);
   static std::optional<CastExpr> from(const Stmt &parent);
@@ -6500,6 +7199,8 @@ class CastExpr : public Expr {
   bool has_stored_fp_features(void) const noexcept;
 };
 
+using ImplicitCastExprRange = DerivedEntityRange<StmtIterator, ImplicitCastExpr>;
+
 class ImplicitCastExpr : public CastExpr {
  private:
   friend class FragmentImpl;
@@ -6508,12 +7209,18 @@ class ImplicitCastExpr : public CastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ImplicitCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ImplicitCastExpr> from(const CastExpr &parent);
   static std::optional<ImplicitCastExpr> from(const Expr &parent);
   static std::optional<ImplicitCastExpr> from(const ValueStmt &parent);
   static std::optional<ImplicitCastExpr> from(const Stmt &parent);
   bool is_part_of_explicit_cast(void) const noexcept;
 };
+
+using ExplicitCastExprRange = DerivedEntityRange<StmtIterator, ExplicitCastExpr>;
 
 class ExplicitCastExpr : public CastExpr {
  private:
@@ -6523,11 +7230,17 @@ class ExplicitCastExpr : public CastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ExplicitCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ExplicitCastExpr> from(const CastExpr &parent);
   static std::optional<ExplicitCastExpr> from(const Expr &parent);
   static std::optional<ExplicitCastExpr> from(const ValueStmt &parent);
   static std::optional<ExplicitCastExpr> from(const Stmt &parent);
 };
+
+using CXXNamedCastExprRange = DerivedEntityRange<StmtIterator, CXXNamedCastExpr>;
 
 class CXXNamedCastExpr : public ExplicitCastExpr {
  private:
@@ -6538,6 +7251,10 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXNamedCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXNamedCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXNamedCastExpr> from(const CastExpr &parent);
   static std::optional<CXXNamedCastExpr> from(const Expr &parent);
@@ -6549,6 +7266,8 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   Token r_paren_token(void) const noexcept;
 };
 
+using CXXDynamicCastExprRange = DerivedEntityRange<StmtIterator, CXXDynamicCastExpr>;
+
 class CXXDynamicCastExpr : public CXXNamedCastExpr {
  private:
   friend class FragmentImpl;
@@ -6559,6 +7278,10 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXDynamicCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXDynamicCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXDynamicCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXDynamicCastExpr> from(const CastExpr &parent);
@@ -6567,6 +7290,8 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
   static std::optional<CXXDynamicCastExpr> from(const Stmt &parent);
   bool is_always_null(void) const noexcept;
 };
+
+using CXXConstCastExprRange = DerivedEntityRange<StmtIterator, CXXConstCastExpr>;
 
 class CXXConstCastExpr : public CXXNamedCastExpr {
  private:
@@ -6578,6 +7303,10 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXConstCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXConstCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXConstCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXConstCastExpr> from(const CastExpr &parent);
@@ -6585,6 +7314,8 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
   static std::optional<CXXConstCastExpr> from(const ValueStmt &parent);
   static std::optional<CXXConstCastExpr> from(const Stmt &parent);
 };
+
+using CXXAddrspaceCastExprRange = DerivedEntityRange<StmtIterator, CXXAddrspaceCastExpr>;
 
 class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
  private:
@@ -6596,6 +7327,10 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXAddrspaceCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXAddrspaceCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXAddrspaceCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXAddrspaceCastExpr> from(const CastExpr &parent);
@@ -6603,6 +7338,8 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
   static std::optional<CXXAddrspaceCastExpr> from(const ValueStmt &parent);
   static std::optional<CXXAddrspaceCastExpr> from(const Stmt &parent);
 };
+
+using CXXStaticCastExprRange = DerivedEntityRange<StmtIterator, CXXStaticCastExpr>;
 
 class CXXStaticCastExpr : public CXXNamedCastExpr {
  private:
@@ -6614,6 +7351,10 @@ class CXXStaticCastExpr : public CXXNamedCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXStaticCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXStaticCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXStaticCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXStaticCastExpr> from(const CastExpr &parent);
@@ -6621,6 +7362,8 @@ class CXXStaticCastExpr : public CXXNamedCastExpr {
   static std::optional<CXXStaticCastExpr> from(const ValueStmt &parent);
   static std::optional<CXXStaticCastExpr> from(const Stmt &parent);
 };
+
+using CXXReinterpretCastExprRange = DerivedEntityRange<StmtIterator, CXXReinterpretCastExpr>;
 
 class CXXReinterpretCastExpr : public CXXNamedCastExpr {
  private:
@@ -6632,6 +7375,10 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXReinterpretCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXReinterpretCastExpr> from(const CXXNamedCastExpr &parent);
   static std::optional<CXXReinterpretCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXReinterpretCastExpr> from(const CastExpr &parent);
@@ -6639,6 +7386,8 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
   static std::optional<CXXReinterpretCastExpr> from(const ValueStmt &parent);
   static std::optional<CXXReinterpretCastExpr> from(const Stmt &parent);
 };
+
+using CXXFunctionalCastExprRange = DerivedEntityRange<StmtIterator, CXXFunctionalCastExpr>;
 
 class CXXFunctionalCastExpr : public ExplicitCastExpr {
  private:
@@ -6649,6 +7398,10 @@ class CXXFunctionalCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXFunctionalCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXFunctionalCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CXXFunctionalCastExpr> from(const CastExpr &parent);
   static std::optional<CXXFunctionalCastExpr> from(const Expr &parent);
@@ -6659,6 +7412,8 @@ class CXXFunctionalCastExpr : public ExplicitCastExpr {
   bool is_list_initialization(void) const noexcept;
 };
 
+using CStyleCastExprRange = DerivedEntityRange<StmtIterator, CStyleCastExpr>;
+
 class CStyleCastExpr : public ExplicitCastExpr {
  private:
   friend class FragmentImpl;
@@ -6668,6 +7423,10 @@ class CStyleCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CStyleCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CStyleCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<CStyleCastExpr> from(const CastExpr &parent);
   static std::optional<CStyleCastExpr> from(const Expr &parent);
@@ -6676,6 +7435,8 @@ class CStyleCastExpr : public ExplicitCastExpr {
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using BuiltinBitCastExprRange = DerivedEntityRange<StmtIterator, BuiltinBitCastExpr>;
 
 class BuiltinBitCastExpr : public ExplicitCastExpr {
  private:
@@ -6686,12 +7447,18 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static BuiltinBitCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BuiltinBitCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<BuiltinBitCastExpr> from(const CastExpr &parent);
   static std::optional<BuiltinBitCastExpr> from(const Expr &parent);
   static std::optional<BuiltinBitCastExpr> from(const ValueStmt &parent);
   static std::optional<BuiltinBitCastExpr> from(const Stmt &parent);
 };
+
+using ObjCBridgedCastExprRange = DerivedEntityRange<StmtIterator, ObjCBridgedCastExpr>;
 
 class ObjCBridgedCastExpr : public ExplicitCastExpr {
  private:
@@ -6702,6 +7469,10 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCBridgedCastExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCBridgedCastExpr> from(const ExplicitCastExpr &parent);
   static std::optional<ObjCBridgedCastExpr> from(const CastExpr &parent);
   static std::optional<ObjCBridgedCastExpr> from(const Expr &parent);
@@ -6713,6 +7484,8 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
   Token l_paren_token(void) const noexcept;
 };
 
+using CallExprRange = DerivedEntityRange<StmtIterator, CallExpr>;
+
 class CallExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6720,6 +7493,10 @@ class CallExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CallExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CallExpr> from(const Expr &parent);
   static std::optional<CallExpr> from(const ValueStmt &parent);
   static std::optional<CallExpr> from(const Stmt &parent);
@@ -6734,6 +7511,8 @@ class CallExpr : public Expr {
   bool uses_adl(void) const noexcept;
 };
 
+using CXXOperatorCallExprRange = DerivedEntityRange<StmtIterator, CXXOperatorCallExpr>;
+
 class CXXOperatorCallExpr : public CallExpr {
  private:
   friend class FragmentImpl;
@@ -6742,6 +7521,10 @@ class CXXOperatorCallExpr : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXOperatorCallExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXOperatorCallExpr> from(const CallExpr &parent);
   static std::optional<CXXOperatorCallExpr> from(const Expr &parent);
   static std::optional<CXXOperatorCallExpr> from(const ValueStmt &parent);
@@ -6753,6 +7536,8 @@ class CXXOperatorCallExpr : public CallExpr {
   bool is_infix_binary_operation(void) const noexcept;
 };
 
+using CXXMemberCallExprRange = DerivedEntityRange<StmtIterator, CXXMemberCallExpr>;
+
 class CXXMemberCallExpr : public CallExpr {
  private:
   friend class FragmentImpl;
@@ -6761,6 +7546,10 @@ class CXXMemberCallExpr : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXMemberCallExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXMemberCallExpr> from(const CallExpr &parent);
   static std::optional<CXXMemberCallExpr> from(const Expr &parent);
   static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
@@ -6768,6 +7557,8 @@ class CXXMemberCallExpr : public CallExpr {
   CXXMethodDecl method_declaration(void) const noexcept;
   CXXRecordDecl record_declaration(void) const noexcept;
 };
+
+using CUDAKernelCallExprRange = DerivedEntityRange<StmtIterator, CUDAKernelCallExpr>;
 
 class CUDAKernelCallExpr : public CallExpr {
  private:
@@ -6777,12 +7568,18 @@ class CUDAKernelCallExpr : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CUDAKernelCallExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CUDAKernelCallExpr> from(const CallExpr &parent);
   static std::optional<CUDAKernelCallExpr> from(const Expr &parent);
   static std::optional<CUDAKernelCallExpr> from(const ValueStmt &parent);
   static std::optional<CUDAKernelCallExpr> from(const Stmt &parent);
   CallExpr config(void) const noexcept;
 };
+
+using UserDefinedLiteralRange = DerivedEntityRange<StmtIterator, UserDefinedLiteral>;
 
 class UserDefinedLiteral : public CallExpr {
  private:
@@ -6792,6 +7589,10 @@ class UserDefinedLiteral : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static UserDefinedLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UserDefinedLiteral> from(const CallExpr &parent);
   static std::optional<UserDefinedLiteral> from(const Expr &parent);
   static std::optional<UserDefinedLiteral> from(const ValueStmt &parent);
@@ -6800,6 +7601,8 @@ class UserDefinedLiteral : public CallExpr {
   Token ud_suffix_token(void) const noexcept;
 };
 
+using CXXUuidofExprRange = DerivedEntityRange<StmtIterator, CXXUuidofExpr>;
+
 class CXXUuidofExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6807,12 +7610,18 @@ class CXXUuidofExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXUuidofExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXUuidofExpr> from(const Expr &parent);
   static std::optional<CXXUuidofExpr> from(const ValueStmt &parent);
   static std::optional<CXXUuidofExpr> from(const Stmt &parent);
   MSGuidDecl guid_declaration(void) const noexcept;
   bool is_type_operand(void) const noexcept;
 };
+
+using CXXUnresolvedConstructExprRange = DerivedEntityRange<StmtIterator, CXXUnresolvedConstructExpr>;
 
 class CXXUnresolvedConstructExpr : public Expr {
  private:
@@ -6821,6 +7630,10 @@ class CXXUnresolvedConstructExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXUnresolvedConstructExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXUnresolvedConstructExpr> from(const Expr &parent);
   static std::optional<CXXUnresolvedConstructExpr> from(const ValueStmt &parent);
   static std::optional<CXXUnresolvedConstructExpr> from(const Stmt &parent);
@@ -6829,6 +7642,8 @@ class CXXUnresolvedConstructExpr : public Expr {
   bool is_list_initialization(void) const noexcept;
 };
 
+using CXXTypeidExprRange = DerivedEntityRange<StmtIterator, CXXTypeidExpr>;
+
 class CXXTypeidExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6836,6 +7651,10 @@ class CXXTypeidExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXTypeidExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXTypeidExpr> from(const Expr &parent);
   static std::optional<CXXTypeidExpr> from(const ValueStmt &parent);
   static std::optional<CXXTypeidExpr> from(const Stmt &parent);
@@ -6844,6 +7663,8 @@ class CXXTypeidExpr : public Expr {
   bool is_type_operand(void) const noexcept;
 };
 
+using CXXThrowExprRange = DerivedEntityRange<StmtIterator, CXXThrowExpr>;
+
 class CXXThrowExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6851,12 +7672,18 @@ class CXXThrowExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXThrowExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXThrowExpr> from(const Expr &parent);
   static std::optional<CXXThrowExpr> from(const ValueStmt &parent);
   static std::optional<CXXThrowExpr> from(const Stmt &parent);
   Token throw_token(void) const noexcept;
   bool is_thrown_variable_in_scope(void) const noexcept;
 };
+
+using CXXThisExprRange = DerivedEntityRange<StmtIterator, CXXThisExpr>;
 
 class CXXThisExpr : public Expr {
  private:
@@ -6865,12 +7692,18 @@ class CXXThisExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXThisExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXThisExpr> from(const Expr &parent);
   static std::optional<CXXThisExpr> from(const ValueStmt &parent);
   static std::optional<CXXThisExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool is_implicit(void) const noexcept;
 };
+
+using CXXStdInitializerListExprRange = DerivedEntityRange<StmtIterator, CXXStdInitializerListExpr>;
 
 class CXXStdInitializerListExpr : public Expr {
  private:
@@ -6879,10 +7712,16 @@ class CXXStdInitializerListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXStdInitializerListExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXStdInitializerListExpr> from(const Expr &parent);
   static std::optional<CXXStdInitializerListExpr> from(const ValueStmt &parent);
   static std::optional<CXXStdInitializerListExpr> from(const Stmt &parent);
 };
+
+using CXXScalarValueInitExprRange = DerivedEntityRange<StmtIterator, CXXScalarValueInitExpr>;
 
 class CXXScalarValueInitExpr : public Expr {
  private:
@@ -6891,11 +7730,17 @@ class CXXScalarValueInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXScalarValueInitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXScalarValueInitExpr> from(const Expr &parent);
   static std::optional<CXXScalarValueInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXScalarValueInitExpr> from(const Stmt &parent);
   Token r_paren_token(void) const noexcept;
 };
+
+using CXXRewrittenBinaryOperatorRange = DerivedEntityRange<StmtIterator, CXXRewrittenBinaryOperator>;
 
 class CXXRewrittenBinaryOperator : public Expr {
  private:
@@ -6904,6 +7749,10 @@ class CXXRewrittenBinaryOperator : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXRewrittenBinaryOperatorRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXRewrittenBinaryOperator> from(const Expr &parent);
   static std::optional<CXXRewrittenBinaryOperator> from(const ValueStmt &parent);
   static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent);
@@ -6916,6 +7765,8 @@ class CXXRewrittenBinaryOperator : public Expr {
   bool is_reversed(void) const noexcept;
 };
 
+using CXXPseudoDestructorExprRange = DerivedEntityRange<StmtIterator, CXXPseudoDestructorExpr>;
+
 class CXXPseudoDestructorExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6923,6 +7774,10 @@ class CXXPseudoDestructorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXPseudoDestructorExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXPseudoDestructorExpr> from(const Expr &parent);
   static std::optional<CXXPseudoDestructorExpr> from(const ValueStmt &parent);
   static std::optional<CXXPseudoDestructorExpr> from(const Stmt &parent);
@@ -6934,6 +7789,8 @@ class CXXPseudoDestructorExpr : public Expr {
   bool is_arrow(void) const noexcept;
 };
 
+using CXXNullPtrLiteralExprRange = DerivedEntityRange<StmtIterator, CXXNullPtrLiteralExpr>;
+
 class CXXNullPtrLiteralExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6941,11 +7798,17 @@ class CXXNullPtrLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXNullPtrLiteralExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXNullPtrLiteralExpr> from(const Expr &parent);
   static std::optional<CXXNullPtrLiteralExpr> from(const ValueStmt &parent);
   static std::optional<CXXNullPtrLiteralExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
+
+using CXXNoexceptExprRange = DerivedEntityRange<StmtIterator, CXXNoexceptExpr>;
 
 class CXXNoexceptExpr : public Expr {
  private:
@@ -6954,11 +7817,17 @@ class CXXNoexceptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXNoexceptExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXNoexceptExpr> from(const Expr &parent);
   static std::optional<CXXNoexceptExpr> from(const ValueStmt &parent);
   static std::optional<CXXNoexceptExpr> from(const Stmt &parent);
   bool value(void) const noexcept;
 };
+
+using CXXNewExprRange = DerivedEntityRange<StmtIterator, CXXNewExpr>;
 
 class CXXNewExpr : public Expr {
  private:
@@ -6967,6 +7836,10 @@ class CXXNewExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXNewExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXNewExpr> from(const Expr &parent);
   static std::optional<CXXNewExpr> from(const ValueStmt &parent);
   static std::optional<CXXNewExpr> from(const Stmt &parent);
@@ -6985,6 +7858,8 @@ class CXXNewExpr : public Expr {
   bool should_null_check_allocation(void) const noexcept;
 };
 
+using CXXInheritedCtorInitExprRange = DerivedEntityRange<StmtIterator, CXXInheritedCtorInitExpr>;
+
 class CXXInheritedCtorInitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -6992,6 +7867,10 @@ class CXXInheritedCtorInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXInheritedCtorInitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXInheritedCtorInitExpr> from(const Expr &parent);
   static std::optional<CXXInheritedCtorInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXInheritedCtorInitExpr> from(const Stmt &parent);
@@ -7002,6 +7881,8 @@ class CXXInheritedCtorInitExpr : public Expr {
   bool inherited_from_virtual_base(void) const noexcept;
 };
 
+using CXXFoldExprRange = DerivedEntityRange<StmtIterator, CXXFoldExpr>;
+
 class CXXFoldExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7009,6 +7890,10 @@ class CXXFoldExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXFoldExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXFoldExpr> from(const Expr &parent);
   static std::optional<CXXFoldExpr> from(const ValueStmt &parent);
   static std::optional<CXXFoldExpr> from(const Stmt &parent);
@@ -7021,6 +7906,8 @@ class CXXFoldExpr : public Expr {
   bool is_right_fold(void) const noexcept;
 };
 
+using CXXDependentScopeMemberExprRange = DerivedEntityRange<StmtIterator, CXXDependentScopeMemberExpr>;
+
 class CXXDependentScopeMemberExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7028,6 +7915,10 @@ class CXXDependentScopeMemberExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXDependentScopeMemberExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXDependentScopeMemberExpr> from(const Expr &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
@@ -7043,6 +7934,8 @@ class CXXDependentScopeMemberExpr : public Expr {
   bool is_implicit_access(void) const noexcept;
 };
 
+using CXXDeleteExprRange = DerivedEntityRange<StmtIterator, CXXDeleteExpr>;
+
 class CXXDeleteExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7050,6 +7943,10 @@ class CXXDeleteExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXDeleteExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXDeleteExpr> from(const Expr &parent);
   static std::optional<CXXDeleteExpr> from(const ValueStmt &parent);
   static std::optional<CXXDeleteExpr> from(const Stmt &parent);
@@ -7060,6 +7957,8 @@ class CXXDeleteExpr : public Expr {
   bool is_global_delete(void) const noexcept;
 };
 
+using CXXDefaultInitExprRange = DerivedEntityRange<StmtIterator, CXXDefaultInitExpr>;
+
 class CXXDefaultInitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7067,12 +7966,18 @@ class CXXDefaultInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXDefaultInitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXDefaultInitExpr> from(const Expr &parent);
   static std::optional<CXXDefaultInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXDefaultInitExpr> from(const Stmt &parent);
   FieldDecl field(void) const noexcept;
   Token used_token(void) const noexcept;
 };
+
+using CXXDefaultArgExprRange = DerivedEntityRange<StmtIterator, CXXDefaultArgExpr>;
 
 class CXXDefaultArgExpr : public Expr {
  private:
@@ -7081,12 +7986,18 @@ class CXXDefaultArgExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXDefaultArgExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXDefaultArgExpr> from(const Expr &parent);
   static std::optional<CXXDefaultArgExpr> from(const ValueStmt &parent);
   static std::optional<CXXDefaultArgExpr> from(const Stmt &parent);
   ParmVarDecl parameter(void) const noexcept;
   Token used_token(void) const noexcept;
 };
+
+using CXXConstructExprRange = DerivedEntityRange<StmtIterator, CXXConstructExpr>;
 
 class CXXConstructExpr : public Expr {
  private:
@@ -7095,6 +8006,10 @@ class CXXConstructExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXConstructExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXConstructExpr> from(const Expr &parent);
   static std::optional<CXXConstructExpr> from(const ValueStmt &parent);
   static std::optional<CXXConstructExpr> from(const Stmt &parent);
@@ -7109,6 +8024,8 @@ class CXXConstructExpr : public Expr {
   bool requires_zero_initialization(void) const noexcept;
 };
 
+using CXXTemporaryObjectExprRange = DerivedEntityRange<StmtIterator, CXXTemporaryObjectExpr>;
+
 class CXXTemporaryObjectExpr : public CXXConstructExpr {
  private:
   friend class FragmentImpl;
@@ -7117,11 +8034,17 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXTemporaryObjectExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXTemporaryObjectExpr> from(const CXXConstructExpr &parent);
   static std::optional<CXXTemporaryObjectExpr> from(const Expr &parent);
   static std::optional<CXXTemporaryObjectExpr> from(const ValueStmt &parent);
   static std::optional<CXXTemporaryObjectExpr> from(const Stmt &parent);
 };
+
+using CXXBoolLiteralExprRange = DerivedEntityRange<StmtIterator, CXXBoolLiteralExpr>;
 
 class CXXBoolLiteralExpr : public Expr {
  private:
@@ -7130,12 +8053,18 @@ class CXXBoolLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXBoolLiteralExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXBoolLiteralExpr> from(const Expr &parent);
   static std::optional<CXXBoolLiteralExpr> from(const ValueStmt &parent);
   static std::optional<CXXBoolLiteralExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool value(void) const noexcept;
 };
+
+using CXXBindTemporaryExprRange = DerivedEntityRange<StmtIterator, CXXBindTemporaryExpr>;
 
 class CXXBindTemporaryExpr : public Expr {
  private:
@@ -7144,10 +8073,16 @@ class CXXBindTemporaryExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CXXBindTemporaryExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXBindTemporaryExpr> from(const Expr &parent);
   static std::optional<CXXBindTemporaryExpr> from(const ValueStmt &parent);
   static std::optional<CXXBindTemporaryExpr> from(const Stmt &parent);
 };
+
+using BlockExprRange = DerivedEntityRange<StmtIterator, BlockExpr>;
 
 class BlockExpr : public Expr {
  private:
@@ -7156,12 +8091,18 @@ class BlockExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static BlockExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BlockExpr> from(const Expr &parent);
   static std::optional<BlockExpr> from(const ValueStmt &parent);
   static std::optional<BlockExpr> from(const Stmt &parent);
   BlockDecl block_declaration(void) const noexcept;
   Token caret_token(void) const noexcept;
 };
+
+using BinaryOperatorRange = DerivedEntityRange<StmtIterator, BinaryOperator>;
 
 class BinaryOperator : public Expr {
  private:
@@ -7170,6 +8111,10 @@ class BinaryOperator : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static BinaryOperatorRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BinaryOperator> from(const Expr &parent);
   static std::optional<BinaryOperator> from(const ValueStmt &parent);
   static std::optional<BinaryOperator> from(const Stmt &parent);
@@ -7192,6 +8137,8 @@ class BinaryOperator : public Expr {
   bool is_shift_operation(void) const noexcept;
 };
 
+using CompoundAssignOperatorRange = DerivedEntityRange<StmtIterator, CompoundAssignOperator>;
+
 class CompoundAssignOperator : public BinaryOperator {
  private:
   friend class FragmentImpl;
@@ -7200,11 +8147,17 @@ class CompoundAssignOperator : public BinaryOperator {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static CompoundAssignOperatorRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CompoundAssignOperator> from(const BinaryOperator &parent);
   static std::optional<CompoundAssignOperator> from(const Expr &parent);
   static std::optional<CompoundAssignOperator> from(const ValueStmt &parent);
   static std::optional<CompoundAssignOperator> from(const Stmt &parent);
 };
+
+using AtomicExprRange = DerivedEntityRange<StmtIterator, AtomicExpr>;
 
 class AtomicExpr : public Expr {
  private:
@@ -7213,6 +8166,10 @@ class AtomicExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static AtomicExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<AtomicExpr> from(const Expr &parent);
   static std::optional<AtomicExpr> from(const ValueStmt &parent);
   static std::optional<AtomicExpr> from(const Stmt &parent);
@@ -7224,6 +8181,8 @@ class AtomicExpr : public Expr {
   bool is_volatile(void) const noexcept;
 };
 
+using AsTypeExprRange = DerivedEntityRange<StmtIterator, AsTypeExpr>;
+
 class AsTypeExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7231,12 +8190,18 @@ class AsTypeExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static AsTypeExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<AsTypeExpr> from(const Expr &parent);
   static std::optional<AsTypeExpr> from(const ValueStmt &parent);
   static std::optional<AsTypeExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using ArrayTypeTraitExprRange = DerivedEntityRange<StmtIterator, ArrayTypeTraitExpr>;
 
 class ArrayTypeTraitExpr : public Expr {
  private:
@@ -7245,11 +8210,17 @@ class ArrayTypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ArrayTypeTraitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ArrayTypeTraitExpr> from(const Expr &parent);
   static std::optional<ArrayTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
   ArrayTypeTrait trait(void) const noexcept;
 };
+
+using ArraySubscriptExprRange = DerivedEntityRange<StmtIterator, ArraySubscriptExpr>;
 
 class ArraySubscriptExpr : public Expr {
  private:
@@ -7258,11 +8229,17 @@ class ArraySubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ArraySubscriptExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ArraySubscriptExpr> from(const Expr &parent);
   static std::optional<ArraySubscriptExpr> from(const ValueStmt &parent);
   static std::optional<ArraySubscriptExpr> from(const Stmt &parent);
   Token r_bracket_token(void) const noexcept;
 };
+
+using ArrayInitLoopExprRange = DerivedEntityRange<StmtIterator, ArrayInitLoopExpr>;
 
 class ArrayInitLoopExpr : public Expr {
  private:
@@ -7271,11 +8248,17 @@ class ArrayInitLoopExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ArrayInitLoopExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ArrayInitLoopExpr> from(const Expr &parent);
   static std::optional<ArrayInitLoopExpr> from(const ValueStmt &parent);
   static std::optional<ArrayInitLoopExpr> from(const Stmt &parent);
   OpaqueValueExpr common_expression(void) const noexcept;
 };
+
+using ArrayInitIndexExprRange = DerivedEntityRange<StmtIterator, ArrayInitIndexExpr>;
 
 class ArrayInitIndexExpr : public Expr {
  private:
@@ -7284,10 +8267,16 @@ class ArrayInitIndexExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ArrayInitIndexExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ArrayInitIndexExpr> from(const Expr &parent);
   static std::optional<ArrayInitIndexExpr> from(const ValueStmt &parent);
   static std::optional<ArrayInitIndexExpr> from(const Stmt &parent);
 };
+
+using AddrLabelExprRange = DerivedEntityRange<StmtIterator, AddrLabelExpr>;
 
 class AddrLabelExpr : public Expr {
  private:
@@ -7296,6 +8285,10 @@ class AddrLabelExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static AddrLabelExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<AddrLabelExpr> from(const Expr &parent);
   static std::optional<AddrLabelExpr> from(const ValueStmt &parent);
   static std::optional<AddrLabelExpr> from(const Stmt &parent);
@@ -7304,6 +8297,8 @@ class AddrLabelExpr : public Expr {
   Token label_token(void) const noexcept;
 };
 
+using AbstractConditionalOperatorRange = DerivedEntityRange<StmtIterator, AbstractConditionalOperator>;
+
 class AbstractConditionalOperator : public Expr {
  private:
   friend class FragmentImpl;
@@ -7311,12 +8306,18 @@ class AbstractConditionalOperator : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static AbstractConditionalOperatorRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<AbstractConditionalOperator> from(const Expr &parent);
   static std::optional<AbstractConditionalOperator> from(const ValueStmt &parent);
   static std::optional<AbstractConditionalOperator> from(const Stmt &parent);
   Token colon_token(void) const noexcept;
   Token question_token(void) const noexcept;
 };
+
+using ConditionalOperatorRange = DerivedEntityRange<StmtIterator, ConditionalOperator>;
 
 class ConditionalOperator : public AbstractConditionalOperator {
  private:
@@ -7326,11 +8327,17 @@ class ConditionalOperator : public AbstractConditionalOperator {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ConditionalOperatorRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ConditionalOperator> from(const AbstractConditionalOperator &parent);
   static std::optional<ConditionalOperator> from(const Expr &parent);
   static std::optional<ConditionalOperator> from(const ValueStmt &parent);
   static std::optional<ConditionalOperator> from(const Stmt &parent);
 };
+
+using BinaryConditionalOperatorRange = DerivedEntityRange<StmtIterator, BinaryConditionalOperator>;
 
 class BinaryConditionalOperator : public AbstractConditionalOperator {
  private:
@@ -7340,12 +8347,18 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static BinaryConditionalOperatorRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
   static std::optional<BinaryConditionalOperator> from(const Expr &parent);
   static std::optional<BinaryConditionalOperator> from(const ValueStmt &parent);
   static std::optional<BinaryConditionalOperator> from(const Stmt &parent);
   OpaqueValueExpr opaque_value(void) const noexcept;
 };
+
+using VAArgExprRange = DerivedEntityRange<StmtIterator, VAArgExpr>;
 
 class VAArgExpr : public Expr {
  private:
@@ -7354,6 +8367,10 @@ class VAArgExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static VAArgExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<VAArgExpr> from(const Expr &parent);
   static std::optional<VAArgExpr> from(const ValueStmt &parent);
   static std::optional<VAArgExpr> from(const Stmt &parent);
@@ -7362,6 +8379,8 @@ class VAArgExpr : public Expr {
   bool is_microsoft_abi(void) const noexcept;
 };
 
+using UnaryOperatorRange = DerivedEntityRange<StmtIterator, UnaryOperator>;
+
 class UnaryOperator : public Expr {
  private:
   friend class FragmentImpl;
@@ -7369,6 +8388,10 @@ class UnaryOperator : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static UnaryOperatorRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UnaryOperator> from(const Expr &parent);
   static std::optional<UnaryOperator> from(const ValueStmt &parent);
   static std::optional<UnaryOperator> from(const Stmt &parent);
@@ -7384,6 +8407,8 @@ class UnaryOperator : public Expr {
   bool is_prefix(void) const noexcept;
 };
 
+using UnaryExprOrTypeTraitExprRange = DerivedEntityRange<StmtIterator, UnaryExprOrTypeTraitExpr>;
+
 class UnaryExprOrTypeTraitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7391,6 +8416,10 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static UnaryExprOrTypeTraitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Expr &parent);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Stmt &parent);
@@ -7399,6 +8428,8 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   bool is_argument_type(void) const noexcept;
 };
 
+using TypoExprRange = DerivedEntityRange<StmtIterator, TypoExpr>;
+
 class TypoExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7406,10 +8437,16 @@ class TypoExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static TypoExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TypoExpr> from(const Expr &parent);
   static std::optional<TypoExpr> from(const ValueStmt &parent);
   static std::optional<TypoExpr> from(const Stmt &parent);
 };
+
+using TypeTraitExprRange = DerivedEntityRange<StmtIterator, TypeTraitExpr>;
 
 class TypeTraitExpr : public Expr {
  private:
@@ -7418,12 +8455,18 @@ class TypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static TypeTraitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TypeTraitExpr> from(const Expr &parent);
   static std::optional<TypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<TypeTraitExpr> from(const Stmt &parent);
   TypeTrait trait(void) const noexcept;
   bool value(void) const noexcept;
 };
+
+using SubstNonTypeTemplateParmPackExprRange = DerivedEntityRange<StmtIterator, SubstNonTypeTemplateParmPackExpr>;
 
 class SubstNonTypeTemplateParmPackExpr : public Expr {
  private:
@@ -7432,12 +8475,18 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static SubstNonTypeTemplateParmPackExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Expr &parent);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const ValueStmt &parent);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Stmt &parent);
   NonTypeTemplateParmDecl parameter_pack(void) const noexcept;
   Token parameter_pack_token(void) const noexcept;
 };
+
+using SubstNonTypeTemplateParmExprRange = DerivedEntityRange<StmtIterator, SubstNonTypeTemplateParmExpr>;
 
 class SubstNonTypeTemplateParmExpr : public Expr {
  private:
@@ -7446,6 +8495,10 @@ class SubstNonTypeTemplateParmExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static SubstNonTypeTemplateParmExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Expr &parent);
   static std::optional<SubstNonTypeTemplateParmExpr> from(const ValueStmt &parent);
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent);
@@ -7454,6 +8507,8 @@ class SubstNonTypeTemplateParmExpr : public Expr {
   bool is_reference_parameter(void) const noexcept;
 };
 
+using StringLiteralRange = DerivedEntityRange<StmtIterator, StringLiteral>;
+
 class StringLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -7461,6 +8516,10 @@ class StringLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static StringLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<StringLiteral> from(const Expr &parent);
   static std::optional<StringLiteral> from(const ValueStmt &parent);
   static std::optional<StringLiteral> from(const Stmt &parent);
@@ -7476,6 +8535,8 @@ class StringLiteral : public Expr {
   bool is_wide(void) const noexcept;
 };
 
+using StmtExprRange = DerivedEntityRange<StmtIterator, StmtExpr>;
+
 class StmtExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7483,6 +8544,10 @@ class StmtExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static StmtExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<StmtExpr> from(const Expr &parent);
   static std::optional<StmtExpr> from(const ValueStmt &parent);
   static std::optional<StmtExpr> from(const Stmt &parent);
@@ -7491,6 +8556,8 @@ class StmtExpr : public Expr {
   CompoundStmt sub_statement(void) const noexcept;
 };
 
+using SourceLocExprRange = DerivedEntityRange<StmtIterator, SourceLocExpr>;
+
 class SourceLocExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7498,6 +8565,10 @@ class SourceLocExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static SourceLocExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SourceLocExpr> from(const Expr &parent);
   static std::optional<SourceLocExpr> from(const ValueStmt &parent);
   static std::optional<SourceLocExpr> from(const Stmt &parent);
@@ -7508,6 +8579,8 @@ class SourceLocExpr : public Expr {
   bool is_string_type(void) const noexcept;
 };
 
+using SizeOfPackExprRange = DerivedEntityRange<StmtIterator, SizeOfPackExpr>;
+
 class SizeOfPackExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7515,6 +8588,10 @@ class SizeOfPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static SizeOfPackExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SizeOfPackExpr> from(const Expr &parent);
   static std::optional<SizeOfPackExpr> from(const ValueStmt &parent);
   static std::optional<SizeOfPackExpr> from(const Stmt &parent);
@@ -7526,6 +8603,8 @@ class SizeOfPackExpr : public Expr {
   bool is_partially_substituted(void) const noexcept;
 };
 
+using ShuffleVectorExprRange = DerivedEntityRange<StmtIterator, ShuffleVectorExpr>;
+
 class ShuffleVectorExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7533,12 +8612,18 @@ class ShuffleVectorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ShuffleVectorExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ShuffleVectorExpr> from(const Expr &parent);
   static std::optional<ShuffleVectorExpr> from(const ValueStmt &parent);
   static std::optional<ShuffleVectorExpr> from(const Stmt &parent);
   Token builtin_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using SYCLUniqueStableNameExprRange = DerivedEntityRange<StmtIterator, SYCLUniqueStableNameExpr>;
 
 class SYCLUniqueStableNameExpr : public Expr {
  private:
@@ -7547,6 +8632,10 @@ class SYCLUniqueStableNameExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static SYCLUniqueStableNameExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SYCLUniqueStableNameExpr> from(const Expr &parent);
   static std::optional<SYCLUniqueStableNameExpr> from(const ValueStmt &parent);
   static std::optional<SYCLUniqueStableNameExpr> from(const Stmt &parent);
@@ -7556,6 +8645,8 @@ class SYCLUniqueStableNameExpr : public Expr {
   Token r_paren_token(void) const noexcept;
 };
 
+using RequiresExprRange = DerivedEntityRange<StmtIterator, RequiresExpr>;
+
 class RequiresExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7563,6 +8654,10 @@ class RequiresExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static RequiresExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<RequiresExpr> from(const Expr &parent);
   static std::optional<RequiresExpr> from(const ValueStmt &parent);
   static std::optional<RequiresExpr> from(const Stmt &parent);
@@ -7573,6 +8668,8 @@ class RequiresExpr : public Expr {
   bool is_satisfied(void) const noexcept;
 };
 
+using RecoveryExprRange = DerivedEntityRange<StmtIterator, RecoveryExpr>;
+
 class RecoveryExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7580,10 +8677,16 @@ class RecoveryExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static RecoveryExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<RecoveryExpr> from(const Expr &parent);
   static std::optional<RecoveryExpr> from(const ValueStmt &parent);
   static std::optional<RecoveryExpr> from(const Stmt &parent);
 };
+
+using PseudoObjectExprRange = DerivedEntityRange<StmtIterator, PseudoObjectExpr>;
 
 class PseudoObjectExpr : public Expr {
  private:
@@ -7592,10 +8695,16 @@ class PseudoObjectExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static PseudoObjectExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<PseudoObjectExpr> from(const Expr &parent);
   static std::optional<PseudoObjectExpr> from(const ValueStmt &parent);
   static std::optional<PseudoObjectExpr> from(const Stmt &parent);
 };
+
+using PredefinedExprRange = DerivedEntityRange<StmtIterator, PredefinedExpr>;
 
 class PredefinedExpr : public Expr {
  private:
@@ -7604,6 +8713,10 @@ class PredefinedExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static PredefinedExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<PredefinedExpr> from(const Expr &parent);
   static std::optional<PredefinedExpr> from(const ValueStmt &parent);
   static std::optional<PredefinedExpr> from(const Stmt &parent);
@@ -7613,6 +8726,8 @@ class PredefinedExpr : public Expr {
   Token token(void) const noexcept;
 };
 
+using ParenListExprRange = DerivedEntityRange<StmtIterator, ParenListExpr>;
+
 class ParenListExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7620,12 +8735,18 @@ class ParenListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ParenListExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ParenListExpr> from(const Expr &parent);
   static std::optional<ParenListExpr> from(const ValueStmt &parent);
   static std::optional<ParenListExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using ParenExprRange = DerivedEntityRange<StmtIterator, ParenExpr>;
 
 class ParenExpr : public Expr {
  private:
@@ -7634,12 +8755,18 @@ class ParenExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ParenExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ParenExpr> from(const Expr &parent);
   static std::optional<ParenExpr> from(const ValueStmt &parent);
   static std::optional<ParenExpr> from(const Stmt &parent);
   Token l_paren(void) const noexcept;
   Token r_paren(void) const noexcept;
 };
+
+using PackExpansionExprRange = DerivedEntityRange<StmtIterator, PackExpansionExpr>;
 
 class PackExpansionExpr : public Expr {
  private:
@@ -7648,11 +8775,17 @@ class PackExpansionExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static PackExpansionExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<PackExpansionExpr> from(const Expr &parent);
   static std::optional<PackExpansionExpr> from(const ValueStmt &parent);
   static std::optional<PackExpansionExpr> from(const Stmt &parent);
   Token ellipsis_token(void) const noexcept;
 };
+
+using OverloadExprRange = DerivedEntityRange<StmtIterator, OverloadExpr>;
 
 class OverloadExpr : public Expr {
  private:
@@ -7661,6 +8794,10 @@ class OverloadExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static OverloadExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OverloadExpr> from(const Expr &parent);
   static std::optional<OverloadExpr> from(const ValueStmt &parent);
   static std::optional<OverloadExpr> from(const Stmt &parent);
@@ -7673,6 +8810,8 @@ class OverloadExpr : public Expr {
   bool has_template_keyword(void) const noexcept;
 };
 
+using UnresolvedMemberExprRange = DerivedEntityRange<StmtIterator, UnresolvedMemberExpr>;
+
 class UnresolvedMemberExpr : public OverloadExpr {
  private:
   friend class FragmentImpl;
@@ -7681,6 +8820,10 @@ class UnresolvedMemberExpr : public OverloadExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static UnresolvedMemberExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UnresolvedMemberExpr> from(const OverloadExpr &parent);
   static std::optional<UnresolvedMemberExpr> from(const Expr &parent);
   static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
@@ -7692,6 +8835,8 @@ class UnresolvedMemberExpr : public OverloadExpr {
   bool is_implicit_access(void) const noexcept;
 };
 
+using UnresolvedLookupExprRange = DerivedEntityRange<StmtIterator, UnresolvedLookupExpr>;
+
 class UnresolvedLookupExpr : public OverloadExpr {
  private:
   friend class FragmentImpl;
@@ -7700,6 +8845,10 @@ class UnresolvedLookupExpr : public OverloadExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static UnresolvedLookupExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UnresolvedLookupExpr> from(const OverloadExpr &parent);
   static std::optional<UnresolvedLookupExpr> from(const Expr &parent);
   static std::optional<UnresolvedLookupExpr> from(const ValueStmt &parent);
@@ -7708,6 +8857,8 @@ class UnresolvedLookupExpr : public OverloadExpr {
   bool requires_adl(void) const noexcept;
 };
 
+using OpaqueValueExprRange = DerivedEntityRange<StmtIterator, OpaqueValueExpr>;
+
 class OpaqueValueExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7715,12 +8866,18 @@ class OpaqueValueExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static OpaqueValueExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OpaqueValueExpr> from(const Expr &parent);
   static std::optional<OpaqueValueExpr> from(const ValueStmt &parent);
   static std::optional<OpaqueValueExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool is_unique(void) const noexcept;
 };
+
+using OffsetOfExprRange = DerivedEntityRange<StmtIterator, OffsetOfExpr>;
 
 class OffsetOfExpr : public Expr {
  private:
@@ -7729,12 +8886,18 @@ class OffsetOfExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static OffsetOfExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OffsetOfExpr> from(const Expr &parent);
   static std::optional<OffsetOfExpr> from(const ValueStmt &parent);
   static std::optional<OffsetOfExpr> from(const Stmt &parent);
   Token operator_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using ObjCSubscriptRefExprRange = DerivedEntityRange<StmtIterator, ObjCSubscriptRefExpr>;
 
 class ObjCSubscriptRefExpr : public Expr {
  private:
@@ -7743,6 +8906,10 @@ class ObjCSubscriptRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCSubscriptRefExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCSubscriptRefExpr> from(const Expr &parent);
   static std::optional<ObjCSubscriptRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent);
@@ -7751,6 +8918,8 @@ class ObjCSubscriptRefExpr : public Expr {
   bool is_array_subscript_reference_expression(void) const noexcept;
 };
 
+using ObjCStringLiteralRange = DerivedEntityRange<StmtIterator, ObjCStringLiteral>;
+
 class ObjCStringLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -7758,12 +8927,18 @@ class ObjCStringLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCStringLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCStringLiteral> from(const Expr &parent);
   static std::optional<ObjCStringLiteral> from(const ValueStmt &parent);
   static std::optional<ObjCStringLiteral> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   StringLiteral string(void) const noexcept;
 };
+
+using ObjCSelectorExprRange = DerivedEntityRange<StmtIterator, ObjCSelectorExpr>;
 
 class ObjCSelectorExpr : public Expr {
  private:
@@ -7772,12 +8947,18 @@ class ObjCSelectorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCSelectorExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCSelectorExpr> from(const Expr &parent);
   static std::optional<ObjCSelectorExpr> from(const ValueStmt &parent);
   static std::optional<ObjCSelectorExpr> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using ObjCProtocolExprRange = DerivedEntityRange<StmtIterator, ObjCProtocolExpr>;
 
 class ObjCProtocolExpr : public Expr {
  private:
@@ -7786,6 +8967,10 @@ class ObjCProtocolExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCProtocolExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCProtocolExpr> from(const Expr &parent);
   static std::optional<ObjCProtocolExpr> from(const ValueStmt &parent);
   static std::optional<ObjCProtocolExpr> from(const Stmt &parent);
@@ -7795,6 +8980,8 @@ class ObjCProtocolExpr : public Expr {
   Token r_paren_token(void) const noexcept;
 };
 
+using ObjCPropertyRefExprRange = DerivedEntityRange<StmtIterator, ObjCPropertyRefExpr>;
+
 class ObjCPropertyRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7802,6 +8989,10 @@ class ObjCPropertyRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCPropertyRefExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCPropertyRefExpr> from(const Expr &parent);
   static std::optional<ObjCPropertyRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCPropertyRefExpr> from(const Stmt &parent);
@@ -7820,6 +9011,8 @@ class ObjCPropertyRefExpr : public Expr {
   bool is_super_receiver(void) const noexcept;
 };
 
+using ObjCMessageExprRange = DerivedEntityRange<StmtIterator, ObjCMessageExpr>;
+
 class ObjCMessageExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7827,6 +9020,10 @@ class ObjCMessageExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCMessageExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCMessageExpr> from(const Expr &parent);
   static std::optional<ObjCMessageExpr> from(const ValueStmt &parent);
   static std::optional<ObjCMessageExpr> from(const Stmt &parent);
@@ -7846,6 +9043,8 @@ class ObjCMessageExpr : public Expr {
   std::vector<Token> selector_tokens(void) const noexcept;
 };
 
+using ObjCIvarRefExprRange = DerivedEntityRange<StmtIterator, ObjCIvarRefExpr>;
+
 class ObjCIvarRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7853,6 +9052,10 @@ class ObjCIvarRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCIvarRefExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCIvarRefExpr> from(const Expr &parent);
   static std::optional<ObjCIvarRefExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIvarRefExpr> from(const Stmt &parent);
@@ -7863,6 +9066,8 @@ class ObjCIvarRefExpr : public Expr {
   bool is_free_instance_variable(void) const noexcept;
 };
 
+using ObjCIsaExprRange = DerivedEntityRange<StmtIterator, ObjCIsaExpr>;
+
 class ObjCIsaExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7870,6 +9075,10 @@ class ObjCIsaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCIsaExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCIsaExpr> from(const Expr &parent);
   static std::optional<ObjCIsaExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIsaExpr> from(const Stmt &parent);
@@ -7879,6 +9088,8 @@ class ObjCIsaExpr : public Expr {
   bool is_arrow(void) const noexcept;
 };
 
+using ObjCIndirectCopyRestoreExprRange = DerivedEntityRange<StmtIterator, ObjCIndirectCopyRestoreExpr>;
+
 class ObjCIndirectCopyRestoreExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7886,11 +9097,17 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCIndirectCopyRestoreExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Expr &parent);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const ValueStmt &parent);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Stmt &parent);
   bool should_copy(void) const noexcept;
 };
+
+using ObjCEncodeExprRange = DerivedEntityRange<StmtIterator, ObjCEncodeExpr>;
 
 class ObjCEncodeExpr : public Expr {
  private:
@@ -7899,12 +9116,18 @@ class ObjCEncodeExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCEncodeExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCEncodeExpr> from(const Expr &parent);
   static std::optional<ObjCEncodeExpr> from(const ValueStmt &parent);
   static std::optional<ObjCEncodeExpr> from(const Stmt &parent);
   Token at_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using ObjCDictionaryLiteralRange = DerivedEntityRange<StmtIterator, ObjCDictionaryLiteral>;
 
 class ObjCDictionaryLiteral : public Expr {
  private:
@@ -7913,11 +9136,17 @@ class ObjCDictionaryLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCDictionaryLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCDictionaryLiteral> from(const Expr &parent);
   static std::optional<ObjCDictionaryLiteral> from(const ValueStmt &parent);
   static std::optional<ObjCDictionaryLiteral> from(const Stmt &parent);
   ObjCMethodDecl dictionary_with_objects_method(void) const noexcept;
 };
+
+using ObjCBoxedExprRange = DerivedEntityRange<StmtIterator, ObjCBoxedExpr>;
 
 class ObjCBoxedExpr : public Expr {
  private:
@@ -7926,6 +9155,10 @@ class ObjCBoxedExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCBoxedExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCBoxedExpr> from(const Expr &parent);
   static std::optional<ObjCBoxedExpr> from(const ValueStmt &parent);
   static std::optional<ObjCBoxedExpr> from(const Stmt &parent);
@@ -7934,6 +9167,8 @@ class ObjCBoxedExpr : public Expr {
   bool is_expressible_as_constant_initializer(void) const noexcept;
 };
 
+using ObjCBoolLiteralExprRange = DerivedEntityRange<StmtIterator, ObjCBoolLiteralExpr>;
+
 class ObjCBoolLiteralExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7941,12 +9176,18 @@ class ObjCBoolLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCBoolLiteralExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCBoolLiteralExpr> from(const Expr &parent);
   static std::optional<ObjCBoolLiteralExpr> from(const ValueStmt &parent);
   static std::optional<ObjCBoolLiteralExpr> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool value(void) const noexcept;
 };
+
+using ObjCAvailabilityCheckExprRange = DerivedEntityRange<StmtIterator, ObjCAvailabilityCheckExpr>;
 
 class ObjCAvailabilityCheckExpr : public Expr {
  private:
@@ -7955,11 +9196,17 @@ class ObjCAvailabilityCheckExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCAvailabilityCheckExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAvailabilityCheckExpr> from(const Expr &parent);
   static std::optional<ObjCAvailabilityCheckExpr> from(const ValueStmt &parent);
   static std::optional<ObjCAvailabilityCheckExpr> from(const Stmt &parent);
   bool has_version(void) const noexcept;
 };
+
+using ObjCArrayLiteralRange = DerivedEntityRange<StmtIterator, ObjCArrayLiteral>;
 
 class ObjCArrayLiteral : public Expr {
  private:
@@ -7968,11 +9215,17 @@ class ObjCArrayLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ObjCArrayLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCArrayLiteral> from(const Expr &parent);
   static std::optional<ObjCArrayLiteral> from(const ValueStmt &parent);
   static std::optional<ObjCArrayLiteral> from(const Stmt &parent);
   ObjCMethodDecl array_with_objects_method(void) const noexcept;
 };
+
+using OMPIteratorExprRange = DerivedEntityRange<StmtIterator, OMPIteratorExpr>;
 
 class OMPIteratorExpr : public Expr {
  private:
@@ -7981,6 +9234,10 @@ class OMPIteratorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static OMPIteratorExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPIteratorExpr> from(const Expr &parent);
   static std::optional<OMPIteratorExpr> from(const ValueStmt &parent);
   static std::optional<OMPIteratorExpr> from(const Stmt &parent);
@@ -7989,6 +9246,8 @@ class OMPIteratorExpr : public Expr {
   Token r_paren_token(void) const noexcept;
 };
 
+using OMPArrayShapingExprRange = DerivedEntityRange<StmtIterator, OMPArrayShapingExpr>;
+
 class OMPArrayShapingExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -7996,12 +9255,18 @@ class OMPArrayShapingExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static OMPArrayShapingExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPArrayShapingExpr> from(const Expr &parent);
   static std::optional<OMPArrayShapingExpr> from(const ValueStmt &parent);
   static std::optional<OMPArrayShapingExpr> from(const Stmt &parent);
   Token l_paren_token(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
+
+using OMPArraySectionExprRange = DerivedEntityRange<StmtIterator, OMPArraySectionExpr>;
 
 class OMPArraySectionExpr : public Expr {
  private:
@@ -8010,6 +9275,10 @@ class OMPArraySectionExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static OMPArraySectionExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPArraySectionExpr> from(const Expr &parent);
   static std::optional<OMPArraySectionExpr> from(const ValueStmt &parent);
   static std::optional<OMPArraySectionExpr> from(const Stmt &parent);
@@ -8018,6 +9287,8 @@ class OMPArraySectionExpr : public Expr {
   Token r_bracket_token(void) const noexcept;
 };
 
+using NoInitExprRange = DerivedEntityRange<StmtIterator, NoInitExpr>;
+
 class NoInitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8025,10 +9296,16 @@ class NoInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static NoInitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<NoInitExpr> from(const Expr &parent);
   static std::optional<NoInitExpr> from(const ValueStmt &parent);
   static std::optional<NoInitExpr> from(const Stmt &parent);
 };
+
+using MemberExprRange = DerivedEntityRange<StmtIterator, MemberExpr>;
 
 class MemberExpr : public Expr {
  private:
@@ -8037,6 +9314,10 @@ class MemberExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static MemberExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MemberExpr> from(const Expr &parent);
   static std::optional<MemberExpr> from(const ValueStmt &parent);
   static std::optional<MemberExpr> from(const Stmt &parent);
@@ -8055,6 +9336,8 @@ class MemberExpr : public Expr {
   NonOdrUseReason is_non_odr_use(void) const noexcept;
 };
 
+using MatrixSubscriptExprRange = DerivedEntityRange<StmtIterator, MatrixSubscriptExpr>;
+
 class MatrixSubscriptExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8062,12 +9345,18 @@ class MatrixSubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static MatrixSubscriptExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MatrixSubscriptExpr> from(const Expr &parent);
   static std::optional<MatrixSubscriptExpr> from(const ValueStmt &parent);
   static std::optional<MatrixSubscriptExpr> from(const Stmt &parent);
   Token r_bracket_token(void) const noexcept;
   bool is_incomplete(void) const noexcept;
 };
+
+using MaterializeTemporaryExprRange = DerivedEntityRange<StmtIterator, MaterializeTemporaryExpr>;
 
 class MaterializeTemporaryExpr : public Expr {
  private:
@@ -8076,6 +9365,10 @@ class MaterializeTemporaryExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static MaterializeTemporaryExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MaterializeTemporaryExpr> from(const Expr &parent);
   static std::optional<MaterializeTemporaryExpr> from(const ValueStmt &parent);
   static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent);
@@ -8086,6 +9379,8 @@ class MaterializeTemporaryExpr : public Expr {
   bool is_usable_in_constant_expressions(void) const noexcept;
 };
 
+using MSPropertySubscriptExprRange = DerivedEntityRange<StmtIterator, MSPropertySubscriptExpr>;
+
 class MSPropertySubscriptExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8093,11 +9388,17 @@ class MSPropertySubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static MSPropertySubscriptExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MSPropertySubscriptExpr> from(const Expr &parent);
   static std::optional<MSPropertySubscriptExpr> from(const ValueStmt &parent);
   static std::optional<MSPropertySubscriptExpr> from(const Stmt &parent);
   Token r_bracket_token(void) const noexcept;
 };
+
+using MSPropertyRefExprRange = DerivedEntityRange<StmtIterator, MSPropertyRefExpr>;
 
 class MSPropertyRefExpr : public Expr {
  private:
@@ -8106,6 +9407,10 @@ class MSPropertyRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static MSPropertyRefExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MSPropertyRefExpr> from(const Expr &parent);
   static std::optional<MSPropertyRefExpr> from(const ValueStmt &parent);
   static std::optional<MSPropertyRefExpr> from(const Stmt &parent);
@@ -8115,6 +9420,8 @@ class MSPropertyRefExpr : public Expr {
   bool is_implicit_access(void) const noexcept;
 };
 
+using LambdaExprRange = DerivedEntityRange<StmtIterator, LambdaExpr>;
+
 class LambdaExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8122,6 +9429,10 @@ class LambdaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static LambdaExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<LambdaExpr> from(const Expr &parent);
   static std::optional<LambdaExpr> from(const ValueStmt &parent);
   static std::optional<LambdaExpr> from(const Stmt &parent);
@@ -8139,6 +9450,8 @@ class LambdaExpr : public Expr {
   bool is_mutable(void) const noexcept;
 };
 
+using IntegerLiteralRange = DerivedEntityRange<StmtIterator, IntegerLiteral>;
+
 class IntegerLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -8146,11 +9459,17 @@ class IntegerLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static IntegerLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<IntegerLiteral> from(const Expr &parent);
   static std::optional<IntegerLiteral> from(const ValueStmt &parent);
   static std::optional<IntegerLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
+
+using InitListExprRange = DerivedEntityRange<StmtIterator, InitListExpr>;
 
 class InitListExpr : public Expr {
  private:
@@ -8159,6 +9478,10 @@ class InitListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static InitListExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<InitListExpr> from(const Expr &parent);
   static std::optional<InitListExpr> from(const ValueStmt &parent);
   static std::optional<InitListExpr> from(const Stmt &parent);
@@ -8176,6 +9499,8 @@ class InitListExpr : public Expr {
   bool is_transparent(void) const noexcept;
 };
 
+using ImplicitValueInitExprRange = DerivedEntityRange<StmtIterator, ImplicitValueInitExpr>;
+
 class ImplicitValueInitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8183,10 +9508,16 @@ class ImplicitValueInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ImplicitValueInitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ImplicitValueInitExpr> from(const Expr &parent);
   static std::optional<ImplicitValueInitExpr> from(const ValueStmt &parent);
   static std::optional<ImplicitValueInitExpr> from(const Stmt &parent);
 };
+
+using ImaginaryLiteralRange = DerivedEntityRange<StmtIterator, ImaginaryLiteral>;
 
 class ImaginaryLiteral : public Expr {
  private:
@@ -8195,10 +9526,16 @@ class ImaginaryLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ImaginaryLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ImaginaryLiteral> from(const Expr &parent);
   static std::optional<ImaginaryLiteral> from(const ValueStmt &parent);
   static std::optional<ImaginaryLiteral> from(const Stmt &parent);
 };
+
+using GenericSelectionExprRange = DerivedEntityRange<StmtIterator, GenericSelectionExpr>;
 
 class GenericSelectionExpr : public Expr {
  private:
@@ -8207,6 +9544,10 @@ class GenericSelectionExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static GenericSelectionExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<GenericSelectionExpr> from(const Expr &parent);
   static std::optional<GenericSelectionExpr> from(const ValueStmt &parent);
   static std::optional<GenericSelectionExpr> from(const Stmt &parent);
@@ -8216,6 +9557,8 @@ class GenericSelectionExpr : public Expr {
   bool is_result_dependent(void) const noexcept;
 };
 
+using GNUNullExprRange = DerivedEntityRange<StmtIterator, GNUNullExpr>;
+
 class GNUNullExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8223,11 +9566,17 @@ class GNUNullExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static GNUNullExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<GNUNullExpr> from(const Expr &parent);
   static std::optional<GNUNullExpr> from(const ValueStmt &parent);
   static std::optional<GNUNullExpr> from(const Stmt &parent);
   Token token_token(void) const noexcept;
 };
+
+using FunctionParmPackExprRange = DerivedEntityRange<StmtIterator, FunctionParmPackExpr>;
 
 class FunctionParmPackExpr : public Expr {
  private:
@@ -8236,6 +9585,10 @@ class FunctionParmPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static FunctionParmPackExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FunctionParmPackExpr> from(const Expr &parent);
   static std::optional<FunctionParmPackExpr> from(const ValueStmt &parent);
   static std::optional<FunctionParmPackExpr> from(const Stmt &parent);
@@ -8244,6 +9597,8 @@ class FunctionParmPackExpr : public Expr {
   std::vector<VarDecl> expansions(void) const noexcept;
 };
 
+using FullExprRange = DerivedEntityRange<StmtIterator, FullExpr>;
+
 class FullExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8251,10 +9606,16 @@ class FullExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static FullExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FullExpr> from(const Expr &parent);
   static std::optional<FullExpr> from(const ValueStmt &parent);
   static std::optional<FullExpr> from(const Stmt &parent);
 };
+
+using ExprWithCleanupsRange = DerivedEntityRange<StmtIterator, ExprWithCleanups>;
 
 class ExprWithCleanups : public FullExpr {
  private:
@@ -8264,12 +9625,18 @@ class ExprWithCleanups : public FullExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ExprWithCleanupsRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ExprWithCleanups> from(const FullExpr &parent);
   static std::optional<ExprWithCleanups> from(const Expr &parent);
   static std::optional<ExprWithCleanups> from(const ValueStmt &parent);
   static std::optional<ExprWithCleanups> from(const Stmt &parent);
   bool cleanups_have_side_effects(void) const noexcept;
 };
+
+using ConstantExprRange = DerivedEntityRange<StmtIterator, ConstantExpr>;
 
 class ConstantExpr : public FullExpr {
  private:
@@ -8279,6 +9646,10 @@ class ConstantExpr : public FullExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ConstantExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ConstantExpr> from(const FullExpr &parent);
   static std::optional<ConstantExpr> from(const Expr &parent);
   static std::optional<ConstantExpr> from(const ValueStmt &parent);
@@ -8288,6 +9659,8 @@ class ConstantExpr : public FullExpr {
   bool is_immediate_invocation(void) const noexcept;
 };
 
+using FloatingLiteralRange = DerivedEntityRange<StmtIterator, FloatingLiteral>;
+
 class FloatingLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -8295,12 +9668,18 @@ class FloatingLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static FloatingLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FloatingLiteral> from(const Expr &parent);
   static std::optional<FloatingLiteral> from(const ValueStmt &parent);
   static std::optional<FloatingLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
   bool is_exact(void) const noexcept;
 };
+
+using FixedPointLiteralRange = DerivedEntityRange<StmtIterator, FixedPointLiteral>;
 
 class FixedPointLiteral : public Expr {
  private:
@@ -8309,11 +9688,17 @@ class FixedPointLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static FixedPointLiteralRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FixedPointLiteral> from(const Expr &parent);
   static std::optional<FixedPointLiteral> from(const ValueStmt &parent);
   static std::optional<FixedPointLiteral> from(const Stmt &parent);
   Token token(void) const noexcept;
 };
+
+using ExtVectorElementExprRange = DerivedEntityRange<StmtIterator, ExtVectorElementExpr>;
 
 class ExtVectorElementExpr : public Expr {
  private:
@@ -8322,6 +9707,10 @@ class ExtVectorElementExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ExtVectorElementExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ExtVectorElementExpr> from(const Expr &parent);
   static std::optional<ExtVectorElementExpr> from(const ValueStmt &parent);
   static std::optional<ExtVectorElementExpr> from(const Stmt &parent);
@@ -8330,6 +9719,8 @@ class ExtVectorElementExpr : public Expr {
   bool is_arrow(void) const noexcept;
 };
 
+using ExpressionTraitExprRange = DerivedEntityRange<StmtIterator, ExpressionTraitExpr>;
+
 class ExpressionTraitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -8337,6 +9728,10 @@ class ExpressionTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static ExpressionTraitExprRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ExpressionTraitExpr> from(const Expr &parent);
   static std::optional<ExpressionTraitExpr> from(const ValueStmt &parent);
   static std::optional<ExpressionTraitExpr> from(const Stmt &parent);
@@ -8344,22 +9739,34 @@ class ExpressionTraitExpr : public Expr {
   bool value(void) const noexcept;
 };
 
+using AttributedStmtRange = DerivedEntityRange<StmtIterator, AttributedStmt>;
+
 class AttributedStmt : public ValueStmt {
  private:
   friend class FragmentImpl;
   friend class ValueStmt;
   friend class Stmt;
  public:
+  inline static AttributedStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<AttributedStmt> from(const ValueStmt &parent);
   static std::optional<AttributedStmt> from(const Stmt &parent);
   Token attribute_token(void) const noexcept;
 };
+
+using SwitchStmtRange = DerivedEntityRange<StmtIterator, SwitchStmt>;
 
 class SwitchStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static SwitchStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SwitchStmt> from(const Stmt &parent);
   std::optional<VarDecl> condition_variable(void) const noexcept;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const noexcept;
@@ -8371,15 +9778,23 @@ class SwitchStmt : public Stmt {
   bool is_all_enum_cases_covered(void) const noexcept;
 };
 
+using SwitchCaseRange = DerivedEntityRange<StmtIterator, SwitchCase>;
+
 class SwitchCase : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
+  inline static SwitchCaseRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<SwitchCase> from(const Stmt &parent);
   Token colon_token(void) const noexcept;
   Token keyword_token(void) const noexcept;
 };
+
+using DefaultStmtRange = DerivedEntityRange<StmtIterator, DefaultStmt>;
 
 class DefaultStmt : public SwitchCase {
  private:
@@ -8387,10 +9802,16 @@ class DefaultStmt : public SwitchCase {
   friend class SwitchCase;
   friend class Stmt;
  public:
+  inline static DefaultStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DefaultStmt> from(const SwitchCase &parent);
   static std::optional<DefaultStmt> from(const Stmt &parent);
   Token default_token(void) const noexcept;
 };
+
+using CaseStmtRange = DerivedEntityRange<StmtIterator, CaseStmt>;
 
 class CaseStmt : public SwitchCase {
  private:
@@ -8398,6 +9819,10 @@ class CaseStmt : public SwitchCase {
   friend class SwitchCase;
   friend class Stmt;
  public:
+  inline static CaseStmtRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CaseStmt> from(const SwitchCase &parent);
   static std::optional<CaseStmt> from(const Stmt &parent);
   bool case_statement_is_gnu_range(void) const noexcept;
@@ -8405,9 +9830,13 @@ class CaseStmt : public SwitchCase {
   Token ellipsis_token(void) const noexcept;
 };
 
+using DeclRange = DerivedEntityRange<DeclIterator, Decl>;
+
 class Decl {
  protected:
+  friend class DeclIterator;
   friend class FragmentImpl;
+  friend class StmtIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
@@ -8419,6 +9848,14 @@ class Decl {
 
   inline static std::optional<Decl> from(const Decl &self) {
     return self;
+  }
+
+ protected:
+  static DeclIterator in_internal(const Fragment &fragment);
+
+ public:
+  inline static DeclRange in(const Fragment &frag) {
+    return in_internal(frag);
   }
 
   AccessSpecifier access(void) const noexcept;
@@ -8463,21 +9900,33 @@ class Decl {
   TokenRange token_range(void) const noexcept;
 };
 
+using ClassScopeFunctionSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassScopeFunctionSpecializationDecl>;
+
 class ClassScopeFunctionSpecializationDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static ClassScopeFunctionSpecializationDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
   CXXMethodDecl specialization(void) const noexcept;
   bool has_explicit_template_arguments(void) const noexcept;
 };
+
+using CapturedDeclRange = DerivedEntityRange<DeclIterator, CapturedDecl>;
 
 class CapturedDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static CapturedDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CapturedDecl> from(const Decl &parent);
   ImplicitParamDecl context_parameter(void) const noexcept;
   bool is_nothrow(void) const noexcept;
@@ -8485,11 +9934,17 @@ class CapturedDecl : public Decl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using BlockDeclRange = DerivedEntityRange<DeclIterator, BlockDecl>;
+
 class BlockDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static BlockDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BlockDecl> from(const Decl &parent);
   bool block_missing_return_type(void) const noexcept;
   bool can_avoid_copy_to_heap(void) const noexcept;
@@ -8505,23 +9960,37 @@ class BlockDecl : public Decl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using AccessSpecDeclRange = DerivedEntityRange<DeclIterator, AccessSpecDecl>;
+
 class AccessSpecDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static AccessSpecDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<AccessSpecDecl> from(const Decl &parent);
   Token access_specifier_token(void) const noexcept;
   Token colon_token(void) const noexcept;
 };
+
+using OMPDeclarativeDirectiveDeclRange = DerivedEntityRange<DeclIterator, OMPDeclarativeDirectiveDecl>;
 
 class OMPDeclarativeDirectiveDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static OMPDeclarativeDirectiveDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent);
 };
+
+using OMPThreadPrivateDeclRange = DerivedEntityRange<DeclIterator, OMPThreadPrivateDecl>;
 
 class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -8529,9 +9998,15 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
+  inline static OMPThreadPrivateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
 };
+
+using OMPRequiresDeclRange = DerivedEntityRange<DeclIterator, OMPRequiresDecl>;
 
 class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -8539,9 +10014,15 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
+  inline static OMPRequiresDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPRequiresDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPRequiresDecl> from(const Decl &parent);
 };
+
+using OMPAllocateDeclRange = DerivedEntityRange<DeclIterator, OMPAllocateDecl>;
 
 class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -8549,64 +10030,104 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
+  inline static OMPAllocateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPAllocateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
   static std::optional<OMPAllocateDecl> from(const Decl &parent);
 };
+
+using TranslationUnitDeclRange = DerivedEntityRange<DeclIterator, TranslationUnitDecl>;
 
 class TranslationUnitDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static TranslationUnitDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
+
+using StaticAssertDeclRange = DerivedEntityRange<DeclIterator, StaticAssertDecl>;
 
 class StaticAssertDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static StaticAssertDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<StaticAssertDecl> from(const Decl &parent);
   StringLiteral message(void) const noexcept;
   Token r_paren_token(void) const noexcept;
   bool is_failed(void) const noexcept;
 };
 
+using RequiresExprBodyDeclRange = DerivedEntityRange<DeclIterator, RequiresExprBodyDecl>;
+
 class RequiresExprBodyDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static RequiresExprBodyDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
+
+using PragmaDetectMismatchDeclRange = DerivedEntityRange<DeclIterator, PragmaDetectMismatchDecl>;
 
 class PragmaDetectMismatchDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static PragmaDetectMismatchDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
   std::string_view name(void) const noexcept;
   std::string_view value(void) const noexcept;
 };
+
+using PragmaCommentDeclRange = DerivedEntityRange<DeclIterator, PragmaCommentDecl>;
 
 class PragmaCommentDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static PragmaCommentDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<PragmaCommentDecl> from(const Decl &parent);
   std::string_view argument(void) const noexcept;
   PragmaMSCommentKind comment_kind(void) const noexcept;
 };
+
+using ObjCPropertyImplDeclRange = DerivedEntityRange<DeclIterator, ObjCPropertyImplDecl>;
 
 class ObjCPropertyImplDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static ObjCPropertyImplDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
   ObjCMethodDecl getter_method_declaration(void) const noexcept;
   ObjCPropertyDecl property_declaration(void) const noexcept;
@@ -8617,11 +10138,17 @@ class ObjCPropertyImplDecl : public Decl {
   bool is_instance_variable_name_specified(void) const noexcept;
 };
 
+using NamedDeclRange = DerivedEntityRange<DeclIterator, NamedDecl>;
+
 class NamedDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static NamedDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<NamedDecl> from(const Decl &parent);
   Linkage formal_linkage(void) const noexcept;
   Linkage linkage_internal(void) const noexcept;
@@ -8640,12 +10167,18 @@ class NamedDecl : public Decl {
   bool is_linkage_valid(void) const noexcept;
 };
 
+using LabelDeclRange = DerivedEntityRange<DeclIterator, LabelDecl>;
+
 class LabelDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static LabelDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<LabelDecl> from(const NamedDecl &parent);
   static std::optional<LabelDecl> from(const Decl &parent);
   std::string_view ms_assembly_label(void) const noexcept;
@@ -8655,16 +10188,24 @@ class LabelDecl : public NamedDecl {
   bool is_resolved_ms_assembly_label(void) const noexcept;
 };
 
+using BaseUsingDeclRange = DerivedEntityRange<DeclIterator, BaseUsingDecl>;
+
 class BaseUsingDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static BaseUsingDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BaseUsingDecl> from(const NamedDecl &parent);
   static std::optional<BaseUsingDecl> from(const Decl &parent);
   std::vector<UsingShadowDecl> shadows(void) const noexcept;
 };
+
+using UsingEnumDeclRange = DerivedEntityRange<DeclIterator, UsingEnumDecl>;
 
 class UsingEnumDecl : public BaseUsingDecl {
  private:
@@ -8673,6 +10214,10 @@ class UsingEnumDecl : public BaseUsingDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UsingEnumDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UsingEnumDecl> from(const BaseUsingDecl &parent);
   static std::optional<UsingEnumDecl> from(const NamedDecl &parent);
   static std::optional<UsingEnumDecl> from(const Decl &parent);
@@ -8681,6 +10226,8 @@ class UsingEnumDecl : public BaseUsingDecl {
   Token using_token(void) const noexcept;
 };
 
+using UsingDeclRange = DerivedEntityRange<DeclIterator, UsingDecl>;
+
 class UsingDecl : public BaseUsingDecl {
  private:
   friend class FragmentImpl;
@@ -8688,6 +10235,10 @@ class UsingDecl : public BaseUsingDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UsingDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UsingDecl> from(const BaseUsingDecl &parent);
   static std::optional<UsingDecl> from(const NamedDecl &parent);
   static std::optional<UsingDecl> from(const Decl &parent);
@@ -8696,16 +10247,24 @@ class UsingDecl : public BaseUsingDecl {
   bool is_access_declaration(void) const noexcept;
 };
 
+using ValueDeclRange = DerivedEntityRange<DeclIterator, ValueDecl>;
+
 class ValueDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ValueDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ValueDecl> from(const NamedDecl &parent);
   static std::optional<ValueDecl> from(const Decl &parent);
   bool is_weak(void) const noexcept;
 };
+
+using UnresolvedUsingValueDeclRange = DerivedEntityRange<DeclIterator, UnresolvedUsingValueDecl>;
 
 class UnresolvedUsingValueDecl : public ValueDecl {
  private:
@@ -8714,6 +10273,10 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UnresolvedUsingValueDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UnresolvedUsingValueDecl> from(const ValueDecl &parent);
   static std::optional<UnresolvedUsingValueDecl> from(const NamedDecl &parent);
   static std::optional<UnresolvedUsingValueDecl> from(const Decl &parent);
@@ -8723,6 +10286,8 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   bool is_pack_expansion(void) const noexcept;
 };
 
+using TemplateParamObjectDeclRange = DerivedEntityRange<DeclIterator, TemplateParamObjectDecl>;
+
 class TemplateParamObjectDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -8730,10 +10295,16 @@ class TemplateParamObjectDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TemplateParamObjectDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TemplateParamObjectDecl> from(const ValueDecl &parent);
   static std::optional<TemplateParamObjectDecl> from(const NamedDecl &parent);
   static std::optional<TemplateParamObjectDecl> from(const Decl &parent);
 };
+
+using OMPDeclareReductionDeclRange = DerivedEntityRange<DeclIterator, OMPDeclareReductionDecl>;
 
 class OMPDeclareReductionDecl : public ValueDecl {
  private:
@@ -8742,6 +10313,10 @@ class OMPDeclareReductionDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static OMPDeclareReductionDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDeclareReductionDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclareReductionDecl> from(const NamedDecl &parent);
   static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
@@ -8750,6 +10325,8 @@ class OMPDeclareReductionDecl : public ValueDecl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using MSGuidDeclRange = DerivedEntityRange<DeclIterator, MSGuidDecl>;
+
 class MSGuidDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -8757,10 +10334,16 @@ class MSGuidDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static MSGuidDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MSGuidDecl> from(const ValueDecl &parent);
   static std::optional<MSGuidDecl> from(const NamedDecl &parent);
   static std::optional<MSGuidDecl> from(const Decl &parent);
 };
+
+using IndirectFieldDeclRange = DerivedEntityRange<DeclIterator, IndirectFieldDecl>;
 
 class IndirectFieldDecl : public ValueDecl {
  private:
@@ -8769,6 +10352,10 @@ class IndirectFieldDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static IndirectFieldDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<IndirectFieldDecl> from(const ValueDecl &parent);
   static std::optional<IndirectFieldDecl> from(const NamedDecl &parent);
   static std::optional<IndirectFieldDecl> from(const Decl &parent);
@@ -8777,6 +10364,8 @@ class IndirectFieldDecl : public ValueDecl {
   std::optional<VarDecl> variable_declaration(void) const noexcept;
 };
 
+using EnumConstantDeclRange = DerivedEntityRange<DeclIterator, EnumConstantDecl>;
+
 class EnumConstantDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -8784,10 +10373,16 @@ class EnumConstantDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static EnumConstantDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<EnumConstantDecl> from(const ValueDecl &parent);
   static std::optional<EnumConstantDecl> from(const NamedDecl &parent);
   static std::optional<EnumConstantDecl> from(const Decl &parent);
 };
+
+using DeclaratorDeclRange = DerivedEntityRange<DeclIterator, DeclaratorDecl>;
 
 class DeclaratorDecl : public ValueDecl {
  private:
@@ -8796,6 +10391,10 @@ class DeclaratorDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static DeclaratorDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DeclaratorDecl> from(const ValueDecl &parent);
   static std::optional<DeclaratorDecl> from(const NamedDecl &parent);
   static std::optional<DeclaratorDecl> from(const Decl &parent);
@@ -8806,6 +10405,8 @@ class DeclaratorDecl : public ValueDecl {
   std::vector<TemplateParameterList> template_parameter_lists(void) const noexcept;
 };
 
+using VarDeclRange = DerivedEntityRange<DeclIterator, VarDecl>;
+
 class VarDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
@@ -8814,6 +10415,10 @@ class VarDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static VarDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<VarDecl> from(const DeclaratorDecl &parent);
   static std::optional<VarDecl> from(const ValueDecl &parent);
   static std::optional<VarDecl> from(const NamedDecl &parent);
@@ -8867,6 +10472,8 @@ class VarDecl : public DeclaratorDecl {
   QualTypeDestructionKind needs_destruction(void) const noexcept;
 };
 
+using ParmVarDeclRange = DerivedEntityRange<DeclIterator, ParmVarDecl>;
+
 class ParmVarDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -8876,6 +10483,10 @@ class ParmVarDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ParmVarDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ParmVarDecl> from(const VarDecl &parent);
   static std::optional<ParmVarDecl> from(const DeclaratorDecl &parent);
   static std::optional<ParmVarDecl> from(const ValueDecl &parent);
@@ -8892,6 +10503,8 @@ class ParmVarDecl : public VarDecl {
   bool is_obj_c_method_parameter(void) const noexcept;
 };
 
+using OMPCapturedExprDeclRange = DerivedEntityRange<DeclIterator, OMPCapturedExprDecl>;
+
 class OMPCapturedExprDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -8901,12 +10514,18 @@ class OMPCapturedExprDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static OMPCapturedExprDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPCapturedExprDecl> from(const VarDecl &parent);
   static std::optional<OMPCapturedExprDecl> from(const DeclaratorDecl &parent);
   static std::optional<OMPCapturedExprDecl> from(const ValueDecl &parent);
   static std::optional<OMPCapturedExprDecl> from(const NamedDecl &parent);
   static std::optional<OMPCapturedExprDecl> from(const Decl &parent);
 };
+
+using ImplicitParamDeclRange = DerivedEntityRange<DeclIterator, ImplicitParamDecl>;
 
 class ImplicitParamDecl : public VarDecl {
  private:
@@ -8917,6 +10536,10 @@ class ImplicitParamDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ImplicitParamDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ImplicitParamDecl> from(const VarDecl &parent);
   static std::optional<ImplicitParamDecl> from(const DeclaratorDecl &parent);
   static std::optional<ImplicitParamDecl> from(const ValueDecl &parent);
@@ -8924,6 +10547,8 @@ class ImplicitParamDecl : public VarDecl {
   static std::optional<ImplicitParamDecl> from(const Decl &parent);
   ImplicitParamDeclImplicitParamKind parameter_kind(void) const noexcept;
 };
+
+using DecompositionDeclRange = DerivedEntityRange<DeclIterator, DecompositionDecl>;
 
 class DecompositionDecl : public VarDecl {
  private:
@@ -8934,6 +10559,10 @@ class DecompositionDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static DecompositionDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<DecompositionDecl> from(const VarDecl &parent);
   static std::optional<DecompositionDecl> from(const DeclaratorDecl &parent);
   static std::optional<DecompositionDecl> from(const ValueDecl &parent);
@@ -8941,6 +10570,8 @@ class DecompositionDecl : public VarDecl {
   static std::optional<DecompositionDecl> from(const Decl &parent);
   std::vector<BindingDecl> bindings(void) const noexcept;
 };
+
+using VarTemplateSpecializationDeclRange = DerivedEntityRange<DeclIterator, VarTemplateSpecializationDecl>;
 
 class VarTemplateSpecializationDecl : public VarDecl {
  private:
@@ -8951,6 +10582,10 @@ class VarTemplateSpecializationDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static VarTemplateSpecializationDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<VarTemplateSpecializationDecl> from(const VarDecl &parent);
   static std::optional<VarTemplateSpecializationDecl> from(const DeclaratorDecl &parent);
   static std::optional<VarTemplateSpecializationDecl> from(const ValueDecl &parent);
@@ -8966,6 +10601,8 @@ class VarTemplateSpecializationDecl : public VarDecl {
   bool is_explicit_specialization(void) const noexcept;
 };
 
+using VarTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, VarTemplatePartialSpecializationDecl>;
+
 class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
  private:
   friend class FragmentImpl;
@@ -8976,6 +10613,10 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static VarTemplatePartialSpecializationDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarTemplateSpecializationDecl &parent);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarDecl &parent);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const DeclaratorDecl &parent);
@@ -8983,6 +10624,8 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   static std::optional<VarTemplatePartialSpecializationDecl> from(const NamedDecl &parent);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const Decl &parent);
 };
+
+using NonTypeTemplateParmDeclRange = DerivedEntityRange<DeclIterator, NonTypeTemplateParmDecl>;
 
 class NonTypeTemplateParmDecl : public DeclaratorDecl {
  private:
@@ -8992,6 +10635,10 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static NonTypeTemplateParmDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<NonTypeTemplateParmDecl> from(const DeclaratorDecl &parent);
   static std::optional<NonTypeTemplateParmDecl> from(const ValueDecl &parent);
   static std::optional<NonTypeTemplateParmDecl> from(const NamedDecl &parent);
@@ -9004,6 +10651,8 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool is_pack_expansion(void) const noexcept;
 };
 
+using MSPropertyDeclRange = DerivedEntityRange<DeclIterator, MSPropertyDecl>;
+
 class MSPropertyDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
@@ -9012,6 +10661,10 @@ class MSPropertyDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static MSPropertyDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<MSPropertyDecl> from(const DeclaratorDecl &parent);
   static std::optional<MSPropertyDecl> from(const ValueDecl &parent);
   static std::optional<MSPropertyDecl> from(const NamedDecl &parent);
@@ -9019,6 +10672,8 @@ class MSPropertyDecl : public DeclaratorDecl {
   bool has_getter(void) const noexcept;
   bool has_setter(void) const noexcept;
 };
+
+using FunctionDeclRange = DerivedEntityRange<DeclIterator, FunctionDecl>;
 
 class FunctionDecl : public DeclaratorDecl {
  private:
@@ -9028,6 +10683,10 @@ class FunctionDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static FunctionDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FunctionDecl> from(const DeclaratorDecl &parent);
   static std::optional<FunctionDecl> from(const ValueDecl &parent);
   static std::optional<FunctionDecl> from(const NamedDecl &parent);
@@ -9101,6 +10760,8 @@ class FunctionDecl : public DeclaratorDecl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using CXXMethodDeclRange = DerivedEntityRange<DeclIterator, CXXMethodDecl>;
+
 class CXXMethodDecl : public FunctionDecl {
  private:
   friend class FragmentImpl;
@@ -9110,6 +10771,10 @@ class CXXMethodDecl : public FunctionDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static CXXMethodDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXMethodDecl> from(const FunctionDecl &parent);
   static std::optional<CXXMethodDecl> from(const DeclaratorDecl &parent);
   static std::optional<CXXMethodDecl> from(const ValueDecl &parent);
@@ -9128,6 +10793,8 @@ class CXXMethodDecl : public FunctionDecl {
   std::vector<CXXMethodDecl> overridden_methods(void) const noexcept;
 };
 
+using CXXDestructorDeclRange = DerivedEntityRange<DeclIterator, CXXDestructorDecl>;
+
 class CXXDestructorDecl : public CXXMethodDecl {
  private:
   friend class FragmentImpl;
@@ -9138,6 +10805,10 @@ class CXXDestructorDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static CXXDestructorDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXDestructorDecl> from(const CXXMethodDecl &parent);
   static std::optional<CXXDestructorDecl> from(const FunctionDecl &parent);
   static std::optional<CXXDestructorDecl> from(const DeclaratorDecl &parent);
@@ -9146,6 +10817,8 @@ class CXXDestructorDecl : public CXXMethodDecl {
   static std::optional<CXXDestructorDecl> from(const Decl &parent);
   FunctionDecl operator_delete(void) const noexcept;
 };
+
+using CXXConversionDeclRange = DerivedEntityRange<DeclIterator, CXXConversionDecl>;
 
 class CXXConversionDecl : public CXXMethodDecl {
  private:
@@ -9157,6 +10830,10 @@ class CXXConversionDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static CXXConversionDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXConversionDecl> from(const CXXMethodDecl &parent);
   static std::optional<CXXConversionDecl> from(const FunctionDecl &parent);
   static std::optional<CXXConversionDecl> from(const DeclaratorDecl &parent);
@@ -9166,6 +10843,8 @@ class CXXConversionDecl : public CXXMethodDecl {
   bool is_explicit(void) const noexcept;
   bool is_lambda_to_block_pointer_conversion(void) const noexcept;
 };
+
+using CXXConstructorDeclRange = DerivedEntityRange<DeclIterator, CXXConstructorDecl>;
 
 class CXXConstructorDecl : public CXXMethodDecl {
  private:
@@ -9177,6 +10856,10 @@ class CXXConstructorDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static CXXConstructorDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXConstructorDecl> from(const CXXMethodDecl &parent);
   static std::optional<CXXConstructorDecl> from(const FunctionDecl &parent);
   static std::optional<CXXConstructorDecl> from(const DeclaratorDecl &parent);
@@ -9191,6 +10874,8 @@ class CXXConstructorDecl : public CXXMethodDecl {
   bool is_specialization_copying_object(void) const noexcept;
 };
 
+using CXXDeductionGuideDeclRange = DerivedEntityRange<DeclIterator, CXXDeductionGuideDecl>;
+
 class CXXDeductionGuideDecl : public FunctionDecl {
  private:
   friend class FragmentImpl;
@@ -9200,6 +10885,10 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static CXXDeductionGuideDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXDeductionGuideDecl> from(const FunctionDecl &parent);
   static std::optional<CXXDeductionGuideDecl> from(const DeclaratorDecl &parent);
   static std::optional<CXXDeductionGuideDecl> from(const ValueDecl &parent);
@@ -9210,6 +10899,8 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   bool is_explicit(void) const noexcept;
 };
 
+using FieldDeclRange = DerivedEntityRange<DeclIterator, FieldDecl>;
+
 class FieldDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
@@ -9218,6 +10909,10 @@ class FieldDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static FieldDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
   static std::optional<FieldDecl> from(const ValueDecl &parent);
   static std::optional<FieldDecl> from(const NamedDecl &parent);
@@ -9234,6 +10929,8 @@ class FieldDecl : public DeclaratorDecl {
   bool is_zero_size(void) const noexcept;
 };
 
+using ObjCIvarDeclRange = DerivedEntityRange<DeclIterator, ObjCIvarDecl>;
+
 class ObjCIvarDecl : public FieldDecl {
  private:
   friend class FragmentImpl;
@@ -9243,6 +10940,10 @@ class ObjCIvarDecl : public FieldDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCIvarDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCIvarDecl> from(const FieldDecl &parent);
   static std::optional<ObjCIvarDecl> from(const DeclaratorDecl &parent);
   static std::optional<ObjCIvarDecl> from(const ValueDecl &parent);
@@ -9255,6 +10956,8 @@ class ObjCIvarDecl : public FieldDecl {
   bool synthesize(void) const noexcept;
 };
 
+using ObjCAtDefsFieldDeclRange = DerivedEntityRange<DeclIterator, ObjCAtDefsFieldDecl>;
+
 class ObjCAtDefsFieldDecl : public FieldDecl {
  private:
   friend class FragmentImpl;
@@ -9264,12 +10967,18 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCAtDefsFieldDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCAtDefsFieldDecl> from(const FieldDecl &parent);
   static std::optional<ObjCAtDefsFieldDecl> from(const DeclaratorDecl &parent);
   static std::optional<ObjCAtDefsFieldDecl> from(const ValueDecl &parent);
   static std::optional<ObjCAtDefsFieldDecl> from(const NamedDecl &parent);
   static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent);
 };
+
+using BindingDeclRange = DerivedEntityRange<DeclIterator, BindingDecl>;
 
 class BindingDecl : public ValueDecl {
  private:
@@ -9278,12 +10987,18 @@ class BindingDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static BindingDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BindingDecl> from(const ValueDecl &parent);
   static std::optional<BindingDecl> from(const NamedDecl &parent);
   static std::optional<BindingDecl> from(const Decl &parent);
   ValueDecl decomposed_declaration(void) const noexcept;
   VarDecl holding_variable(void) const noexcept;
 };
+
+using OMPDeclarativeDirectiveValueDeclRange = DerivedEntityRange<DeclIterator, OMPDeclarativeDirectiveValueDecl>;
 
 class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
  private:
@@ -9292,10 +11007,16 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static OMPDeclarativeDirectiveValueDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const NamedDecl &parent);
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Decl &parent);
 };
+
+using OMPDeclareMapperDeclRange = DerivedEntityRange<DeclIterator, OMPDeclareMapperDecl>;
 
 class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
  private:
@@ -9305,6 +11026,10 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static OMPDeclareMapperDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<OMPDeclareMapperDecl> from(const OMPDeclarativeDirectiveValueDecl &parent);
   static std::optional<OMPDeclareMapperDecl> from(const ValueDecl &parent);
   static std::optional<OMPDeclareMapperDecl> from(const NamedDecl &parent);
@@ -9313,18 +11038,26 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using UsingShadowDeclRange = DerivedEntityRange<DeclIterator, UsingShadowDecl>;
+
 class UsingShadowDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UsingShadowDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UsingShadowDecl> from(const NamedDecl &parent);
   static std::optional<UsingShadowDecl> from(const Decl &parent);
   BaseUsingDecl introducer(void) const noexcept;
   UsingShadowDecl next_using_shadow_declaration(void) const noexcept;
   NamedDecl target_declaration(void) const noexcept;
 };
+
+using ConstructorUsingShadowDeclRange = DerivedEntityRange<DeclIterator, ConstructorUsingShadowDecl>;
 
 class ConstructorUsingShadowDecl : public UsingShadowDecl {
  private:
@@ -9333,6 +11066,10 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ConstructorUsingShadowDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ConstructorUsingShadowDecl> from(const UsingShadowDecl &parent);
   static std::optional<ConstructorUsingShadowDecl> from(const NamedDecl &parent);
   static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent);
@@ -9344,17 +11081,25 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   CXXRecordDecl parent(void) const noexcept;
 };
 
+using UsingPackDeclRange = DerivedEntityRange<DeclIterator, UsingPackDecl>;
+
 class UsingPackDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UsingPackDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UsingPackDecl> from(const NamedDecl &parent);
   static std::optional<UsingPackDecl> from(const Decl &parent);
   std::vector<NamedDecl> expansions(void) const noexcept;
   NamedDecl instantiated_from_using_declaration(void) const noexcept;
 };
+
+using UsingDirectiveDeclRange = DerivedEntityRange<DeclIterator, UsingDirectiveDecl>;
 
 class UsingDirectiveDecl : public NamedDecl {
  private:
@@ -9362,6 +11107,10 @@ class UsingDirectiveDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UsingDirectiveDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UsingDirectiveDecl> from(const NamedDecl &parent);
   static std::optional<UsingDirectiveDecl> from(const Decl &parent);
   Token identifier_token(void) const noexcept;
@@ -9370,15 +11119,23 @@ class UsingDirectiveDecl : public NamedDecl {
   Token using_token(void) const noexcept;
 };
 
+using UnresolvedUsingIfExistsDeclRange = DerivedEntityRange<DeclIterator, UnresolvedUsingIfExistsDecl>;
+
 class UnresolvedUsingIfExistsDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UnresolvedUsingIfExistsDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UnresolvedUsingIfExistsDecl> from(const NamedDecl &parent);
   static std::optional<UnresolvedUsingIfExistsDecl> from(const Decl &parent);
 };
+
+using TypeDeclRange = DerivedEntityRange<DeclIterator, TypeDecl>;
 
 class TypeDecl : public NamedDecl {
  private:
@@ -9386,9 +11143,15 @@ class TypeDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TypeDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TypeDecl> from(const NamedDecl &parent);
   static std::optional<TypeDecl> from(const Decl &parent);
 };
+
+using TemplateTypeParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTypeParmDecl>;
 
 class TemplateTypeParmDecl : public TypeDecl {
  private:
@@ -9397,6 +11160,10 @@ class TemplateTypeParmDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TemplateTypeParmDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TemplateTypeParmDecl> from(const TypeDecl &parent);
   static std::optional<TemplateTypeParmDecl> from(const NamedDecl &parent);
   static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
@@ -9409,6 +11176,8 @@ class TemplateTypeParmDecl : public TypeDecl {
   bool was_declared_with_typename(void) const noexcept;
 };
 
+using TagDeclRange = DerivedEntityRange<DeclIterator, TagDecl>;
+
 class TagDecl : public TypeDecl {
  private:
   friend class FragmentImpl;
@@ -9416,6 +11185,10 @@ class TagDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TagDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TagDecl> from(const TypeDecl &parent);
   static std::optional<TagDecl> from(const NamedDecl &parent);
   static std::optional<TagDecl> from(const Decl &parent);
@@ -9443,6 +11216,8 @@ class TagDecl : public TypeDecl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using RecordDeclRange = DerivedEntityRange<DeclIterator, RecordDecl>;
+
 class RecordDecl : public TagDecl {
  private:
   friend class FragmentImpl;
@@ -9451,6 +11226,10 @@ class RecordDecl : public TagDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static RecordDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<RecordDecl> from(const TagDecl &parent);
   static std::optional<RecordDecl> from(const TypeDecl &parent);
   static std::optional<RecordDecl> from(const NamedDecl &parent);
@@ -9479,6 +11258,8 @@ class RecordDecl : public TagDecl {
   bool may_insert_extra_padding(void) const noexcept;
 };
 
+using CXXRecordDeclRange = DerivedEntityRange<DeclIterator, CXXRecordDecl>;
+
 class CXXRecordDecl : public RecordDecl {
  private:
   friend class FragmentImpl;
@@ -9488,6 +11269,10 @@ class CXXRecordDecl : public RecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static CXXRecordDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<CXXRecordDecl> from(const RecordDecl &parent);
   static std::optional<CXXRecordDecl> from(const TagDecl &parent);
   static std::optional<CXXRecordDecl> from(const TypeDecl &parent);
@@ -9610,6 +11395,8 @@ class CXXRecordDecl : public RecordDecl {
   std::vector<CXXBaseSpecifier> virtual_bases(void) const noexcept;
 };
 
+using ClassTemplateSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplateSpecializationDecl>;
+
 class ClassTemplateSpecializationDecl : public CXXRecordDecl {
  private:
   friend class FragmentImpl;
@@ -9620,6 +11407,10 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ClassTemplateSpecializationDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ClassTemplateSpecializationDecl> from(const CXXRecordDecl &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const RecordDecl &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const TagDecl &parent);
@@ -9637,6 +11428,8 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   bool is_explicit_specialization(void) const noexcept;
 };
 
+using ClassTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplatePartialSpecializationDecl>;
+
 class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
  private:
   friend class FragmentImpl;
@@ -9648,6 +11441,10 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ClassTemplatePartialSpecializationDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const ClassTemplateSpecializationDecl &parent);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const CXXRecordDecl &parent);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const RecordDecl &parent);
@@ -9657,6 +11454,8 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const Decl &parent);
 };
 
+using EnumDeclRange = DerivedEntityRange<DeclIterator, EnumDecl>;
+
 class EnumDecl : public TagDecl {
  private:
   friend class FragmentImpl;
@@ -9665,6 +11464,10 @@ class EnumDecl : public TagDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static EnumDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<EnumDecl> from(const TagDecl &parent);
   static std::optional<EnumDecl> from(const TypeDecl &parent);
   static std::optional<EnumDecl> from(const NamedDecl &parent);
@@ -9683,6 +11486,8 @@ class EnumDecl : public TagDecl {
   bool is_scoped_using_class_tag(void) const noexcept;
 };
 
+using UnresolvedUsingTypenameDeclRange = DerivedEntityRange<DeclIterator, UnresolvedUsingTypenameDecl>;
+
 class UnresolvedUsingTypenameDecl : public TypeDecl {
  private:
   friend class FragmentImpl;
@@ -9690,6 +11495,10 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static UnresolvedUsingTypenameDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<UnresolvedUsingTypenameDecl> from(const TypeDecl &parent);
   static std::optional<UnresolvedUsingTypenameDecl> from(const NamedDecl &parent);
   static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent);
@@ -9699,6 +11508,8 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   bool is_pack_expansion(void) const noexcept;
 };
 
+using TypedefNameDeclRange = DerivedEntityRange<DeclIterator, TypedefNameDecl>;
+
 class TypedefNameDecl : public TypeDecl {
  private:
   friend class FragmentImpl;
@@ -9706,6 +11517,10 @@ class TypedefNameDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TypedefNameDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TypedefNameDecl> from(const TypeDecl &parent);
   static std::optional<TypedefNameDecl> from(const NamedDecl &parent);
   static std::optional<TypedefNameDecl> from(const Decl &parent);
@@ -9713,6 +11528,8 @@ class TypedefNameDecl : public TypeDecl {
   bool is_moded(void) const noexcept;
   bool is_transparent_tag(void) const noexcept;
 };
+
+using TypedefDeclRange = DerivedEntityRange<DeclIterator, TypedefDecl>;
 
 class TypedefDecl : public TypedefNameDecl {
  private:
@@ -9722,11 +11539,17 @@ class TypedefDecl : public TypedefNameDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TypedefDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TypedefDecl> from(const TypedefNameDecl &parent);
   static std::optional<TypedefDecl> from(const TypeDecl &parent);
   static std::optional<TypedefDecl> from(const NamedDecl &parent);
   static std::optional<TypedefDecl> from(const Decl &parent);
 };
+
+using TypeAliasDeclRange = DerivedEntityRange<DeclIterator, TypeAliasDecl>;
 
 class TypeAliasDecl : public TypedefNameDecl {
  private:
@@ -9736,12 +11559,18 @@ class TypeAliasDecl : public TypedefNameDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TypeAliasDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TypeAliasDecl> from(const TypedefNameDecl &parent);
   static std::optional<TypeAliasDecl> from(const TypeDecl &parent);
   static std::optional<TypeAliasDecl> from(const NamedDecl &parent);
   static std::optional<TypeAliasDecl> from(const Decl &parent);
   std::optional<TypeAliasTemplateDecl> described_alias_template(void) const noexcept;
 };
+
+using ObjCTypeParamDeclRange = DerivedEntityRange<DeclIterator, ObjCTypeParamDecl>;
 
 class ObjCTypeParamDecl : public TypedefNameDecl {
  private:
@@ -9751,6 +11580,10 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCTypeParamDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCTypeParamDecl> from(const TypedefNameDecl &parent);
   static std::optional<ObjCTypeParamDecl> from(const TypeDecl &parent);
   static std::optional<ObjCTypeParamDecl> from(const NamedDecl &parent);
@@ -9761,15 +11594,23 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   bool has_explicit_bound(void) const noexcept;
 };
 
+using TemplateDeclRange = DerivedEntityRange<DeclIterator, TemplateDecl>;
+
 class TemplateDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TemplateDecl> from(const NamedDecl &parent);
   static std::optional<TemplateDecl> from(const Decl &parent);
 };
+
+using RedeclarableTemplateDeclRange = DerivedEntityRange<DeclIterator, RedeclarableTemplateDecl>;
 
 class RedeclarableTemplateDecl : public TemplateDecl {
  private:
@@ -9778,10 +11619,16 @@ class RedeclarableTemplateDecl : public TemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static RedeclarableTemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<RedeclarableTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<RedeclarableTemplateDecl> from(const NamedDecl &parent);
   static std::optional<RedeclarableTemplateDecl> from(const Decl &parent);
 };
+
+using FunctionTemplateDeclRange = DerivedEntityRange<DeclIterator, FunctionTemplateDecl>;
 
 class FunctionTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -9791,11 +11638,17 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static FunctionTemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FunctionTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<FunctionTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<FunctionTemplateDecl> from(const NamedDecl &parent);
   static std::optional<FunctionTemplateDecl> from(const Decl &parent);
 };
+
+using ClassTemplateDeclRange = DerivedEntityRange<DeclIterator, ClassTemplateDecl>;
 
 class ClassTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -9805,11 +11658,17 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ClassTemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ClassTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<ClassTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<ClassTemplateDecl> from(const NamedDecl &parent);
   static std::optional<ClassTemplateDecl> from(const Decl &parent);
 };
+
+using VarTemplateDeclRange = DerivedEntityRange<DeclIterator, VarTemplateDecl>;
 
 class VarTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -9819,11 +11678,17 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static VarTemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<VarTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<VarTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<VarTemplateDecl> from(const NamedDecl &parent);
   static std::optional<VarTemplateDecl> from(const Decl &parent);
 };
+
+using TypeAliasTemplateDeclRange = DerivedEntityRange<DeclIterator, TypeAliasTemplateDecl>;
 
 class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -9833,11 +11698,17 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TypeAliasTemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TypeAliasTemplateDecl> from(const RedeclarableTemplateDecl &parent);
   static std::optional<TypeAliasTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<TypeAliasTemplateDecl> from(const NamedDecl &parent);
   static std::optional<TypeAliasTemplateDecl> from(const Decl &parent);
 };
+
+using ConceptDeclRange = DerivedEntityRange<DeclIterator, ConceptDecl>;
 
 class ConceptDecl : public TemplateDecl {
  private:
@@ -9846,11 +11717,17 @@ class ConceptDecl : public TemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ConceptDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ConceptDecl> from(const TemplateDecl &parent);
   static std::optional<ConceptDecl> from(const NamedDecl &parent);
   static std::optional<ConceptDecl> from(const Decl &parent);
   bool is_type_concept(void) const noexcept;
 };
+
+using BuiltinTemplateDeclRange = DerivedEntityRange<DeclIterator, BuiltinTemplateDecl>;
 
 class BuiltinTemplateDecl : public TemplateDecl {
  private:
@@ -9859,10 +11736,16 @@ class BuiltinTemplateDecl : public TemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static BuiltinTemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<BuiltinTemplateDecl> from(const TemplateDecl &parent);
   static std::optional<BuiltinTemplateDecl> from(const NamedDecl &parent);
   static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
 };
+
+using TemplateTemplateParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTemplateParmDecl>;
 
 class TemplateTemplateParmDecl : public TemplateDecl {
  private:
@@ -9871,10 +11754,16 @@ class TemplateTemplateParmDecl : public TemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static TemplateTemplateParmDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<TemplateTemplateParmDecl> from(const TemplateDecl &parent);
   static std::optional<TemplateTemplateParmDecl> from(const NamedDecl &parent);
   static std::optional<TemplateTemplateParmDecl> from(const Decl &parent);
 };
+
+using ObjCPropertyDeclRange = DerivedEntityRange<DeclIterator, ObjCPropertyDecl>;
 
 class ObjCPropertyDecl : public NamedDecl {
  private:
@@ -9882,6 +11771,10 @@ class ObjCPropertyDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCPropertyDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCPropertyDecl> from(const NamedDecl &parent);
   static std::optional<ObjCPropertyDecl> from(const Decl &parent);
   Token at_token(void) const noexcept;
@@ -9903,12 +11796,18 @@ class ObjCPropertyDecl : public NamedDecl {
   bool is_retaining(void) const noexcept;
 };
 
+using ObjCMethodDeclRange = DerivedEntityRange<DeclIterator, ObjCMethodDecl>;
+
 class ObjCMethodDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCMethodDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCMethodDecl> from(const NamedDecl &parent);
   static std::optional<ObjCMethodDecl> from(const Decl &parent);
   bool defined_in_ns_object(void) const noexcept;
@@ -9944,12 +11843,18 @@ class ObjCMethodDecl : public NamedDecl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using ObjCContainerDeclRange = DerivedEntityRange<DeclIterator, ObjCContainerDecl>;
+
 class ObjCContainerDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCContainerDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCContainerDecl> from(const NamedDecl &parent);
   static std::optional<ObjCContainerDecl> from(const Decl &parent);
   std::vector<ObjCMethodDecl> class_methods(void) const noexcept;
@@ -9963,6 +11868,8 @@ class ObjCContainerDecl : public NamedDecl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using ObjCCategoryDeclRange = DerivedEntityRange<DeclIterator, ObjCCategoryDecl>;
+
 class ObjCCategoryDecl : public ObjCContainerDecl {
  private:
   friend class FragmentImpl;
@@ -9970,6 +11877,10 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCCategoryDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCCategoryDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCCategoryDecl> from(const NamedDecl &parent);
   static std::optional<ObjCCategoryDecl> from(const Decl &parent);
@@ -9986,6 +11897,8 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
 };
 
+using ObjCProtocolDeclRange = DerivedEntityRange<DeclIterator, ObjCProtocolDecl>;
+
 class ObjCProtocolDecl : public ObjCContainerDecl {
  private:
   friend class FragmentImpl;
@@ -9993,6 +11906,10 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCProtocolDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCProtocolDecl> from(const NamedDecl &parent);
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
@@ -10005,6 +11922,8 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   std::vector<ObjCProtocolDecl> protocols(void) const noexcept;
 };
 
+using ObjCInterfaceDeclRange = DerivedEntityRange<DeclIterator, ObjCInterfaceDecl>;
+
 class ObjCInterfaceDecl : public ObjCContainerDecl {
  private:
   friend class FragmentImpl;
@@ -10012,6 +11931,10 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCInterfaceDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCInterfaceDecl> from(const NamedDecl &parent);
   static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
@@ -10039,6 +11962,8 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   std::vector<ObjCCategoryDecl> visible_extensions(void) const noexcept;
 };
 
+using ObjCImplDeclRange = DerivedEntityRange<DeclIterator, ObjCImplDecl>;
+
 class ObjCImplDecl : public ObjCContainerDecl {
  private:
   friend class FragmentImpl;
@@ -10046,12 +11971,18 @@ class ObjCImplDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCImplDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCImplDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCImplDecl> from(const NamedDecl &parent);
   static std::optional<ObjCImplDecl> from(const Decl &parent);
   ObjCInterfaceDecl class_interface(void) const noexcept;
   std::vector<ObjCPropertyImplDecl> property_implementations(void) const noexcept;
 };
+
+using ObjCCategoryImplDeclRange = DerivedEntityRange<DeclIterator, ObjCCategoryImplDecl>;
 
 class ObjCCategoryImplDecl : public ObjCImplDecl {
  private:
@@ -10061,6 +11992,10 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCCategoryImplDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCCategoryImplDecl> from(const ObjCImplDecl &parent);
   static std::optional<ObjCCategoryImplDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCCategoryImplDecl> from(const NamedDecl &parent);
@@ -10068,6 +12003,8 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   ObjCCategoryDecl category_declaration(void) const noexcept;
   Token category_name_token(void) const noexcept;
 };
+
+using ObjCImplementationDeclRange = DerivedEntityRange<DeclIterator, ObjCImplementationDecl>;
 
 class ObjCImplementationDecl : public ObjCImplDecl {
  private:
@@ -10077,6 +12014,10 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCImplementationDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCImplementationDecl> from(const ObjCImplDecl &parent);
   static std::optional<ObjCImplementationDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCImplementationDecl> from(const NamedDecl &parent);
@@ -10091,16 +12032,24 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   std::vector<ObjCIvarDecl> instance_variables(void) const noexcept;
 };
 
+using ObjCCompatibleAliasDeclRange = DerivedEntityRange<DeclIterator, ObjCCompatibleAliasDecl>;
+
 class ObjCCompatibleAliasDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static ObjCCompatibleAliasDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ObjCCompatibleAliasDecl> from(const NamedDecl &parent);
   static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
   ObjCInterfaceDecl class_interface(void) const noexcept;
 };
+
+using NamespaceDeclRange = DerivedEntityRange<DeclIterator, NamespaceDecl>;
 
 class NamespaceDecl : public NamedDecl {
  private:
@@ -10108,10 +12057,16 @@ class NamespaceDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static NamespaceDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<NamespaceDecl> from(const NamedDecl &parent);
   static std::optional<NamespaceDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
+
+using NamespaceAliasDeclRange = DerivedEntityRange<DeclIterator, NamespaceAliasDecl>;
 
 class NamespaceAliasDecl : public NamedDecl {
  private:
@@ -10119,6 +12074,10 @@ class NamespaceAliasDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
+  inline static NamespaceAliasDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<NamespaceAliasDecl> from(const NamedDecl &parent);
   static std::optional<NamespaceAliasDecl> from(const Decl &parent);
   Token alias_token(void) const noexcept;
@@ -10127,47 +12086,77 @@ class NamespaceAliasDecl : public NamedDecl {
   Token target_name_token(void) const noexcept;
 };
 
+using LinkageSpecDeclRange = DerivedEntityRange<DeclIterator, LinkageSpecDecl>;
+
 class LinkageSpecDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static LinkageSpecDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<LinkageSpecDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
+
+using LifetimeExtendedTemporaryDeclRange = DerivedEntityRange<DeclIterator, LifetimeExtendedTemporaryDecl>;
 
 class LifetimeExtendedTemporaryDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static LifetimeExtendedTemporaryDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
   ValueDecl extending_declaration(void) const noexcept;
   StorageDuration storage_duration(void) const noexcept;
 };
+
+using ImportDeclRange = DerivedEntityRange<DeclIterator, ImportDecl>;
 
 class ImportDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static ImportDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ImportDecl> from(const Decl &parent);
   std::vector<Token> identifier_tokens(void) const noexcept;
 };
+
+using FriendTemplateDeclRange = DerivedEntityRange<DeclIterator, FriendTemplateDecl>;
 
 class FriendTemplateDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static FriendTemplateDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FriendTemplateDecl> from(const Decl &parent);
 };
+
+using FriendDeclRange = DerivedEntityRange<DeclIterator, FriendDecl>;
 
 class FriendDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static FriendDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FriendDecl> from(const Decl &parent);
   NamedDecl friend_declaration(void) const noexcept;
   Token friend_token(void) const noexcept;
@@ -10175,31 +12164,49 @@ class FriendDecl : public Decl {
   std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const noexcept;
 };
 
+using FileScopeAsmDeclRange = DerivedEntityRange<DeclIterator, FileScopeAsmDecl>;
+
 class FileScopeAsmDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static FileScopeAsmDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<FileScopeAsmDecl> from(const Decl &parent);
   Token assembly_token(void) const noexcept;
   StringLiteral assembly_string(void) const noexcept;
   Token r_paren_token(void) const noexcept;
 };
 
+using ExternCContextDeclRange = DerivedEntityRange<DeclIterator, ExternCContextDecl>;
+
 class ExternCContextDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static ExternCContextDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ExternCContextDecl> from(const Decl &parent);
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
+
+using ExportDeclRange = DerivedEntityRange<DeclIterator, ExportDecl>;
 
 class ExportDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static ExportDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<ExportDecl> from(const Decl &parent);
   Token export_token(void) const noexcept;
   Token r_brace_token(void) const noexcept;
@@ -10207,11 +12214,17 @@ class ExportDecl : public Decl {
   std::vector<Decl> declarations_in_context(void) const noexcept;
 };
 
+using EmptyDeclRange = DerivedEntityRange<DeclIterator, EmptyDecl>;
+
 class EmptyDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
+  inline static EmptyDeclRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static std::optional<EmptyDecl> from(const Decl &parent);
 };
 

@@ -15,6 +15,7 @@
 #include <mutex>
 
 #include "AST.h"
+#include "Iterator.h"
 #include "Types.h"
 
 namespace mx {
@@ -80,8 +81,6 @@ class Token {
   EntityId id(void) const;
 };
 
-class TokenListEnd {};
-
 // Forward-only iterator over a sequence of tokens.
 class TokenListIterator {
  private:
@@ -100,11 +99,13 @@ class TokenListIterator {
         num_tokens(num_tokens_) {}
 
  public:
-  inline bool operator==(TokenListEnd) const noexcept {
+  using EndIteratorType = IteratorEnd;
+
+  inline bool operator==(EndIteratorType) const noexcept {
     return impl.index >= num_tokens;
   }
 
-  inline bool operator!=(TokenListEnd) const noexcept {
+  inline bool operator!=(EndIteratorType) const noexcept {
     return impl.index < num_tokens;
   }
 
@@ -164,7 +165,7 @@ class TokenRange {
     return TokenListIterator(impl, index, num_tokens);
   }
 
-  inline TokenListEnd end(void) const noexcept {
+  inline TokenListIterator::EndIteratorType end(void) const noexcept {
     return {};
   }
 };
@@ -192,8 +193,6 @@ class TokenList : public TokenRange {
   static TokenList containing(const TokenRange &range);
 };
 
-class FileFragmentListEnd {};
-
 // Iterate over the fragments from a file.
 class FileFragmentListIterator {
  private:
@@ -204,6 +203,9 @@ class FileFragmentListIterator {
   std::shared_ptr<const FragmentImpl> frag;
   unsigned index;
   unsigned num_fragments;
+
+  bool operator==(const FileFragmentListIterator &) = delete;
+  bool operator!=(const FileFragmentListIterator &) = delete;
 
   inline FileFragmentListIterator(std::shared_ptr<const FileImpl> impl_,
                                   unsigned index_, unsigned num_fragments_)
@@ -216,6 +218,8 @@ class FileFragmentListIterator {
   void Advance(void);
 
  public:
+  using EndIteratorType = IteratorEnd;
+
   inline Fragment operator*(void) const noexcept;
 
   // Pre-increment.
@@ -230,12 +234,12 @@ class FileFragmentListIterator {
     return FileFragmentListIterator(impl, index++, num_fragments);
   }
 
-  inline bool operator==(FileFragmentListEnd) const noexcept {
-    return index == num_fragments;
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_fragments;
   }
 
-  inline bool operator!=(FileFragmentListEnd) const noexcept {
-    return index != num_fragments;
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_fragments;
   }
 };
 
@@ -264,12 +268,10 @@ class FragmentList {
     return FileFragmentListIterator(impl, 0, num_fragments);
   }
 
-  inline FileFragmentListEnd end(void) const noexcept {
+  inline FileFragmentListIterator::EndIteratorType end(void) const noexcept {
     return {};
   }
 };
-
-class FileListIteratorEnd {};
 
 class FileListIterator {
  private:
@@ -282,6 +284,9 @@ class FileListIterator {
 
   void Advance(void);
 
+  bool operator==(const FileListIterator &) = delete;
+  bool operator!=(const FileListIterator &) = delete;
+
   FileListIterator(std::shared_ptr<FileListImpl> impl_, unsigned index_,
                unsigned num_files_)
       : impl(std::move(impl_)),
@@ -291,6 +296,8 @@ class FileListIterator {
   }
 
  public:
+  using EndIteratorType = IteratorEnd;
+
   inline File operator*(void) const noexcept;
 
   // Pre-increment.
@@ -308,12 +315,12 @@ class FileListIterator {
     return ret;
   }
 
-  inline bool operator==(FileListIteratorEnd) const noexcept {
-    return index == num_files;
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_files;
   }
 
-  inline bool operator!=(FileListIteratorEnd) const noexcept {
-    return index != num_files;
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_files;
   }
 };
 
@@ -330,7 +337,7 @@ class FileList {
  public:
   FileListIterator begin(void) const;
 
-  inline FileListIteratorEnd end(void) const {
+  inline FileListIterator::EndIteratorType end(void) const {
     return {};
   }
 };
@@ -411,8 +418,6 @@ class TokenSubstitutionListIterator;
 
 using TokenSubstitutionEnty = std::variant<Token, TokenSubstitution>;
 
-class TokenSubstitutionListEnd {};
-
 // Iterate over a list of token or token substitution nodes.
 class TokenSubstitutionListIterator {
  private:
@@ -423,6 +428,9 @@ class TokenSubstitutionListIterator {
   unsigned index;
   unsigned num_nodes;
 
+  bool operator==(const TokenSubstitutionListIterator &) = delete;
+  bool operator!=(const TokenSubstitutionListIterator &) = delete;
+
   inline TokenSubstitutionListIterator(
       std::shared_ptr<const TokenSubstitutionListImpl> impl_,
       unsigned index_, unsigned num_nodes_)
@@ -431,6 +439,8 @@ class TokenSubstitutionListIterator {
         num_nodes(num_nodes_) {}
 
  public:
+  using EndIteratorType = IteratorEnd;
+
   std::variant<Token, TokenSubstitution> operator*(void) const;
 
   // Pre-increment.
@@ -444,12 +454,12 @@ class TokenSubstitutionListIterator {
     return TokenSubstitutionListIterator(impl, index++, num_nodes);
   }
 
-  inline bool operator==(TokenSubstitutionListEnd) const noexcept {
-    return index == num_nodes;
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_nodes;
   }
 
-  inline bool operator!=(TokenSubstitutionListEnd) const noexcept {
-    return index != num_nodes;
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_nodes;
   }
 };
 
@@ -473,7 +483,8 @@ class TokenSubstitutionList {
     return TokenSubstitutionListIterator(impl, 0, num_nodes);
   }
 
-  inline TokenSubstitutionListEnd end(void) const noexcept {
+  inline TokenSubstitutionListIterator::EndIteratorType
+  end(void) const noexcept {
     return {};
   }
 };
@@ -483,6 +494,7 @@ class TokenSubstitutionList {
 // trees, and tokens.
 class Fragment {
  private:
+  friend class Decl;
   friend class EntityProvider;
   friend class File;
   friend class FileFragmentListIterator;
@@ -490,6 +502,7 @@ class Fragment {
   friend class FragmentList;
   friend class Index;
   friend class RemoteEntityProvider;
+  friend class Stmt;
   friend class Token;
   friend class TokenSubstitutionListIterator;
 

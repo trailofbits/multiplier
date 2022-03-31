@@ -813,4 +813,22 @@ FileListIterator FileList::begin(void) const {
   return FileListIterator(impl, 0, impl->files.size());
 }
 
+Decl DeclIterator::operator*(void) const noexcept {
+  return Decl(impl, index);
+}
+
+Stmt StmtIterator::operator*(void) const noexcept {
+  return Stmt(impl, index);
+}
+
+DeclIterator Decl::in_internal(const Fragment &fragment) {
+  return DeclIterator(
+      fragment.impl, 0u, fragment.impl->Fragment().getDeclarations().size());
+}
+
+StmtIterator Stmt::in_internal(const Fragment &fragment) {
+  return StmtIterator(
+      fragment.impl, 0u, fragment.impl->Fragment().getStatements().size());
+}
+
 }  // namespace mx

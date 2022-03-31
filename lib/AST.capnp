@@ -12,9 +12,9 @@ using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("mx::ast");
 
 struct TokenContext @0xb9ff75e040124cb3 {
-  parentIndex @0 :UInt32;
+  parentIndexAndKind @0 :UInt32;
   parentOffset @1 :UInt16;
-  aliasOffsetAndKind @2 :UInt16;
+  aliasOffset @2 :UInt16;
 }
 
 struct Decl @0xfb5879761ffaedb6 {
