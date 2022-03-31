@@ -855,9 +855,10 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
 
   std::shared_ptr<const FragmentImpl> frag_ptr(tok.impl, frag);
 
+  // NOTE(pag): +1 to skip `kInvalid`.
   TokenContext ret(std::move(frag_ptr));
-  ret.kind = static_cast<Kind>(index_kind & 0x3);
-  ret.index = (index_kind >> 2u) + 1u;  // +1 to skip `kInvalid`.
+  ret.kind = static_cast<Kind>((index_kind & 0x3) + 1);
+  ret.index = index_kind >> 2u;
   ret.offset = tc.getParentOffset();
   return ret;
 }

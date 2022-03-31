@@ -202,6 +202,10 @@ class TokenContext {
     return kind == kDeclAlias || kind == kStmtAlias;
   }
 
+  inline unsigned id(void) const noexcept {
+    return offset;
+  }
+
   // Return the token context associated with a token.
   //
   // NOTE(pag): This only works with parsed tokens, and not all parsed tokens
