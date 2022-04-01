@@ -1794,16 +1794,66 @@ void SerializeAtomicExpr(EntitySerializer &es, mx::ast::Stmt::Builder b, const p
   b.setVal35(es.EntityId(e.BuiltinToken()));
   b.setVal93(static_cast<unsigned short>(mx::FromPasta(e.Operation())));
   b.setVal36(es.EntityId(e.Order()));
-  b.setVal37(es.EntityId(e.OrderFail()));
+  auto v37 = e.OrderFail();
+  if (v37) {
+    if (auto id37 = es.EntityId(v37.value())) {
+      b.setVal37(id37);
+      b.setVal88(true);
+    } else {
+      b.setVal88(false);
+    }
+  } else {
+    b.setVal88(false);
+  }
   b.setVal38(es.EntityId(e.Pointer()));
   b.setVal39(es.EntityId(e.RParenToken()));
-  b.setVal40(es.EntityId(e.Scope()));
-  b.setVal41(es.EntityId(e.Val1()));
-  b.setVal42(es.EntityId(e.Val2()));
-  b.setVal43(es.EntityId(e.Weak()));
-  b.setVal88(e.IsCmpXChg());
-  b.setVal89(e.IsOpenCL());
-  b.setVal90(e.IsVolatile());
+  auto v40 = e.Scope();
+  if (v40) {
+    if (auto id40 = es.EntityId(v40.value())) {
+      b.setVal40(id40);
+      b.setVal89(true);
+    } else {
+      b.setVal89(false);
+    }
+  } else {
+    b.setVal89(false);
+  }
+  auto v41 = e.Value1();
+  if (v41) {
+    if (auto id41 = es.EntityId(v41.value())) {
+      b.setVal41(id41);
+      b.setVal90(true);
+    } else {
+      b.setVal90(false);
+    }
+  } else {
+    b.setVal90(false);
+  }
+  auto v42 = e.Value2();
+  if (v42) {
+    if (auto id42 = es.EntityId(v42.value())) {
+      b.setVal42(id42);
+      b.setVal91(true);
+    } else {
+      b.setVal91(false);
+    }
+  } else {
+    b.setVal91(false);
+  }
+  auto v43 = e.Weak();
+  if (v43) {
+    if (auto id43 = es.EntityId(v43.value())) {
+      b.setVal43(id43);
+      b.setVal92(true);
+    } else {
+      b.setVal92(false);
+    }
+  } else {
+    b.setVal92(false);
+  }
+  b.setVal94(e.IsCmpXChg());
+  b.setVal97(e.IsOpenCL());
+  b.setVal98(e.IsVolatile());
   auto v15 = e.SubExpressions();
   auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
   auto i15 = 0u;

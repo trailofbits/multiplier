@@ -187,7 +187,6 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 
-  // NOTE(kumarak): Nullptr-returning things temporarily go here!!!
 };
 
 struct ClassHierarchy {
@@ -540,7 +539,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     auto orig_val_name = val_name;
 
     // Don't allow repeats of the underlying values.
-    auto ap_val = val.InitializerVal();
+    auto ap_val = val.InitializerValue();
     ap_val.print(initializer_ss, ap_val.isSigned());
     initializer_ss.flush();
     if (!seen_initializers.emplace(initializer).second) {

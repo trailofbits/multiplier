@@ -3096,7 +3096,7 @@ enum class OpenMPLastprivateModifier : unsigned short {
 OpenMPLastprivateModifier FromPasta(pasta::OpenMPLastprivateModifier pasta_val);
 
 enum class OpenMPLinearClauseKind : unsigned short {
-  VAL,
+  VALUE,
   REFERENCE,
   UVAL,
   UNKNOWN,
@@ -9308,13 +9308,13 @@ class AtomicExpr : public Expr {
   Token builtin_token(void) const;
   AtomicExprAtomicOp operation(void) const;
   Expr order(void) const;
-  Expr order_fail(void) const;
+  std::optional<Expr> order_fail(void) const;
   Expr pointer(void) const;
   Token r_paren_token(void) const;
-  Expr scope(void) const;
-  Expr val1(void) const;
-  Expr val2(void) const;
-  Expr weak(void) const;
+  std::optional<Expr> scope(void) const;
+  std::optional<Expr> value1(void) const;
+  std::optional<Expr> value2(void) const;
+  std::optional<Expr> weak(void) const;
   bool is_cmp_x_chg(void) const;
   bool is_open_cl(void) const;
   bool is_volatile(void) const;

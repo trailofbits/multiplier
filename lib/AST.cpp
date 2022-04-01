@@ -2836,7 +2836,7 @@ OpenMPLastprivateModifier FromPasta(pasta::OpenMPLastprivateModifier e) {
 
 OpenMPLinearClauseKind FromPasta(pasta::OpenMPLinearClauseKind e) {
   switch (static_cast<unsigned>(e)) {
-    case 0: return OpenMPLinearClauseKind::VAL;
+    case 0: return OpenMPLinearClauseKind::VALUE;
     case 1: return OpenMPLinearClauseKind::REFERENCE;
     case 2: return OpenMPLinearClauseKind::UVAL;
     case 3: return OpenMPLinearClauseKind::UNKNOWN;
@@ -11772,10 +11772,14 @@ Expr AtomicExpr::order(void) const {
   return Expr::from(fragment->StmtFor(fragment, id)).value();
 }
 
-Expr AtomicExpr::order_fail(void) const {
+std::optional<Expr> AtomicExpr::order_fail(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal37());
-  return Expr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal88()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal37());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
 Expr AtomicExpr::pointer(void) const {
@@ -11789,43 +11793,59 @@ Token AtomicExpr::r_paren_token(void) const {
   return fragment->TokenFor(fragment, self.getVal39());
 }
 
-Expr AtomicExpr::scope(void) const {
+std::optional<Expr> AtomicExpr::scope(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal40());
-  return Expr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal89()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal40());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
-Expr AtomicExpr::val1(void) const {
+std::optional<Expr> AtomicExpr::value1(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal41());
-  return Expr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal90()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal41());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
-Expr AtomicExpr::val2(void) const {
+std::optional<Expr> AtomicExpr::value2(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal42());
-  return Expr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal91()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal42());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
-Expr AtomicExpr::weak(void) const {
+std::optional<Expr> AtomicExpr::weak(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal43());
-  return Expr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal92()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal43());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
 bool AtomicExpr::is_cmp_x_chg(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal88();
+  return self.getVal94();
 }
 
 bool AtomicExpr::is_open_cl(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal89();
+  return self.getVal97();
 }
 
 bool AtomicExpr::is_volatile(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal90();
+  return self.getVal98();
 }
 
 std::vector<Expr> AtomicExpr::sub_expressions(void) const {
