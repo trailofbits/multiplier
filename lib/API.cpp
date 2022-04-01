@@ -505,7 +505,7 @@ Token::Token(void)
 
 // Return `true` if this is a valid token.
 Token::operator bool(void) const {
-  return !!dynamic_cast<const InvalidTokenReader *>(impl.get());
+  return !dynamic_cast<const InvalidTokenReader *>(impl.get());
 }
 
 // Kind of this token.

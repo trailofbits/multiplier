@@ -530,6 +530,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   std::unordered_set<std::string> seen_initializers;
   std::string initializer;
   llvm::raw_string_ostream initializer_ss(initializer);
+  std::stringstream name_cases_ss;
 
   auto i = 0u;
   for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
@@ -579,6 +580,11 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
     include_h_os
         << "  " << enum_case << ",\n";
+
+    name_cases_ss
+        << "    case " << enum_name << "::" << enum_case << ": return \""
+        << enum_case << "\";\n";
+
     ++i;
   }
 
@@ -603,6 +609,10 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
       include_h_os
           << "  " << enum_case << ",\n";
+
+      name_cases_ss
+          << "    case " << enum_name << "::" << enum_case << ": return \""
+          << enum_case << "\";\n";
       ++i;
     }
 
@@ -621,6 +631,10 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
       include_h_os
           << "  " << enum_case << ",\n";
+
+      name_cases_ss
+          << "    case " << enum_name << "::" << enum_case << ": return \""
+          << enum_case << "\";\n";
       ++i;
     }
   }
@@ -628,12 +642,22 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   lib_cpp_os
       << "    default: __builtin_unreachable();\n"
       << "  }\n"  // End of `switch`.
-      << "}\n\n";  // End of `FromPasta`.
+      << "}\n\n"  // End of `FromPasta`
+      << "const char *EnumeratorName(" << enum_name << " e) {\n"
+      << "  switch (e) {\n"
+      << name_cases_ss.str()
+      << "    default: return \"<invalid>\";\n"
+      << "  }\n"  // End of `switch`.
+      << "}\n\n";  // End of `EnumeratorName`
 
   include_h_os
       << "  NUM_ENUMERATORS\n"
       << "};\n\n"
-      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
+      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n"
+      << "inline static const char *EnumerationName(" << enum_name << ") {\n"
+      << "  return \"" << enum_name << "\";\n"
+      << "}\n\n"
+      << "const char *EnumeratorName(" << enum_name << ");\n\n";
 }
 
 static std::optional<std::string> GetFirstTemplateParameterType(
