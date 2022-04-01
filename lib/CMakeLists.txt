@@ -208,7 +208,6 @@ target_link_libraries("mx-util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
-    $<BUILD_INTERFACE:weggli_native>
     RocksDB::rocksdb
     ZLIB::ZLIB
   PUBLIC

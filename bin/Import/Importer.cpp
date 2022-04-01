@@ -100,7 +100,6 @@ BuildCommandAction::InitCompilerFromCommand(void) {
     new_args.emplace_back(arg);
   }
   new_args.emplace_back("-Wno-missing-sysroot");
-  new_args.emplace_back("-Wno-unknown-warning-option");
   new_args.emplace_back("-E");
   new_args.emplace_back("-P");
   new_args.emplace_back("-v");

@@ -29,9 +29,6 @@ set(VISIBILITY_INLINES_HIDDEN YES)
 
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
-include("cmake/Corrosion.cmake")
-
-find_program(CBINDGEN cbindgen)
 
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
@@ -49,8 +46,6 @@ find_package(Clang CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
-find_package(vast CONFIG REQUIRED)
-find_package(MLIR CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 

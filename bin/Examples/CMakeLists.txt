@@ -43,7 +43,6 @@ define_example("mx-print-function-names" "PrintFunctionNames.cpp")
 define_example("mx-print-uses" "PrintUses.cpp")
 define_example("mx-dump-json" "DumpJSON.cpp")
 define_example("mx-print-token-contexts" "PrintTokenContexts.cpp")
-define_example("mx-print-sourceir" "PrintSourceIR.cpp")
 
 target_link_libraries("mx-dump-json"
   PRIVATE

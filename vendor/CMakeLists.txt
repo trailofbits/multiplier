@@ -19,4 +19,3 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" PARENT_SCOPE)
 
 add_subdirectory(concurrentqueue)
 add_subdirectory(reproc)
-add_subdirectory(weggli_native)
