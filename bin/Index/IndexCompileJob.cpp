@@ -104,7 +104,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
   }
 
-  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &var) final {
+  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final {
     // Do nothing; we will see the specializations as top-level declarations.
   }
 
@@ -339,7 +339,7 @@ IndexCompileJobAction::IndexCompileJobAction(
 // Look through all files referenced by the AST get their unique IDs. If this
 // is the first time seeing a file, then tokenize the file.
 void IndexCompileJobAction::MaybePersistFile(
-    mx::WorkerId worker_id, const mx::Executor &exe, pasta::File file) {
+    mx::WorkerId worker_id, const mx::Executor &, pasta::File file) {
   if (!file.WasParsed()) {
     return;
   }

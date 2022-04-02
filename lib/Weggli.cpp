@@ -74,10 +74,10 @@ class WeggliQueryImpl final {
   static bool CaptureMatchesCallback(size_t start, size_t end, void *userdata) {
     auto query_data = static_cast<WeggliQueryData*>(userdata);
     if (query_data == nullptr){
-      std::cerr << "CaptureMatchesCallback: userdata not provided!";
       return true;
     }
-    query_data->captures.emplace_back(start, end);
+    query_data->captures.emplace_back(static_cast<unsigned>(start),
+                                      static_cast<unsigned>(end));
     return true;
 
   }
@@ -86,10 +86,11 @@ class WeggliQueryImpl final {
       const char* name, size_t start, size_t end, UserDataPtr userdata) {
     auto query_data = static_cast<WeggliQueryData*>(userdata);
     if (query_data == nullptr){
-      std::cerr << "VariableMatchesCallback: userdata not provided!";
       return true;
     }
-    query_data->variables.emplace_back(std::string(name), start, end);
+    query_data->variables.emplace_back(std::string(name),
+                                       static_cast<unsigned>(start),
+                                       static_cast<unsigned>(end));
     return true;
   }
 };

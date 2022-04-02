@@ -94,11 +94,6 @@ elseif(PLATFORM_LINUX)
   set("MX_END_FORCE_LOAD_GROUP" "-Wl,--no-whole-archive")
 endif()
 
-add_custom_target("copy_datalog_server_headers"
-  DEPENDS
-    ${copied_headers}
-)
-
 # The remaining arguments to `mx-bootstrap` are the paths to the files that will
 # be generated based on analyzing the types/classes in the `pasta` namespace.
 set(MX_BOOTSTRAP_LIB_AST_CAPNP "${PROJECT_SOURCE_DIR}/lib/AST.capnp")

@@ -66,7 +66,7 @@ class HashVisitor final : public pasta::DeclVisitor {
 
   // VisitDecl will add kind name of all decl to the folding set
   // node.
-  void VisitDecl(const pasta::Decl &decl) final {}
+  void VisitDecl(const pasta::Decl &) final {}
 
  private:
   std::stringstream &ss;

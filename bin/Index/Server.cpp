@@ -77,8 +77,6 @@ class ServerImpl final {
   // jobs underway then they'll share the same context. When they're all done
   // the context will go away as well.
   std::shared_ptr<IndexingContext> GetOrCreateIndexingContext(void);
-
-  std::shared_ptr<SearchingContext> GetOrCreateSearchingContext(void);
 };
 
 // Initialize the server.
@@ -110,11 +108,6 @@ ServerImpl::GetOrCreateIndexingContext(void) {
     indexing_context = ic;
     return ic;
   }
-}
-
-std::shared_ptr<SearchingContext>
-ServerImpl::GetOrCreateSearchingContext(void) {
-  return std::make_shared<SearchingContext>(server_context, executor);
 }
 
 Server::~Server(void) {
@@ -328,12 +321,20 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   std::string_view syntax_string =
       std::string_view(params.getQuery().cStr(), params.getQuery().size());
 
-  auto sc = d->GetOrCreateSearchingContext();
-  d->executor.EmplaceAction<SearchAction>(sc, std::move(syntax_string));
-  d->executor.Start();
-  d->executor.Wait();
+  auto sc = std::make_shared<SearchingContext>(d->server_context);
 
-  std::cerr << "Number of fragments in results " << sc->fragments_result.size() << "\n";
+  mx::ExecutorOptions opts;
+  opts.num_workers = static_cast<int>(d->executor.NumWorkers());
+  mx::Executor executor(opts);
+  executor.Start();
+  for (auto i = 0; i < opts.num_workers; ++i) {
+    d->executor.EmplaceAction<SearchAction>(sc, std::move(syntax_string));
+  }
+  executor.Wait();
+
+  LOG(INFO)
+      << "Number of fragments in results "
+      << sc->fragments_result.size() << "\n";
 
   auto results = context.initResults();
   auto num_fragments = static_cast<unsigned>(sc->fragments_result.size());

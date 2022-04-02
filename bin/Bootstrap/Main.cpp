@@ -727,7 +727,10 @@ MethodListPtr CodeGenerator::RunOnClass(
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(EntitySerializer &es, mx::ast::Decl::Builder b, const pasta::"
-        << class_name << " &e) {\n";
+        << class_name << " &e) {\n"
+        << "  (void) es;\n"
+        << "  (void) b;\n"
+        << "  (void) e;\n";
 
     nth_entity_reader = "NthDecl";
 

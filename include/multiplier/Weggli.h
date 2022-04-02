@@ -19,9 +19,9 @@ class WeggliQueryImpl;
 
 struct WeggliQueryData final {
   // raw offset of the query matches captured by weggli
-  std::vector<std::tuple<size_t, size_t>> captures;
+  std::vector<std::tuple<unsigned, unsigned>> captures;
   // raw offset of the variable match capture by weggli
-  std::vector<std::tuple<std::string, size_t, size_t>> variables;
+  std::vector<std::tuple<std::string, unsigned, unsigned>> variables;
 };
 
 class WeggliQuery final {

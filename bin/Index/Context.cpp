@@ -247,34 +247,11 @@ void IndexingContext::PutSourceIRs(
   server_context.code_id_to_source_ir.Set(code_id, source_ir);
 }
 
-SearchingContext::SearchingContext(ServerContext &server_context_,
-                                 const mx::Executor &exe_)
+SearchingContext::SearchingContext(ServerContext &server_context_)
     : server_context(server_context_),
-      num_workers(exe_.NumWorkers()){
-  local_next_file_id.store(mx::kMinEntityIdIncrement);
-}
+      local_next_file_id(mx::kMinEntityIdIncrement) {}
 
-SearchingContext::~SearchingContext(void) {
-  server_context.Flush();
-}
-
-void SearchingContext::ForEachFile(
-    std::string syntax, std::function<void(std::string, mx::FileId)> cb) {
-  while (local_next_file_id < server_context.next_file_id) {
-    auto file_id = local_next_file_id.fetch_add(1ull);
-    cb(syntax, file_id);
-  }
-}
-
-
-
-std::optional<mx::FileId> SearchingContext::GetMaxFileId(void) {
-  auto file_id = server_context.next_file_id.load();
-  if (file_id > 1) {
-    return file_id -1;
-  }
-  return std::nullopt;
-}
+SearchingContext::~SearchingContext(void) {}
 
 std::optional<std::string>
 SearchingContext::GetSerializedFile(mx::FileId file_id) {

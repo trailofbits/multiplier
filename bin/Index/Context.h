@@ -277,21 +277,12 @@ class SearchingContext {
  public:
   ServerContext &server_context;
 
-  explicit SearchingContext(ServerContext &server_context_,
-                            const mx::Executor &exe_);
+  explicit SearchingContext(ServerContext &server_context_);
   virtual ~SearchingContext(void);
-
-  const unsigned num_workers;
 
   std::atomic<mx::FileId> local_next_file_id;
 
   std::set<std::tuple<mx::FileId, mx::FragmentId>> fragments_result;
-
-  std::optional<mx::FileId> GetMaxFileId(void);
-
-  void ForEachFile(
-      std::string syntax, std::function<void(std::string, mx::FileId)> cb);
-
 
   std::optional<std::string>
   GetSerializedFile(mx::FileId file_id);

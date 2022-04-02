@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <multiplier/Action.h>
 #include <multiplier/RPC.capnp.h>
@@ -25,8 +26,10 @@ class SearchAction final : public mx::Action {
   mx::WeggliQuery::Ptr query_tree;
 
   const std::string syntax;
+  std::string file_contents;
+  std::map<unsigned, unsigned> eol_offset_to_line_num;
 
-  std::string GetFileContents(mx::FileId);
+  void FillFileContents(mx::FileId);
 
  public:
   virtual ~SearchAction(void);
@@ -34,10 +37,7 @@ class SearchAction final : public mx::Action {
   SearchAction(std::shared_ptr<SearchingContext> context_,
                std::string_view syntax_string);
 
-  void QuerySyntaxInFile(mx::FileId file_id, const std::string &query);
-
-  std::pair<uint32_t, uint32_t> ConvertOffsetToLine(
-      const std::string &file, uint64_t start, uint64_t end);
+  void QuerySyntaxInFile(mx::FileId file_id);
 
   void GetFragmentMatches(
       mx::FileId file_id, uint32_t start, uint32_t end);

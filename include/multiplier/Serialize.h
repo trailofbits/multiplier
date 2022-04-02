@@ -845,8 +845,8 @@ inline constexpr bool kCanReadWriteUnsafely<Empty> = true;
 template <typename Reader, typename Writer>
 struct Serializer<Reader, Writer, Empty> {
   static constexpr bool kIsFixedSize = true;
-  MX_INLINE static void Write(Writer &writer, Empty) {}
-  MX_INLINE static void Read(Reader &reader, Empty &) {}
+  MX_INLINE static void Write(Writer &, Empty) {}
+  MX_INLINE static void Read(Reader &, Empty &) {}
   static constexpr uint32_t SizeInBytes(void) noexcept {
     return 0u;
   }
@@ -1221,8 +1221,8 @@ struct Serializer<Reader, Writer, std::tuple<>> {
     return 0u;
   }
 
-  MX_FLATTEN MX_INLINE static void Write(Writer &writer, std::tuple<>) {}
-  MX_FLATTEN MX_INLINE static void Read(Reader &writer, std::tuple<> &) {}
+  MX_FLATTEN MX_INLINE static void Write(Writer &, std::tuple<>) {}
+  MX_FLATTEN MX_INLINE static void Read(Reader &, std::tuple<> &) {}
 };
 
 template <typename Reader, typename Writer, typename ElemT, size_t kSize>

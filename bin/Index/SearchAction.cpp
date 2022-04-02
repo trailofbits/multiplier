@@ -30,54 +30,27 @@
 
 namespace indexer {
 
-std::string SearchAction::GetFileContents(mx::FileId file_id) {
-  std::string file_contents;
+void SearchAction::FillFileContents(mx::FileId file_id) {
 
+  file_contents.clear();
   auto maybe_contents = context->GetSerializedFile(file_id);
   if (!maybe_contents) {
-    return {};
+    return;  // Bad file ID. This is expected for the way we get them.
   }
+
+  file_contents.reserve(maybe_contents->size());
 
   WithUncompressedMessageImpl(
       "file", maybe_contents.value(),
-      [&file_contents] (capnp::MessageReader &reader) {
+      [this] (capnp::MessageReader &reader) {
     auto file = reader.getRoot<mx::rpc::File>();
     for (auto tokens : file.getTokens()) {
       capnp::Text::Reader data_reader = tokens.getData();
-      file_contents += std::string(data_reader.cStr());
+      auto tok_begin = data_reader.cStr();
+      auto tok_end = &(tok_begin[data_reader.size()]);
+      file_contents.insert(file_contents.end(), tok_begin, tok_end);
     }
   });
-
-  return file_contents;
-}
-
-std::pair<uint32_t, uint32_t> SearchAction::ConvertOffsetToLine(
-    const std::string &file, uint64_t start, uint64_t end) {
-
-  auto line_start = 0u;
-  auto line_end = 0u;
-  auto counter = 0u;
-
-  std::istringstream input{file};
-  size_t start_index = input.tellg();
-  while (false == input.eof()) {
-    std::string   line;
-    std::getline(input, line);
-    counter++;
-
-    size_t end_index = input.tellg();
-    if (start >= start_index && start <= (start_index + line.size())) {
-      line_start = counter;
-    }
-
-    if (end >= start_index && end <= (start_index + line.size())) {
-      line_end = counter;
-    }
-
-    start_index = end_index;
-  }
-
-  return {line_start, line_end};
 }
 
 void SearchAction::GetFragmentMatches(
@@ -108,14 +81,12 @@ void SearchAction::GetFragmentMatches(
       }
     });
   }
-
 }
 
-void SearchAction::QuerySyntaxInFile(mx::FileId file_id,
-                                     const std::string &query) {
+void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
 
   // Get the contents of the file
-  auto file_contents = GetFileContents(file_id);
+  FillFileContents(file_id);
   if (file_contents.empty()) {
     // Invalid file id. It is common and should
     // return for next file id scan
@@ -136,15 +107,34 @@ void SearchAction::QuerySyntaxInFile(mx::FileId file_id,
   // Destroy matches after iterating through them
   query_tree->DestroyMatches(matches);
 
+  // Create an upper-bounding map of byte offsets to line numbers.
+  eol_offset_to_line_num.clear();
+  auto line = 1;
+  auto offset = 0;
+  for (auto ch : file_contents) {
+    ++offset;
+    if ('\n' == ch) {
+      eol_offset_to_line_num.emplace(offset, line);
+      ++line;
+    }
+  }
+
+  auto end_it = eol_offset_to_line_num.end();
 
   for (auto [start, end] : data->captures) {
-    auto [start_line, end_line] = ConvertOffsetToLine(file_contents, start, end);
-    GetFragmentMatches(file_id, start_line, end_line);
+    auto start_line_it = eol_offset_to_line_num.upper_bound(start);
+    auto end_line_it = eol_offset_to_line_num.upper_bound(end);
+    if (start_line_it != end_it && end_line_it != end_it) {
+      GetFragmentMatches(file_id, start_line_it->second, end_line_it->second);
+    }
   }
 
   for (auto [name, start, end] : data->variables) {
-    auto [start_line, end_line] = ConvertOffsetToLine(file_contents, start, end);
-    GetFragmentMatches(file_id, start_line, end_line);
+    auto start_line_it = eol_offset_to_line_num.upper_bound(start);
+    auto end_line_it = eol_offset_to_line_num.upper_bound(end);
+    if (start_line_it != end_it && end_line_it != end_it) {
+      GetFragmentMatches(file_id, start_line_it->second, end_line_it->second);
+    }
   }
 }
 
@@ -159,36 +149,24 @@ SearchAction::SearchAction(
   query_tree = std::make_shared<mx::WeggliQuery>(syntax);
 }
 
-
-void SearchAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
+void SearchAction::Run(mx::Executor, mx::WorkerId) {
   if (syntax.empty()) {
     LOG(ERROR) << "Empty syntax string, exiting without query!";
     return;
   }
-
-  LOG(INFO) << "Querying for the syntax " << syntax
-            << " worker id " << worker_id;
 
   if (!query_tree || !query_tree->IsValid()) {
     LOG(ERROR) << "Failed to create query tree for syntax " << syntax;
     return;
   }
 
-  // Check if there is any file in the persistent map. If not
-  // return here
-  auto max_file_id = context->GetMaxFileId();
-  if (!max_file_id) {
-    LOG(ERROR) << "No file id found in the persistent map!";
-    return;
+  while (true) {
+    mx::FileId file_id = context->local_next_file_id.fetch_add(1ull);
+    if (file_id >= context->server_context.next_file_id.load()) {
+      break;
+    }
+    QuerySyntaxInFile(file_id);
   }
-
-  LOG(INFO) << "Maximum number of file available for scan "
-            << max_file_id.value();
-
-  context->ForEachFile(
-      syntax, [&](std::string syntax, mx::FileId id) {
-    QuerySyntaxInFile(id, syntax);
-  });
 }
 
 } // namespace indexer
