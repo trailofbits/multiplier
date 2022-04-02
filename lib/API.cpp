@@ -382,7 +382,7 @@ SyntaxQueryResultImpl::SyntaxQueryResultImpl(
   }
 }
 
-Fragment SyntaxQueryResultImpl::GetResultImpl(unsigned index) const {
+Fragment SyntaxQueryResultImpl::GetFragmentFromId(unsigned index) const {
   auto fragment_id = fragments[index].first;
   if (auto ptr = ep->FragmentFor(ep, fragment_id)) {
     return Fragment(std::move(ptr));
@@ -409,7 +409,7 @@ void SyntaxQueryResultImpl::GetUnparsedTokens(
 QueryData SyntaxQueryResultImpl::GetResult(unsigned index) const {
   std::string contents;
 
-  auto fragment = GetResultImpl(index);
+  auto fragment = GetFragmentFromId(index);
   auto query_result = QueryData(fragment);
 
   std::map<unsigned, Token, std::less<unsigned>> offset_map;

@@ -328,7 +328,7 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   mx::Executor executor(opts);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
-    d->executor.EmplaceAction<SearchAction>(sc, std::move(syntax_string));
+    executor.EmplaceAction<SearchAction>(sc, std::move(syntax_string));
   }
   executor.Wait();
 

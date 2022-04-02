@@ -287,7 +287,7 @@ public:
   mutable std::vector<std::pair<mx::FragmentId,
     std::weak_ptr<const FragmentImpl>>> fragments;
 
-  Fragment GetResultImpl(unsigned fragment_id) const;
+  Fragment GetFragmentFromId(unsigned fragment_id) const;
 
   QueryData GetResult(unsigned fragment_id) const;
 
