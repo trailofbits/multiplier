@@ -11,6 +11,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   set(PLATFORM_MACOS true)
+  IF(NOT DEFINED ENV{SDKROOT})
+    execute_process(COMMAND xcrun --sdk macosx --show-sdk-path
+      OUTPUT_VARIABLE SDKROOT
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+  ENDIF()
 
 else()
   message(FATAL_ERROR "Unsupported platform")
