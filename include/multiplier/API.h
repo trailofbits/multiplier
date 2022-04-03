@@ -577,6 +577,9 @@ class SyntaxQueryMatch : public TokenRange {
 
   // Return the match results for a specific meta-variable.
   std::optional<TokenRange> MatchFor(const std::string &var) const;
+
+  // Return a list of matched variables.
+  std::vector<std::string> MatchedVariables(void) const;
 };
 
 class SyntaxQueryResultIterator {

@@ -333,7 +333,7 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   }
 
   LOG(INFO)
-      << "Got syntax query: " << syntax_string;
+      << "Got Weggli syntax query: " << syntax_string;
 
   auto sc = std::make_shared<SearchingContext>(d->server_context);
 

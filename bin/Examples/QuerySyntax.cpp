@@ -58,8 +58,24 @@ extern "C" int main(int argc, char *argv[]) {
       FLAGS_host, FLAGS_port));
 
   for (mx::SyntaxQueryMatch match : index.syntax_query(FLAGS_query)) {
-    PrintUnparsedTokens(mx::Fragment::containing(match).unparsed_tokens());
-    std::cout << std::endl;
+    mx::Fragment frag = mx::Fragment::containing(match);
+    std::cout << frag.id();
+    auto sep = "\t";
+    for (mx::Token tok : match) {
+      std::cout << sep << tok.data();
+      sep = " ";
+    }
+    for (auto var : match.MatchedVariables()) {
+      std::cout << '\t' << var;
+      sep = "\t";
+      if (auto capture = match.MatchFor(var)) {
+        for (mx::Token tok : *capture) {
+          std::cout << sep << tok.data();
+          sep = " ";
+        }
+      }
+    }
+    std::cout << "\n\n";
   }
   return EXIT_SUCCESS;
 }

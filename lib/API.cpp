@@ -1062,6 +1062,15 @@ std::optional<TokenRange> SyntaxQueryMatch::MatchFor(const std::string &var) con
   }
 }
 
+// Return a list of matched variables.
+std::vector<std::string> SyntaxQueryMatch::MatchedVariables(void) const {
+  std::vector<std::string> ret;
+  for (const auto &[var, _] : var_matches) {
+    ret.emplace_back(var);
+  }
+  return ret;
+}
+
 SyntaxQueryResult::SyntaxQueryResult(
     std::shared_ptr<const SyntaxQueryResultImpl> impl_)
     : impl(std::move(impl_)),
