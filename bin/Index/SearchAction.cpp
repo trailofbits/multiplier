@@ -60,6 +60,7 @@ void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
   // otherwise mostly occupies the range `[1, N)`.
   FillFileContents(file_id);
   if (file_contents.empty()) {
+    DLOG(INFO) << "File with id " << file_id << " is empty or doesn't exist";
     return;
   }
 
@@ -106,6 +107,8 @@ SearchAction::SearchAction(
 
 void SearchAction::Run(mx::Executor, mx::WorkerId) {
   if (!query_tree.IsValid()) {
+    DLOG(ERROR)
+        << "Query is not valid";
     return;
   }
 
