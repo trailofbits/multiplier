@@ -95,7 +95,6 @@ void WeggliQuery::ForEachMatch(
     return;
   }
 
-  CHECK(!source.back());  // `NUL`-terminated.
   auto matches = weggli_matches(impl->qtree, source.data(), impl->is_cpp);
   if (!matches) {
     return;
