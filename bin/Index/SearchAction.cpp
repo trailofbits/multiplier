@@ -82,6 +82,7 @@ void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
       file_contents,
       [this, file_id] (const mx::WeggliMatchData &match) -> bool {
         unsigned prev_line = 0;
+        std::cerr << "match at [" << match.begin_offset << ", " << match.end_offset << ")\n";
         for (auto i = match.begin_offset; i < match.end_offset; ++i) {
           auto line_it = eol_offset_to_line_num.upper_bound(i);
           if (line_it != eol_offset_to_line_num.end()) {
