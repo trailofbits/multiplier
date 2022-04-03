@@ -332,6 +332,9 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
     return kj::READY_NOW;
   }
 
+  LOG(INFO)
+      << "Got syntax query: " << syntax_string;
+
   auto sc = std::make_shared<SearchingContext>(d->server_context);
 
   const bool is_cpp = params.getIsCpp();
@@ -342,7 +345,7 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   mx::Executor executor(opts);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
-    executor.EmplaceAction<SearchAction>(sc, std::move(syntax_string), is_cpp);
+    executor.EmplaceAction<SearchAction>(sc, syntax_string, is_cpp);
   }
   executor.Wait();
 
