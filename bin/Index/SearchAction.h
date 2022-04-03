@@ -22,10 +22,8 @@ namespace indexer {
 class SearchAction final : public mx::Action {
  private:
   const std::shared_ptr<SearchingContext> context;
+  const mx::WeggliQuery query_tree;
 
-  mx::WeggliQuery::Ptr query_tree;
-
-  const std::string syntax;
   std::string file_contents;
   std::map<unsigned, unsigned> eol_offset_to_line_num;
 
@@ -35,12 +33,9 @@ class SearchAction final : public mx::Action {
   virtual ~SearchAction(void);
 
   SearchAction(std::shared_ptr<SearchingContext> context_,
-               std::string_view syntax_string);
+               std::string_view syntax_string, bool is_cpp);
 
   void QuerySyntaxInFile(mx::FileId file_id);
-
-  void GetFragmentMatches(
-      mx::FileId file_id, uint32_t start, uint32_t end);
 
   // Build and index the AST.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

@@ -17,6 +17,7 @@
 #include <kj/io.h>
 #include <optional>
 #include <map>
+#include <string>
 
 #include "AST.capnp.h"
 #include "RPC.capnp.h"
@@ -264,16 +265,15 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
 };
 
 class SyntaxQueryResultImpl {
-public:
+ public:
   using Response = capnp::Response<mx::rpc::Multiplier::SyntaxQueryResults>;
-  const Response response;
-  const rpc::File::Reader reader;
 
   using Ptr = std::shared_ptr<const SyntaxQueryResultImpl>;
 
   virtual ~SyntaxQueryResultImpl(void) noexcept;
 
-  SyntaxQueryResultImpl(std::string syntax_, EntityProvider::Ptr ep_, Response response_);
+  SyntaxQueryResultImpl(std::string syntax_, EntityProvider::Ptr ep_,
+                        Response response_, bool is_cpp);
 
   const std::string syntax;
 
@@ -281,20 +281,25 @@ public:
   // or look up entities related to other fragments.
   const EntityProvider::Ptr ep;
 
-  WeggliQuery::Ptr query_ptr;
+  // Client-local version of the query to be run on each fragment.
+  const WeggliQuery query;
+
+  // Buffer of fragment data.
+  mutable std::string fragment_buffer;
+  mutable std::map<unsigned, EntityId> offset_to_token;
+  mutable mx::FragmentId fragment_buffer_id{kInvalidEntityId};
+  mutable std::vector<WeggliMatchData> weggli_matches;
+  mutable unsigned next_weggli_match{0};
 
   // List of fragments in this file.
   mutable std::vector<std::pair<mx::FragmentId,
-    std::weak_ptr<const FragmentImpl>>> fragments;
+                      std::weak_ptr<const FragmentImpl>>> fragments;
 
-  Fragment GetFragmentFromId(unsigned fragment_id) const;
+  FragmentImpl::Ptr GetFragmentAtIndex(unsigned index) const;
 
-  QueryData GetResult(unsigned fragment_id) const;
+  EntityId EntityContainingOffset(unsigned offset) const;
 
-  void GetUnparsedTokens(
-      std::string &contents,
-      std::map<unsigned, Token, std::less<unsigned>> &offset,
-      TokenSubstitutionList nodes) const;
+  void GetUnparsedTokens(TokenSubstitutionList nodes) const;
 };
 
 // Provides entities from a remote source, i.e. a remote
@@ -336,7 +341,8 @@ class RemoteEntityProvider final : public EntityProvider {
   // Download a fragment by its unique ID.
   FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
 
-  SyntaxQueryResultImpl::Ptr SyntaxQuery(const Ptr &, std::string query) final;
+  SyntaxQueryResultImpl::Ptr SyntaxQuery(
+      const Ptr &, std::string query, bool is_cpp) final;
 };
 
 class InvalidEntityProvider final : public EntityProvider {
@@ -353,7 +359,8 @@ class InvalidEntityProvider final : public EntityProvider {
   // Download a fragment by its unique ID.
   FragmentImpl::Ptr FragmentFor(const Ptr &, FragmentId id) final;
 
-  SyntaxQueryResultImpl::Ptr SyntaxQuery(const Ptr &, std::string query) final;
+  SyntaxQueryResultImpl::Ptr SyntaxQuery(const Ptr &, std::string query,
+                                         bool is_cpp) final;
 };
 
 class FileListImpl {

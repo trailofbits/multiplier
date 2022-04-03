@@ -57,11 +57,9 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  auto results = index.syntax_query(FLAGS_query);
-  for (auto iter = results.begin(); iter != results.end(); iter++) {
-    mx::QueryData data = *iter;
-    PrintUnparsedTokens(data.fragment.unparsed_tokens());
-    std::cout << "\n";
+  for (mx::SyntaxQueryMatch match : index.syntax_query(FLAGS_query)) {
+    PrintUnparsedTokens(mx::Fragment::containing(match).unparsed_tokens());
+    std::cout << std::endl;
   }
   return EXIT_SUCCESS;
 }

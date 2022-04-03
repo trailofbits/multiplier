@@ -20,7 +20,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
-#include<set>
+#include <set>
 
 namespace mx {
 class Executor;
@@ -280,21 +280,16 @@ class SearchingContext {
   explicit SearchingContext(ServerContext &server_context_);
   virtual ~SearchingContext(void);
 
+  // Next file ID for any `SearchingAction` to look at.
   std::atomic<mx::FileId> local_next_file_id;
 
-  std::set<std::tuple<mx::FileId, mx::FragmentId>> fragments_result;
+  // Set of `file_id:line_number` pairs where matches were approximately
+  // found.
+  std::set<std::tuple<mx::FileId, unsigned>> line_results;
+  std::mutex line_results_lock;
 
   std::optional<std::string>
   GetSerializedFile(mx::FileId file_id);
-
-  std::optional<std::string>
-  GetSerializedFragment(mx::FragmentId fragment_id);
-
-  template <typename P, typename C>
-  void ScanFilePrefix(P prefix, C callback) const {
-    server_context.file_fragment_ids.ScanPrefix(prefix, callback);
-  }
-
 };
 
 }  // namespace indexer

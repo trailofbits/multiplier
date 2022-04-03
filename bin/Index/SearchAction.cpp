@@ -53,59 +53,17 @@ void SearchAction::FillFileContents(mx::FileId file_id) {
   });
 }
 
-void SearchAction::GetFragmentMatches(
-    mx::FileId file_id, uint32_t line_start, uint32_t line_end) {
-
-  std::vector<mx::FragmentId> fragment_ids;
-  context->ScanFilePrefix(file_id,
-      [file_id, &fragment_ids] (mx::FileId found_file_id,
-                                mx::FragmentId fragment_id) {
-        DCHECK_EQ(file_id, found_file_id);
-        fragment_ids.push_back(fragment_id);
-        return file_id == found_file_id;
-      });
-
-  for (auto &fragment_id : fragment_ids) {
-    auto maybe_contents = context->GetSerializedFragment(fragment_id);
-    if (!maybe_contents) {
-      continue;
-    }
-
-    WithUncompressedMessageImpl("fragment", maybe_contents.value(),
-                                [&] (capnp::MessageReader &reader) {
-      auto fragment = reader.getRoot<mx::rpc::Fragment>();
-      auto fragment_first_line = fragment.getFirstLine();
-      auto fragment_last_line = fragment.getLastLine();
-      if ((line_start >= fragment_first_line) && (line_end <= fragment_last_line)) {
-        context->fragments_result.emplace(file_id, fragment_id);
-      }
-    });
-  }
-}
-
 void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
 
-  // Get the contents of the file
+  // Get the contents of the file. We may fail, which is OK, and generally
+  // implies a bad file id. There can be small gaps in the file ID space, which
+  // otherwise mostly occupies the range `[1, N)`.
   FillFileContents(file_id);
   if (file_contents.empty()) {
-    // Invalid file id. It is common and should
-    // return for next file id scan
     return;
   }
 
   LOG(INFO) << "Looking for syntax matches in file with id " << file_id;
-
-  auto matches = query_tree->FindMatches(file_contents, false);
-  if (!matches) {
-    LOG(ERROR) << "Failed to find matches in file with id " << file_id;
-    return;
-  }
-
-  auto data = std::make_unique<mx::WeggliQueryData>();
-  query_tree->IterateMatches(matches, data.get());
-
-  // Destroy matches after iterating through them
-  query_tree->DestroyMatches(matches);
 
   // Create an upper-bounding map of byte offsets to line numbers.
   eol_offset_to_line_num.clear();
@@ -119,44 +77,35 @@ void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
     }
   }
 
-  auto end_it = eol_offset_to_line_num.end();
-
-  for (auto [start, end] : data->captures) {
-    auto start_line_it = eol_offset_to_line_num.upper_bound(start);
-    auto end_line_it = eol_offset_to_line_num.upper_bound(end);
-    if (start_line_it != end_it && end_line_it != end_it) {
-      GetFragmentMatches(file_id, start_line_it->second, end_line_it->second);
-    }
-  }
-
-  for (auto [name, start, end] : data->variables) {
-    auto start_line_it = eol_offset_to_line_num.upper_bound(start);
-    auto end_line_it = eol_offset_to_line_num.upper_bound(end);
-    if (start_line_it != end_it && end_line_it != end_it) {
-      GetFragmentMatches(file_id, start_line_it->second, end_line_it->second);
-    }
-  }
+  query_tree.ForEachMatch(
+      file_contents,
+      [this, file_id] (const mx::WeggliMatchData &match) -> bool {
+        unsigned prev_line = 0;
+        for (auto i = match.begin_offset; i < match.end_offset; ++i) {
+          auto line_it = eol_offset_to_line_num.upper_bound(i);
+          if (line_it != eol_offset_to_line_num.end()) {
+            auto line = line_it->second;
+            if (line != prev_line) {
+              prev_line = line;
+              std::lock_guard<std::mutex> locker(context->line_results_lock);
+              context->line_results.emplace(file_id, line);
+            }
+          }
+        }
+        return true;
+      });
 }
-
 
 SearchAction::~SearchAction(void) {}
 
 SearchAction::SearchAction(
     std::shared_ptr<SearchingContext> context_,
-    std::string_view syntax_)
+    std::string_view syntax, bool is_cpp)
     : context(std::move(context_)),
-      syntax(syntax_){
-  query_tree = std::make_shared<mx::WeggliQuery>(syntax);
-}
+      query_tree(syntax, is_cpp) {}
 
 void SearchAction::Run(mx::Executor, mx::WorkerId) {
-  if (syntax.empty()) {
-    LOG(ERROR) << "Empty syntax string, exiting without query!";
-    return;
-  }
-
-  if (!query_tree || !query_tree->IsValid()) {
-    LOG(ERROR) << "Failed to create query tree for syntax " << syntax;
+  if (!query_tree.IsValid()) {
     return;
   }
 
@@ -170,5 +119,3 @@ void SearchAction::Run(mx::Executor, mx::WorkerId) {
 }
 
 } // namespace indexer
-
-

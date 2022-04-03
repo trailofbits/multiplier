@@ -258,10 +258,4 @@ SearchingContext::GetSerializedFile(mx::FileId file_id) {
   return server_context.file_id_to_serialized_file.TryGet(file_id);
 }
 
-std::optional<std::string>
-SearchingContext::GetSerializedFragment(mx::FragmentId fragment_id) {
-  return server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
-}
-
-
 }  // namespace indexer

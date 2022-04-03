@@ -6,52 +6,46 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 #include <tuple>
-
 
 namespace mx {
 
 class WeggliQueryImpl;
 
-struct WeggliQueryData final {
-  // raw offset of the query matches captured by weggli
-  std::vector<std::tuple<unsigned, unsigned>> captures;
-  // raw offset of the variable match capture by weggli
-  std::vector<std::tuple<std::string, unsigned, unsigned>> variables;
+struct WeggliMatchData final {
+  // raw offset of the query matches captured by Weggli.
+  unsigned begin_offset{~0u};
+  unsigned end_offset{0u};
+
+  std::unordered_map<std::string, std::pair<unsigned, unsigned>> variables;
 };
 
 class WeggliQuery final {
  public:
-  using Ptr = std::shared_ptr<WeggliQuery>;
+  using TreePtr = void *;
+  using ResultPtr = void *;
+  using ResultsPtr = void *;
+  using UserDataPtr = void *;
 
-  using TreePtr = void*;
-  using ResultPtr = void*;
-  using ResultsPtr = void*;
-  using UserDataPtr = void*;
+  using ResultCallback = bool(*)(const void *, void *);
 
-  using ResultCallback = bool(*)(const void*, void*);
+  explicit WeggliQuery(std::string_view query, bool is_cpp);
 
-  explicit WeggliQuery(std::string query);
+  ~WeggliQuery();
 
-  virtual ~WeggliQuery();
+  void ForEachMatch(std::string_view source,
+                    std::function<bool(const WeggliMatchData &)> cb) const;
 
-  ResultsPtr FindMatches(std::string source, bool is_cpp);
-
-  void DestroyMatches(ResultsPtr results);
-
-  void IterateMatches(ResultsPtr results, WeggliQueryData *data);
-
-  bool IsValid(void);
+  bool IsValid(void) const;
 
  private:
   std::unique_ptr<WeggliQueryImpl> impl;
-
-  const std::string syntax;
 };
 
-}
-
+}  // namespace mx

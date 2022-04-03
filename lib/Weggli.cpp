@@ -9,117 +9,104 @@
 #include <weggli.h>
 #include <atomic>
 #include <cassert>
+#include <glog/logging.h>
 #include <iostream>
 #include <multiplier/Compress.h>
 #include <multiplier/Weggli.h>
 
 namespace mx {
+namespace {
 
-class WeggliQueryImpl final {
- private:
-  friend class WeggliQuery;
-
-  using Ptr = std::shared_ptr<WeggliQueryImpl>;
-
-  using TreePtr = struct QueryTree*;
-  using ResultPtr = struct QueryResult*;
-  using ResultsPtr = struct QueryResults*;
-  using UserDataPtr = void*;
-
-  TreePtr qtree;
-
-  std::string query;
-
- public:
-  explicit WeggliQueryImpl(std::string query) {
-    qtree = weggli_new_query(query.c_str(), false);
+static bool CaptureMatchesCallback(size_t start, size_t end, void *data) {
+  if (!data) {
+    return false;
   }
 
-  virtual ~WeggliQueryImpl() {
+  auto match = static_cast<WeggliMatchData *>(data);
+  match->begin_offset = std::min(
+      match->begin_offset, static_cast<unsigned>(start));
+  match->end_offset = std::max(match->begin_offset, static_cast<unsigned>(end));
+  return true;
+}
+
+static bool VariableMatchesCallback(
+    const char *name, size_t start, size_t end, void *data) {
+  if (!data) {
+    return false;
+  }
+
+  auto match = static_cast<WeggliMatchData *>(data);
+  match->variables.try_emplace(
+      name, static_cast<unsigned>(start), static_cast<unsigned>(end));
+  return true;
+}
+
+static bool WeggliCallback(const struct QueryResult *result, void *data) {
+  if (!data) {
+    return false;
+  }
+
+  WeggliMatchData match;
+  weggli_iter_match_captures(result, CaptureMatchesCallback, &match);
+  weggli_iter_match_variables(result, VariableMatchesCallback, &match);
+  if (match.begin_offset < match.end_offset) {
+    auto cb = reinterpret_cast<std::function<bool(const WeggliMatchData &)> *>(data);
+    return (*cb)(match);
+
+  } else {
+    return true;
+  }
+}
+
+}  // namespace
+
+class WeggliQueryImpl final {
+ public:
+  using TreePtr = struct QueryTree *;
+  using ResultPtr = struct QueryResult *;
+  using ResultsPtr = struct QueryResults *;
+  using UserDataPtr = void*;
+
+  const TreePtr qtree;
+  const bool is_cpp;
+
+ public:
+  explicit WeggliQueryImpl(std::string_view query, bool is_cpp_)
+      : qtree(weggli_new_query(query.data(), is_cpp_)),
+        is_cpp(is_cpp_) {}
+
+  ~WeggliQueryImpl(void) {
     if (qtree) {
       weggli_destroy_query(qtree);
     }
   }
-
-  bool IsValid(void) {
-    return qtree != nullptr;
-  }
-
-  ResultsPtr FindMatches(std::string source, bool cpp) {
-    if (qtree) {
-      return weggli_matches(qtree, source.c_str(), cpp);
-    }
-    return nullptr;
-  }
-
-  void DestroyMatches(ResultsPtr results) {
-    if (results) {
-      weggli_destroy_matches(results);
-    }
-  }
-
-  static void IterateMatches(ResultsPtr results, UserDataPtr userdata) {
-    weggli_iter_matches(
-        results,WeggliQueryImpl::MatchesCallback, userdata);
-  }
-
-  static bool MatchesCallback(const struct QueryResult *result, void *userdata) {
-    weggli_iter_match_captures(
-        result, WeggliQueryImpl::CaptureMatchesCallback, userdata);
-    weggli_iter_match_variables(
-        result,WeggliQueryImpl::VariableMatchesCallback, userdata);
-    return true;
-  }
-
-  static bool CaptureMatchesCallback(size_t start, size_t end, void *userdata) {
-    auto query_data = static_cast<WeggliQueryData*>(userdata);
-    if (query_data == nullptr){
-      return true;
-    }
-    query_data->captures.emplace_back(static_cast<unsigned>(start),
-                                      static_cast<unsigned>(end));
-    return true;
-
-  }
-
-  static bool VariableMatchesCallback(
-      const char* name, size_t start, size_t end, UserDataPtr userdata) {
-    auto query_data = static_cast<WeggliQueryData*>(userdata);
-    if (query_data == nullptr){
-      return true;
-    }
-    query_data->variables.emplace_back(std::string(name),
-                                       static_cast<unsigned>(start),
-                                       static_cast<unsigned>(end));
-    return true;
-  }
 };
 
-WeggliQuery::WeggliQuery(std::string query)
-    : syntax(query),
-      impl(std::make_unique<WeggliQueryImpl>(query)){}
+WeggliQuery::WeggliQuery(std::string_view query, bool is_cpp)
+    : impl(std::make_unique<WeggliQueryImpl>(query, is_cpp)) {}
 
-WeggliQuery::~WeggliQuery(){}
+WeggliQuery::~WeggliQuery(void) {}
 
-WeggliQuery::ResultsPtr
-WeggliQuery::FindMatches(std::string source, bool cpp) {
-  return impl->FindMatches(source, cpp);
-}
+void WeggliQuery::ForEachMatch(
+    std::string_view source,
+    std::function<bool(const WeggliMatchData &)> cb) const {
 
-void WeggliQuery::DestroyMatches(ResultsPtr results) {
-  impl->DestroyMatches(
-      reinterpret_cast<WeggliQueryImpl::ResultsPtr>(results));
-}
-
-void WeggliQuery::IterateMatches(ResultsPtr results, WeggliQueryData *data) {
-  if (results) {
-    WeggliQueryImpl::IterateMatches(
-        reinterpret_cast<WeggliQueryImpl::ResultsPtr>(results), data);
+  if (!impl->qtree || source.empty()) {
+    return;
   }
+
+  CHECK(!source.back());  // `NUL`-terminated.
+  auto matches = weggli_matches(impl->qtree, source.data(), impl->is_cpp);
+  if (!matches) {
+    return;
+  }
+
+  weggli_iter_matches(matches, WeggliCallback, &cb);
+  weggli_destroy_matches(matches);
 }
 
-bool WeggliQuery::IsValid(void) {
-  return impl->IsValid();
+bool WeggliQuery::IsValid(void) const {
+  return impl->qtree != nullptr;
 }
 
-}
+}  // namespace mx

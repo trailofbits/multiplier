@@ -20,6 +20,7 @@
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
+#include <set>
 #include <sstream>
 #include <mutex>
 #include <vector>
@@ -29,6 +30,11 @@
 #include "SearchAction.h"
 
 namespace indexer {
+
+class ServerContext;
+class SearchingContext;
+class IndexingContext;
+
 namespace {
 
 // Get the arguments from the compile command as an argument vector.
@@ -318,30 +324,47 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   mx::rpc::Multiplier::SyntaxQueryParams::Reader params =
       context.getParams();
 
+  auto results = context.initResults();
   std::string_view syntax_string =
       std::string_view(params.getQuery().cStr(), params.getQuery().size());
+  if (syntax_string.empty()) {
+    (void) results.initFragments(0u);
+    return kj::READY_NOW;
+  }
 
   auto sc = std::make_shared<SearchingContext>(d->server_context);
 
+  const bool is_cpp = params.getIsCpp();
+
+  // Run N parallel search actions on every file.
   mx::ExecutorOptions opts;
   opts.num_workers = static_cast<int>(d->executor.NumWorkers());
   mx::Executor executor(opts);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
-    executor.EmplaceAction<SearchAction>(sc, std::move(syntax_string));
+    executor.EmplaceAction<SearchAction>(sc, std::move(syntax_string), is_cpp);
   }
   executor.Wait();
 
+  // Convert the file file:line pairs into overlapping fragment IDs.
+  std::set<mx::FragmentId> fragment_ids;
+  for (auto prefix : sc->line_results) {
+    d->server_context.file_fragment_lines.ScanPrefix(
+        prefix, [&fragment_ids] (mx::FileId, unsigned, mx::FragmentId id) {
+          fragment_ids.emplace(id);
+          return true;
+        });
+  }
+
   LOG(INFO)
       << "Number of fragments in results "
-      << sc->fragments_result.size() << "\n";
+      << fragment_ids.size() << "\n";
 
-  auto results = context.initResults();
-  auto num_fragments = static_cast<unsigned>(sc->fragments_result.size());
+  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
   auto fragments = results.initFragments(num_fragments);
   auto index = 0u;
-  for (auto [file_id, fragment]: sc->fragments_result) {
-    fragments.set(index++, fragment);
+  for (auto fragment_id : fragment_ids) {
+    fragments.set(index++, fragment_id);
   }
 
   return kj::READY_NOW;
