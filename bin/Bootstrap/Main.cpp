@@ -722,6 +722,9 @@ MethodListPtr CodeGenerator::RunOnClass(
         << ">;\n"
         << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
+        << class_name << ">;\n"
+        << "using " << class_name
+        << "ContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, "
         << class_name << ">;\n\n";
 
     serialize_cpp_os
@@ -741,6 +744,9 @@ MethodListPtr CodeGenerator::RunOnClass(
         << ">;\n"
         << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
+        << class_name << ">;\n"
+        << "using " << class_name
+        << "ContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, "
         << class_name << ">;\n\n";
 
     serialize_cpp_os
@@ -804,11 +810,48 @@ MethodListPtr CodeGenerator::RunOnClass(
   // and so we need to carry around a fragment pointer.
   } else if (class_name == "Decl" || class_name == "Stmt" ||
              gNotReferenceTypesRelatedToEntities.count(class_name)) {
+    unsigned cd = 0;  // Containing decl.
+    unsigned cs = 0;  // Containing stmt.
+
+    if (class_name == "Decl" || class_name == "Stmt") {
+      cd = storage.AddMethod("UInt64");  // Reference.
+      cs = storage.AddMethod("UInt64");  // Reference.
+
+      auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(cd);
+      auto [cs_getter_name, cs_setter_name, cs_init_name] = NamesFor(cs);
+
+      serialize_cpp_os
+          << "  b." << cd_setter_name << "(es.parent_decl_id);\n"
+          << "  b." << cs_setter_name << "(es.parent_stmt_id);\n";
+
+      lib_cpp_os
+          << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
+          << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+          << "  if (auto id = self." << cd_getter_name << "(); "
+          << "id != kInvalidEntityId) {\n"
+          << "    return fragment->DeclFor(fragment, id);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n"
+          << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
+          << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+          << "  if (auto id = self." << cd_getter_name << "(); "
+          << "id != kInvalidEntityId) {\n"
+          << "    return fragment->StmtFor(fragment, id);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n";
+    }
+
     include_h_os
         << " {\n"
         << " protected:\n"
+        << "  friend class Decl;\n"
         << "  friend class DeclIterator;\n"
         << "  friend class FragmentImpl;\n"
+        << "  friend class Stmt;\n"
         << "  friend class StmtIterator;\n"
         << "  friend class TokenContext;\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
@@ -827,6 +870,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Decl> from(const TokenContext &c) {\n"
           << "    return c.as_decl();\n"
           << "  }\n\n"
+          << "  std::optional<Decl> parent_declaration(void) const;\n"
+          << "  std::optional<Stmt> parent_statement(void) const;\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -839,10 +884,11 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Stmt> from(const TokenContext &c) {\n"
           << "    return c.as_stmt();\n"
           << "  }\n\n"
+          << "  std::optional<Decl> parent_declaration(void) const;\n"
+          << "  std::optional<Stmt> parent_statement(void) const;\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
-
     }
 
   } else if (gEntityClassNames.count(class_name)) {
@@ -868,6 +914,41 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "ContainingTokenRange containing(const Token &tok) {\n"
         << "    return TokenContextIterator(TokenContext::of(tok));\n"
         << "  }\n\n";
+
+    if (is_decl) {
+      include_h_os
+          << "  static " << class_name
+          << "ContainingDeclRange containing(const Decl &decl);\n"
+          << "  static " << class_name
+          << "ContainingDeclRange containing(const Stmt &stmt);\n\n";
+
+      lib_cpp_os
+          << class_name << "ContainingDeclRange " << class_name
+          << "::containing(const Decl &decl) {\n"
+          << "  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());\n"
+          << "}\n\n"
+          << class_name << "ContainingDeclRange " << class_name
+          << "::containing(const Stmt &stmt) {\n"
+          << "  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());\n"
+          << "}\n\n";
+
+    } else if (is_stmt) {
+      include_h_os
+          << "  static " << class_name
+          << "ContainingStmtRange containing(const Decl &decl);\n"
+          << "  static " << class_name
+          << "ContainingStmtRange containing(const Stmt &stmt);\n\n";
+
+      lib_cpp_os
+          << class_name << "ContainingStmtRange " << class_name
+          << "::containing(const Decl &decl) {\n"
+          << "  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());\n"
+          << "}\n\n"
+          << class_name << "ContainingStmtRange " << class_name
+          << "::containing(const Stmt &stmt) {\n"
+          << "  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());\n"
+          << "}\n\n";
+    }
 
     if (is_decl && class_name != "Decl") {
       include_h_os
@@ -1756,6 +1837,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "  serialized_entities.clear();\n"
       << "  code_id = code.fragment_id;\n"
       << "  next_pseudo_entity_offset = 0;\n"
+      << "  parent_decl_id = mx::kInvalidEntityId;\n"
+      << "  parent_stmt_id = mx::kInvalidEntityId;\n"
+      << "  current_decl_id = mx::kInvalidEntityId;\n"
+      << "  current_stmt_id = mx::kInvalidEntityId;\n"
       << "  decl_builder = builder.initDeclarations(code.num_decl_entities);\n"
       << "  stmt_builder = builder.initStatements(code.num_stmt_entities);\n"
       << "  pseudo_builder = builder.initOthers(code.num_pseudo_entities);\n";

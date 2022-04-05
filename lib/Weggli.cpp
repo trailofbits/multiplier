@@ -4,15 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "API.h"
+#include <multiplier/Weggli.h>
+
+#ifndef MX_DISABLE_WEGGLI
 
 #include <weggli.h>
-#include <atomic>
-#include <cassert>
-#include <glog/logging.h>
-#include <iostream>
-#include <multiplier/Compress.h>
-#include <multiplier/Weggli.h>
+#include "API.h"
 
 namespace mx {
 namespace {
@@ -110,3 +107,22 @@ bool WeggliQuery::IsValid(void) const {
 }
 
 }  // namespace mx
+#else
+namespace mx {
+
+class WeggliQueryImpl {};
+
+WeggliQuery::WeggliQuery(std::string_view, bool)
+    : impl() {}
+
+WeggliQuery::~WeggliQuery(void) {}
+
+void WeggliQuery::ForEachMatch(
+    std::string_view, std::function<bool(const WeggliMatchData &)>) const {}
+
+bool WeggliQuery::IsValid(void) const {
+  return false;
+}
+
+}  // namespace mx
+#endif   // MX_DISABLE_WEGGLI

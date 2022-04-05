@@ -16,7 +16,7 @@
 #include <mutex>
 #include <iostream>
 
-#include "AST.h"
+#include "AST.h"  // Auto-generated.
 #include "Iterator.h"
 #include "Types.h"
 
@@ -47,6 +47,21 @@ class TokenSubstitutionList;
 class TokenSubstitutionListImpl;
 
 using FilePathList = std::map<std::filesystem::path, FileId>;
+
+using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
+using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
+
+template <typename T>
+inline ParentDeclIteratorImpl<T> &ParentDeclIteratorImpl<T>::operator++(void) {
+  impl = impl->parent_declaration();
+  return *this;
+}
+
+template <typename T>
+inline ParentStmtIteratorImpl<T> &ParentStmtIteratorImpl<T>::operator++(void) {
+  impl = impl->parent_statement();
+  return *this;
+}
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {

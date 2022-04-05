@@ -109,8 +109,19 @@ target_link_libraries("mx-api"
   PRIVATE
     CapnProto::capnp-rpc
     ZLIB::ZLIB
-    $<BUILD_INTERFACE:weggli_native>
 )
+
+# Add in Weggli.
+if(MX_ENABLE_WEGGLI)
+  target_link_libraries("mx-api"
+    PRIVATE
+      $<BUILD_INTERFACE:weggli_native>
+  )
+else()
+  target_compile_definitions("mx-api"
+    PRIVATE
+      "MX_DISABLE_WEGGLI")
+endif()
 
 set_target_properties("mx-api"
   PROPERTIES
@@ -211,7 +222,6 @@ target_link_libraries("mx-util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
-    $<BUILD_INTERFACE:weggli_native>
     RocksDB::rocksdb
     ZLIB::ZLIB
   PUBLIC
@@ -219,6 +229,17 @@ target_link_libraries("mx-util"
     gflags::gflags
     CapnProto::capnp-rpc
 )
+
+if(MX_ENABLE_WEGGLI)
+  target_link_libraries("mx-util"
+    PRIVATE
+      $<BUILD_INTERFACE:weggli_native>
+  )
+else()
+  target_compile_definitions("mx-util"
+    PRIVATE
+      "MX_DISABLE_WEGGLI")
+endif()
 
 set_target_properties("mx-util"
   PROPERTIES
@@ -255,7 +276,7 @@ target_include_directories("mx-util"
 
 if(MX_ENABLE_INSTALL)
   
-  # NOTE(pag): `util` is *not* installed, just `api`.
+  # NOTE(pag): `mx-util` is *not* installed, just `mx-api`.
   install(
     TARGETS
       "mx-api"

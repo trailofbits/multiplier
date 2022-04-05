@@ -22,10 +22,8 @@ static void FindSwitchCases(mx::Fragment fragment) {
   for (mx::SwitchStmt sw : mx::SwitchStmt::in(fragment)) {
     std::cout << fragment.id() << std::endl;
 
-    // Get function containing first token of the switch; eventually
-    // will have APIs for `DeclA::containing(decl_b)`,
-    // `DeclA::containing(stmt_b)`, etc.
-    auto containing_func = mx::FunctionDecl::containing(sw.begin_token()).begin();
+    auto containing_func = mx::FunctionDecl::containing(sw);
+    CHECK(containing_func);
 
     for (auto cs = sw.first_switch_case(); cs; cs = cs->next_switch_case()) {
       if (auto case_ = mx::CaseStmt::from(*cs)) {

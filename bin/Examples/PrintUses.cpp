@@ -40,8 +40,8 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   for (mx::Token token : mx::Token::in(*fragment)) {
-    for (mx::DeclRefExpr expr : mx::DeclRefExpr::containing(token)) {
-      mx::ValueDecl used_decl = expr.declaration();
+    if (auto expr = mx::DeclRefExpr::containing(token)) {
+      mx::ValueDecl used_decl = expr->declaration();
       if (auto var = mx::VarDecl::from(used_decl)) {
         std::cout << token.data() << "\tvar\t" << var->name() << std::endl;
 

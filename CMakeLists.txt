@@ -29,9 +29,11 @@ set(VISIBILITY_INLINES_HIDDEN YES)
 
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
-include("cmake/Corrosion.cmake")
 
-find_program(CBINDGEN cbindgen)
+if(MX_ENABLE_WEGGLI)
+  include("cmake/Corrosion.cmake")
+  find_program(CBINDGEN cbindgen)
+endif(MX_ENABLE_WEGGLI)
 
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")

@@ -1036,7 +1036,7 @@ std::optional<TokenContext> TokenContext::parent(void) const {
   }
 }
 
-std::optional<std::string_view> Fragment::source_ir() const noexcept {
+std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
   auto mlir = impl->SourceIR();
   if (!mlir.empty()) {
     return mlir;
