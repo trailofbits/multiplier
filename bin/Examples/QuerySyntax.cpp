@@ -17,6 +17,7 @@ DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_string(query, "", "Query pattern to be searched");
+DEFINE_bool(print_matches, false, "Print variable matches found for the syntax");
 
 static void PrintUnparsedTokens(mx::TokenSubstitutionList nodes) {
   for (auto node : nodes) {
@@ -28,6 +29,15 @@ static void PrintUnparsedTokens(mx::TokenSubstitutionList nodes) {
       PrintUnparsedTokens(sub.before());
     }
   }
+}
+
+std::string GetFileContaining(mx::Index &index, mx::FileId file_id) {
+  for (auto [path, id] : index.file_paths()) {
+    if (id == file_id) {
+      return path.generic_string();
+    }
+  }
+  return {};
 }
 
 extern "C" int main(int argc, char *argv[]) {
@@ -59,23 +69,30 @@ extern "C" int main(int argc, char *argv[]) {
 
   for (mx::SyntaxQueryMatch match : index.syntax_query(FLAGS_query)) {
     mx::Fragment frag = mx::Fragment::containing(match);
-    std::cout << frag.id();
+    mx::File file = mx::File::containing(frag);
     auto sep = "\t";
-    for (mx::Token tok : match) {
-      std::cout << sep << tok.data();
-      sep = " ";
-    }
+    std::cout << frag.id() << sep << GetFileContaining(index, file.id())
+        << ":" << frag.first_line() << "\n";
 
-    for (auto var : match.MatchedVariables()) {
-      std::cout << "\n\t" << var;
-      sep = "\t";
-      if (auto capture = match.MatchFor(var)) {
-        for (mx::Token tok : *capture) {
-          std::cout << sep << tok.data();
-          sep = " ";
-        }
+    if (FLAGS_print_matches) {
+      for (mx::Token tok : match) {
+        std::cout << sep << tok.data();
+        sep = " ";
       }
+      for (auto var : match.MatchedVariables()) {
+        std::cout << var;
+        sep = "\t";
+        if (auto capture = match.MatchFor(var)) {
+          for (mx::Token tok : *capture) {
+            std::cout << sep << tok.data();
+            sep = " ";
+          }
+        }
+        std::cout << "\t";
+      }
+      std::cout << "\n\n";
     }
+    PrintUnparsedTokens(frag.unparsed_tokens());
     std::cout << "\n\n";
   }
   return EXIT_SUCCESS;
