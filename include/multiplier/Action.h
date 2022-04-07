@@ -53,15 +53,15 @@ class DeferredAction : public std::enable_shared_from_this<DeferredAction> {
     exe.AddAction(std::move(action));
   }
 
-  Ptr Create(const Executor &exe_, std::unique_ptr<Action> action_) {
-    auto act = new DeferredAction(exe, action_.release());
+  static Ptr Create(const Executor &exe_, std::unique_ptr<Action> action_) {
+    auto act = new DeferredAction(exe_, action_.release());
     return act->shared_from_this();
   }
 
   template<typename T, typename ... Args>
-  Ptr Emplace(const Executor &exe_, Args &&... args) {
+  static Ptr Emplace(const Executor &exe_, Args &&... args) {
     static_assert(std::is_base_of_v<T, Action>);
-    auto act = new DeferredAction(exe, new T(std::forward<Args>(args)...));
+    auto act = new DeferredAction(exe_, new T(std::forward<Args>(args)...));
     return act->shared_from_this();
   }
 

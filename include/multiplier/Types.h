@@ -30,8 +30,10 @@ enum class TokenSubstitutionKind : unsigned short {
   INCLUDE_EXPANSION
 };
 
-static constexpr uint64_t kInvalidEntityId = 0ull;
-static constexpr uint64_t kMinEntityIdIncrement = 1ull;
+using RawEntityId = uint64_t;
+
+static constexpr RawEntityId kInvalidEntityId = 0ull;
+static constexpr RawEntityId kMinEntityIdIncrement = 1ull;
 
 // If we have more than 2^16 tokens in a given code chunk, then we consider
 // this a "big code" chunk. We assume that we'll have few of these, i.e. less
@@ -125,7 +127,7 @@ using VariantId = std::variant<InvalidId, DeclarationId,
 // An opaque, compressed entity id.
 class EntityId {
  private:
-  uint64_t opaque{kInvalidEntityId};
+  RawEntityId opaque{kInvalidEntityId};
 
  public:
   /* implicit */ inline EntityId(uint64_t opaque_)
@@ -138,7 +140,7 @@ class EntityId {
   /* implicit */ EntityId(TokenSubstitutionId id);
   /* implicit */ EntityId(FileTokenId id);
 
-  inline operator uint64_t(void) const noexcept {
+  inline operator RawEntityId(void) const noexcept {
     return opaque;
   }
 

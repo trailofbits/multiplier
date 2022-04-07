@@ -608,7 +608,7 @@ static bool IsIncludeKeyword(pasta::FileToken ft) {
 // We're entering a file, but the file path itself is the result of macro
 // expansion.
 TokenInfo *TokenTreeImpl::HandleBeginningOfFileMacroPath(
-    TokenInfo *prev, TokenInfo *curr, std::stringstream &err) {
+    TokenInfo *prev, TokenInfo *curr, std::stringstream &) {
   CHECK_NOTNULL(prev);
   CHECK_LE(1u, substitutions.size());
   CHECK(!substitutions.empty());
@@ -967,7 +967,7 @@ TokenInfo *TokenTreeImpl::HandleEndOfFile(TokenInfo *prev, TokenInfo *curr,
 }
 
 TokenInfo *TokenTreeImpl::HandleBeginOfMacroExpansion(
-    TokenInfo *prev, TokenInfo *curr, std::stringstream &err) {
+    TokenInfo *prev, TokenInfo *curr, std::stringstream &) {
   CHECK_NOTNULL(prev);
   CHECK_LE(2u, substitutions.size());
   CHECK(prev->category == TokenInfo::kMacroUseToken);

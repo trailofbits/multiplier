@@ -90,11 +90,11 @@ extern "C" int main(int argc, char *argv[]) {
 
     if (auto stmt = context.as_stmt()) {
       bgcolor = " bgcolor=\"aquamarine\"";
-      kind_name = "stmt";
+      kind_name = mx::EnumeratorName(stmt->kind());
 
     } else if (auto decl = context.as_decl()) {
       bgcolor = " bgcolor=\"antiquewhite\"";
-      kind_name = "decl";
+      kind_name = mx::EnumeratorName(decl->kind());
 
     } else if (context.is_alias()) {
       bgcolor = " bgcolor=\"deepskyblue3\"";
@@ -117,7 +117,6 @@ extern "C" int main(int argc, char *argv[]) {
       os
           << "c" << context.id() << " -> c" << parent_context->id() << ";\n";
     }
-
 
     if (auto alias_context = context.aliasee()) {
       os

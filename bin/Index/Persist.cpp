@@ -122,6 +122,26 @@ static void PersistTokens(EntitySerializer &serializer,
   }
 }
 
+// Find the entity id of `canon_decl` that resides in the current fragment
+// on which the serializer is operating.
+static uint64_t IdOfRedeclInFragment(EntitySerializer &serializer,
+                                     pasta::Decl canon_decl) {
+  for (pasta::Decl redecl : canon_decl.Redeclarations()) {
+    mx::EntityId eid = serializer.EntityId(redecl);
+    if (eid == mx::kInvalidEntityId) {
+      continue;
+    }
+    mx::VariantId vid = eid.Unpack();
+    CHECK(std::holds_alternative<mx::DeclarationId>(vid));
+    mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
+    if (id.fragment_id == serializer.code_id) {
+      return eid;
+    }
+  }
+
+  return mx::kInvalidEntityId;
+}
+
 static void PersistTokenContexts(EntitySerializer &serializer,
                                  uint64_t begin_index, uint64_t end_index,
                                  FragmentBuilder &builder) {
@@ -140,8 +160,10 @@ static void PersistTokenContexts(EntitySerializer &serializer,
         c = *alias_context;
       }
 
+      // NOTE(pag): PASTA stored the canonical decl in the decl context, so
+      //            it's not likely to be in the current fragment.
       if (auto decl = pasta::Decl::From(c)) {
-        if (auto eid = serializer.EntityId(*decl);
+        if (auto eid = IdOfRedeclInFragment(serializer, *decl);
             eid != mx::kInvalidEntityId) {
           contexts[eid].insert(*context);
         }
@@ -335,7 +357,7 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
 }
 
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
-                     PendingFragment code_chunk) {
+                     PendingFragment code_chunk, std::string mlir) {
 
   const mx::FragmentId code_id = code_chunk.fragment_id;
   const pasta::Decl &leader_decl = code_chunk.decls[0];
@@ -375,6 +397,7 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   builder.setFileTokenId(serializer.EntityId(min_token));
   builder.setFirstLine(min_token.Line());
   builder.setLastLine(max_token.Line());
+  builder.setMlir(mlir);
 
   auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
   auto tlds = builder.initTopLevelDeclarations(num_tlds);

@@ -16,10 +16,29 @@
 #include "Util.h"
 
 namespace indexer {
+namespace {
+
+struct SaveRestoreEntityId {
+ public:
+  mx::RawEntityId &ref;
+  const mx::RawEntityId old_val;
+
+  SaveRestoreEntityId(mx::RawEntityId &ref_, mx::RawEntityId new_val)
+      : ref(ref_),
+        old_val(ref) {
+    ref = new_val;
+  }
+
+  ~SaveRestoreEntityId(void) {
+    ref = old_val;
+  }
+};
+
+}  // namespace
 
 EntitySerializer::~EntitySerializer(void) {}
 
-uint64_t EntitySerializer::EntityId(const pasta::Decl &entity) {
+mx::RawEntityId EntitySerializer::EntityId(const pasta::Decl &entity) {
   if (auto it = entity_ids.find(entity.RawDecl()); it != entity_ids.end()) {
     return it->second;
   } else {
@@ -27,7 +46,7 @@ uint64_t EntitySerializer::EntityId(const pasta::Decl &entity) {
   }
 }
 
-uint64_t EntitySerializer::EntityId(const pasta::Stmt &entity) {
+mx::RawEntityId EntitySerializer::EntityId(const pasta::Stmt &entity) {
   if (auto it = entity_ids.find(entity.RawStmt()); it != entity_ids.end()) {
     return it->second;
   } else {
@@ -35,7 +54,7 @@ uint64_t EntitySerializer::EntityId(const pasta::Stmt &entity) {
   }
 }
 
-uint64_t EntitySerializer::EntityId(const pasta::Token &entity) {
+mx::RawEntityId EntitySerializer::EntityId(const pasta::Token &entity) {
   if (auto it = entity_ids.find(entity.RawToken()); it != entity_ids.end()) {
     return it->second;
 
@@ -59,8 +78,9 @@ mx::FileId EntitySerializer::FileId(const pasta::File &file) {
   }
 }
 
-uint64_t EntitySerializer::EntityId(const pasta::FileToken &entity) {
-  if (auto it = entity_ids.find(entity.RawFileToken()); it != entity_ids.end()) {
+mx::RawEntityId EntitySerializer::EntityId(const pasta::FileToken &entity) {
+  if (auto it = entity_ids.find(entity.RawFileToken());
+      it != entity_ids.end()) {
     return it->second;
   }
 
@@ -79,13 +99,16 @@ uint64_t EntitySerializer::EntityId(const pasta::FileToken &entity) {
 }
 
 bool EntitySerializer::Enter(const pasta::Decl &entity) {
+  SaveRestoreEntityId save_parent_decl(parent_decl_id, current_decl_id);
 
   // Only serialize if we have a valid entity ID for this.
-  const uint64_t id = EntityId(entity);
+  const mx::RawEntityId id = EntityId(entity);
   if (!id) {
     LOG(FATAL) << "bad entity id";
     return false;
   }
+
+  SaveRestoreEntityId save_current_decl(current_decl_id, id);
 
   mx::EntityId ent_id(id);
   mx::VariantId unpacked_id = ent_id.Unpack();
@@ -125,12 +148,15 @@ bool EntitySerializer::Enter(const pasta::Decl &entity) {
 }
 
 bool EntitySerializer::Enter(const pasta::Stmt &entity) {
+  SaveRestoreEntityId save_parent_stmt(parent_stmt_id, current_stmt_id);
 
   // Only serialize if we have a valid entity ID for this.
-  const uint64_t id = EntityId(entity);
+  const mx::RawEntityId id = EntityId(entity);
   if (!id) {
     return false;
   }
+
+  SaveRestoreEntityId save_current_stmt(current_stmt_id, id);
 
   // Don't re-serialize if we've done it already.
   if (!serialized_entities.emplace(id).second) {

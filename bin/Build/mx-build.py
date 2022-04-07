@@ -194,13 +194,13 @@ def create_build_setup(project_spec, workspace, local_build, index=False):
     """
     try:
         with open(project_spec) as fd:
-            config = Config(json.load(fd))
-            print("[+] Compiling project {}".format(config.name))
             if local_build:
+                config = Config(json.load(fd), workspace)
                 build_and_run_local(config, workspace)
                 if index:
                     mx_import_local(config, workspace)
             else:
+                config = Config(json.load(fd))
                 build_and_run_container(config, workspace)
 
     except FileNotFoundError:

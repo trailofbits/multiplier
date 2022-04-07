@@ -82,6 +82,7 @@ add_library("mx-api"
     "API.cpp"
     "Compress.cpp"
     "Types.cpp"
+    "Weggli.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -109,6 +110,18 @@ target_link_libraries("mx-api"
     CapnProto::capnp-rpc
     ZLIB::ZLIB
 )
+
+# Add in Weggli.
+if(MX_ENABLE_WEGGLI)
+  target_link_libraries("mx-api"
+    PRIVATE
+      $<BUILD_INTERFACE:weggli_native>
+  )
+else()
+  target_compile_definitions("mx-api"
+    PRIVATE
+      "MX_DISABLE_WEGGLI")
+endif()
 
 set_target_properties("mx-api"
   PROPERTIES
@@ -181,6 +194,7 @@ add_library("mx-util"
     "Subprocess.cpp"
     "Types.cpp"
     "WorkerPool.cpp"
+    "Weggli.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -215,6 +229,17 @@ target_link_libraries("mx-util"
     gflags::gflags
     CapnProto::capnp-rpc
 )
+
+if(MX_ENABLE_WEGGLI)
+  target_link_libraries("mx-util"
+    PRIVATE
+      $<BUILD_INTERFACE:weggli_native>
+  )
+else()
+  target_compile_definitions("mx-util"
+    PRIVATE
+      "MX_DISABLE_WEGGLI")
+endif()
 
 set_target_properties("mx-util"
   PROPERTIES
@@ -251,7 +276,7 @@ target_include_directories("mx-util"
 
 if(MX_ENABLE_INSTALL)
   
-  # NOTE(pag): `util` is *not* installed, just `api`.
+  # NOTE(pag): `mx-util` is *not* installed, just `mx-api`.
   install(
     TARGETS
       "mx-api"

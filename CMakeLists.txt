@@ -30,6 +30,11 @@ set(VISIBILITY_INLINES_HIDDEN YES)
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 
+if(MX_ENABLE_WEGGLI)
+  include("cmake/Corrosion.cmake")
+  find_program(CBINDGEN cbindgen)
+endif(MX_ENABLE_WEGGLI)
+
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
 endif(MX_ENABLE_INSTALL)
@@ -46,6 +51,8 @@ find_package(Clang CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
+find_package(vast CONFIG REQUIRED)
+find_package(MLIR CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 
@@ -88,11 +95,6 @@ elseif(PLATFORM_LINUX)
   set("MX_BEGIN_FORCE_LOAD_GROUP" "-Wl,--whole-archive")
   set("MX_END_FORCE_LOAD_GROUP" "-Wl,--no-whole-archive")
 endif()
-
-add_custom_target("copy_datalog_server_headers"
-  DEPENDS
-    ${copied_headers}
-)
 
 # The remaining arguments to `mx-bootstrap` are the paths to the files that will
 # be generated based on analyzing the types/classes in the `pasta` namespace.

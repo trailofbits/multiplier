@@ -20,7 +20,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] --fragment_id ID\n";
+    << " [--host HOST] [--port PORT]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -39,22 +39,8 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  for (mx::Token token : mx::Token::in(*fragment)) {
-    if (auto expr = mx::DeclRefExpr::containing(token)) {
-      mx::ValueDecl used_decl = expr->declaration();
-      if (auto var = mx::VarDecl::from(used_decl)) {
-        std::cout << token.data() << "\tvar\t" << var->name() << std::endl;
-
-      } else if (auto func = mx::FunctionDecl::from(used_decl)) {
-        std::cout << token.data() << "\tfunc\t" << func->name() << std::endl;
-
-      } else if (auto field = mx::FieldDecl::from(used_decl)) {
-        std::cout << token.data() << "\tfield\t" << field->name() << std::endl;
-
-      } else {
-        std::cout << token.data() << "\tother\t" << used_decl.name() << std::endl;
-      }
-    }
+  if (auto mlir = fragment->source_ir(); mlir) {
+    std::cout << *mlir;
   }
 
   return EXIT_SUCCESS;

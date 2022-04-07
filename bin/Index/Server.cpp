@@ -20,14 +20,21 @@
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
+#include <set>
 #include <sstream>
 #include <mutex>
 #include <vector>
 
 #include "Context.h"
 #include "IndexCompileJob.h"
+#include "SearchAction.h"
 
 namespace indexer {
+
+class ServerContext;
+class SearchingContext;
+class IndexingContext;
+
 namespace {
 
 // Get the arguments from the compile command as an argument vector.
@@ -53,6 +60,9 @@ class ServerImpl final {
 
   // Should we show progress bars?
   const bool show_progress_bars;
+
+  // Should generate source IR?
+  const bool generate_sourceir;
 
   ServerContext server_context;
 
@@ -80,6 +90,7 @@ ServerImpl::ServerImpl(ServerOptions &options)
     : executor(options.executor_options),
       workspace_dir(options.workspace_dir),
       show_progress_bars(options.show_progress_bars),
+      generate_sourceir(options.generate_sourceir),
       server_context(options.workspace_dir),
       native_file_system(pasta::FileSystem::CreateNative()) {}
 
@@ -96,6 +107,9 @@ ServerImpl::GetOrCreateIndexingContext(void) {
     ic = std::make_shared<IndexingContext>(server_context, executor);
     if (show_progress_bars) {
       ic->InitializeProgressBars();
+    }
+    if (generate_sourceir) {
+      ic->InitializeCodeGenerator();
     }
     indexing_context = ic;
     return ic;
@@ -165,6 +179,7 @@ kj::Promise<void> Server::indexCompileCommands(
   auto ic = d->GetOrCreateIndexingContext();
   for (mx::rpc::CompileCommand::Reader command : params.getCommands()) {
     mx::ProgressBarWork command_progress(ic->command_progress.get());
+    IndexingCounterRes(ic->stat, kStatCompileCommand);
 
     auto argv = GetArguments(command);
 
@@ -299,6 +314,61 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   results.setFragment(kj::arrayPtr(
       reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
       maybe_contents.value().size()));
+
+  return kj::READY_NOW;
+}
+
+kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
+
+  // Get params and result context
+  mx::rpc::Multiplier::SyntaxQueryParams::Reader params =
+      context.getParams();
+
+  auto results = context.initResults();
+  std::string_view syntax_string =
+      std::string_view(params.getQuery().cStr(), params.getQuery().size());
+  if (syntax_string.empty()) {
+    (void) results.initFragments(0u);
+    return kj::READY_NOW;
+  }
+
+  LOG(INFO)
+      << "Got Weggli syntax query: " << syntax_string;
+
+  auto sc = std::make_shared<SearchingContext>(d->server_context);
+
+  const bool is_cpp = params.getIsCpp();
+
+  // Run N parallel search actions on every file.
+  mx::ExecutorOptions opts;
+  opts.num_workers = static_cast<int>(d->executor.NumWorkers());
+  mx::Executor executor(opts);
+  executor.Start();
+  for (auto i = 0; i < opts.num_workers; ++i) {
+    executor.EmplaceAction<SearchAction>(sc, syntax_string, is_cpp);
+  }
+  executor.Wait();
+
+  // Convert the file file:line pairs into overlapping fragment IDs.
+  std::set<mx::FragmentId> fragment_ids;
+  for (auto prefix : sc->line_results) {
+    d->server_context.file_fragment_lines.ScanPrefix(
+        prefix, [&fragment_ids] (mx::FileId, unsigned, mx::FragmentId id) {
+          fragment_ids.emplace(id);
+          return true;
+        });
+  }
+
+  LOG(INFO)
+      << "Number of fragments in results "
+      << fragment_ids.size() << "\n";
+
+  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
+  auto fragments = results.initFragments(num_fragments);
+  auto index = 0u;
+  for (auto fragment_id : fragment_ids) {
+    fragments.set(index++, fragment_id);
+  }
 
   return kj::READY_NOW;
 }

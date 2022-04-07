@@ -25,6 +25,9 @@ struct ServerOptions {
 
   // Whether or not to show progress bars.
   bool show_progress_bars;
+
+  // Whether or not to generate source IR
+  bool generate_sourceir;
 };
 
 class ServerImpl;
@@ -54,6 +57,8 @@ class Server final : public mx::rpc::Multiplier::Server {
   // Download a fragment containing containing an entity identified by a
   // specific entity ID.
   kj::Promise<void> downloadFragment(DownloadFragmentContext context) final;
+
+  kj::Promise<void> syntaxQuery(SyntaxQueryContext context) final;
 };
 
 }  // namespace indexer

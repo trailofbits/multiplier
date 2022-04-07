@@ -26,6 +26,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "Codegen.h"
 #include "Context.h"
 #include "Hash.h"
 #include "Label.h"
@@ -103,7 +104,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
   }
 
-  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &var) final {
+  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final {
     // Do nothing; we will see the specializations as top-level declarations.
   }
 
@@ -338,7 +339,7 @@ IndexCompileJobAction::IndexCompileJobAction(
 // Look through all files referenced by the AST get their unique IDs. If this
 // is the first time seeing a file, then tokenize the file.
 void IndexCompileJobAction::MaybePersistFile(
-    mx::WorkerId worker_id, const mx::Executor &exe, pasta::File file) {
+    mx::WorkerId worker_id, const mx::Executor &, pasta::File file) {
   if (!file.WasParsed()) {
     return;
   }
@@ -366,6 +367,7 @@ void IndexCompileJobAction::MaybePersistFile(
 void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   std::optional<mx::ProgressBarWork> parsing_progress_tracker(
       context->ast_progress.get());
+  IndexingCounterRes cj_counter(context->stat, kStatCompileJob);
 
   auto main_file_path =
       job.SourceFile().Path().lexically_normal().generic_string();
@@ -378,6 +380,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     return;
   }
 
+  IndexingCounterRes ast_counter(context->stat, kStatAST);
   pasta::AST ast = maybe_ast.TakeValue();
   parsing_progress_tracker.reset();
 
@@ -528,13 +531,16 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
 
     auto [decls_for_group, begin_index, end_index] = std::move(*it);
 
-    // Don't create token `decls_for_group` if the decl is already seen. This
+    IndexingCounterRes chunk_counter(context->stat, kStatCodeFragment);
+    // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
     auto [code_id, is_new] = context->GetOrCreateFragmentId(
         worker_id,
         CodeHash(file_hashes, decls_for_group, tok_range,
                  begin_index, end_index),
         end_index - begin_index + 1u);
+
+
 
     // We always need to enter the code for a chunk, regardless of if it
     // `is_new`. This is because each chunk might have arbitrary references to
@@ -558,7 +564,10 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   EntitySerializer serializer(std::move(tok_range), labeller.TakeEntityIds(),
                               file_ids);
   for (PendingFragment &pending_fragment : pending_fragments) {
-    PersistFragment(*context, serializer, std::move(pending_fragment));
+	  // Generate source IR before saving the fragments to the persistent
+	  // storage
+	auto mlir = ConvertToSourceIR(context, pending_fragment.fragment_id, pending_fragment.decls);
+	PersistFragment(*context, serializer, std::move(pending_fragment), std::move(mlir));
   }
 }
 

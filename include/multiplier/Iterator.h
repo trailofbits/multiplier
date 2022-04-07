@@ -35,13 +35,16 @@ class DerivedEntityIterator {
     Advance();
   }
 
-  inline bool operator!=(EndIteratorType that) const {
-    return iter != that;
+  inline bool operator!=(EndIteratorType) const {
+    return item.has_value();
   }
 
-  template <typename T>
-  inline bool operator==(EndIteratorType that) const {
-    return iter == that;
+  inline bool operator==(EndIteratorType) const {
+    return !item.has_value();
+  }
+
+  inline operator bool(void) const {
+    return item.has_value();
   }
 
   // Return the current token pointed to by the iterator.
@@ -62,7 +65,7 @@ class DerivedEntityIterator {
 
  private:
   void Advance(void) {
-    for (; iter != EndIteratorType(); ++iter) {
+    for (item.reset(); iter != EndIteratorType(); ++iter) {
       item = Derived::from(*iter);
       if (item) {
         break;
@@ -73,18 +76,32 @@ class DerivedEntityIterator {
 
 template <typename Iter, typename Derived>
 class DerivedEntityRange {
- private:
-  Iter iter;
-
  public:
   using DerivedEntityIter = DerivedEntityIterator<Iter, Derived>;
   using EndIteratorType = typename Iter::EndIteratorType;
 
+ private:
+  DerivedEntityIter iter;
+
+ public:
   inline DerivedEntityRange(Iter iter_)
       : iter(std::move(iter_)) {}
 
   inline DerivedEntityIter begin(void) const {
-    return DerivedEntityIter(iter);
+    return iter;
+  }
+
+  inline operator bool(void) const {
+    return !!iter;
+  }
+
+  // Return the current token pointed to by the iterator.
+  inline const Derived &operator*(void) const noexcept {
+    return *iter;
+  }
+
+  inline const Derived *operator->(void) const noexcept {
+    return std::addressof(*iter);
   }
 
   inline EndIteratorType end(void) const noexcept {
@@ -117,6 +134,10 @@ class DeclIterator {
   }
 
   inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_decls;
+  }
+
+  inline operator bool(void) const noexcept {
     return index < num_decls;
   }
 
@@ -160,6 +181,10 @@ class StmtIterator {
   }
 
   inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_stmts;
+  }
+
+  inline operator bool(void) const noexcept {
     return index < num_stmts;
   }
 
@@ -246,9 +271,18 @@ class TokenContextIterator {
     return impl.has_value();
   }
 
+  inline operator bool(void) const noexcept {
+    return impl.has_value();
+  }
+
   // Return the current token context pointed to by the iterator.
   const TokenContext &operator*(void) const noexcept {
     return impl.value();
+  }
+
+  // Return the current token context pointed to by the iterator.
+  const TokenContext *operator->(void) const noexcept {
+    return std::addressof(impl.value());
   }
 
   // Pre-increment.
@@ -256,6 +290,86 @@ class TokenContextIterator {
     impl = impl->parent();
     return *this;
   }
+};
+
+template <typename T>
+class ParentDeclIteratorImpl {
+ private:
+  std::optional<T> impl;
+
+  bool operator==(const TokenContextIterator &) = delete;
+  bool operator!=(const TokenContextIterator &) = delete;
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline ParentDeclIteratorImpl(std::optional<T> impl_)
+      : impl(std::move(impl_)) {}
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return !impl.has_value();
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return impl.has_value();
+  }
+
+  inline operator bool(void) const noexcept {
+    return impl.has_value();
+  }
+
+  // Return the current declaration pointed to by the iterator.
+  const T &operator*(void) const noexcept {
+    return impl.value();
+  }
+
+  // Return the current declaration pointed to by the iterator.
+  const T *operator->(void) const noexcept {
+    return std::addressof(impl.value());
+  }
+
+  // Pre-increment.
+  inline ParentDeclIteratorImpl<T> &operator++(void);
+};
+
+template <typename T>
+class ParentStmtIteratorImpl {
+ private:
+  std::optional<T> impl;
+
+  bool operator==(const TokenContextIterator &) = delete;
+  bool operator!=(const TokenContextIterator &) = delete;
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline ParentStmtIteratorImpl(std::optional<T> impl_)
+      : impl(std::move(impl_)) {}
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return !impl.has_value();
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return impl.has_value();
+  }
+
+  inline operator bool(void) const noexcept {
+    return impl.has_value();
+  }
+
+  // Return the current statement pointed to by the iterator.
+  const T &operator*(void) const noexcept {
+    return impl.value();
+  }
+
+  // Return the current statement pointed to by the iterator.
+  const T *operator->(void) const noexcept {
+    return std::addressof(impl.value());
+  }
+
+  // Pre-increment.
+  inline ParentStmtIteratorImpl<T> &operator++(void);
 };
 
 }  // namespace mx

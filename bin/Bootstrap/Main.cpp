@@ -149,8 +149,8 @@ static const std::unordered_set<std::string> gConcreteClassNames{
 static const std::unordered_set<std::string> gEntityClassNames{
   "Token",
   "FileToken",
-  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
-  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
+  PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, STR_NAME)
+  PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME)
 };
 
 // These methods can trigger asserts deep in their internals that are hard
@@ -229,7 +229,7 @@ struct SpecificEntityStorage {
 
 static std::string SnakeCaseToAPICase(std::string name) {
   if (name == "operator" || name == "namespace" || name == "struct" ||
-      name == "class") {
+      name == "class" || name == "if" || name == "else" || name == "default") {
     name.push_back('_');
   }
   return name;
@@ -530,6 +530,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   std::unordered_set<std::string> seen_initializers;
   std::string initializer;
   llvm::raw_string_ostream initializer_ss(initializer);
+  std::stringstream name_cases_ss;
 
   auto i = 0u;
   for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
@@ -539,7 +540,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     auto orig_val_name = val_name;
 
     // Don't allow repeats of the underlying values.
-    auto ap_val = val.InitializerVal();
+    auto ap_val = val.InitializerValue();
     ap_val.print(initializer_ss, ap_val.isSigned());
     initializer_ss.flush();
     if (!seen_initializers.emplace(initializer).second) {
@@ -579,6 +580,11 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
     include_h_os
         << "  " << enum_case << ",\n";
+
+    name_cases_ss
+        << "    case " << enum_name << "::" << enum_case << ": return \""
+        << enum_case << "\";\n";
+
     ++i;
   }
 
@@ -603,6 +609,10 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
       include_h_os
           << "  " << enum_case << ",\n";
+
+      name_cases_ss
+          << "    case " << enum_name << "::" << enum_case << ": return \""
+          << enum_case << "\";\n";
       ++i;
     }
 
@@ -621,6 +631,10 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
       include_h_os
           << "  " << enum_case << ",\n";
+
+      name_cases_ss
+          << "    case " << enum_name << "::" << enum_case << ": return \""
+          << enum_case << "\";\n";
       ++i;
     }
   }
@@ -628,12 +642,22 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   lib_cpp_os
       << "    default: __builtin_unreachable();\n"
       << "  }\n"  // End of `switch`.
-      << "}\n\n";  // End of `FromPasta`.
+      << "}\n\n"  // End of `FromPasta`
+      << "const char *EnumeratorName(" << enum_name << " e) {\n"
+      << "  switch (e) {\n"
+      << name_cases_ss.str()
+      << "    default: return \"<invalid>\";\n"
+      << "  }\n"  // End of `switch`.
+      << "}\n\n";  // End of `EnumeratorName`
 
   include_h_os
       << "  NUM_ENUMERATORS\n"
       << "};\n\n"
-      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
+      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n"
+      << "inline static const char *EnumerationName(" << enum_name << ") {\n"
+      << "  return \"" << enum_name << "\";\n"
+      << "}\n\n"
+      << "const char *EnumeratorName(" << enum_name << ");\n\n";
 }
 
 static std::optional<std::string> GetFirstTemplateParameterType(
@@ -698,12 +722,18 @@ MethodListPtr CodeGenerator::RunOnClass(
         << ">;\n"
         << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
+        << class_name << ">;\n"
+        << "using " << class_name
+        << "ContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, "
         << class_name << ">;\n\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(EntitySerializer &es, mx::ast::Decl::Builder b, const pasta::"
-        << class_name << " &e) {\n";
+        << class_name << " &e) {\n"
+        << "  (void) es;\n"
+        << "  (void) b;\n"
+        << "  (void) e;\n";
 
     nth_entity_reader = "NthDecl";
 
@@ -714,6 +744,9 @@ MethodListPtr CodeGenerator::RunOnClass(
         << ">;\n"
         << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
+        << class_name << ">;\n"
+        << "using " << class_name
+        << "ContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, "
         << class_name << ">;\n\n";
 
     serialize_cpp_os
@@ -777,11 +810,48 @@ MethodListPtr CodeGenerator::RunOnClass(
   // and so we need to carry around a fragment pointer.
   } else if (class_name == "Decl" || class_name == "Stmt" ||
              gNotReferenceTypesRelatedToEntities.count(class_name)) {
+    unsigned cd = 0;  // Containing decl.
+    unsigned cs = 0;  // Containing stmt.
+
+    if (class_name == "Decl" || class_name == "Stmt") {
+      cd = storage.AddMethod("UInt64");  // Reference.
+      cs = storage.AddMethod("UInt64");  // Reference.
+
+      auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(cd);
+      auto [cs_getter_name, cs_setter_name, cs_init_name] = NamesFor(cs);
+
+      serialize_cpp_os
+          << "  b." << cd_setter_name << "(es.parent_decl_id);\n"
+          << "  b." << cs_setter_name << "(es.parent_stmt_id);\n";
+
+      lib_cpp_os
+          << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
+          << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+          << "  if (auto id = self." << cd_getter_name << "(); "
+          << "id != kInvalidEntityId) {\n"
+          << "    return fragment->DeclFor(fragment, id);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n"
+          << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
+          << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+          << "  if (auto id = self." << cd_getter_name << "(); "
+          << "id != kInvalidEntityId) {\n"
+          << "    return fragment->StmtFor(fragment, id);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n";
+    }
+
     include_h_os
         << " {\n"
         << " protected:\n"
+        << "  friend class Decl;\n"
         << "  friend class DeclIterator;\n"
         << "  friend class FragmentImpl;\n"
+        << "  friend class Stmt;\n"
         << "  friend class StmtIterator;\n"
         << "  friend class TokenContext;\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
@@ -800,6 +870,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Decl> from(const TokenContext &c) {\n"
           << "    return c.as_decl();\n"
           << "  }\n\n"
+          << "  std::optional<Decl> parent_declaration(void) const;\n"
+          << "  std::optional<Stmt> parent_statement(void) const;\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -812,10 +884,11 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Stmt> from(const TokenContext &c) {\n"
           << "    return c.as_stmt();\n"
           << "  }\n\n"
+          << "  std::optional<Decl> parent_declaration(void) const;\n"
+          << "  std::optional<Stmt> parent_statement(void) const;\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
-
     }
 
   } else if (gEntityClassNames.count(class_name)) {
@@ -841,6 +914,41 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "ContainingTokenRange containing(const Token &tok) {\n"
         << "    return TokenContextIterator(TokenContext::of(tok));\n"
         << "  }\n\n";
+
+    if (is_decl) {
+      include_h_os
+          << "  static " << class_name
+          << "ContainingDeclRange containing(const Decl &decl);\n"
+          << "  static " << class_name
+          << "ContainingDeclRange containing(const Stmt &stmt);\n\n";
+
+      lib_cpp_os
+          << class_name << "ContainingDeclRange " << class_name
+          << "::containing(const Decl &decl) {\n"
+          << "  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());\n"
+          << "}\n\n"
+          << class_name << "ContainingDeclRange " << class_name
+          << "::containing(const Stmt &stmt) {\n"
+          << "  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());\n"
+          << "}\n\n";
+
+    } else if (is_stmt) {
+      include_h_os
+          << "  static " << class_name
+          << "ContainingStmtRange containing(const Decl &decl);\n"
+          << "  static " << class_name
+          << "ContainingStmtRange containing(const Stmt &stmt);\n\n";
+
+      lib_cpp_os
+          << class_name << "ContainingStmtRange " << class_name
+          << "::containing(const Decl &decl) {\n"
+          << "  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());\n"
+          << "}\n\n"
+          << class_name << "ContainingStmtRange " << class_name
+          << "::containing(const Stmt &stmt) {\n"
+          << "  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());\n"
+          << "}\n\n";
+    }
 
     if (is_decl && class_name != "Decl") {
       include_h_os
@@ -1729,6 +1837,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "  serialized_entities.clear();\n"
       << "  code_id = code.fragment_id;\n"
       << "  next_pseudo_entity_offset = 0;\n"
+      << "  parent_decl_id = mx::kInvalidEntityId;\n"
+      << "  parent_stmt_id = mx::kInvalidEntityId;\n"
+      << "  current_decl_id = mx::kInvalidEntityId;\n"
+      << "  current_stmt_id = mx::kInvalidEntityId;\n"
       << "  decl_builder = builder.initDeclarations(code.num_decl_entities);\n"
       << "  stmt_builder = builder.initStatements(code.num_stmt_entities);\n"
       << "  pseudo_builder = builder.initOthers(code.num_pseudo_entities);\n";

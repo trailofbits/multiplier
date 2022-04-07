@@ -13,6 +13,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <thread>
+#include <set>
 
 namespace mx {
 namespace {
@@ -363,6 +364,70 @@ PseudoReader PackedFragmentImpl::NthPseudo(unsigned offset) const {
   return reader.getOthers()[offset];
 }
 
+std::string_view PackedFragmentImpl::SourceIR(void) const {
+  if (reader.hasMlir()) {
+    return std::string_view(reader.getMlir().cStr(), reader.getMlir().size());
+  }
+  return {};
+}
+
+SyntaxQueryResultImpl::~SyntaxQueryResultImpl(void) noexcept {}
+
+SyntaxQueryResultImpl::SyntaxQueryResultImpl(
+    std::string syntax_, EntityProvider::Ptr ep_, Response response,
+    bool is_cpp)
+    : syntax(syntax_),
+      ep(ep_),
+      query(syntax_, is_cpp) {
+  for (auto frag_id : response.getFragments()) {
+    fragments.emplace_back().first = frag_id;
+  }
+}
+
+FragmentImpl::Ptr SyntaxQueryResultImpl::GetFragmentAtIndex(unsigned index) const {
+  auto &entry = fragments[index];
+  auto frag = entry.second.lock();
+  if (!frag) {
+    frag = ep->FragmentFor(ep, entry.first);
+    entry.second = frag;
+  }
+  return frag;
+}
+
+EntityId SyntaxQueryResultImpl::EntityContainingOffset(unsigned offset) const {
+  auto it = offset_to_token.upper_bound(offset);
+  if (it != offset_to_token.end()) {
+    return it->second;
+  } else {
+    return kInvalidEntityId;
+  }
+}
+
+void SyntaxQueryResultImpl::GetUnparsedTokens(TokenSubstitutionList nodes) const {
+  for (auto node : nodes) {
+    if (std::holds_alternative<Token>(node)) {
+      auto tok = std::get<Token>(node);
+      auto tok_data = tok.data();
+
+      // Skip empty tokens and whitespace.
+      if (tok_data.empty() || tok.kind() == TokenKind::WHITESPACE) {
+        continue;
+      }
+
+      fragment_buffer.insert(fragment_buffer.end(),
+                             tok_data.begin(), tok_data.end());
+      offset_to_token.emplace(
+          static_cast<unsigned>(fragment_buffer.size()),
+          tok.id());
+      fragment_buffer.push_back(' ');
+
+    } else {
+      auto sub = std::get<mx::TokenSubstitution>(node);
+      GetUnparsedTokens(sub.before());
+    }
+  }
+}
+
 EntityProvider::~EntityProvider(void) noexcept {}
 
 RemoteEntityProvider::ClientConnection::ClientConnection(const std::string &hp)
@@ -463,7 +528,8 @@ FileImpl::Ptr RemoteEntityProvider::FileFor(const Ptr &self, FileId id) {
 }
 
 // Download a fragment based off of an entity ID.
-FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(const Ptr &self, FragmentId id) {
+FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(
+    const Ptr &self, FragmentId id) {
   ClientConnection &cc = Connection();
   capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
                  mx::rpc::Multiplier::DownloadFragmentResults>
@@ -476,6 +542,27 @@ FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(const Ptr &self, FragmentId 
     return FragmentImpl::Ptr(std::move(ret), ret_ptr);
 
   // TODO(pag): Log something.
+  } catch (...) {
+    return {};
+  }
+}
+
+SyntaxQueryResultImpl::Ptr RemoteEntityProvider::SyntaxQuery(
+    const Ptr &self, std::string query, bool is_cpp) {
+  ClientConnection &cc = Connection();
+  capnp::Request<mx::rpc::Multiplier::SyntaxQueryParams,
+                 mx::rpc::Multiplier::SyntaxQueryResults>
+      request = cc.client.syntaxQueryRequest();
+  request.setQuery(query);
+  request.setIsCpp(is_cpp);
+
+  try {
+    return std::make_shared<SyntaxQueryResultImpl>(
+        query,
+        std::move(self),
+        request.send().wait(cc.connection.getWaitScope()),
+        is_cpp);
+
   } catch (...) {
     return {};
   }
@@ -499,13 +586,18 @@ FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(const Ptr &, FragmentId) {
   return {};
 }
 
+SyntaxQueryResultImpl::Ptr InvalidEntityProvider::SyntaxQuery(
+    const Ptr &, std::string, bool is_cpp) {
+  return {};
+}
+
 Token::Token(void)
     : impl(kInvalidTokenReader),
       index(0) {}
 
 // Return `true` if this is a valid token.
 Token::operator bool(void) const {
-  return !!dynamic_cast<const InvalidTokenReader *>(impl.get());
+  return !dynamic_cast<const InvalidTokenReader *>(impl.get());
 }
 
 // Kind of this token.
@@ -622,6 +714,11 @@ TokenList Token::in(const File &file) {
 FragmentList Fragment::in(const File &file) {
   return FragmentList(
       file.impl, static_cast<unsigned>(file.impl->fragments.size()));
+}
+
+// Return the fragment containing a query match.
+Fragment Fragment::containing(const SyntaxQueryMatch &match) {
+  return Fragment(match.frag);
 }
 
 // Return the ID of this fragment.
@@ -780,6 +877,10 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
   }
 }
 
+SyntaxQueryResult Index::syntax_query(std::string query, bool is_cpp) const {
+  return SyntaxQueryResult(impl->SyntaxQuery(impl, std::move(query), is_cpp));
+}
+
 FileListImpl::FileListImpl(EntityProvider::Ptr ep_)
     : ep(std::move(ep_)) {
 
@@ -932,6 +1033,103 @@ std::optional<TokenContext> TokenContext::parent(void) const {
     return ret;
   } else {
     return std::nullopt;
+  }
+}
+
+std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
+  auto mlir = impl->SourceIR();
+  if (!mlir.empty()) {
+    return mlir;
+  }
+  return std::nullopt;
+}
+
+SyntaxQueryMatch::SyntaxQueryMatch(
+    std::shared_ptr<const FragmentImpl> frag_,
+    std::shared_ptr<const TokenReader> impl_,
+    unsigned index_, unsigned num_tokens_,
+    std::unordered_map<std::string, TokenRange> var_matches_)
+    : TokenRange(std::move(impl_), index_, num_tokens_),
+      frag(std::move(frag_)),
+      var_matches(std::move(var_matches_)) {}
+
+std::optional<TokenRange> SyntaxQueryMatch::MatchFor(const std::string &var) const {
+  auto it = var_matches.find(var);
+  if (it != var_matches.end()) {
+    return it->second;
+  } else {
+    return std::nullopt;
+  }
+}
+
+// Return a list of matched variables.
+std::vector<std::string> SyntaxQueryMatch::MatchedVariables(void) const {
+  std::vector<std::string> ret;
+  for (const auto &[var, _] : var_matches) {
+    ret.emplace_back(var);
+  }
+  return ret;
+}
+
+SyntaxQueryResult::SyntaxQueryResult(
+    std::shared_ptr<const SyntaxQueryResultImpl> impl_)
+    : impl(std::move(impl_)),
+      num_fragments(impl->fragments.size()) {}
+
+// Try to advance to the next result. There can be multiple results per
+// fragment.
+void SyntaxQueryResultIterator::Advance(void) {
+  while (index < num_fragments) {
+    auto frag = impl->GetFragmentAtIndex(index);
+    if (!frag) {
+      ++index;
+      continue;
+    }
+
+    // Reset the caches of data in the fragment, and the mapping of offsets
+    // to token ids.
+    if (impl->fragment_buffer_id != frag->id) {
+      impl->next_weggli_match = 0u;
+      impl->weggli_matches.clear();
+      impl->fragment_buffer.clear();
+      impl->fragment_buffer_id = frag->id;
+      impl->GetUnparsedTokens(Fragment(frag).unparsed_tokens());
+
+      impl->query.ForEachMatch(
+          impl->fragment_buffer,
+          [impl = impl.get()] (const WeggliMatchData &match) {
+            impl->weggli_matches.emplace_back(match);
+            return true;
+          });
+    }
+
+    auto match_index = impl->next_weggli_match++;
+    if (match_index >= impl->weggli_matches.size()) {
+      ++index;  // Skip to next fragment.
+      continue;
+    }
+
+    const WeggliMatchData &match = impl->weggli_matches[match_index];
+
+    TokenRange range = frag->TokenRangeFor(
+        frag,
+        impl->EntityContainingOffset(match.begin_offset),
+        impl->EntityContainingOffset(match.end_offset));
+
+    std::unordered_map<std::string, TokenRange> var_matches;
+    for (const auto &[var, range] : match.variables) {
+      var_matches.emplace(
+          var,
+          frag->TokenRangeFor(
+              frag,
+              impl->EntityContainingOffset(range.first),
+              impl->EntityContainingOffset(range.second)));
+    }
+
+    result.reset();
+    result.emplace(frag, std::move(range.impl), range.index, range.num_tokens,
+                   std::move(var_matches));
+    return;
   }
 }
 

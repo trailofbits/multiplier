@@ -130,6 +130,9 @@ struct Fragment @0xe5f27760091f9a3a {
   
   # List of tokens/substitution IDs in the top level.
   unparsedTokens @11 :List(UInt64);
+
+  # Source IR in text format
+  mlir @12 :Text;
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {
@@ -147,4 +150,7 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
 
   # Download a code fragment by an `mx::FragmentId`.
   downloadFragment @3 (id: UInt64) -> (fragment :Data);
+
+  # Search code fragments matches with the query
+  syntaxQuery @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
 }

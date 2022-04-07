@@ -48,8 +48,12 @@ class EntitySerializer final : public EntityVisitor {
  public:
   EntityIdMap entity_ids;
   mx::FragmentId code_id;
+  mx::RawEntityId parent_decl_id{mx::kInvalidEntityId};
+  mx::RawEntityId parent_stmt_id{mx::kInvalidEntityId};
+  mx::RawEntityId current_decl_id{mx::kInvalidEntityId};
+  mx::RawEntityId current_stmt_id{mx::kInvalidEntityId};
   unsigned next_pseudo_entity_offset{0};
-  std::unordered_set<uint64_t> serialized_entities;
+  std::unordered_set<mx::RawEntityId> serialized_entities;
   const std::unordered_map<pasta::File, mx::FileId> &file_ids;
 
   ::capnp::List<::mx::ast::Decl, ::capnp::Kind::STRUCT>::Builder
@@ -76,10 +80,10 @@ class EntitySerializer final : public EntityVisitor {
   void SerializeCodeEntities(PendingFragment code, FragmentBuilder &builder);
 
   mx::FileId FileId(const pasta::File &file);
-  uint64_t EntityId(const pasta::Decl &entity);
-  uint64_t EntityId(const pasta::Stmt &entity);
-  uint64_t EntityId(const pasta::Token &entity);
-  uint64_t EntityId(const pasta::FileToken &entity);
+  mx::RawEntityId EntityId(const pasta::Decl &entity);
+  mx::RawEntityId EntityId(const pasta::Stmt &entity);
+  mx::RawEntityId EntityId(const pasta::Token &entity);
+  mx::RawEntityId EntityId(const pasta::FileToken &entity);
 
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;
