@@ -9,6 +9,8 @@
 #include <glog/logging.h>
 #include <multiplier/AST.h>
 
+#include "Util.h"
+
 namespace indexer {
 
 EntityLabeller::~EntityLabeller(void) {}
@@ -79,14 +81,13 @@ void EntityLabeller::Enter(
 }
 
 bool EntityLabeller::Label(const pasta::Token &entity) {
-  auto kind = entity.Kind();
   auto index = entity.Index();
   CHECK_LE(code.begin_index, index);
   CHECK_LE(index, code.end_index);
   mx::FragmentTokenId id;
   id.fragment_id = code.fragment_id;
   id.offset = static_cast<uint32_t>(index - code.begin_index);
-  id.kind = mx::FromPasta(kind);
+  id.kind = TokenKindFromPasta(entity);
 
   if (entity_ids.emplace(entity.RawToken(), id).second) {
     return true;

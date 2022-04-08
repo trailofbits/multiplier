@@ -202,7 +202,9 @@ void EntityVisitor::VisitConceptSpecializationExpr(
 
 void EntityVisitor::VisitSizeOfPackExpr(const pasta::SizeOfPackExpr &stmt) {
   if (EnterStmt(stmt)) {
-    Enter(stmt, stmt.PartialArguments());
+    if (auto args = stmt.PartialArguments()) {
+      Enter(stmt, std::move(*args));
+    }
   }
 }
 
@@ -242,8 +244,12 @@ bool EntityVisitor::EnterRecordDecl(const pasta::RecordDecl &decl) {
 
 bool EntityVisitor::EnterCXXRecordDecl(const pasta::CXXRecordDecl &decl) {
   if (EnterRecordDecl(decl)) {
-    Enter(decl, decl.Bases());
-    Enter(decl, decl.VirtualBases());
+    if (auto bases = decl.Bases()) {
+      Enter(decl, std::move(bases.value()));
+    }
+    if (auto vbases = decl.VirtualBases()) {
+      Enter(decl, std::move(vbases.value()));
+    }
     if (auto ls = decl.GenericLambdaTemplateParameterList()) {
       Enter(decl, std::move(*ls));
     }

@@ -184,9 +184,21 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // These can crash?
   {"Expr", "BestDynamicClassType"},
 
+  // These are odd.
+  {"CXXRecordDecl", "IsParsingBaseSpecifiers"},
+
+  // These have assertions related to FIXME comments, and so we don't want them.
+  {"CXXRecordDecl", "MostRecentNonInjectedDeclaration"},
+
+  // These have complicated assertions in them.
+  {"CXXRecordDecl", "DefaultedCopyConstructorIsDeleted"},
+  {"CXXRecordDecl", "DefaultedDefaultConstructorIsConstexpr"},
+  {"CXXRecordDecl", "DefaultedDestructorIsConstexpr"},
+  {"CXXRecordDecl", "DefaultedDestructorIsDeleted"},
+  {"CXXRecordDecl", "DefaultedMoveConstructorIsDeleted"},
+
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
-
 };
 
 struct ClassHierarchy {
@@ -251,14 +263,14 @@ static void BuildHierarchy(
       }
 
       auto bases = cls.Bases();
-      if (bases.empty()) {
+      if (!bases || bases->empty()) {
        h = new ClassHierarchy(cls);
        alloc.emplace_back(h);
        roots_out.push_back(h);
        progress = true;
 
       } else {
-        for (pasta::CXXBaseSpecifier parent : bases) {
+        for (pasta::CXXBaseSpecifier parent : *bases) {
           if (auto base = parent.BaseType().AsCXXRecordDeclaration()) {
             if (auto base_h = hmap[*base]) {
               h = new ClassHierarchy(cls);
@@ -475,6 +487,8 @@ class CodeGenerator {
  private:
   std::vector<ClassHierarchy *> roots;
 
+  std::unordered_set<std::string> enum_names;
+
   std::ofstream schema_os;  // `lib/AST.capnp`
   std::ofstream lib_cpp_os;  // `lib/AST.cpp`
   std::ofstream include_h_os;  // `include/multiplier/AST.h`
@@ -493,6 +507,7 @@ class CodeGenerator {
   // We extend `TokenKind` with these.
   std::optional<pasta::EnumDecl> pp_keyword_kinds;
   std::optional<pasta::EnumDecl> objc_at_keywords;
+  std::optional<pasta::EnumDecl> token_role;
 
   std::stringstream header_enum_ss;
 
@@ -508,6 +523,19 @@ class CodeGenerator {
   int RunOnClasses(void);
   int RunOnNamespaces(void);
 
+  void RunOnOptional(SpecificEntityStorage &storage,
+                     const std::optional<pasta::RecordDecl> &record,
+                     const std::string &class_name, const std::string &api_name,
+                     const std::string &method_name,
+                     const char *nth_entity_reader);
+
+  void RunOnVector(SpecificEntityStorage &storage,
+                   const std::optional<pasta::RecordDecl> &record,
+                   const std::string &class_name, const std::string &api_name,
+                   const std::string &method_name,
+                   const char *nth_entity_reader,
+                   bool optional);
+
  public:
   CodeGenerator(char *argv[]);
   int RunOnTranslationUnit(pasta::TranslationUnitDecl tu);
@@ -515,6 +543,11 @@ class CodeGenerator {
 
 void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   auto enum_name = enum_decl.Name();
+  if (enum_name == "TokenRole" || enum_name == "ObjCKeywordKind" ||
+      enum_name == "PPKeywordKind") {
+    return;
+  }
+
   auto itype = CxxIntType(enum_decl.IntegerType());
   include_h_os << "enum class " << enum_name << " : unsigned short {\n";
   lib_cpp_os
@@ -594,6 +627,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   if (enum_name == "TokenKind") {
     assert(pp_keyword_kinds.has_value());
     assert(objc_at_keywords.has_value());
+    assert(token_role.has_value());
     auto j = 0u;
     for (pasta::EnumConstantDecl val : pp_keyword_kinds->Enumerators()) {
       if (!j++) {
@@ -637,6 +671,29 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
           << enum_case << "\";\n";
       ++i;
     }
+
+    // Token roles.
+    j = 0u;
+    for (pasta::EnumConstantDecl val : token_role->Enumerators()) {
+      auto val_name = val.Name();
+      if (!val_name.ends_with("Marker")) {
+        continue;
+      }
+
+      assert(val_name[0] == 'k');
+      val_name = val_name.substr(1);
+
+      auto snake_name = CapitalCaseToSnakeCase(val_name);
+      auto enum_case = SnakeCaseToEnumCase(snake_name);
+
+      include_h_os
+          << "  " << enum_case << ",\n";
+
+      name_cases_ss
+          << "    case " << enum_name << "::" << enum_case << ": return \""
+          << enum_case << "\";\n";
+      ++i;
+    }
   }
 
   lib_cpp_os
@@ -658,6 +715,9 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "  return \"" << enum_name << "\";\n"
       << "}\n\n"
       << "const char *EnumeratorName(" << enum_name << ");\n\n";
+
+
+  enum_names.insert(std::move(enum_name));
 }
 
 static std::optional<std::string> GetFirstTemplateParameterType(
@@ -666,9 +726,25 @@ static std::optional<std::string> GetFirstTemplateParameterType(
     if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
       for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
         if (auto arg_type = arg.AsType()) {
-          if (auto arg_record = arg_type->AsRecordDeclaration()) {
+          if (auto arg_record = arg_type->AsTagDeclaration()) {
             return arg_record->Name();
+          } else if (auto itype = CxxIntType(*arg_type)) {
+            return std::string(itype);
           }
+        }
+      }
+    }
+  }
+  return std::nullopt;
+}
+
+static std::optional<pasta::RecordDecl> GetTemplateParameterRecord(
+    const std::optional<pasta::RecordDecl> &record) {
+  if (record) {
+    if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
+      for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
+        if (auto arg_type = arg.AsType()) {
+          return arg_type->AsRecordDeclaration();
         }
       }
     }
@@ -685,6 +761,445 @@ NamesFor(unsigned meth_id) {
   return std::make_tuple(std::move(getter_name),
                          std::move(setter_name),
                          std::move(init_name));
+}
+
+void CodeGenerator::RunOnOptional(
+    SpecificEntityStorage &storage,
+    const std::optional<pasta::RecordDecl> &record,
+    const std::string &class_name, const std::string &api_name,
+    const std::string &method_name,
+    const char *nth_entity_reader) {
+  std::optional<std::string> element_name =
+      GetFirstTemplateParameterType(record);
+  std::string capn_element_name;
+  std::string cxx_element_name;
+  std::string cxx_underlying_name;
+  if (!element_name) {
+
+  } else if (*element_name == "bool") {
+    capn_element_name = "Bool";
+    cxx_element_name = "bool";
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "unsigned") {
+    capn_element_name = "UInt32";
+    cxx_element_name = "unsigned";
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "int") {
+    capn_element_name = "Int32";
+    cxx_element_name = "int";
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (enum_names.count(*element_name)) {
+    capn_element_name = "UInt16";
+    cxx_element_name = *element_name;
+    cxx_underlying_name = "unsigned short";
+
+  // E.g. `optional<vector<CXXBaseSpecifier>>`, `optional<vector<FriendDecl>>`.
+  } else if (*element_name == "vector") {
+    if (auto sub_record = GetTemplateParameterRecord(record)) {
+      RunOnVector(storage, sub_record, class_name, api_name, method_name,
+                  nth_entity_reader, true);
+      return;
+    }
+
+  // Optional strings will be empty.
+  } else if (*element_name == "string" ||
+             *element_name == "basic_string" ||
+             *element_name == "string_view" ||
+             *element_name == "basic_string_view" ||
+             *element_name == "path") {
+
+    capn_element_name = "Text";
+    cxx_element_name = "std::string_view";
+
+  // Optional references will be left as `0` if they're not present.
+  } else if (gEntityClassNames.count(element_name.value())) {
+    if (!gUnserializableTypes.count(element_name.value())) {
+      capn_element_name = "UInt64";  // Reference.
+      cxx_element_name = element_name.value();
+    }
+  } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
+    capn_element_name = "UInt32";  // Offset.
+    cxx_element_name = element_name.value();
+  }
+
+  if (capn_element_name.empty()) {
+    return;
+  }
+
+  const auto i = storage.AddMethod(capn_element_name);
+  auto [getter_name, setter_name, init_name] = NamesFor(i);
+
+  const auto is_present_i = storage.AddMethod("Bool");
+  auto [ip_getter_name, ip_setter_name, ip_init_name] =
+      NamesFor(is_present_i);
+
+  include_h_os
+      << "  std::optional<" << cxx_element_name << "> "
+      << api_name << "(void) const;\n";
+
+  lib_cpp_os
+      << "std::optional<" << cxx_element_name << "> "
+      << class_name << "::" << api_name
+      << "(void) const {\n"
+      << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
+      << "  if (!self." << ip_getter_name << "()) {\n"
+      << "    return std::nullopt;\n"
+      << "  } else {\n";
+
+  serialize_cpp_os
+      << "  auto v" << i << " = e." << method_name << "();\n";
+
+  // Strings.
+  if (element_name.value() == "string" ||
+      element_name.value() == "basic_string") {
+
+    serialize_cpp_os
+        << "  if (v" << i << ") {\n"
+        << "    b." << setter_name << "(v" << i << ".value());\n"
+        << "    b." << ip_setter_name << "(true);\n"
+        << "  } else {\n"
+        << "    b." << ip_setter_name << "(false);\n"
+        << "  }\n";
+
+    lib_cpp_os
+        << "    capnp::Text::Reader data = self." << getter_name
+        << "();\n"
+        << "    return " << cxx_element_name
+        << "(data.cStr(), data.size());\n";
+
+  // String views need to be converted to `std::string` because Cap'n
+  // Proto requires `:Text` fields to be `NUL`-terminated.
+  } else if (*element_name == "string_view" ||
+             *element_name == "basic_string_view") {
+    serialize_cpp_os
+        << "  if (v" << i << ") {\n"
+        << "    if (v" << i << "->empty()) {\n"
+        << "      b." << setter_name << "(\"\");\n"
+        << "    } else {\n"
+        << "      std::string s" << i << "(v" << i << "->data(), v"
+        << i << "->size());\n"
+        << "      b." << setter_name << "(s" << i << ");\n"
+        << "    }\n"
+        << "    b." << ip_setter_name << "(true);\n"
+        << "  } else {\n"
+        << "    b." << ip_setter_name << "(false);\n"
+        << "  }\n";
+
+    lib_cpp_os
+        << "    capnp::Text::Reader data = self." << getter_name
+        << "();\n"
+        << "    return " << cxx_element_name
+        << "(data.cStr(), data.size());\n";
+
+  // Filesystem paths.
+  } else if (*element_name == "path") {
+    serialize_cpp_os
+        << "  if (v" << i << ") {\n"
+        << "    b." << setter_name
+        << "(v" << i << ".value().lexically_normal().generic_string());\n"
+        << "    b." << ip_setter_name << "(true);\n"
+        << "  } else {\n"
+        << "    b." << ip_setter_name << "(false);\n"
+        << "  }\n";
+
+    lib_cpp_os
+        << "    capnp::Text::Reader data = self." << getter_name
+        << "();\n"
+        << "    return data.cStr();\n";
+
+  // Reference types.
+  } else if (gEntityClassNames.count(*element_name)) {
+    serialize_cpp_os
+        << "  if (v" << i << ") {\n"
+        << "    if (auto id" << i << " = es.EntityId(v" << i << ".value())) {\n"
+        << "      b." << setter_name << "(id" << i << ");\n"
+        << "      b." << ip_setter_name << "(true);\n"
+        << "    } else {\n"
+        << "      b." << ip_setter_name << "(false);\n"
+        << "    }\n"
+        << "  } else {\n"
+        << "    b." << ip_setter_name << "(false);\n"
+        << "  }\n";
+
+    lib_cpp_os
+        << "    EntityId id(self." << getter_name
+        << "());\n";
+
+    // Tokens are more like pseudo-entities but whatever.
+    if (*element_name == "Token") {
+      lib_cpp_os
+          << "    return fragment->TokenFor(fragment, id);\n";
+
+    } else if (*element_name == "Decl") {
+      lib_cpp_os
+          << "    return fragment->DeclFor(fragment, id);\n";
+
+    } else if (*element_name == "Stmt") {
+      lib_cpp_os
+          << "    return fragment->StmtFor(fragment, id);\n";
+
+    } else if (gDeclNames.count(*element_name)) {
+      lib_cpp_os
+          << "    return " << (*element_name)
+          << "::from(fragment->DeclFor(fragment, id));\n";
+
+    } else if (gStmtNames.count(*element_name)) {
+      lib_cpp_os
+          << "    return " << (*element_name)
+          << "::from(fragment->StmtFor(fragment, id));\n";
+
+    } else {
+      std::cerr << "??? optional element_name=" << (*element_name) << '\n';
+      abort();
+    }
+
+  // Pseudo-entities.
+  } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
+
+    serialize_cpp_os
+        << "  if (v" << i << ") {\n"
+        << "    auto o" << i << " = es.next_pseudo_entity_offset++;\n"
+        << "    Serialize" << (*element_name)
+        << "(es, es.pseudo_builder[o" << i << "], v" << i
+        << ".value());\n"
+        << "    b." << setter_name << "(o" << i << ");\n"
+        << "    b." << ip_setter_name << "(true);\n"
+        << "  } else {\n"
+        << "    b." << ip_setter_name << "(false);\n"
+        << "  }\n";
+
+    lib_cpp_os
+        << "    return " << (*element_name) << "(fragment, self."
+        << getter_name << "());\n";
+
+  // Enums, bools, ints, etc.
+  } else {
+    assert(!cxx_underlying_name.empty());
+
+    serialize_cpp_os
+        << "  if (v" << i << ") {\n"
+        << "    b." << setter_name << "(static_cast<"
+        << cxx_underlying_name << ">(v" << i << ".value()));\n"
+        << "    b." << ip_setter_name << "(true);\n"
+        << "  } else {\n"
+        << "    b." << ip_setter_name << "(false);\n"
+        << "  }\n";
+
+    lib_cpp_os
+        << "    return static_cast<" << cxx_element_name
+        << ">(self." << getter_name << "());\n";
+  }
+
+  lib_cpp_os
+      << "  }\n"
+      << "}\n\n";
+}
+
+void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
+                                const std::optional<pasta::RecordDecl> &record,
+                                const std::string &class_name,
+                                const std::string &api_name,
+                                const std::string &method_name,
+                                const char *nth_entity_reader,
+                                bool optional) {
+  std::optional<std::string> element_name =
+      GetFirstTemplateParameterType(record);
+  std::string capn_element_name;
+  std::string cxx_element_name;
+
+  if (!element_name) {
+    if (optional) {
+      abort();
+    }
+
+  } else if (*element_name == "string" ||
+             *element_name == "basic_string" ||
+             *element_name == "string_view" ||
+             *element_name == "basic_string_view" ||
+             *element_name == "path") {
+    capn_element_name = "Text";
+    cxx_element_name = "std::string_view";
+
+  } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
+    capn_element_name = "UInt32";  // Offset.
+    cxx_element_name = element_name.value();
+
+  } else if (gEntityClassNames.count(element_name.value())) {
+    if (!gUnserializableTypes.count(element_name.value())) {
+      capn_element_name = "UInt64";  // Reference.
+      cxx_element_name = element_name.value();
+    }
+
+  } else if (gNotReferenceTypes.count(element_name.value())) {
+    abort();
+//          capn_element_name = element_name.value();
+//          cxx_element_name = element_name.value();
+  } else {
+    std::cerr << "??? vector element_name=" << (*element_name) << '\n';
+  }
+
+  if (capn_element_name.empty()) {
+    return;
+  }
+
+  const auto i = storage.AddMethod("List(" + capn_element_name + ")");
+  unsigned opt_i = 0;
+  if (optional) {
+    opt_i = storage.AddMethod("Bool");
+  }
+  auto [getter_name, setter_name, init_name] = NamesFor(i);
+  auto [opt_getter_name, opt_setter_name, opt_init_name] = NamesFor(opt_i);
+
+  if (optional) {
+    include_h_os
+        << "  std::optional<std::vector<" << cxx_element_name << ">> "
+        << api_name << "(void) const;\n";
+
+    lib_cpp_os
+        << "std::optional<std::vector<" << cxx_element_name << ">> ";
+
+  } else {
+    include_h_os
+        << "  std::vector<" << cxx_element_name << "> "
+        << api_name << "(void) const;\n";
+
+    lib_cpp_os
+        << "std::vector<" << cxx_element_name << "> ";
+  }
+
+  lib_cpp_os
+      << class_name << "::" << api_name
+      << "(void) const {\n"
+      << "  auto self = fragment->" << nth_entity_reader << "(offset);\n";
+
+  if (optional) {
+    lib_cpp_os
+        << "  if (!self." << opt_getter_name << "()) {\n"
+        << "    return std::nullopt;\n"
+        << "  }\n";
+  }
+
+  lib_cpp_os
+      << "  auto list = self." << getter_name << "();\n"
+      << "  std::vector<" << cxx_element_name << "> vec;\n"
+      << "  vec.reserve(list.size());\n"
+      << "  for (auto v : list) {\n";
+
+  serialize_cpp_os << "do {\n";
+
+  if (optional) {
+    serialize_cpp_os
+        << "    auto ov" << i << " = e." << method_name << "();\n"
+        << "    if (!ov" << i << ") {\n"
+        << "      b." << opt_setter_name << "(false);\n"
+        << "      break;\n"
+        << "    }\n"
+        << "    b." << opt_setter_name << "(true);\n"
+        << "    auto v" << i << " = std::move(*ov" << i << ");\n";
+
+  } else {
+    serialize_cpp_os
+        << "    auto v" << i << " = e." << method_name << "();\n";
+  }
+  serialize_cpp_os
+      << "    auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
+      << i << ".size()));\n"
+      << "    auto i" << i << " = 0u;\n"
+      << "    for (const auto &e" << i << " : v" << i << ") {\n";
+
+  if (*element_name == "string" || *element_name == "basic_string") {
+    serialize_cpp_os
+        << "      sv" << i << ".set(i" << i << ", e" << i << ");\n";
+
+    lib_cpp_os
+        << "vec.emplace_back(v.cStr(), v.size());\n";
+
+  // String views need to be converted to `std::string` because Cap'n
+  // Proto requires `:Text` fields to be `NUL`-terminated.
+  } else if (*element_name == "string_view" ||
+             *element_name == "basic_string_view") {
+    serialize_cpp_os
+        << "      std::string se" << i << "(e" << i << ".data(), e"
+        << i << ".size());\n"
+        << "      sv" << i << ".set(i" << i << ", se" << i << ");\n";
+
+    lib_cpp_os
+        << "vec.emplace_back(v.cStr(), v.size());\n";
+
+  // Filesystem paths.
+  } else if (*element_name == "path") {
+    serialize_cpp_os
+        << "      sv" << i << ".set(i" << i << ", e" << i
+        << ".lexically_normal().generic_string());\n";
+
+    lib_cpp_os
+        << "    vec.emplace_back(v.cStr());\n";
+
+  // Reference types.
+  } else if (gEntityClassNames.count(*element_name)) {
+    serialize_cpp_os
+        << "      sv" << i << ".set(i" << i << ", es.EntityId(e" << i
+        << "));\n";
+
+    lib_cpp_os
+        << "    EntityId id(v);\n";
+
+    // Tokens are more like pseudo-entities but whatever.
+    if (*element_name == "Token") {
+      lib_cpp_os
+          << "    vec.emplace_back(fragment->TokenFor(fragment, id));\n";
+
+    } else if (*element_name == "Decl") {
+      lib_cpp_os
+          << "    vec.emplace_back(fragment->DeclFor(fragment, id));\n";
+
+    } else if (*element_name == "Stmt") {
+      lib_cpp_os
+          << "    vec.emplace_back(fragment->StmtFor(fragment, id));\n";
+
+    } else if (gDeclNames.count(*element_name)) {
+      lib_cpp_os
+          << "    if (auto e = " << (*element_name)
+          << "::from(fragment->DeclFor(fragment, id))) {\n"
+          << "      vec.emplace_back(std::move(*e));\n"
+          << "    }\n";
+
+    } else if (gStmtNames.count(*element_name)) {
+      lib_cpp_os
+          << "    if (auto e = " << (*element_name)
+          << "::from(fragment->StmtFor(fragment, id))) {\n"
+          << "      vec.emplace_back(std::move(*e));\n"
+          << "    }\n";
+
+    } else {
+      std::cerr << "??? vec " << (*element_name) << '\n';
+      abort();
+    }
+
+  // Not reference types, need to serialize offsets.
+  } else {
+    serialize_cpp_os
+        << "      auto o" << i << " = es.next_pseudo_entity_offset++;\n"
+        << "      sv" << i << ".set(i" << i << ", o" << i << ");\n"
+        << "      Serialize" << (*element_name)
+        << "(es, es.pseudo_builder[o" << i << "], e" << i << ");\n";
+
+    lib_cpp_os
+        << "vec.emplace_back(fragment, v);\n";
+  }
+
+  lib_cpp_os
+      << "  }\n"
+      << "  return vec;\n"
+      << "}\n\n";
+
+  serialize_cpp_os
+      << "      ++i" << i << ";\n"
+      << "    }\n"
+      << "  } while (false);\n";
 }
 
 MethodListPtr CodeGenerator::RunOnClass(
@@ -1080,7 +1595,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 //        << "      offset(child.offset) {}\n\n";
 //  }
 
-  for (pasta::CXXMethodDecl method : cls->record.Methods()) {
+  auto methods = cls->record.Methods();
+  assert(methods);
+  for (pasta::CXXMethodDecl method : *methods) {
     if (method.NumParameters()) {
       continue;  // Skip methods with parameters.
     }
@@ -1256,341 +1773,13 @@ MethodListPtr CodeGenerator::RunOnClass(
       // the union tag, and the size of the union is the size of its largest
       // member, so the extra `bool` just means 1 bit of overhead.
       } else if (record_name == "optional") {
-        std::optional<std::string> element_name =
-            GetFirstTemplateParameterType(record);
-        std::string capn_element_name;
-        std::string cxx_element_name;
-        if (!element_name) {
-
-        // Optional strings will be empty.
-        } else if (*element_name == "string" ||
-                   *element_name == "basic_string" ||
-                   *element_name == "string_view" ||
-                   *element_name == "basic_string_view" ||
-                   *element_name == "path") {
-
-          capn_element_name = "Text";
-          cxx_element_name = "std::string_view";
-
-        // Optional references will be left as `0` if they're not present.
-        } else if (gEntityClassNames.count(element_name.value())) {
-          if (!gUnserializableTypes.count(element_name.value())) {
-            capn_element_name = "UInt64";  // Reference.
-            cxx_element_name = element_name.value();
-          }
-        } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
-          capn_element_name = "UInt32";  // Offset.
-          cxx_element_name = element_name.value();
-        }
-
-        if (capn_element_name.empty()) {
-          continue;
-        }
-
-        const auto i = storage.AddMethod(capn_element_name);
-        auto [getter_name, setter_name, init_name] = NamesFor(i);
-
-        const auto is_present_i = storage.AddMethod("Bool");
-        auto [ip_getter_name, ip_setter_name, ip_init_name] =
-            NamesFor(is_present_i);
-
-        include_h_os
-            << "  std::optional<" << cxx_element_name << "> "
-            << api_name << "(void) const;\n";
-
-        lib_cpp_os
-            << "std::optional<" << cxx_element_name << "> "
-            << class_name << "::" << api_name
-            << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
-            << "  if (!self." << ip_getter_name << "()) {\n"
-            << "    return std::nullopt;\n"
-            << "  } else {\n";
-
-        serialize_cpp_os
-            << "  auto v" << i << " = e." << method_name << "();\n";
-
-        // Strings.
-        if (element_name.value() == "string" ||
-            element_name.value() == "basic_string") {
-
-          serialize_cpp_os
-              << "  if (v" << i << ") {\n"
-              << "    b." << setter_name << "(v.value());\n"
-              << "    b." << ip_setter_name << "(true);\n"
-              << "  } else {\n"
-              << "    b." << ip_setter_name << "(false);\n"
-              << "  }\n";
-
-          lib_cpp_os
-              << "    capnp::Text::Reader data = self." << getter_name
-              << "();\n"
-              << "    return " << cxx_element_name
-              << "(data.cStr(), data.size());\n";
-
-        // String views need to be converted to `std::string` because Cap'n
-        // Proto requires `:Text` fields to be `NUL`-terminated.
-        } else if (*element_name == "string_view" ||
-                   *element_name == "basic_string_view") {
-          serialize_cpp_os
-              << "  if (v" << i << ") {\n"
-              << "    if (v" << i << "->empty()) {\n"
-              << "      b." << setter_name << "(\"\");\n"
-              << "    } else {\n"
-              << "      std::string s" << i << "(v" << i << "->data(), v"
-              << i << "->size());\n"
-              << "      b." << setter_name << "(s" << i << ");\n"
-              << "    }\n"
-              << "    b." << ip_setter_name << "(true);\n"
-              << "  } else {\n"
-              << "    b." << ip_setter_name << "(false);\n"
-              << "  }\n";
-
-          lib_cpp_os
-              << "    capnp::Text::Reader data = self." << getter_name
-              << "();\n"
-              << "    return " << cxx_element_name
-              << "(data.cStr(), data.size());\n";
-
-        // Filesystem paths.
-        } else if (*element_name == "path") {
-          serialize_cpp_os
-              << "  if (v" << i << ") {\n"
-              << "    b." << setter_name
-              << "(v.value().lexically_normal().generic_string());\n"
-              << "    b." << ip_setter_name << "(true);\n"
-              << "  } else {\n"
-              << "    b." << ip_setter_name << "(false);\n"
-              << "  }\n";
-
-          lib_cpp_os
-              << "    capnp::Text::Reader data = self." << getter_name
-              << "();\n"
-              << "    return data.cStr();\n";
-
-        // Reference types.
-        } else if (gEntityClassNames.count(*element_name)) {
-          serialize_cpp_os
-              << "  if (v" << i << ") {\n"
-              << "    if (auto id" << i << " = es.EntityId(v" << i << ".value())) {\n"
-              << "      b." << setter_name << "(id" << i << ");\n"
-              << "      b." << ip_setter_name << "(true);\n"
-              << "    } else {\n"
-              << "      b." << ip_setter_name << "(false);\n"
-              << "    }\n"
-              << "  } else {\n"
-              << "    b." << ip_setter_name << "(false);\n"
-              << "  }\n";
-
-          lib_cpp_os
-              << "    EntityId id(self." << getter_name
-              << "());\n";
-
-          // Tokens are more like pseudo-entities but whatever.
-          if (*element_name == "Token") {
-            lib_cpp_os
-                << "    return fragment->TokenFor(fragment, id);\n";
-
-          } else if (*element_name == "Decl") {
-            lib_cpp_os
-                << "    return fragment->DeclFor(fragment, id);\n";
-
-          } else if (*element_name == "Stmt") {
-            lib_cpp_os
-                << "    return fragment->StmtFor(fragment, id);\n";
-
-          } else if (gDeclNames.count(*element_name)) {
-            lib_cpp_os
-                << "    return " << (*element_name)
-                << "::from(fragment->DeclFor(fragment, id));\n";
-
-          } else if (gStmtNames.count(*element_name)) {
-            lib_cpp_os
-                << "    return " << (*element_name)
-                << "::from(fragment->StmtFor(fragment, id));\n";
-
-          } else {
-            std::cerr << "??? " << (*element_name) << '\n';
-            abort();
-          }
-
-        // Pseudo-entities.
-        } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
-
-          serialize_cpp_os
-              << "  if (v" << i << ") {\n"
-              << "    auto o" << i << " = es.next_pseudo_entity_offset++;\n"
-              << "    Serialize" << (*element_name)
-              << "(es, es.pseudo_builder[o" << i << "], v" << i
-              << ".value());\n"
-              << "    b." << setter_name << "(o" << i << ");\n"
-              << "    b." << ip_setter_name << "(true);\n"
-              << "  } else {\n"
-              << "    b." << ip_setter_name << "(false);\n"
-              << "  }\n";
-
-          lib_cpp_os
-              << "    return " << (*element_name) << "(fragment, self."
-              << getter_name << "());\n";
-
-        } else {
-          abort();
-        }
-
-        lib_cpp_os
-            << "  }\n"
-            << "}\n\n";
+        RunOnOptional(storage, record, class_name, api_name, method_name,
+                      nth_entity_reader);
 
       // List of things; figure out what.
       } else if (record_name == "vector") {
-        std::optional<std::string> element_name =
-            GetFirstTemplateParameterType(record);
-        std::string capn_element_name;
-        std::string cxx_element_name;
-
-        if (!element_name) {
-
-        } else if (*element_name == "string" ||
-                   *element_name == "basic_string" ||
-                   *element_name == "string_view" ||
-                   *element_name == "basic_string_view" ||
-                   *element_name == "path") {
-          capn_element_name = "Text";
-          cxx_element_name = "std::string_view";
-
-        } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
-          capn_element_name = "UInt32";  // Offset.
-          cxx_element_name = element_name.value();
-
-        } else if (gEntityClassNames.count(element_name.value())) {
-          if (!gUnserializableTypes.count(element_name.value())) {
-            capn_element_name = "UInt64";  // Reference.
-            cxx_element_name = element_name.value();
-          }
-
-        } else if (gNotReferenceTypes.count(element_name.value())) {
-          abort();
-//          capn_element_name = element_name.value();
-//          cxx_element_name = element_name.value();
-        }
-
-        if (capn_element_name.empty()) {
-          continue;
-        }
-
-        const auto i = storage.AddMethod("List(" + capn_element_name + ")");
-        auto [getter_name, setter_name, init_name] = NamesFor(i);
-
-        include_h_os
-            << "  std::vector<" << cxx_element_name << "> "
-            << api_name << "(void) const;\n";
-
-        lib_cpp_os
-            << "std::vector<" << cxx_element_name << "> "
-            << class_name << "::" << api_name
-            << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
-            << "  auto list = self." << getter_name << "();\n"
-            << "  std::vector<" << cxx_element_name << "> vec;\n"
-            << "  vec.reserve(list.size());\n"
-            << "  for (auto v : list) {\n";
-
-        serialize_cpp_os
-            << "  auto v" << i << " = e." << method_name << "();\n"
-            << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
-            << i << ".size()));\n"
-            << "  auto i" << i << " = 0u;\n"
-            << "  for (const auto &e" << i << " : v" << i << ") {\n";
-
-        if (*element_name == "string" || *element_name == "basic_string") {
-          serialize_cpp_os
-              << "    sv" << i << ".set(i" << i << ", e" << i << ");\n";
-
-          lib_cpp_os
-              << "vec.emplace_back(v.cStr(), v.size());\n";
-
-        // String views need to be converted to `std::string` because Cap'n
-        // Proto requires `:Text` fields to be `NUL`-terminated.
-        } else if (*element_name == "string_view" ||
-                   *element_name == "basic_string_view") {
-          serialize_cpp_os
-              << "    std::string se" << i << "(e" << i << ".data(), e"
-              << i << ".size());\n"
-              << "    sv" << i << ".set(i" << i << ", se" << i << ");\n";
-
-          lib_cpp_os
-              << "vec.emplace_back(v.cStr(), v.size());\n";
-
-        // Filesystem paths.
-        } else if (*element_name == "path") {
-          serialize_cpp_os
-              << "    sv" << i << ".set(i" << i << ", e" << i
-              << ".lexically_normal().generic_string());\n";
-
-          lib_cpp_os
-              << "    vec.emplace_back(v.cStr());\n";
-
-        // Reference types.
-        } else if (gEntityClassNames.count(*element_name)) {
-          serialize_cpp_os
-              << "    sv" << i << ".set(i" << i << ", es.EntityId(e" << i
-              << "));\n";
-
-          lib_cpp_os
-              << "    EntityId id(v);\n";
-
-          // Tokens are more like pseudo-entities but whatever.
-          if (*element_name == "Token") {
-            lib_cpp_os
-                << "    vec.emplace_back(fragment->TokenFor(fragment, id));\n";
-
-          } else if (*element_name == "Decl") {
-            lib_cpp_os
-                << "    vec.emplace_back(fragment->DeclFor(fragment, id));\n";
-
-          } else if (*element_name == "Stmt") {
-            lib_cpp_os
-                << "    vec.emplace_back(fragment->StmtFor(fragment, id));\n";
-
-          } else if (gDeclNames.count(*element_name)) {
-            lib_cpp_os
-                << "    if (auto e = " << (*element_name)
-                << "::from(fragment->DeclFor(fragment, id))) {\n"
-                << "      vec.emplace_back(std::move(*e));\n"
-                << "    }\n";
-
-          } else if (gStmtNames.count(*element_name)) {
-            lib_cpp_os
-                << "    if (auto e = " << (*element_name)
-                << "::from(fragment->StmtFor(fragment, id))) {\n"
-                << "      vec.emplace_back(std::move(*e));\n"
-                << "    }\n";
-
-          } else {
-            std::cerr << "??? vec " << (*element_name) << '\n';
-            abort();
-          }
-
-        // Not reference types, need to serialize offsets.
-        } else {
-          serialize_cpp_os
-              << "    auto o" << i << " = es.next_pseudo_entity_offset++;\n"
-              << "    sv" << i << ".set(i" << i << ", o" << i << ");\n"
-              << "    Serialize" << (*element_name)
-              << "(es, es.pseudo_builder[o" << i << "], e" << i << ");\n";
-
-          lib_cpp_os
-              << "vec.emplace_back(fragment, v);\n";
-        }
-
-        lib_cpp_os
-            << "  }\n"
-            << "  return vec;\n"
-            << "}\n\n";
-
-        serialize_cpp_os
-            << "    ++i" << i << ";\n"
-            << "  }\n";
+        RunOnVector(storage, record, class_name, api_name, method_name,
+                    nth_entity_reader, false);
 
       // E.g. something that returns a `Decl`, `Stmt`, etc.
       } else if (gEntityClassNames.count(record_name)) {
@@ -1879,6 +2068,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
     if (auto itype = CxxIntType(tag.IntegerType())) {
       serialize_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
       include_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
+    } else {
+      std::cerr << "??? " << tag.Name() << "\n";
     }
   }
   serialize_h_os
@@ -1904,6 +2095,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       pp_keyword_kinds = tag;
     } else if (enum_name == "ObjCKeywordKind") {
       objc_at_keywords = tag;
+    } else if (enum_name == "TokenRole") {
+      token_role = tag;
     }
   }
 
@@ -2077,7 +2270,7 @@ int CodeGenerator::RunOnNamespaces(void) {
       } else if (auto e = pasta::EnumDecl::From(decl);
                  e && e->IsThisDeclarationADefinition()) {
         auto name = e->Name();
-        if (name != "TokenRole" && name != "TokenContextKind") {
+        if (name != "TokenContextKind") {
           enums.emplace_back(std::move(*e));
         }
       }

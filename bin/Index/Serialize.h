@@ -350,6 +350,7 @@ class CXXBaseSpecifier;
 class TemplateArgument;
 class TemplateParameterList;
 class FileToken;
+enum class TokenRole : unsigned short;
 enum class DeclKind : unsigned;
 enum class ArrayTypeArraySizeModifier : unsigned;
 enum class AtomicExprAtomicOp : unsigned;

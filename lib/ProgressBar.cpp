@@ -201,7 +201,7 @@ void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
   assert((lpad + rpad) == static_cast<int>(kNumProgressBars));
   const auto num_digits = NumDigits(max);
   const auto label_len = strlen(label);
-  const auto label_rpad = label_len < 25ull ? 25ull - label_len : 0;
+  const auto label_rpad = label_len < 30ull ? 30ull - label_len : 0;
   const auto div_rpad = num_digits < 8 ? 16 - (num_digits * 2) : 0;
 
   // Write into `next_line`, which is "local" to the owning thread.

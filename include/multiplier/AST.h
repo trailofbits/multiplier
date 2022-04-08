@@ -18,6 +18,7 @@
 #include "Types.h"
 
 namespace pasta {
+enum class TokenRole : unsigned short;
 enum class DeclKind : unsigned;
 enum class ArrayTypeArraySizeModifier : unsigned;
 enum class AtomicExprAtomicOp : unsigned;
@@ -3751,45 +3752,6 @@ inline static const char *EnumerationName(ObjCInstanceTypeFamily) {
 
 const char *EnumeratorName(ObjCInstanceTypeFamily);
 
-enum class ObjCKeywordKind : unsigned short {
-  NOT_KEYWORD,
-  CLASS,
-  COMPATIBILITY_ALIAS,
-  DEFINITIONS,
-  ENCODE,
-  OBJC_END,
-  IMPLEMENTATION,
-  INTERFACE,
-  PRIVATE,
-  PROTECTED,
-  PROTOCOL,
-  PUBLIC,
-  SELECTOR,
-  THROW,
-  TRY,
-  CATCH,
-  FINALLY,
-  SYNCHRONIZED,
-  AUTORELEASEPOOL,
-  PROPERTY,
-  PACKAGE,
-  REQUIRED,
-  OPTIONAL,
-  SYNTHESIZE,
-  DYNAMIC,
-  IMPORT,
-  AVAILABLE,
-  NUM_ENUMERATORS
-};
-
-ObjCKeywordKind FromPasta(pasta::ObjCKeywordKind pasta_val);
-
-inline static const char *EnumerationName(ObjCKeywordKind) {
-  return "ObjCKeywordKind";
-}
-
-const char *EnumeratorName(ObjCKeywordKind);
-
 enum class ObjCLifetime : unsigned short {
   NONE,
   EXPLICIT_NONE,
@@ -4310,44 +4272,6 @@ inline static const char *EnumerationName(PCSType) {
 }
 
 const char *EnumeratorName(PCSType);
-
-enum class PPKeywordKind : unsigned short {
-  NOT_KEYWORD,
-  IF,
-  IFDEF,
-  IFNDEF,
-  ELIF,
-  ELIFDEF,
-  ELIFNDEF,
-  ELSE,
-  ENDIF,
-  DEFINED,
-  INCLUDE,
-  __INCLUDE_MACROS,
-  DEFINE,
-  UNDEF,
-  LINE,
-  ERROR,
-  PRAGMA,
-  IMPORT,
-  INCLUDE_NEXT,
-  WARNING,
-  IDENTIFIER,
-  SCCS,
-  ASSERT,
-  UNASSERT,
-  __PUBLIC_MACRO,
-  __PRIVATE_MACRO,
-  NUM_ENUMERATORS
-};
-
-PPKeywordKind FromPasta(pasta::PPKeywordKind pasta_val);
-
-inline static const char *EnumerationName(PPKeywordKind) {
-  return "PPKeywordKind";
-}
-
-const char *EnumeratorName(PPKeywordKind);
 
 enum class ParameterABI : unsigned short {
   ORDINARY,
@@ -5573,6 +5497,10 @@ enum class TokenKind : unsigned short {
   OBJC_AT_DYNAMIC,
   OBJC_AT_IMPORT,
   OBJC_AT_AVAILABLE,
+  BEGIN_OF_FILE_MARKER,
+  END_OF_FILE_MARKER,
+  BEGIN_OF_MACRO_EXPANSION_MARKER,
+  END_OF_MACRO_EXPANSION_MARKER,
   NUM_ENUMERATORS
 };
 
@@ -9199,7 +9127,7 @@ class CXXCatchStmt : public Stmt {
   static std::optional<CXXCatchStmt> from(const TokenContext &c);
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
   Token catch_token(void) const;
-  VarDecl exception_declaration(void) const;
+  std::optional<VarDecl> exception_declaration(void) const;
   Stmt handler_block(void) const;
 };
 
@@ -9466,10 +9394,14 @@ class Expr : public ValueStmt {
   std::optional<FieldDecl> source_bit_field(void) const;
   ExprValueKind value_kind(void) const;
   bool has_non_trivial_call(void) const;
+  std::optional<bool> is_cxx11_constant_expression(void) const;
+  std::optional<bool> is_cxx98_integral_constant_expression(void) const;
   bool is_default_argument(void) const;
+  std::optional<bool> is_evaluatable(void) const;
   bool is_gl_value(void) const;
   bool is_implicit_cxx_this(void) const;
   bool is_instantiation_dependent(void) const;
+  std::optional<bool> is_integer_constant_expression(void) const;
   bool is_known_to_have_boolean_value(void) const;
   bool is_l_value(void) const;
   bool is_objcgc_candidate(void) const;
@@ -10546,7 +10478,7 @@ class CXXUuidofExpr : public Expr {
   static std::optional<CXXUuidofExpr> from(const Expr &parent);
   static std::optional<CXXUuidofExpr> from(const ValueStmt &parent);
   static std::optional<CXXUuidofExpr> from(const Stmt &parent);
-  Expr expression_operand(void) const;
+  std::optional<Expr> expression_operand(void) const;
   MSGuidDecl guid_declaration(void) const;
   bool is_type_operand(void) const;
 };
@@ -10609,8 +10541,8 @@ class CXXTypeidExpr : public Expr {
   static std::optional<CXXTypeidExpr> from(const Expr &parent);
   static std::optional<CXXTypeidExpr> from(const ValueStmt &parent);
   static std::optional<CXXTypeidExpr> from(const Stmt &parent);
-  Expr expression_operand(void) const;
-  bool is_most_derived(void) const;
+  std::optional<Expr> expression_operand(void) const;
+  std::optional<bool> is_most_derived(void) const;
   bool is_potentially_evaluated(void) const;
   bool is_type_operand(void) const;
 };
@@ -10974,6 +10906,7 @@ class CXXFoldExpr : public Expr {
   Expr initializer(void) const;
   Expr lhs(void) const;
   Token l_paren_token(void) const;
+  std::optional<unsigned> num_expansions(void) const;
   BinaryOperatorKind operator_(void) const;
   Expr pattern(void) const;
   Expr rhs(void) const;
@@ -11081,7 +11014,7 @@ class CXXDefaultInitExpr : public Expr {
   static std::optional<CXXDefaultInitExpr> from(const Expr &parent);
   static std::optional<CXXDefaultInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXDefaultInitExpr> from(const Stmt &parent);
-  Expr expression(void) const;
+  std::optional<Expr> expression(void) const;
   FieldDecl field(void) const;
   Token used_token(void) const;
 };
@@ -11832,7 +11765,7 @@ class TypeTraitExpr : public Expr {
   static std::optional<TypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<TypeTraitExpr> from(const Stmt &parent);
   TypeTrait trait(void) const;
-  bool value(void) const;
+  std::optional<bool> value(void) const;
 };
 
 using SubstNonTypeTemplateParmPackExprRange = DerivedEntityRange<StmtIterator, SubstNonTypeTemplateParmPackExpr>;
@@ -12027,8 +11960,9 @@ class SizeOfPackExpr : public Expr {
   static std::optional<SizeOfPackExpr> from(const Stmt &parent);
   Token operator_token(void) const;
   NamedDecl pack(void) const;
+  std::optional<unsigned> pack_length(void) const;
   Token pack_token(void) const;
-  std::vector<TemplateArgument> partial_arguments(void) const;
+  std::optional<std::vector<TemplateArgument>> partial_arguments(void) const;
   Token r_paren_token(void) const;
   bool is_partially_substituted(void) const;
 };
@@ -12310,6 +12244,7 @@ class PackExpansionExpr : public Expr {
   static std::optional<PackExpansionExpr> from(const ValueStmt &parent);
   static std::optional<PackExpansionExpr> from(const Stmt &parent);
   Token ellipsis_token(void) const;
+  std::optional<unsigned> num_expansions(void) const;
   Expr pattern(void) const;
 };
 
@@ -13192,8 +13127,8 @@ class MaterializeTemporaryExpr : public Expr {
   static std::optional<MaterializeTemporaryExpr> from(const Expr &parent);
   static std::optional<MaterializeTemporaryExpr> from(const ValueStmt &parent);
   static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent);
-  ValueDecl extending_declaration(void) const;
-  LifetimeExtendedTemporaryDecl lifetime_extended_temporary_declaration(void) const;
+  std::optional<ValueDecl> extending_declaration(void) const;
+  std::optional<LifetimeExtendedTemporaryDecl> lifetime_extended_temporary_declaration(void) const;
   StorageDuration storage_duration(void) const;
   Expr sub_expression(void) const;
   bool is_bound_to_lvalue_reference(void) const;
@@ -14397,7 +14332,7 @@ class NamedDecl : public Decl {
   Linkage formal_linkage(void) const;
   Linkage linkage_internal(void) const;
   std::string_view name(void) const;
-  ObjCStringFormatFamily obj_cf_string_formatting_family(void) const;
+  std::optional<ObjCStringFormatFamily> obj_cf_string_formatting_family(void) const;
   std::string_view qualified_name_as_string(void) const;
   NamedDecl underlying_declaration(void) const;
   Visibility visibility(void) const;
@@ -14823,6 +14758,7 @@ class VarDecl : public DeclaratorDecl {
   bool has_dependent_alignment(void) const;
   bool has_external_storage(void) const;
   bool has_global_storage(void) const;
+  std::optional<bool> has_ice_initializer(void) const;
   bool has_initializer(void) const;
   bool has_local_storage(void) const;
   bool is_arc_pseudo_strong(void) const;
@@ -15168,6 +15104,7 @@ class FunctionDecl : public DeclaratorDecl {
   static std::optional<FunctionDecl> from(const ValueDecl &parent);
   static std::optional<FunctionDecl> from(const NamedDecl &parent);
   static std::optional<FunctionDecl> from(const Decl &parent);
+  std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
   bool does_this_declaration_have_a_body(void) const;
   ConstexprSpecKind constexpr_kind(void) const;
   std::optional<FunctionDecl> definition(void) const;
@@ -15177,6 +15114,7 @@ class FunctionDecl : public DeclaratorDecl {
   std::optional<FunctionDecl> instantiated_from_member_function(void) const;
   LanguageLinkage language_linkage(void) const;
   MultiVersionKind multi_version_kind(void) const;
+  std::optional<unsigned> odr_hash(void) const;
   OverloadedOperatorKind overloaded_operator(void) const;
   TokenRange parameters_source_range(void) const;
   Token point_of_instantiation(void) const;
@@ -15211,9 +15149,11 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_in_extern_c_context(void) const;
   bool is_in_extern_cxx_context(void) const;
   bool is_inline_builtin_declaration(void) const;
+  std::optional<bool> is_inline_definition_externally_visible(void) const;
   bool is_inline_specified(void) const;
   bool is_inlined(void) const;
   bool is_late_template_parsed(void) const;
+  std::optional<bool> is_ms_extern_inline(void) const;
   bool is_msvcrt_entry_point(void) const;
   bool is_main(void) const;
   bool is_multi_version(void) const;
@@ -15221,6 +15161,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_overloaded_operator(void) const;
   bool is_pure(void) const;
   bool is_replaceable_global_allocation_function(void) const;
+  std::optional<bool> is_reserved_global_placement_operator(void) const;
   bool is_static(void) const;
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
@@ -15313,8 +15254,8 @@ class CXXDestructorDecl : public CXXMethodDecl {
   static std::optional<CXXDestructorDecl> from(const ValueDecl &parent);
   static std::optional<CXXDestructorDecl> from(const NamedDecl &parent);
   static std::optional<CXXDestructorDecl> from(const Decl &parent);
-  FunctionDecl operator_delete(void) const;
-  Expr operator_delete_this_argument(void) const;
+  std::optional<FunctionDecl> operator_delete(void) const;
+  std::optional<Expr> operator_delete_this_argument(void) const;
 };
 
 using CXXConversionDeclRange = DerivedEntityRange<DeclIterator, CXXConversionDecl>;
@@ -15385,7 +15326,7 @@ class CXXConstructorDecl : public CXXMethodDecl {
   static std::optional<CXXConstructorDecl> from(const ValueDecl &parent);
   static std::optional<CXXConstructorDecl> from(const NamedDecl &parent);
   static std::optional<CXXConstructorDecl> from(const Decl &parent);
-  CXXConstructorDecl target_constructor(void) const;
+  std::optional<CXXConstructorDecl> target_constructor(void) const;
   bool is_default_constructor(void) const;
   bool is_delegating_constructor(void) const;
   bool is_explicit(void) const;
@@ -15656,7 +15597,7 @@ class UsingShadowDecl : public NamedDecl {
   static std::optional<UsingShadowDecl> from(const NamedDecl &parent);
   static std::optional<UsingShadowDecl> from(const Decl &parent);
   BaseUsingDecl introducer(void) const;
-  UsingShadowDecl next_using_shadow_declaration(void) const;
+  std::optional<UsingShadowDecl> next_using_shadow_declaration(void) const;
   NamedDecl target_declaration(void) const;
 };
 
@@ -15971,122 +15912,119 @@ class CXXRecordDecl : public RecordDecl {
   static std::optional<CXXRecordDecl> from(const TypeDecl &parent);
   static std::optional<CXXRecordDecl> from(const NamedDecl &parent);
   static std::optional<CXXRecordDecl> from(const Decl &parent);
-  bool allow_const_default_initializer(void) const;
-  std::vector<CXXBaseSpecifier> bases(void) const;
+  std::optional<bool> allow_const_default_initializer(void) const;
+  std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
   MSInheritanceModel calculate_inheritance_model(void) const;
   std::vector<CXXConstructorDecl> constructors(void) const;
-  bool defaulted_copy_constructor_is_deleted(void) const;
-  bool defaulted_default_constructor_is_constexpr(void) const;
-  bool defaulted_destructor_is_constexpr(void) const;
-  bool defaulted_destructor_is_deleted(void) const;
-  bool defaulted_move_constructor_is_deleted(void) const;
-  std::vector<FriendDecl> friends(void) const;
+  std::optional<std::vector<FriendDecl>> friends(void) const;
   std::optional<CXXDestructorDecl> destructor(void) const;
   std::optional<TemplateParameterList> generic_lambda_template_parameter_list(void) const;
   std::optional<CXXRecordDecl> instantiated_from_member_class(void) const;
   std::optional<CXXMethodDecl> lambda_call_operator(void) const;
-  LambdaCaptureDefault lambda_capture_default(void) const;
-  Decl lambda_context_declaration(void) const;
-  std::vector<NamedDecl> lambda_explicit_template_parameters(void) const;
-  MSInheritanceModel ms_inheritance_model(void) const;
+  std::optional<LambdaCaptureDefault> lambda_capture_default(void) const;
+  std::optional<Decl> lambda_context_declaration(void) const;
+  std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
+  std::optional<unsigned> lambda_mangling_number(void) const;
+  std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
-  CXXRecordDecl most_recent_non_injected_declaration(void) const;
+  std::optional<unsigned> num_bases(void) const;
+  std::optional<unsigned> num_virtual_bases(void) const;
+  std::optional<unsigned> odr_hash(void) const;
   std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;
-  bool has_any_dependent_bases(void) const;
-  bool has_constexpr_default_constructor(void) const;
-  bool has_constexpr_destructor(void) const;
-  bool has_constexpr_non_copy_move_constructor(void) const;
-  bool has_copy_assignment_with_const_parameter(void) const;
-  bool has_copy_constructor_with_const_parameter(void) const;
-  bool has_default_constructor(void) const;
-  bool has_definition(void) const;
-  bool has_direct_fields(void) const;
-  bool has_friends(void) const;
-  bool has_in_class_initializer(void) const;
-  bool has_inherited_assignment(void) const;
-  bool has_inherited_constructor(void) const;
-  bool has_irrelevant_destructor(void) const;
-  bool has_known_lambda_internal_linkage(void) const;
-  bool has_move_assignment(void) const;
-  bool has_move_constructor(void) const;
-  bool has_mutable_fields(void) const;
-  bool has_non_literal_type_fields_or_bases(void) const;
-  bool has_non_trivial_copy_assignment(void) const;
-  bool has_non_trivial_copy_constructor(void) const;
-  bool has_non_trivial_copy_constructor_for_call(void) const;
-  bool has_non_trivial_default_constructor(void) const;
-  bool has_non_trivial_destructor(void) const;
-  bool has_non_trivial_destructor_for_call(void) const;
-  bool has_non_trivial_move_assignment(void) const;
-  bool has_non_trivial_move_constructor(void) const;
-  bool has_non_trivial_move_constructor_for_call(void) const;
-  bool has_private_fields(void) const;
-  bool has_protected_fields(void) const;
-  bool has_simple_copy_assignment(void) const;
-  bool has_simple_copy_constructor(void) const;
-  bool has_simple_destructor(void) const;
-  bool has_simple_move_assignment(void) const;
-  bool has_simple_move_constructor(void) const;
-  bool has_trivial_copy_assignment(void) const;
-  bool has_trivial_copy_constructor(void) const;
-  bool has_trivial_copy_constructor_for_call(void) const;
-  bool has_trivial_default_constructor(void) const;
-  bool has_trivial_destructor(void) const;
-  bool has_trivial_destructor_for_call(void) const;
-  bool has_trivial_move_assignment(void) const;
-  bool has_trivial_move_constructor(void) const;
-  bool has_trivial_move_constructor_for_call(void) const;
-  bool has_uninitialized_reference_member(void) const;
-  bool has_user_declared_constructor(void) const;
-  bool has_user_declared_copy_assignment(void) const;
-  bool has_user_declared_copy_constructor(void) const;
-  bool has_user_declared_destructor(void) const;
-  bool has_user_declared_move_assignment(void) const;
-  bool has_user_declared_move_constructor(void) const;
-  bool has_user_declared_move_operation(void) const;
-  bool has_user_provided_default_constructor(void) const;
-  bool has_variant_members(void) const;
-  bool implicit_copy_assignment_has_const_parameter(void) const;
-  bool implicit_copy_constructor_has_const_parameter(void) const;
-  bool is_abstract(void) const;
-  bool is_aggregate(void) const;
-  bool is_any_destructor_no_return(void) const;
-  bool is_c_like(void) const;
-  bool is_cxx11_standard_layout(void) const;
+  std::optional<bool> has_any_dependent_bases(void) const;
+  std::optional<bool> has_constexpr_default_constructor(void) const;
+  std::optional<bool> has_constexpr_destructor(void) const;
+  std::optional<bool> has_constexpr_non_copy_move_constructor(void) const;
+  std::optional<bool> has_copy_assignment_with_const_parameter(void) const;
+  std::optional<bool> has_copy_constructor_with_const_parameter(void) const;
+  std::optional<bool> has_default_constructor(void) const;
+  std::optional<bool> has_definition(void) const;
+  std::optional<bool> has_direct_fields(void) const;
+  std::optional<bool> has_friends(void) const;
+  std::optional<bool> has_in_class_initializer(void) const;
+  std::optional<bool> has_inherited_assignment(void) const;
+  std::optional<bool> has_inherited_constructor(void) const;
+  std::optional<bool> has_irrelevant_destructor(void) const;
+  std::optional<bool> has_known_lambda_internal_linkage(void) const;
+  std::optional<bool> has_move_assignment(void) const;
+  std::optional<bool> has_move_constructor(void) const;
+  std::optional<bool> has_mutable_fields(void) const;
+  std::optional<bool> has_non_literal_type_fields_or_bases(void) const;
+  std::optional<bool> has_non_trivial_copy_assignment(void) const;
+  std::optional<bool> has_non_trivial_copy_constructor(void) const;
+  std::optional<bool> has_non_trivial_copy_constructor_for_call(void) const;
+  std::optional<bool> has_non_trivial_default_constructor(void) const;
+  std::optional<bool> has_non_trivial_destructor(void) const;
+  std::optional<bool> has_non_trivial_destructor_for_call(void) const;
+  std::optional<bool> has_non_trivial_move_assignment(void) const;
+  std::optional<bool> has_non_trivial_move_constructor(void) const;
+  std::optional<bool> has_non_trivial_move_constructor_for_call(void) const;
+  std::optional<bool> has_private_fields(void) const;
+  std::optional<bool> has_protected_fields(void) const;
+  std::optional<bool> has_simple_copy_assignment(void) const;
+  std::optional<bool> has_simple_copy_constructor(void) const;
+  std::optional<bool> has_simple_destructor(void) const;
+  std::optional<bool> has_simple_move_assignment(void) const;
+  std::optional<bool> has_simple_move_constructor(void) const;
+  std::optional<bool> has_trivial_copy_assignment(void) const;
+  std::optional<bool> has_trivial_copy_constructor(void) const;
+  std::optional<bool> has_trivial_copy_constructor_for_call(void) const;
+  std::optional<bool> has_trivial_default_constructor(void) const;
+  std::optional<bool> has_trivial_destructor(void) const;
+  std::optional<bool> has_trivial_destructor_for_call(void) const;
+  std::optional<bool> has_trivial_move_assignment(void) const;
+  std::optional<bool> has_trivial_move_constructor(void) const;
+  std::optional<bool> has_trivial_move_constructor_for_call(void) const;
+  std::optional<bool> has_uninitialized_reference_member(void) const;
+  std::optional<bool> has_user_declared_constructor(void) const;
+  std::optional<bool> has_user_declared_copy_assignment(void) const;
+  std::optional<bool> has_user_declared_copy_constructor(void) const;
+  std::optional<bool> has_user_declared_destructor(void) const;
+  std::optional<bool> has_user_declared_move_assignment(void) const;
+  std::optional<bool> has_user_declared_move_constructor(void) const;
+  std::optional<bool> has_user_declared_move_operation(void) const;
+  std::optional<bool> has_user_provided_default_constructor(void) const;
+  std::optional<bool> has_variant_members(void) const;
+  std::optional<bool> implicit_copy_assignment_has_const_parameter(void) const;
+  std::optional<bool> implicit_copy_constructor_has_const_parameter(void) const;
+  std::optional<bool> is_abstract(void) const;
+  std::optional<bool> is_aggregate(void) const;
+  std::optional<bool> is_any_destructor_no_return(void) const;
+  std::optional<bool> is_c_like(void) const;
+  std::optional<bool> is_cxx11_standard_layout(void) const;
   bool is_dependent_lambda(void) const;
-  bool is_dynamic_class(void) const;
-  bool is_effectively_final(void) const;
-  bool is_empty(void) const;
+  std::optional<bool> is_dynamic_class(void) const;
+  std::optional<bool> is_effectively_final(void) const;
+  std::optional<bool> is_empty(void) const;
   bool is_generic_lambda(void) const;
-  bool is_interface_like(void) const;
-  bool is_literal(void) const;
+  std::optional<bool> is_interface_like(void) const;
+  std::optional<bool> is_literal(void) const;
   std::optional<FunctionDecl> is_local_class(void) const;
-  bool is_pod(void) const;
-  bool is_parsing_base_specifiers(void) const;
-  bool is_polymorphic(void) const;
-  bool is_standard_layout(void) const;
-  bool is_structural(void) const;
-  bool is_trivial(void) const;
-  bool is_trivially_copyable(void) const;
-  bool lambda_is_default_constructible_and_assignable(void) const;
-  bool may_be_abstract(void) const;
-  bool may_be_dynamic_class(void) const;
-  bool may_be_non_dynamic_class(void) const;
-  std::vector<CXXMethodDecl> methods(void) const;
-  bool needs_implicit_copy_assignment(void) const;
-  bool needs_implicit_copy_constructor(void) const;
-  bool needs_implicit_default_constructor(void) const;
-  bool needs_implicit_destructor(void) const;
-  bool needs_implicit_move_assignment(void) const;
-  bool needs_implicit_move_constructor(void) const;
-  bool needs_overload_resolution_for_copy_assignment(void) const;
-  bool needs_overload_resolution_for_copy_constructor(void) const;
-  bool needs_overload_resolution_for_destructor(void) const;
-  bool needs_overload_resolution_for_move_assignment(void) const;
-  bool needs_overload_resolution_for_move_constructor(void) const;
-  bool null_field_offset_is_zero(void) const;
-  std::vector<CXXBaseSpecifier> virtual_bases(void) const;
+  std::optional<bool> is_pod(void) const;
+  std::optional<bool> is_polymorphic(void) const;
+  std::optional<bool> is_standard_layout(void) const;
+  std::optional<bool> is_structural(void) const;
+  std::optional<bool> is_trivial(void) const;
+  std::optional<bool> is_trivially_copyable(void) const;
+  std::optional<bool> lambda_is_default_constructible_and_assignable(void) const;
+  std::optional<bool> may_be_abstract(void) const;
+  std::optional<bool> may_be_dynamic_class(void) const;
+  std::optional<bool> may_be_non_dynamic_class(void) const;
+  std::optional<std::vector<CXXMethodDecl>> methods(void) const;
+  std::optional<bool> needs_implicit_copy_assignment(void) const;
+  std::optional<bool> needs_implicit_copy_constructor(void) const;
+  std::optional<bool> needs_implicit_default_constructor(void) const;
+  std::optional<bool> needs_implicit_destructor(void) const;
+  std::optional<bool> needs_implicit_move_assignment(void) const;
+  std::optional<bool> needs_implicit_move_constructor(void) const;
+  std::optional<bool> needs_overload_resolution_for_copy_assignment(void) const;
+  std::optional<bool> needs_overload_resolution_for_copy_constructor(void) const;
+  std::optional<bool> needs_overload_resolution_for_destructor(void) const;
+  std::optional<bool> needs_overload_resolution_for_move_assignment(void) const;
+  std::optional<bool> needs_overload_resolution_for_move_constructor(void) const;
+  std::optional<bool> null_field_offset_is_zero(void) const;
+  std::optional<std::vector<CXXBaseSpecifier>> virtual_bases(void) const;
 };
 
 using ClassTemplateSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplateSpecializationDecl>;
@@ -16199,6 +16137,7 @@ class EnumDecl : public TagDecl {
   std::vector<EnumConstantDecl> enumerators(void) const;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
   TokenRange integer_type_range(void) const;
+  std::optional<unsigned> odr_hash(void) const;
   std::optional<EnumDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;
   bool is_closed(void) const;
@@ -17195,7 +17134,7 @@ class FriendDecl : public Decl {
 
   static std::optional<FriendDecl> from(const TokenContext &c);
   static std::optional<FriendDecl> from(const Decl &parent);
-  NamedDecl friend_declaration(void) const;
+  std::optional<NamedDecl> friend_declaration(void) const;
   Token friend_token(void) const;
   bool is_unsupported_friend(void) const;
   std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const;

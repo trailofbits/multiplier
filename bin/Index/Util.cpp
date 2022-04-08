@@ -194,4 +194,27 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
   return kind;
 }
 
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
+  switch (entity.Role()) {
+    case pasta::TokenRole::kBeginOfFileMarker:
+      return mx::TokenKind::BEGIN_OF_FILE_MARKER;
+    case pasta::TokenRole::kEndOfFileMarker:
+      return mx::TokenKind::END_OF_FILE_MARKER;
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+      return mx::TokenKind::BEGIN_OF_MACRO_EXPANSION_MARKER;
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      return mx::TokenKind::END_OF_MACRO_EXPANSION_MARKER;
+    default:
+      break;
+  }
+  auto kind = mx::FromPasta(entity.Kind());
+  if (kind == mx::TokenKind::UNKNOWN) {
+    if (IsWhitespaceOrEmpty(entity.Data())) {
+      return mx::TokenKind::WHITESPACE;
+    }
+  }
+  return kind;
+}
+
 }  // namespace indexer

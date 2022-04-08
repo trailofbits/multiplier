@@ -49,19 +49,25 @@ class HashVisitor final : public pasta::DeclVisitor {
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    ss << ':' << decl.ODRHash();
+    if (auto hash = decl.ODRHash()) {
+      ss << ':' << hash.value();
+    }
     VisitDeclContext(decl);
   }
 
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
     if (decl.HasDefinition()) {
-      ss << ':' << decl.ODRHash();
+      if (auto hash = decl.ODRHash()) {
+        ss << ':' << hash.value();
+      }
       VisitDeclContext(decl);
     }
   }
 
   void VisitEnumDecl(const pasta::EnumDecl &decl) final {
-    ss << ':' << decl.ODRHash();
+    if (auto hash = decl.ODRHash()) {
+      ss << ':' << hash.value();
+    }
   }
 
   // VisitDecl will add kind name of all decl to the folding set

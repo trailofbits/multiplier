@@ -12,6 +12,7 @@
 namespace pasta {
 class Decl;
 class FileToken;
+class Token;
 }  // namespace pasta
 namespace mx {
 enum class TokenKind : unsigned short;
@@ -32,5 +33,8 @@ bool IsWhitespaceOrEmpty(std::string_view data);
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);
+
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 
 }  // namespace indexer
