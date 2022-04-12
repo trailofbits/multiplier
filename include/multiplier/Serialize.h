@@ -26,6 +26,10 @@ struct Empty {};
 // An unserializer that always returns default-initialzied values.
 struct NullReader {
  public:
+  MX_ALWAYS_INLINE uint32_t SizeLeft(void) const noexcept {
+    return 0;
+  }
+
   MX_ALWAYS_INLINE uint32_t ReadSize(void) {
     return {};
   }
@@ -285,11 +289,18 @@ class UnsafeByteWriter : public ByteWriter<UnsafeByteWriter> {
 template <typename Self>
 class ByteReader {
  public:
-  explicit ByteReader(const char *read_ptr_) noexcept
-      : read_ptr(reinterpret_cast<const uint8_t *>(read_ptr_)) {}
+  explicit ByteReader(const char *read_ptr_, const char *end_read_ptr_) noexcept
+      : read_ptr(reinterpret_cast<const uint8_t *>(read_ptr_)),
+        end_read_ptr(reinterpret_cast<const uint8_t *>(end_read_ptr_)) {}
 
-  explicit ByteReader(const uint8_t *read_ptr_) noexcept
-      : read_ptr(read_ptr_) {}
+  explicit ByteReader(const uint8_t *read_ptr_,
+                      const uint8_t *end_read_ptr_) noexcept
+      : read_ptr(read_ptr_),
+        end_read_ptr(end_read_ptr_) {}
+
+  MX_ALWAYS_INLINE uint32_t SizeLeft(void) const noexcept {
+    return static_cast<uint32_t>(end_read_ptr - read_ptr);
+  }
 
   [[gnu::hot]] MX_ALWAYS_INLINE double ReadF64(void) noexcept {
     alignas(double) uint8_t data[8u];
@@ -465,6 +476,7 @@ class ByteReader {
   }
 
   const uint8_t *read_ptr;
+  const uint8_t * const end_read_ptr;
 };
 
 // A reader for reading continuous data starting from `read_ptr_`; no bounds
@@ -474,41 +486,28 @@ class UnsafeByteReader : public ByteReader<UnsafeByteReader> {
   using ByteReader<UnsafeByteReader>::ReadU8;
 
   MX_ALWAYS_INLINE UnsafeByteReader(const std::string &data) noexcept
-      : UnsafeByteReader(data.data()) {}
+      : UnsafeByteReader(data.data(), data.size()) {}
 
   MX_ALWAYS_INLINE UnsafeByteReader(std::string_view data) noexcept
-      : UnsafeByteReader(data.data()) {}
+      : UnsafeByteReader(data.data(), data.size()) {}
 
-  MX_ALWAYS_INLINE explicit UnsafeByteReader(const char *read_ptr_)
-      : ByteReader(read_ptr_) {}
+  MX_ALWAYS_INLINE explicit UnsafeByteReader(const char *read_ptr_, size_t size)
+      : ByteReader(read_ptr_, &(read_ptr_[size])) {}
 
-  MX_ALWAYS_INLINE explicit UnsafeByteReader(const uint8_t *read_ptr_)
-      : ByteReader(read_ptr_) {}
+  MX_ALWAYS_INLINE explicit UnsafeByteReader(
+      const uint8_t *read_ptr_, size_t size)
+      : ByteReader(read_ptr_, &(read_ptr_[size])) {}
 };
 
 // A reader for reading at most `num_bytes` of data starting at `read_ptr_`.
 // Bounds checking is performed.
 class ByteRangeReader : public UnsafeByteReader {
  public:
-  explicit ByteRangeReader(const std::string &data) noexcept
-      : UnsafeByteReader(data.data()),
-        max_read_ptr(&(read_ptr[data.size()])) {}
-
-  explicit ByteRangeReader(std::string_view data) noexcept
-      : UnsafeByteReader(data.data()),
-        max_read_ptr(&(read_ptr[data.size()])) {}
-
-  explicit ByteRangeReader(const char *read_ptr_, size_t num_bytes) noexcept
-      : UnsafeByteReader(read_ptr_),
-        max_read_ptr(&(read_ptr[num_bytes])) {}
-
-  explicit ByteRangeReader(const uint8_t *read_ptr_, size_t num_bytes) noexcept
-      : UnsafeByteReader(read_ptr_),
-        max_read_ptr(&(read_ptr[num_bytes])) {}
+  using UnsafeByteReader::UnsafeByteReader;
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE double
   ReadF64(void) noexcept {
-    if (&(read_ptr[7]) >= max_read_ptr) {
+    if (&(read_ptr[7]) >= end_read_ptr) {
       error = true;
       return {};
     } else {
@@ -518,7 +517,7 @@ class ByteRangeReader : public UnsafeByteReader {
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE float
   ReadF32(void) noexcept {
-    if (&(read_ptr[3]) >= max_read_ptr) {
+    if (&(read_ptr[3]) >= end_read_ptr) {
       error = true;
       return {};
     } else {
@@ -528,7 +527,7 @@ class ByteRangeReader : public UnsafeByteReader {
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE uint64_t
   ReadU64(void) noexcept {
-    if (&(read_ptr[7]) >= max_read_ptr) {
+    if (&(read_ptr[7]) >= end_read_ptr) {
       error = true;
       return {};
     } else {
@@ -538,7 +537,7 @@ class ByteRangeReader : public UnsafeByteReader {
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE uint32_t
   ReadU32(void) noexcept {
-    if (&(read_ptr[3]) >= max_read_ptr) {
+    if (&(read_ptr[3]) >= end_read_ptr) {
       error = true;
       return {};
     } else {
@@ -548,7 +547,7 @@ class ByteRangeReader : public UnsafeByteReader {
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE uint16_t
   ReadU16(void) noexcept {
-    if (&(read_ptr[1]) >= max_read_ptr) {
+    if (&(read_ptr[1]) >= end_read_ptr) {
       error = true;
       return {};
     } else {
@@ -558,7 +557,7 @@ class ByteRangeReader : public UnsafeByteReader {
 
   [[gnu::hot]] MX_FLATTEN MX_ALWAYS_INLINE uint8_t
   ReadU8(void) noexcept {
-    if (read_ptr >= max_read_ptr) {
+    if (read_ptr >= end_read_ptr) {
       error = true;
       return {};
     } else {
@@ -592,12 +591,11 @@ class ByteRangeReader : public UnsafeByteReader {
 
   [[gnu::hot]] void Skip(uint32_t num_bytes) noexcept {
     read_ptr = &(read_ptr[num_bytes]);
-    if (read_ptr > max_read_ptr) {
+    if (read_ptr > end_read_ptr) {
       error = true;
     }
   }
 
-  const uint8_t *max_read_ptr;
   bool error{false};
 };
 
@@ -690,6 +688,7 @@ template <typename SubReader>
 struct ByteCountingReader : public SubReader {
  public:
   using SubReader::SubReader;
+  using SubReader::SizeLeft;
 
   // This is the one special case where we actual do the read.
   MX_ALWAYS_INLINE uint32_t ReadSize(void) {

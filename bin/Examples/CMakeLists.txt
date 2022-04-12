@@ -9,7 +9,7 @@
 
 function(define_example exe_name source_file)
   add_executable("${exe_name}"
-      "${source_file}"
+    "${source_file}"
   )
   
   target_link_libraries("${exe_name}"

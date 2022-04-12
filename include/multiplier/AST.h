@@ -6362,7 +6362,7 @@ class CoawaitExpr;
 class CXXAddrspaceCastExpr;
 class CXXConstCastExpr;
 class CXXDynamicCastExpr;
-#ifndef MX_DISABLE_API
+#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
  protected:
   friend class Decl;
@@ -17904,5 +17904,5 @@ static_assert(sizeof(ExportDecl) == sizeof(Decl));
 
 static_assert(sizeof(EmptyDecl) == sizeof(Decl));
 
-#endif  // MX_DISABLE_API
+#endif
 }  // namespace mx

@@ -140,6 +140,10 @@ target_compile_features("mx-api"
     cxx_std_20
 )
 
+target_compile_definitions("mx-api"
+  PRIVATE
+    "MX_ENABLE_API")
+
 add_library("${PROJECT_NAME}::api" ALIAS "mx-api")
 set_target_properties("mx-api" PROPERTIES LINKER_LANGUAGE CXX)
 

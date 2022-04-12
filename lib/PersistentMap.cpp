@@ -92,6 +92,8 @@ PersistentMapImpl::~PersistentMapImpl(void) {
       << "Canceling background RocksDB work";
   rocksdb::CancelAllBackgroundWork(rocks_db.get(), true  /* wait */);
 
+  rocks_db->DestroyColumnFamilyHandle(cf_handle);
+
   status = rocks_db->Close();
   LOG_IF(ERROR, !status.ok())
       << "Error closing key/value store: " << status.ToString();

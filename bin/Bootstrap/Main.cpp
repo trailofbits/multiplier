@@ -2164,10 +2164,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   include_h_os
-      << "#ifndef MX_DISABLE_API\n";
+      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n";
 
   lib_cpp_os
-      << "#ifndef MX_DISABLE_API\n";
+      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n";
 
   while (!work_list.empty()) {
     auto [cls, parent_methods] = work_list.back();
@@ -2230,10 +2230,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   include_h_os << late_include_h_os.str();
 
   include_h_os
-      << "#endif  // MX_DISABLE_API\n";
+      << "#endif\n";
 
   lib_cpp_os
-      << "#endif  // MX_DISABLE_API\n";
+      << "#endif\n";
 
   lib_cpp_os << "}  // namespace mx\n";
   include_h_os << "}  // namespace mx\n";

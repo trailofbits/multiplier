@@ -8612,7 +8612,7 @@ const char *EnumeratorName(TargetLanguage e) {
   }
 }
 
-#ifndef MX_DISABLE_API
+#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 unsigned TemplateParameterList::num_parameters(void) const {
   auto self = fragment->NthPseudo(offset);
   return self.getVal0();
@@ -29800,5 +29800,5 @@ std::optional<EmptyDecl> EmptyDecl::from(const Decl &parent) {
   }
 }
 
-#endif  // MX_DISABLE_API
+#endif
 }  // namespace mx

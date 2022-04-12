@@ -34,7 +34,7 @@ class PersistentMapBase {
   bool GetOrSet(std::string_view key, std::string *val) const;
   bool TryGet(std::string_view key, std::string *val) const;
   void MatchCommonPrefix(
-      std::string  key_prefix,
+      std::string key_prefix,
       std::function<bool(std::string_view, std::string_view)> cb) const;
 };
 
