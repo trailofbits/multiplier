@@ -58,6 +58,27 @@ bool ASTNode::operator==(const ASTNode &that) const noexcept {
   return true;
 }
 
+AST::AST(void) {
+  index.resize(static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
+               static_cast<unsigned>(mx::StmtKind::NUM_ENUMERATORS) +
+               static_cast<unsigned>(mx::TokenKind::NUM_ENUMERATORS));
+}
+
+const ASTNode *AST::LastNodeOfKind(mx::DeclKind kind) {
+  return index[static_cast<unsigned>(kind)];
+}
+
+const ASTNode *AST::LastNodeOfKind(mx::StmtKind kind) {
+  return index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
+               static_cast<unsigned>(kind)];
+}
+
+const ASTNode *AST::LastNodeOfKind(mx::TokenKind kind) {
+  return index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
+               static_cast<unsigned>(mx::StmtKind::NUM_ENUMERATORS) +
+               static_cast<unsigned>(kind)];
+}
+
 AST AST::Build(mx::Fragment fragment) {
   AST self;
   ASTNode *root = &(self.nodes.emplace_back(fragment));
@@ -91,8 +112,10 @@ AST AST::Build(mx::Fragment fragment) {
          c_it != c_end; ++c_it) {
       const mx::TokenContext &c = *c_it;
       std::optional<ASTNode> dummy;
+      const ASTNode **last_ptr = nullptr;
       if (auto decl = mx::Decl::from(c)) {
         dummy.emplace(*decl);
+        last_ptr = &(self.index[dummy->kind_val]);
 
       } else if (auto stmt = mx::Stmt::from(c)) {
         switch (stmt->kind()) {
@@ -101,6 +124,9 @@ AST AST::Build(mx::Fragment fragment) {
             continue;  // Skip these; they are spam.
           default:
             dummy.emplace(*stmt);
+            last_ptr =
+                &(self.index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
+                             dummy->kind_val]);
             break;
         }
 
@@ -114,6 +140,8 @@ AST AST::Build(mx::Fragment fragment) {
       // Need to add a new branch.
       if (curr_children.empty()) {
         auto next_curr = &(self.nodes.emplace_back(std::move(*dummy)));
+        next_curr->prev_of_kind = *last_ptr;
+        *last_ptr = next_curr;
         curr_children.emplace_back(next_curr);
         curr = next_curr;
         continue;
@@ -124,6 +152,8 @@ AST AST::Build(mx::Fragment fragment) {
       if (last_child->kind != dummy->kind ||
           last_child->kind_val != dummy->kind_val) {
         auto next_curr = &(self.nodes.emplace_back(std::move(*dummy)));
+        next_curr->prev_of_kind = *last_ptr;
+        *last_ptr = next_curr;
         curr_children.emplace_back(next_curr);
         curr = next_curr;
         continue;
@@ -134,8 +164,14 @@ AST AST::Build(mx::Fragment fragment) {
     }
 
     // Add the token.
-    std::get<ASTNode::ChildVector>(curr->data).emplace_back(
-        &(self.nodes.emplace_back(tok)));
+    ASTNode *tok_node = &(self.nodes.emplace_back(tok));
+    const ASTNode **last_tok_ptr =
+        &(self.index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
+                     static_cast<unsigned>(mx::StmtKind::NUM_ENUMERATORS) +
+                     tok_node->kind_val]);
+    tok_node->prev_of_kind = *last_tok_ptr;
+    *last_tok_ptr = tok_node;
+    std::get<ASTNode::ChildVector>(curr->data).emplace_back(tok_node);
   }
 
   return self;
