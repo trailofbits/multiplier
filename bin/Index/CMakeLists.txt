@@ -28,6 +28,8 @@ add_executable("${exe_name}"
   "PrintTokenGraph.h"
   "SearchAction.cpp"
   "SearchAction.h"
+  "SearchRE2.cpp"
+  "SearchRE2.h"
   "Serialize.cpp"
   "Serialize.h"
   "Serializer.cpp"
@@ -48,6 +50,11 @@ target_link_libraries("${exe_name}"
     "mx-util"
     ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
     ${MX_END_FORCE_LOAD_GROUP}
+    pasta::pasta
+    vast::vast
+    MLIRDLTI
+    MLIRStandard
+    MLIRLLVMIR
 )
 
 if(MX_ENABLE_VAST)

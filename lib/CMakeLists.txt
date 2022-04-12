@@ -199,6 +199,7 @@ add_library("mx-util"
     "Types.cpp"
     "WorkerPool.cpp"
     "Weggli.cpp"
+    "Re2.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -226,6 +227,7 @@ target_link_libraries("mx-util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
+    $<BUILD_INTERFACE:re2>
     RocksDB::rocksdb
     ZLIB::ZLIB
   PUBLIC

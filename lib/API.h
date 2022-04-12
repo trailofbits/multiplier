@@ -268,12 +268,17 @@ class SyntaxQueryResultImpl {
  public:
   using Response = capnp::Response<mx::rpc::Multiplier::SyntaxQueryResults>;
 
+  using ResponseRegEx = capnp::Response<mx::rpc::Multiplier::RegexQueryResults>;
+
   using Ptr = std::shared_ptr<const SyntaxQueryResultImpl>;
 
   virtual ~SyntaxQueryResultImpl(void) noexcept;
 
   SyntaxQueryResultImpl(std::string syntax_, EntityProvider::Ptr ep_,
                         Response response_, bool is_cpp);
+
+  SyntaxQueryResultImpl(std::string syntax_, EntityProvider::Ptr ep_,
+                        ResponseRegEx response_, bool is_cpp);
 
   const std::string syntax;
 
@@ -343,6 +348,9 @@ class RemoteEntityProvider final : public EntityProvider {
 
   SyntaxQueryResultImpl::Ptr SyntaxQuery(
       const Ptr &, std::string query, bool is_cpp) final;
+
+  SyntaxQueryResultImpl::Ptr RegexQuery(
+      const Ptr &, std::string query, bool is_cpp) final;
 };
 
 class InvalidEntityProvider final : public EntityProvider {
@@ -361,6 +369,10 @@ class InvalidEntityProvider final : public EntityProvider {
 
   SyntaxQueryResultImpl::Ptr SyntaxQuery(const Ptr &, std::string query,
                                          bool is_cpp) final;
+
+  SyntaxQueryResultImpl::Ptr RegexQuery(const Ptr &, std::string query,
+                                         bool is_cpp) final;
+
 };
 
 class FileListImpl {

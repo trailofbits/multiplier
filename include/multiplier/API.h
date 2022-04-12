@@ -581,6 +581,7 @@ class SyntaxQueryMatch : public TokenRange {
   friend class SyntaxQueryResultImpl;
 
   std::shared_ptr<const FragmentImpl> frag;
+  std::shared_ptr<const FileImpl> file;
   std::unordered_map<std::string, TokenRange> var_matches;
 
  public:
@@ -717,6 +718,9 @@ class EntityProvider {
 
   virtual std::shared_ptr<const SyntaxQueryResultImpl>
   SyntaxQuery(const Ptr &, std::string query, bool is_cpp) = 0;
+
+  virtual std::shared_ptr<const SyntaxQueryResultImpl>
+  RegexQuery(const Ptr &, std::string query, bool is_cpp) = 0;
 };
 
 // Access to the indexed code.
@@ -748,6 +752,8 @@ class Index {
   std::optional<Fragment> fragment_containing(EntityId) const;
 
   SyntaxQueryResult syntax_query(std::string query, bool is_cpp=false) const;
+
+  SyntaxQueryResult regex_query(std::string regex) const;
 };
 
 class FileManager {

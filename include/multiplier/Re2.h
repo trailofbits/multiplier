@@ -16,9 +16,9 @@
 
 namespace mx {
 
-class WeggliQueryImpl;
+class ReExprImpl;
 
-struct WeggliMatchData final {
+struct ExprMatchData final {
   // raw offset of the query matches captured by Weggli.
   unsigned begin_offset{~0u};
   unsigned end_offset{0u};
@@ -26,24 +26,20 @@ struct WeggliMatchData final {
   std::unordered_map<std::string, std::pair<unsigned, unsigned>> variables;
 };
 
-class WeggliQuery final {
+class ReExpr final {
  public:
-  using TreePtr = void *;
-  using ResultPtr = void *;
-  using ResultsPtr = void *;
-  using UserDataPtr = void *;
 
-  explicit WeggliQuery(std::string_view query, bool is_cpp);
+  explicit ReExpr(std::string_view query, bool is_cpp);
 
-  ~WeggliQuery();
+  ~ReExpr();
 
   void ForEachMatch(std::string_view source,
-                    std::function<bool(const WeggliMatchData &)> cb) const;
+                    std::function<bool(const ExprMatchData &)> cb) const;
 
   bool IsValid(void) const;
 
  private:
-  std::unique_ptr<WeggliQueryImpl> impl;
+  std::unique_ptr<ReExprImpl> impl;
 };
 
-}  // namespace mx
+}

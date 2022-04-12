@@ -28,6 +28,7 @@
 #include "Context.h"
 #include "IndexCompileJob.h"
 #include "SearchAction.h"
+#include "SearchRE2.h"
 
 namespace indexer {
 
@@ -369,6 +370,36 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   for (auto fragment_id : fragment_ids) {
     fragments.set(index++, fragment_id);
   }
+
+  return kj::READY_NOW;
+}
+
+kj::Promise<void> Server::regexQuery(RegexQueryContext context) {
+  // Get params and result context
+  mx::rpc::Multiplier::RegexQueryParams::Reader params =
+      context.getParams();
+
+  auto results = context.initResults();
+  std::string_view regex_string =
+      std::string_view(params.getRegex().cStr(), params.getRegex().size());
+  if (regex_string.empty()) {
+    (void) results.initFragments(0u);
+    return kj::READY_NOW;
+  }
+
+  LOG(INFO)
+      << "Got Regex syntax query: " << regex_string;
+
+  auto sc = std::make_shared<SearchingContext>(d->server_context);
+  mx::ExecutorOptions opts;
+  opts.num_workers = static_cast<int>(d->executor.NumWorkers());
+  mx::Executor executor(opts);
+  executor.Start();
+  for (auto i = 0; i < opts.num_workers; ++i) {
+    executor.EmplaceAction<RE2Action>(sc, regex_string, false);
+  }
+  executor.Wait();
+
 
   return kj::READY_NOW;
 }

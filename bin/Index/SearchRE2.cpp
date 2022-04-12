@@ -1,10 +1,5 @@
-// Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
-//
-// This source code is licensed in accordance with the terms specified in
-// the LICENSE file found in the root directory of this source tree.
 
-#include "SearchAction.h"
+#include "SearchRE2.h"
 
 #include <capnp/message.h>
 #include <capnp/serialize.h>
@@ -22,13 +17,16 @@
 #include <tuple>
 #include <vector>
 
+#include <re2/re2.h>
+
+
 #include "Context.h"
 #include "Compress.h"
 #include "Util.h"
 
 namespace indexer {
 
-void SearchAction::FillFileContents(mx::FileId file_id) {
+void RE2Action::FillFileContents(mx::FileId file_id) {
 
   file_contents.clear();
   auto maybe_contents = context->GetSerializedFile(file_id);
@@ -51,7 +49,7 @@ void SearchAction::FillFileContents(mx::FileId file_id) {
   });
 }
 
-void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
+void RE2Action::QuerySyntaxInFile(mx::FileId file_id) {
 
   // Get the contents of the file. We may fail, which is OK, and generally
   // implies a bad file id. There can be small gaps in the file ID space, which
@@ -76,9 +74,9 @@ void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
     }
   }
 
-  query_tree.ForEachMatch(
+  regex.ForEachMatch(
       file_contents,
-      [this, file_id] (const mx::WeggliMatchData &match) -> bool {
+      [this, file_id] (const mx::ExprMatchData &match) -> bool {
         unsigned prev_line = 0;
         std::cerr << "match at [" << match.begin_offset << ", " << match.end_offset << ")\n";
         for (auto i = match.begin_offset; i < match.end_offset; ++i) {
@@ -96,16 +94,18 @@ void SearchAction::QuerySyntaxInFile(mx::FileId file_id) {
       });
 }
 
-SearchAction::~SearchAction(void) {}
 
-SearchAction::SearchAction(
+
+RE2Action::~RE2Action(void) {}
+
+RE2Action::RE2Action(
     std::shared_ptr<SearchingContext> context_,
-    std::string_view syntax, bool is_cpp)
+    std::string_view regex_string, bool is_cpp)
     : context(std::move(context_)),
-      query_tree(syntax, is_cpp) {}
+      regex(regex_string, is_cpp) {}
 
-void SearchAction::Run(mx::Executor, mx::WorkerId) {
-  if (!query_tree.IsValid()) {
+void RE2Action::Run(mx::Executor, mx::WorkerId) {
+  if (!regex.IsValid()) {
     DLOG(ERROR)
         << "Query is not valid";
     return;
@@ -120,4 +120,4 @@ void SearchAction::Run(mx::Executor, mx::WorkerId) {
   }
 }
 
-} // namespace indexer
+}

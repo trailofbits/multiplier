@@ -59,6 +59,8 @@ class Server final : public mx::rpc::Multiplier::Server {
   kj::Promise<void> downloadFragment(DownloadFragmentContext context) final;
 
   kj::Promise<void> syntaxQuery(SyntaxQueryContext context) final;
+
+  kj::Promise<void> regexQuery(RegexQueryContext context) final;
 };
 
 }  // namespace indexer

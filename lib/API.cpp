@@ -384,6 +384,17 @@ SyntaxQueryResultImpl::SyntaxQueryResultImpl(
   }
 }
 
+SyntaxQueryResultImpl::SyntaxQueryResultImpl(
+    std::string syntax_, EntityProvider::Ptr ep_, ResponseRegEx response,
+    bool is_cpp)
+    : syntax(syntax_),
+      ep(ep_),
+      query(syntax_, is_cpp) {
+  for (auto frag_id : response.getFragments()) {
+    fragments.emplace_back().first = frag_id;
+  }
+}
+
 FragmentImpl::Ptr SyntaxQueryResultImpl::GetFragmentAtIndex(unsigned index) const {
   auto &entry = fragments[index];
   auto frag = entry.second.lock();
@@ -568,6 +579,29 @@ SyntaxQueryResultImpl::Ptr RemoteEntityProvider::SyntaxQuery(
   }
 }
 
+SyntaxQueryResultImpl::Ptr RemoteEntityProvider::RegexQuery(
+    const Ptr &self, std::string regex, bool is_cpp) {
+  ClientConnection &cc = Connection();
+  capnp::Request<mx::rpc::Multiplier::RegexQueryParams,
+                 mx::rpc::Multiplier::RegexQueryResults>
+      request = cc.client.regexQueryRequest();
+
+  request.setRegex(regex);
+  request.setIsCpp(false);
+
+  try {
+    return std::make_shared<SyntaxQueryResultImpl>(
+        regex,
+        std::move(self),
+        request.send().wait(cc.connection.getWaitScope()),
+        false);
+  } catch (...) {
+    return {};
+  }
+
+}
+
+
 InvalidEntityProvider::~InvalidEntityProvider(void) noexcept {}
 
 // Get the current list of parsed files, where the minimum ID
@@ -590,6 +624,12 @@ SyntaxQueryResultImpl::Ptr InvalidEntityProvider::SyntaxQuery(
     const Ptr &, std::string, bool is_cpp) {
   return {};
 }
+
+SyntaxQueryResultImpl::Ptr InvalidEntityProvider::RegexQuery(
+    const Ptr &, std::string, bool is_cpp) {
+  return {};
+}
+
 
 Token::Token(void)
     : impl(kInvalidTokenReader),
@@ -879,6 +919,10 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
 
 SyntaxQueryResult Index::syntax_query(std::string query, bool is_cpp) const {
   return SyntaxQueryResult(impl->SyntaxQuery(impl, std::move(query), is_cpp));
+}
+
+SyntaxQueryResult Index::regex_query(std::string query) const {
+  return SyntaxQueryResult(impl->RegexQuery(impl, std::move(query), false));
 }
 
 FileListImpl::FileListImpl(EntityProvider::Ptr ep_)

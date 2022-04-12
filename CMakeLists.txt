@@ -34,7 +34,7 @@ include("cmake/llvm.cmake")
 
 if(MX_ENABLE_WEGGLI)
   include("cmake/Corrosion.cmake")
-  find_program(CBINDGEN cbindgen)
+  find_program(CBINDGEN cbindgen REQUIRED HINTS "$ENV{HOME}/.cargo/bin")
 endif(MX_ENABLE_WEGGLI)
 
 if(MX_ENABLE_INSTALL)

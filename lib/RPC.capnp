@@ -153,4 +153,7 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
 
   # Search code fragments matches with the query
   syntaxQuery @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
+ 
+  # Query for a regular expression match
+  regexQuery @5 (regex :Text, isCpp :Bool) -> (file: List(FileInfo), fragments :List(UInt64));
 }
