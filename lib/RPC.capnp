@@ -135,6 +135,11 @@ struct Fragment @0xe5f27760091f9a3a {
   mlir @12 :Text;
 }
 
+struct RegexMatch @0xc119a143d978fd1e {
+  fileId @0 :UInt64;
+  fragmentId @1 : UInt64;
+}
+
 interface Multiplier @0xb0c484f9ec88f1d6 {
   
   # Tell Multiplier to index a compile command.
@@ -155,5 +160,5 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   syntaxQuery @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
  
   # Query for a regular expression match
-  regexQuery @5 (regex :Text, isCpp :Bool) -> (file: List(FileInfo), fragments :List(UInt64));
+  regexQuery @5 (regex :Text) -> (matches : List(RegexMatch));
 }

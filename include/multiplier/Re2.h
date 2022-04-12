@@ -16,30 +16,25 @@
 
 namespace mx {
 
-class ReExprImpl;
+class RegExprImpl;
 
-struct ExprMatchData final {
-  // raw offset of the query matches captured by Weggli.
-  unsigned begin_offset{~0u};
-  unsigned end_offset{0u};
-
-  std::unordered_map<std::string, std::pair<unsigned, unsigned>> variables;
-};
-
-class ReExpr final {
+class RegExpr final {
  public:
 
-  explicit ReExpr(std::string_view query, bool is_cpp);
+  explicit RegExpr(std::string_view pattern);
 
-  ~ReExpr();
+  ~RegExpr();
 
-  void ForEachMatch(std::string_view source,
-                    std::function<bool(const ExprMatchData &)> cb) const;
+  void ForEachMatch(
+      std::string_view source,
+      std::function<bool(const std::string &pattern,
+                         unsigned begin_offset,
+                         unsigned end_offset)> cb) const;
 
   bool IsValid(void) const;
 
  private:
-  std::unique_ptr<ReExprImpl> impl;
+  std::unique_ptr<RegExprImpl> impl;
 };
 
 }

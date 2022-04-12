@@ -8,6 +8,7 @@
 
 #include <multiplier/API.h>
 #include <multiplier/Weggli.h>
+#include <multiplier/Re2.h>
 
 #include <capnp/ez-rpc.h>
 #include <capnp/message.h>
@@ -268,17 +269,12 @@ class SyntaxQueryResultImpl {
  public:
   using Response = capnp::Response<mx::rpc::Multiplier::SyntaxQueryResults>;
 
-  using ResponseRegEx = capnp::Response<mx::rpc::Multiplier::RegexQueryResults>;
-
   using Ptr = std::shared_ptr<const SyntaxQueryResultImpl>;
 
   virtual ~SyntaxQueryResultImpl(void) noexcept;
 
   SyntaxQueryResultImpl(std::string syntax_, EntityProvider::Ptr ep_,
                         Response response_, bool is_cpp);
-
-  SyntaxQueryResultImpl(std::string syntax_, EntityProvider::Ptr ep_,
-                        ResponseRegEx response_, bool is_cpp);
 
   const std::string syntax;
 
@@ -305,6 +301,62 @@ class SyntaxQueryResultImpl {
   EntityId EntityContainingOffset(unsigned offset) const;
 
   void GetUnparsedTokens(TokenSubstitutionList nodes) const;
+};
+
+class RegexQueryResultImpl {
+ public:
+  using Response = capnp::Response<mx::rpc::Multiplier::RegexQueryResults>;
+
+  using Ptr = std::shared_ptr<const RegexQueryResultImpl>;
+
+  virtual ~RegexQueryResultImpl(void) noexcept;
+
+  RegexQueryResultImpl(
+          std::string syntax_, EntityProvider::Ptr ep_, Response response_);
+
+  const std::string pattern;
+
+  // Needed for us to be able to look up the file containing this fragment,
+  // or look up entities related to other fragments.
+  const EntityProvider::Ptr ep;
+
+  // Client-local version of the query to be run on each fragment.
+  const RegExpr re;
+
+  // Buffer of fragment data.
+  mutable std::string fragment_buffer;
+  mutable std::map<unsigned, EntityId> offset_to_token;
+
+  mutable mx::FragmentId fragment_buffer_id{kInvalidEntityId};
+
+  mutable std::string file_buffer;
+
+  mutable mx::FileId file_buffer_id{kInvalidEntityId};
+
+  mutable std::vector<std::tuple<
+  std::string, unsigned, unsigned>> regex_matches;
+
+  mutable unsigned next_regex_match{0};
+
+  // List of fragments that matches
+  mutable std::vector<std::pair<mx::FragmentId,
+                      std::weak_ptr<const FragmentImpl>>> fragments;
+
+  // Lust of files that matches
+  mutable std::vector<std::pair<mx::FileId,
+                      std::weak_ptr<const FileImpl>>> files;
+
+  mutable std::vector<std::tuple<mx::FileId, mx::FragmentId>> matches;
+
+  FragmentImpl::Ptr GetFragmentAtIndex(unsigned index) const;
+
+  FileImpl::Ptr GetFileAtIndex(unsigned index) const;
+
+  EntityId EntityContainingOffset(unsigned offset) const;
+
+  void GetUnparsedTokens(TokenSubstitutionList nodes) const;
+
+  void GetFileContents(File) const;
 };
 
 // Provides entities from a remote source, i.e. a remote
@@ -349,8 +401,8 @@ class RemoteEntityProvider final : public EntityProvider {
   SyntaxQueryResultImpl::Ptr SyntaxQuery(
       const Ptr &, std::string query, bool is_cpp) final;
 
-  SyntaxQueryResultImpl::Ptr RegexQuery(
-      const Ptr &, std::string query, bool is_cpp) final;
+  RegexQueryResultImpl::Ptr RegexQuery(
+      const Ptr &, std::string pattern) final;
 };
 
 class InvalidEntityProvider final : public EntityProvider {
@@ -370,9 +422,8 @@ class InvalidEntityProvider final : public EntityProvider {
   SyntaxQueryResultImpl::Ptr SyntaxQuery(const Ptr &, std::string query,
                                          bool is_cpp) final;
 
-  SyntaxQueryResultImpl::Ptr RegexQuery(const Ptr &, std::string query,
-                                         bool is_cpp) final;
-
+  RegexQueryResultImpl::Ptr RegexQuery(
+      const Ptr &, std::string pattern) final;
 };
 
 class FileListImpl {

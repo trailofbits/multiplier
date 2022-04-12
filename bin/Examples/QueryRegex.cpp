@@ -65,8 +65,8 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  for (mx::SyntaxQueryMatch match : index.regex_query(FLAGS_regex)) {
-    mx::Fragment frag = mx::Fragment::containing(match);
+  for (mx::RegexMatch match : index.regex_query(FLAGS_regex)) {
+   mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);
     auto sep = "\t";
     std::cout << frag.id() << sep << GetFileContaining(index, file.id())

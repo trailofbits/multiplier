@@ -32,11 +32,15 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class RemoteEntityProvider;
+class RegexMatchIterator;
+class RegexMatch;
+class RegexQueryResultImpl;
+class RegexQueryResult;
 class InvalidEntityProvider;
 class SyntaxQueryMatch;
+class SyntaxQueryResultIterator;
 class SyntaxQueryResult;
 class SyntaxQueryResultImpl;
-class SyntaxQueryResultIterator;
 class Token;
 class TokenList;
 class TokenListIterator;
@@ -159,6 +163,7 @@ class TokenRange {
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class RegexMatchIterator;
   friend class SyntaxQueryResultIterator;
   friend class TokenList;
   friend class TokenSubstitutionListIterator;
@@ -379,6 +384,8 @@ class File {
   friend class FragmentImpl;
   friend class Index;
   friend class RemoteEntityProvider;
+  friend class RegexMatchIterator;
+  friend class RegexQueryResultImpl;
   friend class Token;
   friend class TokenSubstitutionListIterator;
 
@@ -526,6 +533,7 @@ class Fragment {
   friend class FragmentList;
   friend class Index;
   friend class RemoteEntityProvider;
+  friend class RegexMatchIterator;
   friend class Stmt;
   friend class Token;
   friend class TokenSubstitutionListIterator;
@@ -543,6 +551,8 @@ class Fragment {
 
   // Return the fragment containing a query match.
   static Fragment containing(const SyntaxQueryMatch &);
+
+  static Fragment containing(const RegexMatch &);
 
   // Return the ID of this fragment.
   FragmentId id(void) const noexcept;
@@ -580,8 +590,9 @@ class SyntaxQueryMatch : public TokenRange {
   friend class SyntaxQueryResult;
   friend class SyntaxQueryResultImpl;
 
+  // Fragment with the match
   std::shared_ptr<const FragmentImpl> frag;
-  std::shared_ptr<const FileImpl> file;
+  // Map variables with token range
   std::unordered_map<std::string, TokenRange> var_matches;
 
  public:
@@ -603,6 +614,7 @@ class SyntaxQueryResultIterator {
   friend class SyntaxQueryResult;
 
   std::shared_ptr<const SyntaxQueryResultImpl> impl;
+
   unsigned index;
   unsigned num_fragments;
   std::optional<SyntaxQueryMatch> result;
@@ -639,6 +651,7 @@ class SyntaxQueryResultIterator {
 
   // Pre-increment.
   inline SyntaxQueryResultIterator &operator++(void) noexcept {
+    ++index;
     Advance();
     return *this;
   }
@@ -663,6 +676,115 @@ class SyntaxQueryResult {
   // Return an iterator pointing at the first token in this list.
   inline SyntaxQueryResultIterator begin(void) const noexcept {
     return SyntaxQueryResultIterator(impl, 0, num_fragments);
+  }
+
+  inline IteratorEnd end(void) const noexcept {
+    return {};
+  }
+};
+
+// The range of tokens that matches regex
+class RegexMatch : public TokenRange {
+ private:
+  friend class Fragment;
+  friend class File;
+  friend class RegexQueryResult;
+  friend class RegexQueryResultImpl;
+
+  // Fragment with the match
+  std::shared_ptr<const FragmentImpl> frag;
+  // File with the match
+  std::shared_ptr<const FileImpl> file;
+  // Map variables with token range
+  std::unordered_map<std::string, TokenRange> variable_matches;
+
+ public:
+  RegexMatch(
+      std::shared_ptr<const FragmentImpl> frag_,
+      std::shared_ptr<const FileImpl> file_,
+      std::shared_ptr<const TokenReader> impl_,
+      unsigned index_, unsigned num_tokens_,
+      std::unordered_map<std::string, TokenRange> variable_matches_);
+
+  // Return the match results for a specific meta-variable.
+  std::optional<TokenRange> MatchFor(const std::string &var) const;
+
+  // Return a list of matched variables.
+  std::vector<std::string> MatchedVariables(void) const;
+
+  bool IsFragmentMatch(void) const {
+    return frag != nullptr;
+  }
+};
+
+class RegexMatchIterator {
+ private:
+  friend class RegexQueryResult;
+
+  std::shared_ptr<const RegexQueryResultImpl> impl;
+
+  unsigned index;
+  unsigned num_matches;
+
+  std::optional<RegexMatch> result;
+
+  // Try to advance to the next result. There can be multiple results per
+  // fragment.
+  void Advance(void);
+
+  inline RegexMatchIterator(
+      std::shared_ptr<const RegexQueryResultImpl> impl_,
+      unsigned index_, unsigned num_matches_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_matches(num_matches_) {
+    Advance();
+  }
+
+ public:
+  inline const RegexMatch &operator*(void) const noexcept {
+    return result.value();
+  }
+
+  inline const RegexMatch *operator->(void) const noexcept {
+    return std::addressof(result.value());
+  }
+
+  inline bool operator==(IteratorEnd) const noexcept {
+    return index >= num_matches;
+  }
+
+  inline bool operator!=(IteratorEnd) const noexcept {
+    return index < num_matches;
+  }
+
+  // Pre-increment.
+  inline RegexMatchIterator &operator++(void) noexcept {
+    ++index;
+    Advance();
+    return *this;
+  }
+};
+
+class RegexQueryResult {
+ private:
+
+  using Ptr = std::shared_ptr<const RegexQueryResult>;
+
+  friend class EntityProvider;
+  friend class RemoteEntityProvider;
+  friend class InvalidEntityProvider;
+  friend class RegexMatchIterator;
+
+  std::shared_ptr<const RegexQueryResultImpl> impl;
+  unsigned num_fragments;
+
+ public:
+  RegexQueryResult(std::shared_ptr<const RegexQueryResultImpl> impl_);
+
+  // Return an iterator pointing at the first token in this list.
+  inline RegexMatchIterator begin(void) const noexcept {
+    return RegexMatchIterator(impl, 0, num_fragments);
   }
 
   inline IteratorEnd end(void) const noexcept {
@@ -702,6 +824,7 @@ class EntityProvider {
   friend class FragmentImpl;
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
+  friend class RegexQueryResultImpl;
   friend class SyntaxQueryResultImpl;
 
   // Get the current list of parsed files, where the minimum ID
@@ -719,8 +842,8 @@ class EntityProvider {
   virtual std::shared_ptr<const SyntaxQueryResultImpl>
   SyntaxQuery(const Ptr &, std::string query, bool is_cpp) = 0;
 
-  virtual std::shared_ptr<const SyntaxQueryResultImpl>
-  RegexQuery(const Ptr &, std::string query, bool is_cpp) = 0;
+  virtual std::shared_ptr<const RegexQueryResultImpl>
+  RegexQuery(const Ptr &, std::string pattern) = 0;
 };
 
 // Access to the indexed code.
@@ -753,7 +876,7 @@ class Index {
 
   SyntaxQueryResult syntax_query(std::string query, bool is_cpp=false) const;
 
-  SyntaxQueryResult regex_query(std::string regex) const;
+  RegexQueryResult regex_query(std::string regex) const;
 };
 
 class FileManager {

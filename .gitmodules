@@ -7,6 +7,3 @@
 [submodule "vendor/weggli_native/src"]
 	path = vendor/weggli_native/src
 	url = https://github.com/trailofbits/weggli-native.git
-[submodule "vendor/re2/src"]
-	path = vendor/re2/src
-	url = https://github.com/google/re2.git

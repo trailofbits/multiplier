@@ -27,8 +27,8 @@
 
 #include "Context.h"
 #include "IndexCompileJob.h"
+#include "RegexSearchAction.h"
 #include "SearchAction.h"
-#include "SearchRE2.h"
 
 namespace indexer {
 
@@ -380,15 +380,15 @@ kj::Promise<void> Server::regexQuery(RegexQueryContext context) {
       context.getParams();
 
   auto results = context.initResults();
-  std::string_view regex_string =
+  std::string_view pattern =
       std::string_view(params.getRegex().cStr(), params.getRegex().size());
-  if (regex_string.empty()) {
-    (void) results.initFragments(0u);
+  if (pattern.empty()) {
+    (void) results.initMatches(0u);
     return kj::READY_NOW;
   }
 
   LOG(INFO)
-      << "Got Regex syntax query: " << regex_string;
+      << "Got regex expression to query: " << pattern;
 
   auto sc = std::make_shared<SearchingContext>(d->server_context);
   mx::ExecutorOptions opts;
@@ -396,10 +396,29 @@ kj::Promise<void> Server::regexQuery(RegexQueryContext context) {
   mx::Executor executor(opts);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
-    executor.EmplaceAction<RE2Action>(sc, regex_string, false);
+    executor.EmplaceAction<RegexSearchAction>(sc, pattern);
   }
   executor.Wait();
 
+  // Convert the file file:line pairs into overlapping fragment IDs.
+  std::set<std::tuple<mx::FileId, mx::FragmentId>> matches;
+  for (auto prefix : sc->line_results) {
+    d->server_context.file_fragment_lines.ScanPrefix(
+        prefix, [&matches] (mx::FileId file_id, unsigned, mx::FragmentId frag_id) {
+      std::string file_path;
+      matches.emplace(file_id, frag_id);
+      return true;
+    });
+  }
+
+  auto num_files = static_cast<unsigned>(matches.size());
+  auto match_builder = results.initMatches(num_files);
+  auto index = 0u;
+  for (auto &match : matches) {
+    mx::rpc::RegexMatch::Builder info = match_builder[index++];
+    info.setFileId(std::get<0>(match));
+    info.setFragmentId(std::get<1>(match));
+  }
 
   return kj::READY_NOW;
 }

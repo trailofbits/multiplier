@@ -83,6 +83,7 @@ add_library("mx-api"
     "Compress.cpp"
     "Types.cpp"
     "Weggli.cpp"
+    "Re2.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -109,6 +110,7 @@ target_link_libraries("mx-api"
   PRIVATE
     CapnProto::capnp-rpc
     ZLIB::ZLIB
+    re2::re2
 )
 
 # Add in Weggli.
@@ -227,13 +229,13 @@ target_link_libraries("mx-util"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
-    $<BUILD_INTERFACE:re2>
     RocksDB::rocksdb
     ZLIB::ZLIB
   PUBLIC
     glog::glog
     gflags::gflags
     CapnProto::capnp-rpc
+    re2::re2
 )
 
 if(MX_ENABLE_WEGGLI)

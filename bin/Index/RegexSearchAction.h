@@ -15,24 +15,26 @@
 
 namespace indexer {
 
-class RE2Action final : public mx::Action {
+class RegexSearchAction final : public mx::Action {
  private:
   const std::shared_ptr<SearchingContext> context;
 
-  const mx::ReExpr regex;
+  const mx::RegExpr regex;
 
   std::string file_contents;
-  std::map<unsigned, unsigned> eol_offset_to_line_num;
+  std::map<unsigned, unsigned> offset_to_line_num;
 
   void FillFileContents(mx::FileId);
 
  public:
-  virtual ~RE2Action(void);
+  virtual ~RegexSearchAction(void);
 
-  RE2Action(std::shared_ptr<SearchingContext> context_,
-               std::string_view regex_string, bool is_cpp);
+  RegexSearchAction(std::shared_ptr<SearchingContext> context_,
+                    std::string_view pattern);
 
-  void QuerySyntaxInFile(mx::FileId file_id);
+  void QueryExprInFile(mx::FileId file_id);
+
+  void FileOffsetToLine(void);
 
   // Build and index the AST.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;
