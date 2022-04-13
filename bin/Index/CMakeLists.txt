@@ -44,21 +44,21 @@ add_executable("${exe_name}"
 
 target_link_libraries("${exe_name}"
   PRIVATE
+    ${MX_BEGIN_FORCE_LOAD_GROUP}
     "mx-util"
-    pasta::pasta
-    vast::vast
-    MLIRDLTI
-    MLIRStandard
-    MLIRLLVMIR
+    ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
+    ${MX_END_FORCE_LOAD_GROUP}
 )
 
 if(MX_ENABLE_VAST)
   target_link_libraries("${exe_name}"
     PRIVATE
+      ${MX_BEGIN_FORCE_LOAD_GROUP}
       vast::vast
       MLIRDLTI
       MLIRStandard
       MLIRLLVMIR
+      ${MX_END_FORCE_LOAD_GROUP}
   )
 else()
   target_compile_definitions("${exe_name}"

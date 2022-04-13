@@ -27,6 +27,8 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_VISIBILITY_PRESET hidden) 
 set(VISIBILITY_INLINES_HIDDEN YES)
 
+list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
+
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 
@@ -41,6 +43,7 @@ endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
 
+find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
 find_package(CapnProto CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(gflags CONFIG REQUIRED)
@@ -51,10 +54,11 @@ find_package(Clang CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
-find_package(vast CONFIG REQUIRED)
-find_package(MLIR CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
-
+if(MX_ENABLE_VAST)
+  find_package(vast CONFIG REQUIRED)
+  find_package(MLIR CONFIG REQUIRED)
+endif(MX_ENABLE_VAST)
 
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
