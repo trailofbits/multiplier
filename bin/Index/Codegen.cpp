@@ -4,6 +4,9 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include "Codegen.h"
+
+#ifndef MX_DISABLE_SOURCEIR
 #include <clang/AST/ASTContext.h>
 #include <clang/Tooling/Tooling.h>
 #include <mlir/IR/Builders.h>
@@ -11,19 +14,19 @@
 #include <vast/Translation/CodeGen.hpp>
 
 #include <glog/logging.h>
+#endif  // MX_DISABLE_SOURCEIR
 
-#include "Codegen.h"
 #include "Context.h"
 
 namespace indexer {
 
+#ifndef MX_DISABLE_SOURCEIR
 class CodeGenVisitor final : public pasta::DeclVisitor {
  public:
   virtual ~CodeGenVisitor(void) = default;
 
-  explicit CodeGenVisitor(
-      vast::hl::module_owning_ref &mod_,
-      vast::hl::high_level_codegen *gen_)
+  explicit CodeGenVisitor(vast::hl::module_owning_ref &mod_,
+                          vast::hl::high_level_codegen *gen_)
       : mod(mod_), gen(gen_) {}
 
   void VisitDeclContext(const pasta::DeclContext &dc) {
@@ -65,7 +68,6 @@ class CodeGenVisitor final : public pasta::DeclVisitor {
   vast::hl::module_owning_ref &mod;
   vast::hl::high_level_codegen *gen;
 };
-
 
 class CodeGenerator::Impl {
  public:
@@ -126,8 +128,10 @@ void CodeGenerator::GenerateSourceIRFromTLDs(
 }
 
 // Generate source IR from the TLDs
-std::string ConvertToSourceIR(std::shared_ptr<IndexingContext> context,
-                              mx::FragmentId code_id, const std::vector<pasta::Decl> &decls) {
+std::string ConvertToSourceIR(
+    std::shared_ptr<IndexingContext> context,
+    mx::FragmentId code_id, const std::vector<pasta::Decl> &decls) {
+
   // Get the instance of code generator
   if (auto codegen = context->codegen.get(); codegen) {
     std::string ir_string;
@@ -155,5 +159,22 @@ std::string ConvertToSourceIR(std::shared_ptr<IndexingContext> context,
   return {};
 }
 
+#else
+
+CodeGenerator::CodeGenerator(void) {}
+
+CodeGenerator::~CodeGenerator(void) {}
+
+void CodeGenerator::GenerateSourceIRFromTLDs(
+    std::string, const std::vector<pasta::Decl> &,
+    std::string &) {}
+
+// Generate source IR from the TLDs
+std::string ConvertToSourceIR(
+    std::shared_ptr<IndexingContext>,
+    mx::FragmentId, const std::vector<pasta::Decl> &) {
+  return {};
+}
+#endif  // MX_DISABLE_SOURCEIR
 
 } // namespace indexer

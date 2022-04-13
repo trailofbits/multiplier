@@ -52,6 +52,21 @@ target_link_libraries("${exe_name}"
     MLIRLLVMIR
 )
 
+if(MX_ENABLE_VAST)
+  target_link_libraries("${exe_name}"
+    PRIVATE
+      vast::vast
+      MLIRDLTI
+      MLIRStandard
+      MLIRLLVMIR
+  )
+else()
+  target_compile_definitions("${exe_name}"
+    PRIVATE
+      "MX_DISABLE_SOURCEIR"
+  )
+endif()
+
 add_executable("${PROJECT_NAME}::${exe_name}" ALIAS "${exe_name}")
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 

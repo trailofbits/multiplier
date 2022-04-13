@@ -566,8 +566,10 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   for (PendingFragment &pending_fragment : pending_fragments) {
 	  // Generate source IR before saving the fragments to the persistent
 	  // storage
-	auto mlir = ConvertToSourceIR(context, pending_fragment.fragment_id, pending_fragment.decls);
-	PersistFragment(*context, serializer, std::move(pending_fragment), std::move(mlir));
+    auto mlir = ConvertToSourceIR(context, pending_fragment.fragment_id,
+                                  pending_fragment.decls);
+    PersistFragment(*context, serializer, std::move(pending_fragment),
+                    std::move(mlir));
   }
 }
 

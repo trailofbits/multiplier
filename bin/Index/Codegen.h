@@ -40,7 +40,8 @@ class CodeGenerator {
 // the top-level declaration is not `FunctionDecl`, it will visit
 // AST node and generate source ir for function decl found.
 
-std::string ConvertToSourceIR(std::shared_ptr<IndexingContext> context,
-                              mx::FragmentId code_id, const std::vector<pasta::Decl> &decls);
+std::string ConvertToSourceIR(
+    std::shared_ptr<IndexingContext> context,
+    mx::FragmentId code_id, const std::vector<pasta::Decl> &decls);
 
-}
+}  // namespace indexer
