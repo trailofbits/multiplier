@@ -18,7 +18,7 @@ subdirectories, `scripts` and `installed`. Rename the extracted directory to
 RELEASE_VERSION=v0.2.1
 RELEASE_NAME=vcpkg_macos-11_llvm-13_xcode-13.0_amd64
 VCPKG_ROOT="${WORKSPACE_DIR}/vcpkg-install"
-VCPKG_TARGET_TRIPLET=x64-osx
+VCPKG_TARGET_TRIPLET=x64-osx-rel
 
 
 wget "https://github.com/lifting-bits/cxx-common/releases/download/${RELEASE_VERSION}/${RELEASE_NAME}.tar.xz" -P "${WORKSPACE_DIR}"
@@ -139,7 +139,7 @@ cd "${WORKSPACE_DIR}/build/pasta"
 cmake \
   -DCMAKE_BUILD_TYPE=Release \
   "-DCMAKE_INSTALL_PREFIX=${WORKSPACE_DIR}/install" \
-  "-DVCPKG_ROOT=${VCPKG_ROOT" \
+  "-DVCPKG_ROOT=${VCPKG_ROOT}" \
   "-DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}" \
   "-DCMAKE_C_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang" \
   "-DCMAKE_CXX_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang++" \
@@ -156,7 +156,7 @@ make install -j13
 
 ```shell
 cd "${WORKSPACE_DIR}/src"
-git clone git@github.com:trailofbits/multiplier.git
+git clone --recurse git@github.com:trailofbits/multiplier.git
 ```
 
 ```shell
@@ -165,7 +165,7 @@ cd "${WORKSPACE_DIR}/build/multiplier"
 cmake \
   -DCMAKE_BUILD_TYPE=Release \
   "-DCMAKE_INSTALL_PREFIX=${WORKSPACE_DIR}/install" \
-  "-DVCPKG_ROOT=${VCPKG_ROOT" \
+  "-DVCPKG_ROOT=${VCPKG_ROOT}" \
   "-DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}" \
   "-DCMAKE_C_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang" \
   "-DCMAKE_CXX_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang++" \
