@@ -1,5 +1,10 @@
+// Copyright (c) 2022-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
 
-#include "RegexSearchAction.h"
+#include "WeggliSearchAction.h"
 
 #include <capnp/message.h>
 #include <capnp/serialize.h>
@@ -17,16 +22,13 @@
 #include <tuple>
 #include <vector>
 
-#include <re2/re2.h>
-
-
 #include "Context.h"
 #include "Compress.h"
 #include "Util.h"
 
 namespace indexer {
 
-void RegexSearchAction::QueryExprInFile(mx::FileId file_id) {
+void WeggliSearchAction::QuerySyntaxInFile(mx::FileId file_id) {
 
   // Get the contents of the file. We may fail, which is OK, and generally
   // implies a bad file id. There can be small gaps in the file ID space, which
@@ -43,19 +45,20 @@ void RegexSearchAction::QueryExprInFile(mx::FileId file_id) {
     std::string_view file_contents(file.getData().cStr(),
                                    file.getData().size());
 
-    offset_to_line_num.clear();
+    eol_offset_to_line_num.clear();
     for (mx::rpc::UpperBound::Reader ubr : file.getEolOffsets()) {
-      offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
+      eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
     }
 
-    LOG(INFO) << "Looking for RE2 matches in file with id " << file_id;
-    regex.ForEachMatch(
+    LOG(INFO) << "Looking for Weggli matches in file with id " << file_id;
+
+    query_tree.ForEachMatch(
         file_contents,
-        [=] (const std::string &, unsigned begin, unsigned end) -> bool {
+        [=] (const mx::WeggliMatchData &match) -> bool {
           unsigned prev_line = 0;
-          for (auto i = begin; i < end; ++i) {
-            auto line_it = offset_to_line_num.upper_bound(i);
-            if (line_it != offset_to_line_num.end()) {
+          for (auto i = match.begin_offset; i < match.end_offset; ++i) {
+            auto line_it = eol_offset_to_line_num.upper_bound(i);
+            if (line_it != eol_offset_to_line_num.end()) {
               auto line = line_it->second;
               if (line != prev_line) {
                 prev_line = line;
@@ -69,18 +72,18 @@ void RegexSearchAction::QueryExprInFile(mx::FileId file_id) {
   });
 }
 
-RegexSearchAction::~RegexSearchAction(void) {}
+WeggliSearchAction::~WeggliSearchAction(void) {}
 
-RegexSearchAction::RegexSearchAction(
+WeggliSearchAction::WeggliSearchAction(
     std::shared_ptr<SearchingContext> context_,
-    std::string_view pattern)
+    std::string_view syntax, bool is_cpp)
     : context(std::move(context_)),
-      regex(pattern) {}
+      query_tree(syntax, is_cpp) {}
 
-void RegexSearchAction::Run(mx::Executor, mx::WorkerId) {
-  if (!regex.IsValid()) {
+void WeggliSearchAction::Run(mx::Executor, mx::WorkerId) {
+  if (!query_tree.IsValid()) {
     DLOG(ERROR)
-        << "Regex expression is not valid";
+        << "Query is not valid";
     return;
   }
 
@@ -89,8 +92,8 @@ void RegexSearchAction::Run(mx::Executor, mx::WorkerId) {
     if (file_id >= context->server_context.next_file_id.load()) {
       break;
     }
-    QueryExprInFile(file_id);
+    QuerySyntaxInFile(file_id);
   }
 }
 
-}  // namespace indexer
+} // namespace indexer

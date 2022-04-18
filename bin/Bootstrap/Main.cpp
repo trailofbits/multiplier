@@ -509,6 +509,9 @@ class CodeGenerator {
   std::optional<pasta::EnumDecl> objc_at_keywords;
   std::optional<pasta::EnumDecl> token_role;
 
+  std::unordered_map<std::string, std::pair<const char *, const char *>>
+      enum_type;
+
   std::stringstream header_enum_ss;
 
   void RunOnEnum(pasta::EnumDecl enum_decl);
@@ -548,8 +551,20 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     return;
   }
 
+  auto enumerators = enum_decl.Enumerators();
+  auto num_enumerators = enumerators.size();
   auto itype = CxxIntType(enum_decl.IntegerType());
-  include_h_os << "enum class " << enum_name << " : unsigned short {\n";
+
+  auto &types = enum_type[enum_name];
+  if (static_cast<uint8_t>(num_enumerators) == num_enumerators) {
+    types.first = "unsigned char";
+    types.second = "UInt8";
+  } else {
+    types.first = "unsigned short";
+    types.second = "UInt16";
+  }
+
+  include_h_os << "enum class " << enum_name << " : " << types.first << " {\n";
   lib_cpp_os
       << enum_name << " FromPasta(pasta::" << enum_name << " e) {\n"
       << "  switch (static_cast<";
@@ -566,7 +581,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   std::stringstream name_cases_ss;
 
   auto i = 0u;
-  for (pasta::EnumConstantDecl val : enum_decl.Enumerators()) {
+  for (pasta::EnumConstantDecl val : enumerators) {
     initializer.clear();
 
     auto val_name = val.Name();
@@ -708,11 +723,14 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "}\n\n";  // End of `EnumeratorName`
 
   include_h_os
-      << "  NUM_ENUMERATORS\n"
       << "};\n\n"
       << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n"
       << "inline static const char *EnumerationName(" << enum_name << ") {\n"
       << "  return \"" << enum_name << "\";\n"
+      << "}\n\n"
+      << "inline static constexpr unsigned NumEnumerators(" << enum_name
+      << ") {\n"
+      << "  return " << i << ";\n"
       << "}\n\n"
       << "const char *EnumeratorName(" << enum_name << ");\n\n";
 
@@ -792,9 +810,11 @@ void CodeGenerator::RunOnOptional(
     cxx_underlying_name = cxx_element_name;
 
   } else if (enum_names.count(*element_name)) {
-    capn_element_name = "UInt16";
+
+    auto &types = enum_type[*element_name];
+    capn_element_name = types.second;
     cxx_element_name = *element_name;
-    cxx_underlying_name = "unsigned short";
+    cxx_underlying_name = types.first;
 
   // E.g. `optional<vector<CXXBaseSpecifier>>`, `optional<vector<FriendDecl>>`.
   } else if (*element_name == "vector") {
@@ -1871,10 +1891,13 @@ MethodListPtr CodeGenerator::RunOnClass(
     // Handle enumerations return types.
     } else if (auto tag = return_type.AsTagDeclaration()) {
       if (auto enum_decl = pasta::EnumDecl::From(*tag)) {
-        const auto i = storage.AddMethod("UInt16");
-        auto [getter_name, setter_name, init_name] = NamesFor(i);
 
         std::string enum_name = enum_decl->Name();
+        std::pair<const char *, const char *> types = enum_type[enum_name];
+
+        const auto i = storage.AddMethod(types.second);
+        auto [getter_name, setter_name, init_name] = NamesFor(i);
+
         include_h_os
             << "  " << enum_name << " " << api_name
             << "(void) const;\n";
@@ -1889,7 +1912,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_cpp_os
             << "  b." << setter_name
-            << "(static_cast<unsigned short>(mx::FromPasta(e."
+            << "(static_cast<" << types.first << ">(mx::FromPasta(e."
             << method_name << "())));\n";
       }
 
@@ -1989,7 +2012,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
-      << "#include \"API.h\"\n\n"
+      << "#include \"Fragment.h\"\n\n"
       << "namespace mx {\n";
 
   serialize_h_os

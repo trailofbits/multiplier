@@ -65,8 +65,6 @@ class EntitySerializer final : public EntityVisitor {
 
   const pasta::TokenRange range;
 
-  void Serialize(mx::rpc::Token::Builder token, const pasta::Token &entity);
-
   virtual ~EntitySerializer(void);
 
   inline EntitySerializer(

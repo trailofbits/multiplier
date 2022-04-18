@@ -159,7 +159,18 @@ static bool TokenIsInContextOfDecl(const pasta::Token &tok,
     if (auto maybe_decl = pasta::Decl::From(*context)) {
       if (*maybe_decl == cdecl) {
         return true;
+      } else if (pasta::ClassTemplateSpecializationDecl::From(*maybe_decl) ||
+                 pasta::VarTemplateSpecializationDecl::From(*maybe_decl) ||
+                 pasta::ClassScopeFunctionSpecializationDecl::From(*maybe_decl)) {
+        return true;
       }
+    } else if (auto maybe_type = pasta::Type::From(*context)) {
+      if (pasta::TemplateSpecializationType::From(*maybe_type)) {
+        return true;
+      }
+    } else if (context->Kind() == pasta::TokenContextKind::kTemplateArgument ||
+               context->Kind() == pasta::TokenContextKind::kTemplateParameterList) {
+      return true;
     }
   }
   return false;

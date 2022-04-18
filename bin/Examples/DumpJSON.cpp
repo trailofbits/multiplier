@@ -77,12 +77,11 @@ llvm::json::Object UnparsedSubstitution(mx::TokenSubstitution sub) {
   return obj;
 }
 
-static void OutputSourceIR(const mx::Fragment &frag, const std::filesystem::path &output_dir) {
+static void OutputSourceIR(const mx::Fragment &frag,
+                           const std::filesystem::path &output_dir) {
   if (auto mlir = frag.source_ir(); mlir) {
     llvm::json::Object obj;
     obj["id"] = static_cast<uint64_t>(frag.id());
-    obj["first_line"] = frag.first_line();
-    obj["last_line"] = frag.last_line();
     obj["source_ir"] = llvm::StringRef(mlir->data(), mlir->size());
 
     std::string file_name = "mlir.fragment." + std::to_string(frag.id()) + ".json";
@@ -130,10 +129,8 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
 
     llvm::json::Object obj;
     obj["id"] = static_cast<uint64_t>(frag.id());
-    obj["first_line"] = frag.first_line();
-    obj["last_line"] = frag.last_line();
     obj["tokens"] = std::move(tokens);
-    obj["unparsed_tokens"] = UnparsedTokens(frag.unparsed_tokens());
+    obj["unparsed_tokens"] = UnparsedTokens(frag.substitutions());
 
     std::string file_name = "source.fragment." + std::to_string(frag.id()) + ".json";
 

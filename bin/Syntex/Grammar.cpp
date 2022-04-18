@@ -202,12 +202,12 @@ NonTerminal::NonTerminal(mx::DeclKind k)
 
 NonTerminal::NonTerminal(mx::StmtKind k)
     : val(static_cast<unsigned short>(k) +
-          static_cast<unsigned short>(mx::DeclKind::NUM_ENUMERATORS)) {}
+          mx::NumEnumerators(mx::DeclKind{})) {}
 
 NonTerminal::NonTerminal(mx::TokenKind k)
     : val(static_cast<unsigned short>(k) +
-          static_cast<unsigned short>(mx::DeclKind::NUM_ENUMERATORS) +
-          static_cast<unsigned short>(mx::StmtKind::NUM_ENUMERATORS)) {}
+          mx::NumEnumerators(mx::DeclKind{}) +
+          mx::NumEnumerators(mx::StmtKind{})) {}
 
 Rule::~Rule(void) {
   if (begin) {

@@ -19,21 +19,18 @@
 
 namespace indexer {
 
-class SearchAction final : public mx::Action {
+class WeggliSearchAction final : public mx::Action {
  private:
   const std::shared_ptr<SearchingContext> context;
   const mx::WeggliQuery query_tree;
 
-  std::string file_contents;
   std::map<unsigned, unsigned> eol_offset_to_line_num;
 
-  void FillFileContents(mx::FileId);
-
  public:
-  virtual ~SearchAction(void);
+  virtual ~WeggliSearchAction(void);
 
-  SearchAction(std::shared_ptr<SearchingContext> context_,
-               std::string_view syntax_string, bool is_cpp);
+  WeggliSearchAction(std::shared_ptr<SearchingContext> context_,
+                     std::string_view syntax_string, bool is_cpp);
 
   void QuerySyntaxInFile(mx::FileId file_id);
 

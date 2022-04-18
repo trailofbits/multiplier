@@ -28,7 +28,7 @@
 #include "Context.h"
 #include "IndexCompileJob.h"
 #include "RegexSearchAction.h"
-#include "SearchAction.h"
+#include "WeggliSearchAction.h"
 
 namespace indexer {
 
@@ -319,10 +319,10 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   return kj::READY_NOW;
 }
 
-kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
+kj::Promise<void> Server::weggliQuery(WeggliQueryContext context) {
 
   // Get params and result context
-  mx::rpc::Multiplier::SyntaxQueryParams::Reader params =
+  mx::rpc::Multiplier::WeggliQueryParams::Reader params =
       context.getParams();
 
   auto results = context.initResults();
@@ -346,7 +346,7 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   mx::Executor executor(opts);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
-    executor.EmplaceAction<SearchAction>(sc, syntax_string, is_cpp);
+    executor.EmplaceAction<WeggliSearchAction>(sc, syntax_string, is_cpp);
   }
   executor.Wait();
 

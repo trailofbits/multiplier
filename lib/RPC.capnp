@@ -76,9 +76,12 @@ struct CompileCommand @0xab30180088262c95 {
   compiler @12 :CompilerName;
 }
 
-struct Token @0xdf7bccc629d6dcf9 {
-  kind @0 :UInt16;
-  data @1 :Text;
+# Used to tell us the upper bound of something, e.g. the byte offsets of the
+# ends of lines, where `val` is the line number, and `offset` is the offset of
+# the `\n` character.
+struct UpperBound @0xdf7bccc629d6dcf9 {
+  val @0 :UInt32;
+  offset @1 :UInt32;
 }
 
 struct TokenContext @0xb9ff75e040124cb3 {
@@ -88,9 +91,24 @@ struct TokenContext @0xb9ff75e040124cb3 {
 }
 
 struct File @0x987f05f6a48636d5 {
+  # Unique ID of this file. This corresponds to an `mx::FileId`.
   id @0 :UInt64;
+  
+  # Hash of `data`.
   hash @1 :Text;
-  tokens @2 :List(Token);
+  
+  # The data of the file.
+  data @2 :Text;
+  
+  # Tells us about the tokens inside of `data`. There is one extra element in
+  # `tokenOffsets`.
+  tokenKinds @3 :List(UInt16);
+  tokenOffsets @4 :List(UInt32);
+    
+  # Byte offsets of the end of line characters. We use this to map matches in
+  # files to matches in fragments, with a persistent set containing <file_id,
+  # line_num, fragment_id> triples.
+  eolOffsets @5 :List(UpperBound);
 }
 
 struct FileInfo @0xfd1022cb187f18f8 {
@@ -102,37 +120,45 @@ struct Fragment @0xe5f27760091f9a3a {
   # The unique identifier for this top-level declaration.
   codeId @0 :UInt64;
   
-  # ID of the first file token associated with this framgnet. We 'hang'
-  # the fragment on this ID from the perspective of rendering fragments
-  # in a GUI.
-  fileTokenId @1 :UInt64;
-  
-  firstLine @2 :UInt32;
-  lastLine @3 :UInt32;
+  # Inclusive range of file token IDs for the unparsed data of this fragment.
+  firstFileTokenId @1 :UInt64;
+  lastFileTokenId @2 :UInt64;
   
   # Entities embedded in this code sequence.
-  declarations @4 :List(AST.Decl);
-  statements @5 :List(AST.Stmt);
-  others @6 :List(AST.Pseudo);
+  declarations @3 :List(AST.Decl);
+  statements @4 :List(AST.Stmt);
+  others @5 :List(AST.Pseudo);
   
   # List of top-level declarations in this code chunk.
-  topLevelDeclarations @7 :List(UInt64);
+  topLevelDeclarations @6 :List(UInt64);
   
   # List of token substitutions in this fragment.
-  tokenSubstitutions @8 :List(TokenSubstitution);
+  tokenSubstitutions @7 :List(TokenSubstitution);
   
-  # List of parsed tokens in this fragment.
-  tokens @9 :List(Token);
+  # The actual parsed tokens, as a text buffer. Each token is separated by a
+  # single space. There are no newlines, except those that might be inside of
+  # character/string literals.
+  parsedTokenData @8 :Text;
+  
+  # List of parsed token kinds in this fragment.
+  tokenKinds @9 :List(UInt16);
+  
+  # List of offsets of the beginning of tokens. There is one extra element in
+  # here than there are tokens, which represents the size of the data.
+  tokenOffsets @10 :List(UInt32);
+  
+  # List of token IDs for file tokens corresponding with the parsed tokens.
+  fileTokenIds @11 :List(UInt64);
   
   # List of token contexts. The first N token contexts correspond to the
   # tokens themselves.
-  tokenContexts @10 :List(TokenContext);
+  tokenContexts @12 :List(TokenContext);
   
   # List of tokens/substitution IDs in the top level.
-  unparsedTokens @11 :List(UInt64);
+  unparsedTokens @13 :List(UInt64);
 
   # Source IR in text format
-  mlir @12 :Text;
+  mlir @14 :Text;
 }
 
 struct RegexMatch @0xc119a143d978fd1e {
@@ -157,7 +183,7 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   downloadFragment @3 (id: UInt64) -> (fragment :Data);
 
   # Search code fragments matches with the query
-  syntaxQuery @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
+  weggliQuery @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
  
   # Query for a regular expression match
   regexQuery @5 (regex :Text) -> (matches : List(RegexMatch));

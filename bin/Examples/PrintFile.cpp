@@ -33,15 +33,13 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
-  auto file = index.file(FLAGS_file_id);
+  std::optional<mx::File> file = index.file(FLAGS_file_id);
   if (!file) {
     std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
     return EXIT_FAILURE;
   }
 
-  for (mx::Token token : mx::Token::in(*file)) {
-    std::cout << token.data();
-  }
+  std::cout << file->data();
 
   return EXIT_SUCCESS;
 }

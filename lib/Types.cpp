@@ -34,19 +34,15 @@ static_assert(static_cast<uint64_t>(EntityKind::kNumEnumerators) <=
               (1u << kEntityKindNumBits));
 
 static constexpr unsigned kDeclKindNumBits = 7;
-static_assert(static_cast<uint64_t>(DeclKind::NUM_ENUMERATORS) <=
-              (1u << kDeclKindNumBits));
+static_assert(NumEnumerators(DeclKind{}) <= (1u << kDeclKindNumBits));
 
 static constexpr unsigned kStmtKindNumBits = 8;
-static_assert(static_cast<uint64_t>(StmtKind::NUM_ENUMERATORS) <=
-              (1u << kStmtKindNumBits));
+static_assert(NumEnumerators(StmtKind{}) <= (1u << kStmtKindNumBits));
 
 static constexpr unsigned kTokenKindNumBits = 9;
-static_assert(static_cast<uint64_t>(TokenKind::NUM_ENUMERATORS) <=
-              (1u << kTokenKindNumBits));
+static_assert(NumEnumerators(TokenKind{}) <= (1u << kTokenKindNumBits));
 
-static constexpr uint64_t kNumDeclKinds =
-    static_cast<uint64_t>(DeclKind::NUM_ENUMERATORS);
+static constexpr uint64_t kNumDeclKinds = NumEnumerators(DeclKind{});
 
 // A small X is a token in a code with less than `kNumTokensInBigCode`
 // tokens, and so we only need `kBigCodeIdNumBits` bits to represent the

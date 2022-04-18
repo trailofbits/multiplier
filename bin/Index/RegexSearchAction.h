@@ -21,10 +21,7 @@ class RegexSearchAction final : public mx::Action {
 
   const mx::RegExpr regex;
 
-  std::string file_contents;
   std::map<unsigned, unsigned> offset_to_line_num;
-
-  void FillFileContents(mx::FileId);
 
  public:
   virtual ~RegexSearchAction(void);
@@ -33,8 +30,6 @@ class RegexSearchAction final : public mx::Action {
                     std::string_view pattern);
 
   void QueryExprInFile(mx::FileId file_id);
-
-  void FileOffsetToLine(void);
 
   // Build and index the AST.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

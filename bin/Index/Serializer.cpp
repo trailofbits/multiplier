@@ -211,11 +211,4 @@ void EntitySerializer::Enter(
 void EntitySerializer::Enter(
     const pasta::Stmt &, const pasta::TemplateParameterList &) {}
 
-void EntitySerializer::Serialize(mx::rpc::Token::Builder token,
-                                 const pasta::Token &entity) {
-  std::string data(entity.Data().data(), entity.Data().size());
-  token.setKind(static_cast<unsigned short>(mx::FromPasta(entity.Kind())));
-  token.setData(data);
-}
-
 }  // namespace indexer
