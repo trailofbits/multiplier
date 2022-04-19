@@ -74,7 +74,7 @@ if(MX_ENABLE_INSTALL)
   install(
       FILES
           "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-          "${PROJECT_SOURCE_DIR}/cmake/FindFilesystem.cmake"
+          "${PROJECT_SOURCE_DIR}/cmake/modules/FindFilesystem.cmake"
       DESTINATION "${cmake_install_dir}"
   )
   install(EXPORT "${PROJECT_NAME}Targets"
