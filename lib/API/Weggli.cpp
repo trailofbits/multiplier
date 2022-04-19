@@ -76,7 +76,7 @@ WeggliQueryMatch::WeggliQueryMatch(
       frag(std::move(frag_)),
       var_matches(std::move(var_matches_)) {}
 
-std::optional<TokenRange> WeggliQueryMatch::MatchFor(const std::string &var) const {
+std::optional<TokenRange> WeggliQueryMatch::variable_capture(const std::string &var) const {
   auto it = var_matches.find(var);
   if (it != var_matches.end()) {
     return it->second;
@@ -86,7 +86,7 @@ std::optional<TokenRange> WeggliQueryMatch::MatchFor(const std::string &var) con
 }
 
 // Return a list of matched variables.
-std::vector<std::string> WeggliQueryMatch::MatchedVariables(void) const {
+std::vector<std::string> WeggliQueryMatch::captured_variables(void) const {
   std::vector<std::string> ret;
   for (const auto &[var, _] : var_matches) {
     ret.emplace_back(var);

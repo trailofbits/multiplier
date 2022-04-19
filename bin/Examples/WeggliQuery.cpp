@@ -80,10 +80,10 @@ extern "C" int main(int argc, char *argv[]) {
         std::cout << sep << tok.data();
         sep = " ";
       }
-      for (auto var : match.MatchedVariables()) {
+      for (std::string var : match.captured_variables()) {
         std::cout << var;
         sep = "\t";
-        if (auto capture = match.MatchFor(var)) {
+        if (auto capture = match.variable_capture(var)) {
           for (mx::Token tok : *capture) {
             std::cout << sep << tok.data();
             sep = " ";

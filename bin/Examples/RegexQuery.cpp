@@ -54,10 +54,6 @@ extern "C" int main(int argc, char *argv[]) {
       FLAGS_host, FLAGS_port));
 
   for (mx::RegexMatch match : index.regex_query(FLAGS_query)) {
-    if (!match.IsFragmentMatch()) {
-      continue;
-    }
-
     mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);
     std::cout

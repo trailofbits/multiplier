@@ -620,10 +620,10 @@ class WeggliQueryMatch : public TokenRange {
       std::unordered_map<std::string, TokenRange> var_matches_);
 
   // Return the match results for a specific meta-variable.
-  std::optional<TokenRange> MatchFor(const std::string &var) const;
+  std::optional<TokenRange> variable_capture(const std::string &var) const;
 
   // Return a list of matched variables.
-  std::vector<std::string> MatchedVariables(void) const;
+  std::vector<std::string> captured_variables(void) const;
 };
 
 class WeggliQueryResultIterator {
@@ -724,14 +724,10 @@ class RegexMatch : public TokenRange {
       std::unordered_map<std::string, TokenRange> variable_matches_);
 
   // Return the match results for a specific meta-variable.
-  std::optional<TokenRange> MatchFor(const std::string &var) const;
+  std::optional<TokenRange> variable_capture(const std::string &var) const;
 
   // Return a list of matched variables.
-  std::vector<std::string> MatchedVariables(void) const;
-
-  bool IsFragmentMatch(void) const {
-    return frag != nullptr;
-  }
+  std::vector<std::string> captured_variables(void) const;
 };
 
 class RegexMatchIterator {

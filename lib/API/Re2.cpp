@@ -203,7 +203,7 @@ RegexMatch::RegexMatch(
       frag(std::move(frag_)), file(std::move(file_)),
       variable_matches(std::move(variable_matches_)) {}
 
-std::optional<TokenRange> RegexMatch::MatchFor(const std::string &var) const {
+std::optional<TokenRange> RegexMatch::variable_capture(const std::string &var) const {
   auto it = variable_matches.find(var);
   if (it != variable_matches.end()) {
     return it->second;
@@ -213,7 +213,7 @@ std::optional<TokenRange> RegexMatch::MatchFor(const std::string &var) const {
 }
 
 // Return a list of matched variables.
-std::vector<std::string> RegexMatch::MatchedVariables(void) const {
+std::vector<std::string> RegexMatch::captured_variables(void) const {
   std::vector<std::string> ret;
   for (const auto &[var, _] : variable_matches) {
     ret.emplace_back(var);
