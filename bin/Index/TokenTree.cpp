@@ -596,10 +596,6 @@ static bool IsIncludeKeyword(pasta::FileToken ft) {
     case pasta::PPKeywordKind::kIncludeNext:
     case pasta::PPKeywordKind::kImport:
       return true;
-    case pasta::PPKeywordKind::kNotKeyword: {
-      auto data = ft.Data();
-      return (data == "include" || data == "include_next" || data == "import");
-    }
     default:
       return false;
   }
