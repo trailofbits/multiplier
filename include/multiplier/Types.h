@@ -20,11 +20,11 @@ using FragmentId = uint64_t;
 class Fragment;
 class FragmentImpl;
 
-enum class DeclKind : unsigned short;
-enum class StmtKind : unsigned short;
+enum class DeclKind : unsigned char;
+enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 
-enum class TokenSubstitutionKind : unsigned short {
+enum class TokenSubstitutionKind : unsigned char {
   MACRO_EXPANSION,
   FUNCTION_LIKE_MACRO_EXPANSION,
   INCLUDE_EXPANSION

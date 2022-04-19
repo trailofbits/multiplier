@@ -17,19 +17,6 @@ DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_string(query, "", "Query pattern to be searched");
-DEFINE_bool(print_matches, false, "Print variable matches found for the syntax");
-
-static void PrintUnparsedTokens(mx::TokenSubstitutionList nodes) {
-  for (auto node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      auto tok = std::get<mx::Token>(node);
-      std::cout << tok.data();
-    } else {
-      auto sub = std::get<mx::TokenSubstitution>(node);
-      PrintUnparsedTokens(sub.before());
-    }
-  }
-}
 
 std::string GetFileContaining(mx::Index &index, mx::FileId file_id) {
   for (auto [path, id] : index.file_paths()) {
@@ -59,41 +46,24 @@ extern "C" int main(int argc, char *argv[]) {
 
   if (FLAGS_query.empty()) {
     std::cerr
-        << "Must specify query string to be searched for.";
+        << "Must specify regular expression string to be searched for.";
     return EXIT_FAILURE;
   }
 
-  auto query_string = FLAGS_query;
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  for (mx::SyntaxQueryMatch match : index.syntax_query(FLAGS_query)) {
+  for (mx::RegexMatch match : index.regex_query(FLAGS_query)) {
     mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);
-    auto sep = "\t";
-    std::cout << frag.id() << sep << GetFileContaining(index, file.id())
-        << ":" << frag.first_line() << "\n";
+    std::cout
+        << frag.id() << '\t' << GetFileContaining(index, file.id())
+        << std::endl;
 
-    if (FLAGS_print_matches) {
-      for (mx::Token tok : match) {
-        std::cout << sep << tok.data();
-        sep = " ";
-      }
-      for (auto var : match.MatchedVariables()) {
-        std::cout << var;
-        sep = "\t";
-        if (auto capture = match.MatchFor(var)) {
-          for (mx::Token tok : *capture) {
-            std::cout << sep << tok.data();
-            sep = " ";
-          }
-        }
-        std::cout << "\t";
-      }
-      std::cout << "\n\n";
-    }
-    PrintUnparsedTokens(frag.unparsed_tokens());
+    std::cout << frag.file_tokens().data();
     std::cout << "\n\n";
   }
   return EXIT_SUCCESS;
 }
+
+

@@ -16,7 +16,7 @@ add_custom_target("bootstrapped_files"
   DEPENDS
     "${MX_BOOTSTRAP_LIB_AST_CAPNP}"
     "${MX_BOOTSTRAP_LIB_AST_H}"
-    "${MX_BOOTSTRAP_LIB_AST_CPP}"
+    "${MX_BOOTSTRAP_LIB_API_AST_CPP}"
     "${MX_BOOTSTRAP_INCLUDE_AST_H}"
 )
 
@@ -77,12 +77,32 @@ add_library("mx-api"
     ${api_headers}
     ${copied_headers}
 
-    "AST.cpp"
-    "API.h"
-    "API.cpp"
+    "${MX_BOOTSTRAP_LIB_API_AST_CPP}"  # Auto-generated
+    
+    "API/API.cpp"
+    "API/API.h"
+    "API/FileList.cpp"
+    "API/File.cpp"
+    "API/File.h"
+    "API/Fragment.cpp"
+    "API/FragmentImpl.cpp"
+    "API/Fragment.h"
+    "API/Index.cpp"
+    "API/PackedFileImpl.cpp"
+    "API/PackedFragmentImpl.cpp"
+    "API/Re2.cpp"
+    "API/Re2.h"
+    "API/TokenContext.cpp"
+    "API/TokenSubstitution.cpp"
+    "API/Token.cpp"
+    "API/Token.h"
+    "API/Weggli.cpp"
+    "API/Weggli.h"
+    
     "Compress.cpp"
     "Types.cpp"
     "Weggli.cpp"
+    "Re2.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -109,6 +129,7 @@ target_link_libraries("mx-api"
   PRIVATE
     CapnProto::capnp-rpc
     ZLIB::ZLIB
+    re2::re2
 )
 
 # Add in Weggli.
@@ -187,8 +208,8 @@ add_library("mx-util"
     ${util_headers}
 
     "Action.cpp"
-    "AST.cpp"
-    "API.h"
+    "${MX_BOOTSTRAP_LIB_API_AST_CPP}"  # Auto-generated
+    "API/API.h"
     "BloomFilter.cpp"
     "Compress.cpp"
     "Executor.cpp"
@@ -199,6 +220,7 @@ add_library("mx-util"
     "Types.cpp"
     "WorkerPool.cpp"
     "Weggli.cpp"
+    "Re2.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -232,6 +254,7 @@ target_link_libraries("mx-util"
     glog::glog
     gflags::gflags
     CapnProto::capnp-rpc
+    re2::re2
 )
 
 if(MX_ENABLE_WEGGLI)

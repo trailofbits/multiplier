@@ -13,7 +13,7 @@
 #include <tuple>
 
 namespace mx {
-enum class TokenSubstitutionKind : unsigned short;
+enum class TokenSubstitutionKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 

@@ -40,9 +40,7 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   for (mx::Fragment frag : mx::Fragment::in(*file)) {
-    std::cout
-        << frag.id() << '\t' << frag.first_line() << '\t'
-        << frag.last_line() << '\n';
+    std::cout << frag.id() << std::endl;
   }
 
   return EXIT_SUCCESS;

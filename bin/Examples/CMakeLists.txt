@@ -45,7 +45,8 @@ define_example("mx-dump-json" "DumpJSON.cpp")
 define_example("mx-print-token-contexts" "PrintTokenContexts.cpp")
 define_example("mx-find-switch-cases" "FindSwitchCases.cpp")
 define_example("mx-print-sourceir" "PrintSourceIR.cpp")
-define_example("mx-query-syntax" "QuerySyntax.cpp")
+define_example("mx-weggli-query" "WeggliQuery.cpp")
+define_example("mx-regex-query" "RegexQuery.cpp")
 
 target_link_libraries("mx-dump-json"
   PRIVATE

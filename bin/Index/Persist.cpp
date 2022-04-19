@@ -12,6 +12,7 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <kj/string-tree.h>
+#include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/ProgressBar.h>
 #include <multiplier/RPC.capnp.h>
@@ -28,6 +29,11 @@
 namespace indexer {
 namespace {
 
+// Count the number of substitutions in a token tree. We need to pre-initialize
+// the total size of lists in Cap'n Proto, and so we need to know how many
+// substitutions we'll want to store when serializing a fragment, as the
+// serialized fragments contain the macro substitution tree (e.g. to help us
+// print out the "unparsed", i.e. original, code of a fragment).
 static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
   for (auto node : tt) {
     if (auto sub = node.Substitution()) {
@@ -39,7 +45,10 @@ static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
   }
 }
 
-// Figure out the lines of `file` spanned by `tt`.
+// Figure out the lines of `file` spanned by `tt`. We use this to help us
+// populate an index (persistent set) of `<file_id, line_num, frag_id>` triples.
+// This index helps us go from matches (e.g. RE2) in files to matches in
+// fragments.
 static void FindFileRange(TokenTree tt, const pasta::File &file,
                           pasta::FileToken *min, pasta::FileToken *max,
                           unsigned &num_subs) {
@@ -71,6 +80,8 @@ using SubstitutionListBuilder =
 using TokenListBuilder =
     capnp::List<uint64_t, ::capnp::Kind::PRIMITIVE>::Builder;
 
+// Persist the token tree, which is a tree of substitutions, i.e. before/after
+// macro use/expansion, or x-macro file inclusion.
 static void PersistTokenTree(EntitySerializer &serializer,
                              SubstitutionListBuilder &subs_builder,
                              TokenListBuilder toks_builder,
@@ -109,21 +120,77 @@ static void PersistTokenTree(EntitySerializer &serializer,
   }
 }
 
+// Persist the tokens of a fragment.
 static void PersistTokens(EntitySerializer &serializer,
                           uint64_t begin_index, uint64_t end_index,
-                          FragmentBuilder &builder) {
-  auto num_toks = static_cast<unsigned>(
+                          FragmentBuilder &fb) {
+  auto num_tokens = static_cast<unsigned>(
       (end_index - begin_index) + 1u);
-  auto tok_builder = builder.initTokens(num_toks);
+
+  unsigned token_data_size = 0u;
   for (auto i = begin_index; i <= end_index; ++i) {
-    serializer.Serialize(
-        tok_builder[static_cast<unsigned>(i - begin_index)],
-        serializer.range[i]);
+    pasta::Token tok = serializer.range[i];
+    token_data_size += static_cast<unsigned>(tok.Data().size());
+    token_data_size += 1u;
   }
+
+  std::string utf8_fragment_data;
+  utf8_fragment_data.reserve(token_data_size);
+
+  // Encode the token kinds and the offsets of token data. We can't be certain
+  // that the file is in UTF-8, so we re-build the contents on a per-token
+  // basis, because that's the only way to guarantee token offsets in the
+  // presence of UTF-8 issues.
+  auto ftb = fb.initFileTokenIds(num_tokens);
+  auto tkb = fb.initTokenKinds(num_tokens);
+  auto tob = fb.initTokenOffsets(num_tokens + 1u);
+  auto j = 0u;
+  for (auto i = begin_index; i <= end_index; ++i, ++j) {
+
+    pasta::Token tok = serializer.range[i];
+    if (auto file_tok = tok.FileLocation()) {
+      ftb.set(j, serializer.EntityId(*file_tok));
+    } else {
+      ftb.set(j, mx::kInvalidEntityId);
+    }
+
+    tkb.set(j, static_cast<unsigned short>(TokenKindFromPasta(tok)));
+    tob.set(j, static_cast<unsigned>(utf8_fragment_data.size()));
+
+    llvm::StringRef tok_data = tok.Data();
+    if (llvm::json::isUTF8(tok_data)) {
+      utf8_fragment_data.insert(utf8_fragment_data.end(),
+                                tok_data.begin(), tok_data.end());
+
+    } else {
+      utf8_fragment_data += llvm::json::fixUTF8(tok_data);
+    }
+
+    // Space-separate every token.
+    //
+    // NOTE(pag): This means that `PackedFragmentImpl::NthTokenData` needs
+    //            to account for this additional space.
+    utf8_fragment_data.push_back(' ');
+  }
+
+  tob.set(j, static_cast<unsigned>(utf8_fragment_data.size()));
+
+  // Cap'n Proto requires that `Text`-typed data is UTF-8.
+  fb.setParsedTokenData(utf8_fragment_data);
 }
 
 // Find the entity id of `canon_decl` that resides in the current fragment
-// on which the serializer is operating.
+// on which the serializer is operating. Token contexts from PASTA store the
+// canonical (typically first) declaration, but we generally want the version
+// of the declaration that is inside of the fragment itself, so here we go from
+// canonical back to specific.
+//
+// TODO(pag): Eventually, we should change the serialized representation of
+//            token contexts to store full 64-bit entity IDs. Right now, they
+//            store offsets of things in the fragments, hence the actual need
+//            to go canonical->specific in the first place, and why a failure to
+//            do so results in `kInvalidEntityId` instead of just falling back
+//            on the ID of the canonical decl.
 static uint64_t IdOfRedeclInFragment(EntitySerializer &serializer,
                                      pasta::Decl canon_decl) {
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
@@ -142,6 +209,24 @@ static uint64_t IdOfRedeclInFragment(EntitySerializer &serializer,
   return mx::kInvalidEntityId;
 }
 
+// Persist the token contexts. The token contexts are a kind of inverted tree,
+// e.g.
+//
+//        int       foo       =         0       ;
+//         |         |        |         |       |
+//     BuiltinType   |        |     IntLiteral  /
+//          \  .--<--'  .--<--' .---<---' .----'
+//           \ | .--<---' .--<--'  .--<---'
+//            \|/  .---<--'  .--<--'
+//           VarDecl <---<---'
+//
+// They tell us the provenance or relation of a particular token to the AST that
+// represents the code containing that token. You can, in theory, follow a
+// linked list from a token all the way up to the root of an AST. We want to
+// serialize these because they allow us to make queries in our API, e.g. "give
+// me the SwitchStmt containing this token." Token contexts aren't pure linked
+// lists, though; there are special "alias" nodes that tend to link you further
+// down the lists, and so that takes some special handling.
 static void PersistTokenContexts(EntitySerializer &serializer,
                                  uint64_t begin_index, uint64_t end_index,
                                  FragmentBuilder &builder) {
@@ -335,27 +420,107 @@ static void PersistTokenContexts(EntitySerializer &serializer,
 
 }  // namespace
 
+// Persist a file. Our representation includes stuff not in the file to enable
+// us to improve performance of common operations, like search. That is, we
+// could store a file as a list of tokens, where each token has its own data;
+// however, we want to able to run regular expression searches over files, and
+// so it's convenient to not have to reconstruct the file data from the tokens
+// for every such query. Similarly, we often want to map from matches in files
+// to matches in fragments, and so we create and persist a mapping of file
+// offsets to line numbers here to help us with those translations later.
 void PersistFile(IndexingContext &context, mx::FileId file_id,
                  std::string file_hash, pasta::File file) {
   auto file_tokens = file.Tokens();
+  auto maybe_file_data = file.Data();
+  LOG_IF(FATAL, !maybe_file_data.Succeeded())
+      << "No data for file " << file.Path().generic_string()
+      << ": " << maybe_file_data.TakeError();
 
+  std::string_view file_data = maybe_file_data.TakeValue();
   capnp::MallocMessageBuilder message;
-  auto fb = message.initRoot<mx::rpc::File>();
+  mx::rpc::File::Builder fb = message.initRoot<mx::rpc::File>();
   fb.setId(file_id);
   fb.setHash(file_hash);
-  auto tsb = fb.initTokens(static_cast<unsigned>(file_tokens.Size()));
-  std::string tok_data;
+
+  std::string utf8_file_data;
+  utf8_file_data.reserve(file_data.size());
+
+  // Encode the token kinds and the offsets of token data. We can't be certain
+  // that the file is in UTF-8, so we re-build the contents on a per-token
+  // basis, because that's the only way to guarantee token offsets in the
+  // presence of UTF-8 issues.
+  auto num_tokens = static_cast<unsigned>(file_tokens.Size());
+  auto tkb = fb.initTokenKinds(num_tokens);
+  auto tob = fb.initTokenOffsets(num_tokens + 1u);
+  auto i = 0u;
   for (pasta::FileToken ft : file_tokens) {
-    tok_data.clear();
-    tok_data.insert(tok_data.end(), ft.Data().begin(), ft.Data().end());
-    mx::rpc::Token::Builder ftb = tsb[static_cast<unsigned>(ft.Index())];
-    ftb.setKind(static_cast<unsigned short>(TokenKindFromPasta(ft)));
-    ftb.setData(tok_data);
+    tkb.set(i, static_cast<unsigned short>(TokenKindFromPasta(ft)));
+    tob.set(i, static_cast<unsigned>(utf8_file_data.size()));
+
+    llvm::StringRef tok_data = ft.Data();
+    if (llvm::json::isUTF8(tok_data)) {
+      utf8_file_data.insert(utf8_file_data.end(),
+                            tok_data.begin(), tok_data.end());
+
+    } else {
+      utf8_file_data += llvm::json::fixUTF8(tok_data);
+    }
+
+    i += 1u;
+  }
+  tob.set(i, static_cast<unsigned>(utf8_file_data.size()));
+
+  // Cap'n Proto requires that `Text`-typed data is UTF-8.
+  fb.setData(utf8_file_data);
+
+  // Build up and serialize a mapping of offsets of the last byte in a line to
+  // line numbers. This mapping is used during regular expression matches and
+  // Weggli matches over file contents to help us map to fragments whose code
+  // is derived from those files.
+  std::map<unsigned, unsigned> eol_offset_to_line_num;
+  auto line = 1u;
+  auto offset = 0u;
+  for (char ch : file_data) {
+    ++offset;
+    if ('\n' == ch) {
+      eol_offset_to_line_num.emplace(offset, line);
+      ++line;
+    }
+  }
+
+  i = 0u;
+  auto ublb = fb.initEolOffsets(static_cast<unsigned>(
+      eol_offset_to_line_num.size()));
+  for (auto [eol_offset, line_num] : eol_offset_to_line_num) {
+    mx::rpc::UpperBound::Builder ubb = ublb[i++];
+    ubb.setOffset(eol_offset);
+    ubb.setVal(line_num);
   }
 
   context.PutSerializedFile(file_id, CompressedMessage("file", message));
 }
 
+// Persist a fragment. A fragment is Multiplier's "unit of granularity" of
+// deduplication and indexing. It roughly corresponds to a sequence of one-or-
+// more syntactically overlapping "top-level declarations." For us, a top-level
+// declaration is one that only nested inside of a namespace, a linkage
+// specifier, a translation unit, etc. Thus, things like global variables,
+// functions, and classes are all top-level declarations. These things tend to
+// contain lots of other declarations/statements, and those all get lumped into
+// and persisted a TLD's fragment.
+//
+// Fragments separate out their lists of persistent entities. This enables some
+// downstream benefits. For example, all declarations are persisted in a
+// separate list from all statements. This allows us to more easily jump into
+// the middle of the "sub-AST" persisted in a fragment. For example, if we want
+// to find all `VarDecl`s, we can iterate the list of declarations, check the
+// decl kinds, and then yield only the discovered `VarDecl`s. No recursive
+// visitor needed!
+//
+// Fragments also store things like the macro substitution tree, and parsed
+// tokens associated with the covered declarations/statements. This is partially
+// because our serialized decls/stmts/etc. reference these tokens, and partially
+// so that we can do things like print out fragments, or chunks thereof.
 void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
                      PendingFragment code_chunk, std::string mlir) {
 
@@ -394,9 +559,8 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder builder = message.initRoot<mx::rpc::Fragment>();
   builder.setCodeId(code_chunk.fragment_id);
-  builder.setFileTokenId(serializer.EntityId(min_token));
-  builder.setFirstLine(min_token.Line());
-  builder.setLastLine(max_token.Line());
+  builder.setFirstFileTokenId(serializer.EntityId(min_token));
+  builder.setLastFileTokenId(serializer.EntityId(max_token));
   builder.setMlir(mlir);
 
   auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
@@ -413,8 +577,8 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   PersistTokens(serializer, begin_index, end_index, builder);
   PersistTokenContexts(serializer, begin_index, end_index, builder);
 
-  DCHECK_GT(builder.getTokens().size(), 0u);
-  DCHECK_GE(builder.getTokenContexts().size(), builder.getTokens().size());
+  DCHECK_GT(builder.getTokenKinds().size(), 0u);
+  DCHECK_GE(builder.getTokenContexts().size(), builder.getTokenKinds().size());
 
   unsigned next_substitution_index = 0u;
   SubstitutionListBuilder substitutions_builder =

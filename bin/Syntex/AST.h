@@ -19,8 +19,8 @@ class Decl;
 class Fragment;
 class Stmt;
 class Token;
-enum class DeclKind : unsigned short;
-enum class StmtKind : unsigned short;
+enum class DeclKind : unsigned char;
+enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 }  // namespace mx
 namespace syntex {

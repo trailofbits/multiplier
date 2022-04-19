@@ -228,7 +228,9 @@ void IndexingContext::PutSerializedFragment(mx::FragmentId id,
 
 // Save an entries of the form `(file_id, line_number, fragment_id)` over
 // the inclusive range `[start_line, end_line]` so that we can figure out
-// which fragments overlap which lines.
+// which fragments overlap which lines. We use this index to go from regular
+// expression matches or Weggli syntax matches on files into matches inside of
+// fragments.
 //
 // TODO(pag): Eventually implement an async writer for `PersistentMap` and
 //            `PersistentSet` using a RocksDB `WriteBatch`.

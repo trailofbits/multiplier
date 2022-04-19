@@ -269,7 +269,7 @@ class Token;
 class TokenContext;class TokenContextIterator;
 class TokenRange;
 
-enum class DeclKind : unsigned short {
+enum class DeclKind : unsigned char {
   ACCESS_SPEC,
   BASE_USING,
   BINDING,
@@ -364,7 +364,6 @@ enum class DeclKind : unsigned short {
   VAR_TEMPLATE,
   VAR_TEMPLATE_PARTIAL_SPECIALIZATION,
   VAR_TEMPLATE_SPECIALIZATION,
-  NUM_ENUMERATORS
 };
 
 DeclKind FromPasta(pasta::DeclKind pasta_val);
@@ -373,13 +372,16 @@ inline static const char *EnumerationName(DeclKind) {
   return "DeclKind";
 }
 
+inline static constexpr unsigned NumEnumerators(DeclKind) {
+  return 94;
+}
+
 const char *EnumeratorName(DeclKind);
 
-enum class ArrayTypeArraySizeModifier : unsigned short {
+enum class ArrayTypeArraySizeModifier : unsigned char {
   NORMAL,
   STATIC,
   STAR,
-  NUM_ENUMERATORS
 };
 
 ArrayTypeArraySizeModifier FromPasta(pasta::ArrayTypeArraySizeModifier pasta_val);
@@ -388,9 +390,13 @@ inline static const char *EnumerationName(ArrayTypeArraySizeModifier) {
   return "ArrayTypeArraySizeModifier";
 }
 
+inline static constexpr unsigned NumEnumerators(ArrayTypeArraySizeModifier) {
+  return 3;
+}
+
 const char *EnumeratorName(ArrayTypeArraySizeModifier);
 
-enum class AtomicExprAtomicOp : unsigned short {
+enum class AtomicExprAtomicOp : unsigned char {
   C11_ATOMIC_INITIALIZER,
   C11_ATOMIC_LOAD,
   C11_ATOMIC_STORE,
@@ -441,7 +447,6 @@ enum class AtomicExprAtomicOp : unsigned short {
   OPENCL_ATOMIC_FETCH_MAX,
   ATOMIC_FETCH_MIN,
   ATOMIC_FETCH_MAX,
-  NUM_ENUMERATORS
 };
 
 AtomicExprAtomicOp FromPasta(pasta::AtomicExprAtomicOp pasta_val);
@@ -450,9 +455,13 @@ inline static const char *EnumerationName(AtomicExprAtomicOp) {
   return "AtomicExprAtomicOp";
 }
 
+inline static constexpr unsigned NumEnumerators(AtomicExprAtomicOp) {
+  return 50;
+}
+
 const char *EnumeratorName(AtomicExprAtomicOp);
 
-enum class BuiltinTypeKind : unsigned short {
+enum class BuiltinTypeKind : unsigned char {
   OCL_IMAGE1_DRO,
   OCL_IMAGE1_DARRAY_RO,
   OCL_IMAGE1_DBUFFER_RO,
@@ -690,7 +699,6 @@ enum class BuiltinTypeKind : unsigned short {
   OMP_ARRAY_SECTION,
   OMP_ARRAY_SHAPING,
   OMP_ITERATOR,
-  NUM_ENUMERATORS
 };
 
 BuiltinTypeKind FromPasta(pasta::BuiltinTypeKind pasta_val);
@@ -699,14 +707,17 @@ inline static const char *EnumerationName(BuiltinTypeKind) {
   return "BuiltinTypeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(BuiltinTypeKind) {
+  return 237;
+}
+
 const char *EnumeratorName(BuiltinTypeKind);
 
-enum class CXXConstructExprConstructionKind : unsigned short {
+enum class CXXConstructExprConstructionKind : unsigned char {
   COMPLETE,
   NON_VIRTUAL_BASE,
   VIRTUAL_BASE,
   DELEGATING,
-  NUM_ENUMERATORS
 };
 
 CXXConstructExprConstructionKind FromPasta(pasta::CXXConstructExprConstructionKind pasta_val);
@@ -715,13 +726,16 @@ inline static const char *EnumerationName(CXXConstructExprConstructionKind) {
   return "CXXConstructExprConstructionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CXXConstructExprConstructionKind) {
+  return 4;
+}
+
 const char *EnumeratorName(CXXConstructExprConstructionKind);
 
-enum class CXXNewExprInitializationStyle : unsigned short {
+enum class CXXNewExprInitializationStyle : unsigned char {
   NO_INITIALIZER,
   CALL_INITIALIZER,
   LIST_INITIALIZER,
-  NUM_ENUMERATORS
 };
 
 CXXNewExprInitializationStyle FromPasta(pasta::CXXNewExprInitializationStyle pasta_val);
@@ -730,12 +744,15 @@ inline static const char *EnumerationName(CXXNewExprInitializationStyle) {
   return "CXXNewExprInitializationStyle";
 }
 
+inline static constexpr unsigned NumEnumerators(CXXNewExprInitializationStyle) {
+  return 3;
+}
+
 const char *EnumeratorName(CXXNewExprInitializationStyle);
 
-enum class CallExprADLCallKind : unsigned short {
+enum class CallExprADLCallKind : unsigned char {
   NOT_ADL,
   USES_ADL,
-  NUM_ENUMERATORS
 };
 
 CallExprADLCallKind FromPasta(pasta::CallExprADLCallKind pasta_val);
@@ -744,14 +761,17 @@ inline static const char *EnumerationName(CallExprADLCallKind) {
   return "CallExprADLCallKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CallExprADLCallKind) {
+  return 2;
+}
+
 const char *EnumeratorName(CallExprADLCallKind);
 
-enum class CapturedStmtVariableCaptureKind : unsigned short {
+enum class CapturedStmtVariableCaptureKind : unsigned char {
   THIS,
   BY_REFERENCE,
   BY_COPY,
   VLA_TYPE,
-  NUM_ENUMERATORS
 };
 
 CapturedStmtVariableCaptureKind FromPasta(pasta::CapturedStmtVariableCaptureKind pasta_val);
@@ -760,15 +780,18 @@ inline static const char *EnumerationName(CapturedStmtVariableCaptureKind) {
   return "CapturedStmtVariableCaptureKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CapturedStmtVariableCaptureKind) {
+  return 4;
+}
+
 const char *EnumeratorName(CapturedStmtVariableCaptureKind);
 
-enum class CharacterLiteralCharacterKind : unsigned short {
+enum class CharacterLiteralCharacterKind : unsigned char {
   ASCII,
   WIDE,
   UTF8,
   UTF16,
   UTF32,
-  NUM_ENUMERATORS
 };
 
 CharacterLiteralCharacterKind FromPasta(pasta::CharacterLiteralCharacterKind pasta_val);
@@ -777,13 +800,16 @@ inline static const char *EnumerationName(CharacterLiteralCharacterKind) {
   return "CharacterLiteralCharacterKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CharacterLiteralCharacterKind) {
+  return 5;
+}
+
 const char *EnumeratorName(CharacterLiteralCharacterKind);
 
-enum class ConstantExprResultStorageKind : unsigned short {
+enum class ConstantExprResultStorageKind : unsigned char {
   NONE,
   INT64,
   AP_VALUE,
-  NUM_ENUMERATORS
 };
 
 ConstantExprResultStorageKind FromPasta(pasta::ConstantExprResultStorageKind pasta_val);
@@ -792,13 +818,16 @@ inline static const char *EnumerationName(ConstantExprResultStorageKind) {
   return "ConstantExprResultStorageKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ConstantExprResultStorageKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ConstantExprResultStorageKind);
 
-enum class DeclFriendObjectKind : unsigned short {
+enum class DeclFriendObjectKind : unsigned char {
   NONE,
   DECLARED,
   UNDECLARED,
-  NUM_ENUMERATORS
 };
 
 DeclFriendObjectKind FromPasta(pasta::DeclFriendObjectKind pasta_val);
@@ -807,9 +836,13 @@ inline static const char *EnumerationName(DeclFriendObjectKind) {
   return "DeclFriendObjectKind";
 }
 
+inline static constexpr unsigned NumEnumerators(DeclFriendObjectKind) {
+  return 3;
+}
+
 const char *EnumeratorName(DeclFriendObjectKind);
 
-enum class DeclIdentifierNamespace : unsigned short {
+enum class DeclIdentifierNamespace : unsigned char {
   LABEL,
   TAG,
   TYPE,
@@ -824,7 +857,6 @@ enum class DeclIdentifierNamespace : unsigned short {
   LOCAL_EXTERN,
   OMP_REDUCTION,
   OMP_MAPPER,
-  NUM_ENUMERATORS
 };
 
 DeclIdentifierNamespace FromPasta(pasta::DeclIdentifierNamespace pasta_val);
@@ -833,14 +865,17 @@ inline static const char *EnumerationName(DeclIdentifierNamespace) {
   return "DeclIdentifierNamespace";
 }
 
+inline static constexpr unsigned NumEnumerators(DeclIdentifierNamespace) {
+  return 14;
+}
+
 const char *EnumeratorName(DeclIdentifierNamespace);
 
-enum class DeclModuleOwnershipKind : unsigned short {
+enum class DeclModuleOwnershipKind : unsigned char {
   UNOWNED,
   VISIBLE,
   VISIBLE_WHEN_IMPORTED,
   MODULE_PRIVATE,
-  NUM_ENUMERATORS
 };
 
 DeclModuleOwnershipKind FromPasta(pasta::DeclModuleOwnershipKind pasta_val);
@@ -849,9 +884,13 @@ inline static const char *EnumerationName(DeclModuleOwnershipKind) {
   return "DeclModuleOwnershipKind";
 }
 
+inline static constexpr unsigned NumEnumerators(DeclModuleOwnershipKind) {
+  return 4;
+}
+
 const char *EnumeratorName(DeclModuleOwnershipKind);
 
-enum class DeclObjCDeclQualifier : unsigned short {
+enum class DeclObjCDeclQualifier : unsigned char {
   NONE,
   IN,
   INOUT,
@@ -860,7 +899,6 @@ enum class DeclObjCDeclQualifier : unsigned short {
   BYREF,
   ONEWAY,
   CS_NULLABILITY,
-  NUM_ENUMERATORS
 };
 
 DeclObjCDeclQualifier FromPasta(pasta::DeclObjCDeclQualifier pasta_val);
@@ -869,14 +907,17 @@ inline static const char *EnumerationName(DeclObjCDeclQualifier) {
   return "DeclObjCDeclQualifier";
 }
 
+inline static constexpr unsigned NumEnumerators(DeclObjCDeclQualifier) {
+  return 8;
+}
+
 const char *EnumeratorName(DeclObjCDeclQualifier);
 
-enum class ExprConstantExprKind : unsigned short {
+enum class ExprConstantExprKind : unsigned char {
   NORMAL,
   NON_CLASS_TEMPLATE_ARGUMENT,
   CLASS_TEMPLATE_ARGUMENT,
   IMMEDIATE_INVOCATION,
-  NUM_ENUMERATORS
 };
 
 ExprConstantExprKind FromPasta(pasta::ExprConstantExprKind pasta_val);
@@ -885,9 +926,13 @@ inline static const char *EnumerationName(ExprConstantExprKind) {
   return "ExprConstantExprKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprConstantExprKind) {
+  return 4;
+}
+
 const char *EnumeratorName(ExprConstantExprKind);
 
-enum class ExprLValueClassification : unsigned short {
+enum class ExprLValueClassification : unsigned char {
   VALID,
   NOT_OBJECT_TYPE,
   INCOMPLETE_VOID_TYPE,
@@ -898,7 +943,6 @@ enum class ExprLValueClassification : unsigned short {
   SUB_OBJ_C_PROPERTY_SETTING,
   CLASS_TEMPORARY,
   ARRAY_TEMPORARY,
-  NUM_ENUMERATORS
 };
 
 ExprLValueClassification FromPasta(pasta::ExprLValueClassification pasta_val);
@@ -907,15 +951,18 @@ inline static const char *EnumerationName(ExprLValueClassification) {
   return "ExprLValueClassification";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprLValueClassification) {
+  return 10;
+}
+
 const char *EnumeratorName(ExprLValueClassification);
 
-enum class ExprNullPointerConstantKind : unsigned short {
+enum class ExprNullPointerConstantKind : unsigned char {
   NOT_NULL,
   ZERO_EXPRESSION,
   ZERO_LITERAL,
   CXX11_NULLPTR,
   GNU_NULL,
-  NUM_ENUMERATORS
 };
 
 ExprNullPointerConstantKind FromPasta(pasta::ExprNullPointerConstantKind pasta_val);
@@ -924,13 +971,16 @@ inline static const char *EnumerationName(ExprNullPointerConstantKind) {
   return "ExprNullPointerConstantKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprNullPointerConstantKind) {
+  return 5;
+}
+
 const char *EnumeratorName(ExprNullPointerConstantKind);
 
-enum class ExprNullPointerConstantValueDependence : unsigned short {
+enum class ExprNullPointerConstantValueDependence : unsigned char {
   NEVER_VALUE_DEPENDENT,
   VALUE_DEPENDENT_IS_NULL,
   VALUE_DEPENDENT_IS_NOT_NULL,
-  NUM_ENUMERATORS
 };
 
 ExprNullPointerConstantValueDependence FromPasta(pasta::ExprNullPointerConstantValueDependence pasta_val);
@@ -939,13 +989,16 @@ inline static const char *EnumerationName(ExprNullPointerConstantValueDependence
   return "ExprNullPointerConstantValueDependence";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprNullPointerConstantValueDependence) {
+  return 3;
+}
+
 const char *EnumeratorName(ExprNullPointerConstantValueDependence);
 
-enum class ExprSideEffectsKind : unsigned short {
+enum class ExprSideEffectsKind : unsigned char {
   NO_SIDE_EFFECTS,
   ALLOW_UNDEFINED_BEHAVIOR,
   ALLOW_SIDE_EFFECTS,
-  NUM_ENUMERATORS
 };
 
 ExprSideEffectsKind FromPasta(pasta::ExprSideEffectsKind pasta_val);
@@ -954,9 +1007,13 @@ inline static const char *EnumerationName(ExprSideEffectsKind) {
   return "ExprSideEffectsKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprSideEffectsKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ExprSideEffectsKind);
 
-enum class ExprisModifiableLvalueResult : unsigned short {
+enum class ExprisModifiableLvalueResult : unsigned char {
   VALID,
   NOT_OBJECT_TYPE,
   INCOMPLETE_VOID_TYPE,
@@ -974,7 +1031,6 @@ enum class ExprisModifiableLvalueResult : unsigned short {
   INVALID_MESSAGE_EXPRESSION,
   CLASS_TEMPORARY,
   ARRAY_TEMPORARY,
-  NUM_ENUMERATORS
 };
 
 ExprisModifiableLvalueResult FromPasta(pasta::ExprisModifiableLvalueResult pasta_val);
@@ -983,15 +1039,18 @@ inline static const char *EnumerationName(ExprisModifiableLvalueResult) {
   return "ExprisModifiableLvalueResult";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprisModifiableLvalueResult) {
+  return 17;
+}
+
 const char *EnumeratorName(ExprisModifiableLvalueResult);
 
-enum class FunctionDeclTemplatedKind : unsigned short {
+enum class FunctionDeclTemplatedKind : unsigned char {
   NON_TEMPLATE,
   FUNCTION_TEMPLATE,
   MEMBER_SPECIALIZATION,
   FUNCTION_TEMPLATE_SPECIALIZATION,
   DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION,
-  NUM_ENUMERATORS
 };
 
 FunctionDeclTemplatedKind FromPasta(pasta::FunctionDeclTemplatedKind pasta_val);
@@ -1000,11 +1059,14 @@ inline static const char *EnumerationName(FunctionDeclTemplatedKind) {
   return "FunctionDeclTemplatedKind";
 }
 
+inline static constexpr unsigned NumEnumerators(FunctionDeclTemplatedKind) {
+  return 5;
+}
+
 const char *EnumeratorName(FunctionDeclTemplatedKind);
 
-enum class ImplicitCastExprOnStack : unsigned short {
+enum class ImplicitCastExprOnStack : unsigned char {
   ON_STACK,
-  NUM_ENUMERATORS
 };
 
 ImplicitCastExprOnStack FromPasta(pasta::ImplicitCastExprOnStack pasta_val);
@@ -1013,16 +1075,19 @@ inline static const char *EnumerationName(ImplicitCastExprOnStack) {
   return "ImplicitCastExprOnStack";
 }
 
+inline static constexpr unsigned NumEnumerators(ImplicitCastExprOnStack) {
+  return 1;
+}
+
 const char *EnumeratorName(ImplicitCastExprOnStack);
 
-enum class ImplicitParamDeclImplicitParamKind : unsigned short {
+enum class ImplicitParamDeclImplicitParamKind : unsigned char {
   OBJ_C_SELF,
   OBJ_C_CMD,
   CXX_THIS,
   CXXVTT,
   CAPTURED_CONTEXT,
   OTHER,
-  NUM_ENUMERATORS
 };
 
 ImplicitParamDeclImplicitParamKind FromPasta(pasta::ImplicitParamDeclImplicitParamKind pasta_val);
@@ -1031,12 +1096,15 @@ inline static const char *EnumerationName(ImplicitParamDeclImplicitParamKind) {
   return "ImplicitParamDeclImplicitParamKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ImplicitParamDeclImplicitParamKind) {
+  return 6;
+}
+
 const char *EnumeratorName(ImplicitParamDeclImplicitParamKind);
 
-enum class LinkageSpecDeclLanguageIDs : unsigned short {
+enum class LinkageSpecDeclLanguageIDs : unsigned char {
   C,
   CXX,
-  NUM_ENUMERATORS
 };
 
 LinkageSpecDeclLanguageIDs FromPasta(pasta::LinkageSpecDeclLanguageIDs pasta_val);
@@ -1045,12 +1113,15 @@ inline static const char *EnumerationName(LinkageSpecDeclLanguageIDs) {
   return "LinkageSpecDeclLanguageIDs";
 }
 
+inline static constexpr unsigned NumEnumerators(LinkageSpecDeclLanguageIDs) {
+  return 2;
+}
+
 const char *EnumeratorName(LinkageSpecDeclLanguageIDs);
 
-enum class NamedDeclExplicitVisibilityKind : unsigned short {
+enum class NamedDeclExplicitVisibilityKind : unsigned char {
   VISIBILITY_FOR_TYPE,
   VISIBILITY_FOR_VALUE,
-  NUM_ENUMERATORS
 };
 
 NamedDeclExplicitVisibilityKind FromPasta(pasta::NamedDeclExplicitVisibilityKind pasta_val);
@@ -1059,13 +1130,16 @@ inline static const char *EnumerationName(NamedDeclExplicitVisibilityKind) {
   return "NamedDeclExplicitVisibilityKind";
 }
 
+inline static constexpr unsigned NumEnumerators(NamedDeclExplicitVisibilityKind) {
+  return 2;
+}
+
 const char *EnumeratorName(NamedDeclExplicitVisibilityKind);
 
-enum class OMPDeclareReductionDeclInitKind : unsigned short {
+enum class OMPDeclareReductionDeclInitKind : unsigned char {
   CALL_INITIALIZER,
   DIRECT_INITIALIZER,
   COPY_INITIALIZER,
-  NUM_ENUMERATORS
 };
 
 OMPDeclareReductionDeclInitKind FromPasta(pasta::OMPDeclareReductionDeclInitKind pasta_val);
@@ -1074,15 +1148,18 @@ inline static const char *EnumerationName(OMPDeclareReductionDeclInitKind) {
   return "OMPDeclareReductionDeclInitKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OMPDeclareReductionDeclInitKind) {
+  return 3;
+}
+
 const char *EnumeratorName(OMPDeclareReductionDeclInitKind);
 
-enum class ObjCIvarDeclAccessControl : unsigned short {
+enum class ObjCIvarDeclAccessControl : unsigned char {
   NONE,
   PRIVATE,
   PROTECTED,
   PUBLIC,
   PACKAGE,
-  NUM_ENUMERATORS
 };
 
 ObjCIvarDeclAccessControl FromPasta(pasta::ObjCIvarDeclAccessControl pasta_val);
@@ -1091,14 +1168,17 @@ inline static const char *EnumerationName(ObjCIvarDeclAccessControl) {
   return "ObjCIvarDeclAccessControl";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCIvarDeclAccessControl) {
+  return 5;
+}
+
 const char *EnumeratorName(ObjCIvarDeclAccessControl);
 
-enum class ObjCMessageExprReceiverKind : unsigned short {
+enum class ObjCMessageExprReceiverKind : unsigned char {
   CLASS,
   INSTANCE,
   SUPER_CLASS,
   SUPER_INSTANCE,
-  NUM_ENUMERATORS
 };
 
 ObjCMessageExprReceiverKind FromPasta(pasta::ObjCMessageExprReceiverKind pasta_val);
@@ -1107,13 +1187,16 @@ inline static const char *EnumerationName(ObjCMessageExprReceiverKind) {
   return "ObjCMessageExprReceiverKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCMessageExprReceiverKind) {
+  return 4;
+}
+
 const char *EnumeratorName(ObjCMessageExprReceiverKind);
 
-enum class ObjCMethodDeclImplementationControl : unsigned short {
+enum class ObjCMethodDeclImplementationControl : unsigned char {
   NONE,
   REQUIRED,
   OPTIONAL,
-  NUM_ENUMERATORS
 };
 
 ObjCMethodDeclImplementationControl FromPasta(pasta::ObjCMethodDeclImplementationControl pasta_val);
@@ -1122,13 +1205,16 @@ inline static const char *EnumerationName(ObjCMethodDeclImplementationControl) {
   return "ObjCMethodDeclImplementationControl";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCMethodDeclImplementationControl) {
+  return 3;
+}
+
 const char *EnumeratorName(ObjCMethodDeclImplementationControl);
 
-enum class ObjCPropertyDeclPropertyControl : unsigned short {
+enum class ObjCPropertyDeclPropertyControl : unsigned char {
   NONE,
   REQUIRED,
   OPTIONAL,
-  NUM_ENUMERATORS
 };
 
 ObjCPropertyDeclPropertyControl FromPasta(pasta::ObjCPropertyDeclPropertyControl pasta_val);
@@ -1137,14 +1223,17 @@ inline static const char *EnumerationName(ObjCPropertyDeclPropertyControl) {
   return "ObjCPropertyDeclPropertyControl";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCPropertyDeclPropertyControl) {
+  return 3;
+}
+
 const char *EnumeratorName(ObjCPropertyDeclPropertyControl);
 
-enum class ObjCPropertyDeclSetterKind : unsigned short {
+enum class ObjCPropertyDeclSetterKind : unsigned char {
   ASSIGN,
   RETAIN,
   COPY,
   WEAK,
-  NUM_ENUMERATORS
 };
 
 ObjCPropertyDeclSetterKind FromPasta(pasta::ObjCPropertyDeclSetterKind pasta_val);
@@ -1153,12 +1242,15 @@ inline static const char *EnumerationName(ObjCPropertyDeclSetterKind) {
   return "ObjCPropertyDeclSetterKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCPropertyDeclSetterKind) {
+  return 4;
+}
+
 const char *EnumeratorName(ObjCPropertyDeclSetterKind);
 
-enum class ObjCPropertyImplDeclKind : unsigned short {
+enum class ObjCPropertyImplDeclKind : unsigned char {
   SYNTHESIZE,
   DYNAMIC,
-  NUM_ENUMERATORS
 };
 
 ObjCPropertyImplDeclKind FromPasta(pasta::ObjCPropertyImplDeclKind pasta_val);
@@ -1167,9 +1259,13 @@ inline static const char *EnumerationName(ObjCPropertyImplDeclKind) {
   return "ObjCPropertyImplDeclKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCPropertyImplDeclKind) {
+  return 2;
+}
+
 const char *EnumeratorName(ObjCPropertyImplDeclKind);
 
-enum class PredefinedExprIdentKind : unsigned short {
+enum class PredefinedExprIdentKind : unsigned char {
   FUNC,
   FUNCTION,
   L_FUNCTION,
@@ -1178,7 +1274,6 @@ enum class PredefinedExprIdentKind : unsigned short {
   L_FUNC_SIG,
   PRETTY_FUNCTION,
   PRETTY_FUNCTION_NO_VIRTUAL,
-  NUM_ENUMERATORS
 };
 
 PredefinedExprIdentKind FromPasta(pasta::PredefinedExprIdentKind pasta_val);
@@ -1187,15 +1282,18 @@ inline static const char *EnumerationName(PredefinedExprIdentKind) {
   return "PredefinedExprIdentKind";
 }
 
+inline static constexpr unsigned NumEnumerators(PredefinedExprIdentKind) {
+  return 8;
+}
+
 const char *EnumeratorName(PredefinedExprIdentKind);
 
-enum class QualTypeDestructionKind : unsigned short {
+enum class QualTypeDestructionKind : unsigned char {
   NONE,
   CXX_DESTRUCTOR,
   OBJC_STRONG_LIFETIME,
   OBJC_WEAK_LIFETIME,
   NONTRIVIAL_C_STRUCT,
-  NUM_ENUMERATORS
 };
 
 QualTypeDestructionKind FromPasta(pasta::QualTypeDestructionKind pasta_val);
@@ -1204,15 +1302,18 @@ inline static const char *EnumerationName(QualTypeDestructionKind) {
   return "QualTypeDestructionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(QualTypeDestructionKind) {
+  return 5;
+}
+
 const char *EnumeratorName(QualTypeDestructionKind);
 
-enum class QualTypePrimitiveCopyKind : unsigned short {
+enum class QualTypePrimitiveCopyKind : unsigned char {
   TRIVIAL,
   VOLATILE_TRIVIAL,
   ARC_STRONG,
   ARC_WEAK,
   STRUCT,
-  NUM_ENUMERATORS
 };
 
 QualTypePrimitiveCopyKind FromPasta(pasta::QualTypePrimitiveCopyKind pasta_val);
@@ -1221,14 +1322,17 @@ inline static const char *EnumerationName(QualTypePrimitiveCopyKind) {
   return "QualTypePrimitiveCopyKind";
 }
 
+inline static constexpr unsigned NumEnumerators(QualTypePrimitiveCopyKind) {
+  return 5;
+}
+
 const char *EnumeratorName(QualTypePrimitiveCopyKind);
 
-enum class QualTypePrimitiveDefaultInitializeKind : unsigned short {
+enum class QualTypePrimitiveDefaultInitializeKind : unsigned char {
   TRIVIAL,
   ARC_STRONG,
   ARC_WEAK,
   STRUCT,
-  NUM_ENUMERATORS
 };
 
 QualTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualTypePrimitiveDefaultInitializeKind pasta_val);
@@ -1237,13 +1341,16 @@ inline static const char *EnumerationName(QualTypePrimitiveDefaultInitializeKind
   return "QualTypePrimitiveDefaultInitializeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(QualTypePrimitiveDefaultInitializeKind) {
+  return 4;
+}
+
 const char *EnumeratorName(QualTypePrimitiveDefaultInitializeKind);
 
-enum class RecordDeclArgPassingKind : unsigned short {
+enum class RecordDeclArgPassingKind : unsigned char {
   CAN_PASS_IN_REGS,
   CANNOT_PASS_IN_REGS,
   CAN_NEVER_PASS_IN_REGS,
-  NUM_ENUMERATORS
 };
 
 RecordDeclArgPassingKind FromPasta(pasta::RecordDeclArgPassingKind pasta_val);
@@ -1252,14 +1359,17 @@ inline static const char *EnumerationName(RecordDeclArgPassingKind) {
   return "RecordDeclArgPassingKind";
 }
 
+inline static constexpr unsigned NumEnumerators(RecordDeclArgPassingKind) {
+  return 3;
+}
+
 const char *EnumeratorName(RecordDeclArgPassingKind);
 
-enum class SourceLocExprIdentKind : unsigned short {
+enum class SourceLocExprIdentKind : unsigned char {
   FUNCTION,
   FILE,
   LINE,
   COLUMN,
-  NUM_ENUMERATORS
 };
 
 SourceLocExprIdentKind FromPasta(pasta::SourceLocExprIdentKind pasta_val);
@@ -1268,13 +1378,16 @@ inline static const char *EnumerationName(SourceLocExprIdentKind) {
   return "SourceLocExprIdentKind";
 }
 
+inline static constexpr unsigned NumEnumerators(SourceLocExprIdentKind) {
+  return 4;
+}
+
 const char *EnumeratorName(SourceLocExprIdentKind);
 
-enum class StmtLikelihood : unsigned short {
+enum class StmtLikelihood : unsigned char {
   UNLIKELY,
   NONE,
   LIKELY,
-  NUM_ENUMERATORS
 };
 
 StmtLikelihood FromPasta(pasta::StmtLikelihood pasta_val);
@@ -1283,9 +1396,13 @@ inline static const char *EnumerationName(StmtLikelihood) {
   return "StmtLikelihood";
 }
 
+inline static constexpr unsigned NumEnumerators(StmtLikelihood) {
+  return 3;
+}
+
 const char *EnumeratorName(StmtLikelihood);
 
-enum class StmtKind : unsigned short {
+enum class StmtKind : unsigned char {
   GCC_ASM_STMT,
   MS_ASM_STMT,
   BREAK_STMT,
@@ -1506,7 +1623,6 @@ enum class StmtKind : unsigned short {
   VA_ARG_EXPR,
   LABEL_STMT,
   WHILE_STMT,
-  NUM_ENUMERATORS
 };
 
 StmtKind FromPasta(pasta::StmtKind pasta_val);
@@ -1515,15 +1631,18 @@ inline static const char *EnumerationName(StmtKind) {
   return "StmtKind";
 }
 
+inline static constexpr unsigned NumEnumerators(StmtKind) {
+  return 220;
+}
+
 const char *EnumeratorName(StmtKind);
 
-enum class StringLiteralStringKind : unsigned short {
+enum class StringLiteralStringKind : unsigned char {
   ASCII,
   WIDE,
   UTF8,
   UTF16,
   UTF32,
-  NUM_ENUMERATORS
 };
 
 StringLiteralStringKind FromPasta(pasta::StringLiteralStringKind pasta_val);
@@ -1532,9 +1651,13 @@ inline static const char *EnumerationName(StringLiteralStringKind) {
   return "StringLiteralStringKind";
 }
 
+inline static constexpr unsigned NumEnumerators(StringLiteralStringKind) {
+  return 5;
+}
+
 const char *EnumeratorName(StringLiteralStringKind);
 
-enum class TemplateArgumentKind : unsigned short {
+enum class TemplateArgumentKind : unsigned char {
   EMPTY,
   TYPE,
   DECLARATION,
@@ -1544,7 +1667,6 @@ enum class TemplateArgumentKind : unsigned short {
   TEMPLATE_EXPANSION,
   EXPRESSION,
   PACK,
-  NUM_ENUMERATORS
 };
 
 TemplateArgumentKind FromPasta(pasta::TemplateArgumentKind pasta_val);
@@ -1553,9 +1675,13 @@ inline static const char *EnumerationName(TemplateArgumentKind) {
   return "TemplateArgumentKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TemplateArgumentKind) {
+  return 9;
+}
+
 const char *EnumeratorName(TemplateArgumentKind);
 
-enum class TypeScalarTypeKind : unsigned short {
+enum class TypeScalarTypeKind : unsigned char {
   C_POINTER,
   BLOCK_POINTER,
   OBJ_C_OBJECT_POINTER,
@@ -1566,7 +1692,6 @@ enum class TypeScalarTypeKind : unsigned short {
   INTEGRAL_COMPLEX,
   FLOATING_COMPLEX,
   FIXED_POINT,
-  NUM_ENUMERATORS
 };
 
 TypeScalarTypeKind FromPasta(pasta::TypeScalarTypeKind pasta_val);
@@ -1575,9 +1700,13 @@ inline static const char *EnumerationName(TypeScalarTypeKind) {
   return "TypeScalarTypeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeScalarTypeKind) {
+  return 10;
+}
+
 const char *EnumeratorName(TypeScalarTypeKind);
 
-enum class TypeKind : unsigned short {
+enum class TypeKind : unsigned char {
   ADJUSTED,
   DECAYED,
   CONSTANT_ARRAY,
@@ -1630,7 +1759,6 @@ enum class TypeKind : unsigned short {
   UNRESOLVED_USING,
   VECTOR,
   EXT_VECTOR,
-  NUM_ENUMERATORS
 };
 
 TypeKind FromPasta(pasta::TypeKind pasta_val);
@@ -1639,11 +1767,14 @@ inline static const char *EnumerationName(TypeKind) {
   return "TypeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeKind) {
+  return 52;
+}
+
 const char *EnumeratorName(TypeKind);
 
-enum class UnaryTransformTypeUTTKind : unsigned short {
+enum class UnaryTransformTypeUTTKind : unsigned char {
   ENUM_UNDERLYING_TYPE,
-  NUM_ENUMERATORS
 };
 
 UnaryTransformTypeUTTKind FromPasta(pasta::UnaryTransformTypeUTTKind pasta_val);
@@ -1652,16 +1783,19 @@ inline static const char *EnumerationName(UnaryTransformTypeUTTKind) {
   return "UnaryTransformTypeUTTKind";
 }
 
+inline static constexpr unsigned NumEnumerators(UnaryTransformTypeUTTKind) {
+  return 1;
+}
+
 const char *EnumeratorName(UnaryTransformTypeUTTKind);
 
-enum class UserDefinedLiteralLiteralOperatorKind : unsigned short {
+enum class UserDefinedLiteralLiteralOperatorKind : unsigned char {
   RAW,
   TEMPLATE,
   INTEGER,
   FLOATING,
   STRING,
   CHARACTER,
-  NUM_ENUMERATORS
 };
 
 UserDefinedLiteralLiteralOperatorKind FromPasta(pasta::UserDefinedLiteralLiteralOperatorKind pasta_val);
@@ -1670,13 +1804,16 @@ inline static const char *EnumerationName(UserDefinedLiteralLiteralOperatorKind)
   return "UserDefinedLiteralLiteralOperatorKind";
 }
 
+inline static constexpr unsigned NumEnumerators(UserDefinedLiteralLiteralOperatorKind) {
+  return 6;
+}
+
 const char *EnumeratorName(UserDefinedLiteralLiteralOperatorKind);
 
-enum class VarDeclDefinitionKind : unsigned short {
+enum class VarDeclDefinitionKind : unsigned char {
   DECLARATION_ONLY,
   TENTATIVE_DEFINITION,
   DEFINITION,
-  NUM_ENUMERATORS
 };
 
 VarDeclDefinitionKind FromPasta(pasta::VarDeclDefinitionKind pasta_val);
@@ -1685,13 +1822,16 @@ inline static const char *EnumerationName(VarDeclDefinitionKind) {
   return "VarDeclDefinitionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(VarDeclDefinitionKind) {
+  return 3;
+}
+
 const char *EnumeratorName(VarDeclDefinitionKind);
 
-enum class VarDeclInitializationStyle : unsigned short {
+enum class VarDeclInitializationStyle : unsigned char {
   C_INIT,
   CALL_INITIALIZER,
   LIST_INITIALIZER,
-  NUM_ENUMERATORS
 };
 
 VarDeclInitializationStyle FromPasta(pasta::VarDeclInitializationStyle pasta_val);
@@ -1700,13 +1840,16 @@ inline static const char *EnumerationName(VarDeclInitializationStyle) {
   return "VarDeclInitializationStyle";
 }
 
+inline static constexpr unsigned NumEnumerators(VarDeclInitializationStyle) {
+  return 3;
+}
+
 const char *EnumeratorName(VarDeclInitializationStyle);
 
-enum class VarDeclTLSKind : unsigned short {
+enum class VarDeclTLSKind : unsigned char {
   NONE,
   STATIC,
   DYNAMIC,
-  NUM_ENUMERATORS
 };
 
 VarDeclTLSKind FromPasta(pasta::VarDeclTLSKind pasta_val);
@@ -1715,9 +1858,13 @@ inline static const char *EnumerationName(VarDeclTLSKind) {
   return "VarDeclTLSKind";
 }
 
+inline static constexpr unsigned NumEnumerators(VarDeclTLSKind) {
+  return 3;
+}
+
 const char *EnumeratorName(VarDeclTLSKind);
 
-enum class VectorTypeVectorKind : unsigned short {
+enum class VectorTypeVectorKind : unsigned char {
   GENERIC_VECTOR,
   ALTI_VEC_VECTOR,
   ALTI_VEC_PIXEL,
@@ -1726,7 +1873,6 @@ enum class VectorTypeVectorKind : unsigned short {
   NEON_POLY_VECTOR,
   SVE_FIXED_LENGTH_DATA_VECTOR,
   SVE_FIXED_LENGTH_PREDICATE_VECTOR,
-  NUM_ENUMERATORS
 };
 
 VectorTypeVectorKind FromPasta(pasta::VectorTypeVectorKind pasta_val);
@@ -1735,12 +1881,15 @@ inline static const char *EnumerationName(VectorTypeVectorKind) {
   return "VectorTypeVectorKind";
 }
 
+inline static constexpr unsigned NumEnumerators(VectorTypeVectorKind) {
+  return 8;
+}
+
 const char *EnumeratorName(VectorTypeVectorKind);
 
-enum class ASTDumpOutputFormat : unsigned short {
+enum class ASTDumpOutputFormat : unsigned char {
   DEFAULT,
   JSON,
-  NUM_ENUMERATORS
 };
 
 ASTDumpOutputFormat FromPasta(pasta::ASTDumpOutputFormat pasta_val);
@@ -1749,14 +1898,17 @@ inline static const char *EnumerationName(ASTDumpOutputFormat) {
   return "ASTDumpOutputFormat";
 }
 
+inline static constexpr unsigned NumEnumerators(ASTDumpOutputFormat) {
+  return 2;
+}
+
 const char *EnumeratorName(ASTDumpOutputFormat);
 
-enum class AccessSpecifier : unsigned short {
+enum class AccessSpecifier : unsigned char {
   PUBLIC,
   PROTECTED,
   PRIVATE,
   NONE,
-  NUM_ENUMERATORS
 };
 
 AccessSpecifier FromPasta(pasta::AccessSpecifier pasta_val);
@@ -1765,13 +1917,16 @@ inline static const char *EnumerationName(AccessSpecifier) {
   return "AccessSpecifier";
 }
 
+inline static constexpr unsigned NumEnumerators(AccessSpecifier) {
+  return 4;
+}
+
 const char *EnumeratorName(AccessSpecifier);
 
-enum class AddrSpaceMapMangling : unsigned short {
+enum class AddrSpaceMapMangling : unsigned char {
   TARGET,
   ON,
   OFF,
-  NUM_ENUMERATORS
 };
 
 AddrSpaceMapMangling FromPasta(pasta::AddrSpaceMapMangling pasta_val);
@@ -1780,9 +1935,13 @@ inline static const char *EnumerationName(AddrSpaceMapMangling) {
   return "AddrSpaceMapMangling";
 }
 
+inline static constexpr unsigned NumEnumerators(AddrSpaceMapMangling) {
+  return 3;
+}
+
 const char *EnumeratorName(AddrSpaceMapMangling);
 
-enum class AllocatorTypeTy : unsigned short {
+enum class AllocatorTypeTy : unsigned char {
   OMP_NULL_MEMORY_ALLOC,
   OMP_DEFAULT_MEMORY_ALLOC,
   OMP_LARGE_CAP_MEMORY_ALLOC,
@@ -1793,7 +1952,6 @@ enum class AllocatorTypeTy : unsigned short {
   OMPP_TEAM_MEMORY_ALLOC,
   OMP_THREAD_MEMORY_ALLOC,
   OMP_USER_DEFINED_MEMORY_ALLOC,
-  NUM_ENUMERATORS
 };
 
 AllocatorTypeTy FromPasta(pasta::AllocatorTypeTy pasta_val);
@@ -1802,14 +1960,17 @@ inline static const char *EnumerationName(AllocatorTypeTy) {
   return "AllocatorTypeTy";
 }
 
+inline static constexpr unsigned NumEnumerators(AllocatorTypeTy) {
+  return 10;
+}
+
 const char *EnumeratorName(AllocatorTypeTy);
 
-enum class AltivecSrcCompatKind : unsigned short {
+enum class AltivecSrcCompatKind : unsigned char {
   MIXED,
   GCC,
   XL,
   // Skipped repeat pasta::kDefault
-  NUM_ENUMERATORS
 };
 
 AltivecSrcCompatKind FromPasta(pasta::AltivecSrcCompatKind pasta_val);
@@ -1818,9 +1979,13 @@ inline static const char *EnumerationName(AltivecSrcCompatKind) {
   return "AltivecSrcCompatKind";
 }
 
+inline static constexpr unsigned NumEnumerators(AltivecSrcCompatKind) {
+  return 3;
+}
+
 const char *EnumeratorName(AltivecSrcCompatKind);
 
-enum class ArgumentKind : unsigned short {
+enum class ArgumentKind : unsigned char {
   STD_STRING,
   C_STRING,
   SINT,
@@ -1836,7 +2001,6 @@ enum class ArgumentKind : unsigned short {
   DECLCONTEXT,
   QUALTYPE_PAIR,
   ATTRIBUTE,
-  NUM_ENUMERATORS
 };
 
 ArgumentKind FromPasta(pasta::ArgumentKind pasta_val);
@@ -1845,12 +2009,15 @@ inline static const char *EnumerationName(ArgumentKind) {
   return "ArgumentKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ArgumentKind) {
+  return 15;
+}
+
 const char *EnumeratorName(ArgumentKind);
 
-enum class ArrayTypeTrait : unsigned short {
+enum class ArrayTypeTrait : unsigned char {
   ARRAY_RANK,
   ARRAY_EXTENT,
-  NUM_ENUMERATORS
 };
 
 ArrayTypeTrait FromPasta(pasta::ArrayTypeTrait pasta_val);
@@ -1859,18 +2026,25 @@ inline static const char *EnumerationName(ArrayTypeTrait) {
   return "ArrayTypeTrait";
 }
 
+inline static constexpr unsigned NumEnumerators(ArrayTypeTrait) {
+  return 2;
+}
+
 const char *EnumeratorName(ArrayTypeTrait);
 
-enum class AtomicScopeModelKind : unsigned short {
+enum class AtomicScopeModelKind : unsigned char {
   NONE,
   OPEN_CL,
-  NUM_ENUMERATORS
 };
 
 AtomicScopeModelKind FromPasta(pasta::AtomicScopeModelKind pasta_val);
 
 inline static const char *EnumerationName(AtomicScopeModelKind) {
   return "AtomicScopeModelKind";
+}
+
+inline static constexpr unsigned NumEnumerators(AtomicScopeModelKind) {
+  return 2;
 }
 
 const char *EnumeratorName(AtomicScopeModelKind);
@@ -2217,7 +2391,6 @@ enum class AttributeKind : unsigned short {
   RENDER_SCRIPT_KERNEL,
   SWIFT_OBJ_C_MEMBERS,
   THREAD,
-  NUM_ENUMERATORS
 };
 
 AttributeKind FromPasta(pasta::AttributeKind pasta_val);
@@ -2226,13 +2399,16 @@ inline static const char *EnumerationName(AttributeKind) {
   return "AttributeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(AttributeKind) {
+  return 341;
+}
+
 const char *EnumeratorName(AttributeKind);
 
-enum class AutoTypeKeyword : unsigned short {
+enum class AutoTypeKeyword : unsigned char {
   AUTO,
   DECLTYPE_AUTO,
   GNU_AUTO_TYPE,
-  NUM_ENUMERATORS
 };
 
 AutoTypeKeyword FromPasta(pasta::AutoTypeKeyword pasta_val);
@@ -2241,14 +2417,17 @@ inline static const char *EnumerationName(AutoTypeKeyword) {
   return "AutoTypeKeyword";
 }
 
+inline static constexpr unsigned NumEnumerators(AutoTypeKeyword) {
+  return 3;
+}
+
 const char *EnumeratorName(AutoTypeKeyword);
 
-enum class AvailabilityResult : unsigned short {
+enum class AvailabilityResult : unsigned char {
   AVAILABLE,
   NOT_YET_INTRODUCED,
   DEPRECATED,
   UNAVAILABLE,
-  NUM_ENUMERATORS
 };
 
 AvailabilityResult FromPasta(pasta::AvailabilityResult pasta_val);
@@ -2257,9 +2436,13 @@ inline static const char *EnumerationName(AvailabilityResult) {
   return "AvailabilityResult";
 }
 
+inline static constexpr unsigned NumEnumerators(AvailabilityResult) {
+  return 4;
+}
+
 const char *EnumeratorName(AvailabilityResult);
 
-enum class BinaryOperatorKind : unsigned short {
+enum class BinaryOperatorKind : unsigned char {
   POINTER_MEMORY_D,
   POINTER_MEMORY_I,
   MUL,
@@ -2293,7 +2476,6 @@ enum class BinaryOperatorKind : unsigned short {
   XOR_ASSIGN,
   OR_ASSIGN,
   COMMA,
-  NUM_ENUMERATORS
 };
 
 BinaryOperatorKind FromPasta(pasta::BinaryOperatorKind pasta_val);
@@ -2302,9 +2484,13 @@ inline static const char *EnumerationName(BinaryOperatorKind) {
   return "BinaryOperatorKind";
 }
 
+inline static constexpr unsigned NumEnumerators(BinaryOperatorKind) {
+  return 33;
+}
+
 const char *EnumeratorName(BinaryOperatorKind);
 
-enum class Bits : unsigned short {
+enum class Bits : unsigned char {
   NONE,
   UNEXPANDED_PACK,
   INSTANTIATION,
@@ -2314,7 +2500,6 @@ enum class Bits : unsigned short {
   ERROR,
   VARIABLY_MODIFIED,
   SYNTACTIC,
-  NUM_ENUMERATORS
 };
 
 Bits FromPasta(pasta::Bits pasta_val);
@@ -2323,11 +2508,14 @@ inline static const char *EnumerationName(Bits) {
   return "Bits";
 }
 
+inline static constexpr unsigned NumEnumerators(Bits) {
+  return 9;
+}
+
 const char *EnumeratorName(Bits);
 
-enum class BlockType : unsigned short {
+enum class BlockType : unsigned char {
   BY_REFERENCE,
-  NUM_ENUMERATORS
 };
 
 BlockType FromPasta(pasta::BlockType pasta_val);
@@ -2336,13 +2524,16 @@ inline static const char *EnumerationName(BlockType) {
   return "BlockType";
 }
 
+inline static constexpr unsigned NumEnumerators(BlockType) {
+  return 1;
+}
+
 const char *EnumeratorName(BlockType);
 
-enum class BranchStateTy : unsigned short {
+enum class BranchStateTy : unsigned char {
   UNDEFINED,
   INBRANCH,
   NOTINBRANCH,
-  NUM_ENUMERATORS
 };
 
 BranchStateTy FromPasta(pasta::BranchStateTy pasta_val);
@@ -2351,9 +2542,13 @@ inline static const char *EnumerationName(BranchStateTy) {
   return "BranchStateTy";
 }
 
+inline static constexpr unsigned NumEnumerators(BranchStateTy) {
+  return 3;
+}
+
 const char *EnumeratorName(BranchStateTy);
 
-enum class CallingConv : unsigned short {
+enum class CallingConv : unsigned char {
   C,
   X86_STD_CALL,
   X86_FAST_CALL,
@@ -2373,7 +2568,6 @@ enum class CallingConv : unsigned short {
   PRESERVE_MOST,
   PRESERVE_ALL,
   A_ARCH64_VECTOR_CALL,
-  NUM_ENUMERATORS
 };
 
 CallingConv FromPasta(pasta::CallingConv pasta_val);
@@ -2382,13 +2576,16 @@ inline static const char *EnumerationName(CallingConv) {
   return "CallingConv";
 }
 
+inline static constexpr unsigned NumEnumerators(CallingConv) {
+  return 19;
+}
+
 const char *EnumeratorName(CallingConv);
 
-enum class CanThrowResult : unsigned short {
+enum class CanThrowResult : unsigned char {
   CANNOT,
   DEPENDENT,
   CAN,
-  NUM_ENUMERATORS
 };
 
 CanThrowResult FromPasta(pasta::CanThrowResult pasta_val);
@@ -2397,13 +2594,16 @@ inline static const char *EnumerationName(CanThrowResult) {
   return "CanThrowResult";
 }
 
+inline static constexpr unsigned NumEnumerators(CanThrowResult) {
+  return 3;
+}
+
 const char *EnumeratorName(CanThrowResult);
 
-enum class CapturedRegionKind : unsigned short {
+enum class CapturedRegionKind : unsigned char {
   DEFAULT,
   OBJ_C_AT_FINALLY,
   OPEN_MP,
-  NUM_ENUMERATORS
 };
 
 CapturedRegionKind FromPasta(pasta::CapturedRegionKind pasta_val);
@@ -2412,9 +2612,13 @@ inline static const char *EnumerationName(CapturedRegionKind) {
   return "CapturedRegionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CapturedRegionKind) {
+  return 3;
+}
+
 const char *EnumeratorName(CapturedRegionKind);
 
-enum class CastKind : unsigned short {
+enum class CastKind : unsigned char {
   DEPENDENT,
   BIT_CAST,
   L_VALUE_BIT_CAST,
@@ -2480,7 +2684,6 @@ enum class CastKind : unsigned short {
   ZERO_TO_OCL_OPAQUE_TYPE,
   ADDRESS_SPACE_CONVERSION,
   INT_TO_OCL_SAMPLER,
-  NUM_ENUMERATORS
 };
 
 CastKind FromPasta(pasta::CastKind pasta_val);
@@ -2489,9 +2692,13 @@ inline static const char *EnumerationName(CastKind) {
   return "CastKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CastKind) {
+  return 65;
+}
+
 const char *EnumeratorName(CastKind);
 
-enum class ClangABI : unsigned short {
+enum class ClangABI : unsigned char {
   VER38,
   VER4,
   VER6,
@@ -2500,7 +2707,6 @@ enum class ClangABI : unsigned short {
   VER11,
   VER12,
   LATEST,
-  NUM_ENUMERATORS
 };
 
 ClangABI FromPasta(pasta::ClangABI pasta_val);
@@ -2509,9 +2715,13 @@ inline static const char *EnumerationName(ClangABI) {
   return "ClangABI";
 }
 
+inline static constexpr unsigned NumEnumerators(ClangABI) {
+  return 8;
+}
+
 const char *EnumeratorName(ClangABI);
 
-enum class CommentKind : unsigned short {
+enum class CommentKind : unsigned char {
   INVALID,
   ORDINARY_BCPL,
   ORDINARY_C,
@@ -2520,7 +2730,6 @@ enum class CommentKind : unsigned short {
   JAVA_DOC,
   QT,
   MERGED,
-  NUM_ENUMERATORS
 };
 
 CommentKind FromPasta(pasta::CommentKind pasta_val);
@@ -2529,15 +2738,18 @@ inline static const char *EnumerationName(CommentKind) {
   return "CommentKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CommentKind) {
+  return 8;
+}
+
 const char *EnumeratorName(CommentKind);
 
-enum class ComparisonCategoryResult : unsigned short {
+enum class ComparisonCategoryResult : unsigned char {
   EQUAL,
   EQUIVALENT,
   LESS,
   GREATER,
   UNORDERED,
-  NUM_ENUMERATORS
 };
 
 ComparisonCategoryResult FromPasta(pasta::ComparisonCategoryResult pasta_val);
@@ -2546,13 +2758,16 @@ inline static const char *EnumerationName(ComparisonCategoryResult) {
   return "ComparisonCategoryResult";
 }
 
+inline static constexpr unsigned NumEnumerators(ComparisonCategoryResult) {
+  return 5;
+}
+
 const char *EnumeratorName(ComparisonCategoryResult);
 
-enum class ComparisonCategoryType : unsigned short {
+enum class ComparisonCategoryType : unsigned char {
   PARTIAL_ORDERING,
   WEAK_ORDERING,
   STRONG_ORDERING,
-  NUM_ENUMERATORS
 };
 
 ComparisonCategoryType FromPasta(pasta::ComparisonCategoryType pasta_val);
@@ -2561,14 +2776,17 @@ inline static const char *EnumerationName(ComparisonCategoryType) {
   return "ComparisonCategoryType";
 }
 
+inline static constexpr unsigned NumEnumerators(ComparisonCategoryType) {
+  return 3;
+}
+
 const char *EnumeratorName(ComparisonCategoryType);
 
-enum class CompilingModuleKind : unsigned short {
+enum class CompilingModuleKind : unsigned char {
   NONE,
   MODULE_MAP,
   HEADER_MODULE,
   MODULE_INTERFACE,
-  NUM_ENUMERATORS
 };
 
 CompilingModuleKind FromPasta(pasta::CompilingModuleKind pasta_val);
@@ -2577,14 +2795,17 @@ inline static const char *EnumerationName(CompilingModuleKind) {
   return "CompilingModuleKind";
 }
 
+inline static constexpr unsigned NumEnumerators(CompilingModuleKind) {
+  return 4;
+}
+
 const char *EnumeratorName(CompilingModuleKind);
 
-enum class ConstexprSpecKind : unsigned short {
+enum class ConstexprSpecKind : unsigned char {
   UNSPECIFIED,
   CONSTEXPR,
   CONSTEVAL,
   CONSTINIT,
-  NUM_ENUMERATORS
 };
 
 ConstexprSpecKind FromPasta(pasta::ConstexprSpecKind pasta_val);
@@ -2593,13 +2814,16 @@ inline static const char *EnumerationName(ConstexprSpecKind) {
   return "ConstexprSpecKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ConstexprSpecKind) {
+  return 4;
+}
+
 const char *EnumeratorName(ConstexprSpecKind);
 
-enum class ConsumedState : unsigned short {
+enum class ConsumedState : unsigned char {
   UNKNOWN,
   CONSUMED,
   UNCONSUMED,
-  NUM_ENUMERATORS
 };
 
 ConsumedState FromPasta(pasta::ConsumedState pasta_val);
@@ -2608,14 +2832,17 @@ inline static const char *EnumerationName(ConsumedState) {
   return "ConsumedState";
 }
 
+inline static constexpr unsigned NumEnumerators(ConsumedState) {
+  return 3;
+}
+
 const char *EnumeratorName(ConsumedState);
 
-enum class ConventionKind : unsigned short {
+enum class ConventionKind : unsigned char {
   NONE,
   NON_NULL_ERROR,
   ZERO_ARGUMENT,
   NON_ZERO_ARGUMENT,
-  NUM_ENUMERATORS
 };
 
 ConventionKind FromPasta(pasta::ConventionKind pasta_val);
@@ -2624,9 +2851,13 @@ inline static const char *EnumerationName(ConventionKind) {
   return "ConventionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ConventionKind) {
+  return 4;
+}
+
 const char *EnumeratorName(ConventionKind);
 
-enum class CoreFoundationABI : unsigned short {
+enum class CoreFoundationABI : unsigned char {
   UNSPECIFIED,
   STANDALONE,
   OBJECTIVE_C,
@@ -2634,7 +2865,6 @@ enum class CoreFoundationABI : unsigned short {
   SWIFT50,
   SWIFT42,
   SWIFT41,
-  NUM_ENUMERATORS
 };
 
 CoreFoundationABI FromPasta(pasta::CoreFoundationABI pasta_val);
@@ -2643,14 +2873,17 @@ inline static const char *EnumerationName(CoreFoundationABI) {
   return "CoreFoundationABI";
 }
 
+inline static constexpr unsigned NumEnumerators(CoreFoundationABI) {
+  return 7;
+}
+
 const char *EnumeratorName(CoreFoundationABI);
 
-enum class DefaultArgKind : unsigned short {
+enum class DefaultArgKind : unsigned char {
   NONE,
   UNPARSED,
   UNINSTANTIATED,
   NORMAL,
-  NUM_ENUMERATORS
 };
 
 DefaultArgKind FromPasta(pasta::DefaultArgKind pasta_val);
@@ -2659,16 +2892,19 @@ inline static const char *EnumerationName(DefaultArgKind) {
   return "DefaultArgKind";
 }
 
+inline static constexpr unsigned NumEnumerators(DefaultArgKind) {
+  return 4;
+}
+
 const char *EnumeratorName(DefaultArgKind);
 
-enum class DefaultCallingConvention : unsigned short {
+enum class DefaultCallingConvention : unsigned char {
   NONE,
   C_DECL,
   FAST_CALL,
   STD_CALL,
   VECTOR_CALL,
   REG_CALL,
-  NUM_ENUMERATORS
 };
 
 DefaultCallingConvention FromPasta(pasta::DefaultCallingConvention pasta_val);
@@ -2677,13 +2913,16 @@ inline static const char *EnumerationName(DefaultCallingConvention) {
   return "DefaultCallingConvention";
 }
 
+inline static constexpr unsigned NumEnumerators(DefaultCallingConvention) {
+  return 6;
+}
+
 const char *EnumeratorName(DefaultCallingConvention);
 
-enum class DevTypeTy : unsigned short {
+enum class DevTypeTy : unsigned char {
   HOST,
   NO_HOST,
   ANY,
-  NUM_ENUMERATORS
 };
 
 DevTypeTy FromPasta(pasta::DevTypeTy pasta_val);
@@ -2692,16 +2931,19 @@ inline static const char *EnumerationName(DevTypeTy) {
   return "DevTypeTy";
 }
 
+inline static constexpr unsigned NumEnumerators(DevTypeTy) {
+  return 3;
+}
+
 const char *EnumeratorName(DevTypeTy);
 
-enum class DiagnosticLevelMask : unsigned short {
+enum class DiagnosticLevelMask : unsigned char {
   NONE,
   NOTE,
   REMARK,
   WARNING,
   ERROR,
   ALL,
-  NUM_ENUMERATORS
 };
 
 DiagnosticLevelMask FromPasta(pasta::DiagnosticLevelMask pasta_val);
@@ -2710,12 +2952,15 @@ inline static const char *EnumerationName(DiagnosticLevelMask) {
   return "DiagnosticLevelMask";
 }
 
+inline static constexpr unsigned NumEnumerators(DiagnosticLevelMask) {
+  return 6;
+}
+
 const char *EnumeratorName(DiagnosticLevelMask);
 
-enum class DiagnosticType : unsigned short {
+enum class DiagnosticType : unsigned char {
   ERROR,
   WARNING,
-  NUM_ENUMERATORS
 };
 
 DiagnosticType FromPasta(pasta::DiagnosticType pasta_val);
@@ -2724,9 +2969,13 @@ inline static const char *EnumerationName(DiagnosticType) {
   return "DiagnosticType";
 }
 
+inline static constexpr unsigned NumEnumerators(DiagnosticType) {
+  return 2;
+}
+
 const char *EnumeratorName(DiagnosticType);
 
-enum class ElaboratedTypeKeyword : unsigned short {
+enum class ElaboratedTypeKeyword : unsigned char {
   STRUCT,
   INTERFACE,
   UNION,
@@ -2734,7 +2983,6 @@ enum class ElaboratedTypeKeyword : unsigned short {
   ENUM,
   TYPENAME,
   NONE,
-  NUM_ENUMERATORS
 };
 
 ElaboratedTypeKeyword FromPasta(pasta::ElaboratedTypeKeyword pasta_val);
@@ -2743,14 +2991,17 @@ inline static const char *EnumerationName(ElaboratedTypeKeyword) {
   return "ElaboratedTypeKeyword";
 }
 
+inline static constexpr unsigned NumEnumerators(ElaboratedTypeKeyword) {
+  return 7;
+}
+
 const char *EnumeratorName(ElaboratedTypeKeyword);
 
-enum class EmbedBitcodeKind : unsigned short {
+enum class EmbedBitcodeKind : unsigned char {
   EMBED_OFF,
   EMBED_ALL,
   EMBED_BITCODE,
   EMBED_MARKER,
-  NUM_ENUMERATORS
 };
 
 EmbedBitcodeKind FromPasta(pasta::EmbedBitcodeKind pasta_val);
@@ -2759,15 +3010,18 @@ inline static const char *EnumerationName(EmbedBitcodeKind) {
   return "EmbedBitcodeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(EmbedBitcodeKind) {
+  return 4;
+}
+
 const char *EnumeratorName(EmbedBitcodeKind);
 
-enum class ExceptionHandlingKind : unsigned short {
+enum class ExceptionHandlingKind : unsigned char {
   NONE,
   SJ_LJ,
   WIN_EH,
   DWARF_CFI,
   WASM,
-  NUM_ENUMERATORS
 };
 
 ExceptionHandlingKind FromPasta(pasta::ExceptionHandlingKind pasta_val);
@@ -2776,9 +3030,13 @@ inline static const char *EnumerationName(ExceptionHandlingKind) {
   return "ExceptionHandlingKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExceptionHandlingKind) {
+  return 5;
+}
+
 const char *EnumeratorName(ExceptionHandlingKind);
 
-enum class ExceptionSpecificationType : unsigned short {
+enum class ExceptionSpecificationType : unsigned char {
   NONE,
   DYNAMIC_NONE,
   DYNAMIC,
@@ -2791,7 +3049,6 @@ enum class ExceptionSpecificationType : unsigned short {
   UNEVALUATED,
   UNINSTANTIATED,
   UNPARSED,
-  NUM_ENUMERATORS
 };
 
 ExceptionSpecificationType FromPasta(pasta::ExceptionSpecificationType pasta_val);
@@ -2800,13 +3057,16 @@ inline static const char *EnumerationName(ExceptionSpecificationType) {
   return "ExceptionSpecificationType";
 }
 
+inline static constexpr unsigned NumEnumerators(ExceptionSpecificationType) {
+  return 12;
+}
+
 const char *EnumeratorName(ExceptionSpecificationType);
 
-enum class ExplicitSpecKind : unsigned short {
+enum class ExplicitSpecKind : unsigned char {
   RESOLVED_FALSE,
   RESOLVED_TRUE,
   UNRESOLVED,
-  NUM_ENUMERATORS
 };
 
 ExplicitSpecKind FromPasta(pasta::ExplicitSpecKind pasta_val);
@@ -2815,9 +3075,13 @@ inline static const char *EnumerationName(ExplicitSpecKind) {
   return "ExplicitSpecKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExplicitSpecKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ExplicitSpecKind);
 
-enum class ExprDependence : unsigned short {
+enum class ExprDependence : unsigned char {
   UNEXPANDED_PACK,
   INSTANTIATION,
   TYPE,
@@ -2830,7 +3094,6 @@ enum class ExprDependence : unsigned short {
   VALUE_INSTANTIATION,
   TYPE_VALUE_INSTANTIATION,
   ERROR_DEPENDENT,
-  NUM_ENUMERATORS
 };
 
 ExprDependence FromPasta(pasta::ExprDependence pasta_val);
@@ -2839,16 +3102,19 @@ inline static const char *EnumerationName(ExprDependence) {
   return "ExprDependence";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprDependence) {
+  return 12;
+}
+
 const char *EnumeratorName(ExprDependence);
 
-enum class ExprObjectKind : unsigned short {
+enum class ExprObjectKind : unsigned char {
   ORDINARY,
   BIT_FIELD,
   VECTOR_COMPONENT,
   OBJ_C_PROPERTY,
   OBJ_C_SUBSCRIPT,
   MATRIX_COMPONENT,
-  NUM_ENUMERATORS
 };
 
 ExprObjectKind FromPasta(pasta::ExprObjectKind pasta_val);
@@ -2857,13 +3123,16 @@ inline static const char *EnumerationName(ExprObjectKind) {
   return "ExprObjectKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprObjectKind) {
+  return 6;
+}
+
 const char *EnumeratorName(ExprObjectKind);
 
-enum class ExprOffsets : unsigned short {
+enum class ExprOffsets : unsigned char {
   ALLOCATOR,
   ALLOCATOR_TRAITS,
   TOTAL,
-  NUM_ENUMERATORS
 };
 
 ExprOffsets FromPasta(pasta::ExprOffsets pasta_val);
@@ -2872,13 +3141,16 @@ inline static const char *EnumerationName(ExprOffsets) {
   return "ExprOffsets";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprOffsets) {
+  return 3;
+}
+
 const char *EnumeratorName(ExprOffsets);
 
-enum class ExprValueKind : unsigned short {
+enum class ExprValueKind : unsigned char {
   PR_VALUE,
   L_VALUE,
   X_VALUE,
-  NUM_ENUMERATORS
 };
 
 ExprValueKind FromPasta(pasta::ExprValueKind pasta_val);
@@ -2887,12 +3159,15 @@ inline static const char *EnumerationName(ExprValueKind) {
   return "ExprValueKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExprValueKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ExprValueKind);
 
-enum class ExpressionTrait : unsigned short {
+enum class ExpressionTrait : unsigned char {
   IS_L_VALUE_EXPRESSION,
   IS_R_VALUE_EXPRESSION,
-  NUM_ENUMERATORS
 };
 
 ExpressionTrait FromPasta(pasta::ExpressionTrait pasta_val);
@@ -2901,13 +3176,16 @@ inline static const char *EnumerationName(ExpressionTrait) {
   return "ExpressionTrait";
 }
 
+inline static constexpr unsigned NumEnumerators(ExpressionTrait) {
+  return 2;
+}
+
 const char *EnumeratorName(ExpressionTrait);
 
-enum class ExtKind : unsigned short {
+enum class ExtKind : unsigned char {
   ALWAYS,
   NEVER,
   REPLY_HAZY,
-  NUM_ENUMERATORS
 };
 
 ExtKind FromPasta(pasta::ExtKind pasta_val);
@@ -2916,12 +3194,15 @@ inline static const char *EnumerationName(ExtKind) {
   return "ExtKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExtKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ExtKind);
 
-enum class ExtendArgsKind : unsigned short {
+enum class ExtendArgsKind : unsigned char {
   EXTEND_TO32,
   EXTEND_TO64,
-  NUM_ENUMERATORS
 };
 
 ExtendArgsKind FromPasta(pasta::ExtendArgsKind pasta_val);
@@ -2930,13 +3211,16 @@ inline static const char *EnumerationName(ExtendArgsKind) {
   return "ExtendArgsKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ExtendArgsKind) {
+  return 2;
+}
+
 const char *EnumeratorName(ExtendArgsKind);
 
-enum class FPExceptionModeKind : unsigned short {
+enum class FPExceptionModeKind : unsigned char {
   IGNORE,
   MAY_TRAP,
   STRICT,
-  NUM_ENUMERATORS
 };
 
 FPExceptionModeKind FromPasta(pasta::FPExceptionModeKind pasta_val);
@@ -2945,14 +3229,17 @@ inline static const char *EnumerationName(FPExceptionModeKind) {
   return "FPExceptionModeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(FPExceptionModeKind) {
+  return 3;
+}
+
 const char *EnumeratorName(FPExceptionModeKind);
 
-enum class FPModeKind : unsigned short {
+enum class FPModeKind : unsigned char {
   OFF,
   ON,
   FAST,
   FAST_HONOR_PRAGMAS,
-  NUM_ENUMERATORS
 };
 
 FPModeKind FromPasta(pasta::FPModeKind pasta_val);
@@ -2961,16 +3248,19 @@ inline static const char *EnumerationName(FPModeKind) {
   return "FPModeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(FPModeKind) {
+  return 4;
+}
+
 const char *EnumeratorName(FPModeKind);
 
-enum class FamilyKind : unsigned short {
+enum class FamilyKind : unsigned char {
   NONE,
   ALLOC,
   COPY,
   INITIALIZER,
   MUTABLE_COPY,
   NEW,
-  NUM_ENUMERATORS
 };
 
 FamilyKind FromPasta(pasta::FamilyKind pasta_val);
@@ -2979,13 +3269,16 @@ inline static const char *EnumerationName(FamilyKind) {
   return "FamilyKind";
 }
 
+inline static constexpr unsigned NumEnumerators(FamilyKind) {
+  return 6;
+}
+
 const char *EnumeratorName(FamilyKind);
 
-enum class FiniteLoopsKind : unsigned short {
+enum class FiniteLoopsKind : unsigned char {
   LANGUAGE,
   ALWAYS,
   NEVER,
-  NUM_ENUMERATORS
 };
 
 FiniteLoopsKind FromPasta(pasta::FiniteLoopsKind pasta_val);
@@ -2994,13 +3287,16 @@ inline static const char *EnumerationName(FiniteLoopsKind) {
   return "FiniteLoopsKind";
 }
 
+inline static constexpr unsigned NumEnumerators(FiniteLoopsKind) {
+  return 3;
+}
+
 const char *EnumeratorName(FiniteLoopsKind);
 
-enum class FramePointerKind : unsigned short {
+enum class FramePointerKind : unsigned char {
   NONE,
   NON_LEAF,
   ALL,
-  NUM_ENUMERATORS
 };
 
 FramePointerKind FromPasta(pasta::FramePointerKind pasta_val);
@@ -3009,13 +3305,16 @@ inline static const char *EnumerationName(FramePointerKind) {
   return "FramePointerKind";
 }
 
+inline static constexpr unsigned NumEnumerators(FramePointerKind) {
+  return 3;
+}
+
 const char *EnumeratorName(FramePointerKind);
 
-enum class GC : unsigned short {
+enum class GC : unsigned char {
   GC_NONE,
   WEAK,
   STRONG,
-  NUM_ENUMERATORS
 };
 
 GC FromPasta(pasta::GC pasta_val);
@@ -3024,13 +3323,16 @@ inline static const char *EnumerationName(GC) {
   return "GC";
 }
 
+inline static constexpr unsigned NumEnumerators(GC) {
+  return 3;
+}
+
 const char *EnumeratorName(GC);
 
-enum class GCMode : unsigned short {
+enum class GCMode : unsigned char {
   NON_GC,
   GC_ONLY,
   HYBRID_GC,
-  NUM_ENUMERATORS
 };
 
 GCMode FromPasta(pasta::GCMode pasta_val);
@@ -3039,15 +3341,18 @@ inline static const char *EnumerationName(GCMode) {
   return "GCMode";
 }
 
+inline static constexpr unsigned NumEnumerators(GCMode) {
+  return 3;
+}
+
 const char *EnumeratorName(GCMode);
 
-enum class GVALinkage : unsigned short {
+enum class GVALinkage : unsigned char {
   INTERNAL,
   AVAILABLE_EXTERNALLY,
   DISCARDABLE_ODR,
   STRONG_EXTERNAL,
   STRONG_ODR,
-  NUM_ENUMERATORS
 };
 
 GVALinkage FromPasta(pasta::GVALinkage pasta_val);
@@ -3056,15 +3361,18 @@ inline static const char *EnumerationName(GVALinkage) {
   return "GVALinkage";
 }
 
+inline static constexpr unsigned NumEnumerators(GVALinkage) {
+  return 5;
+}
+
 const char *EnumeratorName(GVALinkage);
 
-enum class GetBuiltinTypeError : unsigned short {
+enum class GetBuiltinTypeError : unsigned char {
   NONE,
   MISSING_TYPE,
   MISSING_STDIO,
   MISSING,
   MISSING_UCONTEXT,
-  NUM_ENUMERATORS
 };
 
 GetBuiltinTypeError FromPasta(pasta::GetBuiltinTypeError pasta_val);
@@ -3073,11 +3381,14 @@ inline static const char *EnumerationName(GetBuiltinTypeError) {
   return "GetBuiltinTypeError";
 }
 
+inline static constexpr unsigned NumEnumerators(GetBuiltinTypeError) {
+  return 5;
+}
+
 const char *EnumeratorName(GetBuiltinTypeError);
 
-enum class GuardArg : unsigned short {
+enum class GuardArg : unsigned char {
   NOCF,
-  NUM_ENUMERATORS
 };
 
 GuardArg FromPasta(pasta::GuardArg pasta_val);
@@ -3086,14 +3397,17 @@ inline static const char *EnumerationName(GuardArg) {
   return "GuardArg";
 }
 
+inline static constexpr unsigned NumEnumerators(GuardArg) {
+  return 1;
+}
+
 const char *EnumeratorName(GuardArg);
 
-enum class ID : unsigned short {
+enum class ID : unsigned char {
   WORK_GROUP,
   DEVICE,
   ALL_SVM_DEVICES,
   SUB_GROUP,
-  NUM_ENUMERATORS
 };
 
 ID FromPasta(pasta::ID pasta_val);
@@ -3102,14 +3416,17 @@ inline static const char *EnumerationName(ID) {
   return "ID";
 }
 
+inline static constexpr unsigned NumEnumerators(ID) {
+  return 4;
+}
+
 const char *EnumeratorName(ID);
 
-enum class IdentifierInfoFlag : unsigned short {
+enum class IdentifierInfoFlag : unsigned char {
   ZERO_ARGUMENT,
   ONE_ARGUMENT,
   MULTI_ARGUMENT,
   // Skipped repeat pasta::kArgumentFlags
-  NUM_ENUMERATORS
 };
 
 IdentifierInfoFlag FromPasta(pasta::IdentifierInfoFlag pasta_val);
@@ -3118,14 +3435,17 @@ inline static const char *EnumerationName(IdentifierInfoFlag) {
   return "IdentifierInfoFlag";
 }
 
+inline static constexpr unsigned NumEnumerators(IdentifierInfoFlag) {
+  return 3;
+}
+
 const char *EnumeratorName(IdentifierInfoFlag);
 
-enum class ImbueAttribute : unsigned short {
+enum class ImbueAttribute : unsigned char {
   NONE,
   ALWAYS,
   NEVER,
   ALWAYSARG1,
-  NUM_ENUMERATORS
 };
 
 ImbueAttribute FromPasta(pasta::ImbueAttribute pasta_val);
@@ -3134,16 +3454,19 @@ inline static const char *EnumerationName(ImbueAttribute) {
   return "ImbueAttribute";
 }
 
+inline static constexpr unsigned NumEnumerators(ImbueAttribute) {
+  return 4;
+}
+
 const char *EnumeratorName(ImbueAttribute);
 
-enum class ImplicitReason : unsigned short {
+enum class ImplicitReason : unsigned char {
   NONE,
   ARC_FORBIDDEN_TYPE,
   FORBIDDEN_WEAK,
   ARC_FORBIDDEN_CONVERSION,
   ARC_INIT_RETURNS_UNRELATED,
   ARC_FIELD_WITH_OWNERSHIP,
-  NUM_ENUMERATORS
 };
 
 ImplicitReason FromPasta(pasta::ImplicitReason pasta_val);
@@ -3152,13 +3475,16 @@ inline static const char *EnumerationName(ImplicitReason) {
   return "ImplicitReason";
 }
 
+inline static constexpr unsigned NumEnumerators(ImplicitReason) {
+  return 6;
+}
+
 const char *EnumeratorName(ImplicitReason);
 
-enum class InClassInitStyle : unsigned short {
+enum class InClassInitStyle : unsigned char {
   NO_INITIALIZER,
   COPY_INITIALIZER,
   LIST_INITIALIZER,
-  NUM_ENUMERATORS
 };
 
 InClassInitStyle FromPasta(pasta::InClassInitStyle pasta_val);
@@ -3167,13 +3493,16 @@ inline static const char *EnumerationName(InClassInitStyle) {
   return "InClassInitStyle";
 }
 
+inline static constexpr unsigned NumEnumerators(InClassInitStyle) {
+  return 3;
+}
+
 const char *EnumeratorName(InClassInitStyle);
 
-enum class InheritedDesignatedInitializersState : unsigned short {
+enum class InheritedDesignatedInitializersState : unsigned char {
   UNKNOWN,
   INHERITED,
   NOT_INHERITED,
-  NUM_ENUMERATORS
 };
 
 InheritedDesignatedInitializersState FromPasta(pasta::InheritedDesignatedInitializersState pasta_val);
@@ -3182,14 +3511,17 @@ inline static const char *EnumerationName(InheritedDesignatedInitializersState) 
   return "InheritedDesignatedInitializersState";
 }
 
+inline static constexpr unsigned NumEnumerators(InheritedDesignatedInitializersState) {
+  return 3;
+}
+
 const char *EnumeratorName(InheritedDesignatedInitializersState);
 
-enum class InitStorageKind : unsigned short {
+enum class InitStorageKind : unsigned char {
   NO_INITIALIZER,
   IN_CLASS_COPY_INITIALIZER,
   IN_CLASS_LIST_INITIALIZER,
   CAPTURED_VLA_TYPE,
-  NUM_ENUMERATORS
 };
 
 InitStorageKind FromPasta(pasta::InitStorageKind pasta_val);
@@ -3198,14 +3530,17 @@ inline static const char *EnumerationName(InitStorageKind) {
   return "InitStorageKind";
 }
 
+inline static constexpr unsigned NumEnumerators(InitStorageKind) {
+  return 4;
+}
+
 const char *EnumeratorName(InitStorageKind);
 
-enum class InlineVariableDefinitionKind : unsigned short {
+enum class InlineVariableDefinitionKind : unsigned char {
   NONE,
   WEAK,
   WEAK_UNKNOWN,
   STRONG,
-  NUM_ENUMERATORS
 };
 
 InlineVariableDefinitionKind FromPasta(pasta::InlineVariableDefinitionKind pasta_val);
@@ -3214,13 +3549,16 @@ inline static const char *EnumerationName(InlineVariableDefinitionKind) {
   return "InlineVariableDefinitionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(InlineVariableDefinitionKind) {
+  return 4;
+}
+
 const char *EnumeratorName(InlineVariableDefinitionKind);
 
-enum class InliningMethod : unsigned short {
+enum class InliningMethod : unsigned char {
   NORMAL_INLINING,
   ONLY_HINT_INLINING,
   ONLY_ALWAYS_INLINING,
-  NUM_ENUMERATORS
 };
 
 InliningMethod FromPasta(pasta::InliningMethod pasta_val);
@@ -3229,16 +3567,19 @@ inline static const char *EnumerationName(InliningMethod) {
   return "InliningMethod";
 }
 
+inline static constexpr unsigned NumEnumerators(InliningMethod) {
+  return 3;
+}
+
 const char *EnumeratorName(InliningMethod);
 
-enum class InterruptType : unsigned short {
+enum class InterruptType : unsigned char {
   IRQ,
   FIQ,
   SWI,
   ABORT,
   UNDEF,
   GENERIC,
-  NUM_ENUMERATORS
 };
 
 InterruptType FromPasta(pasta::InterruptType pasta_val);
@@ -3247,9 +3588,13 @@ inline static const char *EnumerationName(InterruptType) {
   return "InterruptType";
 }
 
+inline static constexpr unsigned NumEnumerators(InterruptType) {
+  return 6;
+}
+
 const char *EnumeratorName(InterruptType);
 
-enum class Kinds : unsigned short {
+enum class Kinds : unsigned char {
   L_VALUE,
   X_VALUE,
   FUNCTION,
@@ -3262,7 +3607,6 @@ enum class Kinds : unsigned short {
   ARRAY_TEMPORARY,
   OBJ_C_MESSAGE_R_VALUE,
   PR_VALUE,
-  NUM_ENUMERATORS
 };
 
 Kinds FromPasta(pasta::Kinds pasta_val);
@@ -3271,13 +3615,16 @@ inline static const char *EnumerationName(Kinds) {
   return "Kinds";
 }
 
+inline static constexpr unsigned NumEnumerators(Kinds) {
+  return 12;
+}
+
 const char *EnumeratorName(Kinds);
 
-enum class LambdaCaptureDefault : unsigned short {
+enum class LambdaCaptureDefault : unsigned char {
   NONE,
   BY_COPY,
   BY_REFERENCE,
-  NUM_ENUMERATORS
 };
 
 LambdaCaptureDefault FromPasta(pasta::LambdaCaptureDefault pasta_val);
@@ -3286,15 +3633,18 @@ inline static const char *EnumerationName(LambdaCaptureDefault) {
   return "LambdaCaptureDefault";
 }
 
+inline static constexpr unsigned NumEnumerators(LambdaCaptureDefault) {
+  return 3;
+}
+
 const char *EnumeratorName(LambdaCaptureDefault);
 
-enum class LambdaCaptureKind : unsigned short {
+enum class LambdaCaptureKind : unsigned char {
   THIS,
   STAR_THIS,
   BY_COPY,
   BY_REFERENCE,
   VLA_TYPE,
-  NUM_ENUMERATORS
 };
 
 LambdaCaptureKind FromPasta(pasta::LambdaCaptureKind pasta_val);
@@ -3303,9 +3653,13 @@ inline static const char *EnumerationName(LambdaCaptureKind) {
   return "LambdaCaptureKind";
 }
 
+inline static constexpr unsigned NumEnumerators(LambdaCaptureKind) {
+  return 5;
+}
+
 const char *EnumeratorName(LambdaCaptureKind);
 
-enum class LangAS : unsigned short {
+enum class LangAS : unsigned char {
   DEFAULT,
   OPENCL_GLOBAL,
   OPENCL_LOCAL,
@@ -3325,7 +3679,6 @@ enum class LangAS : unsigned short {
   PTR32_SPTR,
   PTR32_UPTR,
   PTR64,
-  NUM_ENUMERATORS
 };
 
 LangAS FromPasta(pasta::LangAS pasta_val);
@@ -3334,9 +3687,13 @@ inline static const char *EnumerationName(LangAS) {
   return "LangAS";
 }
 
+inline static constexpr unsigned NumEnumerators(LangAS) {
+  return 19;
+}
+
 const char *EnumeratorName(LangAS);
 
-enum class LangFeatures : unsigned short {
+enum class LangFeatures : unsigned char {
   LINE_COMMENT,
   C99,
   C11,
@@ -3353,7 +3710,6 @@ enum class LangFeatures : unsigned short {
   HEX_FLOAT,
   IMPLICIT_INT,
   OPEN_CL,
-  NUM_ENUMERATORS
 };
 
 LangFeatures FromPasta(pasta::LangFeatures pasta_val);
@@ -3362,9 +3718,13 @@ inline static const char *EnumerationName(LangFeatures) {
   return "LangFeatures";
 }
 
+inline static constexpr unsigned NumEnumerators(LangFeatures) {
+  return 16;
+}
+
 const char *EnumeratorName(LangFeatures);
 
-enum class Language : unsigned short {
+enum class Language : unsigned char {
   UNKNOWN,
   ASSEMBLY,
   LLVMIR,
@@ -3377,7 +3737,6 @@ enum class Language : unsigned short {
   CUDA,
   RENDER_SCRIPT,
   HIP,
-  NUM_ENUMERATORS
 };
 
 Language FromPasta(pasta::Language pasta_val);
@@ -3386,13 +3745,16 @@ inline static const char *EnumerationName(Language) {
   return "Language";
 }
 
+inline static constexpr unsigned NumEnumerators(Language) {
+  return 12;
+}
+
 const char *EnumeratorName(Language);
 
-enum class LanguageLinkage : unsigned short {
+enum class LanguageLinkage : unsigned char {
   C_LANGUAGE_LINKAGE,
   CXX_LANGUAGE_LINKAGE,
   NO_LANGUAGE_LINKAGE,
-  NUM_ENUMERATORS
 };
 
 LanguageLinkage FromPasta(pasta::LanguageLinkage pasta_val);
@@ -3401,13 +3763,16 @@ inline static const char *EnumerationName(LanguageLinkage) {
   return "LanguageLinkage";
 }
 
+inline static constexpr unsigned NumEnumerators(LanguageLinkage) {
+  return 3;
+}
+
 const char *EnumeratorName(LanguageLinkage);
 
-enum class LaxVectorConversionKind : unsigned short {
+enum class LaxVectorConversionKind : unsigned char {
   NONE,
   INTEGER,
   ALL,
-  NUM_ENUMERATORS
 };
 
 LaxVectorConversionKind FromPasta(pasta::LaxVectorConversionKind pasta_val);
@@ -3416,16 +3781,19 @@ inline static const char *EnumerationName(LaxVectorConversionKind) {
   return "LaxVectorConversionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(LaxVectorConversionKind) {
+  return 3;
+}
+
 const char *EnumeratorName(LaxVectorConversionKind);
 
-enum class Level : unsigned short {
+enum class Level : unsigned char {
   IGNORED,
   NOTE,
   REMARK,
   WARNING,
   ERROR,
   FATAL,
-  NUM_ENUMERATORS
 };
 
 Level FromPasta(pasta::Level pasta_val);
@@ -3434,9 +3802,13 @@ inline static const char *EnumerationName(Level) {
   return "Level";
 }
 
+inline static constexpr unsigned NumEnumerators(Level) {
+  return 6;
+}
+
 const char *EnumeratorName(Level);
 
-enum class Linkage : unsigned short {
+enum class Linkage : unsigned char {
   NO_LINKAGE,
   INTERNAL_LINKAGE,
   UNIQUE_EXTERNAL_LINKAGE,
@@ -3444,7 +3816,6 @@ enum class Linkage : unsigned short {
   MODULE_INTERNAL_LINKAGE,
   MODULE_LINKAGE,
   EXTERNAL_LINKAGE,
-  NUM_ENUMERATORS
 };
 
 Linkage FromPasta(pasta::Linkage pasta_val);
@@ -3453,9 +3824,13 @@ inline static const char *EnumerationName(Linkage) {
   return "Linkage";
 }
 
+inline static constexpr unsigned NumEnumerators(Linkage) {
+  return 7;
+}
+
 const char *EnumeratorName(Linkage);
 
-enum class LoopHintState : unsigned short {
+enum class LoopHintState : unsigned char {
   ENABLE,
   DISABLE,
   NUMERIC,
@@ -3463,7 +3838,6 @@ enum class LoopHintState : unsigned short {
   SCALABLE_WIDTH,
   ASSUME_SAFETY,
   FULL,
-  NUM_ENUMERATORS
 };
 
 LoopHintState FromPasta(pasta::LoopHintState pasta_val);
@@ -3472,14 +3846,17 @@ inline static const char *EnumerationName(LoopHintState) {
   return "LoopHintState";
 }
 
+inline static constexpr unsigned NumEnumerators(LoopHintState) {
+  return 7;
+}
+
 const char *EnumeratorName(LoopHintState);
 
-enum class MSInheritanceModel : unsigned short {
+enum class MSInheritanceModel : unsigned char {
   SINGLE,
   MULTIPLE,
   VIRTUAL,
   UNSPECIFIED,
-  NUM_ENUMERATORS
 };
 
 MSInheritanceModel FromPasta(pasta::MSInheritanceModel pasta_val);
@@ -3488,9 +3865,13 @@ inline static const char *EnumerationName(MSInheritanceModel) {
   return "MSInheritanceModel";
 }
 
+inline static constexpr unsigned NumEnumerators(MSInheritanceModel) {
+  return 4;
+}
+
 const char *EnumeratorName(MSInheritanceModel);
 
-enum class MSVCMajorVersion : unsigned short {
+enum class MSVCMajorVersion : unsigned char {
   MSVC2010,
   MSVC2012,
   MSVC2013,
@@ -3500,7 +3881,6 @@ enum class MSVCMajorVersion : unsigned short {
   MSVC20177,
   MSVC2019,
   MSVC20198,
-  NUM_ENUMERATORS
 };
 
 MSVCMajorVersion FromPasta(pasta::MSVCMajorVersion pasta_val);
@@ -3509,13 +3889,16 @@ inline static const char *EnumerationName(MSVCMajorVersion) {
   return "MSVCMajorVersion";
 }
 
+inline static constexpr unsigned NumEnumerators(MSVCMajorVersion) {
+  return 9;
+}
+
 const char *EnumeratorName(MSVCMajorVersion);
 
-enum class MSVtorDispMode : unsigned short {
+enum class MSVtorDispMode : unsigned char {
   NEVER,
   FOR_VIRTUAL_BASE_OVERRIDE,
   FOR_VF_TABLE,
-  NUM_ENUMERATORS
 };
 
 MSVtorDispMode FromPasta(pasta::MSVtorDispMode pasta_val);
@@ -3524,12 +3907,15 @@ inline static const char *EnumerationName(MSVtorDispMode) {
   return "MSVtorDispMode";
 }
 
+inline static constexpr unsigned NumEnumerators(MSVtorDispMode) {
+  return 3;
+}
+
 const char *EnumeratorName(MSVtorDispMode);
 
-enum class MapTypeTy : unsigned short {
+enum class MapTypeTy : unsigned char {
   TO,
   LINK,
-  NUM_ENUMERATORS
 };
 
 MapTypeTy FromPasta(pasta::MapTypeTy pasta_val);
@@ -3538,13 +3924,16 @@ inline static const char *EnumerationName(MapTypeTy) {
   return "MapTypeTy";
 }
 
+inline static constexpr unsigned NumEnumerators(MapTypeTy) {
+  return 2;
+}
+
 const char *EnumeratorName(MapTypeTy);
 
-enum class MethodRefFlags : unsigned short {
+enum class MethodRefFlags : unsigned char {
   METHOD_REFERENCE_NONE,
   METHOD_REFERENCE_GETTER,
   METHOD_REFERENCE_SETTER,
-  NUM_ENUMERATORS
 };
 
 MethodRefFlags FromPasta(pasta::MethodRefFlags pasta_val);
@@ -3553,9 +3942,13 @@ inline static const char *EnumerationName(MethodRefFlags) {
   return "MethodRefFlags";
 }
 
+inline static constexpr unsigned NumEnumerators(MethodRefFlags) {
+  return 3;
+}
+
 const char *EnumeratorName(MethodRefFlags);
 
-enum class ModifiableType : unsigned short {
+enum class ModifiableType : unsigned char {
   UNTESTED,
   MODIFIABLE,
   R_VALUE,
@@ -3567,7 +3960,6 @@ enum class ModifiableType : unsigned short {
   CONST_ADDR_SPACE,
   ARRAY_TYPE,
   INCOMPLETE_TYPE,
-  NUM_ENUMERATORS
 };
 
 ModifiableType FromPasta(pasta::ModifiableType pasta_val);
@@ -3576,14 +3968,17 @@ inline static const char *EnumerationName(ModifiableType) {
   return "ModifiableType";
 }
 
+inline static constexpr unsigned NumEnumerators(ModifiableType) {
+  return 11;
+}
+
 const char *EnumeratorName(ModifiableType);
 
-enum class MultiVersionKind : unsigned short {
+enum class MultiVersionKind : unsigned char {
   NONE,
   TARGET,
   CPU_SPECIFIC,
   CPU_DISPATCH,
-  NUM_ENUMERATORS
 };
 
 MultiVersionKind FromPasta(pasta::MultiVersionKind pasta_val);
@@ -3592,9 +3987,13 @@ inline static const char *EnumerationName(MultiVersionKind) {
   return "MultiVersionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(MultiVersionKind) {
+  return 4;
+}
+
 const char *EnumeratorName(MultiVersionKind);
 
-enum class NameKind : unsigned short {
+enum class NameKind : unsigned char {
   TEMPLATE,
   OVERLOADED_TEMPLATE,
   ASSUMED_TEMPLATE,
@@ -3602,7 +4001,6 @@ enum class NameKind : unsigned short {
   DEPENDENT_TEMPLATE,
   SUBST_TEMPLATE_TEMPLATE_PARM,
   SUBST_TEMPLATE_TEMPLATE_PARM_PACK,
-  NUM_ENUMERATORS
 };
 
 NameKind FromPasta(pasta::NameKind pasta_val);
@@ -3611,11 +4009,14 @@ inline static const char *EnumerationName(NameKind) {
   return "NameKind";
 }
 
+inline static constexpr unsigned NumEnumerators(NameKind) {
+  return 7;
+}
+
 const char *EnumeratorName(NameKind);
 
-enum class NeedExtraManglingDecl : unsigned short {
+enum class NeedExtraManglingDecl : unsigned char {
   NEED_EXTRA_MANGLING_DECLARATION,
-  NUM_ENUMERATORS
 };
 
 NeedExtraManglingDecl FromPasta(pasta::NeedExtraManglingDecl pasta_val);
@@ -3624,9 +4025,13 @@ inline static const char *EnumerationName(NeedExtraManglingDecl) {
   return "NeedExtraManglingDecl";
 }
 
+inline static constexpr unsigned NumEnumerators(NeedExtraManglingDecl) {
+  return 1;
+}
+
 const char *EnumeratorName(NeedExtraManglingDecl);
 
-enum class NestedNameSpecifierDependence : unsigned short {
+enum class NestedNameSpecifierDependence : unsigned char {
   UNEXPANDED_PACK,
   INSTANTIATION,
   DEPENDENT,
@@ -3634,7 +4039,6 @@ enum class NestedNameSpecifierDependence : unsigned short {
   NONE,
   DEPENDENT_INSTANTIATION,
   ALL,
-  NUM_ENUMERATORS
 };
 
 NestedNameSpecifierDependence FromPasta(pasta::NestedNameSpecifierDependence pasta_val);
@@ -3643,12 +4047,15 @@ inline static const char *EnumerationName(NestedNameSpecifierDependence) {
   return "NestedNameSpecifierDependence";
 }
 
+inline static constexpr unsigned NumEnumerators(NestedNameSpecifierDependence) {
+  return 7;
+}
+
 const char *EnumeratorName(NestedNameSpecifierDependence);
 
-enum class NewtypeKind : unsigned short {
+enum class NewtypeKind : unsigned char {
   STRUCT,
   ENUM,
-  NUM_ENUMERATORS
 };
 
 NewtypeKind FromPasta(pasta::NewtypeKind pasta_val);
@@ -3657,14 +4064,17 @@ inline static const char *EnumerationName(NewtypeKind) {
   return "NewtypeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(NewtypeKind) {
+  return 2;
+}
+
 const char *EnumeratorName(NewtypeKind);
 
-enum class NonOdrUseReason : unsigned short {
+enum class NonOdrUseReason : unsigned char {
   NONE,
   UNEVALUATED,
   CONSTANT,
   DISCARDED,
-  NUM_ENUMERATORS
 };
 
 NonOdrUseReason FromPasta(pasta::NonOdrUseReason pasta_val);
@@ -3673,11 +4083,14 @@ inline static const char *EnumerationName(NonOdrUseReason) {
   return "NonOdrUseReason";
 }
 
+inline static constexpr unsigned NumEnumerators(NonOdrUseReason) {
+  return 4;
+}
+
 const char *EnumeratorName(NonOdrUseReason);
 
-enum class NonceObjCInterface : unsigned short {
+enum class NonceObjCInterface : unsigned char {
   OBJ_C_INTERFACE,
-  NUM_ENUMERATORS
 };
 
 NonceObjCInterface FromPasta(pasta::NonceObjCInterface pasta_val);
@@ -3686,14 +4099,17 @@ inline static const char *EnumerationName(NonceObjCInterface) {
   return "NonceObjCInterface";
 }
 
+inline static constexpr unsigned NumEnumerators(NonceObjCInterface) {
+  return 1;
+}
+
 const char *EnumeratorName(NonceObjCInterface);
 
-enum class NullabilityKind : unsigned short {
+enum class NullabilityKind : unsigned char {
   NON_NULL,
   NULLABLE,
   UNSPECIFIED,
   NULLABLE_RESULT,
-  NUM_ENUMERATORS
 };
 
 NullabilityKind FromPasta(pasta::NullabilityKind pasta_val);
@@ -3702,13 +4118,16 @@ inline static const char *EnumerationName(NullabilityKind) {
   return "NullabilityKind";
 }
 
+inline static constexpr unsigned NumEnumerators(NullabilityKind) {
+  return 4;
+}
+
 const char *EnumeratorName(NullabilityKind);
 
-enum class ObjCBridgeCastKind : unsigned short {
+enum class ObjCBridgeCastKind : unsigned char {
   BRIDGE,
   BRIDGE_TRANSFER,
   BRIDGE_RETAINED,
-  NUM_ENUMERATORS
 };
 
 ObjCBridgeCastKind FromPasta(pasta::ObjCBridgeCastKind pasta_val);
@@ -3717,13 +4136,16 @@ inline static const char *EnumerationName(ObjCBridgeCastKind) {
   return "ObjCBridgeCastKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCBridgeCastKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ObjCBridgeCastKind);
 
-enum class ObjCDispatchMethodKind : unsigned short {
+enum class ObjCDispatchMethodKind : unsigned char {
   LEGACY,
   NON_LEGACY,
   MIXED,
-  NUM_ENUMERATORS
 };
 
 ObjCDispatchMethodKind FromPasta(pasta::ObjCDispatchMethodKind pasta_val);
@@ -3732,16 +4154,19 @@ inline static const char *EnumerationName(ObjCDispatchMethodKind) {
   return "ObjCDispatchMethodKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCDispatchMethodKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ObjCDispatchMethodKind);
 
-enum class ObjCInstanceTypeFamily : unsigned short {
+enum class ObjCInstanceTypeFamily : unsigned char {
   NONE,
   ARRAY,
   DICTIONARY,
   SINGLETON,
   INITIALIZER,
   RETURNS_SELF,
-  NUM_ENUMERATORS
 };
 
 ObjCInstanceTypeFamily FromPasta(pasta::ObjCInstanceTypeFamily pasta_val);
@@ -3750,15 +4175,18 @@ inline static const char *EnumerationName(ObjCInstanceTypeFamily) {
   return "ObjCInstanceTypeFamily";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCInstanceTypeFamily) {
+  return 6;
+}
+
 const char *EnumeratorName(ObjCInstanceTypeFamily);
 
-enum class ObjCLifetime : unsigned short {
+enum class ObjCLifetime : unsigned char {
   NONE,
   EXPLICIT_NONE,
   STRONG,
   WEAK,
   AUTORELEASING,
-  NUM_ENUMERATORS
 };
 
 ObjCLifetime FromPasta(pasta::ObjCLifetime pasta_val);
@@ -3767,9 +4195,13 @@ inline static const char *EnumerationName(ObjCLifetime) {
   return "ObjCLifetime";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCLifetime) {
+  return 5;
+}
+
 const char *EnumeratorName(ObjCLifetime);
 
-enum class ObjCMethodFamily : unsigned short {
+enum class ObjCMethodFamily : unsigned char {
   NONE,
   ALLOC,
   COPY,
@@ -3785,7 +4217,6 @@ enum class ObjCMethodFamily : unsigned short {
   SELF,
   INITIALIZE,
   PERFORM_SELECTOR,
-  NUM_ENUMERATORS
 };
 
 ObjCMethodFamily FromPasta(pasta::ObjCMethodFamily pasta_val);
@@ -3794,13 +4225,16 @@ inline static const char *EnumerationName(ObjCMethodFamily) {
   return "ObjCMethodFamily";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCMethodFamily) {
+  return 15;
+}
+
 const char *EnumeratorName(ObjCMethodFamily);
 
-enum class ObjCPropertyQueryKind : unsigned short {
+enum class ObjCPropertyQueryKind : unsigned char {
   QUERY_UNKNOWN,
   QUERY_INSTANCE,
   QUERY_CLASS,
-  NUM_ENUMERATORS
 };
 
 ObjCPropertyQueryKind FromPasta(pasta::ObjCPropertyQueryKind pasta_val);
@@ -3809,13 +4243,16 @@ inline static const char *EnumerationName(ObjCPropertyQueryKind) {
   return "ObjCPropertyQueryKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCPropertyQueryKind) {
+  return 3;
+}
+
 const char *EnumeratorName(ObjCPropertyQueryKind);
 
-enum class ObjCStringFormatFamily : unsigned short {
+enum class ObjCStringFormatFamily : unsigned char {
   NONE,
   NS_STRING,
   CF_STRING,
-  NUM_ENUMERATORS
 };
 
 ObjCStringFormatFamily FromPasta(pasta::ObjCStringFormatFamily pasta_val);
@@ -3824,15 +4261,18 @@ inline static const char *EnumerationName(ObjCStringFormatFamily) {
   return "ObjCStringFormatFamily";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCStringFormatFamily) {
+  return 3;
+}
+
 const char *EnumeratorName(ObjCStringFormatFamily);
 
-enum class ObjCSubstitutionContext : unsigned short {
+enum class ObjCSubstitutionContext : unsigned char {
   ORDINARY,
   RESULT,
   PARAMETER,
   PROPERTY,
   SUPERCLASS,
-  NUM_ENUMERATORS
 };
 
 ObjCSubstitutionContext FromPasta(pasta::ObjCSubstitutionContext pasta_val);
@@ -3841,13 +4281,16 @@ inline static const char *EnumerationName(ObjCSubstitutionContext) {
   return "ObjCSubstitutionContext";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCSubstitutionContext) {
+  return 5;
+}
+
 const char *EnumeratorName(ObjCSubstitutionContext);
 
-enum class ObjCTypeParamVariance : unsigned short {
+enum class ObjCTypeParamVariance : unsigned char {
   INVARIANT,
   COVARIANT,
   CONTRAVARIANT,
-  NUM_ENUMERATORS
 };
 
 ObjCTypeParamVariance FromPasta(pasta::ObjCTypeParamVariance pasta_val);
@@ -3856,13 +4299,16 @@ inline static const char *EnumerationName(ObjCTypeParamVariance) {
   return "ObjCTypeParamVariance";
 }
 
+inline static constexpr unsigned NumEnumerators(ObjCTypeParamVariance) {
+  return 3;
+}
+
 const char *EnumeratorName(ObjCTypeParamVariance);
 
-enum class OnOffSwitch : unsigned short {
+enum class OnOffSwitch : unsigned char {
   ON,
   OFF,
   DEFAULT,
-  NUM_ENUMERATORS
 };
 
 OnOffSwitch FromPasta(pasta::OnOffSwitch pasta_val);
@@ -3871,11 +4317,14 @@ inline static const char *EnumerationName(OnOffSwitch) {
   return "OnOffSwitch";
 }
 
+inline static constexpr unsigned NumEnumerators(OnOffSwitch) {
+  return 3;
+}
+
 const char *EnumeratorName(OnOffSwitch);
 
-enum class OnStackType : unsigned short {
+enum class OnStackType : unsigned char {
   ON_STACK,
-  NUM_ENUMERATORS
 };
 
 OnStackType FromPasta(pasta::OnStackType pasta_val);
@@ -3884,14 +4333,17 @@ inline static const char *EnumerationName(OnStackType) {
   return "OnStackType";
 }
 
+inline static constexpr unsigned NumEnumerators(OnStackType) {
+  return 1;
+}
+
 const char *EnumeratorName(OnStackType);
 
-enum class OpenMPAtomicDefaultMemOrderClauseKind : unsigned short {
+enum class OpenMPAtomicDefaultMemOrderClauseKind : unsigned char {
   SEQ_CST,
   ACQ_REL,
   RELAXED,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPAtomicDefaultMemOrderClauseKind FromPasta(pasta::OpenMPAtomicDefaultMemOrderClauseKind pasta_val);
@@ -3900,14 +4352,17 @@ inline static const char *EnumerationName(OpenMPAtomicDefaultMemOrderClauseKind)
   return "OpenMPAtomicDefaultMemOrderClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPAtomicDefaultMemOrderClauseKind) {
+  return 4;
+}
+
 const char *EnumeratorName(OpenMPAtomicDefaultMemOrderClauseKind);
 
-enum class OpenMPDefaultmapClauseKind : unsigned short {
+enum class OpenMPDefaultmapClauseKind : unsigned char {
   SCALAR,
   AGGREGATE,
   POINTER,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPDefaultmapClauseKind FromPasta(pasta::OpenMPDefaultmapClauseKind pasta_val);
@@ -3916,9 +4371,13 @@ inline static const char *EnumerationName(OpenMPDefaultmapClauseKind) {
   return "OpenMPDefaultmapClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPDefaultmapClauseKind) {
+  return 4;
+}
+
 const char *EnumeratorName(OpenMPDefaultmapClauseKind);
 
-enum class OpenMPDefaultmapClauseModifier : unsigned short {
+enum class OpenMPDefaultmapClauseModifier : unsigned char {
   UNKNOWN,
   ALLOC,
   TO,
@@ -3927,7 +4386,6 @@ enum class OpenMPDefaultmapClauseModifier : unsigned short {
   NONE,
   DEFAULT,
   PRESENT,
-  NUM_ENUMERATORS
 };
 
 OpenMPDefaultmapClauseModifier FromPasta(pasta::OpenMPDefaultmapClauseModifier pasta_val);
@@ -3936,9 +4394,13 @@ inline static const char *EnumerationName(OpenMPDefaultmapClauseModifier) {
   return "OpenMPDefaultmapClauseModifier";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPDefaultmapClauseModifier) {
+  return 8;
+}
+
 const char *EnumeratorName(OpenMPDefaultmapClauseModifier);
 
-enum class OpenMPDependClauseKind : unsigned short {
+enum class OpenMPDependClauseKind : unsigned char {
   IN,
   OUT,
   INOUT,
@@ -3947,7 +4409,6 @@ enum class OpenMPDependClauseKind : unsigned short {
   SOURCE,
   SINK,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPDependClauseKind FromPasta(pasta::OpenMPDependClauseKind pasta_val);
@@ -3956,13 +4417,16 @@ inline static const char *EnumerationName(OpenMPDependClauseKind) {
   return "OpenMPDependClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPDependClauseKind) {
+  return 8;
+}
+
 const char *EnumeratorName(OpenMPDependClauseKind);
 
-enum class OpenMPDeviceClauseModifier : unsigned short {
+enum class OpenMPDeviceClauseModifier : unsigned char {
   ANCESTOR,
   DEVICE_NUM,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPDeviceClauseModifier FromPasta(pasta::OpenMPDeviceClauseModifier pasta_val);
@@ -3971,14 +4435,17 @@ inline static const char *EnumerationName(OpenMPDeviceClauseModifier) {
   return "OpenMPDeviceClauseModifier";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPDeviceClauseModifier) {
+  return 3;
+}
+
 const char *EnumeratorName(OpenMPDeviceClauseModifier);
 
-enum class OpenMPDeviceType : unsigned short {
+enum class OpenMPDeviceType : unsigned char {
   HOST,
   NOHOST,
   ANY,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPDeviceType FromPasta(pasta::OpenMPDeviceType pasta_val);
@@ -3987,12 +4454,15 @@ inline static const char *EnumerationName(OpenMPDeviceType) {
   return "OpenMPDeviceType";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPDeviceType) {
+  return 4;
+}
+
 const char *EnumeratorName(OpenMPDeviceType);
 
-enum class OpenMPDistScheduleClauseKind : unsigned short {
+enum class OpenMPDistScheduleClauseKind : unsigned char {
   STATIC,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPDistScheduleClauseKind FromPasta(pasta::OpenMPDistScheduleClauseKind pasta_val);
@@ -4001,12 +4471,15 @@ inline static const char *EnumerationName(OpenMPDistScheduleClauseKind) {
   return "OpenMPDistScheduleClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPDistScheduleClauseKind) {
+  return 2;
+}
+
 const char *EnumeratorName(OpenMPDistScheduleClauseKind);
 
-enum class OpenMPLastprivateModifier : unsigned short {
+enum class OpenMPLastprivateModifier : unsigned char {
   CONDITIONAL,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPLastprivateModifier FromPasta(pasta::OpenMPLastprivateModifier pasta_val);
@@ -4015,14 +4488,17 @@ inline static const char *EnumerationName(OpenMPLastprivateModifier) {
   return "OpenMPLastprivateModifier";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPLastprivateModifier) {
+  return 2;
+}
+
 const char *EnumeratorName(OpenMPLastprivateModifier);
 
-enum class OpenMPLinearClauseKind : unsigned short {
+enum class OpenMPLinearClauseKind : unsigned char {
   VALUE,
   REFERENCE,
   UVAL,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPLinearClauseKind FromPasta(pasta::OpenMPLinearClauseKind pasta_val);
@@ -4031,9 +4507,13 @@ inline static const char *EnumerationName(OpenMPLinearClauseKind) {
   return "OpenMPLinearClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPLinearClauseKind) {
+  return 4;
+}
+
 const char *EnumeratorName(OpenMPLinearClauseKind);
 
-enum class OpenMPMapClauseKind : unsigned short {
+enum class OpenMPMapClauseKind : unsigned char {
   ALLOC,
   TO,
   FROM,
@@ -4041,7 +4521,6 @@ enum class OpenMPMapClauseKind : unsigned short {
   DELETE,
   RELEASE,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPMapClauseKind FromPasta(pasta::OpenMPMapClauseKind pasta_val);
@@ -4050,15 +4529,18 @@ inline static const char *EnumerationName(OpenMPMapClauseKind) {
   return "OpenMPMapClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPMapClauseKind) {
+  return 7;
+}
+
 const char *EnumeratorName(OpenMPMapClauseKind);
 
-enum class OpenMPMapModifierKind : unsigned short {
+enum class OpenMPMapModifierKind : unsigned char {
   UNKNOWN,
   ALWAYS,
   CLOSE,
   MAPPER,
   PRESENT,
-  NUM_ENUMERATORS
 };
 
 OpenMPMapModifierKind FromPasta(pasta::OpenMPMapModifierKind pasta_val);
@@ -4067,13 +4549,16 @@ inline static const char *EnumerationName(OpenMPMapModifierKind) {
   return "OpenMPMapModifierKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPMapModifierKind) {
+  return 5;
+}
+
 const char *EnumeratorName(OpenMPMapModifierKind);
 
-enum class OpenMPMotionModifierKind : unsigned short {
+enum class OpenMPMotionModifierKind : unsigned char {
   MOTIONMODIFIER_MAPPER,
   MOTIONMODIFIER_PRESENT,
   MOTIONMODIFIER_UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPMotionModifierKind FromPasta(pasta::OpenMPMotionModifierKind pasta_val);
@@ -4082,12 +4567,15 @@ inline static const char *EnumerationName(OpenMPMotionModifierKind) {
   return "OpenMPMotionModifierKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPMotionModifierKind) {
+  return 3;
+}
+
 const char *EnumeratorName(OpenMPMotionModifierKind);
 
-enum class OpenMPOrderClauseKind : unsigned short {
+enum class OpenMPOrderClauseKind : unsigned char {
   CONCURRENT,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPOrderClauseKind FromPasta(pasta::OpenMPOrderClauseKind pasta_val);
@@ -4096,14 +4584,17 @@ inline static const char *EnumerationName(OpenMPOrderClauseKind) {
   return "OpenMPOrderClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPOrderClauseKind) {
+  return 2;
+}
+
 const char *EnumeratorName(OpenMPOrderClauseKind);
 
-enum class OpenMPReductionClauseModifier : unsigned short {
+enum class OpenMPReductionClauseModifier : unsigned char {
   DEFAULT,
   INSCAN,
   TASK,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPReductionClauseModifier FromPasta(pasta::OpenMPReductionClauseModifier pasta_val);
@@ -4112,16 +4603,19 @@ inline static const char *EnumerationName(OpenMPReductionClauseModifier) {
   return "OpenMPReductionClauseModifier";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPReductionClauseModifier) {
+  return 4;
+}
+
 const char *EnumeratorName(OpenMPReductionClauseModifier);
 
-enum class OpenMPScheduleClauseKind : unsigned short {
+enum class OpenMPScheduleClauseKind : unsigned char {
   STATIC,
   DYNAMIC,
   GUIDED,
   AUTO,
   RUNTIME,
   UNKNOWN,
-  NUM_ENUMERATORS
 };
 
 OpenMPScheduleClauseKind FromPasta(pasta::OpenMPScheduleClauseKind pasta_val);
@@ -4130,14 +4624,17 @@ inline static const char *EnumerationName(OpenMPScheduleClauseKind) {
   return "OpenMPScheduleClauseKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPScheduleClauseKind) {
+  return 6;
+}
+
 const char *EnumeratorName(OpenMPScheduleClauseKind);
 
-enum class OpenMPScheduleClauseModifier : unsigned short {
+enum class OpenMPScheduleClauseModifier : unsigned char {
   UNKNOWN,
   MONOTONIC,
   NONMONOTONIC,
   SIMD,
-  NUM_ENUMERATORS
 };
 
 OpenMPScheduleClauseModifier FromPasta(pasta::OpenMPScheduleClauseModifier pasta_val);
@@ -4146,9 +4643,13 @@ inline static const char *EnumerationName(OpenMPScheduleClauseModifier) {
   return "OpenMPScheduleClauseModifier";
 }
 
+inline static constexpr unsigned NumEnumerators(OpenMPScheduleClauseModifier) {
+  return 4;
+}
+
 const char *EnumeratorName(OpenMPScheduleClauseModifier);
 
-enum class OptionType : unsigned short {
+enum class OptionType : unsigned char {
   VECTORIZE,
   VECTORIZE_WIDTH,
   INTERLEAVE,
@@ -4161,7 +4662,6 @@ enum class OptionType : unsigned short {
   PIPELINE_INITIATION_INTERVAL,
   DISTRIBUTE,
   VECTORIZE_PREDICATE,
-  NUM_ENUMERATORS
 };
 
 OptionType FromPasta(pasta::OptionType pasta_val);
@@ -4170,9 +4670,13 @@ inline static const char *EnumerationName(OptionType) {
   return "OptionType";
 }
 
+inline static constexpr unsigned NumEnumerators(OptionType) {
+  return 12;
+}
+
 const char *EnumeratorName(OptionType);
 
-enum class OverloadedOperatorKind : unsigned short {
+enum class OverloadedOperatorKind : unsigned char {
   NONE,
   NEW,
   DELETE,
@@ -4219,7 +4723,6 @@ enum class OverloadedOperatorKind : unsigned short {
   SUBSCRIPT,
   CONDITIONAL,
   COAWAIT,
-  NUM_ENUMERATORS
 };
 
 OverloadedOperatorKind FromPasta(pasta::OverloadedOperatorKind pasta_val);
@@ -4228,12 +4731,15 @@ inline static const char *EnumerationName(OverloadedOperatorKind) {
   return "OverloadedOperatorKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OverloadedOperatorKind) {
+  return 46;
+}
+
 const char *EnumeratorName(OverloadedOperatorKind);
 
-enum class OverloadsShown : unsigned short {
+enum class OverloadsShown : unsigned char {
   ALL,
   BEST,
-  NUM_ENUMERATORS
 };
 
 OverloadsShown FromPasta(pasta::OverloadsShown pasta_val);
@@ -4242,13 +4748,16 @@ inline static const char *EnumerationName(OverloadsShown) {
   return "OverloadsShown";
 }
 
+inline static constexpr unsigned NumEnumerators(OverloadsShown) {
+  return 2;
+}
+
 const char *EnumeratorName(OverloadsShown);
 
-enum class OwnershipKind : unsigned short {
+enum class OwnershipKind : unsigned char {
   HOLDS,
   RETURNS,
   TAKES,
-  NUM_ENUMERATORS
 };
 
 OwnershipKind FromPasta(pasta::OwnershipKind pasta_val);
@@ -4257,12 +4766,15 @@ inline static const char *EnumerationName(OwnershipKind) {
   return "OwnershipKind";
 }
 
+inline static constexpr unsigned NumEnumerators(OwnershipKind) {
+  return 3;
+}
+
 const char *EnumeratorName(OwnershipKind);
 
-enum class PCSType : unsigned short {
+enum class PCSType : unsigned char {
   AAPCS,
   VFP,
-  NUM_ENUMERATORS
 };
 
 PCSType FromPasta(pasta::PCSType pasta_val);
@@ -4271,15 +4783,18 @@ inline static const char *EnumerationName(PCSType) {
   return "PCSType";
 }
 
+inline static constexpr unsigned NumEnumerators(PCSType) {
+  return 2;
+}
+
 const char *EnumeratorName(PCSType);
 
-enum class ParameterABI : unsigned short {
+enum class ParameterABI : unsigned char {
   ORDINARY,
   SWIFT_INDIRECT_RESULT,
   SWIFT_ERROR_RESULT,
   SWIFT_CONTEXT,
   SWIFT_ASYNC_CONTEXT,
-  NUM_ENUMERATORS
 };
 
 ParameterABI FromPasta(pasta::ParameterABI pasta_val);
@@ -4288,13 +4803,16 @@ inline static const char *EnumerationName(ParameterABI) {
   return "ParameterABI";
 }
 
+inline static constexpr unsigned NumEnumerators(ParameterABI) {
+  return 5;
+}
+
 const char *EnumeratorName(ParameterABI);
 
-enum class ParenLocsOffsets : unsigned short {
+enum class ParenLocsOffsets : unsigned char {
   L_PAREN,
   R_PAREN,
   TOTAL,
-  NUM_ENUMERATORS
 };
 
 ParenLocsOffsets FromPasta(pasta::ParenLocsOffsets pasta_val);
@@ -4303,9 +4821,13 @@ inline static const char *EnumerationName(ParenLocsOffsets) {
   return "ParenLocsOffsets";
 }
 
+inline static constexpr unsigned NumEnumerators(ParenLocsOffsets) {
+  return 3;
+}
+
 const char *EnumeratorName(ParenLocsOffsets);
 
-enum class PragmaFloatControlKind : unsigned short {
+enum class PragmaFloatControlKind : unsigned char {
   UNKNOWN,
   PRECISE,
   NO_PRECISE,
@@ -4313,7 +4835,6 @@ enum class PragmaFloatControlKind : unsigned short {
   NO_EXCEPT,
   PUSH,
   POP,
-  NUM_ENUMERATORS
 };
 
 PragmaFloatControlKind FromPasta(pasta::PragmaFloatControlKind pasta_val);
@@ -4322,16 +4843,19 @@ inline static const char *EnumerationName(PragmaFloatControlKind) {
   return "PragmaFloatControlKind";
 }
 
+inline static constexpr unsigned NumEnumerators(PragmaFloatControlKind) {
+  return 7;
+}
+
 const char *EnumeratorName(PragmaFloatControlKind);
 
-enum class PragmaMSCommentKind : unsigned short {
+enum class PragmaMSCommentKind : unsigned char {
   UNKNOWN,
   LINKER,
   LIB,
   COMPILER,
   EXE_STRING,
   USER,
-  NUM_ENUMERATORS
 };
 
 PragmaMSCommentKind FromPasta(pasta::PragmaMSCommentKind pasta_val);
@@ -4340,14 +4864,17 @@ inline static const char *EnumerationName(PragmaMSCommentKind) {
   return "PragmaMSCommentKind";
 }
 
+inline static constexpr unsigned NumEnumerators(PragmaMSCommentKind) {
+  return 6;
+}
+
 const char *EnumeratorName(PragmaMSCommentKind);
 
-enum class PragmaMSPointersToMembersKind : unsigned short {
+enum class PragmaMSPointersToMembersKind : unsigned char {
   BEST_CASE,
   FULL_GENERALITY_SINGLE_INHERITANCE,
   FULL_GENERALITY_MULTIPLE_INHERITANCE,
   FULL_GENERALITY_VIRTUAL_INHERITANCE,
-  NUM_ENUMERATORS
 };
 
 PragmaMSPointersToMembersKind FromPasta(pasta::PragmaMSPointersToMembersKind pasta_val);
@@ -4356,12 +4883,15 @@ inline static const char *EnumerationName(PragmaMSPointersToMembersKind) {
   return "PragmaMSPointersToMembersKind";
 }
 
+inline static constexpr unsigned NumEnumerators(PragmaMSPointersToMembersKind) {
+  return 4;
+}
+
 const char *EnumeratorName(PragmaMSPointersToMembersKind);
 
-enum class PragmaMSStructKind : unsigned short {
+enum class PragmaMSStructKind : unsigned char {
   OFF,
   ON,
-  NUM_ENUMERATORS
 };
 
 PragmaMSStructKind FromPasta(pasta::PragmaMSStructKind pasta_val);
@@ -4370,9 +4900,13 @@ inline static const char *EnumerationName(PragmaMSStructKind) {
   return "PragmaMSStructKind";
 }
 
+inline static constexpr unsigned NumEnumerators(PragmaMSStructKind) {
+  return 2;
+}
+
 const char *EnumeratorName(PragmaMSStructKind);
 
-enum class PragmaSectionFlag : unsigned short {
+enum class PragmaSectionFlag : unsigned char {
   NONE,
   READ,
   WRITE,
@@ -4380,7 +4914,6 @@ enum class PragmaSectionFlag : unsigned short {
   IMPLICIT,
   ZERO_INITIALIZER,
   INVALID,
-  NUM_ENUMERATORS
 };
 
 PragmaSectionFlag FromPasta(pasta::PragmaSectionFlag pasta_val);
@@ -4389,14 +4922,17 @@ inline static const char *EnumerationName(PragmaSectionFlag) {
   return "PragmaSectionFlag";
 }
 
+inline static constexpr unsigned NumEnumerators(PragmaSectionFlag) {
+  return 7;
+}
+
 const char *EnumeratorName(PragmaSectionFlag);
 
-enum class ProfileInstrKind : unsigned short {
+enum class ProfileInstrKind : unsigned char {
   PROFILE_NONE,
   PROFILE_CLANG_INSTR,
   PROFILE_IR_INSTR,
   PROFILE_CSIR_INSTR,
-  NUM_ENUMERATORS
 };
 
 ProfileInstrKind FromPasta(pasta::ProfileInstrKind pasta_val);
@@ -4405,14 +4941,17 @@ inline static const char *EnumerationName(ProfileInstrKind) {
   return "ProfileInstrKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ProfileInstrKind) {
+  return 4;
+}
+
 const char *EnumeratorName(ProfileInstrKind);
 
-enum class RangeExprOffset : unsigned short {
+enum class RangeExprOffset : unsigned char {
   BEGIN,
   END,
   STEP,
   TOTAL,
-  NUM_ENUMERATORS
 };
 
 RangeExprOffset FromPasta(pasta::RangeExprOffset pasta_val);
@@ -4421,13 +4960,16 @@ inline static const char *EnumerationName(RangeExprOffset) {
   return "RangeExprOffset";
 }
 
+inline static constexpr unsigned NumEnumerators(RangeExprOffset) {
+  return 4;
+}
+
 const char *EnumeratorName(RangeExprOffset);
 
-enum class RangeLocOffset : unsigned short {
+enum class RangeLocOffset : unsigned char {
   ASSIGN_TOKEN,
   SECOND_COLON_TOKEN,
   TOTAL,
-  NUM_ENUMERATORS
 };
 
 RangeLocOffset FromPasta(pasta::RangeLocOffset pasta_val);
@@ -4436,13 +4978,16 @@ inline static const char *EnumerationName(RangeLocOffset) {
   return "RangeLocOffset";
 }
 
+inline static constexpr unsigned NumEnumerators(RangeLocOffset) {
+  return 3;
+}
+
 const char *EnumeratorName(RangeLocOffset);
 
-enum class RefQualifierKind : unsigned short {
+enum class RefQualifierKind : unsigned char {
   NONE,
   L_VALUE,
   R_VALUE,
-  NUM_ENUMERATORS
 };
 
 RefQualifierKind FromPasta(pasta::RefQualifierKind pasta_val);
@@ -4451,16 +4996,19 @@ inline static const char *EnumerationName(RefQualifierKind) {
   return "RefQualifierKind";
 }
 
+inline static constexpr unsigned NumEnumerators(RefQualifierKind) {
+  return 3;
+}
+
 const char *EnumeratorName(RefQualifierKind);
 
-enum class RemarkKind : unsigned short {
+enum class RemarkKind : unsigned char {
   MISSING,
   ENABLED,
   ENABLED_EVERYTHING,
   DISABLED,
   DISABLED_EVERYTHING,
   WITH_PATTERN,
-  NUM_ENUMERATORS
 };
 
 RemarkKind FromPasta(pasta::RemarkKind pasta_val);
@@ -4469,15 +5017,18 @@ inline static const char *EnumerationName(RemarkKind) {
   return "RemarkKind";
 }
 
+inline static constexpr unsigned NumEnumerators(RemarkKind) {
+  return 6;
+}
+
 const char *EnumeratorName(RemarkKind);
 
-enum class ReservedIdentifierStatus : unsigned short {
+enum class ReservedIdentifierStatus : unsigned char {
   NOT_RESERVED,
   STARTS_WITH_UNDERSCORE_AT_GLOBAL_SCOPE,
   STARTS_WITH_DOUBLE_UNDERSCORE,
   STARTS_WITH_UNDERSCORE_FOLLOWED_BY_CAPITAL_LETTER,
   CONTAINS_DOUBLE_UNDERSCORE,
-  NUM_ENUMERATORS
 };
 
 ReservedIdentifierStatus FromPasta(pasta::ReservedIdentifierStatus pasta_val);
@@ -4486,14 +5037,17 @@ inline static const char *EnumerationName(ReservedIdentifierStatus) {
   return "ReservedIdentifierStatus";
 }
 
+inline static constexpr unsigned NumEnumerators(ReservedIdentifierStatus) {
+  return 5;
+}
+
 const char *EnumeratorName(ReservedIdentifierStatus);
 
-enum class SFINAEResponse : unsigned short {
+enum class SFINAEResponse : unsigned char {
   SUBSTITUTION_FAILURE,
   SUPPRESS,
   REPORT,
   ACCESS_CONTROL,
-  NUM_ENUMERATORS
 };
 
 SFINAEResponse FromPasta(pasta::SFINAEResponse pasta_val);
@@ -4502,14 +5056,17 @@ inline static const char *EnumerationName(SFINAEResponse) {
   return "SFINAEResponse";
 }
 
+inline static constexpr unsigned NumEnumerators(SFINAEResponse) {
+  return 4;
+}
+
 const char *EnumeratorName(SFINAEResponse);
 
-enum class SYCLMajorVersion : unsigned short {
+enum class SYCLMajorVersion : unsigned char {
   VERSION_NONE,
   VERSION2017,
   VERSION2020,
   // Skipped repeat pasta::kDefault
-  NUM_ENUMERATORS
 };
 
 SYCLMajorVersion FromPasta(pasta::SYCLMajorVersion pasta_val);
@@ -4518,9 +5075,13 @@ inline static const char *EnumerationName(SYCLMajorVersion) {
   return "SYCLMajorVersion";
 }
 
+inline static constexpr unsigned NumEnumerators(SYCLMajorVersion) {
+  return 3;
+}
+
 const char *EnumeratorName(SYCLMajorVersion);
 
-enum class SanitizerOrdinal : unsigned short {
+enum class SanitizerOrdinal : unsigned char {
   ADDRESS,
   POINTER_COMPARE,
   POINTER_SUBTRACT,
@@ -4588,7 +5149,6 @@ enum class SanitizerOrdinal : unsigned short {
   SCUDO,
   ALL_GROUP,
   COUNT,
-  NUM_ENUMERATORS
 };
 
 SanitizerOrdinal FromPasta(pasta::SanitizerOrdinal pasta_val);
@@ -4597,13 +5157,16 @@ inline static const char *EnumerationName(SanitizerOrdinal) {
   return "SanitizerOrdinal";
 }
 
+inline static constexpr unsigned NumEnumerators(SanitizerOrdinal) {
+  return 67;
+}
+
 const char *EnumeratorName(SanitizerOrdinal);
 
-enum class SelectorLocationsKind : unsigned short {
+enum class SelectorLocationsKind : unsigned char {
   NON_STANDARD,
   STANDARD_NO_SPACE,
   STANDARD_WITH_SPACE,
-  NUM_ENUMERATORS
 };
 
 SelectorLocationsKind FromPasta(pasta::SelectorLocationsKind pasta_val);
@@ -4612,12 +5175,15 @@ inline static const char *EnumerationName(SelectorLocationsKind) {
   return "SelectorLocationsKind";
 }
 
+inline static constexpr unsigned NumEnumerators(SelectorLocationsKind) {
+  return 3;
+}
+
 const char *EnumeratorName(SelectorLocationsKind);
 
-enum class SignReturnAddressKeyKind : unsigned short {
+enum class SignReturnAddressKeyKind : unsigned char {
   A_KEY,
   B_KEY,
-  NUM_ENUMERATORS
 };
 
 SignReturnAddressKeyKind FromPasta(pasta::SignReturnAddressKeyKind pasta_val);
@@ -4626,13 +5192,16 @@ inline static const char *EnumerationName(SignReturnAddressKeyKind) {
   return "SignReturnAddressKeyKind";
 }
 
+inline static constexpr unsigned NumEnumerators(SignReturnAddressKeyKind) {
+  return 2;
+}
+
 const char *EnumeratorName(SignReturnAddressKeyKind);
 
-enum class SignReturnAddressScopeKind : unsigned short {
+enum class SignReturnAddressScopeKind : unsigned char {
   NONE,
   NON_LEAF,
   ALL,
-  NUM_ENUMERATORS
 };
 
 SignReturnAddressScopeKind FromPasta(pasta::SignReturnAddressScopeKind pasta_val);
@@ -4641,13 +5210,16 @@ inline static const char *EnumerationName(SignReturnAddressScopeKind) {
   return "SignReturnAddressScopeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(SignReturnAddressScopeKind) {
+  return 3;
+}
+
 const char *EnumeratorName(SignReturnAddressScopeKind);
 
-enum class SignedOverflowBehaviorTy : unsigned short {
+enum class SignedOverflowBehaviorTy : unsigned char {
   UNDEFINED,
   DEFINED,
   TRAPPING,
-  NUM_ENUMERATORS
 };
 
 SignedOverflowBehaviorTy FromPasta(pasta::SignedOverflowBehaviorTy pasta_val);
@@ -4656,9 +5228,13 @@ inline static const char *EnumerationName(SignedOverflowBehaviorTy) {
   return "SignedOverflowBehaviorTy";
 }
 
+inline static constexpr unsigned NumEnumerators(SignedOverflowBehaviorTy) {
+  return 3;
+}
+
 const char *EnumeratorName(SignedOverflowBehaviorTy);
 
-enum class SpecialMemberFlags : unsigned short {
+enum class SpecialMemberFlags : unsigned char {
   DEFAULT_CONSTRUCTOR,
   COPY_CONSTRUCTOR,
   MOVE_CONSTRUCTOR,
@@ -4666,7 +5242,6 @@ enum class SpecialMemberFlags : unsigned short {
   MOVE_ASSIGNMENT,
   DESTRUCTOR,
   ALL,
-  NUM_ENUMERATORS
 };
 
 SpecialMemberFlags FromPasta(pasta::SpecialMemberFlags pasta_val);
@@ -4675,9 +5250,13 @@ inline static const char *EnumerationName(SpecialMemberFlags) {
   return "SpecialMemberFlags";
 }
 
+inline static constexpr unsigned NumEnumerators(SpecialMemberFlags) {
+  return 7;
+}
+
 const char *EnumeratorName(SpecialMemberFlags);
 
-enum class SpecifierKind : unsigned short {
+enum class SpecifierKind : unsigned char {
   IDENTIFIER,
   NAMESPACE,
   NAMESPACE_ALIAS,
@@ -4685,7 +5264,6 @@ enum class SpecifierKind : unsigned short {
   TYPE_SPEC_WITH_TEMPLATE,
   GLOBAL,
   SUPER,
-  NUM_ENUMERATORS
 };
 
 SpecifierKind FromPasta(pasta::SpecifierKind pasta_val);
@@ -4694,14 +5272,17 @@ inline static const char *EnumerationName(SpecifierKind) {
   return "SpecifierKind";
 }
 
+inline static constexpr unsigned NumEnumerators(SpecifierKind) {
+  return 7;
+}
+
 const char *EnumeratorName(SpecifierKind);
 
-enum class Spelling : unsigned short {
+enum class Spelling : unsigned char {
   GNU_AARCH64_VECTOR_PCS,
   CXX11_CLANG_AARCH64_VECTOR_PCS,
   C2_XCLANG_AARCH64_VECTOR_PCS,
   SPELLING_NOT_CALCULATED,
-  NUM_ENUMERATORS
 };
 
 Spelling FromPasta(pasta::Spelling pasta_val);
@@ -4710,14 +5291,17 @@ inline static const char *EnumerationName(Spelling) {
   return "Spelling";
 }
 
+inline static constexpr unsigned NumEnumerators(Spelling) {
+  return 4;
+}
+
 const char *EnumeratorName(Spelling);
 
-enum class StackProtectorMode : unsigned short {
+enum class StackProtectorMode : unsigned char {
   OFF,
   ON,
   STRONG,
   REQ,
-  NUM_ENUMERATORS
 };
 
 StackProtectorMode FromPasta(pasta::StackProtectorMode pasta_val);
@@ -4726,16 +5310,19 @@ inline static const char *EnumerationName(StackProtectorMode) {
   return "StackProtectorMode";
 }
 
+inline static constexpr unsigned NumEnumerators(StackProtectorMode) {
+  return 4;
+}
+
 const char *EnumeratorName(StackProtectorMode);
 
-enum class StorageClass : unsigned short {
+enum class StorageClass : unsigned char {
   NONE,
   EXTERN,
   STATIC,
   PRIVATE_EXTERN,
   AUTO,
   REGISTER,
-  NUM_ENUMERATORS
 };
 
 StorageClass FromPasta(pasta::StorageClass pasta_val);
@@ -4744,15 +5331,18 @@ inline static const char *EnumerationName(StorageClass) {
   return "StorageClass";
 }
 
+inline static constexpr unsigned NumEnumerators(StorageClass) {
+  return 6;
+}
+
 const char *EnumeratorName(StorageClass);
 
-enum class StorageDuration : unsigned short {
+enum class StorageDuration : unsigned char {
   FULL_EXPRESSION,
   AUTOMATIC,
   THREAD,
   STATIC,
   DYNAMIC,
-  NUM_ENUMERATORS
 };
 
 StorageDuration FromPasta(pasta::StorageDuration pasta_val);
@@ -4761,9 +5351,13 @@ inline static const char *EnumerationName(StorageDuration) {
   return "StorageDuration";
 }
 
+inline static constexpr unsigned NumEnumerators(StorageDuration) {
+  return 5;
+}
+
 const char *EnumeratorName(StorageDuration);
 
-enum class StoredNameKind : unsigned short {
+enum class StoredNameKind : unsigned char {
   STORED_IDENTIFIER,
   STORED_OBJ_C_ZERO_ARGUMENT_SELECTOR,
   STORED_OBJ_C_ONE_ARGUMENT_SELECTOR,
@@ -4774,7 +5368,6 @@ enum class StoredNameKind : unsigned short {
   STORED_DECLARATION_NAME_EXTRA,
   // Skipped repeat pasta::kPointerMask
   UNCOMMON_NAME_KIND_OFFSET,
-  NUM_ENUMERATORS
 };
 
 StoredNameKind FromPasta(pasta::StoredNameKind pasta_val);
@@ -4783,14 +5376,17 @@ inline static const char *EnumerationName(StoredNameKind) {
   return "StoredNameKind";
 }
 
+inline static constexpr unsigned NumEnumerators(StoredNameKind) {
+  return 9;
+}
+
 const char *EnumeratorName(StoredNameKind);
 
-enum class StoredSpecifierKind : unsigned short {
+enum class StoredSpecifierKind : unsigned char {
   STORED_IDENTIFIER,
   STORED_DECLARATION,
   STORED_TYPE_SPEC,
   STORED_TYPE_SPEC_WITH_TEMPLATE,
-  NUM_ENUMERATORS
 };
 
 StoredSpecifierKind FromPasta(pasta::StoredSpecifierKind pasta_val);
@@ -4799,13 +5395,16 @@ inline static const char *EnumerationName(StoredSpecifierKind) {
   return "StoredSpecifierKind";
 }
 
+inline static constexpr unsigned NumEnumerators(StoredSpecifierKind) {
+  return 4;
+}
+
 const char *EnumeratorName(StoredSpecifierKind);
 
-enum class StructReturnConventionKind : unsigned short {
+enum class StructReturnConventionKind : unsigned char {
   DEFAULT,
   ON_STACK,
   IN_REGS,
-  NUM_ENUMERATORS
 };
 
 StructReturnConventionKind FromPasta(pasta::StructReturnConventionKind pasta_val);
@@ -4814,14 +5413,17 @@ inline static const char *EnumerationName(StructReturnConventionKind) {
   return "StructReturnConventionKind";
 }
 
+inline static constexpr unsigned NumEnumerators(StructReturnConventionKind) {
+  return 3;
+}
+
 const char *EnumeratorName(StructReturnConventionKind);
 
-enum class SubExpr : unsigned short {
+enum class SubExpr : unsigned char {
   CALLEE,
   LHS,
   RHS,
   COUNT,
-  NUM_ENUMERATORS
 };
 
 SubExpr FromPasta(pasta::SubExpr pasta_val);
@@ -4830,9 +5432,13 @@ inline static const char *EnumerationName(SubExpr) {
   return "SubExpr";
 }
 
+inline static constexpr unsigned NumEnumerators(SubExpr) {
+  return 4;
+}
+
 const char *EnumeratorName(SubExpr);
 
-enum class SubStmt : unsigned short {
+enum class SubStmt : unsigned char {
   BODY,
   PROMISE,
   INITIALIZER_SUSPEND,
@@ -4845,7 +5451,6 @@ enum class SubStmt : unsigned short {
   RESULT_DECLARATION,
   RETURN_STATEMENT,
   RETURN_STATEMENT_ON_ALLOC_FAILURE,
-  NUM_ENUMERATORS
 };
 
 SubStmt FromPasta(pasta::SubStmt pasta_val);
@@ -4854,14 +5459,17 @@ inline static const char *EnumerationName(SubStmt) {
   return "SubStmt";
 }
 
+inline static constexpr unsigned NumEnumerators(SubStmt) {
+  return 12;
+}
+
 const char *EnumeratorName(SubStmt);
 
-enum class SyncScope : unsigned short {
+enum class SyncScope : unsigned char {
   OPEN_CL_WORK_GROUP,
   OPEN_CL_DEVICE,
   OPEN_CL_ALL_SVM_DEVICES,
   OPEN_CL_SUB_GROUP,
-  NUM_ENUMERATORS
 };
 
 SyncScope FromPasta(pasta::SyncScope pasta_val);
@@ -4870,9 +5478,13 @@ inline static const char *EnumerationName(SyncScope) {
   return "SyncScope";
 }
 
+inline static constexpr unsigned NumEnumerators(SyncScope) {
+  return 4;
+}
+
 const char *EnumeratorName(SyncScope);
 
-enum class Syntax : unsigned short {
+enum class Syntax : unsigned char {
   GNU,
   CXX11,
   C2_X,
@@ -4881,7 +5493,6 @@ enum class Syntax : unsigned short {
   KEYWORD,
   PRAGMA,
   CONTEXT_SENSITIVE_KEYWORD,
-  NUM_ENUMERATORS
 };
 
 Syntax FromPasta(pasta::Syntax pasta_val);
@@ -4890,14 +5501,17 @@ inline static const char *EnumerationName(Syntax) {
   return "Syntax";
 }
 
+inline static constexpr unsigned NumEnumerators(Syntax) {
+  return 8;
+}
+
 const char *EnumeratorName(Syntax);
 
-enum class TLSModel : unsigned short {
+enum class TLSModel : unsigned char {
   GENERAL_DYNAMIC_TLS_MODEL,
   LOCAL_DYNAMIC_TLS_MODEL,
   INITIAL_EXEC_TLS_MODEL,
   LOCAL_EXEC_TLS_MODEL,
-  NUM_ENUMERATORS
 };
 
 TLSModel FromPasta(pasta::TLSModel pasta_val);
@@ -4906,14 +5520,17 @@ inline static const char *EnumerationName(TLSModel) {
   return "TLSModel";
 }
 
+inline static constexpr unsigned NumEnumerators(TLSModel) {
+  return 4;
+}
+
 const char *EnumeratorName(TLSModel);
 
-enum class TQ : unsigned short {
+enum class TQ : unsigned char {
   CONST,
   RESTRICT,
   VOLATILE,
   CVR_MASK,
-  NUM_ENUMERATORS
 };
 
 TQ FromPasta(pasta::TQ pasta_val);
@@ -4922,15 +5539,18 @@ inline static const char *EnumerationName(TQ) {
   return "TQ";
 }
 
+inline static constexpr unsigned NumEnumerators(TQ) {
+  return 4;
+}
+
 const char *EnumeratorName(TQ);
 
-enum class TagTypeKind : unsigned short {
+enum class TagTypeKind : unsigned char {
   STRUCT,
   INTERFACE,
   UNION,
   CLASS,
   ENUM,
-  NUM_ENUMERATORS
 };
 
 TagTypeKind FromPasta(pasta::TagTypeKind pasta_val);
@@ -4939,13 +5559,16 @@ inline static const char *EnumerationName(TagTypeKind) {
   return "TagTypeKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TagTypeKind) {
+  return 5;
+}
+
 const char *EnumeratorName(TagTypeKind);
 
-enum class TailPaddingUseRules : unsigned short {
+enum class TailPaddingUseRules : unsigned char {
   ALWAYS_USE_TAIL_PADDING,
   USE_TAIL_PADDING_UNLESS_POD03,
   USE_TAIL_PADDING_UNLESS_POD11,
-  NUM_ENUMERATORS
 };
 
 TailPaddingUseRules FromPasta(pasta::TailPaddingUseRules pasta_val);
@@ -4954,9 +5577,13 @@ inline static const char *EnumerationName(TailPaddingUseRules) {
   return "TailPaddingUseRules";
 }
 
+inline static constexpr unsigned NumEnumerators(TailPaddingUseRules) {
+  return 3;
+}
+
 const char *EnumeratorName(TailPaddingUseRules);
 
-enum class TemplateArgumentDependence : unsigned short {
+enum class TemplateArgumentDependence : unsigned char {
   UNEXPANDED_PACK,
   INSTANTIATION,
   DEPENDENT,
@@ -4964,7 +5591,6 @@ enum class TemplateArgumentDependence : unsigned short {
   NONE,
   DEPENDENT_INSTANTIATION,
   ALL,
-  NUM_ENUMERATORS
 };
 
 TemplateArgumentDependence FromPasta(pasta::TemplateArgumentDependence pasta_val);
@@ -4973,9 +5599,13 @@ inline static const char *EnumerationName(TemplateArgumentDependence) {
   return "TemplateArgumentDependence";
 }
 
+inline static constexpr unsigned NumEnumerators(TemplateArgumentDependence) {
+  return 7;
+}
+
 const char *EnumeratorName(TemplateArgumentDependence);
 
-enum class TemplateNameDependence : unsigned short {
+enum class TemplateNameDependence : unsigned char {
   UNEXPANDED_PACK,
   INSTANTIATION,
   DEPENDENT,
@@ -4983,7 +5613,6 @@ enum class TemplateNameDependence : unsigned short {
   NONE,
   DEPENDENT_INSTANTIATION,
   ALL,
-  NUM_ENUMERATORS
 };
 
 TemplateNameDependence FromPasta(pasta::TemplateNameDependence pasta_val);
@@ -4992,15 +5621,18 @@ inline static const char *EnumerationName(TemplateNameDependence) {
   return "TemplateNameDependence";
 }
 
+inline static constexpr unsigned NumEnumerators(TemplateNameDependence) {
+  return 7;
+}
+
 const char *EnumeratorName(TemplateNameDependence);
 
-enum class TemplateSpecializationKind : unsigned short {
+enum class TemplateSpecializationKind : unsigned char {
   UNDECLARED,
   IMPLICIT_INSTANTIATION,
   EXPLICIT_SPECIALIZATION,
   EXPLICIT_INSTANTIATION_DECLARATION,
   EXPLICIT_INSTANTIATION_DEFINITION,
-  NUM_ENUMERATORS
 };
 
 TemplateSpecializationKind FromPasta(pasta::TemplateSpecializationKind pasta_val);
@@ -5009,13 +5641,16 @@ inline static const char *EnumerationName(TemplateSpecializationKind) {
   return "TemplateSpecializationKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TemplateSpecializationKind) {
+  return 5;
+}
+
 const char *EnumeratorName(TemplateSpecializationKind);
 
-enum class TextDiagnosticFormat : unsigned short {
+enum class TextDiagnosticFormat : unsigned char {
   CLANG,
   MSVC,
   VI,
-  NUM_ENUMERATORS
 };
 
 TextDiagnosticFormat FromPasta(pasta::TextDiagnosticFormat pasta_val);
@@ -5024,12 +5659,15 @@ inline static const char *EnumerationName(TextDiagnosticFormat) {
   return "TextDiagnosticFormat";
 }
 
+inline static constexpr unsigned NumEnumerators(TextDiagnosticFormat) {
+  return 3;
+}
+
 const char *EnumeratorName(TextDiagnosticFormat);
 
-enum class ThreadModelKind : unsigned short {
+enum class ThreadModelKind : unsigned char {
   POSIX,
   SINGLE,
-  NUM_ENUMERATORS
 };
 
 ThreadModelKind FromPasta(pasta::ThreadModelKind pasta_val);
@@ -5038,20 +5676,27 @@ inline static const char *EnumerationName(ThreadModelKind) {
   return "ThreadModelKind";
 }
 
+inline static constexpr unsigned NumEnumerators(ThreadModelKind) {
+  return 2;
+}
+
 const char *EnumeratorName(ThreadModelKind);
 
-enum class ThreadStorageClassSpecifier : unsigned short {
+enum class ThreadStorageClassSpecifier : unsigned char {
   UNSPECIFIED,
   __THREAD,
   THREAD_LOCAL,
   _THREAD_LOCAL,
-  NUM_ENUMERATORS
 };
 
 ThreadStorageClassSpecifier FromPasta(pasta::ThreadStorageClassSpecifier pasta_val);
 
 inline static const char *EnumerationName(ThreadStorageClassSpecifier) {
   return "ThreadStorageClassSpecifier";
+}
+
+inline static constexpr unsigned NumEnumerators(ThreadStorageClassSpecifier) {
+  return 4;
 }
 
 const char *EnumeratorName(ThreadStorageClassSpecifier);
@@ -5501,7 +6146,6 @@ enum class TokenKind : unsigned short {
   END_OF_FILE_MARKER,
   BEGIN_OF_MACRO_EXPANSION_MARKER,
   END_OF_MACRO_EXPANSION_MARKER,
-  NUM_ENUMERATORS
 };
 
 TokenKind FromPasta(pasta::TokenKind pasta_val);
@@ -5510,12 +6154,15 @@ inline static const char *EnumerationName(TokenKind) {
   return "TokenKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TokenKind) {
+  return 444;
+}
+
 const char *EnumeratorName(TokenKind);
 
-enum class TrailingAllocKind : unsigned short {
+enum class TrailingAllocKind : unsigned char {
   TAK_INHERITS_CONSTRUCTOR,
   TAK_HAS_TAIL_EXPLICIT,
-  NUM_ENUMERATORS
 };
 
 TrailingAllocKind FromPasta(pasta::TrailingAllocKind pasta_val);
@@ -5524,14 +6171,17 @@ inline static const char *EnumerationName(TrailingAllocKind) {
   return "TrailingAllocKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TrailingAllocKind) {
+  return 2;
+}
+
 const char *EnumeratorName(TrailingAllocKind);
 
-enum class TranslationUnitKind : unsigned short {
+enum class TranslationUnitKind : unsigned char {
   COMPLETE,
   PREFIX,
   MODULE,
   INCREMENTAL,
-  NUM_ENUMERATORS
 };
 
 TranslationUnitKind FromPasta(pasta::TranslationUnitKind pasta_val);
@@ -5540,13 +6190,16 @@ inline static const char *EnumerationName(TranslationUnitKind) {
   return "TranslationUnitKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TranslationUnitKind) {
+  return 4;
+}
+
 const char *EnumeratorName(TranslationUnitKind);
 
-enum class TrivialAutoVarInitKind : unsigned short {
+enum class TrivialAutoVarInitKind : unsigned char {
   UNINITIALIZED,
   ZERO,
   PATTERN,
-  NUM_ENUMERATORS
 };
 
 TrivialAutoVarInitKind FromPasta(pasta::TrivialAutoVarInitKind pasta_val);
@@ -5555,9 +6208,13 @@ inline static const char *EnumerationName(TrivialAutoVarInitKind) {
   return "TrivialAutoVarInitKind";
 }
 
+inline static constexpr unsigned NumEnumerators(TrivialAutoVarInitKind) {
+  return 3;
+}
+
 const char *EnumeratorName(TrivialAutoVarInitKind);
 
-enum class TypeDependence : unsigned short {
+enum class TypeDependence : unsigned char {
   UNEXPANDED_PACK,
   INSTANTIATION,
   DEPENDENT,
@@ -5566,7 +6223,6 @@ enum class TypeDependence : unsigned short {
   NONE,
   ALL,
   DEPENDENT_INSTANTIATION,
-  NUM_ENUMERATORS
 };
 
 TypeDependence FromPasta(pasta::TypeDependence pasta_val);
@@ -5575,9 +6231,13 @@ inline static const char *EnumerationName(TypeDependence) {
   return "TypeDependence";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeDependence) {
+  return 8;
+}
+
 const char *EnumeratorName(TypeDependence);
 
-enum class TypeLocClass : unsigned short {
+enum class TypeLocClass : unsigned char {
   ADJUSTED,
   DECAYED,
   CONSTANT_ARRAY,
@@ -5631,7 +6291,6 @@ enum class TypeLocClass : unsigned short {
   VECTOR,
   EXT_VECTOR,
   QUALIFIED,
-  NUM_ENUMERATORS
 };
 
 TypeLocClass FromPasta(pasta::TypeLocClass pasta_val);
@@ -5640,13 +6299,16 @@ inline static const char *EnumerationName(TypeLocClass) {
   return "TypeLocClass";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeLocClass) {
+  return 53;
+}
+
 const char *EnumeratorName(TypeLocClass);
 
-enum class TypeSpecifierSign : unsigned short {
+enum class TypeSpecifierSign : unsigned char {
   UNSPECIFIED,
   SIGNED,
   UNSIGNED,
-  NUM_ENUMERATORS
 };
 
 TypeSpecifierSign FromPasta(pasta::TypeSpecifierSign pasta_val);
@@ -5655,9 +6317,13 @@ inline static const char *EnumerationName(TypeSpecifierSign) {
   return "TypeSpecifierSign";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeSpecifierSign) {
+  return 3;
+}
+
 const char *EnumeratorName(TypeSpecifierSign);
 
-enum class TypeSpecifierType : unsigned short {
+enum class TypeSpecifierType : unsigned char {
   UNSPECIFIED,
   VOID,
   CHARACTER,
@@ -5708,7 +6374,6 @@ enum class TypeSpecifierType : unsigned short {
   IMAGE2_DARRAY_MSAA_DEPTH_T,
   IMAGE3_DT,
   ERROR,
-  NUM_ENUMERATORS
 };
 
 TypeSpecifierType FromPasta(pasta::TypeSpecifierType pasta_val);
@@ -5717,14 +6382,17 @@ inline static const char *EnumerationName(TypeSpecifierType) {
   return "TypeSpecifierType";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeSpecifierType) {
+  return 50;
+}
+
 const char *EnumeratorName(TypeSpecifierType);
 
-enum class TypeSpecifierWidth : unsigned short {
+enum class TypeSpecifierWidth : unsigned char {
   UNSPECIFIED,
   SHORT,
   LONG,
   LONG_LONG,
-  NUM_ENUMERATORS
 };
 
 TypeSpecifierWidth FromPasta(pasta::TypeSpecifierWidth pasta_val);
@@ -5733,12 +6401,15 @@ inline static const char *EnumerationName(TypeSpecifierWidth) {
   return "TypeSpecifierWidth";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeSpecifierWidth) {
+  return 4;
+}
+
 const char *EnumeratorName(TypeSpecifierWidth);
 
-enum class TypeSpecifiersPipe : unsigned short {
+enum class TypeSpecifiersPipe : unsigned char {
   UNSPECIFIED,
   PIPE,
-  NUM_ENUMERATORS
 };
 
 TypeSpecifiersPipe FromPasta(pasta::TypeSpecifiersPipe pasta_val);
@@ -5747,9 +6418,13 @@ inline static const char *EnumerationName(TypeSpecifiersPipe) {
   return "TypeSpecifiersPipe";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeSpecifiersPipe) {
+  return 2;
+}
+
 const char *EnumeratorName(TypeSpecifiersPipe);
 
-enum class TypeTrait : unsigned short {
+enum class TypeTrait : unsigned char {
   IS_INTERFACE_CLASS,
   IS_SEALED,
   IS_DESTRUCTIBLE,
@@ -5814,7 +6489,6 @@ enum class TypeTrait : unsigned short {
   IS_CONSTRUCTIBLE,
   IS_NOTHROW_CONSTRUCTIBLE,
   IS_TRIVIALLY_CONSTRUCTIBLE,
-  NUM_ENUMERATORS
 };
 
 TypeTrait FromPasta(pasta::TypeTrait pasta_val);
@@ -5823,15 +6497,18 @@ inline static const char *EnumerationName(TypeTrait) {
   return "TypeTrait";
 }
 
+inline static constexpr unsigned NumEnumerators(TypeTrait) {
+  return 64;
+}
+
 const char *EnumeratorName(TypeTrait);
 
-enum class UnaryExprOrTypeTrait : unsigned short {
+enum class UnaryExprOrTypeTrait : unsigned char {
   SIZE_OF,
   ALIGN_OF,
   PREFERRED_ALIGN_OF,
   VEC_STEP,
   OPEN_MP_REQUIRED_SIMD_ALIGN,
-  NUM_ENUMERATORS
 };
 
 UnaryExprOrTypeTrait FromPasta(pasta::UnaryExprOrTypeTrait pasta_val);
@@ -5840,9 +6517,13 @@ inline static const char *EnumerationName(UnaryExprOrTypeTrait) {
   return "UnaryExprOrTypeTrait";
 }
 
+inline static constexpr unsigned NumEnumerators(UnaryExprOrTypeTrait) {
+  return 5;
+}
+
 const char *EnumeratorName(UnaryExprOrTypeTrait);
 
-enum class UnaryOperatorKind : unsigned short {
+enum class UnaryOperatorKind : unsigned char {
   POST_INCREMENT,
   POST_DEC,
   PRE_INCREMENT,
@@ -5857,7 +6538,6 @@ enum class UnaryOperatorKind : unsigned short {
   IMAG,
   EXTENSION,
   COAWAIT,
-  NUM_ENUMERATORS
 };
 
 UnaryOperatorKind FromPasta(pasta::UnaryOperatorKind pasta_val);
@@ -5866,9 +6546,13 @@ inline static const char *EnumerationName(UnaryOperatorKind) {
   return "UnaryOperatorKind";
 }
 
+inline static constexpr unsigned NumEnumerators(UnaryOperatorKind) {
+  return 14;
+}
+
 const char *EnumeratorName(UnaryOperatorKind);
 
-enum class APValueKind : unsigned short {
+enum class APValueKind : unsigned char {
   NONE,
   INDETERMINATE,
   INT,
@@ -5883,7 +6567,6 @@ enum class APValueKind : unsigned short {
   UNION,
   MEMBER_POINTER,
   ADDR_LABEL_DIFF,
-  NUM_ENUMERATORS
 };
 
 APValueKind FromPasta(pasta::APValueKind pasta_val);
@@ -5892,16 +6575,19 @@ inline static const char *EnumerationName(APValueKind) {
   return "APValueKind";
 }
 
+inline static constexpr unsigned NumEnumerators(APValueKind) {
+  return 14;
+}
+
 const char *EnumeratorName(APValueKind);
 
-enum class VectorLibrary : unsigned short {
+enum class VectorLibrary : unsigned char {
   NO_LIBRARY,
   ACCELERATE,
   LIBMVEC,
   MASSV,
   SVML,
   DARWIN_LIBSYSTEM_M,
-  NUM_ENUMERATORS
 };
 
 VectorLibrary FromPasta(pasta::VectorLibrary pasta_val);
@@ -5910,13 +6596,16 @@ inline static const char *EnumerationName(VectorLibrary) {
   return "VectorLibrary";
 }
 
+inline static constexpr unsigned NumEnumerators(VectorLibrary) {
+  return 6;
+}
+
 const char *EnumeratorName(VectorLibrary);
 
-enum class Visibility : unsigned short {
+enum class Visibility : unsigned char {
   HIDDEN_VISIBILITY,
   PROTECTED_VISIBILITY,
   DEFAULT_VISIBILITY,
-  NUM_ENUMERATORS
 };
 
 Visibility FromPasta(pasta::Visibility pasta_val);
@@ -5925,13 +6614,16 @@ inline static const char *EnumerationName(Visibility) {
   return "Visibility";
 }
 
+inline static constexpr unsigned NumEnumerators(Visibility) {
+  return 3;
+}
+
 const char *EnumeratorName(Visibility);
 
-enum class VisibilityType : unsigned short {
+enum class VisibilityType : unsigned char {
   DEFAULT,
   HIDDEN,
   PROTECTED,
-  NUM_ENUMERATORS
 };
 
 VisibilityType FromPasta(pasta::VisibilityType pasta_val);
@@ -5940,12 +6632,15 @@ inline static const char *EnumerationName(VisibilityType) {
   return "VisibilityType";
 }
 
+inline static constexpr unsigned NumEnumerators(VisibilityType) {
+  return 3;
+}
+
 const char *EnumeratorName(VisibilityType);
 
-enum class PathKind : unsigned short {
+enum class PathKind : unsigned char {
   UNIX,
   WINDOWS,
-  NUM_ENUMERATORS
 };
 
 PathKind FromPasta(pasta::PathKind pasta_val);
@@ -5954,9 +6649,13 @@ inline static const char *EnumerationName(PathKind) {
   return "PathKind";
 }
 
+inline static constexpr unsigned NumEnumerators(PathKind) {
+  return 2;
+}
+
 const char *EnumeratorName(PathKind);
 
-enum class FileType : unsigned short {
+enum class FileType : unsigned char {
   NONE,
   NOT_FOUND,
   REGULAR,
@@ -5967,7 +6666,6 @@ enum class FileType : unsigned short {
   FIRST_IN_FIRST_OUT,
   SOCKET,
   KNKNOWN,
-  NUM_ENUMERATORS
 };
 
 FileType FromPasta(pasta::FileType pasta_val);
@@ -5976,16 +6674,19 @@ inline static const char *EnumerationName(FileType) {
   return "FileType";
 }
 
+inline static constexpr unsigned NumEnumerators(FileType) {
+  return 10;
+}
+
 const char *EnumeratorName(FileType);
 
-enum class CompilerName : unsigned short {
+enum class CompilerName : unsigned char {
   UNKNOWN,
   CLANG,
   APPLE_CLANG,
   CLANG_CL,
   CL,
   GNU,
-  NUM_ENUMERATORS
 };
 
 CompilerName FromPasta(pasta::CompilerName pasta_val);
@@ -5994,12 +6695,15 @@ inline static const char *EnumerationName(CompilerName) {
   return "CompilerName";
 }
 
+inline static constexpr unsigned NumEnumerators(CompilerName) {
+  return 6;
+}
+
 const char *EnumeratorName(CompilerName);
 
-enum class IncludePathLocation : unsigned short {
+enum class IncludePathLocation : unsigned char {
   ABSOLUTE,
   SYSROOT_RELATIVE,
-  NUM_ENUMERATORS
 };
 
 IncludePathLocation FromPasta(pasta::IncludePathLocation pasta_val);
@@ -6008,18 +6712,25 @@ inline static const char *EnumerationName(IncludePathLocation) {
   return "IncludePathLocation";
 }
 
+inline static constexpr unsigned NumEnumerators(IncludePathLocation) {
+  return 2;
+}
+
 const char *EnumeratorName(IncludePathLocation);
 
-enum class TargetLanguage : unsigned short {
+enum class TargetLanguage : unsigned char {
   C,
   CXX,
-  NUM_ENUMERATORS
 };
 
 TargetLanguage FromPasta(pasta::TargetLanguage pasta_val);
 
 inline static const char *EnumerationName(TargetLanguage) {
   return "TargetLanguage";
+}
+
+inline static constexpr unsigned NumEnumerators(TargetLanguage) {
+  return 2;
 }
 
 const char *EnumeratorName(TargetLanguage);
@@ -9096,7 +9807,7 @@ class CXXForRangeStmt : public Stmt {
   DeclStmt end_statement(void) const;
   Token for_token(void) const;
   Expr increment(void) const;
-  Stmt initializer(void) const;
+  std::optional<Stmt> initializer(void) const;
   DeclStmt loop_variable_statement(void) const;
   VarDecl loop_variable(void) const;
   Token r_paren_token(void) const;
@@ -10384,7 +11095,7 @@ class CXXMemberCallExpr : public CallExpr {
   static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
   static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
   Expr implicit_object_argument(void) const;
-  CXXMethodDecl method_declaration(void) const;
+  std::optional<CXXMethodDecl> method_declaration(void) const;
   CXXRecordDecl record_declaration(void) const;
 };
 
@@ -10573,7 +11284,7 @@ class CXXThrowExpr : public Expr {
   static std::optional<CXXThrowExpr> from(const Expr &parent);
   static std::optional<CXXThrowExpr> from(const ValueStmt &parent);
   static std::optional<CXXThrowExpr> from(const Stmt &parent);
-  Expr sub_expression(void) const;
+  std::optional<Expr> sub_expression(void) const;
   Token throw_token(void) const;
   bool is_thrown_variable_in_scope(void) const;
 };
@@ -10826,10 +11537,10 @@ class CXXNewExpr : public Expr {
   static std::optional<CXXNewExpr> from(const Stmt &parent);
   bool does_usual_array_delete_want_size(void) const;
   std::optional<Expr> array_size(void) const;
-  CXXConstructExpr construct_expression(void) const;
+  std::optional<CXXConstructExpr> construct_expression(void) const;
   TokenRange direct_initializer_range(void) const;
   CXXNewExprInitializationStyle initialization_style(void) const;
-  Expr initializer(void) const;
+  std::optional<Expr> initializer(void) const;
   FunctionDecl operator_delete(void) const;
   FunctionDecl operator_new(void) const;
   TokenRange type_id_parentheses(void) const;
@@ -10942,7 +11653,7 @@ class CXXDependentScopeMemberExpr : public Expr {
   static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
   Expr base(void) const;
-  NamedDecl first_qualifier_found_in_scope(void) const;
+  std::optional<NamedDecl> first_qualifier_found_in_scope(void) const;
   Token l_angle_token(void) const;
   Token member_token(void) const;
   Token operator_token(void) const;
@@ -11856,7 +12567,7 @@ class StringLiteral : public Expr {
   static std::optional<StringLiteral> from(const Expr &parent);
   static std::optional<StringLiteral> from(const ValueStmt &parent);
   static std::optional<StringLiteral> from(const Stmt &parent);
-  bool contains_non_ascii(void) const;
+  std::optional<bool> contains_non_ascii(void) const;
   bool contains_non_ascii_or_null(void) const;
   std::string_view bytes(void) const;
   std::string_view string(void) const;
@@ -15914,7 +16625,7 @@ class CXXRecordDecl : public RecordDecl {
   static std::optional<CXXRecordDecl> from(const Decl &parent);
   std::optional<bool> allow_const_default_initializer(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
-  MSInheritanceModel calculate_inheritance_model(void) const;
+  std::optional<MSInheritanceModel> calculate_inheritance_model(void) const;
   std::vector<CXXConstructorDecl> constructors(void) const;
   std::optional<std::vector<FriendDecl>> friends(void) const;
   std::optional<CXXDestructorDecl> destructor(void) const;

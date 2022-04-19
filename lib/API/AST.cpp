@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include "API.h"
+#include "Fragment.h"
 
 namespace mx {
 DeclKind FromPasta(pasta::DeclKind e) {
@@ -12890,10 +12890,14 @@ Expr CXXForRangeStmt::increment(void) const {
   return Expr::from(fragment->StmtFor(fragment, id)).value();
 }
 
-Stmt CXXForRangeStmt::initializer(void) const {
+std::optional<Stmt> CXXForRangeStmt::initializer(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal27());
-  return Stmt(fragment->StmtFor(fragment, id));
+  if (!self.getVal13()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal27());
+    return fragment->StmtFor(fragment, id);
+  }
 }
 
 DeclStmt CXXForRangeStmt::loop_variable_statement(void) const {
@@ -15678,10 +15682,14 @@ Expr CXXMemberCallExpr::implicit_object_argument(void) const {
   return Expr::from(fragment->StmtFor(fragment, id)).value();
 }
 
-CXXMethodDecl CXXMemberCallExpr::method_declaration(void) const {
+std::optional<CXXMethodDecl> CXXMemberCallExpr::method_declaration(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal42());
-  return CXXMethodDecl::from(fragment->DeclFor(fragment, id)).value();
+  if (!self.getVal109()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal42());
+    return CXXMethodDecl::from(fragment->DeclFor(fragment, id));
+  }
 }
 
 CXXRecordDecl CXXMemberCallExpr::record_declaration(void) const {
@@ -15991,10 +15999,14 @@ std::optional<CXXThrowExpr> CXXThrowExpr::from(const Stmt &parent) {
   }
 }
 
-Expr CXXThrowExpr::sub_expression(void) const {
+std::optional<Expr> CXXThrowExpr::sub_expression(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal37());
-  return Expr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal98()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal37());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
 Token CXXThrowExpr::throw_token(void) const {
@@ -16004,7 +16016,7 @@ Token CXXThrowExpr::throw_token(void) const {
 
 bool CXXThrowExpr::is_thrown_variable_in_scope(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal98();
+  return self.getVal99();
 }
 
 CXXThisExprContainingStmtRange CXXThisExpr::containing(const Decl &decl) {
@@ -16405,10 +16417,14 @@ std::optional<Expr> CXXNewExpr::array_size(void) const {
   }
 }
 
-CXXConstructExpr CXXNewExpr::construct_expression(void) const {
+std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal38());
-  return CXXConstructExpr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal100()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal38());
+    return CXXConstructExpr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
@@ -16421,10 +16437,14 @@ CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
   return static_cast<CXXNewExprInitializationStyle>(self.getVal103());
 }
 
-Expr CXXNewExpr::initializer(void) const {
+std::optional<Expr> CXXNewExpr::initializer(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal41());
-  return Expr::from(fragment->StmtFor(fragment, id)).value();
+  if (!self.getVal101()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal41());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
 FunctionDecl CXXNewExpr::operator_delete(void) const {
@@ -16446,27 +16466,27 @@ TokenRange CXXNewExpr::type_id_parentheses(void) const {
 
 bool CXXNewExpr::has_initializer(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal100();
+  return self.getVal102();
 }
 
 bool CXXNewExpr::is_array(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal101();
+  return self.getVal104();
 }
 
 bool CXXNewExpr::is_global_new(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal102();
+  return self.getVal107();
 }
 
 bool CXXNewExpr::is_parenthesis_type_id(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal104();
+  return self.getVal108();
 }
 
 bool CXXNewExpr::pass_alignment(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal107();
+  return self.getVal109();
 }
 
 std::vector<Expr> CXXNewExpr::placement_arguments(void) const {
@@ -16485,7 +16505,7 @@ std::vector<Expr> CXXNewExpr::placement_arguments(void) const {
 
 bool CXXNewExpr::should_null_check_allocation(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal108();
+  return self.getVal110();
 }
 
 CXXInheritedCtorInitExprContainingStmtRange CXXInheritedCtorInitExpr::containing(const Decl &decl) {
@@ -16685,10 +16705,14 @@ Expr CXXDependentScopeMemberExpr::base(void) const {
   return Expr::from(fragment->StmtFor(fragment, id)).value();
 }
 
-NamedDecl CXXDependentScopeMemberExpr::first_qualifier_found_in_scope(void) const {
+std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_scope(void) const {
   auto self = fragment->NthStmt(offset);
-  EntityId id(self.getVal38());
-  return NamedDecl::from(fragment->DeclFor(fragment, id)).value();
+  if (!self.getVal98()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal38());
+    return NamedDecl::from(fragment->DeclFor(fragment, id));
+  }
 }
 
 Token CXXDependentScopeMemberExpr::l_angle_token(void) const {
@@ -16718,22 +16742,22 @@ Token CXXDependentScopeMemberExpr::template_keyword_token(void) const {
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal98();
+  return self.getVal99();
 }
 
 bool CXXDependentScopeMemberExpr::has_template_keyword(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal99();
+  return self.getVal100();
 }
 
 bool CXXDependentScopeMemberExpr::is_arrow(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal100();
+  return self.getVal101();
 }
 
 bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal101();
+  return self.getVal102();
 }
 
 CXXDeleteExprContainingStmtRange CXXDeleteExpr::containing(const Decl &decl) {
@@ -18303,14 +18327,18 @@ std::optional<StringLiteral> StringLiteral::from(const Stmt &parent) {
   }
 }
 
-bool StringLiteral::contains_non_ascii(void) const {
+std::optional<bool> StringLiteral::contains_non_ascii(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal98();
+  if (!self.getVal99()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(self.getVal98());
+  }
 }
 
 bool StringLiteral::contains_non_ascii_or_null(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal99();
+  return self.getVal100();
 }
 
 std::string_view StringLiteral::bytes(void) const {
@@ -18327,32 +18355,32 @@ std::string_view StringLiteral::string(void) const {
 
 bool StringLiteral::is_ascii(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal100();
+  return self.getVal101();
 }
 
 bool StringLiteral::is_pascal(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal101();
+  return self.getVal102();
 }
 
 bool StringLiteral::is_utf16(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal102();
+  return self.getVal104();
 }
 
 bool StringLiteral::is_utf32(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal104();
+  return self.getVal107();
 }
 
 bool StringLiteral::is_utf8(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal107();
+  return self.getVal108();
 }
 
 bool StringLiteral::is_wide(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal108();
+  return self.getVal109();
 }
 
 StmtExprContainingStmtRange StmtExpr::containing(const Decl &decl) {
@@ -26387,9 +26415,13 @@ vec.emplace_back(fragment, v);
   return vec;
 }
 
-MSInheritanceModel CXXRecordDecl::calculate_inheritance_model(void) const {
+std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(void) const {
   auto self = fragment->NthDecl(offset);
-  return static_cast<MSInheritanceModel>(self.getVal92());
+  if (!self.getVal132()) {
+    return std::nullopt;
+  } else {
+    return static_cast<MSInheritanceModel>(self.getVal92());
+  }
 }
 
 std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
@@ -26408,7 +26440,7 @@ std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
 
 std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal132()) {
+  if (!self.getVal133()) {
     return std::nullopt;
   }
   auto list = self.getVal184();
@@ -26425,7 +26457,7 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
 
 std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal133()) {
+  if (!self.getVal134()) {
     return std::nullopt;
   } else {
     EntityId id(self.getVal86());
@@ -26435,7 +26467,7 @@ std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
 
 std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal134()) {
+  if (!self.getVal137()) {
     return std::nullopt;
   } else {
     return TemplateParameterList(fragment, self.getVal152());
@@ -26444,7 +26476,7 @@ std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_para
 
 std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal137()) {
+  if (!self.getVal142()) {
     return std::nullopt;
   } else {
     EntityId id(self.getVal88());
@@ -26454,7 +26486,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void)
 
 std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal142()) {
+  if (!self.getVal143()) {
     return std::nullopt;
   } else {
     EntityId id(self.getVal91());
@@ -26464,7 +26496,7 @@ std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
 
 std::optional<LambdaCaptureDefault> CXXRecordDecl::lambda_capture_default(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal143()) {
+  if (!self.getVal144()) {
     return std::nullopt;
   } else {
     return static_cast<LambdaCaptureDefault>(self.getVal93());
@@ -26473,7 +26505,7 @@ std::optional<LambdaCaptureDefault> CXXRecordDecl::lambda_capture_default(void) 
 
 std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal144()) {
+  if (!self.getVal145()) {
     return std::nullopt;
   } else {
     EntityId id(self.getVal96());
@@ -26483,7 +26515,7 @@ std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
 
 std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_parameters(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal145()) {
+  if (!self.getVal146()) {
     return std::nullopt;
   }
   auto list = self.getVal185();
@@ -26500,7 +26532,7 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
 
 std::optional<unsigned> CXXRecordDecl::lambda_mangling_number(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal146()) {
+  if (!self.getVal147()) {
     return std::nullopt;
   } else {
     return static_cast<unsigned>(self.getVal186());
@@ -26509,7 +26541,7 @@ std::optional<unsigned> CXXRecordDecl::lambda_mangling_number(void) const {
 
 std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal147()) {
+  if (!self.getVal148()) {
     return std::nullopt;
   } else {
     return static_cast<MSInheritanceModel>(self.getVal94());
@@ -26523,7 +26555,7 @@ MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const {
 
 std::optional<unsigned> CXXRecordDecl::num_bases(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal148()) {
+  if (!self.getVal149()) {
     return std::nullopt;
   } else {
     return static_cast<unsigned>(self.getVal187());
@@ -26532,7 +26564,7 @@ std::optional<unsigned> CXXRecordDecl::num_bases(void) const {
 
 std::optional<unsigned> CXXRecordDecl::num_virtual_bases(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal149()) {
+  if (!self.getVal154()) {
     return std::nullopt;
   } else {
     return static_cast<unsigned>(self.getVal188());
@@ -26541,7 +26573,7 @@ std::optional<unsigned> CXXRecordDecl::num_virtual_bases(void) const {
 
 std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal154()) {
+  if (!self.getVal155()) {
     return std::nullopt;
   } else {
     return static_cast<unsigned>(self.getVal189());
@@ -26550,7 +26582,7 @@ std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
 
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal155()) {
+  if (!self.getVal156()) {
     return std::nullopt;
   } else {
     EntityId id(self.getVal136());
@@ -26565,611 +26597,611 @@ TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) con
 
 std::optional<bool> CXXRecordDecl::has_any_dependent_bases(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal157()) {
+  if (!self.getVal158()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal156());
+    return static_cast<bool>(self.getVal157());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal159()) {
+  if (!self.getVal160()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal158());
+    return static_cast<bool>(self.getVal159());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal161()) {
+  if (!self.getVal162()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal160());
+    return static_cast<bool>(self.getVal161());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal163()) {
+  if (!self.getVal164()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal162());
+    return static_cast<bool>(self.getVal163());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal166()) {
+  if (!self.getVal168()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal164());
+    return static_cast<bool>(self.getVal166());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal169()) {
+  if (!self.getVal170()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal168());
+    return static_cast<bool>(self.getVal169());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal171()) {
+  if (!self.getVal172()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal170());
+    return static_cast<bool>(self.getVal171());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_definition(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal173()) {
+  if (!self.getVal174()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal172());
+    return static_cast<bool>(self.getVal173());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal175()) {
+  if (!self.getVal177()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal174());
+    return static_cast<bool>(self.getVal175());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_friends(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal179()) {
+  if (!self.getVal180()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal177());
+    return static_cast<bool>(self.getVal179());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_in_class_initializer(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal181()) {
+  if (!self.getVal182()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal180());
+    return static_cast<bool>(self.getVal181());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal183()) {
+  if (!self.getVal190()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal182());
+    return static_cast<bool>(self.getVal183());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal191()) {
+  if (!self.getVal192()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal190());
+    return static_cast<bool>(self.getVal191());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal193()) {
+  if (!self.getVal194()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal192());
+    return static_cast<bool>(self.getVal193());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal195()) {
+  if (!self.getVal196()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal194());
+    return static_cast<bool>(self.getVal195());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal197()) {
+  if (!self.getVal198()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal196());
+    return static_cast<bool>(self.getVal197());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal199()) {
+  if (!self.getVal200()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal198());
+    return static_cast<bool>(self.getVal199());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal201()) {
+  if (!self.getVal202()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal200());
+    return static_cast<bool>(self.getVal201());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal203()) {
+  if (!self.getVal204()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal202());
+    return static_cast<bool>(self.getVal203());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal205()) {
+  if (!self.getVal206()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal204());
+    return static_cast<bool>(self.getVal205());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal207()) {
+  if (!self.getVal208()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal206());
+    return static_cast<bool>(self.getVal207());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal209()) {
+  if (!self.getVal210()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal208());
+    return static_cast<bool>(self.getVal209());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal211()) {
+  if (!self.getVal212()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal210());
+    return static_cast<bool>(self.getVal211());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal213()) {
+  if (!self.getVal214()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal212());
+    return static_cast<bool>(self.getVal213());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal215()) {
+  if (!self.getVal216()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal214());
+    return static_cast<bool>(self.getVal215());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal217()) {
+  if (!self.getVal218()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal216());
+    return static_cast<bool>(self.getVal217());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal219()) {
+  if (!self.getVal220()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal218());
+    return static_cast<bool>(self.getVal219());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal221()) {
+  if (!self.getVal222()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal220());
+    return static_cast<bool>(self.getVal221());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal223()) {
+  if (!self.getVal224()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal222());
+    return static_cast<bool>(self.getVal223());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal225()) {
+  if (!self.getVal226()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal224());
+    return static_cast<bool>(self.getVal225());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal227()) {
+  if (!self.getVal228()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal226());
+    return static_cast<bool>(self.getVal227());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal229()) {
+  if (!self.getVal230()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal228());
+    return static_cast<bool>(self.getVal229());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal231()) {
+  if (!self.getVal232()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal230());
+    return static_cast<bool>(self.getVal231());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal233()) {
+  if (!self.getVal234()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal232());
+    return static_cast<bool>(self.getVal233());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal235()) {
+  if (!self.getVal236()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal234());
+    return static_cast<bool>(self.getVal235());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal237()) {
+  if (!self.getVal238()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal236());
+    return static_cast<bool>(self.getVal237());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal239()) {
+  if (!self.getVal240()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal238());
+    return static_cast<bool>(self.getVal239());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal241()) {
+  if (!self.getVal242()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal240());
+    return static_cast<bool>(self.getVal241());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal243()) {
+  if (!self.getVal244()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal242());
+    return static_cast<bool>(self.getVal243());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal245()) {
+  if (!self.getVal246()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal244());
+    return static_cast<bool>(self.getVal245());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal247()) {
+  if (!self.getVal248()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal246());
+    return static_cast<bool>(self.getVal247());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal249()) {
+  if (!self.getVal250()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal248());
+    return static_cast<bool>(self.getVal249());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal251()) {
+  if (!self.getVal252()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal250());
+    return static_cast<bool>(self.getVal251());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal253()) {
+  if (!self.getVal254()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal252());
+    return static_cast<bool>(self.getVal253());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal255()) {
+  if (!self.getVal256()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal254());
+    return static_cast<bool>(self.getVal255());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal257()) {
+  if (!self.getVal258()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal256());
+    return static_cast<bool>(self.getVal257());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal259()) {
+  if (!self.getVal260()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal258());
+    return static_cast<bool>(self.getVal259());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal261()) {
+  if (!self.getVal262()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal260());
+    return static_cast<bool>(self.getVal261());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal263()) {
+  if (!self.getVal264()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal262());
+    return static_cast<bool>(self.getVal263());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal265()) {
+  if (!self.getVal266()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal264());
+    return static_cast<bool>(self.getVal265());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal267()) {
+  if (!self.getVal268()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal266());
+    return static_cast<bool>(self.getVal267());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal269()) {
+  if (!self.getVal270()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal268());
+    return static_cast<bool>(self.getVal269());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal271()) {
+  if (!self.getVal272()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal270());
+    return static_cast<bool>(self.getVal271());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal273()) {
+  if (!self.getVal274()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal272());
+    return static_cast<bool>(self.getVal273());
   }
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal275()) {
+  if (!self.getVal276()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal274());
+    return static_cast<bool>(self.getVal275());
   }
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal277()) {
+  if (!self.getVal278()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal276());
+    return static_cast<bool>(self.getVal277());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_abstract(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal279()) {
+  if (!self.getVal280()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal278());
+    return static_cast<bool>(self.getVal279());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal281()) {
+  if (!self.getVal282()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal280());
+    return static_cast<bool>(self.getVal281());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal283()) {
+  if (!self.getVal284()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal282());
+    return static_cast<bool>(self.getVal283());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_c_like(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal285()) {
+  if (!self.getVal286()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal284());
+    return static_cast<bool>(self.getVal285());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal287()) {
+  if (!self.getVal288()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal286());
+    return static_cast<bool>(self.getVal287());
   }
 }
 
 bool CXXRecordDecl::is_dependent_lambda(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal288();
+  return self.getVal289();
 }
 
 std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal290()) {
+  if (!self.getVal291()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal289());
+    return static_cast<bool>(self.getVal290());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal292()) {
+  if (!self.getVal293()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal291());
+    return static_cast<bool>(self.getVal292());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_empty(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal294()) {
+  if (!self.getVal295()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal293());
+    return static_cast<bool>(self.getVal294());
   }
 }
 
 bool CXXRecordDecl::is_generic_lambda(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal295();
+  return self.getVal296();
 }
 
 std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal297()) {
+  if (!self.getVal298()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal296());
+    return static_cast<bool>(self.getVal297());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_literal(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal299()) {
+  if (!self.getVal300()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal298());
+    return static_cast<bool>(self.getVal299());
   }
 }
 
 std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal300()) {
+  if (!self.getVal301()) {
     return std::nullopt;
   } else {
     EntityId id(self.getVal138());
@@ -27179,100 +27211,100 @@ std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
 
 std::optional<bool> CXXRecordDecl::is_pod(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal302()) {
+  if (!self.getVal303()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal301());
+    return static_cast<bool>(self.getVal302());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal304()) {
+  if (!self.getVal305()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal303());
+    return static_cast<bool>(self.getVal304());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal306()) {
+  if (!self.getVal307()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal305());
+    return static_cast<bool>(self.getVal306());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_structural(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal308()) {
+  if (!self.getVal309()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal307());
+    return static_cast<bool>(self.getVal308());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_trivial(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal310()) {
+  if (!self.getVal311()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal309());
+    return static_cast<bool>(self.getVal310());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal312()) {
+  if (!self.getVal313()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal311());
+    return static_cast<bool>(self.getVal312());
   }
 }
 
 std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal314()) {
+  if (!self.getVal315()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal313());
+    return static_cast<bool>(self.getVal314());
   }
 }
 
 std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal316()) {
+  if (!self.getVal317()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal315());
+    return static_cast<bool>(self.getVal316());
   }
 }
 
 std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal318()) {
+  if (!self.getVal319()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal317());
+    return static_cast<bool>(self.getVal318());
   }
 }
 
 std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal320()) {
+  if (!self.getVal321()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal319());
+    return static_cast<bool>(self.getVal320());
   }
 }
 
 std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal322()) {
+  if (!self.getVal323()) {
     return std::nullopt;
   }
-  auto list = self.getVal321();
+  auto list = self.getVal322();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -27286,115 +27318,115 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal324()) {
+  if (!self.getVal325()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal323());
+    return static_cast<bool>(self.getVal324());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal326()) {
+  if (!self.getVal327()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal325());
+    return static_cast<bool>(self.getVal326());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal328()) {
+  if (!self.getVal329()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal327());
+    return static_cast<bool>(self.getVal328());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal330()) {
+  if (!self.getVal331()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal329());
+    return static_cast<bool>(self.getVal330());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal332()) {
+  if (!self.getVal333()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal331());
+    return static_cast<bool>(self.getVal332());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal334()) {
+  if (!self.getVal335()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal333());
+    return static_cast<bool>(self.getVal334());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal336()) {
+  if (!self.getVal337()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal335());
+    return static_cast<bool>(self.getVal336());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal338()) {
+  if (!self.getVal339()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal337());
+    return static_cast<bool>(self.getVal338());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal340()) {
+  if (!self.getVal341()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal339());
+    return static_cast<bool>(self.getVal340());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal342()) {
+  if (!self.getVal343()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal341());
+    return static_cast<bool>(self.getVal342());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal344()) {
+  if (!self.getVal345()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal343());
+    return static_cast<bool>(self.getVal344());
   }
 }
 
 std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal346()) {
+  if (!self.getVal347()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal345());
+    return static_cast<bool>(self.getVal346());
   }
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) const {
   auto self = fragment->NthDecl(offset);
-  if (!self.getVal347()) {
+  if (!self.getVal348()) {
     return std::nullopt;
   }
   auto list = self.getVal151();
@@ -27468,7 +27500,7 @@ TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(
 
 std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal348();
+  auto list = self.getVal349();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -27479,7 +27511,7 @@ vec.emplace_back(fragment, v);
 
 std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal349();
+  auto list = self.getVal350();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -27495,17 +27527,17 @@ Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal350();
+  return self.getVal351();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal351();
+  return self.getVal352();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal352();
+  return self.getVal353();
 }
 
 ClassTemplatePartialSpecializationDeclContainingDeclRange ClassTemplatePartialSpecializationDecl::containing(const Decl &decl) {
@@ -28691,7 +28723,7 @@ std::vector<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
 
 std::vector<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal321();
+  auto list = self.getVal322();
   std::vector<ObjCPropertyDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28705,7 +28737,7 @@ std::vector<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
 
 std::vector<Decl> ObjCContainerDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal353();
+  auto list = self.getVal354();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28793,7 +28825,7 @@ ObjCCategoryDecl ObjCCategoryDecl::next_class_category_raw(void) const {
 
 std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal354();
+  auto list = self.getVal355();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28807,7 +28839,7 @@ std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
 
 std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal355();
+  auto list = self.getVal356();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28819,7 +28851,7 @@ std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const {
 
 std::vector<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal356();
+  auto list = self.getVal357();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28892,7 +28924,7 @@ bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const {
 
 std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal354();
+  auto list = self.getVal355();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28904,7 +28936,7 @@ std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const {
 
 std::vector<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal355();
+  auto list = self.getVal356();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28950,7 +28982,7 @@ std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Decl &parent) {
 
 std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal354();
+  auto list = self.getVal355();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29040,7 +29072,7 @@ bool ObjCInterfaceDecl::is_this_declaration_a_definition(void) const {
 
 std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal355();
+  auto list = self.getVal356();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29054,7 +29086,7 @@ std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal356();
+  auto list = self.getVal357();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29068,7 +29100,7 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal357();
+  auto list = self.getVal358();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29082,7 +29114,7 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
 
 std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal358();
+  auto list = self.getVal359();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29094,7 +29126,7 @@ std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
 
 std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal359();
+  auto list = self.getVal360();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29108,7 +29140,7 @@ std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal360();
+  auto list = self.getVal361();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29122,7 +29154,7 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const 
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal361();
+  auto list = self.getVal362();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29176,7 +29208,7 @@ ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
 
 std::vector<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal354();
+  auto list = self.getVal355();
   std::vector<ObjCPropertyImplDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29310,7 +29342,7 @@ bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
 
 std::vector<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal355();
+  auto list = self.getVal356();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {

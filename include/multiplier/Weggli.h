@@ -33,8 +33,6 @@ class WeggliQuery final {
   using ResultsPtr = void *;
   using UserDataPtr = void *;
 
-  using ResultCallback = bool(*)(const void *, void *);
-
   explicit WeggliQuery(std::string_view query, bool is_cpp);
 
   ~WeggliQuery();

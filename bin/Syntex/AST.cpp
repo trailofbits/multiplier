@@ -59,9 +59,9 @@ bool ASTNode::operator==(const ASTNode &that) const noexcept {
 }
 
 AST::AST(void) {
-  index.resize(static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
-               static_cast<unsigned>(mx::StmtKind::NUM_ENUMERATORS) +
-               static_cast<unsigned>(mx::TokenKind::NUM_ENUMERATORS));
+  index.resize(mx::NumEnumerators(mx::DeclKind{}) +
+               mx::NumEnumerators(mx::StmtKind{}) +
+               mx::NumEnumerators(mx::TokenKind{}));
 }
 
 const ASTNode *AST::LastNodeOfKind(mx::DeclKind kind) {
@@ -69,13 +69,13 @@ const ASTNode *AST::LastNodeOfKind(mx::DeclKind kind) {
 }
 
 const ASTNode *AST::LastNodeOfKind(mx::StmtKind kind) {
-  return index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
+  return index[mx::NumEnumerators(mx::DeclKind{}) +
                static_cast<unsigned>(kind)];
 }
 
 const ASTNode *AST::LastNodeOfKind(mx::TokenKind kind) {
-  return index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
-               static_cast<unsigned>(mx::StmtKind::NUM_ENUMERATORS) +
+  return index[mx::NumEnumerators(mx::DeclKind{}) +
+               mx::NumEnumerators(mx::StmtKind{}) +
                static_cast<unsigned>(kind)];
 }
 
@@ -125,7 +125,7 @@ AST AST::Build(mx::Fragment fragment) {
           default:
             dummy.emplace(*stmt);
             last_ptr =
-                &(self.index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
+                &(self.index[mx::NumEnumerators(mx::DeclKind{}) +
                              dummy->kind_val]);
             break;
         }
@@ -166,8 +166,8 @@ AST AST::Build(mx::Fragment fragment) {
     // Add the token.
     ASTNode *tok_node = &(self.nodes.emplace_back(tok));
     const ASTNode **last_tok_ptr =
-        &(self.index[static_cast<unsigned>(mx::DeclKind::NUM_ENUMERATORS) +
-                     static_cast<unsigned>(mx::StmtKind::NUM_ENUMERATORS) +
+        &(self.index[mx::NumEnumerators(mx::DeclKind{}) +
+                     mx::NumEnumerators(mx::StmtKind{}) +
                      tok_node->kind_val]);
     tok_node->prev_of_kind = *last_tok_ptr;
     *last_tok_ptr = tok_node;

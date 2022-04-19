@@ -27,7 +27,8 @@
 
 #include "Context.h"
 #include "IndexCompileJob.h"
-#include "SearchAction.h"
+#include "RegexSearchAction.h"
+#include "WeggliSearchAction.h"
 
 namespace indexer {
 
@@ -318,10 +319,10 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   return kj::READY_NOW;
 }
 
-kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
+kj::Promise<void> Server::weggliQuery(WeggliQueryContext context) {
 
   // Get params and result context
-  mx::rpc::Multiplier::SyntaxQueryParams::Reader params =
+  mx::rpc::Multiplier::WeggliQueryParams::Reader params =
       context.getParams();
 
   auto results = context.initResults();
@@ -345,7 +346,7 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   mx::Executor executor(opts);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
-    executor.EmplaceAction<SearchAction>(sc, syntax_string, is_cpp);
+    executor.EmplaceAction<WeggliSearchAction>(sc, syntax_string, is_cpp);
   }
   executor.Wait();
 
@@ -368,6 +369,55 @@ kj::Promise<void> Server::syntaxQuery(SyntaxQueryContext context) {
   auto index = 0u;
   for (auto fragment_id : fragment_ids) {
     fragments.set(index++, fragment_id);
+  }
+
+  return kj::READY_NOW;
+}
+
+kj::Promise<void> Server::regexQuery(RegexQueryContext context) {
+  // Get params and result context
+  mx::rpc::Multiplier::RegexQueryParams::Reader params =
+      context.getParams();
+
+  auto results = context.initResults();
+  std::string_view pattern =
+      std::string_view(params.getRegex().cStr(), params.getRegex().size());
+  if (pattern.empty()) {
+    (void) results.initMatches(0u);
+    return kj::READY_NOW;
+  }
+
+  LOG(INFO)
+      << "Got regex expression to query: " << pattern;
+
+  auto sc = std::make_shared<SearchingContext>(d->server_context);
+  mx::ExecutorOptions opts;
+  opts.num_workers = static_cast<int>(d->executor.NumWorkers());
+  mx::Executor executor(opts);
+  executor.Start();
+  for (auto i = 0; i < opts.num_workers; ++i) {
+    executor.EmplaceAction<RegexSearchAction>(sc, pattern);
+  }
+  executor.Wait();
+
+  // Convert the file file:line pairs into overlapping fragment IDs.
+  std::set<std::tuple<mx::FileId, mx::FragmentId>> matches;
+  for (auto prefix : sc->line_results) {
+    d->server_context.file_fragment_lines.ScanPrefix(
+        prefix, [&matches] (mx::FileId file_id, unsigned, mx::FragmentId frag_id) {
+      std::string file_path;
+      matches.emplace(file_id, frag_id);
+      return true;
+    });
+  }
+
+  auto num_files = static_cast<unsigned>(matches.size());
+  auto match_builder = results.initMatches(num_files);
+  auto index = 0u;
+  for (auto &match : matches) {
+    mx::rpc::RegexMatch::Builder info = match_builder[index++];
+    info.setFileId(std::get<0>(match));
+    info.setFragmentId(std::get<1>(match));
   }
 
   return kj::READY_NOW;
