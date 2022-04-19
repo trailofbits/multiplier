@@ -824,11 +824,14 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
       } else if (IsIncludeKeyword(sft)) {
         seen_include = prev;
 
-      } else if (!seen_hash) {
-        seen_hash = nullptr;
-        seen_include = nullptr;
       }
-
+      // Don't reset seen_include and seen_hash to null. It can cause
+      // missing the end of include directive if included in the middle
+      // for certain cases. e.g:
+      // {
+      //    ...
+      //    #include <boost/smart_ptr/detail/operator_bool.hpp>
+      // }
     // Now look for a new line after the end of the directive.
     } else if (tok_kind == pasta::TokenKind::kUnknown) {
       auto data = sft.Data();

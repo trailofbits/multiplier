@@ -14714,6 +14714,7 @@ class BlockDecl : public Decl {
   bool can_avoid_copy_to_heap(void) const;
   bool captures_cxx_this(void) const;
   bool does_not_escape(void) const;
+  std::optional<Decl> block_mangling_context_declaration(void) const;
   Token caret_token(void) const;
   CompoundStmt compound_body(void) const;
   bool has_captures(void) const;
