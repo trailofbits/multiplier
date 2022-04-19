@@ -2226,7 +2226,13 @@ void SerializeStringLiteral(EntitySerializer &es, mx::ast::Stmt::Builder b, cons
   } else {
     b.setVal99(false);
   }
-  b.setVal100(e.ContainsNonAsciiOrNull());
+  auto v100 = e.ContainsNonAsciiOrNull();
+  if (v100) {
+    b.setVal100(static_cast<bool>(v100.value()));
+    b.setVal101(true);
+  } else {
+    b.setVal101(false);
+  }
   auto v63 = e.Bytes();
   std::string s63(v63.data(), v63.size());
   b.setVal63(s63);
@@ -3180,12 +3186,11 @@ void SerializeBlockDecl(EntitySerializer &es, mx::ast::Decl::Builder b, const pa
   b.setVal57(e.CanAvoidCopyToHeap());
   b.setVal58(e.CapturesCXXThis());
   b.setVal59(e.DoesNotEscape());
-  b.setVal53(es.EntityId(e.BlockManglingContextDeclaration()));
-  b.setVal60(es.EntityId(e.CaretToken()));
-  b.setVal61(es.EntityId(e.CompoundBody()));
-  b.setVal62(e.HasCaptures());
-  b.setVal63(e.IsConversionFromLambda());
-  b.setVal64(e.IsVariadic());
+  b.setVal53(es.EntityId(e.CaretToken()));
+  b.setVal60(es.EntityId(e.CompoundBody()));
+  b.setVal61(e.HasCaptures());
+  b.setVal62(e.IsConversionFromLambda());
+  b.setVal63(e.IsVariadic());
 do {
     auto v55 = e.Parameters();
     auto sv55 = b.initVal55(static_cast<unsigned>(v55.size()));
@@ -3204,13 +3209,13 @@ do {
       ++i56;
     }
   } while (false);
-  pasta::DeclContext dc65(e);
-  auto v65 = dc65.AlreadyLoadedDeclarations();
-  auto sv65 = b.initVal65(static_cast<unsigned>(v65.size()));
-  auto i65 = 0u;
-  for (const pasta::Decl &e65 : v65) {
-    sv65.set(i65, es.EntityId(e65));
-    ++i65;
+  pasta::DeclContext dc64(e);
+  auto v64 = dc64.AlreadyLoadedDeclarations();
+  auto sv64 = b.initVal64(static_cast<unsigned>(v64.size()));
+  auto i64 = 0u;
+  for (const pasta::Decl &e64 : v64) {
+    sv64.set(i64, es.EntityId(e64));
+    ++i64;
   }
 }
 
@@ -3290,7 +3295,7 @@ void SerializeStaticAssertDecl(EntitySerializer &es, mx::ast::Decl::Builder b, c
   SerializeDecl(es, b, e);
   b.setVal53(es.EntityId(e.AssertExpression()));
   b.setVal60(es.EntityId(e.Message()));
-  b.setVal61(es.EntityId(e.RParenToken()));
+  b.setVal65(es.EntityId(e.RParenToken()));
   b.setVal54(e.IsFailed());
 }
 
@@ -3370,9 +3375,9 @@ void SerializeNamedDecl(EntitySerializer &es, mx::ast::Decl::Builder b, const pa
   b.setVal57(e.HasExternalFormalLinkage());
   b.setVal58(e.HasLinkage());
   b.setVal59(e.HasLinkageBeenComputed());
-  b.setVal62(e.IsCXXClassMember());
-  b.setVal63(e.IsCXXInstanceMember());
-  b.setVal64(e.IsExternallyDeclarable());
+  b.setVal61(e.IsCXXClassMember());
+  b.setVal62(e.IsCXXInstanceMember());
+  b.setVal63(e.IsExternallyDeclarable());
   b.setVal76(e.IsExternallyVisible());
   b.setVal77(e.IsLinkageValid());
 }
@@ -3413,7 +3418,7 @@ void SerializeUsingEnumDecl(EntitySerializer &es, mx::ast::Decl::Builder b, cons
   (void) e;
   SerializeBaseUsingDecl(es, b, e);
   b.setVal60(es.EntityId(e.EnumDeclaration()));
-  b.setVal61(es.EntityId(e.EnumToken()));
+  b.setVal65(es.EntityId(e.EnumToken()));
   b.setVal69(es.EntityId(e.UsingToken()));
 }
 
@@ -3441,7 +3446,7 @@ void SerializeUnresolvedUsingValueDecl(EntitySerializer &es, mx::ast::Decl::Buil
   (void) e;
   SerializeValueDecl(es, b, e);
   b.setVal60(es.EntityId(e.EllipsisToken()));
-  b.setVal61(es.EntityId(e.UsingToken()));
+  b.setVal65(es.EntityId(e.UsingToken()));
   b.setVal80(e.IsAccessDeclaration());
   b.setVal81(e.IsPackExpansion());
 }
@@ -3459,7 +3464,7 @@ void SerializeOMPDeclareReductionDecl(EntitySerializer &es, mx::ast::Decl::Build
   (void) e;
   SerializeValueDecl(es, b, e);
   b.setVal60(es.EntityId(e.Combiner()));
-  b.setVal61(es.EntityId(e.CombinerIn()));
+  b.setVal65(es.EntityId(e.CombinerIn()));
   b.setVal69(es.EntityId(e.CombinerOut()));
   b.setVal70(es.EntityId(e.InitializerOriginal()));
   b.setVal71(es.EntityId(e.InitializerPrivate()));
@@ -3508,10 +3513,10 @@ do {
   } else {
     b.setVal80(false);
   }
-  auto v61 = e.VariableDeclaration();
-  if (v61) {
-    if (auto id61 = es.EntityId(v61.value())) {
-      b.setVal61(id61);
+  auto v65 = e.VariableDeclaration();
+  if (v65) {
+    if (auto id65 = es.EntityId(v65.value())) {
+      b.setVal65(id65);
       b.setVal81(true);
     } else {
       b.setVal81(false);
@@ -3545,7 +3550,7 @@ void SerializeDeclaratorDecl(EntitySerializer &es, mx::ast::Decl::Builder b, con
   (void) e;
   SerializeValueDecl(es, b, e);
   b.setVal60(es.EntityId(e.InnerTokenStart()));
-  b.setVal61(es.EntityId(e.OuterTokenStart()));
+  b.setVal65(es.EntityId(e.OuterTokenStart()));
   auto v69 = e.TrailingRequiresClause();
   if (v69) {
     if (auto id69 = es.EntityId(v69.value())) {
@@ -4023,12 +4028,12 @@ void SerializeCXXMethodDecl(EntitySerializer &es, mx::ast::Decl::Builder b, cons
   b.setVal174(e.IsVirtual());
   b.setVal175(e.IsVolatile());
 do {
-    auto v65 = e.OverriddenMethods();
-    auto sv65 = b.initVal65(static_cast<unsigned>(v65.size()));
-    auto i65 = 0u;
-    for (const auto &e65 : v65) {
-      sv65.set(i65, es.EntityId(e65));
-      ++i65;
+    auto v64 = e.OverriddenMethods();
+    auto sv64 = b.initVal64(static_cast<unsigned>(v64.size()));
+    auto i64 = 0u;
+    for (const auto &e64 : v64) {
+      sv64.set(i64, es.EntityId(e64));
+      ++i64;
     }
   } while (false);
 }
@@ -4168,7 +4173,7 @@ void SerializeBindingDecl(EntitySerializer &es, mx::ast::Decl::Builder b, const 
   (void) e;
   SerializeValueDecl(es, b, e);
   b.setVal60(es.EntityId(e.Binding()));
-  b.setVal61(es.EntityId(e.DecomposedDeclaration()));
+  b.setVal65(es.EntityId(e.DecomposedDeclaration()));
   b.setVal69(es.EntityId(e.HoldingVariable()));
 }
 
@@ -4185,7 +4190,7 @@ void SerializeOMPDeclareMapperDecl(EntitySerializer &es, mx::ast::Decl::Builder 
   (void) e;
   SerializeOMPDeclarativeDirectiveValueDecl(es, b, e);
   b.setVal60(es.EntityId(e.MapperVariableReference()));
-  b.setVal61(es.EntityId(e.PrevDeclarationInScope()));
+  b.setVal65(es.EntityId(e.PrevDeclarationInScope()));
   pasta::DeclContext dc55(e);
   auto v55 = dc55.AlreadyLoadedDeclarations();
   auto sv55 = b.initVal55(static_cast<unsigned>(v55.size()));
@@ -4202,10 +4207,10 @@ void SerializeUsingShadowDecl(EntitySerializer &es, mx::ast::Decl::Builder b, co
   (void) e;
   SerializeNamedDecl(es, b, e);
   b.setVal60(es.EntityId(e.Introducer()));
-  auto v61 = e.NextUsingShadowDeclaration();
-  if (v61) {
-    if (auto id61 = es.EntityId(v61.value())) {
-      b.setVal61(id61);
+  auto v65 = e.NextUsingShadowDeclaration();
+  if (v65) {
+    if (auto id65 = es.EntityId(v65.value())) {
+      b.setVal65(id65);
       b.setVal79(true);
     } else {
       b.setVal79(false);
@@ -4272,7 +4277,7 @@ void SerializeUsingDirectiveDecl(EntitySerializer &es, mx::ast::Decl::Builder b,
   (void) e;
   SerializeNamedDecl(es, b, e);
   b.setVal60(es.EntityId(e.IdentifierToken()));
-  b.setVal61(es.EntityId(e.NamespaceKeyToken()));
+  b.setVal65(es.EntityId(e.NamespaceKeyToken()));
   b.setVal69(es.EntityId(e.NominatedNamespaceAsWritten()));
   b.setVal70(es.EntityId(e.UsingToken()));
 }
@@ -4312,10 +4317,10 @@ void SerializeTagDecl(EntitySerializer &es, mx::ast::Decl::Builder b, const past
   SerializeTypeDecl(es, b, e);
   if (auto r60 = e.BraceRange(); auto rs60 = r60.Size()) {
     b.setVal60(es.EntityId(r60[0]));
-    b.setVal61(es.EntityId(r60[rs60 - 1u]));
+    b.setVal65(es.EntityId(r60[rs60 - 1u]));
   } else {
     b.setVal60(0);
-    b.setVal61(0);
+    b.setVal65(0);
   }
   auto v69 = e.Definition();
   if (v69) {
@@ -4461,12 +4466,12 @@ do {
     b.setVal132(false);
   }
 do {
-    auto v65 = e.Constructors();
-    auto sv65 = b.initVal65(static_cast<unsigned>(v65.size()));
-    auto i65 = 0u;
-    for (const auto &e65 : v65) {
-      sv65.set(i65, es.EntityId(e65));
-      ++i65;
+    auto v64 = e.Constructors();
+    auto sv64 = b.initVal64(static_cast<unsigned>(v64.size()));
+    auto i64 = 0u;
+    for (const auto &e64 : v64) {
+      sv64.set(i64, es.EntityId(e64));
+      ++i64;
     }
   } while (false);
 do {
@@ -5378,7 +5383,7 @@ void SerializeUnresolvedUsingTypenameDecl(EntitySerializer &es, mx::ast::Decl::B
   (void) e;
   SerializeTypeDecl(es, b, e);
   b.setVal60(es.EntityId(e.EllipsisToken()));
-  b.setVal61(es.EntityId(e.TypenameToken()));
+  b.setVal65(es.EntityId(e.TypenameToken()));
   b.setVal69(es.EntityId(e.UsingToken()));
   b.setVal79(e.IsPackExpansion());
 }
@@ -5415,10 +5420,10 @@ void SerializeTypeAliasDecl(EntitySerializer &es, mx::ast::Decl::Builder b, cons
   (void) b;
   (void) e;
   SerializeTypedefNameDecl(es, b, e);
-  auto v61 = e.DescribedAliasTemplate();
-  if (v61) {
-    if (auto id61 = es.EntityId(v61.value())) {
-      b.setVal61(id61);
+  auto v65 = e.DescribedAliasTemplate();
+  if (v65) {
+    if (auto id65 = es.EntityId(v65.value())) {
+      b.setVal65(id65);
       b.setVal85(true);
     } else {
       b.setVal85(false);
@@ -5503,7 +5508,7 @@ void SerializeObjCPropertyDecl(EntitySerializer &es, mx::ast::Decl::Builder b, c
   (void) e;
   SerializeNamedDecl(es, b, e);
   b.setVal60(es.EntityId(e.AtToken()));
-  b.setVal61(es.EntityId(e.GetterMethodDeclaration()));
+  b.setVal65(es.EntityId(e.GetterMethodDeclaration()));
   b.setVal69(es.EntityId(e.GetterNameToken()));
   b.setVal70(es.EntityId(e.LParenToken()));
   b.setVal82(static_cast<unsigned char>(mx::FromPasta(e.PropertyImplementation())));
@@ -5528,7 +5533,7 @@ void SerializeObjCMethodDecl(EntitySerializer &es, mx::ast::Decl::Builder b, con
   SerializeNamedDecl(es, b, e);
   b.setVal79(e.DefinedInNSObject());
   b.setVal60(es.EntityId(e.FindPropertyDeclaration()));
-  b.setVal61(es.EntityId(e.Category()));
+  b.setVal65(es.EntityId(e.Category()));
   b.setVal69(es.EntityId(e.ClassInterface()));
   b.setVal70(es.EntityId(e.CmdDeclaration()));
   b.setVal71(es.EntityId(e.DeclaratorEndToken()));
@@ -5578,13 +5583,13 @@ do {
       ++i56;
     }
   } while (false);
-  pasta::DeclContext dc65(e);
-  auto v65 = dc65.AlreadyLoadedDeclarations();
-  auto sv65 = b.initVal65(static_cast<unsigned>(v65.size()));
-  auto i65 = 0u;
-  for (const pasta::Decl &e65 : v65) {
-    sv65.set(i65, es.EntityId(e65));
-    ++i65;
+  pasta::DeclContext dc64(e);
+  auto v64 = dc64.AlreadyLoadedDeclarations();
+  auto sv64 = b.initVal64(static_cast<unsigned>(v64.size()));
+  auto i64 = 0u;
+  for (const pasta::Decl &e64 : v64) {
+    sv64.set(i64, es.EntityId(e64));
+    ++i64;
   }
 }
 
@@ -5613,19 +5618,19 @@ do {
   } while (false);
   if (auto r60 = e.AtEndRange(); auto rs60 = r60.Size()) {
     b.setVal60(es.EntityId(r60[0]));
-    b.setVal61(es.EntityId(r60[rs60 - 1u]));
+    b.setVal65(es.EntityId(r60[rs60 - 1u]));
   } else {
     b.setVal60(0);
-    b.setVal61(0);
+    b.setVal65(0);
   }
   b.setVal69(es.EntityId(e.AtStartToken()));
 do {
-    auto v65 = e.InstanceMethods();
-    auto sv65 = b.initVal65(static_cast<unsigned>(v65.size()));
-    auto i65 = 0u;
-    for (const auto &e65 : v65) {
-      sv65.set(i65, es.EntityId(e65));
-      ++i65;
+    auto v64 = e.InstanceMethods();
+    auto sv64 = b.initVal64(static_cast<unsigned>(v64.size()));
+    auto i64 = 0u;
+    for (const auto &e64 : v64) {
+      sv64.set(i64, es.EntityId(e64));
+      ++i64;
     }
   } while (false);
 do {
@@ -5913,7 +5918,7 @@ void SerializeNamespaceAliasDecl(EntitySerializer &es, mx::ast::Decl::Builder b,
   (void) e;
   SerializeNamedDecl(es, b, e);
   b.setVal60(es.EntityId(e.AliasToken()));
-  b.setVal61(es.EntityId(e.AliasedNamespace()));
+  b.setVal65(es.EntityId(e.AliasedNamespace()));
   b.setVal69(es.EntityId(e.NamespaceToken()));
   b.setVal70(es.EntityId(e.TargetNameToken()));
 }
@@ -6011,7 +6016,7 @@ void SerializeFileScopeAsmDecl(EntitySerializer &es, mx::ast::Decl::Builder b, c
   SerializeDecl(es, b, e);
   b.setVal53(es.EntityId(e.AssemblyToken()));
   b.setVal60(es.EntityId(e.AssemblyString()));
-  b.setVal61(es.EntityId(e.RParenToken()));
+  b.setVal65(es.EntityId(e.RParenToken()));
 }
 
 void SerializeExternCContextDecl(EntitySerializer &es, mx::ast::Decl::Builder b, const pasta::ExternCContextDecl &e) {

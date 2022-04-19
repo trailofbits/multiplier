@@ -18336,9 +18336,13 @@ std::optional<bool> StringLiteral::contains_non_ascii(void) const {
   }
 }
 
-bool StringLiteral::contains_non_ascii_or_null(void) const {
+std::optional<bool> StringLiteral::contains_non_ascii_or_null(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal100();
+  if (!self.getVal101()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(self.getVal100());
+  }
 }
 
 std::string_view StringLiteral::bytes(void) const {
@@ -18347,40 +18351,44 @@ std::string_view StringLiteral::bytes(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view StringLiteral::string(void) const {
+std::optional<std::string_view> StringLiteral::string(void) const {
   auto self = fragment->NthStmt(offset);
-  capnp::Text::Reader data = self.getVal68();
-  return std::string_view(data.cStr(), data.size());
+  if (!self.getVal102()) {
+    return std::nullopt;
+  } else {
+    capnp::Text::Reader data = self.getVal68();
+    return std::string_view(data.cStr(), data.size());
+  }
 }
 
 bool StringLiteral::is_ascii(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal101();
+  return self.getVal104();
 }
 
 bool StringLiteral::is_pascal(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal102();
+  return self.getVal107();
 }
 
 bool StringLiteral::is_utf16(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal104();
+  return self.getVal108();
 }
 
 bool StringLiteral::is_utf32(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal107();
+  return self.getVal109();
 }
 
 bool StringLiteral::is_utf8(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal108();
+  return self.getVal110();
 }
 
 bool StringLiteral::is_wide(void) const {
   auto self = fragment->NthStmt(offset);
-  return self.getVal109();
+  return self.getVal111();
 }
 
 StmtExprContainingStmtRange StmtExpr::containing(const Decl &decl) {
@@ -22312,36 +22320,30 @@ bool BlockDecl::does_not_escape(void) const {
   return self.getVal59();
 }
 
-Decl BlockDecl::block_mangling_context_declaration(void) const {
-  auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal53());
-  return Decl(fragment->DeclFor(fragment, id));
-}
-
 Token BlockDecl::caret_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal60());
+  return fragment->TokenFor(fragment, self.getVal53());
 }
 
 CompoundStmt BlockDecl::compound_body(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal60());
   return CompoundStmt::from(fragment->StmtFor(fragment, id)).value();
 }
 
 bool BlockDecl::has_captures(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal62();
+  return self.getVal61();
 }
 
 bool BlockDecl::is_conversion_from_lambda(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal63();
+  return self.getVal62();
 }
 
 bool BlockDecl::is_variadic(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal64();
+  return self.getVal63();
 }
 
 std::vector<ParmVarDecl> BlockDecl::parameters(void) const {
@@ -22374,7 +22376,7 @@ std::vector<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
 
 std::vector<Decl> BlockDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal65();
+  auto list = self.getVal64();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -22630,7 +22632,7 @@ StringLiteral StaticAssertDecl::message(void) const {
 
 Token StaticAssertDecl::r_paren_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 bool StaticAssertDecl::is_failed(void) const {
@@ -22783,7 +22785,7 @@ ObjCMethodDecl ObjCPropertyImplDecl::getter_method_declaration(void) const {
 
 ObjCPropertyDecl ObjCPropertyImplDecl::property_declaration(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal65());
   return ObjCPropertyDecl::from(fragment->DeclFor(fragment, id)).value();
 }
 
@@ -22974,17 +22976,17 @@ bool NamedDecl::has_linkage_been_computed(void) const {
 
 bool NamedDecl::is_cxx_class_member(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal62();
+  return self.getVal61();
 }
 
 bool NamedDecl::is_cxx_instance_member(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal63();
+  return self.getVal62();
 }
 
 bool NamedDecl::is_externally_declarable(void) const {
   auto self = fragment->NthDecl(offset);
-  return self.getVal64();
+  return self.getVal63();
 }
 
 bool NamedDecl::is_externally_visible(void) const {
@@ -23136,7 +23138,7 @@ EnumDecl UsingEnumDecl::enum_declaration(void) const {
 
 Token UsingEnumDecl::enum_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 Token UsingEnumDecl::using_token(void) const {
@@ -23290,7 +23292,7 @@ Token UnresolvedUsingValueDecl::ellipsis_token(void) const {
 
 Token UnresolvedUsingValueDecl::using_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 bool UnresolvedUsingValueDecl::is_access_declaration(void) const {
@@ -23375,7 +23377,7 @@ Expr OMPDeclareReductionDecl::combiner(void) const {
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal65());
   return Expr::from(fragment->StmtFor(fragment, id)).value();
 }
 
@@ -23519,7 +23521,7 @@ std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
   if (!self.getVal81()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal61());
+    EntityId id(self.getVal65());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -23623,7 +23625,7 @@ Token DeclaratorDecl::inner_token_start(void) const {
 
 Token DeclaratorDecl::outer_token_start(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
@@ -25036,7 +25038,7 @@ bool CXXMethodDecl::is_volatile(void) const {
 
 std::vector<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal65();
+  auto list = self.getVal64();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -25557,7 +25559,7 @@ Expr BindingDecl::binding(void) const {
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal65());
   return ValueDecl::from(fragment->DeclFor(fragment, id)).value();
 }
 
@@ -25643,7 +25645,7 @@ Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
 
 OMPDeclareMapperDecl OMPDeclareMapperDecl::prev_declaration_in_scope(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal65());
   return OMPDeclareMapperDecl::from(fragment->DeclFor(fragment, id)).value();
 }
 
@@ -25699,7 +25701,7 @@ std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(vo
   if (!self.getVal79()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal61());
+    EntityId id(self.getVal65());
     return UsingShadowDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -25868,7 +25870,7 @@ Token UsingDirectiveDecl::identifier_token(void) const {
 
 Token UsingDirectiveDecl::namespace_key_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
@@ -26056,7 +26058,7 @@ std::optional<TagDecl> TagDecl::from(const Decl &parent) {
 
 TokenRange TagDecl::brace_range(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenRangeFor(fragment, self.getVal60(), self.getVal61());
+  return fragment->TokenRangeFor(fragment, self.getVal60(), self.getVal65());
 }
 
 std::optional<TagDecl> TagDecl::definition(void) const {
@@ -26426,7 +26428,7 @@ std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(voi
 
 std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal65();
+  auto list = self.getVal64();
   std::vector<CXXConstructorDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -27751,7 +27753,7 @@ Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const {
 
 Token UnresolvedUsingTypenameDecl::typename_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 Token UnresolvedUsingTypenameDecl::using_token(void) const {
@@ -27896,7 +27898,7 @@ std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(voi
   if (!self.getVal85()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal61());
+    EntityId id(self.getVal65());
     return TypeAliasTemplateDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -27939,7 +27941,7 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const Decl &parent) {
 
 Token ObjCTypeParamDecl::colon_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
@@ -28315,7 +28317,7 @@ Token ObjCPropertyDecl::at_token(void) const {
 
 ObjCMethodDecl ObjCPropertyDecl::getter_method_declaration(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal65());
   return ObjCMethodDecl::from(fragment->DeclFor(fragment, id)).value();
 }
 
@@ -28437,7 +28439,7 @@ ObjCPropertyDecl ObjCMethodDecl::find_property_declaration(void) const {
 
 ObjCCategoryDecl ObjCMethodDecl::category(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal65());
   return ObjCCategoryDecl::from(fragment->DeclFor(fragment, id)).value();
 }
 
@@ -28597,7 +28599,7 @@ std::vector<Token> ObjCMethodDecl::selector_tokens(void) const {
 
 std::vector<Decl> ObjCMethodDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal65();
+  auto list = self.getVal64();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -28671,7 +28673,7 @@ std::vector<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const {
 
 TokenRange ObjCContainerDecl::at_end_range(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenRangeFor(fragment, self.getVal60(), self.getVal61());
+  return fragment->TokenRangeFor(fragment, self.getVal60(), self.getVal65());
 }
 
 Token ObjCContainerDecl::at_start_token(void) const {
@@ -28681,7 +28683,7 @@ Token ObjCContainerDecl::at_start_token(void) const {
 
 std::vector<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
   auto self = fragment->NthDecl(offset);
-  auto list = self.getVal65();
+  auto list = self.getVal64();
   std::vector<ObjCMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -29463,7 +29465,7 @@ Token NamespaceAliasDecl::alias_token(void) const {
 
 NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
   auto self = fragment->NthDecl(offset);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal65());
   return NamedDecl::from(fragment->DeclFor(fragment, id)).value();
 }
 
@@ -29718,7 +29720,7 @@ StringLiteral FileScopeAsmDecl::assembly_string(void) const {
 
 Token FileScopeAsmDecl::r_paren_token(void) const {
   auto self = fragment->NthDecl(offset);
-  return fragment->TokenFor(fragment, self.getVal61());
+  return fragment->TokenFor(fragment, self.getVal65());
 }
 
 ExternCContextDeclContainingDeclRange ExternCContextDecl::containing(const Decl &decl) {

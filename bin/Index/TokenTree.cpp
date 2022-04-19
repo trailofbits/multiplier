@@ -824,7 +824,7 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
       } else if (IsIncludeKeyword(sft)) {
         seen_include = prev;
 
-      } else {
+      } else if (!seen_hash) {
         seen_hash = nullptr;
         seen_include = nullptr;
       }
