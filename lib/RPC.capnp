@@ -85,9 +85,18 @@ struct UpperBound @0xdf7bccc629d6dcf9 {
 }
 
 struct TokenContext @0xb9ff75e040124cb3 {
-  parentIndexAndKind @0 :UInt32;
-  parentOffset @1 :UInt32;
-  aliasOffset @2 :UInt32;
+  
+  # Index of the parent token context (shifted left by 1). Low bit is 1 if this
+  # value is present.
+  parentIndex @0 :UInt32;
+  
+  # Index of the aliased token context (shifted left by 1). Low bit is 1 if this
+  # value is present. The `entityId` at the indexed context should match.
+  aliasIndex @1 :UInt32;
+  
+  # Entity ID. This should generally be in the same fragment, but sometimes
+  # isn't.
+  entityId @2 :UInt64;
 }
 
 struct File @0x987f05f6a48636d5 {
@@ -127,38 +136,41 @@ struct Fragment @0xe5f27760091f9a3a {
   # Entities embedded in this code sequence.
   declarations @3 :List(AST.Decl);
   statements @4 :List(AST.Stmt);
-  others @5 :List(AST.Pseudo);
+  types @5 :List(AST.Type);
+  others @6 :List(AST.Pseudo);
   
   # List of top-level declarations in this code chunk.
-  topLevelDeclarations @6 :List(UInt64);
+  topLevelDeclarations @7 :List(UInt64);
   
   # List of token substitutions in this fragment.
-  tokenSubstitutions @7 :List(TokenSubstitution);
+  tokenSubstitutions @8 :List(TokenSubstitution);
   
   # The actual parsed tokens, as a text buffer. Each token is separated by a
   # single space. There are no newlines, except those that might be inside of
   # character/string literals.
-  parsedTokenData @8 :Text;
+  parsedTokenData @9 :Text;
   
   # List of parsed token kinds in this fragment.
-  tokenKinds @9 :List(UInt16);
+  tokenKinds @10 :List(UInt16);
   
   # List of offsets of the beginning of tokens. There is one extra element in
   # here than there are tokens, which represents the size of the data.
-  tokenOffsets @10 :List(UInt32);
+  tokenOffsets @11 :List(UInt32);
   
   # List of token IDs for file tokens corresponding with the parsed tokens.
-  fileTokenIds @11 :List(UInt64);
+  fileTokenIds @12 :List(UInt64);
   
-  # List of token contexts. The first N token contexts correspond to the
-  # tokens themselves.
-  tokenContexts @12 :List(TokenContext);
+  # List of token contexts. 
+  tokenContexts @13 :List(TokenContext);
+  
+  # List of offsets of token contexts for each of the tokens.
+  tokenContextOffsets @14 :List(UInt32);
   
   # List of tokens/substitution IDs in the top level.
-  unparsedTokens @13 :List(UInt64);
+  unparsedTokens @15 :List(UInt64);
 
   # Source IR in text format
-  mlir @14 :Text;
+  mlir @16 :Text;
 }
 
 struct RegexMatch @0xc119a143d978fd1e {

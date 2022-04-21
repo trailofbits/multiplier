@@ -22,94 +22,98 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
     return std::nullopt;
   }
 
-  auto tc = frag->Fragment().getTokenContexts()[tok.index];
-  auto index_kind = tc.getParentIndexAndKind();
-  if (!index_kind) {
-    return std::nullopt;
-  }
-
-  index_kind >>= 1u;
-
+  FragmentReader frag_reader = frag->Fragment();
+  unsigned offset = frag_reader.getTokenContextOffsets()[tok.index];
+  mx::rpc::TokenContext::Reader tc = frag_reader.getTokenContexts()[offset];
   std::shared_ptr<const FragmentImpl> frag_ptr(tok.impl, frag);
 
   // NOTE(pag): +1 to skip `kInvalid`.
   TokenContext ret(std::move(frag_ptr));
-  ret.kind = static_cast<Kind>((index_kind & 0x3) + 1);
-  ret.index = index_kind >> 2u;
-  ret.offset = tc.getParentOffset();
+  ret.entity_id = tc.getEntityId();
+  ret.offset = offset;
+
+  assert(ret.entity_id != kInvalidEntityId);
+
+  if (auto parent_index = tc.getParentIndex()) {
+    ret.parent_offset = parent_index >> 1u;
+  }
+
+  if (auto alias_index = tc.getAliasIndex()) {
+    ret.alias_offset = alias_index >> 1u;
+  }
+
   return ret;
 }
 
-std::optional<Decl> TokenContext::as_decl(void) const {
-  if (kind != kDecl && kind != kDeclAlias) {
-    return std::nullopt;
-  } else if (!impl) {
-    return std::nullopt;
+std::optional<Decl> TokenContext::as_declaration(void) const {
+  EntityId id(entity_id);
+  if (impl && std::holds_alternative<DeclarationId>(id.Unpack())) {
+    return impl->DeclFor(impl, id);
   } else {
-    return Decl(impl, index);
+    return std::nullopt;
   }
 }
 
-std::optional<Stmt> TokenContext::as_stmt(void) const {
-  if (kind != kStmt && kind != kStmtAlias) {
-    return std::nullopt;
-  } else if (!impl) {
-    return std::nullopt;
+std::optional<Stmt> TokenContext::as_statement(void) const {
+  EntityId id(entity_id);
+  if (impl && std::holds_alternative<StatementId>(id.Unpack())) {
+    return impl->StmtFor(impl, id);
   } else {
-    return Stmt(impl, index);
+    return std::nullopt;
+  }
+}
+
+std::optional<Type> TokenContext::as_type(void) const {
+  EntityId id(entity_id);
+  if (impl && std::holds_alternative<TypeId>(id.Unpack())) {
+    return impl->TypeFor(impl, id);
+  } else {
+    return std::nullopt;
   }
 }
 
 // Return the aliased context.
 std::optional<TokenContext> TokenContext::aliasee(void) const {
-  if (!impl) {
+  if (!impl || !alias_offset.has_value()) {
     return std::nullopt;
-
-  } else if (kind == kDeclAlias) {
-    auto tc = impl->Fragment().getTokenContexts()[offset];
-    TokenContext ret(impl);
-    ret.kind = kDecl;
-    ret.index = index;
-    ret.offset = tc.getAliasOffset();
-    return ret;
-
-  } else if (kind == kStmtAlias) {
-    auto tc = impl->Fragment().getTokenContexts()[offset];
-    TokenContext ret(impl);
-    ret.kind = kStmt;
-    ret.index = index;
-    ret.offset = tc.getAliasOffset();
-    return ret;
 
   } else {
-    return std::nullopt;
+    auto tc = impl->Fragment().getTokenContexts()[alias_offset.value()];
+    TokenContext ret(impl);
+    assert(entity_id == tc.getEntityId());
+    assert(!tc.getAliasIndex());
+    ret.entity_id = entity_id;
+    ret.offset = alias_offset.value();
+    assert(ret.offset != offset);
+    return ret;
   }
 }
 
 // Return the parent context.
 std::optional<TokenContext> TokenContext::parent(void) const {
-  if (!impl) {
-    return std::nullopt;
-
-  } else if (kind == kDecl || kind == kDeclAlias ||
-             kind == kStmt || kind == kStmtAlias) {
-    auto tc = impl->Fragment().getTokenContexts()[offset];
-    auto index_kind = tc.getParentIndexAndKind();
-    if (!index_kind) {
-      return std::nullopt;
-    }
-
-    index_kind >>= 1u;
-
-    // NOTE(pag): `+1` to skip `kInvalid`.
-    TokenContext ret(impl);
-    ret.kind = static_cast<Kind>((index_kind & 0x3) + 1);
-    ret.index = index_kind >> 2u;
-    ret.offset = tc.getParentOffset();
-    return ret;
-  } else {
+  if (!impl || !parent_offset.has_value()) {
     return std::nullopt;
   }
+
+  auto tc = impl->Fragment().getTokenContexts()[parent_offset.value()];
+
+  // NOTE(pag): `+1` to skip `kInvalid`.
+  TokenContext ret(impl);
+  ret.entity_id = tc.getEntityId();
+  ret.offset = parent_offset.value();
+
+  assert(ret.offset != offset);
+  assert(ret.entity_id != kInvalidEntityId);
+
+  if (auto parent_index = tc.getParentIndex()) {
+    ret.parent_offset = parent_index >> 1u;
+  }
+
+  if (auto alias_index = tc.getAliasIndex()) {
+    ret.alias_offset = alias_index >> 1u;
+  }
+
+  return ret;
 }
 
 }  // namespace mx

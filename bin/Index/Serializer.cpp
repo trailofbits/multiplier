@@ -6,6 +6,8 @@
 
 #include "Serializer.h"
 
+#include <capnp/common.h>
+#include <capnp/message.h>
 #include <cassert>
 #include <glog/logging.h>
 #include <pasta/AST/Forward.h>
@@ -96,6 +98,27 @@ mx::RawEntityId EntitySerializer::EntityId(const pasta::FileToken &entity) {
   } else {
     return mx::kInvalidEntityId;
   }
+}
+
+mx::RawEntityId EntitySerializer::EntityId(const pasta::Type &entity) {
+  std::pair<const void *, uint32_t> type_key(entity.RawType(),
+                                             entity.RawQualifiers());
+  assert(type_key.first != nullptr);
+
+  mx::RawEntityId &raw_id = lazy_type_id[type_key];
+  if (raw_id == mx::kInvalidEntityId) {
+    mx::TypeId id;
+    id.fragment_id = code_id;
+    id.kind = mx::FromPasta(entity.Kind());
+    id.offset = static_cast<uint32_t>(types_to_serialize.size());
+    assert(id.offset == types_to_serialize.size());
+    raw_id = mx::EntityId(id);
+
+    types_to_serialize.emplace_back(entity);
+    assert(types_to_serialize.back().RawType() != nullptr);
+  }
+
+  return raw_id;
 }
 
 bool EntitySerializer::Enter(const pasta::Decl &entity) {
@@ -196,6 +219,56 @@ bool EntitySerializer::Enter(const pasta::Stmt &entity) {
     default:
       return false;
   }
+}
+
+// Reset the serializer in preparation to serialize `fragment`.
+void EntitySerializer::PrepareToSerialize(const PendingFragment &fragment) {
+  serialized_entities.clear();
+  lazy_type_id.clear();
+  types_to_serialize.clear();
+  code_id = fragment.fragment_id;
+  next_pseudo_entity_offset = 0;
+  parent_decl_id = mx::kInvalidEntityId;
+  parent_stmt_id = mx::kInvalidEntityId;
+  current_decl_id = mx::kInvalidEntityId;
+  current_stmt_id = mx::kInvalidEntityId;
+}
+
+void EntitySerializer::SerializeTypes(FragmentBuilder &builder) {
+
+  // First pass does "fake" serialization to expand the set of types until
+  // nothing is added to `types_to_serialize`.
+  for (auto i = 0u; i < types_to_serialize.size(); ++i) {
+    pasta::Type entity = types_to_serialize[i];  // NOTE(pag): Might resize.
+    capnp::MallocMessageBuilder message;
+    mx::ast::Type::Builder b = message.initRoot<mx::ast::Type>();
+    switch (entity.Kind()) {
+#define MX_SERIALIZE_TYPE(type) \
+    case pasta::TypeKind::k ## type: { \
+      Serialize ## type ## Type ( \
+          *this, b, reinterpret_cast<const pasta::type ## Type &>(entity)); \
+      break; \
+    }
+      PASTA_FOR_EACH_TYPE_IMPL(MX_SERIALIZE_TYPE,
+                               PASTA_IGNORE_ABSTRACT)
+    }
+  }
+
+  auto num_types = static_cast<uint32_t>(types_to_serialize.size());
+  assert(lazy_type_id.size() == num_types);
+
+  // Second pass actually does the real serialization.
+  auto type_builder = builder.initTypes(num_types);
+  auto i = 0u;
+  for (const pasta::Type &entity : types_to_serialize) {
+    mx::ast::Type::Builder b = type_builder[i++];
+    switch (entity.Kind()) {
+      PASTA_FOR_EACH_TYPE_IMPL(MX_SERIALIZE_TYPE,
+                               PASTA_IGNORE_ABSTRACT)
+    }
+  }
+
+#undef MX_SERIALIZE_TYPE
 }
 
 void EntitySerializer::Enter(

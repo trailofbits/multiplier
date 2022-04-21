@@ -8,12 +8,15 @@
 
 #include <optional>
 
+#include "Types.h"
+
 namespace mx {
 
 class Decl;
 class FragmentImpl;
 class Stmt;
 class Token;
+class Type;
 
 class IteratorEnd {};
 
@@ -203,28 +206,80 @@ class StmtIterator {
   }
 };
 
+class TypeIterator {
+ private:
+  friend class Type;
+
+  std::shared_ptr<const FragmentImpl> impl;
+  unsigned index{0};
+  unsigned num_types{0};
+
+  bool operator==(const TypeIterator &) = delete;
+  bool operator!=(const TypeIterator &) = delete;
+
+  inline TypeIterator(std::shared_ptr<const FragmentImpl> impl_,
+                      unsigned index_, unsigned num_types_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_types(num_types_) {}
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_types;
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_types;
+  }
+
+  inline operator bool(void) const noexcept {
+    return index < num_types;
+  }
+
+  // Return the current type pointed to by the iterator.
+  Type operator*(void) const noexcept;
+
+  // Pre-increment.
+  inline TypeIterator &operator++(void) noexcept {
+    ++index;
+    return *this;
+  }
+
+  // Post-increment.
+  inline TypeIterator operator++(int) noexcept {
+    return TypeIterator(impl, index++, num_types);
+  }
+};
+
 class TokenContext {
  private:
   std::shared_ptr<const FragmentImpl> impl;
 
-  enum Kind {
-    kInvalid,
-    kDecl,
-    kDeclAlias,
-    kStmt,
-    kStmtAlias
-  } kind{kInvalid};
-
-  // These represent the index and offset of the storage of this token context.
-  unsigned index{0};
+  // Offset of this token context inside of the fragment.
   unsigned offset{0};
+
+  // Offset of this token context's parent within the fragment.
+  std::optional<unsigned> parent_offset;
+
+  // Offset of this context's alias within the fragment.
+  std::optional<unsigned> alias_offset;
+
+  // Entity to which this token context refers. In general, this belongs to
+  // the current fragment, but in rare instances it may not.
+  RawEntityId entity_id{kInvalidEntityId};
 
   inline TokenContext(std::shared_ptr<const FragmentImpl> impl_)
       : impl(std::move(impl_)) {}
 
  public:
-  inline bool is_alias(void) const {
-    return kind == kDeclAlias || kind == kStmtAlias;
+  inline bool has_parent(void) const noexcept {
+    return parent_offset.has_value();
+  }
+
+  inline bool is_alias(void) const noexcept {
+    return alias_offset.has_value();
   }
 
   inline unsigned id(void) const noexcept {
@@ -238,10 +293,13 @@ class TokenContext {
   static std::optional<TokenContext> of(const Token &tok);
 
   // Return the declaration associated with this context, if any.
-  std::optional<Decl> as_decl(void) const;
+  std::optional<Decl> as_declaration(void) const;
 
   // Return the statement associated with this context, if any.
-  std::optional<Stmt> as_stmt(void) const;
+  std::optional<Stmt> as_statement(void) const;
+
+  // Return the type associated with this context, if any.
+  std::optional<Type> as_type(void) const;
 
   // Return the aliased context, if any.
   std::optional<TokenContext> aliasee(void) const;

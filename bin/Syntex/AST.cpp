@@ -27,6 +27,11 @@ ASTNode::ASTNode(const mx::Stmt &stmt)
       kind_val(static_cast<unsigned short>(stmt.kind())),
       data(ChildVector()) {}
 
+ASTNode::ASTNode(const mx::Type &type)
+    : kind(kTypeKind),
+      kind_val(static_cast<unsigned short>(type.kind())),
+      data(ChildVector()) {}
+
 ASTNode::ASTNode(const mx::Token &tok)
     : kind(kTokenKind),
       kind_val(static_cast<unsigned short>(tok.kind())),
@@ -61,6 +66,7 @@ bool ASTNode::operator==(const ASTNode &that) const noexcept {
 AST::AST(void) {
   index.resize(mx::NumEnumerators(mx::DeclKind{}) +
                mx::NumEnumerators(mx::StmtKind{}) +
+               mx::NumEnumerators(mx::TypeKind{}) +
                mx::NumEnumerators(mx::TokenKind{}));
 }
 
@@ -73,9 +79,16 @@ const ASTNode *AST::LastNodeOfKind(mx::StmtKind kind) {
                static_cast<unsigned>(kind)];
 }
 
+const ASTNode *AST::LastNodeOfKind(mx::TypeKind kind) {
+  return index[mx::NumEnumerators(mx::DeclKind{}) +
+               mx::NumEnumerators(mx::StmtKind{}) +
+               static_cast<unsigned>(kind)];
+}
+
 const ASTNode *AST::LastNodeOfKind(mx::TokenKind kind) {
   return index[mx::NumEnumerators(mx::DeclKind{}) +
                mx::NumEnumerators(mx::StmtKind{}) +
+               mx::NumEnumerators(mx::TypeKind{}) +
                static_cast<unsigned>(kind)];
 }
 
@@ -113,10 +126,13 @@ AST AST::Build(mx::Fragment fragment) {
       const mx::TokenContext &c = *c_it;
       std::optional<ASTNode> dummy;
       const ASTNode **last_ptr = nullptr;
+
+      // Declarations.
       if (auto decl = mx::Decl::from(c)) {
         dummy.emplace(*decl);
         last_ptr = &(self.index[dummy->kind_val]);
 
+      // Statements.
       } else if (auto stmt = mx::Stmt::from(c)) {
         switch (stmt->kind()) {
           case mx::StmtKind::IMPLICIT_CAST_EXPR:
@@ -129,6 +145,13 @@ AST AST::Build(mx::Fragment fragment) {
                              dummy->kind_val]);
             break;
         }
+
+      // Types.
+      } else if (auto type = mx::Type::from(c)) {
+        dummy.emplace(*type);
+        last_ptr = &(self.index[mx::NumEnumerators(mx::DeclKind{}) +
+                                mx::NumEnumerators(mx::StmtKind{}) +
+                                dummy->kind_val]);
 
       } else {
         continue;
@@ -168,6 +191,7 @@ AST AST::Build(mx::Fragment fragment) {
     const ASTNode **last_tok_ptr =
         &(self.index[mx::NumEnumerators(mx::DeclKind{}) +
                      mx::NumEnumerators(mx::StmtKind{}) +
+                     mx::NumEnumerators(mx::TypeKind{}) +
                      tok_node->kind_val]);
     tok_node->prev_of_kind = *last_tok_ptr;
     *last_tok_ptr = tok_node;
@@ -224,6 +248,12 @@ void AST::PrintDOT(std::ostream &os) const {
         os
           << " bgcolor=\"darkolivegreen3\">"
           << mx::EnumeratorName(static_cast<mx::StmtKind>(node.kind_val))
+          << "</TD></TR></TABLE>>];\n";
+        break;
+      case ASTNode::kTypeKind:
+        os
+          << " bgcolor=\"goldenrod\">"
+          << mx::EnumeratorName(static_cast<mx::TypeKind>(node.kind_val))
           << "</TD></TR></TABLE>>];\n";
         break;
       case ASTNode::kTokenKind:

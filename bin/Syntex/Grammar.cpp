@@ -180,6 +180,8 @@ static NonTerminal NodeToNonTerminal(const ASTNode *node) {
       return NonTerminal(static_cast<mx::DeclKind>(node->kind_val));
     case ASTNode::kStmtKind:
       return NonTerminal(static_cast<mx::StmtKind>(node->kind_val));
+    case ASTNode::kTypeKind:
+      return NonTerminal(static_cast<mx::TypeKind>(node->kind_val));
     case ASTNode::kTokenKind:
       return NonTerminal(static_cast<mx::TokenKind>(node->kind_val));
   }
@@ -204,10 +206,16 @@ NonTerminal::NonTerminal(mx::StmtKind k)
     : val(static_cast<unsigned short>(k) +
           mx::NumEnumerators(mx::DeclKind{})) {}
 
-NonTerminal::NonTerminal(mx::TokenKind k)
+NonTerminal::NonTerminal(mx::TypeKind k)
     : val(static_cast<unsigned short>(k) +
           mx::NumEnumerators(mx::DeclKind{}) +
           mx::NumEnumerators(mx::StmtKind{})) {}
+
+NonTerminal::NonTerminal(mx::TokenKind k)
+    : val(static_cast<unsigned short>(k) +
+          mx::NumEnumerators(mx::DeclKind{}) +
+          mx::NumEnumerators(mx::StmtKind{}) +
+          mx::NumEnumerators(mx::TypeKind{})) {}
 
 Rule::~Rule(void) {
   if (begin) {
@@ -304,70 +312,8 @@ void Grammar::Import(const mx::Fragment &fragment) {
       auto &children = std::get<ASTNode::ChildVector>(node->data);
       const auto num_children = children.size();
 
-      // Process the children of this node. We want to do some kind of pre-
-      // processing of semicolon and comma-separated things here. A basic
-      // treatment of this AST node and it's children would take the following:
-      //
-      //        .-- A --.
-      //       /\  /\  /|\
-      //      ( B , C , D )
-      //
-      // And convert it into a rule of the form:
-      //
-      //      ( B , C , D ) A
-      //
-      // But what we'd like is something more along the lines of:
-      //
-      //      ( A_comma ) A
-      //
-      //      B A_comma
-      //      C A_comma
-      //      D A_comma
-      //
-      // Where an `A_comma` is a special "comma" type that allows us to know
-      // in a search procedure that we can have more than one of them besides
-      // each-other.
-      //
-      // This is all a bit tricky, as it means finding reasonable "stop" nodes
-      // or tokens at boundaries (e.g. parens, brackets, braces). This is really
-      // a kind of rule summarization / compression procedure.
-      for (auto i = 0u; i < num_children; ++i) {
-        const ASTNode *child = children[i];
-        nodes.push_back(child);
-
-//        if (NodeIsComma(child) || NodeIsSemicolon(child)) {
-//          continue;
-//        }
-//
-//        bool is_comma = false;
-//        bool is_semi = false;
-//        if (i) {
-//          const ASTNode *prev_child = children[i - 1u];
-//          is_comma = NodeIsComma(prev_child);
-//          is_semi = NodeIsSemicolon(prev_child);
-//        }
-//
-//        if ((i + 1u) < num_children) {
-//          const ASTNode *next_child = children[i + 1u];
-//          is_comma = is_comma || NodeIsComma(next_child);
-//          is_semi = is_semi || NodeIsSemicolon(next_child);
-//        }
-//
-//        // E.g. `B` in `A, B;`.
-//        if (is_comma && is_semi) {
-//
-//        // E.g. either `A` or `B` in `(A, B)`.
-//        } else if (is_comma) {
-//
-//        // E.g. `B` in `A = B;`.
-//        } else if (is_semi) {
-//
-//        } else {
-//          nodes_for_rule.push_back(node);
-//        }
-
-        ++i;
-      }
+      // Add the child nodes to the work list.
+      nodes.insert(nodes.end(), children.begin(), children.end());
 
       if (node->kind == ASTNode::kFragment) {
         continue;

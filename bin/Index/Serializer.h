@@ -52,8 +52,11 @@ class EntitySerializer final : public EntityVisitor {
   mx::RawEntityId parent_stmt_id{mx::kInvalidEntityId};
   mx::RawEntityId current_decl_id{mx::kInvalidEntityId};
   mx::RawEntityId current_stmt_id{mx::kInvalidEntityId};
+
   unsigned next_pseudo_entity_offset{0};
+
   std::unordered_set<mx::RawEntityId> serialized_entities;
+
   const std::unordered_map<pasta::File, mx::FileId> &file_ids;
 
   ::capnp::List<::mx::ast::Decl, ::capnp::Kind::STRUCT>::Builder
@@ -62,6 +65,15 @@ class EntitySerializer final : public EntityVisitor {
       stmt_builder;
   ::capnp::List<::mx::ast::Pseudo, ::capnp::Kind::STRUCT>::Builder
       pseudo_builder;
+
+  // Types are lazily serialized. They are more like pseudo-entities than
+  // actual entities, insofar as they aren't externally identifiable in terms
+  // of some `<fragment, offset>`. Instead, they are more like
+  // `CXXBaseSpecifier` in terms of serialization where other things refer to
+  // them inside of the fragment, but there are no inter-fragment references to
+  // them.
+  std::map<std::pair<const void *, uint32_t>, mx::RawEntityId> lazy_type_id;
+  std::vector<pasta::Type> types_to_serialize;
 
   const pasta::TokenRange range;
 
@@ -75,13 +87,17 @@ class EntitySerializer final : public EntityVisitor {
         file_ids(file_ids_),
         range(std::move(range_)) {}
 
+  // Reset the serializer in preparation to serialize `fragment`.
+  void PrepareToSerialize(const PendingFragment &code);
   void SerializeCodeEntities(PendingFragment code, FragmentBuilder &builder);
+  void SerializeTypes(FragmentBuilder &builder);
 
   mx::FileId FileId(const pasta::File &file);
   mx::RawEntityId EntityId(const pasta::Decl &entity);
   mx::RawEntityId EntityId(const pasta::Stmt &entity);
   mx::RawEntityId EntityId(const pasta::Token &entity);
   mx::RawEntityId EntityId(const pasta::FileToken &entity);
+  mx::RawEntityId EntityId(const pasta::Type &entity);
 
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;

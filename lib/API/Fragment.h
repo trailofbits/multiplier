@@ -49,6 +49,7 @@ class FragmentImpl {
   // Return a specific type of entity.
   virtual DeclReader NthDecl(unsigned offset) const = 0;
   virtual StmtReader NthStmt(unsigned offset) const = 0;
+  virtual TypeReader NthType(unsigned offset) const = 0;
   virtual PseudoReader NthPseudo(unsigned offset) const = 0;
 
   virtual std::string_view SourceIR(void) const = 0;
@@ -68,6 +69,9 @@ class FragmentImpl {
 
   // Return the statement associated with a specific entity ID.
   Stmt StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
+
+  // Return the type associated with a specific entity ID.
+  Type TypeFor(const FragmentImpl::Ptr &, EntityId id) const;
 };
 
 // A packed fragment of code, i.e. a serialized fragment.
@@ -116,6 +120,7 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   // Return a specific type of entity.
   DeclReader NthDecl(unsigned offset) const final;
   StmtReader NthStmt(unsigned offset) const final;
+  TypeReader NthType(unsigned offset) const final;
   PseudoReader NthPseudo(unsigned offset) const final;
 
   std::string_view SourceIR(void) const final;

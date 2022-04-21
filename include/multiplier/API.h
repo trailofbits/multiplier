@@ -554,6 +554,7 @@ class Fragment {
   friend class Stmt;
   friend class Token;
   friend class TokenSubstitutionListIterator;
+  friend class Type;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
 

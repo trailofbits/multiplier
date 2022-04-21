@@ -250,6 +250,10 @@ Stmt StmtIterator::operator*(void) const noexcept {
   return Stmt(impl, index);
 }
 
+Type TypeIterator::operator*(void) const noexcept {
+  return Type(impl, index);
+}
+
 DeclIterator Decl::in_internal(const Fragment &fragment) {
   return DeclIterator(
       fragment.impl, 0u, fragment.impl->Fragment().getDeclarations().size());
@@ -258,6 +262,11 @@ DeclIterator Decl::in_internal(const Fragment &fragment) {
 StmtIterator Stmt::in_internal(const Fragment &fragment) {
   return StmtIterator(
       fragment.impl, 0u, fragment.impl->Fragment().getStatements().size());
+}
+
+TypeIterator Type::in_internal(const Fragment &fragment) {
+  return TypeIterator(
+      fragment.impl, 0u, fragment.impl->Fragment().getTypes().size());
 }
 
 }  // namespace mx

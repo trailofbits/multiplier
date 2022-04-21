@@ -88,13 +88,17 @@ extern "C" int main(int argc, char *argv[]) {
     auto bgcolor = "";
     auto kind_name = "";
 
-    if (auto stmt = context.as_stmt()) {
+    if (auto stmt = context.as_statement()) {
       bgcolor = " bgcolor=\"aquamarine\"";
       kind_name = mx::EnumeratorName(stmt->kind());
 
-    } else if (auto decl = context.as_decl()) {
+    } else if (auto decl = context.as_declaration()) {
       bgcolor = " bgcolor=\"antiquewhite\"";
       kind_name = mx::EnumeratorName(decl->kind());
+
+    } else if (auto type = context.as_type()) {
+      bgcolor = " bgcolor=\"cadetblue1\"";
+      kind_name = mx::EnumeratorName(type->kind());
 
     } else if (context.is_alias()) {
       bgcolor = " bgcolor=\"deepskyblue3\"";

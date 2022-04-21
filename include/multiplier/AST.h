@@ -7073,6 +7073,66 @@ class CoawaitExpr;
 class CXXAddrspaceCastExpr;
 class CXXConstCastExpr;
 class CXXDynamicCastExpr;
+class Type;
+class TypeOfExprType;
+class TypeOfType;
+class TypedefType;
+class UnaryTransformType;
+class UnresolvedUsingType;
+class VectorType;
+class TypeWithKeyword;
+class AdjustedType;
+class ArrayType;
+class AtomicType;
+class AttributedType;
+class BlockPointerType;
+class BuiltinType;
+class ComplexType;
+class ConstantArrayType;
+class DecayedType;
+class DecltypeType;
+class DeducedType;
+class DependentAddressSpaceType;
+class DependentExtIntType;
+class DependentNameType;
+class DependentSizedArrayType;
+class DependentSizedExtVectorType;
+class DependentTemplateSpecializationType;
+class DependentVectorType;
+class ElaboratedType;
+class ExtIntType;
+class ExtVectorType;
+class FunctionType;
+class IncompleteArrayType;
+class InjectedClassNameType;
+class MacroQualifiedType;
+class MatrixType;
+class MemberPointerType;
+class ObjCObjectPointerType;
+class ObjCObjectType;
+class ObjCTypeParamType;
+class PackExpansionType;
+class ParenType;
+class PipeType;
+class PointerType;
+class ReferenceType;
+class SubstTemplateTypeParmPackType;
+class SubstTemplateTypeParmType;
+class TagType;
+class TemplateSpecializationType;
+class TemplateTypeParmType;
+class VariableArrayType;
+class AutoType;
+class ConstantMatrixType;
+class DeducedTemplateSpecializationType;
+class DependentSizedMatrixType;
+class EnumType;
+class FunctionNoProtoType;
+class FunctionProtoType;
+class LValueReferenceType;
+class ObjCInterfaceType;
+class RValueReferenceType;
+class RecordType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
  protected:
@@ -7082,6 +7142,8 @@ class TemplateParameterList {
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7111,6 +7173,8 @@ class TemplateArgument {
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7126,6 +7190,9 @@ class TemplateArgument {
   bool contains_unexpanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
   std::optional<ValueDecl> as_declaration(void) const;
+  std::optional<Type> as_type(void) const;
+  std::optional<Type> parameter_type_for_declaration(void) const;
+  std::optional<Type> null_pointer_type(void) const;
 };
 
 class CXXBaseSpecifier {
@@ -7136,6 +7203,8 @@ class CXXBaseSpecifier {
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7153,6 +7222,1745 @@ class CXXBaseSpecifier {
   std::optional<Token> ellipsis(void) const;
   AccessSpecifier semantic_access_specifier(void) const;
   AccessSpecifier lexical_access_specifier(void) const;
+  Type base_type(void) const;
+};
+
+using TypeRange = DerivedEntityRange<TypeIterator, Type>;
+using TypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, Type>;
+class Type {
+ protected:
+  friend class Decl;
+  friend class DeclIterator;
+  friend class FragmentImpl;
+  friend class Stmt;
+  friend class StmtIterator;
+  friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset;
+
+ public:
+  inline Type(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+      : fragment(std::move(fragment_)),
+        offset(offset_) {}
+
+  inline static std::optional<Type> from(const Type &self) {
+    return self;
+  }
+
+  inline static std::optional<Type> from(const TokenContext &c) {
+    return c.as_type();
+  }
+
+ protected:
+  static TypeIterator in_internal(const Fragment &fragment);
+
+ public:
+  inline static TypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  bool is_qualified(void) const;
+  Type unqualified_type(void) const;
+  bool accepts_obj_c_type_parameters(void) const;
+  bool can_decay_to_pointer_type(void) const;
+  bool can_have_nullability(void) const;
+  bool contains_errors(void) const;
+  bool contains_unexpanded_parameter_pack(void) const;
+  std::optional<Type> array_element_type_no_type_qualified(void) const;
+  std::optional<CXXRecordDecl> as_cxx_record_declaration(void) const;
+  std::optional<ComplexType> as_complex_integer_type(void) const;
+  std::optional<ObjCObjectPointerType> as_obj_c_interface_pointer_type(void) const;
+  std::optional<ObjCObjectType> as_obj_c_interface_type(void) const;
+  std::optional<ObjCObjectPointerType> as_obj_c_qualified_class_type(void) const;
+  std::optional<ObjCObjectPointerType> as_obj_c_qualified_id_type(void) const;
+  std::optional<ObjCObjectType> as_obj_c_qualified_interface_type(void) const;
+  std::optional<BuiltinType> as_placeholder_type(void) const;
+  std::optional<RecordDecl> as_record_declaration(void) const;
+  std::optional<RecordType> as_structure_type(void) const;
+  std::optional<TagDecl> as_tag_declaration(void) const;
+  std::optional<RecordType> as_union_type(void) const;
+  Type canonical_type_internal(void) const;
+  std::optional<AutoType> contained_auto_type(void) const;
+  std::optional<DeducedType> contained_deduced_type(void) const;
+  Linkage linkage(void) const;
+  Type locally_unqualified_single_step_desugared_type(void) const;
+  std::optional<NullabilityKind> nullability(void) const;
+  std::optional<CXXRecordDecl> pointee_cxx_record_declaration(void) const;
+  std::optional<Type> pointee_or_array_element_type(void) const;
+  std::optional<Type> pointee_type(void) const;
+  std::optional<TypeScalarTypeKind> scalar_type_kind(void) const;
+  std::optional<Type> sve_element_type(void) const;
+  TypeKind kind(void) const;
+  Type unqualified_desugared_type(void) const;
+  Visibility visibility(void) const;
+  bool has_auto_for_trailing_return_type(void) const;
+  bool has_floating_representation(void) const;
+  bool has_integer_representation(void) const;
+  bool has_obj_c_pointer_representation(void) const;
+  bool has_pointer_representation(void) const;
+  bool has_signed_integer_representation(void) const;
+  bool has_sized_vla_type(void) const;
+  bool has_unnamed_or_local_type(void) const;
+  bool has_unsigned_integer_representation(void) const;
+  bool is_aggregate_type(void) const;
+  bool is_align_value_t(void) const;
+  bool is_any_character_type(void) const;
+  bool is_any_complex_type(void) const;
+  bool is_any_pointer_type(void) const;
+  bool is_arithmetic_type(void) const;
+  bool is_array_type(void) const;
+  bool is_atomic_type(void) const;
+  bool is_b_float16_type(void) const;
+  bool is_block_compatible_obj_c_pointer_type(void) const;
+  bool is_block_pointer_type(void) const;
+  bool is_boolean_type(void) const;
+  bool is_builtin_type(void) const;
+  bool is_carc_bridgable_type(void) const;
+  bool is_cuda_device_builtin_surface_type(void) const;
+  bool is_cuda_device_builtin_texture_type(void) const;
+  bool is_canonical_unqualified(void) const;
+  bool is_char16_type(void) const;
+  bool is_char32_type(void) const;
+  bool is_char8_type(void) const;
+  bool is_character_type(void) const;
+  bool is_class_type(void) const;
+  bool is_clk_event_t(void) const;
+  bool is_complex_integer_type(void) const;
+  bool is_complex_type(void) const;
+  bool is_compound_type(void) const;
+  bool is_constant_array_type(void) const;
+  bool is_constant_matrix_type(void) const;
+  std::optional<bool> is_constant_size_type(void) const;
+  bool is_decltype_type(void) const;
+  bool is_dependent_address_space_type(void) const;
+  bool is_dependent_sized_array_type(void) const;
+  bool is_dependent_type(void) const;
+  bool is_elaborated_type_specifier(void) const;
+  bool is_enumeral_type(void) const;
+  bool is_event_t(void) const;
+  bool is_ext_int_type(void) const;
+  bool is_ext_vector_type(void) const;
+  bool is_fixed_point_or_integer_type(void) const;
+  bool is_fixed_point_type(void) const;
+  bool is_float128_type(void) const;
+  bool is_float16_type(void) const;
+  bool is_floating_type(void) const;
+  bool is_from_ast(void) const;
+  bool is_function_no_proto_type(void) const;
+  bool is_function_pointer_type(void) const;
+  bool is_function_proto_type(void) const;
+  bool is_function_reference_type(void) const;
+  bool is_function_type(void) const;
+  bool is_fundamental_type(void) const;
+  bool is_half_type(void) const;
+  bool is_image_type(void) const;
+  bool is_incomplete_array_type(void) const;
+  bool is_incomplete_or_object_type(void) const;
+  bool is_incomplete_type(void) const;
+  bool is_instantiation_dependent_type(void) const;
+  bool is_integer_type(void) const;
+  bool is_integral_or_enumeration_type(void) const;
+  bool is_integral_or_unscoped_enumeration_type(void) const;
+  bool is_integral_type(void) const;
+  bool is_interface_type(void) const;
+  bool is_l_value_reference_type(void) const;
+  bool is_linkage_valid(void) const;
+  std::optional<bool> is_literal_type(void) const;
+  bool is_matrix_type(void) const;
+  bool is_member_data_pointer_type(void) const;
+  bool is_member_function_pointer_type(void) const;
+  bool is_member_pointer_type(void) const;
+  bool is_non_overload_placeholder_type(void) const;
+  bool is_nothrow_t(void) const;
+  bool is_null_pointer_type(void) const;
+  bool is_ocl_ext_opaque_type(void) const;
+  bool is_ocl_image1_darray_ro_type(void) const;
+  bool is_ocl_image1_darray_rw_type(void) const;
+  bool is_ocl_image1_darray_wo_type(void) const;
+  bool is_ocl_image1_dbuffer_ro_type(void) const;
+  bool is_ocl_image1_dbuffer_rw_type(void) const;
+  bool is_ocl_image1_dbuffer_wo_type(void) const;
+  bool is_ocl_image1_dro_type(void) const;
+  bool is_ocl_image1_drw_type(void) const;
+  bool is_ocl_image1_dwo_type(void) const;
+  bool is_ocl_image2_darray_depth_ro_type(void) const;
+  bool is_ocl_image2_darray_depth_rw_type(void) const;
+  bool is_ocl_image2_darray_depth_wo_type(void) const;
+  bool is_ocl_image2_darray_msaa_depth_ro_type(void) const;
+  bool is_ocl_image2_darray_msaa_depth_rw_type(void) const;
+  bool is_ocl_image2_darray_msaa_depth_wo_type(void) const;
+  bool is_ocl_image2_darray_msaaro_type(void) const;
+  bool is_ocl_image2_darray_msaarw_type(void) const;
+  bool is_ocl_image2_darray_msaawo_type(void) const;
+  bool is_ocl_image2_darray_ro_type(void) const;
+  bool is_ocl_image2_darray_rw_type(void) const;
+  bool is_ocl_image2_darray_wo_type(void) const;
+  bool is_ocl_image2_ddepth_ro_type(void) const;
+  bool is_ocl_image2_ddepth_rw_type(void) const;
+  bool is_ocl_image2_ddepth_wo_type(void) const;
+  bool is_ocl_image2_dmsaa_depth_ro_type(void) const;
+  bool is_ocl_image2_dmsaa_depth_rw_type(void) const;
+  bool is_ocl_image2_dmsaa_depth_wo_type(void) const;
+  bool is_ocl_image2_dmsaaro_type(void) const;
+  bool is_ocl_image2_dmsaarw_type(void) const;
+  bool is_ocl_image2_dmsaawo_type(void) const;
+  bool is_ocl_image2_dro_type(void) const;
+  bool is_ocl_image2_drw_type(void) const;
+  bool is_ocl_image2_dwo_type(void) const;
+  bool is_ocl_image3_dro_type(void) const;
+  bool is_ocl_image3_drw_type(void) const;
+  bool is_ocl_image3_dwo_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ime_dual_reference_streamin_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ime_payload_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ime_result_dual_reference_streamout_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ime_result_single_reference_streamout_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ime_result_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ime_single_reference_streamin_type(void) const;
+  bool is_ocl_intel_subgroup_avc_mce_payload_type(void) const;
+  bool is_ocl_intel_subgroup_avc_mce_result_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ref_payload_type(void) const;
+  bool is_ocl_intel_subgroup_avc_ref_result_type(void) const;
+  bool is_ocl_intel_subgroup_avc_sic_payload_type(void) const;
+  bool is_ocl_intel_subgroup_avc_sic_result_type(void) const;
+  bool is_ocl_intel_subgroup_avc_type(void) const;
+  bool is_obj_carc_bridgable_type(void) const;
+  std::optional<bool> is_obj_carc_implicitly_unretained_type(void) const;
+  bool is_obj_c_boxable_record_type(void) const;
+  bool is_obj_c_builtin_type(void) const;
+  bool is_obj_c_class_or_class_kind_of_type(void) const;
+  bool is_obj_c_class_type(void) const;
+  bool is_obj_c_id_type(void) const;
+  bool is_obj_c_independent_class_type(void) const;
+  bool is_obj_c_indirect_lifetime_type(void) const;
+  bool is_obj_c_inert_unsafe_unretained_type(void) const;
+  bool is_obj_c_lifetime_type(void) const;
+  bool is_obj_cns_object_type(void) const;
+  bool is_obj_c_object_or_interface_type(void) const;
+  bool is_obj_c_object_pointer_type(void) const;
+  bool is_obj_c_object_type(void) const;
+  bool is_obj_c_qualified_class_type(void) const;
+  bool is_obj_c_qualified_id_type(void) const;
+  bool is_obj_c_qualified_interface_type(void) const;
+  bool is_obj_c_retainable_type(void) const;
+  bool is_obj_c_sel_type(void) const;
+  bool is_object_pointer_type(void) const;
+  bool is_object_type(void) const;
+  bool is_open_cl_specific_type(void) const;
+  bool is_overloadable_type(void) const;
+  bool is_pipe_type(void) const;
+  bool is_placeholder_type(void) const;
+  bool is_pointer_type(void) const;
+  bool is_promotable_integer_type(void) const;
+  bool is_queue_t(void) const;
+  bool is_r_value_reference_type(void) const;
+  bool is_real_floating_type(void) const;
+  bool is_real_type(void) const;
+  bool is_record_type(void) const;
+  bool is_reference_type(void) const;
+  bool is_reserve_idt(void) const;
+  bool is_sampler_t(void) const;
+  bool is_saturated_fixed_point_type(void) const;
+  bool is_scalar_type(void) const;
+  bool is_scoped_enumeral_type(void) const;
+  bool is_signed_fixed_point_type(void) const;
+  bool is_signed_integer_or_enumeration_type(void) const;
+  bool is_signed_integer_type(void) const;
+  bool is_sizeless_builtin_type(void) const;
+  bool is_sizeless_type(void) const;
+  bool is_specifier_type(void) const;
+  std::optional<bool> is_standard_layout_type(void) const;
+  bool is_std_byte_type(void) const;
+  bool is_structural_type(void) const;
+  bool is_structure_or_class_type(void) const;
+  bool is_structure_type(void) const;
+  bool is_template_type_parm_type(void) const;
+  bool is_typedef_name_type(void) const;
+  bool is_undeduced_auto_type(void) const;
+  bool is_undeduced_type(void) const;
+  bool is_union_type(void) const;
+  bool is_unsaturated_fixed_point_type(void) const;
+  bool is_unscoped_enumeration_type(void) const;
+  bool is_unsigned_fixed_point_type(void) const;
+  bool is_unsigned_integer_or_enumeration_type(void) const;
+  bool is_unsigned_integer_type(void) const;
+  bool is_vlst_builtin_type(void) const;
+  bool is_variable_array_type(void) const;
+  bool is_variably_modified_type(void) const;
+  bool is_vector_type(void) const;
+  bool is_visibility_explicit(void) const;
+  bool is_void_pointer_type(void) const;
+  bool is_void_type(void) const;
+  bool is_wide_character_type(void) const;
+  Type ignore_parentheses(void) const;
+  LangAS address_space(void) const;
+  Type atomic_unqualified_type(void) const;
+  Type canonical_type(void) const;
+  Type desugared_type(void) const;
+  Type local_unqualified_type(void) const;
+  Type non_l_value_expression_type(void) const;
+  Type non_pack_expansion_type(void) const;
+  Type non_reference_type(void) const;
+  Type single_step_desugared_type(void) const;
+  bool has_address_space(void) const;
+  bool has_local_non_fast_qualifiers(void) const;
+  bool has_local_qualifiers(void) const;
+  bool has_non_trivial_obj_c_lifetime(void) const;
+  bool has_non_trivial_to_primitive_copy_c_union(void) const;
+  bool has_non_trivial_to_primitive_default_initialize_c_union(void) const;
+  bool has_non_trivial_to_primitive_destruct_c_union(void) const;
+  bool has_qualifiers(void) const;
+  bool has_strong_or_weak_obj_c_lifetime(void) const;
+  bool is_c_forbidden_l_value_type(void) const;
+  bool is_cxx11_pod_type(void) const;
+  bool is_cxx98_pod_type(void) const;
+  bool is_canonical(void) const;
+  bool is_canonical_as_parameter(void) const;
+  bool is_const_qualified(void) const;
+  bool is_constant(void) const;
+  QualTypeDestructionKind is_destructed_type(void) const;
+  bool is_local_const_qualified(void) const;
+  bool is_local_restrict_qualified(void) const;
+  bool is_local_volatile_qualified(void) const;
+  QualTypePrimitiveCopyKind is_non_trivial_to_primitive_copy(void) const;
+  QualTypePrimitiveDefaultInitializeKind is_non_trivial_to_primitive_default_initialize(void) const;
+  QualTypePrimitiveCopyKind is_non_trivial_to_primitive_destructive_move(void) const;
+  bool is_non_weak_in_mrr_with_obj_c_weak(void) const;
+  bool is_null(void) const;
+  bool is_obj_cgc_strong(void) const;
+  bool is_obj_cgc_weak(void) const;
+  bool is_pod_type(void) const;
+  bool is_restrict_qualified(void) const;
+  bool is_trivial_type(void) const;
+  bool is_trivially_copyable_type(void) const;
+  bool is_volatile_qualified(void) const;
+  bool may_be_dynamic_class(void) const;
+  bool may_be_not_dynamic_class(void) const;
+  Type strip_obj_c_kind_of_type(void) const;
+  Type with_const(void) const;
+  Type with_restrict(void) const;
+  Type with_volatile(void) const;
+  Type without_local_fast_qualifiers(void) const;
+};
+
+using TemplateTypeParmTypeRange = DerivedEntityRange<TypeIterator, TemplateTypeParmType>;
+using TemplateTypeParmTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateTypeParmType>;
+class TemplateTypeParmType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static TemplateTypeParmTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TemplateTypeParmTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TemplateTypeParmType> from(const TokenContext &c);
+  static std::optional<TemplateTypeParmType> from(const Type &parent);
+  Type desugar(void) const;
+  TemplateTypeParmDecl declaration(void) const;
+  bool is_parameter_pack(void) const;
+  bool is_sugared(void) const;
+};
+
+using TemplateSpecializationTypeRange = DerivedEntityRange<TypeIterator, TemplateSpecializationType>;
+using TemplateSpecializationTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateSpecializationType>;
+class TemplateSpecializationType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static TemplateSpecializationTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TemplateSpecializationType> from(const TokenContext &c);
+  static std::optional<TemplateSpecializationType> from(const Type &parent);
+  Type desugar(void) const;
+  Type aliased_type(void) const;
+  bool is_current_instantiation(void) const;
+  bool is_sugared(void) const;
+  bool is_type_alias(void) const;
+  std::vector<TemplateArgument> template_arguments(void) const;
+};
+
+using TagTypeRange = DerivedEntityRange<TypeIterator, TagType>;
+using TagTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TagType>;
+class TagType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static TagTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TagTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TagType> from(const TokenContext &c);
+  static std::optional<TagType> from(const Type &parent);
+  TagDecl declaration(void) const;
+  bool is_being_defined(void) const;
+};
+
+using RecordTypeRange = DerivedEntityRange<TypeIterator, RecordType>;
+using RecordTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, RecordType>;
+class RecordType : public TagType {
+ private:
+  friend class FragmentImpl;
+  friend class TagType;
+  friend class Type;
+ public:
+  inline static RecordTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RecordTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<RecordType> from(const TokenContext &c);
+  static std::optional<RecordType> from(const TagType &parent);
+  static std::optional<RecordType> from(const Type &parent);
+  Type desugar(void) const;
+  bool has_const_fields(void) const;
+  bool is_sugared(void) const;
+};
+
+using EnumTypeRange = DerivedEntityRange<TypeIterator, EnumType>;
+using EnumTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnumType>;
+class EnumType : public TagType {
+ private:
+  friend class FragmentImpl;
+  friend class TagType;
+  friend class Type;
+ public:
+  inline static EnumTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static EnumTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<EnumType> from(const TokenContext &c);
+  static std::optional<EnumType> from(const TagType &parent);
+  static std::optional<EnumType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using SubstTemplateTypeParmTypeRange = DerivedEntityRange<TypeIterator, SubstTemplateTypeParmType>;
+using SubstTemplateTypeParmTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, SubstTemplateTypeParmType>;
+class SubstTemplateTypeParmType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static SubstTemplateTypeParmTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SubstTemplateTypeParmTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SubstTemplateTypeParmType> from(const TokenContext &c);
+  static std::optional<SubstTemplateTypeParmType> from(const Type &parent);
+  Type desugar(void) const;
+  TemplateTypeParmType replaced_parameter(void) const;
+  Type replacement_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using SubstTemplateTypeParmPackTypeRange = DerivedEntityRange<TypeIterator, SubstTemplateTypeParmPackType>;
+using SubstTemplateTypeParmPackTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, SubstTemplateTypeParmPackType>;
+class SubstTemplateTypeParmPackType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static SubstTemplateTypeParmPackTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SubstTemplateTypeParmPackTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<SubstTemplateTypeParmPackType> from(const TokenContext &c);
+  static std::optional<SubstTemplateTypeParmPackType> from(const Type &parent);
+  Type desugar(void) const;
+  TemplateTypeParmType replaced_parameter(void) const;
+  bool is_sugared(void) const;
+};
+
+using ReferenceTypeRange = DerivedEntityRange<TypeIterator, ReferenceType>;
+using ReferenceTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReferenceType>;
+class ReferenceType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ReferenceTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReferenceTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ReferenceType> from(const TokenContext &c);
+  static std::optional<ReferenceType> from(const Type &parent);
+  Type pointee_type_as_written(void) const;
+  bool is_inner_reference(void) const;
+  bool is_spelled_as_l_value(void) const;
+};
+
+using RValueReferenceTypeRange = DerivedEntityRange<TypeIterator, RValueReferenceType>;
+using RValueReferenceTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, RValueReferenceType>;
+class RValueReferenceType : public ReferenceType {
+ private:
+  friend class FragmentImpl;
+  friend class ReferenceType;
+  friend class Type;
+ public:
+  inline static RValueReferenceTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RValueReferenceTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<RValueReferenceType> from(const TokenContext &c);
+  static std::optional<RValueReferenceType> from(const ReferenceType &parent);
+  static std::optional<RValueReferenceType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using LValueReferenceTypeRange = DerivedEntityRange<TypeIterator, LValueReferenceType>;
+using LValueReferenceTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, LValueReferenceType>;
+class LValueReferenceType : public ReferenceType {
+ private:
+  friend class FragmentImpl;
+  friend class ReferenceType;
+  friend class Type;
+ public:
+  inline static LValueReferenceTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LValueReferenceTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<LValueReferenceType> from(const TokenContext &c);
+  static std::optional<LValueReferenceType> from(const ReferenceType &parent);
+  static std::optional<LValueReferenceType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using PointerTypeRange = DerivedEntityRange<TypeIterator, PointerType>;
+using PointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, PointerType>;
+class PointerType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static PointerTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PointerTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PointerType> from(const TokenContext &c);
+  static std::optional<PointerType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using PipeTypeRange = DerivedEntityRange<TypeIterator, PipeType>;
+using PipeTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, PipeType>;
+class PipeType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static PipeTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PipeTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PipeType> from(const TokenContext &c);
+  static std::optional<PipeType> from(const Type &parent);
+  Type desugar(void) const;
+  Type element_type(void) const;
+  bool is_read_only(void) const;
+  bool is_sugared(void) const;
+};
+
+using ParenTypeRange = DerivedEntityRange<TypeIterator, ParenType>;
+using ParenTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParenType>;
+class ParenType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ParenTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ParenTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ParenType> from(const TokenContext &c);
+  static std::optional<ParenType> from(const Type &parent);
+  Type desugar(void) const;
+  Type inner_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using PackExpansionTypeRange = DerivedEntityRange<TypeIterator, PackExpansionType>;
+using PackExpansionTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, PackExpansionType>;
+class PackExpansionType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static PackExpansionTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PackExpansionTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<PackExpansionType> from(const TokenContext &c);
+  static std::optional<PackExpansionType> from(const Type &parent);
+  Type desugar(void) const;
+  std::optional<unsigned> num_expansions(void) const;
+  Type pattern(void) const;
+  bool is_sugared(void) const;
+};
+
+using ObjCTypeParamTypeRange = DerivedEntityRange<TypeIterator, ObjCTypeParamType>;
+using ObjCTypeParamTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCTypeParamType>;
+class ObjCTypeParamType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ObjCTypeParamTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCTypeParamTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCTypeParamType> from(const TokenContext &c);
+  static std::optional<ObjCTypeParamType> from(const Type &parent);
+  Type desugar(void) const;
+  ObjCTypeParamDecl declaration(void) const;
+  bool is_sugared(void) const;
+};
+
+using ObjCObjectTypeRange = DerivedEntityRange<TypeIterator, ObjCObjectType>;
+using ObjCObjectTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCObjectType>;
+class ObjCObjectType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ObjCObjectTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCObjectTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCObjectType> from(const TokenContext &c);
+  static std::optional<ObjCObjectType> from(const Type &parent);
+  Type desugar(void) const;
+  Type base_type(void) const;
+  ObjCInterfaceDecl interface(void) const;
+  std::optional<Type> super_class_type(void) const;
+  std::vector<Type> type_arguments(void) const;
+  std::vector<Type> type_arguments_as_written(void) const;
+  bool is_kind_of_type(void) const;
+  bool is_kind_of_type_as_written(void) const;
+  bool is_obj_c_class(void) const;
+  bool is_obj_c_id(void) const;
+  bool is_obj_c_qualified_class(void) const;
+  bool is_obj_c_qualified_id(void) const;
+  bool is_obj_c_unqualified_class(void) const;
+  bool is_obj_c_unqualified_id(void) const;
+  bool is_obj_c_unqualified_id_or_class(void) const;
+  bool is_specialized(void) const;
+  bool is_specialized_as_written(void) const;
+  bool is_sugared(void) const;
+  bool is_unspecialized(void) const;
+  bool is_unspecialized_as_written(void) const;
+  Type strip_obj_c_kind_of_type_and_qualifieds(void) const;
+};
+
+using ObjCInterfaceTypeRange = DerivedEntityRange<TypeIterator, ObjCInterfaceType>;
+using ObjCInterfaceTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCInterfaceType>;
+class ObjCInterfaceType : public ObjCObjectType {
+ private:
+  friend class FragmentImpl;
+  friend class ObjCObjectType;
+  friend class Type;
+ public:
+  inline static ObjCInterfaceTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCInterfaceTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCInterfaceType> from(const TokenContext &c);
+  static std::optional<ObjCInterfaceType> from(const ObjCObjectType &parent);
+  static std::optional<ObjCInterfaceType> from(const Type &parent);
+  ObjCInterfaceDecl declaration(void) const;
+};
+
+using ObjCObjectPointerTypeRange = DerivedEntityRange<TypeIterator, ObjCObjectPointerType>;
+using ObjCObjectPointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCObjectPointerType>;
+class ObjCObjectPointerType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ObjCObjectPointerTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCObjectPointerTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ObjCObjectPointerType> from(const TokenContext &c);
+  static std::optional<ObjCObjectPointerType> from(const Type &parent);
+  Type desugar(void) const;
+  ObjCInterfaceDecl interface_declaration(void) const;
+  ObjCInterfaceType interface_type(void) const;
+  ObjCObjectType object_type(void) const;
+  Type super_class_type(void) const;
+  std::vector<Type> type_arguments(void) const;
+  std::vector<Type> type_arguments_as_written(void) const;
+  bool is_kind_of_type(void) const;
+  bool is_obj_c_id_or_class_type(void) const;
+  bool is_specialized(void) const;
+  bool is_specialized_as_written(void) const;
+  bool is_sugared(void) const;
+  bool is_unspecialized(void) const;
+  bool is_unspecialized_as_written(void) const;
+  std::vector<ObjCProtocolDecl> qualifieds(void) const;
+  ObjCObjectPointerType strip_obj_c_kind_of_type_and_qualifieds(void) const;
+  std::vector<ObjCProtocolDecl> protocols(void) const;
+};
+
+using MemberPointerTypeRange = DerivedEntityRange<TypeIterator, MemberPointerType>;
+using MemberPointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, MemberPointerType>;
+class MemberPointerType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static MemberPointerTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MemberPointerTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MemberPointerType> from(const TokenContext &c);
+  static std::optional<MemberPointerType> from(const Type &parent);
+  Type desugar(void) const;
+  Type class_(void) const;
+  CXXRecordDecl most_recent_cxx_record_declaration(void) const;
+  bool is_member_data_pointer(void) const;
+  bool is_member_function_pointer(void) const;
+  bool is_sugared(void) const;
+};
+
+using MatrixTypeRange = DerivedEntityRange<TypeIterator, MatrixType>;
+using MatrixTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, MatrixType>;
+class MatrixType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static MatrixTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MatrixTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MatrixType> from(const TokenContext &c);
+  static std::optional<MatrixType> from(const Type &parent);
+  Type desugar(void) const;
+  Type element_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using DependentSizedMatrixTypeRange = DerivedEntityRange<TypeIterator, DependentSizedMatrixType>;
+using DependentSizedMatrixTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentSizedMatrixType>;
+class DependentSizedMatrixType : public MatrixType {
+ private:
+  friend class FragmentImpl;
+  friend class MatrixType;
+  friend class Type;
+ public:
+  inline static DependentSizedMatrixTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentSizedMatrixTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentSizedMatrixType> from(const TokenContext &c);
+  static std::optional<DependentSizedMatrixType> from(const MatrixType &parent);
+  static std::optional<DependentSizedMatrixType> from(const Type &parent);
+  Token attribute_token(void) const;
+  Expr column_expression(void) const;
+  Expr row_expression(void) const;
+};
+
+using ConstantMatrixTypeRange = DerivedEntityRange<TypeIterator, ConstantMatrixType>;
+using ConstantMatrixTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstantMatrixType>;
+class ConstantMatrixType : public MatrixType {
+ private:
+  friend class FragmentImpl;
+  friend class MatrixType;
+  friend class Type;
+ public:
+  inline static ConstantMatrixTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConstantMatrixTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConstantMatrixType> from(const TokenContext &c);
+  static std::optional<ConstantMatrixType> from(const MatrixType &parent);
+  static std::optional<ConstantMatrixType> from(const Type &parent);
+};
+
+using MacroQualifiedTypeRange = DerivedEntityRange<TypeIterator, MacroQualifiedType>;
+using MacroQualifiedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, MacroQualifiedType>;
+class MacroQualifiedType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static MacroQualifiedTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MacroQualifiedTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<MacroQualifiedType> from(const TokenContext &c);
+  static std::optional<MacroQualifiedType> from(const Type &parent);
+  Type desugar(void) const;
+  Type modified_type(void) const;
+  Type underlying_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using InjectedClassNameTypeRange = DerivedEntityRange<TypeIterator, InjectedClassNameType>;
+using InjectedClassNameTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, InjectedClassNameType>;
+class InjectedClassNameType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static InjectedClassNameTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static InjectedClassNameTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<InjectedClassNameType> from(const TokenContext &c);
+  static std::optional<InjectedClassNameType> from(const Type &parent);
+  Type desugar(void) const;
+  CXXRecordDecl declaration(void) const;
+  Type injected_specialization_type(void) const;
+  TemplateSpecializationType injected_tst(void) const;
+  bool is_sugared(void) const;
+};
+
+using FunctionTypeRange = DerivedEntityRange<TypeIterator, FunctionType>;
+using FunctionTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionType>;
+class FunctionType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static FunctionTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FunctionTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FunctionType> from(const TokenContext &c);
+  static std::optional<FunctionType> from(const Type &parent);
+  CallingConv call_conv(void) const;
+  Type call_result_type(void) const;
+  bool cmse_ns_call_attribute(void) const;
+  bool has_reg_parm(void) const;
+  bool no_return_attribute(void) const;
+  Type return_type(void) const;
+  bool is_const(void) const;
+  bool is_restrict(void) const;
+  bool is_volatile(void) const;
+};
+
+using FunctionProtoTypeRange = DerivedEntityRange<TypeIterator, FunctionProtoType>;
+using FunctionProtoTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionProtoType>;
+class FunctionProtoType : public FunctionType {
+ private:
+  friend class FragmentImpl;
+  friend class FunctionType;
+  friend class Type;
+ public:
+  inline static FunctionProtoTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FunctionProtoTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FunctionProtoType> from(const TokenContext &c);
+  static std::optional<FunctionProtoType> from(const FunctionType &parent);
+  static std::optional<FunctionProtoType> from(const Type &parent);
+  CanThrowResult can_throw(void) const;
+  Type desugar(void) const;
+  std::vector<Type> exceptions(void) const;
+  Token ellipsis_token(void) const;
+  std::optional<FunctionDecl> exception_spec_declaration(void) const;
+  std::optional<FunctionDecl> exception_spec_template(void) const;
+  ExceptionSpecificationType exception_spec_type(void) const;
+  std::optional<Expr> noexcept_expression(void) const;
+  std::vector<Type> parameter_types(void) const;
+  RefQualifierKind reference_qualifier(void) const;
+  bool has_dependent_exception_spec(void) const;
+  bool has_dynamic_exception_spec(void) const;
+  bool has_exception_spec(void) const;
+  bool has_ext_parameter_infos(void) const;
+  bool has_instantiation_dependent_exception_spec(void) const;
+  bool has_noexcept_exception_spec(void) const;
+  bool has_trailing_return(void) const;
+  bool is_nothrow(void) const;
+  bool is_sugared(void) const;
+  bool is_template_variadic(void) const;
+  bool is_variadic(void) const;
+  std::vector<Type> exception_types(void) const;
+};
+
+using FunctionNoProtoTypeRange = DerivedEntityRange<TypeIterator, FunctionNoProtoType>;
+using FunctionNoProtoTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionNoProtoType>;
+class FunctionNoProtoType : public FunctionType {
+ private:
+  friend class FragmentImpl;
+  friend class FunctionType;
+  friend class Type;
+ public:
+  inline static FunctionNoProtoTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FunctionNoProtoTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<FunctionNoProtoType> from(const TokenContext &c);
+  static std::optional<FunctionNoProtoType> from(const FunctionType &parent);
+  static std::optional<FunctionNoProtoType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using ExtIntTypeRange = DerivedEntityRange<TypeIterator, ExtIntType>;
+using ExtIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExtIntType>;
+class ExtIntType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ExtIntTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ExtIntTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExtIntType> from(const TokenContext &c);
+  static std::optional<ExtIntType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_signed(void) const;
+  bool is_sugared(void) const;
+  bool is_unsigned(void) const;
+};
+
+using DependentVectorTypeRange = DerivedEntityRange<TypeIterator, DependentVectorType>;
+using DependentVectorTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentVectorType>;
+class DependentVectorType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static DependentVectorTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentVectorTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentVectorType> from(const TokenContext &c);
+  static std::optional<DependentVectorType> from(const Type &parent);
+  Type desugar(void) const;
+  Token attribute_token(void) const;
+  Type element_type(void) const;
+  Expr size_expression(void) const;
+  VectorTypeVectorKind vector_kind(void) const;
+  bool is_sugared(void) const;
+};
+
+using DependentSizedExtVectorTypeRange = DerivedEntityRange<TypeIterator, DependentSizedExtVectorType>;
+using DependentSizedExtVectorTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentSizedExtVectorType>;
+class DependentSizedExtVectorType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static DependentSizedExtVectorTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentSizedExtVectorTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentSizedExtVectorType> from(const TokenContext &c);
+  static std::optional<DependentSizedExtVectorType> from(const Type &parent);
+  Type desugar(void) const;
+  Token attribute_token(void) const;
+  Type element_type(void) const;
+  Expr size_expression(void) const;
+  bool is_sugared(void) const;
+};
+
+using DependentExtIntTypeRange = DerivedEntityRange<TypeIterator, DependentExtIntType>;
+using DependentExtIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentExtIntType>;
+class DependentExtIntType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static DependentExtIntTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentExtIntTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentExtIntType> from(const TokenContext &c);
+  static std::optional<DependentExtIntType> from(const Type &parent);
+  Type desugar(void) const;
+  Expr num_bits_expression(void) const;
+  bool is_signed(void) const;
+  bool is_sugared(void) const;
+  bool is_unsigned(void) const;
+};
+
+using DependentAddressSpaceTypeRange = DerivedEntityRange<TypeIterator, DependentAddressSpaceType>;
+using DependentAddressSpaceTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentAddressSpaceType>;
+class DependentAddressSpaceType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static DependentAddressSpaceTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentAddressSpaceTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentAddressSpaceType> from(const TokenContext &c);
+  static std::optional<DependentAddressSpaceType> from(const Type &parent);
+  Type desugar(void) const;
+  Expr addr_space_expression(void) const;
+  Token attribute_token(void) const;
+  bool is_sugared(void) const;
+};
+
+using DeducedTypeRange = DerivedEntityRange<TypeIterator, DeducedType>;
+using DeducedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeducedType>;
+class DeducedType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static DeducedTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DeducedTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DeducedType> from(const TokenContext &c);
+  static std::optional<DeducedType> from(const Type &parent);
+  Type desugar(void) const;
+  Type resolved_type(void) const;
+  bool is_deduced(void) const;
+  bool is_sugared(void) const;
+};
+
+using DeducedTemplateSpecializationTypeRange = DerivedEntityRange<TypeIterator, DeducedTemplateSpecializationType>;
+using DeducedTemplateSpecializationTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeducedTemplateSpecializationType>;
+class DeducedTemplateSpecializationType : public DeducedType {
+ private:
+  friend class FragmentImpl;
+  friend class DeducedType;
+  friend class Type;
+ public:
+  inline static DeducedTemplateSpecializationTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DeducedTemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &c);
+  static std::optional<DeducedTemplateSpecializationType> from(const DeducedType &parent);
+  static std::optional<DeducedTemplateSpecializationType> from(const Type &parent);
+};
+
+using AutoTypeRange = DerivedEntityRange<TypeIterator, AutoType>;
+using AutoTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, AutoType>;
+class AutoType : public DeducedType {
+ private:
+  friend class FragmentImpl;
+  friend class DeducedType;
+  friend class Type;
+ public:
+  inline static AutoTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AutoTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AutoType> from(const TokenContext &c);
+  static std::optional<AutoType> from(const DeducedType &parent);
+  static std::optional<AutoType> from(const Type &parent);
+  AutoTypeKeyword keyword(void) const;
+  std::vector<TemplateArgument> type_constraint_arguments(void) const;
+  ConceptDecl type_constraint_concept(void) const;
+  bool is_constrained(void) const;
+  bool is_decltype_auto(void) const;
+};
+
+using DecltypeTypeRange = DerivedEntityRange<TypeIterator, DecltypeType>;
+using DecltypeTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DecltypeType>;
+class DecltypeType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static DecltypeTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DecltypeTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DecltypeType> from(const TokenContext &c);
+  static std::optional<DecltypeType> from(const Type &parent);
+  Type desugar(void) const;
+  Expr underlying_expression(void) const;
+  Type underlying_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using ComplexTypeRange = DerivedEntityRange<TypeIterator, ComplexType>;
+using ComplexTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ComplexType>;
+class ComplexType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ComplexTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ComplexTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ComplexType> from(const TokenContext &c);
+  static std::optional<ComplexType> from(const Type &parent);
+  Type desugar(void) const;
+  Type element_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using BuiltinTypeRange = DerivedEntityRange<TypeIterator, BuiltinType>;
+using BuiltinTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, BuiltinType>;
+class BuiltinType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static BuiltinTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BuiltinTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BuiltinType> from(const TokenContext &c);
+  static std::optional<BuiltinType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_floating_point(void) const;
+  bool is_integer(void) const;
+  bool is_signed_integer(void) const;
+  bool is_sugared(void) const;
+  bool is_unsigned_integer(void) const;
+};
+
+using BlockPointerTypeRange = DerivedEntityRange<TypeIterator, BlockPointerType>;
+using BlockPointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, BlockPointerType>;
+class BlockPointerType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static BlockPointerTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BlockPointerTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<BlockPointerType> from(const TokenContext &c);
+  static std::optional<BlockPointerType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using AttributedTypeRange = DerivedEntityRange<TypeIterator, AttributedType>;
+using AttributedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, AttributedType>;
+class AttributedType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static AttributedTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AttributedTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AttributedType> from(const TokenContext &c);
+  static std::optional<AttributedType> from(const Type &parent);
+  Type desugar(void) const;
+  AttributeKind attribute_kind(void) const;
+  Type equivalent_type(void) const;
+  std::optional<NullabilityKind> immediate_nullability(void) const;
+  Type modified_type(void) const;
+  bool is_calling_conv(void) const;
+  bool is_ms_type_spec(void) const;
+  bool is_qualifier(void) const;
+  bool is_sugared(void) const;
+};
+
+using AtomicTypeRange = DerivedEntityRange<TypeIterator, AtomicType>;
+using AtomicTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, AtomicType>;
+class AtomicType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static AtomicTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AtomicTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AtomicType> from(const TokenContext &c);
+  static std::optional<AtomicType> from(const Type &parent);
+  Type desugar(void) const;
+  Type value_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using ArrayTypeRange = DerivedEntityRange<TypeIterator, ArrayType>;
+using ArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArrayType>;
+class ArrayType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static ArrayTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ArrayTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ArrayType> from(const TokenContext &c);
+  static std::optional<ArrayType> from(const Type &parent);
+  Type element_type(void) const;
+  ArrayTypeArraySizeModifier size_modifier(void) const;
+};
+
+using VariableArrayTypeRange = DerivedEntityRange<TypeIterator, VariableArrayType>;
+using VariableArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, VariableArrayType>;
+class VariableArrayType : public ArrayType {
+ private:
+  friend class FragmentImpl;
+  friend class ArrayType;
+  friend class Type;
+ public:
+  inline static VariableArrayTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static VariableArrayTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<VariableArrayType> from(const TokenContext &c);
+  static std::optional<VariableArrayType> from(const ArrayType &parent);
+  static std::optional<VariableArrayType> from(const Type &parent);
+  Type desugar(void) const;
+  TokenRange brackets_range(void) const;
+  Token l_bracket_token(void) const;
+  Token r_bracket_token(void) const;
+  Expr size_expression(void) const;
+  bool is_sugared(void) const;
+};
+
+using IncompleteArrayTypeRange = DerivedEntityRange<TypeIterator, IncompleteArrayType>;
+using IncompleteArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, IncompleteArrayType>;
+class IncompleteArrayType : public ArrayType {
+ private:
+  friend class FragmentImpl;
+  friend class ArrayType;
+  friend class Type;
+ public:
+  inline static IncompleteArrayTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static IncompleteArrayTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<IncompleteArrayType> from(const TokenContext &c);
+  static std::optional<IncompleteArrayType> from(const ArrayType &parent);
+  static std::optional<IncompleteArrayType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using DependentSizedArrayTypeRange = DerivedEntityRange<TypeIterator, DependentSizedArrayType>;
+using DependentSizedArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentSizedArrayType>;
+class DependentSizedArrayType : public ArrayType {
+ private:
+  friend class FragmentImpl;
+  friend class ArrayType;
+  friend class Type;
+ public:
+  inline static DependentSizedArrayTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentSizedArrayTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentSizedArrayType> from(const TokenContext &c);
+  static std::optional<DependentSizedArrayType> from(const ArrayType &parent);
+  static std::optional<DependentSizedArrayType> from(const Type &parent);
+  Type desugar(void) const;
+  TokenRange brackets_range(void) const;
+  Token l_bracket_token(void) const;
+  Token r_bracket_token(void) const;
+  Expr size_expression(void) const;
+  bool is_sugared(void) const;
+};
+
+using ConstantArrayTypeRange = DerivedEntityRange<TypeIterator, ConstantArrayType>;
+using ConstantArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstantArrayType>;
+class ConstantArrayType : public ArrayType {
+ private:
+  friend class FragmentImpl;
+  friend class ArrayType;
+  friend class Type;
+ public:
+  inline static ConstantArrayTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConstantArrayTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ConstantArrayType> from(const TokenContext &c);
+  static std::optional<ConstantArrayType> from(const ArrayType &parent);
+  static std::optional<ConstantArrayType> from(const Type &parent);
+  Type desugar(void) const;
+  std::optional<Expr> size_expression(void) const;
+  bool is_sugared(void) const;
+};
+
+using AdjustedTypeRange = DerivedEntityRange<TypeIterator, AdjustedType>;
+using AdjustedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, AdjustedType>;
+class AdjustedType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static AdjustedTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AdjustedTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<AdjustedType> from(const TokenContext &c);
+  static std::optional<AdjustedType> from(const Type &parent);
+  Type desugar(void) const;
+  Type resolved_type(void) const;
+  Type original_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using DecayedTypeRange = DerivedEntityRange<TypeIterator, DecayedType>;
+using DecayedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DecayedType>;
+class DecayedType : public AdjustedType {
+ private:
+  friend class FragmentImpl;
+  friend class AdjustedType;
+  friend class Type;
+ public:
+  inline static DecayedTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DecayedTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DecayedType> from(const TokenContext &c);
+  static std::optional<DecayedType> from(const AdjustedType &parent);
+  static std::optional<DecayedType> from(const Type &parent);
+};
+
+using TypeWithKeywordRange = DerivedEntityRange<TypeIterator, TypeWithKeyword>;
+using TypeWithKeywordContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeWithKeyword>;
+class TypeWithKeyword : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static TypeWithKeywordRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeWithKeywordContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypeWithKeyword> from(const TokenContext &c);
+  static std::optional<TypeWithKeyword> from(const Type &parent);
+  ElaboratedTypeKeyword keyword(void) const;
+};
+
+using ElaboratedTypeRange = DerivedEntityRange<TypeIterator, ElaboratedType>;
+using ElaboratedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ElaboratedType>;
+class ElaboratedType : public TypeWithKeyword {
+ private:
+  friend class FragmentImpl;
+  friend class TypeWithKeyword;
+  friend class Type;
+ public:
+  inline static ElaboratedTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ElaboratedTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ElaboratedType> from(const TokenContext &c);
+  static std::optional<ElaboratedType> from(const TypeWithKeyword &parent);
+  static std::optional<ElaboratedType> from(const Type &parent);
+  Type desugar(void) const;
+  Type named_type(void) const;
+  std::optional<TagDecl> owned_tag_declaration(void) const;
+  bool is_sugared(void) const;
+};
+
+using DependentTemplateSpecializationTypeRange = DerivedEntityRange<TypeIterator, DependentTemplateSpecializationType>;
+using DependentTemplateSpecializationTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentTemplateSpecializationType>;
+class DependentTemplateSpecializationType : public TypeWithKeyword {
+ private:
+  friend class FragmentImpl;
+  friend class TypeWithKeyword;
+  friend class Type;
+ public:
+  inline static DependentTemplateSpecializationTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentTemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentTemplateSpecializationType> from(const TokenContext &c);
+  static std::optional<DependentTemplateSpecializationType> from(const TypeWithKeyword &parent);
+  static std::optional<DependentTemplateSpecializationType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+  std::vector<TemplateArgument> template_arguments(void) const;
+};
+
+using DependentNameTypeRange = DerivedEntityRange<TypeIterator, DependentNameType>;
+using DependentNameTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentNameType>;
+class DependentNameType : public TypeWithKeyword {
+ private:
+  friend class FragmentImpl;
+  friend class TypeWithKeyword;
+  friend class Type;
+ public:
+  inline static DependentNameTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DependentNameTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<DependentNameType> from(const TokenContext &c);
+  static std::optional<DependentNameType> from(const TypeWithKeyword &parent);
+  static std::optional<DependentNameType> from(const Type &parent);
+  Type desugar(void) const;
+  bool is_sugared(void) const;
+};
+
+using VectorTypeRange = DerivedEntityRange<TypeIterator, VectorType>;
+using VectorTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, VectorType>;
+class VectorType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static VectorTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static VectorTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<VectorType> from(const TokenContext &c);
+  static std::optional<VectorType> from(const Type &parent);
+  Type desugar(void) const;
+  Type element_type(void) const;
+  VectorTypeVectorKind vector_kind(void) const;
+  bool is_sugared(void) const;
+};
+
+using ExtVectorTypeRange = DerivedEntityRange<TypeIterator, ExtVectorType>;
+using ExtVectorTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExtVectorType>;
+class ExtVectorType : public VectorType {
+ private:
+  friend class FragmentImpl;
+  friend class VectorType;
+  friend class Type;
+ public:
+  inline static ExtVectorTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ExtVectorTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<ExtVectorType> from(const TokenContext &c);
+  static std::optional<ExtVectorType> from(const VectorType &parent);
+  static std::optional<ExtVectorType> from(const Type &parent);
+};
+
+using UnresolvedUsingTypeRange = DerivedEntityRange<TypeIterator, UnresolvedUsingType>;
+using UnresolvedUsingTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingType>;
+class UnresolvedUsingType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static UnresolvedUsingTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UnresolvedUsingTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnresolvedUsingType> from(const TokenContext &c);
+  static std::optional<UnresolvedUsingType> from(const Type &parent);
+  Type desugar(void) const;
+  UnresolvedUsingTypenameDecl declaration(void) const;
+  bool is_sugared(void) const;
+};
+
+using UnaryTransformTypeRange = DerivedEntityRange<TypeIterator, UnaryTransformType>;
+using UnaryTransformTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnaryTransformType>;
+class UnaryTransformType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static UnaryTransformTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UnaryTransformTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<UnaryTransformType> from(const TokenContext &c);
+  static std::optional<UnaryTransformType> from(const Type &parent);
+  Type desugar(void) const;
+  Type base_type(void) const;
+  UnaryTransformTypeUTTKind utt_kind(void) const;
+  Type underlying_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using TypedefTypeRange = DerivedEntityRange<TypeIterator, TypedefType>;
+using TypedefTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypedefType>;
+class TypedefType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static TypedefTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypedefTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypedefType> from(const TokenContext &c);
+  static std::optional<TypedefType> from(const Type &parent);
+  Type desugar(void) const;
+  TypedefNameDecl declaration(void) const;
+  bool is_sugared(void) const;
+};
+
+using TypeOfTypeRange = DerivedEntityRange<TypeIterator, TypeOfType>;
+using TypeOfTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeOfType>;
+class TypeOfType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static TypeOfTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeOfTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypeOfType> from(const TokenContext &c);
+  static std::optional<TypeOfType> from(const Type &parent);
+  Type desugar(void) const;
+  Type underlying_type(void) const;
+  bool is_sugared(void) const;
+};
+
+using TypeOfExprTypeRange = DerivedEntityRange<TypeIterator, TypeOfExprType>;
+using TypeOfExprTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeOfExprType>;
+class TypeOfExprType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static TypeOfExprTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeOfExprTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static std::optional<TypeOfExprType> from(const TokenContext &c);
+  static std::optional<TypeOfExprType> from(const Type &parent);
+  Type desugar(void) const;
+  Expr underlying_expression(void) const;
+  bool is_sugared(void) const;
 };
 
 using StmtRange = DerivedEntityRange<StmtIterator, Stmt>;
@@ -7167,6 +8975,8 @@ class Stmt {
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7180,7 +8990,7 @@ class Stmt {
   }
 
   inline static std::optional<Stmt> from(const TokenContext &c) {
-    return c.as_stmt();
+    return c.as_statement();
   }
 
   std::optional<Decl> parent_declaration(void) const;
@@ -9442,7 +11252,7 @@ class IndirectGotoStmt : public Stmt {
 
   static std::optional<IndirectGotoStmt> from(const TokenContext &c);
   static std::optional<IndirectGotoStmt> from(const Stmt &parent);
-  LabelDecl constant_target(void) const;
+  std::optional<LabelDecl> constant_target(void) const;
   Token goto_token(void) const;
   Token star_token(void) const;
   Expr target(void) const;
@@ -9838,6 +11648,7 @@ class CXXCatchStmt : public Stmt {
   static std::optional<CXXCatchStmt> from(const TokenContext &c);
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
   Token catch_token(void) const;
+  Type caught_type(void) const;
   std::optional<VarDecl> exception_declaration(void) const;
   Stmt handler_block(void) const;
 };
@@ -10103,6 +11914,7 @@ class Expr : public ValueStmt {
   ExprObjectKind object_kind(void) const;
   std::optional<Decl> referenced_declaration_of_callee(void) const;
   std::optional<FieldDecl> source_bit_field(void) const;
+  Type type(void) const;
   ExprValueKind value_kind(void) const;
   bool has_non_trivial_call(void) const;
   std::optional<bool> is_cxx11_constant_expression(void) const;
@@ -10423,6 +12235,7 @@ class ConvertVectorExpr : public Expr {
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
   Expr src_expression(void) const;
+  Type type_source_info(void) const;
 };
 
 using ConceptSpecializationExprRange = DerivedEntityRange<StmtIterator, ConceptSpecializationExpr>;
@@ -10483,6 +12296,7 @@ class CompoundLiteralExpr : public Expr {
   static std::optional<CompoundLiteralExpr> from(const Stmt &parent);
   Expr initializer(void) const;
   Token l_paren_token(void) const;
+  Type type_source_info(void) const;
   bool is_file_scope(void) const;
 };
 
@@ -10645,6 +12459,8 @@ class ExplicitCastExpr : public CastExpr {
   static std::optional<ExplicitCastExpr> from(const Expr &parent);
   static std::optional<ExplicitCastExpr> from(const ValueStmt &parent);
   static std::optional<ExplicitCastExpr> from(const Stmt &parent);
+  Type type_as_written(void) const;
+  Type type_info_as_written(void) const;
 };
 
 using CXXNamedCastExprRange = DerivedEntityRange<StmtIterator, CXXNamedCastExpr>;
@@ -11019,6 +12835,7 @@ class CallExpr : public Expr {
   static std::optional<CallExpr> from(const Stmt &parent);
   std::vector<Expr> arguments(void) const;
   CallExprADLCallKind adl_call_kind(void) const;
+  Type call_return_type(void) const;
   Expr callee(void) const;
   std::optional<Decl> callee_declaration(void) const;
   std::optional<FunctionDecl> direct_callee(void) const;
@@ -11096,6 +12913,7 @@ class CXXMemberCallExpr : public CallExpr {
   static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
   Expr implicit_object_argument(void) const;
   std::optional<CXXMethodDecl> method_declaration(void) const;
+  Type object_type(void) const;
   CXXRecordDecl record_declaration(void) const;
 };
 
@@ -11191,6 +13009,8 @@ class CXXUuidofExpr : public Expr {
   static std::optional<CXXUuidofExpr> from(const Stmt &parent);
   std::optional<Expr> expression_operand(void) const;
   MSGuidDecl guid_declaration(void) const;
+  Type type_operand(void) const;
+  Type type_operand_source_info(void) const;
   bool is_type_operand(void) const;
 };
 
@@ -11223,6 +13043,8 @@ class CXXUnresolvedConstructExpr : public Expr {
   std::vector<Expr> arguments(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
+  Type type_as_written(void) const;
+  Type type_source_info(void) const;
   bool is_list_initialization(void) const;
 };
 
@@ -11253,6 +13075,8 @@ class CXXTypeidExpr : public Expr {
   static std::optional<CXXTypeidExpr> from(const ValueStmt &parent);
   static std::optional<CXXTypeidExpr> from(const Stmt &parent);
   std::optional<Expr> expression_operand(void) const;
+  Type type_operand(void) const;
+  Type type_operand_source_info(void) const;
   std::optional<bool> is_most_derived(void) const;
   bool is_potentially_evaluated(void) const;
   bool is_type_operand(void) const;
@@ -11375,6 +13199,7 @@ class CXXScalarValueInitExpr : public Expr {
   static std::optional<CXXScalarValueInitExpr> from(const ValueStmt &parent);
   static std::optional<CXXScalarValueInitExpr> from(const Stmt &parent);
   Token r_paren_token(void) const;
+  Type type_source_info(void) const;
 };
 
 using CXXRewrittenBinaryOperatorRange = DerivedEntityRange<StmtIterator, CXXRewrittenBinaryOperator>;
@@ -11443,8 +13268,11 @@ class CXXPseudoDestructorExpr : public Expr {
   static std::optional<CXXPseudoDestructorExpr> from(const Stmt &parent);
   Expr base(void) const;
   Token colon_colon_token(void) const;
+  Type destroyed_type(void) const;
+  Type destroyed_type_info(void) const;
   Token destroyed_type_token(void) const;
   Token operator_token(void) const;
+  Type scope_type_info(void) const;
   Token tilde_token(void) const;
   bool has_qualifier(void) const;
   bool is_arrow(void) const;
@@ -11536,6 +13364,8 @@ class CXXNewExpr : public Expr {
   static std::optional<CXXNewExpr> from(const ValueStmt &parent);
   static std::optional<CXXNewExpr> from(const Stmt &parent);
   bool does_usual_array_delete_want_size(void) const;
+  Type allocated_type(void) const;
+  Type allocated_type_source_info(void) const;
   std::optional<Expr> array_size(void) const;
   std::optional<CXXConstructExpr> construct_expression(void) const;
   TokenRange direct_initializer_range(void) const;
@@ -11653,6 +13483,7 @@ class CXXDependentScopeMemberExpr : public Expr {
   static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
   Expr base(void) const;
+  Type base_type(void) const;
   std::optional<NamedDecl> first_qualifier_found_in_scope(void) const;
   Token l_angle_token(void) const;
   Token member_token(void) const;
@@ -11693,6 +13524,7 @@ class CXXDeleteExpr : public Expr {
   static std::optional<CXXDeleteExpr> from(const Stmt &parent);
   bool does_usual_array_delete_want_size(void) const;
   Expr argument(void) const;
+  Type destroyed_type(void) const;
   FunctionDecl operator_delete(void) const;
   bool is_array_form(void) const;
   bool is_array_form_as_written(void) const;
@@ -11827,6 +13659,7 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
   static std::optional<CXXTemporaryObjectExpr> from(const Expr &parent);
   static std::optional<CXXTemporaryObjectExpr> from(const ValueStmt &parent);
   static std::optional<CXXTemporaryObjectExpr> from(const Stmt &parent);
+  Type type_source_info(void) const;
 };
 
 using CXXBoolLiteralExprRange = DerivedEntityRange<StmtIterator, CXXBoolLiteralExpr>;
@@ -11917,6 +13750,7 @@ class BlockExpr : public Expr {
   BlockDecl block_declaration(void) const;
   Stmt body(void) const;
   Token caret_token(void) const;
+  FunctionProtoType function_type(void) const;
 };
 
 using BinaryOperatorRange = DerivedEntityRange<StmtIterator, BinaryOperator>;
@@ -11994,6 +13828,8 @@ class CompoundAssignOperator : public BinaryOperator {
   static std::optional<CompoundAssignOperator> from(const Expr &parent);
   static std::optional<CompoundAssignOperator> from(const ValueStmt &parent);
   static std::optional<CompoundAssignOperator> from(const Stmt &parent);
+  Type computation_lhs_type(void) const;
+  Type computation_result_type(void) const;
 };
 
 using AtomicExprRange = DerivedEntityRange<StmtIterator, AtomicExpr>;
@@ -12031,6 +13867,7 @@ class AtomicExpr : public Expr {
   std::optional<Expr> scope(void) const;
   std::optional<Expr> value1(void) const;
   std::optional<Expr> value2(void) const;
+  Type value_type(void) const;
   std::optional<Expr> weak(void) const;
   bool is_cmp_x_chg(void) const;
   bool is_open_cl(void) const;
@@ -12096,6 +13933,8 @@ class ArrayTypeTraitExpr : public Expr {
   static std::optional<ArrayTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
   Expr dimension_expression(void) const;
+  Type queried_type(void) const;
+  Type queried_type_source_info(void) const;
   ArrayTypeTrait trait(void) const;
 };
 
@@ -12347,6 +14186,7 @@ class VAArgExpr : public Expr {
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
   Expr sub_expression(void) const;
+  Type written_type_info(void) const;
   bool is_microsoft_abi(void) const;
 };
 
@@ -12416,8 +14256,11 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   static std::optional<UnaryExprOrTypeTraitExpr> from(const ValueStmt &parent);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Stmt &parent);
   std::optional<Expr> argument_expression(void) const;
+  std::optional<Type> argument_type(void) const;
+  std::optional<Type> argument_type_info(void) const;
   Token operator_token(void) const;
   Token r_paren_token(void) const;
+  Type type_of_argument(void) const;
   bool is_argument_type(void) const;
 };
 
@@ -12477,6 +14320,7 @@ class TypeTraitExpr : public Expr {
   static std::optional<TypeTraitExpr> from(const Stmt &parent);
   TypeTrait trait(void) const;
   std::optional<bool> value(void) const;
+  std::vector<Type> arguments(void) const;
 };
 
 using SubstNonTypeTemplateParmPackExprRange = DerivedEntityRange<StmtIterator, SubstNonTypeTemplateParmPackExpr>;
@@ -12537,6 +14381,7 @@ class SubstNonTypeTemplateParmExpr : public Expr {
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent);
   Token name_token(void) const;
   NonTypeTemplateParmDecl parameter(void) const;
+  Type parameter_type(void) const;
   Expr replacement(void) const;
   bool is_reference_parameter(void) const;
 };
@@ -12738,6 +14583,7 @@ class SYCLUniqueStableNameExpr : public Expr {
   Token l_paren_token(void) const;
   Token token(void) const;
   Token r_paren_token(void) const;
+  Type type_source_info(void) const;
 };
 
 using RequiresExprRange = DerivedEntityRange<StmtIterator, RequiresExpr>;
@@ -13023,6 +14869,7 @@ class UnresolvedMemberExpr : public OverloadExpr {
   static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
   static std::optional<UnresolvedMemberExpr> from(const Stmt &parent);
   Expr base(void) const;
+  Type base_type(void) const;
   Token member_token(void) const;
   Token operator_token(void) const;
   bool has_unresolved_using(void) const;
@@ -13121,6 +14968,7 @@ class OffsetOfExpr : public Expr {
   static std::optional<OffsetOfExpr> from(const Stmt &parent);
   Token operator_token(void) const;
   Token r_paren_token(void) const;
+  Type type_source_info(void) const;
 };
 
 using ObjCSubscriptRefExprRange = DerivedEntityRange<StmtIterator, ObjCSubscriptRefExpr>;
@@ -13281,6 +15129,8 @@ class ObjCPropertyRefExpr : public Expr {
   ObjCMethodDecl implicit_property_setter(void) const;
   Token token(void) const;
   Token receiver_token(void) const;
+  Type receiver_type(void) const;
+  Type super_receiver_type(void) const;
   bool is_class_receiver(void) const;
   bool is_explicit_property(void) const;
   bool is_implicit_property(void) const;
@@ -13317,6 +15167,9 @@ class ObjCMessageExpr : public Expr {
   static std::optional<ObjCMessageExpr> from(const ValueStmt &parent);
   static std::optional<ObjCMessageExpr> from(const Stmt &parent);
   std::vector<Expr> arguments(void) const;
+  Type call_return_type(void) const;
+  Type class_receiver(void) const;
+  Type class_receiver_type_info(void) const;
   Expr instance_receiver(void) const;
   Token left_token(void) const;
   ObjCMethodDecl method_declaration(void) const;
@@ -13324,9 +15177,11 @@ class ObjCMessageExpr : public Expr {
   ObjCInterfaceDecl receiver_interface(void) const;
   ObjCMessageExprReceiverKind receiver_kind(void) const;
   TokenRange receiver_range(void) const;
+  Type receiver_type(void) const;
   Token right_token(void) const;
   Token selector_start_token(void) const;
   Token super_token(void) const;
+  Type super_type(void) const;
   bool is_class_message(void) const;
   bool is_delegate_initializer_call(void) const;
   bool is_implicit(void) const;
@@ -13458,6 +15313,8 @@ class ObjCEncodeExpr : public Expr {
   static std::optional<ObjCEncodeExpr> from(const ValueStmt &parent);
   static std::optional<ObjCEncodeExpr> from(const Stmt &parent);
   Token at_token(void) const;
+  Type encoded_type(void) const;
+  Type encoded_type_source_info(void) const;
   Token r_paren_token(void) const;
 };
 
@@ -14552,6 +16409,8 @@ class Decl {
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -14565,7 +16424,7 @@ class Decl {
   }
 
   inline static std::optional<Decl> from(const TokenContext &c) {
-    return c.as_decl();
+    return c.as_declaration();
   }
 
   std::optional<Decl> parent_declaration(void) const;
@@ -14587,7 +16446,6 @@ class Decl {
   static DeclContainingDeclRange containing(const Stmt &stmt);
 
   AccessSpecifier access(void) const;
-  AccessSpecifier access_unsafe(void) const;
   AvailabilityResult availability(void) const;
   Token begin_token(void) const;
   Token body_r_brace(void) const;
@@ -14595,6 +16453,7 @@ class Decl {
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   Token end_token(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
+  std::optional<FunctionType> function_type(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
   Decl most_recent_declaration(void) const;
   std::optional<Decl> next_declaration_in_context(void) const;
@@ -14717,6 +16576,7 @@ class BlockDecl : public Decl {
   std::optional<Decl> block_mangling_context_declaration(void) const;
   Token caret_token(void) const;
   CompoundStmt compound_body(void) const;
+  Type signature_as_written(void) const;
   bool has_captures(void) const;
   bool is_conversion_from_lambda(void) const;
   bool is_variadic(void) const;
@@ -15201,6 +17061,7 @@ class ValueDecl : public NamedDecl {
   static std::optional<ValueDecl> from(const TokenContext &c);
   static std::optional<ValueDecl> from(const NamedDecl &parent);
   static std::optional<ValueDecl> from(const Decl &parent);
+  Type type(void) const;
   bool is_weak(void) const;
 };
 
@@ -15418,6 +17279,7 @@ class DeclaratorDecl : public ValueDecl {
   Token inner_token_start(void) const;
   Token outer_token_start(void) const;
   std::optional<Expr> trailing_requires_clause(void) const;
+  Type type_source_info(void) const;
   Token type_spec_end_token(void) const;
   Token type_spec_start_token(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;
@@ -15535,6 +17397,7 @@ class ParmVarDecl : public VarDecl {
   std::optional<Expr> default_argument(void) const;
   TokenRange default_argument_range(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
+  Type original_type(void) const;
   std::optional<Expr> uninstantiated_default_argument(void) const;
   bool has_default_argument(void) const;
   bool has_inherited_default_argument(void) const;
@@ -15678,6 +17541,7 @@ class VarTemplateSpecializationDecl : public VarDecl {
   std::vector<TemplateArgument> template_arguments(void) const;
   std::vector<TemplateArgument> template_instantiation_arguments(void) const;
   Token template_keyword_token(void) const;
+  Type type_as_written(void) const;
   bool is_class_scope_explicit_specialization(void) const;
   bool is_explicit_instantiation_or_specialization(void) const;
   bool is_explicit_specialization(void) const;
@@ -15753,6 +17617,8 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool has_placeholder_type_constraint(void) const;
   bool is_expanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
+  std::vector<Type> expansion_types(void) const;
+  std::vector<Type> expansion_type_source_infos(void) const;
 };
 
 using MSPropertyDeclRange = DerivedEntityRange<DeclIterator, MSPropertyDecl>;
@@ -15817,7 +17683,9 @@ class FunctionDecl : public DeclaratorDecl {
   static std::optional<FunctionDecl> from(const Decl &parent);
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
   bool does_this_declaration_have_a_body(void) const;
+  Type call_result_type(void) const;
   ConstexprSpecKind constexpr_kind(void) const;
+  Type declared_return_type(void) const;
   std::optional<FunctionDecl> definition(void) const;
   Token ellipsis_token(void) const;
   TokenRange exception_spec_source_range(void) const;
@@ -15829,6 +17697,7 @@ class FunctionDecl : public DeclaratorDecl {
   OverloadedOperatorKind overloaded_operator(void) const;
   TokenRange parameters_source_range(void) const;
   Token point_of_instantiation(void) const;
+  Type return_type(void) const;
   TokenRange return_type_source_range(void) const;
   StorageClass storage_class(void) const;
   std::optional<FunctionDecl> template_instantiation_pattern(void) const;
@@ -15922,6 +17791,8 @@ class CXXMethodDecl : public FunctionDecl {
   static std::optional<CXXMethodDecl> from(const Decl &parent);
   CXXRecordDecl parent(void) const;
   RefQualifierKind reference_qualifier(void) const;
+  Type this_object_type(void) const;
+  Type this_type(void) const;
   bool has_inline_body(void) const;
   bool is_const(void) const;
   bool is_copy_assignment_operator(void) const;
@@ -16001,6 +17872,7 @@ class CXXConversionDecl : public CXXMethodDecl {
   static std::optional<CXXConversionDecl> from(const ValueDecl &parent);
   static std::optional<CXXConversionDecl> from(const NamedDecl &parent);
   static std::optional<CXXConversionDecl> from(const Decl &parent);
+  Type conversion_type(void) const;
   bool is_explicit(void) const;
   bool is_lambda_to_block_pointer_conversion(void) const;
 };
@@ -16109,6 +17981,7 @@ class FieldDecl : public DeclaratorDecl {
   static std::optional<FieldDecl> from(const NamedDecl &parent);
   static std::optional<FieldDecl> from(const Decl &parent);
   std::optional<Expr> bit_width(void) const;
+  std::optional<VariableArrayType> captured_vla_type(void) const;
   InClassInitStyle in_class_initializer_style(void) const;
   std::optional<Expr> in_class_initializer(void) const;
   RecordDecl parent(void) const;
@@ -16454,6 +18327,7 @@ class TypeDecl : public NamedDecl {
   static std::optional<TypeDecl> from(const TokenContext &c);
   static std::optional<TypeDecl> from(const NamedDecl &parent);
   static std::optional<TypeDecl> from(const Decl &parent);
+  std::optional<Type> type_for_declaration(void) const;
 };
 
 using TemplateTypeParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTypeParmDecl>;
@@ -16483,6 +18357,8 @@ class TemplateTypeParmDecl : public TypeDecl {
   static std::optional<TemplateTypeParmDecl> from(const NamedDecl &parent);
   static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
   bool default_argument_was_inherited(void) const;
+  Type default_argument(void) const;
+  Type default_argument_info(void) const;
   Token default_argument_token(void) const;
   bool has_default_argument(void) const;
   bool has_type_constraint(void) const;
@@ -16636,6 +18512,7 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<Decl> lambda_context_declaration(void) const;
   std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
   std::optional<unsigned> lambda_mangling_number(void) const;
+  std::optional<Type> lambda_type_info(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
   std::optional<unsigned> num_bases(void) const;
@@ -16776,6 +18653,7 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   std::vector<TemplateArgument> template_arguments(void) const;
   std::vector<TemplateArgument> template_instantiation_arguments(void) const;
   Token template_keyword_token(void) const;
+  Type type_as_written(void) const;
   bool is_class_scope_explicit_specialization(void) const;
   bool is_explicit_instantiation_or_specialization(void) const;
   bool is_explicit_specialization(void) const;
@@ -16847,8 +18725,11 @@ class EnumDecl : public TagDecl {
   static std::optional<EnumDecl> from(const Decl &parent);
   std::vector<EnumConstantDecl> enumerators(void) const;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
+  std::optional<Type> integer_type(void) const;
   TokenRange integer_type_range(void) const;
+  std::optional<Type> integer_type_source_info(void) const;
   std::optional<unsigned> odr_hash(void) const;
+  Type promotion_type(void) const;
   std::optional<EnumDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;
   bool is_closed(void) const;
@@ -16919,6 +18800,8 @@ class TypedefNameDecl : public TypeDecl {
   static std::optional<TypedefNameDecl> from(const NamedDecl &parent);
   static std::optional<TypedefNameDecl> from(const Decl &parent);
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;
+  Type type_source_info(void) const;
+  Type underlying_type(void) const;
   bool is_moded(void) const;
   bool is_transparent_tag(void) const;
 };
@@ -17312,6 +19195,8 @@ class ObjCPropertyDecl : public NamedDecl {
   ObjCPropertyDeclSetterKind setter_kind(void) const;
   ObjCMethodDecl setter_method_declaration(void) const;
   Token setter_name_token(void) const;
+  Type type(void) const;
+  Type type_source_info(void) const;
   bool is_atomic(void) const;
   bool is_class_property(void) const;
   bool is_direct_property(void) const;
@@ -17354,6 +19239,8 @@ class ObjCMethodDecl : public NamedDecl {
   ObjCMethodDeclImplementationControl implementation_control(void) const;
   ObjCMethodFamily method_family(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
+  Type return_type(void) const;
+  Type return_type_source_info(void) const;
   TokenRange return_type_source_range(void) const;
   Token selector_start_token(void) const;
   ImplicitParamDecl self_declaration(void) const;
@@ -17520,8 +19407,11 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   Token end_of_definition_token(void) const;
   ObjCImplementationDecl implementation(void) const;
   std::string_view obj_c_runtime_name_as_string(void) const;
-  ObjCInterfaceDecl super_class(void) const;
+  std::optional<ObjCInterfaceDecl> super_class(void) const;
   Token super_class_token(void) const;
+  std::optional<Type> super_class_type_info(void) const;
+  std::optional<ObjCObjectType> super_class_type(void) const;
+  Type type_for_declaration(void) const;
   bool has_definition(void) const;
   bool has_designated_initializers(void) const;
   bool is_arc_weakref_unavailable(void) const;
@@ -17847,6 +19737,7 @@ class FriendDecl : public Decl {
   static std::optional<FriendDecl> from(const Decl &parent);
   std::optional<NamedDecl> friend_declaration(void) const;
   Token friend_token(void) const;
+  Type friend_type(void) const;
   bool is_unsupported_friend(void) const;
   std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const;
 };
@@ -17954,6 +19845,124 @@ class EmptyDecl : public Decl {
   static std::optional<EmptyDecl> from(const TokenContext &c);
   static std::optional<EmptyDecl> from(const Decl &parent);
 };
+
+static_assert(sizeof(TemplateTypeParmType) == sizeof(Type));
+
+static_assert(sizeof(TemplateSpecializationType) == sizeof(Type));
+
+static_assert(sizeof(TagType) == sizeof(Type));
+
+static_assert(sizeof(RecordType) == sizeof(TagType));
+
+static_assert(sizeof(EnumType) == sizeof(TagType));
+
+static_assert(sizeof(SubstTemplateTypeParmType) == sizeof(Type));
+
+static_assert(sizeof(SubstTemplateTypeParmPackType) == sizeof(Type));
+
+static_assert(sizeof(ReferenceType) == sizeof(Type));
+
+static_assert(sizeof(RValueReferenceType) == sizeof(ReferenceType));
+
+static_assert(sizeof(LValueReferenceType) == sizeof(ReferenceType));
+
+static_assert(sizeof(PointerType) == sizeof(Type));
+
+static_assert(sizeof(PipeType) == sizeof(Type));
+
+static_assert(sizeof(ParenType) == sizeof(Type));
+
+static_assert(sizeof(PackExpansionType) == sizeof(Type));
+
+static_assert(sizeof(ObjCTypeParamType) == sizeof(Type));
+
+static_assert(sizeof(ObjCObjectType) == sizeof(Type));
+
+static_assert(sizeof(ObjCInterfaceType) == sizeof(ObjCObjectType));
+
+static_assert(sizeof(ObjCObjectPointerType) == sizeof(Type));
+
+static_assert(sizeof(MemberPointerType) == sizeof(Type));
+
+static_assert(sizeof(MatrixType) == sizeof(Type));
+
+static_assert(sizeof(DependentSizedMatrixType) == sizeof(MatrixType));
+
+static_assert(sizeof(ConstantMatrixType) == sizeof(MatrixType));
+
+static_assert(sizeof(MacroQualifiedType) == sizeof(Type));
+
+static_assert(sizeof(InjectedClassNameType) == sizeof(Type));
+
+static_assert(sizeof(FunctionType) == sizeof(Type));
+
+static_assert(sizeof(FunctionProtoType) == sizeof(FunctionType));
+
+static_assert(sizeof(FunctionNoProtoType) == sizeof(FunctionType));
+
+static_assert(sizeof(ExtIntType) == sizeof(Type));
+
+static_assert(sizeof(DependentVectorType) == sizeof(Type));
+
+static_assert(sizeof(DependentSizedExtVectorType) == sizeof(Type));
+
+static_assert(sizeof(DependentExtIntType) == sizeof(Type));
+
+static_assert(sizeof(DependentAddressSpaceType) == sizeof(Type));
+
+static_assert(sizeof(DeducedType) == sizeof(Type));
+
+static_assert(sizeof(DeducedTemplateSpecializationType) == sizeof(DeducedType));
+
+static_assert(sizeof(AutoType) == sizeof(DeducedType));
+
+static_assert(sizeof(DecltypeType) == sizeof(Type));
+
+static_assert(sizeof(ComplexType) == sizeof(Type));
+
+static_assert(sizeof(BuiltinType) == sizeof(Type));
+
+static_assert(sizeof(BlockPointerType) == sizeof(Type));
+
+static_assert(sizeof(AttributedType) == sizeof(Type));
+
+static_assert(sizeof(AtomicType) == sizeof(Type));
+
+static_assert(sizeof(ArrayType) == sizeof(Type));
+
+static_assert(sizeof(VariableArrayType) == sizeof(ArrayType));
+
+static_assert(sizeof(IncompleteArrayType) == sizeof(ArrayType));
+
+static_assert(sizeof(DependentSizedArrayType) == sizeof(ArrayType));
+
+static_assert(sizeof(ConstantArrayType) == sizeof(ArrayType));
+
+static_assert(sizeof(AdjustedType) == sizeof(Type));
+
+static_assert(sizeof(DecayedType) == sizeof(AdjustedType));
+
+static_assert(sizeof(TypeWithKeyword) == sizeof(Type));
+
+static_assert(sizeof(ElaboratedType) == sizeof(TypeWithKeyword));
+
+static_assert(sizeof(DependentTemplateSpecializationType) == sizeof(TypeWithKeyword));
+
+static_assert(sizeof(DependentNameType) == sizeof(TypeWithKeyword));
+
+static_assert(sizeof(VectorType) == sizeof(Type));
+
+static_assert(sizeof(ExtVectorType) == sizeof(VectorType));
+
+static_assert(sizeof(UnresolvedUsingType) == sizeof(Type));
+
+static_assert(sizeof(UnaryTransformType) == sizeof(Type));
+
+static_assert(sizeof(TypedefType) == sizeof(Type));
+
+static_assert(sizeof(TypeOfType) == sizeof(Type));
+
+static_assert(sizeof(TypeOfExprType) == sizeof(Type));
 
 static_assert(sizeof(SEHTryStmt) == sizeof(Stmt));
 

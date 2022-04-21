@@ -16,6 +16,7 @@
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Stmt.h>
+#include <pasta/AST/Type.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
 #include <pasta/Compile/Job.h>
@@ -38,6 +39,7 @@
 static const std::unordered_set<std::string> gAbstractTypes{
   PASTA_FOR_EACH_DECL_IMPL(IGNORE, STR_NAME)
   PASTA_FOR_EACH_STMT_IMPL(IGNORE, IGNORE, IGNORE, IGNORE, IGNORE, STR_NAME)
+  PASTA_FOR_EACH_TYPE_IMPL(IGNORE, STR_NAME)
 };
 
 static const std::unordered_set<std::string> gUnserializableTypes{
@@ -77,7 +79,7 @@ static const std::unordered_set<std::string> gStmtNames{
 };
 
 static const std::unordered_set<std::string> gTypeNames{
-//  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
+  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
 };
 
 #define FRAGMENT_NON_REF_TYPES \
@@ -143,7 +145,7 @@ static const std::unordered_set<std::string> gConcreteClassNames{
   NON_REF_TYPES,
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
-//  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, IGNORE)
+  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, IGNORE)
 };
 
 static const std::unordered_set<std::string> gEntityClassNames{
@@ -151,6 +153,7 @@ static const std::unordered_set<std::string> gEntityClassNames{
   "FileToken",
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, STR_NAME)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME)
+  PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
 };
 
 // These methods can trigger asserts deep in their internals that are hard
@@ -196,6 +199,7 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"CXXRecordDecl", "DefaultedDestructorIsConstexpr"},
   {"CXXRecordDecl", "DefaultedDestructorIsDeleted"},
   {"CXXRecordDecl", "DefaultedMoveConstructorIsDeleted"},
+  {"Type", "ObjCSubstitutions"},
 
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
@@ -446,6 +450,14 @@ static const char *CxxIntType(pasta::Type type) {
   return nullptr;
 }
 
+static const char *CxxIntType(std::optional<pasta::Type> type) {
+  if (type) {
+    return CxxIntType(std::move(type.value()));
+  } else {
+    return nullptr;
+  }
+}
+
 static const char *SchemaIntType(pasta::Type type) {
   auto t = type;
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
@@ -518,6 +530,7 @@ class CodeGenerator {
 
   AnyEntityStorage root_decl_storage;
   AnyEntityStorage root_stmt_storage;
+  AnyEntityStorage root_type_storage;
   AnyEntityStorage root_pseudo_storage;
   std::unordered_map<ClassHierarchy *, SpecificEntityStorage> specific_storage;
 
@@ -546,6 +559,8 @@ class CodeGenerator {
 
 void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   auto enum_name = enum_decl.Name();
+
+  // NOTE(pag): We fold these into `TokenKind`.
   if (enum_name == "TokenRole" || enum_name == "ObjCKeywordKind" ||
       enum_name == "PPKeywordKind") {
     return;
@@ -556,6 +571,8 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   auto itype = CxxIntType(enum_decl.IntegerType());
 
   auto &types = enum_type[enum_name];
+
+  // Try to find the smallest type to rerpesent this enum.
   if (static_cast<uint8_t>(num_enumerators) == num_enumerators) {
     types.first = "unsigned char";
     types.second = "UInt8";
@@ -565,6 +582,11 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   }
 
   include_h_os << "enum class " << enum_name << " : " << types.first << " {\n";
+
+  // Generate a `switch` to convert from PASTA, as PASTA's version of enums
+  // have the same initializer values as Clang does, but in Multiplier, we use
+  // default initializers (starting from 0 to `num_enumerators`), and so we need
+  // a `switch` to do the mapping.
   lib_cpp_os
       << enum_name << " FromPasta(pasta::" << enum_name << " e) {\n"
       << "  switch (static_cast<";
@@ -961,6 +983,11 @@ void CodeGenerator::RunOnOptional(
       lib_cpp_os
           << "    return fragment->StmtFor(fragment, id);\n";
 
+    } else if (*element_name == "Type") {
+      lib_cpp_os
+          << "    return fragment->TypeFor(fragment, id);\n";
+
+
     } else if (gDeclNames.count(*element_name)) {
       lib_cpp_os
           << "    return " << (*element_name)
@@ -970,6 +997,11 @@ void CodeGenerator::RunOnOptional(
       lib_cpp_os
           << "    return " << (*element_name)
           << "::from(fragment->StmtFor(fragment, id));\n";
+
+    } else if (gTypeNames.count(*element_name)) {
+      lib_cpp_os
+          << "    return " << (*element_name)
+          << "::from(fragment->TypeFor(fragment, id));\n";
 
     } else {
       std::cerr << "??? optional element_name=" << (*element_name) << '\n';
@@ -1032,6 +1064,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
 
   if (!element_name) {
     if (optional) {
+      std::cerr << "no optional element name?\n";
       abort();
     }
 
@@ -1054,6 +1087,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
     }
 
   } else if (gNotReferenceTypes.count(element_name.value())) {
+    std::cerr << element_name.value() << " not a reference type?\n";
     abort();
 //          capn_element_name = element_name.value();
 //          cxx_element_name = element_name.value();
@@ -1108,7 +1142,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
       << "  vec.reserve(list.size());\n"
       << "  for (auto v : list) {\n";
 
-  serialize_cpp_os << "do {\n";
+  serialize_cpp_os << "  do {\n";
 
   if (optional) {
     serialize_cpp_os
@@ -1180,6 +1214,10 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
       lib_cpp_os
           << "    vec.emplace_back(fragment->StmtFor(fragment, id));\n";
 
+    } else if (*element_name == "Type") {
+      lib_cpp_os
+          << "    vec.emplace_back(fragment->TypeFor(fragment, id));\n";
+
     } else if (gDeclNames.count(*element_name)) {
       lib_cpp_os
           << "    if (auto e = " << (*element_name)
@@ -1191,6 +1229,13 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
       lib_cpp_os
           << "    if (auto e = " << (*element_name)
           << "::from(fragment->StmtFor(fragment, id))) {\n"
+          << "      vec.emplace_back(std::move(*e));\n"
+          << "    }\n";
+
+    } else if (gTypeNames.count(*element_name)) {
+      lib_cpp_os
+          << "    if (auto e = " << (*element_name)
+          << "::from(fragment->TypeFor(fragment, id))) {\n"
           << "      vec.emplace_back(std::move(*e));\n"
           << "    }\n";
 
@@ -1227,8 +1272,11 @@ MethodListPtr CodeGenerator::RunOnClass(
   auto seen_methods = std::make_shared<MethodList>(*parent_methods);
   auto class_name = cls->record.Name();
 
+  std::cerr << "Running on " << class_name << '\n';
+
   const auto is_decl = gDeclNames.count(class_name);
   const auto is_stmt = gStmtNames.count(class_name);
+  const auto is_type = gTypeNames.count(class_name);
 
   if (cls->base) {
     specific_storage.try_emplace(cls, specific_storage.find(cls->base)->second);
@@ -1236,6 +1284,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     specific_storage.try_emplace(cls, root_decl_storage);
   } else if (is_stmt) {
     specific_storage.try_emplace(cls, root_stmt_storage);
+  } else if (is_type) {
+    specific_storage.try_emplace(cls, root_type_storage);
   } else {
     specific_storage.try_emplace(cls, root_pseudo_storage);
   }
@@ -1291,6 +1341,25 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthStmt";
 
+  } else if (is_type) {
+    include_h_os
+        << "using " << class_name
+        << "Range = DerivedEntityRange<TypeIterator, " << class_name
+        << ">;\n"
+        << "using " << class_name
+        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
+        << class_name << ">;\n";
+
+    serialize_cpp_os
+        << "void Serialize" << class_name
+        << "(EntitySerializer &es, mx::ast::Type::Builder b, const pasta::"
+        << class_name << " &e) {\n"
+        << "  (void) es;\n"
+        << "  (void) b;\n"
+        << "  (void) e;\n";
+
+    nth_entity_reader = "NthType";
+
   } else {
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -1344,10 +1413,14 @@ MethodListPtr CodeGenerator::RunOnClass(
   // are derived from entities in fragments, and link to entities in fragments,
   // and so we need to carry around a fragment pointer.
   } else if (class_name == "Decl" || class_name == "Stmt" ||
+             class_name == "Type" ||
              gNotReferenceTypesRelatedToEntities.count(class_name)) {
     unsigned cd = 0;  // Containing decl.
     unsigned cs = 0;  // Containing stmt.
 
+    // Keep track of containing/parent decl/stmt. We don't have this for types
+    // because they are deduplicated under-the-hood, and not specific to any
+    // one location (that's `clang::TypeLoc`, which PASTA doesn't represent).
     if (class_name == "Decl" || class_name == "Stmt") {
       cd = storage.AddMethod("UInt64");  // Reference.
       cs = storage.AddMethod("UInt64");  // Reference.
@@ -1389,6 +1462,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  friend class Stmt;\n"
         << "  friend class StmtIterator;\n"
         << "  friend class TokenContext;\n"
+        << "  friend class Type;\n"
+        << "  friend class TypeIterator;\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset;\n\n"
         << " public:\n"
@@ -1403,7 +1478,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return self;\n"
           << "  }\n\n"
           << "  inline static std::optional<Decl> from(const TokenContext &c) {\n"
-          << "    return c.as_decl();\n"
+          << "    return c.as_declaration();\n"
           << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n\n"
@@ -1417,20 +1492,34 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return self;\n"
           << "  }\n\n"
           << "  inline static std::optional<Stmt> from(const TokenContext &c) {\n"
-          << "    return c.as_stmt();\n"
+          << "    return c.as_statement();\n"
           << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
+
+    } else if (class_name == "Type") {
+      include_h_os
+          << "  inline static std::optional<Type> from(const Type &self) {\n"
+          << "    return self;\n"
+          << "  }\n\n"
+          << "  inline static std::optional<Type> from(const TokenContext &c) {\n"
+          << "    return c.as_type();\n"
+          << "  }\n\n"
+          << " protected:\n"
+          << "  static TypeIterator in_internal(const Fragment &fragment);\n\n"
+          << " public:\n";
     }
 
   } else if (gEntityClassNames.count(class_name)) {
+    std::cerr << class_name << " is an entity class?\n";
     abort();
 
   // Hrmm... Not sure what to put as the data for a non-entity.
   } else {
+    std::cerr << class_name << " is not an entity class?\n";
     abort();
 //    include_h_os
 //        << " {\n"
@@ -1438,8 +1527,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 //        << "  std::shared_ptr<ast::" << class_name << "> data;\n\n";
   }
 
-  // TODO(pag): Types.
-  if (is_decl || is_stmt) {
+  if (is_decl || is_stmt || is_type) {
     include_h_os
         << "  inline static " << class_name
         << "Range in(const Fragment &frag) {\n"
@@ -1483,6 +1571,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "::containing(const Stmt &stmt) {\n"
           << "  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());\n"
           << "}\n\n";
+    } else if (is_type) {
+
     }
 
     if (is_decl && class_name != "Decl") {
@@ -1492,7 +1582,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << "std::optional<" << class_name
           << "> " << class_name << "::from(const TokenContext &c) {\n"
-          << "  if (auto d = c.as_decl()) {\n"
+          << "  if (auto d = c.as_declaration()) {\n"
           << "    return from(*d);\n"
           << "  } else {\n"
           << "    return std::nullopt;\n"
@@ -1507,7 +1597,22 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << "std::optional<" << class_name
           << "> " << class_name << "::from(const TokenContext &c) {\n"
-          << "  if (auto d = c.as_stmt()) {\n"
+          << "  if (auto d = c.as_statement()) {\n"
+          << "    return from(*d);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n";
+
+    } else if (is_type && class_name != "Type") {
+      include_h_os
+          << "  static std::optional<" << class_name
+          << "> from(const TokenContext &c);\n";
+
+      lib_cpp_os
+          << "std::optional<" << class_name
+          << "> " << class_name << "::from(const TokenContext &c) {\n"
+          << "  if (auto d = c.as_type()) {\n"
           << "    return from(*d);\n"
           << "  } else {\n"
           << "    return std::nullopt;\n"
@@ -1529,7 +1634,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "::from(const " << grand_parent_class_name << " &parent) {\n";
 
     if (grand_parent_class_name != "Decl" &&
-        grand_parent_class_name != "Stmt") {
+        grand_parent_class_name != "Stmt" &&
+        grand_parent_class_name != "Type") {
       if (gDeclNames.count(grand_parent_class_name)) {
         lib_cpp_os
             << "  return from(reinterpret_cast<const Decl &>(parent));\n"
@@ -1540,7 +1646,15 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  return from(reinterpret_cast<const Stmt &>(parent));\n"
             << "}\n\n";
 
+      } else if (gTypeNames.count(grand_parent_class_name)) {
+        lib_cpp_os
+            << "  return from(reinterpret_cast<const Type &>(parent));\n"
+            << "}\n\n";
+
       } else {
+        std::cerr
+            << "::from on " << class_name << " with grand parent "
+            << grand_parent_class_name << "\n";
         abort();
       }
       continue;
@@ -1564,10 +1678,10 @@ MethodListPtr CodeGenerator::RunOnClass(
       }
 
       if (grand_parent_class_name == "Decl") {
-        grand_child_class_name.pop_back();
-        grand_child_class_name.pop_back();
-        grand_child_class_name.pop_back();
-        grand_child_class_name.pop_back();
+        grand_child_class_name.pop_back();  // `l`
+        grand_child_class_name.pop_back();  // `c`
+        grand_child_class_name.pop_back();  // `e`
+        grand_child_class_name.pop_back();  // `D`
         lib_cpp_os
             << "    case mx::DeclKind::";
 
@@ -1575,7 +1689,18 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "    case mx::StmtKind::";
 
+      } else if (grand_parent_class_name == "Type"){
+        grand_child_class_name.pop_back();  // `e`
+        grand_child_class_name.pop_back();  // `p`
+        grand_child_class_name.pop_back();  // `y`
+        grand_child_class_name.pop_back();  // `T`
+        lib_cpp_os
+            << "    case mx::TypeKind::";
+
       } else {
+        std::cerr
+            << "switch on parent kind of " << class_name
+            << " with grand parent " << grand_parent_class_name << "\n";
         abort();
       }
 
@@ -1827,11 +1952,15 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         if (record_name == "Decl") {
           lib_cpp_os
-              << "  return Decl(fragment->DeclFor(fragment, id));\n";
+              << "  return fragment->DeclFor(fragment, id);\n";
 
         } else if (record_name == "Stmt") {
           lib_cpp_os
-              << "  return Stmt(fragment->StmtFor(fragment, id));\n";
+              << "  return fragment->StmtFor(fragment, id);\n";
+
+        } else if (record_name == "Type") {
+          lib_cpp_os
+              << "  return fragment->TypeFor(fragment, id);\n";
 
         } else if (gDeclNames.count(record_name)) {
           lib_cpp_os
@@ -1842,6 +1971,11 @@ MethodListPtr CodeGenerator::RunOnClass(
           lib_cpp_os
               << "  return " << record_name
               << "::from(fragment->StmtFor(fragment, id)).value();\n";
+
+        } else if (gTypeNames.count(record_name)) {
+          lib_cpp_os
+              << "  return " << record_name
+              << "::from(fragment->TypeFor(fragment, id)).value();\n";
 
         } else {
           std::cerr << "??? record " << record_name << '\n';
@@ -1875,6 +2009,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "(es, es.pseudo_builder[o" << i << "], e" << i << ");\n";
 
       } else if (gNotReferenceTypes.count(record_name)) {
+        std::cerr << "unhandled record " << record_name << "\n";
         abort();
 //        const auto i = storage.AddMethod(record_name);
 //        auto [getter_name, setter_name, init_name] = NamesFor(i);
@@ -2046,13 +2181,6 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "namespace indexer {\n\n"
       << "void EntitySerializer::SerializeCodeEntities(\n"
       << "    PendingFragment code, FragmentBuilder &builder) {\n"
-      << "  serialized_entities.clear();\n"
-      << "  code_id = code.fragment_id;\n"
-      << "  next_pseudo_entity_offset = 0;\n"
-      << "  parent_decl_id = mx::kInvalidEntityId;\n"
-      << "  parent_stmt_id = mx::kInvalidEntityId;\n"
-      << "  current_decl_id = mx::kInvalidEntityId;\n"
-      << "  current_stmt_id = mx::kInvalidEntityId;\n"
       << "  decl_builder = builder.initDeclarations(code.num_decl_entities);\n"
       << "  stmt_builder = builder.initStatements(code.num_stmt_entities);\n"
       << "  pseudo_builder = builder.initOthers(code.num_pseudo_entities);\n";
@@ -2163,10 +2291,10 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "  for (const pasta::Decl &decl : code.decls) {\n"
       << "    this->DeclVisitor::Accept(decl);\n"
       << "  }\n"
+      << "  this->SerializeTypes(builder);\n"
       << "}\n\n";
 
   for (const pasta::CXXRecordDecl &record : types) {
-    abort();  // Not handled yet!
     auto name = record.Name();
     include_h_os
         << "class " << name << ";\n";
@@ -2221,6 +2349,15 @@ int CodeGenerator::RunOnClassHierarchies(void) {
 
   i = 0u;
   for (const auto &[type, ids] : root_stmt_storage.max_method_count) {
+    for (auto id : ids) {
+      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
+    }
+  }
+  schema_os
+      << "}\n\n"
+      << NameAndHash("struct Type") << " {\n";
+  i = 0u;
+  for (const auto &[type, ids] : root_type_storage.max_method_count) {
     for (auto id : ids) {
       schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
     }
@@ -2308,9 +2445,9 @@ int CodeGenerator::RunOnNamespaces(void) {
     std::cerr << "Could not locate any statements.\n";
     return EXIT_FAILURE;
 
-//  } else if (types.empty()) {
-//    std::cerr << "Could not locate any types.\n";
-//    return EXIT_FAILURE;
+  } else if (types.empty()) {
+    std::cerr << "Could not locate any types.\n";
+    return EXIT_FAILURE;
 
   } else if (tokens.empty()) {
     std::cerr << "Could not locate pasta::Token.\n";

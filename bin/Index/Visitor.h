@@ -13,6 +13,7 @@
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Token.h>
+#include <pasta/AST/Type.h>
 #include <unordered_map>
 #include <unordered_set>
 

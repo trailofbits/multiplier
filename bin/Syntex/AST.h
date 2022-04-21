@@ -19,9 +19,11 @@ class Decl;
 class Fragment;
 class Stmt;
 class Token;
+class Type;
 enum class DeclKind : unsigned char;
 enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
+enum class TypeKind : unsigned char;
 }  // namespace mx
 namespace syntex {
 
@@ -40,6 +42,7 @@ class ASTNode {
     kFragment,
     kDeclKind,
     kStmtKind,
+    kTypeKind,
     kTokenKind,
   } kind;
 
@@ -59,6 +62,7 @@ class ASTNode {
   ASTNode(const mx::Fragment &fragment);
   ASTNode(const mx::Decl &decl);
   ASTNode(const mx::Stmt &stmt);
+  ASTNode(const mx::Type &type);
   ASTNode(const mx::Token &token);
 
   bool operator==(const ASTNode &that) const noexcept;
@@ -84,6 +88,7 @@ class AST {
   // Used to "hop into" the middle of the
   const ASTNode *LastNodeOfKind(mx::DeclKind kind);
   const ASTNode *LastNodeOfKind(mx::StmtKind kind);
+  const ASTNode *LastNodeOfKind(mx::TypeKind kind);
   const ASTNode *LastNodeOfKind(mx::TokenKind kind);
 
   void PrintDOT(std::ostream &os) const;

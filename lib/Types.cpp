@@ -13,36 +13,28 @@ namespace mx {
 namespace {
 
 enum EntityKind : uint64_t {
+  kInvalid,  // Zero.
   kFileToken,
-
-  kBigCodeDeclaration,
-  kBigCodeStatement,
-  kBigCodeToken,
-
-  kSmallCodeDeclaration,
-  kSmallCodeStatement,
-  kSmallCodeToken,
-
-  kNumEnumerators
+  kBigCodeEntity,  // Declarations, statements, types.
+  kSmallCodeEntity,  // Declarations, statements, types.
 };
 
 // A code chunk with many tokens. This
 static_assert(kNumTokensInBigFragment == (1u << kBigFragmentIdNumBits));
 
-static constexpr unsigned kEntityKindNumBits = 3;
-static_assert(static_cast<uint64_t>(EntityKind::kNumEnumerators) <=
-              (1u << kEntityKindNumBits));
-
-static constexpr unsigned kDeclKindNumBits = 7;
-static_assert(NumEnumerators(DeclKind{}) <= (1u << kDeclKindNumBits));
-
-static constexpr unsigned kStmtKindNumBits = 8;
-static_assert(NumEnumerators(StmtKind{}) <= (1u << kStmtKindNumBits));
+static constexpr unsigned kEntityKindNumBits = 2;
+static constexpr uint64_t kNumDeclKinds = NumEnumerators(DeclKind{});
+static constexpr uint64_t kNumStmtKinds = NumEnumerators(StmtKind{});
+static constexpr uint64_t kNumTypeKinds = NumEnumerators(TypeKind{});
+static constexpr uint64_t kNumTokenKinds = NumEnumerators(TokenKind{});
+static constexpr uint64_t kNumTokenSubstitutionKinds = 3u;
+static constexpr unsigned kSubKindNumBits = 10;
+static_assert((kNumDeclKinds + kNumStmtKinds + kNumTypeKinds +
+               kNumTokenKinds + kNumTokenSubstitutionKinds) <=
+              (1u << kSubKindNumBits));
 
 static constexpr unsigned kTokenKindNumBits = 9;
 static_assert(NumEnumerators(TokenKind{}) <= (1u << kTokenKindNumBits));
-
-static constexpr uint64_t kNumDeclKinds = NumEnumerators(DeclKind{});
 
 // A small X is a token in a code with less than `kNumTokensInBigCode`
 // tokens, and so we only need `kBigCodeIdNumBits` bits to represent the
@@ -63,51 +55,21 @@ union PackedEntityId {
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
-    uint64_t decl_kind:kDeclKindNumBits;
+    uint64_t sub_kind:kSubKindNumBits;
     uint64_t offset:kBigFragmentIdNumBits;
-    uint64_t code_id:(64 - (kEntityKindNumBits + kDeclKindNumBits +
+
+    // 36 bits for fragment id, i.e. 68 billion ids.
+    uint64_t code_id:(64 - (kEntityKindNumBits + kSubKindNumBits +
                             kBigFragmentIdNumBits));
-  } __attribute__((packed)) small_decl;
+  } __attribute__((packed)) small_entity;
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
-    uint64_t decl_kind:kDeclKindNumBits;
+    uint64_t sub_kind:kSubKindNumBits;
     uint64_t code_id:kBigFragmentIdNumBits;
-    uint64_t offset:(64 - (kEntityKindNumBits + kDeclKindNumBits +
+    uint64_t offset:(64 - (kEntityKindNumBits + kSubKindNumBits +
                            kBigFragmentIdNumBits));
-  } __attribute__((packed)) big_decl;
-
-  struct {
-    uint64_t entity_kind:kEntityKindNumBits;
-    uint64_t stmt_kind:kStmtKindNumBits;
-    uint64_t offset:kBigFragmentIdNumBits;
-    uint64_t code_id:(64 - (kEntityKindNumBits + kStmtKindNumBits +
-                            kBigFragmentIdNumBits));
-  } __attribute__((packed)) small_stmt;
-
-  struct {
-    uint64_t entity_kind:kEntityKindNumBits;
-    uint64_t stmt_kind:kStmtKindNumBits;
-    uint64_t code_id:kBigFragmentIdNumBits;
-    uint64_t offset:(64 - (kEntityKindNumBits + kStmtKindNumBits +
-                           kBigFragmentIdNumBits));
-  } __attribute__((packed)) big_stmt;
-
-  struct {
-    uint64_t entity_kind:kEntityKindNumBits;
-    uint64_t token_kind:kTokenKindNumBits;
-    uint64_t offset:kBigFragmentIdNumBits;
-    uint64_t code_id:(64 - (kEntityKindNumBits + kTokenKindNumBits +
-                            kBigFragmentIdNumBits));
-  } __attribute__((packed)) small_token;
-
-  struct {
-    uint64_t entity_kind:kEntityKindNumBits;
-    uint64_t token_kind:kTokenKindNumBits;
-    uint64_t code_id:kBigFragmentIdNumBits;
-    uint64_t offset:(64 - (kEntityKindNumBits + kTokenKindNumBits +
-                           kBigFragmentIdNumBits));
-  } __attribute__((packed)) big_token;
+  } __attribute__((packed)) big_entity;
 
   struct {
     uint64_t entity_kind:kEntityKindNumBits;
@@ -127,16 +89,16 @@ EntityId::EntityId(DeclarationId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_decl.code_id = id.fragment_id;
-      packed.small_decl.entity_kind =
-          static_cast<uint64_t>(kSmallCodeDeclaration);
-      packed.small_decl.decl_kind = static_cast<uint64_t>(id.kind);
-      packed.small_decl.offset = id.offset;
+      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.entity_kind =
+          static_cast<uint64_t>(kSmallCodeEntity);
+      packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      packed.small_entity.offset = id.offset;
     } else {
-      packed.big_decl.code_id = id.fragment_id;
-      packed.big_decl.entity_kind = static_cast<uint64_t>(kBigCodeDeclaration);
-      packed.big_decl.decl_kind = static_cast<uint64_t>(id.kind);
-      packed.big_decl.offset = id.offset;
+      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.entity_kind = static_cast<uint64_t>(kBigCodeEntity);
+      packed.big_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      packed.big_entity.offset = id.offset;
     }
     opaque = packed.opaque;
 
@@ -148,50 +110,22 @@ EntityId::EntityId(DeclarationId id) {
   }
 }
 
-// Token substitutions are packed in to use the remaining bit space above
-// declaration kinds.
-EntityId::EntityId(TokenSubstitutionId id) {
-  if (id.fragment_id) {
-    PackedEntityId packed = {};
-    if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_decl.code_id = id.fragment_id;
-      packed.small_decl.entity_kind =
-          static_cast<uint64_t>(kSmallCodeDeclaration);
-      packed.small_decl.decl_kind =
-          kNumDeclKinds + static_cast<uint64_t>(id.kind);
-      packed.small_decl.offset = id.offset;
-    } else {
-      packed.big_decl.code_id = id.fragment_id;
-      packed.big_decl.entity_kind =
-          static_cast<uint64_t>(kBigCodeDeclaration);
-      packed.big_decl.decl_kind =
-          kNumDeclKinds + static_cast<uint64_t>(id.kind);
-      packed.big_decl.offset = id.offset;
-    }
-    opaque = packed.opaque;
-
-#ifndef NDEBUG
-    auto unpacked = Unpack();
-    assert(std::holds_alternative<TokenSubstitutionId>(unpacked));
-    assert(std::get<TokenSubstitutionId>(unpacked) == id);
-#endif
-  }
-}
-
 EntityId::EntityId(StatementId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_stmt.code_id = id.fragment_id;
-      packed.small_stmt.entity_kind =
-          static_cast<uint64_t>(kSmallCodeStatement);
-      packed.small_stmt.stmt_kind = static_cast<uint64_t>(id.kind);
-      packed.small_stmt.offset = id.offset;
+      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.entity_kind =
+          static_cast<uint64_t>(kSmallCodeEntity);
+      packed.small_entity.sub_kind = kNumDeclKinds +
+                                     static_cast<uint64_t>(id.kind);
+      packed.small_entity.offset = id.offset;
     } else {
-      packed.big_stmt.code_id = id.fragment_id;
-      packed.big_stmt.entity_kind = static_cast<uint64_t>(kBigCodeStatement);
-      packed.big_stmt.stmt_kind = static_cast<uint64_t>(id.kind);
-      packed.big_stmt.offset = id.offset;
+      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.entity_kind = static_cast<uint64_t>(kBigCodeEntity);
+      packed.big_entity.sub_kind = kNumDeclKinds +
+                                   static_cast<uint64_t>(id.kind);
+      packed.big_entity.offset = id.offset;
     }
     opaque = packed.opaque;
 
@@ -203,19 +137,50 @@ EntityId::EntityId(StatementId id) {
   }
 }
 
+EntityId::EntityId(TypeId id) {
+  if (id.fragment_id) {
+    PackedEntityId packed = {};
+    if (id.fragment_id >= kMaxBigFragmentId) {
+      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.entity_kind =
+          static_cast<uint64_t>(kSmallCodeEntity);
+      packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
+                                     static_cast<uint64_t>(id.kind);
+      packed.small_entity.offset = id.offset;
+    } else {
+      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.entity_kind = static_cast<uint64_t>(kBigCodeEntity);
+      packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
+                                   static_cast<uint64_t>(id.kind);
+      packed.big_entity.offset = id.offset;
+    }
+    opaque = packed.opaque;
+
+#ifndef NDEBUG
+    auto unpacked = Unpack();
+    assert(std::holds_alternative<TypeId>(unpacked));
+    assert(std::get<TypeId>(unpacked) == id);
+#endif
+  }
+}
 EntityId::EntityId(FragmentTokenId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_token.code_id = id.fragment_id;
-      packed.small_token.entity_kind = static_cast<uint64_t>(kSmallCodeToken);
-      packed.small_token.token_kind = static_cast<uint64_t>(id.kind);
-      packed.small_token.offset = id.offset;
+      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.entity_kind =
+          static_cast<uint64_t>(kSmallCodeEntity);
+      packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
+                                     kNumTypeKinds +
+                                     static_cast<uint64_t>(id.kind);
+      packed.small_entity.offset = id.offset;
     } else {
-      packed.big_token.code_id = id.fragment_id;
-      packed.big_token.entity_kind = static_cast<uint64_t>(kBigCodeToken);
-      packed.big_token.token_kind = static_cast<uint64_t>(id.kind);
-      packed.big_token.offset = id.offset;
+      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.entity_kind = static_cast<uint64_t>(kBigCodeEntity);
+      packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
+                                   kNumTypeKinds +
+                                   static_cast<uint64_t>(id.kind);
+      packed.big_entity.offset = id.offset;
     }
     opaque = packed.opaque;
 
@@ -223,6 +188,37 @@ EntityId::EntityId(FragmentTokenId id) {
     auto unpacked = Unpack();
     assert(std::holds_alternative<FragmentTokenId>(unpacked));
     assert(std::get<FragmentTokenId>(unpacked) == id);
+#endif
+  }
+}
+
+// Token substitutions are packed in to use the remaining bit space above
+// declaration kinds.
+EntityId::EntityId(TokenSubstitutionId id) {
+  if (id.fragment_id) {
+    PackedEntityId packed = {};
+    if (id.fragment_id >= kMaxBigFragmentId) {
+      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.entity_kind =
+          static_cast<uint64_t>(kSmallCodeEntity);
+      packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
+                                     kNumTypeKinds + kNumTokenKinds +
+                                     static_cast<uint64_t>(id.kind);
+      packed.small_entity.offset = id.offset;
+    } else {
+      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.entity_kind = static_cast<uint64_t>(kBigCodeEntity);
+      packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
+                                   kNumTypeKinds + kNumTokenKinds +
+                                   static_cast<uint64_t>(id.kind);
+      packed.big_entity.offset = id.offset;
+    }
+    opaque = packed.opaque;
+
+#ifndef NDEBUG
+    auto unpacked = Unpack();
+    assert(std::holds_alternative<TokenSubstitutionId>(unpacked));
+    assert(std::get<TokenSubstitutionId>(unpacked) == id);
 #endif
   }
 }
@@ -249,6 +245,9 @@ VariantId EntityId::Unpack(void) const noexcept {
   PackedEntityId packed = {};
   packed.opaque = opaque;
   switch (static_cast<EntityKind>(packed.sel.entity_kind)) {
+    case EntityKind::kInvalid:
+      break;
+
     case EntityKind::kFileToken: {
       FileTokenId id;
       id.file_id = packed.file_token.file_id;
@@ -256,69 +255,119 @@ VariantId EntityId::Unpack(void) const noexcept {
       id.offset = packed.file_token.offset;
       return id;
     }
-    case EntityKind::kBigCodeDeclaration: {
-      if (packed.big_decl.decl_kind >= kNumDeclKinds) {
-        TokenSubstitutionId id;
-        id.fragment_id = packed.big_decl.code_id;
-        id.kind = static_cast<TokenSubstitutionKind>(
-            packed.big_decl.decl_kind - kNumDeclKinds);
-        id.offset = packed.big_decl.offset;
-        return id;
-      } else {
+
+    // A "big code entity" is an entity belonging to a fragment that has a lot
+    // of tokens in it, and thus likely to have a lot of types/decls/stmts in
+    // it. "A lot" is defined as more than 2^16 tokens. We reserve the low
+    // 2^16 fragment ids for such big code entities, on the assumption that
+    // there aren't going to be *that* many huge fragments of code.
+    case EntityKind::kBigCodeEntity: {
+      auto sub_kind = packed.big_entity.sub_kind;
+      if (sub_kind < kNumDeclKinds) {
         DeclarationId id;
-        id.fragment_id = packed.big_decl.code_id;
-        id.kind = static_cast<DeclKind>(packed.big_decl.decl_kind);
-        id.offset = packed.big_decl.offset;
+        id.fragment_id = packed.big_entity.code_id;
+        id.kind = static_cast<DeclKind>(sub_kind);
+        id.offset = packed.big_entity.offset;
         return id;
       }
-    }
-    case EntityKind::kSmallCodeDeclaration: {
-      if (packed.big_decl.decl_kind >= kNumDeclKinds) {
-        TokenSubstitutionId id;
-        id.fragment_id = packed.small_decl.code_id;
-        id.kind = static_cast<TokenSubstitutionKind>(
-            packed.small_decl.decl_kind - kNumDeclKinds);
-        id.offset = packed.small_decl.offset;
-        return id;
-      } else {
-        DeclarationId id;
-        id.fragment_id = packed.small_decl.code_id;
-        id.kind = static_cast<DeclKind>(packed.small_decl.decl_kind);
-        id.offset = packed.small_decl.offset;
+
+      sub_kind -= kNumDeclKinds;
+      if (sub_kind < kNumStmtKinds) {
+        StatementId id;
+        id.fragment_id = packed.big_entity.code_id;
+        id.kind = static_cast<StmtKind>(sub_kind);
+        id.offset = packed.big_entity.offset;
         return id;
       }
+
+      sub_kind -= kNumStmtKinds;
+      if (sub_kind < kNumTypeKinds) {
+        TypeId id;
+        id.fragment_id = packed.big_entity.code_id;
+        id.kind = static_cast<TypeKind>(sub_kind);
+        id.offset = packed.big_entity.offset;
+        return id;
+      }
+
+      sub_kind -= kNumTypeKinds;
+      if (sub_kind < kNumTokenKinds) {
+        FragmentTokenId id;
+        id.fragment_id = packed.big_entity.code_id;
+        id.kind = static_cast<TokenKind>(sub_kind);
+        id.offset = packed.big_entity.offset;
+        return id;
+      }
+
+      sub_kind -= kNumTokenKinds;
+      if (sub_kind < kNumTokenSubstitutionKinds) {
+        TokenSubstitutionId id;
+        id.fragment_id = packed.big_entity.code_id;
+        id.kind = static_cast<TokenSubstitutionKind>(sub_kind);
+        id.offset = packed.big_entity.offset;
+        return id;
+      }
+
+      // Not valid.
+      break;
     }
-    case EntityKind::kBigCodeStatement: {
-      StatementId id;
-      id.fragment_id = packed.big_stmt.code_id;
-      id.kind = static_cast<StmtKind>(packed.big_stmt.stmt_kind);
-      id.offset = packed.big_stmt.offset;
-      return id;
+
+    // A "small code entity" is an entity belonging to a fragment that has less
+    // than 2^16 tokens. These entities all belong to fragments whose IDs are
+    // greater-than-or-equal to `kMaxBigFragmentId`.
+    case EntityKind::kSmallCodeEntity: {
+      auto sub_kind = packed.small_entity.sub_kind;
+      if (sub_kind < kNumDeclKinds) {
+        DeclarationId id;
+        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.kind = static_cast<DeclKind>(sub_kind);
+        id.offset = packed.small_entity.offset;
+        return id;
+      }
+
+      sub_kind -= kNumDeclKinds;
+      if (sub_kind < kNumStmtKinds) {
+        StatementId id;
+        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.kind = static_cast<StmtKind>(sub_kind);
+        id.offset = packed.small_entity.offset;
+        return id;
+      }
+
+      sub_kind -= kNumStmtKinds;
+      if (sub_kind < kNumTypeKinds) {
+        TypeId id;
+        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.kind = static_cast<TypeKind>(sub_kind);
+        id.offset = packed.small_entity.offset;
+        return id;
+      }
+
+      sub_kind -= kNumTypeKinds;
+      if (sub_kind < kNumTokenKinds) {
+        FragmentTokenId id;
+        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.kind = static_cast<TokenKind>(sub_kind);
+        id.offset = packed.small_entity.offset;
+        return id;
+      }
+
+      sub_kind -= kNumTokenKinds;
+      if (sub_kind < kNumTokenSubstitutionKinds) {
+        TokenSubstitutionId id;
+        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.kind = static_cast<TokenSubstitutionKind>(sub_kind);
+        id.offset = packed.small_entity.offset;
+        return id;
+      }
+
+      // Not valid.
+      break;
     }
-    case EntityKind::kSmallCodeStatement: {
-      StatementId id;
-      id.fragment_id = packed.small_stmt.code_id;
-      id.kind = static_cast<StmtKind>(packed.small_stmt.stmt_kind);
-      id.offset = packed.small_stmt.offset;
-      return id;
-    }
-    case EntityKind::kBigCodeToken: {
-      FragmentTokenId id;
-      id.fragment_id = packed.big_token.code_id;
-      id.kind = static_cast<TokenKind>(packed.big_token.token_kind);
-      id.offset = packed.big_token.offset;
-      return id;
-    }
-    case EntityKind::kSmallCodeToken: {
-      FragmentTokenId id;
-      id.fragment_id = packed.small_token.code_id;
-      id.kind = static_cast<TokenKind>(packed.small_token.token_kind);
-      id.offset = packed.small_token.offset;
-      return id;
-    }
+
     default:
-      return InvalidId{};
+      break;
   }
+  return InvalidId{};
 }
 
 }  // namespace mx

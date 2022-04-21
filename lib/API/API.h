@@ -27,13 +27,15 @@ namespace mx {
 
 using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
-				     capnp::Kind::STRUCT>::Reader;
+				                                     capnp::Kind::STRUCT>::Reader;
 using FragmentReader = rpc::Fragment::Reader;
 using DeclReader = ast::Decl::Reader;
 using StmtReader = ast::Stmt::Reader;
+using TypeReader = ast::Type::Reader;
 using PseudoReader = ast::Pseudo::Reader;
 using DeclListReader = capnp::List<ast::Decl, capnp::Kind::STRUCT>::Reader;
 using StmtListReader = capnp::List<ast::Stmt, capnp::Kind::STRUCT>::Reader;
+using TypeListReader = capnp::List<ast::Type, capnp::Kind::STRUCT>::Reader;
 using PseudoListReader = capnp::List<ast::Pseudo, capnp::Kind::STRUCT>::Reader;
 using TopLevelDeclListReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 

@@ -23,6 +23,7 @@ class FragmentImpl;
 enum class DeclKind : unsigned char;
 enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
+enum class TypeKind : unsigned char;
 
 enum class TokenSubstitutionKind : unsigned char {
   MACRO_EXPANSION,
@@ -53,7 +54,7 @@ struct DeclarationId {
   DeclKind kind;
 
   // Offset of this where this declaration is stored inside of
-  // `rpc::Fragment::entities`.
+  // `rpc::Fragment::declarations`.
   uint32_t offset;
 
   bool operator==(const DeclarationId &) const noexcept = default;
@@ -67,11 +68,23 @@ struct StatementId {
   StmtKind kind;
 
   // Offset of this where this statement is stored inside of
-  // `rpc::Fragment::entities`.
+  // `rpc::Fragment::statements`.
   uint32_t offset;
 
   bool operator==(const StatementId &) const noexcept = default;
   bool operator!=(const StatementId &) const noexcept = default;
+};
+
+struct TypeId {
+  FragmentId fragment_id;
+  TypeKind kind;
+
+  // Offset of this where this statement is stored inside of
+  // `rpc::Fragment::types`.
+  uint32_t offset;
+
+  bool operator==(const TypeId &) const noexcept = default;
+  bool operator!=(const TypeId &) const noexcept = default;
 };
 
 // Identifies a token inside of a `Fragment`.
@@ -80,7 +93,7 @@ struct FragmentTokenId {
   TokenKind kind;
 
   // Offset of this where this token is stored inside of a serialized
-  // `rpc::Fragment::tokens`.
+  // `rpc::Fragment::tokenKinds` (and other token related lists).
   uint32_t offset;
 
   bool operator==(const FragmentTokenId &) const noexcept = default;
@@ -120,9 +133,9 @@ struct InvalidId {};
 
 // Possible types of entity ids represented by a packed
 // `EntityId`.
-using VariantId = std::variant<InvalidId, DeclarationId,
-                               StatementId, FragmentTokenId,
-                               TokenSubstitutionId, FileTokenId>;
+using VariantId = std::variant<InvalidId, DeclarationId, StatementId, TypeId,
+                               FragmentTokenId, FileTokenId,
+                               TokenSubstitutionId>;
 
 // An opaque, compressed entity id.
 class EntityId {
@@ -130,12 +143,13 @@ class EntityId {
   RawEntityId opaque{kInvalidEntityId};
 
  public:
-  /* implicit */ inline EntityId(uint64_t opaque_)
+  /* implicit */ inline EntityId(RawEntityId opaque_)
       : opaque(opaque_) {}
 
   // Pack an elaborated entity ID into an opaque entity ID.
   /* implicit */ EntityId(DeclarationId id);
   /* implicit */ EntityId(StatementId id);
+  /* implicit */ EntityId(TypeId id);
   /* implicit */ EntityId(FragmentTokenId id);
   /* implicit */ EntityId(TokenSubstitutionId id);
   /* implicit */ EntityId(FileTokenId id);

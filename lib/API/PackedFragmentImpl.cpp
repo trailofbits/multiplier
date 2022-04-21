@@ -92,6 +92,10 @@ StmtReader PackedFragmentImpl::NthStmt(unsigned offset) const {
   return reader.getStatements()[offset];
 }
 
+TypeReader PackedFragmentImpl::NthType(unsigned offset) const {
+  return reader.getTypes()[offset];
+}
+
 PseudoReader PackedFragmentImpl::NthPseudo(unsigned offset) const {
   return reader.getOthers()[offset];
 }

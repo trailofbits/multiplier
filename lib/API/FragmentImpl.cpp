@@ -169,4 +169,27 @@ Stmt FragmentImpl::StmtFor(const FragmentImpl::Ptr &self, EntityId id) const {
   }
 }
 
+
+// Return the type associated with a specific entity ID.
+Type FragmentImpl::TypeFor(const FragmentImpl::Ptr &self, EntityId id) const {
+  VariantId vid = id.Unpack();
+
+  // It's a fragment token.
+  if (!std::holds_alternative<TypeId>(vid)) {
+    assert(false);
+    abort();
+  }
+
+  TypeId type_id = std::get<TypeId>(vid);
+
+  // It's a token inside of the current fragment.
+  if (type_id.fragment_id == id) {
+    return Type(self, type_id.offset);
+
+  // It's a token inside of another fragment, go get the other fragment.
+  } else {
+    return Type(ep->FragmentFor(ep, type_id.fragment_id), type_id.offset);
+  }
+}
+
 }  // namespace mx

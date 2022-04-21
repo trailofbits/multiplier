@@ -16,6 +16,7 @@ class Fragment;
 enum class DeclKind : unsigned char;
 enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
+enum class TypeKind : unsigned char;
 
 }  // namespace mx
 namespace syntex {
@@ -33,6 +34,7 @@ struct NonTerminal {
   NonTerminal(void) = default;
   NonTerminal(mx::DeclKind k);
   NonTerminal(mx::StmtKind k);
+  NonTerminal(mx::TypeKind k);
   NonTerminal(mx::TokenKind k);
 };
 
