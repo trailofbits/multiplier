@@ -139,6 +139,23 @@ Token TokenRange::operator[](size_t relative_index) const {
   }
 }
 
+// Return a slice of this token range. If the indices given are invalid, then
+// an empty token range is returned. The indices cover the tokens in the
+// exclusive range `[start_index, end_index)`.
+TokenRange TokenRange::slice(size_t start_index,
+                             size_t end_index) const noexcept {
+  if (end_index <= start_index || start_index >= num_tokens ||
+      end_index > num_tokens || (index + start_index) >= num_tokens ||
+      (index + end_index) > num_tokens ||
+      static_cast<unsigned>(index + start_index) != (index + start_index) ||
+      static_cast<unsigned>(index + end_index) != (index + end_index)) {
+    return TokenRange();
+  } else {
+    return TokenRange(impl, static_cast<unsigned>(index + start_index),
+                      static_cast<unsigned>(index + end_index));
+  }
+}
+
 // Return the underlying token data associated with the tokens covered by this
 // token range.
 std::string_view TokenRange::data(void) const {
@@ -147,7 +164,7 @@ std::string_view TokenRange::data(void) const {
   }
 
   auto data_begin = impl->NthTokenData(index);
-  auto data_end = impl->NthTokenData(index + num_tokens - 1u);
+  auto data_end = impl->NthTokenData(num_tokens - 1u);
   auto size = static_cast<size_t>(data_end.data() - data_begin.data()) +
               data_end.size();
 

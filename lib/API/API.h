@@ -17,7 +17,6 @@
 #include <kj/async.h>
 #include <kj/io.h>
 #include <optional>
-#include <map>
 #include <string>
 
 #include "AST.capnp.h"
@@ -67,7 +66,7 @@ class RemoteEntityProvider final : public EntityProvider {
 
     capnp::ReaderOptions options;
     capnp::EzRpcClient connection;
-    mx::rpc::Multiplier::Client client;
+    rpc::Multiplier::Client client;
 
     ClientConnection(const std::string &host_port);
   };
@@ -96,11 +95,11 @@ class RemoteEntityProvider final : public EntityProvider {
   std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, FragmentId id) final;
 
-  std::shared_ptr<const WeggliQueryResultImpl> WeggliQuery(
-      const Ptr &, std::string query, bool is_cpp) final;
+  std::shared_ptr<WeggliQueryResultImpl> Query(
+      const Ptr &, const WeggliQuery &query) final;
 
-  std::shared_ptr<const RegexQueryResultImpl> RegexQuery(
-      const Ptr &, std::string pattern) final;
+  std::shared_ptr<RegexQueryResultImpl> Query(
+      const Ptr &, const RegexQuery &) final;
 };
 
 class InvalidEntityProvider final : public EntityProvider {
@@ -118,11 +117,11 @@ class InvalidEntityProvider final : public EntityProvider {
   std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, FragmentId id) final;
 
-  std::shared_ptr<const WeggliQueryResultImpl>
-  WeggliQuery(const Ptr &, std::string query, bool is_cpp) final;
+  std::shared_ptr<WeggliQueryResultImpl>
+  Query(const Ptr &, const WeggliQuery &) final;
 
-  std::shared_ptr<const RegexQueryResultImpl> RegexQuery(
-      const Ptr &, std::string pattern) final;
+  std::shared_ptr<RegexQueryResultImpl> Query(
+      const Ptr &, const RegexQuery &) final;
 };
 
 class FileListImpl {

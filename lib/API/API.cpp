@@ -20,6 +20,7 @@
 #include "Re2.h"
 #include "Token.h"
 #include "Weggli.h"
+#include "../Re2.h"
 
 namespace mx {
 namespace {
@@ -175,39 +176,47 @@ FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(
   }
 }
 
-WeggliQueryResultImpl::Ptr RemoteEntityProvider::WeggliQuery(
-    const Ptr &self, std::string query, bool is_cpp) {
+WeggliQueryResultImpl::Ptr RemoteEntityProvider::Query(
+    const Ptr &self, const WeggliQuery &query) {
+  if (!query.IsValid()) {
+    return {};
+  }
+
   ClientConnection &cc = Connection();
-  capnp::Request<mx::rpc::Multiplier::WeggliQueryParams,
-                 mx::rpc::Multiplier::WeggliQueryResults>
-      request = cc.client.weggliQueryRequest();
-  request.setQuery(query);
-  request.setIsCpp(is_cpp);
+  capnp::Request<mx::rpc::Multiplier::WeggliQueryFragmentsParams,
+                 mx::rpc::Multiplier::WeggliQueryFragmentsResults>
+      request = cc.client.weggliQueryFragmentsRequest();
+  request.setQuery(kj::heapString(query.Pattern().data(),
+                                  query.Pattern().size()));
+  request.setIsCpp(query.IsCPlusPlus());
 
   try {
     return std::make_shared<WeggliQueryResultImpl>(
-        query,
-        std::move(self),
-        request.send().wait(cc.connection.getWaitScope()),
-        is_cpp);
+        query, std::move(self),
+        request.send().wait(cc.connection.getWaitScope()));
 
   } catch (...) {
     return {};
   }
 }
 
-RegexQueryResultImpl::Ptr RemoteEntityProvider::RegexQuery(
-    const Ptr &self, std::string regex) {
+RegexQueryResultImpl::Ptr RemoteEntityProvider::Query(
+    const Ptr &self, const RegexQuery &query) {
+
+  if (!query.IsValid()) {
+    return {};
+  }
 
   ClientConnection &cc = Connection();
-  capnp::Request<mx::rpc::Multiplier::RegexQueryParams,
-                 mx::rpc::Multiplier::RegexQueryResults>
-      request = cc.client.regexQueryRequest();
-  request.setRegex(regex);
+  capnp::Request<mx::rpc::Multiplier::RegexQueryFragmentsParams,
+                 mx::rpc::Multiplier::RegexQueryFragmentsResults>
+      request = cc.client.regexQueryFragmentsRequest();
+  request.setRegex(kj::heapString(query.Pattern().data(),
+                                  query.Pattern().size()));
+
   try {
     return std::make_shared<RegexQueryResultImpl>(
-        regex,
-        std::move(self),
+        query, std::move(self),
         request.send().wait(cc.connection.getWaitScope()));
   } catch (...) {
     return {};
@@ -232,13 +241,13 @@ FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(const Ptr &, FragmentId) {
   return {};
 }
 
-WeggliQueryResultImpl::Ptr InvalidEntityProvider::WeggliQuery(
-    const Ptr &, std::string, bool is_cpp) {
+WeggliQueryResultImpl::Ptr InvalidEntityProvider::Query(
+    const Ptr &, const WeggliQuery &) {
   return {};
 }
 
-RegexQueryResultImpl::Ptr InvalidEntityProvider::RegexQuery(
-    const Ptr &, std::string) {
+RegexQueryResultImpl::Ptr InvalidEntityProvider::Query(
+    const Ptr &, const RegexQuery &) {
   return {};
 }
 

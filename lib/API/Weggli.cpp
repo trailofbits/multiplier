@@ -13,24 +13,12 @@ namespace mx {
 WeggliQueryResultImpl::~WeggliQueryResultImpl(void) noexcept {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(
-    std::string syntax_, EntityProvider::Ptr ep_, Response response,
-    bool is_cpp)
-    : syntax(std::move(syntax_)),
-      ep(std::move(ep_)),
-      query(syntax, is_cpp) {
-  for (auto frag_id : response.getFragments()) {
-    fragments.emplace_back().first = frag_id;
+    const WeggliQuery &query_, EntityProvider::Ptr ep_, Response response)
+    : query(query_),
+      ep(std::move(ep_)) {
+  for (FragmentId frag_id : response.getFragments()) {
+    fragments.emplace_back(frag_id);
   }
-}
-
-FragmentImpl::Ptr WeggliQueryResultImpl::GetFragmentAtIndex(unsigned index) const {
-  auto &entry = fragments[index];
-  auto frag = entry.second.lock();
-  if (!frag) {
-    frag = ep->FragmentFor(ep, entry.first);
-    entry.second = frag;
-  }
-  return frag;
 }
 
 EntityId WeggliQueryResultImpl::EntityContainingOffset(unsigned offset) const {
@@ -42,7 +30,7 @@ EntityId WeggliQueryResultImpl::EntityContainingOffset(unsigned offset) const {
   }
 }
 
-void WeggliQueryResultImpl::GetUnparsedTokens(TokenSubstitutionList nodes) const {
+void WeggliQueryResultImpl::GetUnparsedTokens(TokenSubstitutionList nodes) {
   for (auto node : nodes) {
     if (std::holds_alternative<Token>(node)) {
       auto tok = std::get<Token>(node);
@@ -76,7 +64,8 @@ WeggliQueryMatch::WeggliQueryMatch(
       frag(std::move(frag_)),
       var_matches(std::move(var_matches_)) {}
 
-std::optional<TokenRange> WeggliQueryMatch::variable_capture(const std::string &var) const {
+std::optional<TokenRange> WeggliQueryMatch::variable_capture(
+    const std::string &var) const {
   auto it = var_matches.find(var);
   if (it != var_matches.end()) {
     return it->second;
@@ -95,7 +84,7 @@ std::vector<std::string> WeggliQueryMatch::captured_variables(void) const {
 }
 
 WeggliQueryResult::WeggliQueryResult(
-    std::shared_ptr<const WeggliQueryResultImpl> impl_)
+    std::shared_ptr<WeggliQueryResultImpl> impl_)
     : impl(std::move(impl_)),
       num_fragments(impl->fragments.size()) {}
 
@@ -103,57 +92,58 @@ WeggliQueryResult::WeggliQueryResult(
 // fragment.
 void WeggliQueryResultIterator::Advance(void) {
   while (index < num_fragments) {
-      auto frag = impl->GetFragmentAtIndex(index);
-      if (!frag) {
+
+    // Reset the caches of data in the fragment, and the mapping of offsets
+    // to token ids.
+    if (!impl->frag) {
+      impl->frag = impl->ep->FragmentFor(impl->ep, impl->fragments[index]);
+      if (!impl->frag) {
         ++index;
         continue;
       }
 
-      // Reset the caches of data in the fragment, and the mapping of offsets
-      // to token ids.
-      if (impl->fragment_buffer_id != frag->id) {
-        impl->next_weggli_match = 0u;
-        impl->weggli_matches.clear();
-        impl->fragment_buffer.clear();
-        impl->fragment_buffer_id = frag->id;
-        impl->GetUnparsedTokens(Fragment(frag).substitutions());
+      impl->next_weggli_match = 0u;
+      impl->weggli_matches.clear();
+      impl->fragment_buffer.clear();
+      impl->GetUnparsedTokens(Fragment(impl->frag).substitutions());
 
-        impl->query.ForEachMatch(
-            impl->fragment_buffer,
-            [impl = impl.get()] (const WeggliMatchData &match) {
-          impl->weggli_matches.emplace_back(match);
-          return true;
-        });
-      }
-
-      auto match_index = impl->next_weggli_match++;
-      if (match_index >= impl->weggli_matches.size()) {
-        ++index;  // Skip to next fragment.
-        continue;
-      }
-
-      const WeggliMatchData &match = impl->weggli_matches[match_index];
-
-      TokenRange range = frag->TokenRangeFor(
-          frag,
-          impl->EntityContainingOffset(match.begin_offset),
-          impl->EntityContainingOffset(match.end_offset));
-
-      std::unordered_map<std::string, TokenRange> var_matches;
-      for (const auto &[var, range] : match.variables) {
-        var_matches.emplace(
-            var,
-            frag->TokenRangeFor(
-                frag,
-                impl->EntityContainingOffset(range.first),
-                impl->EntityContainingOffset(range.second)));
-      }
-
-      result.reset();
-      result.emplace(frag, std::move(range.impl), range.index,
-                     range.num_tokens, std::move(var_matches));
-      return;
+      impl->query.ForEachMatch(
+          impl->fragment_buffer,
+          [impl = impl.get()] (const WeggliMatchData &match) {
+        impl->weggli_matches.emplace_back(match);
+        return true;
+      });
     }
+
+    auto match_index = impl->next_weggli_match++;
+    if (match_index >= impl->weggli_matches.size()) {
+      impl->frag.reset();
+      ++index;  // Skip to next fragment.
+      continue;
+    }
+
+    const WeggliMatchData &match = impl->weggli_matches[match_index];
+
+    TokenRange range = impl->frag->TokenRangeFor(
+        impl->frag,
+        impl->EntityContainingOffset(match.begin_offset),
+        impl->EntityContainingOffset(match.end_offset));
+
+    std::unordered_map<std::string, TokenRange> var_matches;
+    for (const auto &[var, range] : match.variables) {
+      var_matches.emplace(
+          var,
+          impl->frag->TokenRangeFor(
+              impl->frag,
+              impl->EntityContainingOffset(range.first),
+              impl->EntityContainingOffset(range.second)));
+    }
+
+    result.reset();
+    result.emplace(impl->frag, std::move(range.impl), range.index,
+                   range.num_tokens, std::move(var_matches));
+    return;
+  }
 }
 
 }  // namespace mx

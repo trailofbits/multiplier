@@ -51,7 +51,7 @@ void RegexSearchAction::QueryExprInFile(mx::FileId file_id) {
     LOG(INFO) << "Looking for RE2 matches in file with id " << file_id;
     regex.ForEachMatch(
         file_contents,
-        [=] (const std::string &, unsigned begin, unsigned end) -> bool {
+        [=] (std::string_view, unsigned begin, unsigned end) -> bool {
           unsigned prev_line = 0;
           for (auto i = begin; i < end; ++i) {
             auto line_it = offset_to_line_num.upper_bound(i);
@@ -73,9 +73,9 @@ RegexSearchAction::~RegexSearchAction(void) {}
 
 RegexSearchAction::RegexSearchAction(
     std::shared_ptr<SearchingContext> context_,
-    std::string_view pattern)
+    std::string pattern)
     : context(std::move(context_)),
-      regex(pattern) {}
+      regex(std::move(pattern)) {}
 
 void RegexSearchAction::Run(mx::Executor, mx::WorkerId) {
   if (!regex.IsValid()) {

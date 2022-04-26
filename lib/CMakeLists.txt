@@ -103,6 +103,7 @@ add_library("mx-api"
     "Types.cpp"
     "Weggli.cpp"
     "Re2.cpp"
+    "Re2.h"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}

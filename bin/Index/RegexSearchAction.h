@@ -19,7 +19,7 @@ class RegexSearchAction final : public mx::Action {
  private:
   const std::shared_ptr<SearchingContext> context;
 
-  const mx::RegExpr regex;
+  const mx::RegexQuery regex;
 
   std::map<unsigned, unsigned> offset_to_line_num;
 
@@ -27,7 +27,7 @@ class RegexSearchAction final : public mx::Action {
   virtual ~RegexSearchAction(void);
 
   RegexSearchAction(std::shared_ptr<SearchingContext> context_,
-                    std::string_view pattern);
+                    std::string pattern);
 
   void QueryExprInFile(mx::FileId file_id);
 

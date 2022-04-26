@@ -32,11 +32,14 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class RemoteEntityProvider;
-class RegexMatchIterator;
-class RegexMatch;
+class RegexQuery;
+class RegexQueryImpl;
+class RegexQueryResultIterator;
+class RegexQueryMatch;
 class RegexQueryResultImpl;
 class RegexQueryResult;
 class InvalidEntityProvider;
+class WeggliQuery;
 class WeggliQueryMatch;
 class WeggliQueryResultIterator;
 class WeggliQueryResult;
@@ -167,7 +170,7 @@ class TokenRange {
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
-  friend class RegexMatchIterator;
+  friend class RegexQueryResultIterator;
   friend class WeggliQueryResultIterator;
   friend class TokenList;
   friend class TokenSubstitutionListIterator;
@@ -205,6 +208,11 @@ class TokenRange {
   inline TokenListIterator::EndIteratorType end(void) const noexcept {
     return {};
   }
+
+  // Return a slice of this token range. If the indices given are invalid, then
+  // an empty token range is returned. The indices cover the tokens in the
+  // exclusive range `[start_index, end_index)`.
+  TokenRange slice(size_t start_index, size_t end_index) const noexcept;
 };
 
 // List of tokens.
@@ -392,7 +400,7 @@ class File {
   friend class FragmentImpl;
   friend class Index;
   friend class RemoteEntityProvider;
-  friend class RegexMatchIterator;
+  friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
   friend class Token;
   friend class TokenSubstitutionListIterator;
@@ -518,7 +526,7 @@ class TokenSubstitutionList {
   friend class TokenSubstitution;
 
   std::shared_ptr<const TokenSubstitutionListImpl> impl;
-  unsigned num_nodes;
+  unsigned num_nodes{0u};
 
   inline TokenSubstitutionList(
       std::shared_ptr<const TokenSubstitutionListImpl> impl_,
@@ -527,6 +535,8 @@ class TokenSubstitutionList {
         num_nodes(num_nodes_) {}
 
  public:
+  TokenSubstitutionList(void) = default;
+
   inline TokenSubstitutionListIterator begin(void) const noexcept {
     return TokenSubstitutionListIterator(impl, 0, num_nodes);
   }
@@ -550,7 +560,8 @@ class Fragment {
   friend class FragmentList;
   friend class Index;
   friend class RemoteEntityProvider;
-  friend class RegexMatchIterator;
+  friend class RegexQueryResultImpl;
+  friend class RegexQueryResultIterator;
   friend class Stmt;
   friend class Token;
   friend class TokenSubstitutionListIterator;
@@ -570,7 +581,7 @@ class Fragment {
   // Return the fragment containing a query match.
   static Fragment containing(const WeggliQueryMatch &);
 
-  static Fragment containing(const RegexMatch &);
+  static Fragment containing(const RegexQueryMatch &);
 
   // Return the ID of this fragment.
   FragmentId id(void) const noexcept;
@@ -631,7 +642,7 @@ class WeggliQueryResultIterator {
  private:
   friend class WeggliQueryResult;
 
-  std::shared_ptr<const WeggliQueryResultImpl> impl;
+  std::shared_ptr<WeggliQueryResultImpl> impl;
 
   unsigned index;
   unsigned num_fragments;
@@ -642,7 +653,7 @@ class WeggliQueryResultIterator {
   void Advance(void);
 
   inline WeggliQueryResultIterator(
-      std::shared_ptr<const WeggliQueryResultImpl> impl_,
+      std::shared_ptr<WeggliQueryResultImpl> impl_,
       unsigned index_, unsigned num_fragments_)
       : impl(std::move(impl_)),
         index(index_),
@@ -685,11 +696,11 @@ class WeggliQueryResult {
   friend class InvalidEntityProvider;
   friend class WeggliQueryResultIterator;
 
-  std::shared_ptr<const WeggliQueryResultImpl> impl;
+  std::shared_ptr<WeggliQueryResultImpl> impl;
   unsigned num_fragments;
 
  public:
-  WeggliQueryResult(std::shared_ptr<const WeggliQueryResultImpl> impl_);
+  WeggliQueryResult(std::shared_ptr<WeggliQueryResultImpl> impl_);
 
   // Return an iterator pointing at the first token in this list.
   inline WeggliQueryResultIterator begin(void) const noexcept {
@@ -701,53 +712,79 @@ class WeggliQueryResult {
   }
 };
 
-// The range of tokens that matches regex
-class RegexMatch : public TokenRange {
+// The range of tokens that matches a regular expression.
+class RegexQueryMatch : public TokenRange {
  private:
   friend class Fragment;
   friend class File;
   friend class RegexQueryResult;
   friend class RegexQueryResultImpl;
 
-  // Fragment with the match
+  // The actual range of matched data. This is possibly a sub-sequence of
+  // `this->TokenRange::data()`.
+  std::string_view data_range;
+
+  // Fragment with the match.
   std::shared_ptr<const FragmentImpl> frag;
-  // File with the match
-  std::shared_ptr<const FileImpl> file;
-  // Map variables with token range
-  std::unordered_map<std::string, TokenRange> variable_matches;
+
+  // The regular expression used.
+  std::shared_ptr<RegexQueryImpl> query;
+
+  // Translate a data capture into a token range capture.
+  std::optional<TokenRange> TranslateCapture(std::string_view capture) const;
+
+  // Try to match a specific capture group.
+  std::optional<std::string_view> MatchCapture(size_t index) const;
 
  public:
-  RegexMatch(
-      std::shared_ptr<const FragmentImpl> frag_,
-      std::shared_ptr<const FileImpl> file_,
-      std::shared_ptr<const TokenReader> impl_,
-      unsigned index_, unsigned num_tokens_,
-      std::unordered_map<std::string, TokenRange> variable_matches_);
+  ~RegexQueryMatch(void);
 
-  // Return the match results for a specific meta-variable.
-  std::optional<TokenRange> variable_capture(const std::string &var) const;
+  RegexQueryMatch(TokenRange range_, std::string_view data_range_,
+                  std::shared_ptr<const FragmentImpl> frag_,
+                  const RegexQuery &query_);
 
-  // Return a list of matched variables.
+  // The actual range of matched data. This is possibly a sub-sequence of
+  // `this->TokenRange::data()`.
+  inline std::string_view data(void) const noexcept {
+    return data_range;
+  }
+
+  // Return the captured tokens for a given named capture group.
+  std::optional<TokenRange> captured_tokens(const std::string &var) const;
+
+  // Return the captured data for a given named capture group.
+  std::optional<std::string_view> captured_data(const std::string &var) const;
+
+  // Return the captured tokens for a given indexed capture group.
+  std::optional<TokenRange> captured_tokens(size_t catpture_index) const;
+
+  // Return the captured data for a given indexed capture group.
+  std::optional<std::string_view> captured_data(size_t capture_index) const;
+
+  // Return a list of named capture groups.
   std::vector<std::string> captured_variables(void) const;
+
+  // Return the number of capture groups.
+  unsigned num_captures(void) const;
 };
 
-class RegexMatchIterator {
+class RegexQueryResultIterator {
  private:
   friend class RegexQueryResult;
 
-  std::shared_ptr<const RegexQueryResultImpl> impl;
+  std::shared_ptr<RegexQueryResultImpl> impl;
 
   unsigned index;
   unsigned num_matches;
 
-  std::optional<RegexMatch> result;
+  std::optional<RegexQueryMatch> result;
 
   // Try to advance to the next result. There can be multiple results per
   // fragment.
   void Advance(void);
 
-  inline RegexMatchIterator(
-      std::shared_ptr<const RegexQueryResultImpl> impl_,
+  inline RegexQueryResultIterator(
+      std::shared_ptr<RegexQueryResultImpl> impl_,
       unsigned index_, unsigned num_matches_)
       : impl(std::move(impl_)),
         index(index_),
@@ -756,11 +793,11 @@ class RegexMatchIterator {
   }
 
  public:
-  inline const RegexMatch &operator*(void) const noexcept {
+  inline const RegexQueryMatch &operator*(void) const noexcept {
     return result.value();
   }
 
-  inline const RegexMatch *operator->(void) const noexcept {
+  inline const RegexQueryMatch *operator->(void) const noexcept {
     return std::addressof(result.value());
   }
 
@@ -773,7 +810,7 @@ class RegexMatchIterator {
   }
 
   // Pre-increment.
-  inline RegexMatchIterator &operator++(void) noexcept {
+  inline RegexQueryResultIterator &operator++(void) noexcept {
     ++index;
     Advance();
     return *this;
@@ -788,17 +825,17 @@ class RegexQueryResult {
   friend class EntityProvider;
   friend class RemoteEntityProvider;
   friend class InvalidEntityProvider;
-  friend class RegexMatchIterator;
+  friend class RegexQueryResultIterator;
 
-  std::shared_ptr<const RegexQueryResultImpl> impl;
+  std::shared_ptr<RegexQueryResultImpl> impl;
   unsigned num_fragments;
 
  public:
-  RegexQueryResult(std::shared_ptr<const RegexQueryResultImpl> impl_);
+  RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_);
 
   // Return an iterator pointing at the first token in this list.
-  inline RegexMatchIterator begin(void) const noexcept {
-    return RegexMatchIterator(impl, 0, num_fragments);
+  inline RegexQueryResultIterator begin(void) const noexcept {
+    return RegexQueryResultIterator(impl, 0, num_fragments);
   }
 
   inline IteratorEnd end(void) const noexcept {
@@ -839,7 +876,9 @@ class EntityProvider {
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
   friend class RegexQueryResultImpl;
+  friend class RegexQueryResultIterator;
   friend class WeggliQueryResultImpl;
+  friend class WeggliQueryResultIterator;
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
@@ -853,11 +892,11 @@ class EntityProvider {
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, FragmentId id) = 0;
 
-  virtual std::shared_ptr<const WeggliQueryResultImpl>
-  WeggliQuery(const Ptr &, std::string query, bool is_cpp) = 0;
+  virtual std::shared_ptr<WeggliQueryResultImpl>
+  Query(const Ptr &, const WeggliQuery &query) = 0;
 
-  virtual std::shared_ptr<const RegexQueryResultImpl>
-  RegexQuery(const Ptr &, std::string pattern) = 0;
+  virtual std::shared_ptr<RegexQueryResultImpl>
+  Query(const Ptr &, const RegexQuery &query) = 0;
 };
 
 // Access to the indexed code.
@@ -888,12 +927,15 @@ class Index {
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
 
-  WeggliQueryResult weggli_query(std::string query, bool is_cpp=false) const;
+  // Run a Weggli search over the fragments in the index.
+  //
+  // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
+  WeggliQueryResult query_fragments(const WeggliQuery &query) const;
 
   // Run a regular expression search over the fragments in the index.
   //
   // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
-  RegexQueryResult regex_query(std::string regex) const;
+  RegexQueryResult query_fragments(const RegexQuery &query) const;
 };
 
 class FileManager {

@@ -10,6 +10,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <multiplier/API.h>
+#include <multiplier/Re2.h>
 #include <fstream>
 #include <sstream>
 
@@ -38,7 +39,6 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-
   if (1 >= argc || FLAGS_help) {
     std::cerr << google::ProgramUsage() << std::endl;
     return EXIT_FAILURE;
@@ -46,24 +46,30 @@ extern "C" int main(int argc, char *argv[]) {
 
   if (FLAGS_query.empty()) {
     std::cerr
-        << "Must specify regular expression string to be searched for.";
+        << "Must specify regular expression string to be searched for."
+        << std::endl;
     return EXIT_FAILURE;
   }
 
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  for (mx::RegexMatch match : index.regex_query(FLAGS_query)) {
+  mx::RegexQuery query(FLAGS_query);
+  for (mx::RegexQueryMatch match : index.query_fragments(query)) {
     mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);
     std::cout
         << frag.id() << '\t' << GetFileContaining(index, file.id())
         << std::endl;
 
-    std::cout << frag.file_tokens().data();
+    for (auto i = 0u, max_i = match.num_captures(); i <= max_i; ++i) {
+      if (auto data = match.captured_data(i)) {
+        std::cout << "\t[" << i << "] = \t" << *data << '\n';
+      }
+    }
+
     std::cout << "\n\n";
   }
+
   return EXIT_SUCCESS;
 }
-
-

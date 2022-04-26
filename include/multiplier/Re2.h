@@ -8,33 +8,47 @@
 
 #include <functional>
 #include <memory>
-#include <string>
 #include <string_view>
-#include <unordered_map>
+#include <string>
 #include <vector>
-#include <tuple>
 
 namespace mx {
 
-class RegExprImpl;
+class RegexQueryImpl;
+class RegexQueryMatch;
 
-class RegExpr final {
+// A regular expression.
+class RegexQuery final {
+ private:
+  friend class Index;
+  friend class RegexQueryMatch;
+
+  std::shared_ptr<RegexQueryImpl> impl;
+
+  RegexQuery(void) = delete;
+
  public:
 
-  explicit RegExpr(std::string_view pattern);
+  // TODO(pag): Eventually make a `Create` static method and return a result
+  //            type.
+  explicit RegexQuery(std::string pattern);
 
-  ~RegExpr();
+  ~RegexQuery();
 
+  // Search for matches in `source`. Each match is returned as a string
+  // view, corresponding to the range `[begin_offset, end_offset)` in `source`.
+  // `match` also points into `source`.
   void ForEachMatch(
       std::string_view source,
-      std::function<bool(const std::string &pattern,
-                         unsigned begin_offset,
-                         unsigned end_offset)> cb) const;
+      std::function<bool(std::string_view /* match */,
+                         unsigned /* begin_offset */,
+                         unsigned /* end_offset */)> cb) const;
 
+  // Returns the underlying pattern.
+  std::string_view Pattern(void) const;
+
+  // Returns `true` if we successfully compiled this regular expression.
   bool IsValid(void) const;
-
- private:
-  std::unique_ptr<RegExprImpl> impl;
 };
 
-}
+}  // namespace mx

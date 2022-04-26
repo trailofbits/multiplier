@@ -22,7 +22,7 @@ Fragment Fragment::containing(const WeggliQueryMatch &match) {
 }
 
 // Return the fragment containing a query match.
-Fragment Fragment::containing(const RegexMatch &match) {
+Fragment Fragment::containing(const RegexQueryMatch &match) {
   return Fragment(match.frag);
 }
 
@@ -52,8 +52,7 @@ TokenRange Fragment::file_tokens(void) const {
   auto raw_file = file.get();
   return TokenRange(
       raw_file->TokenReader(std::move(file)),
-      first_fid.offset,
-      (last_fid.offset - first_fid.offset) + 1u);
+      first_fid.offset, last_fid.offset + 1u);
 }
 
 // The range of parsed tokens in this fragment. This is equivalent to

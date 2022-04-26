@@ -10,10 +10,12 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <multiplier/API.h>
+#include <multiplier/Weggli.h>
 #include <fstream>
 #include <sstream>
 
 DECLARE_bool(help);
+DEFINE_bool(c_plus_plus, false, "Should we interpret the query as C++ code?ß");
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_string(query, "", "Query pattern to be searched");
@@ -67,7 +69,8 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  for (mx::WeggliQueryMatch match : index.weggli_query(FLAGS_query)) {
+  mx::WeggliQuery query(FLAGS_query, FLAGS_c_plus_plus);
+  for (mx::WeggliQueryMatch match : index.query_fragments(query)) {
     mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);
     auto sep = "\t";

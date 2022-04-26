@@ -58,12 +58,12 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
   }
 }
 
-WeggliQueryResult Index::weggli_query(std::string query, bool is_cpp) const {
-  return WeggliQueryResult(impl->WeggliQuery(impl, std::move(query), is_cpp));
+WeggliQueryResult Index::query_fragments(const WeggliQuery &query) const {
+  return WeggliQueryResult(impl->Query(impl, query));
 }
 
-RegexQueryResult Index::regex_query(std::string pattern) const {
-  return RegexQueryResult(impl->RegexQuery(impl, std::move(pattern)));
+RegexQueryResult Index::query_fragments(const RegexQuery &query) const {
+  return RegexQueryResult(impl->Query(impl, query));
 }
 
 }  // namespace mx

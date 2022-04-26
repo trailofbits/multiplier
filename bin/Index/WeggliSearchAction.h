@@ -30,7 +30,7 @@ class WeggliSearchAction final : public mx::Action {
   virtual ~WeggliSearchAction(void);
 
   WeggliSearchAction(std::shared_ptr<SearchingContext> context_,
-                     std::string_view syntax_string, bool is_cpp);
+                     std::string syntax_string, bool is_cpp);
 
   void QuerySyntaxInFile(mx::FileId file_id);
 

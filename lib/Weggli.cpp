@@ -65,12 +65,14 @@ class WeggliQueryImpl final {
   using ResultsPtr = struct QueryResults *;
   using UserDataPtr = void*;
 
+  const std::string pattern;
   const TreePtr qtree;
   const bool is_cpp;
 
  public:
-  explicit WeggliQueryImpl(std::string_view query, bool is_cpp_)
-      : qtree(weggli_new_query(query.data(), is_cpp_)),
+  explicit WeggliQueryImpl(std::string query_, bool is_cpp_)
+      : pattern(std::move(query_)),
+        qtree(weggli_new_query(pattern.data(), is_cpp_)),
         is_cpp(is_cpp_) {}
 
   ~WeggliQueryImpl(void) {
@@ -80,8 +82,8 @@ class WeggliQueryImpl final {
   }
 };
 
-WeggliQuery::WeggliQuery(std::string_view query, bool is_cpp)
-    : impl(std::make_unique<WeggliQueryImpl>(query, is_cpp)) {}
+WeggliQuery::WeggliQuery(std::string query, bool is_cpp)
+    : impl(std::make_shared<WeggliQueryImpl>(std::move(query), is_cpp)) {}
 
 WeggliQuery::~WeggliQuery(void) {}
 
@@ -102,8 +104,16 @@ void WeggliQuery::ForEachMatch(
   weggli_destroy_matches(matches);
 }
 
+std::string_view WeggliQuery::Pattern(void) const {
+  return impl->pattern;
+}
+
 bool WeggliQuery::IsValid(void) const {
   return impl->qtree != nullptr;
+}
+
+bool WeggliQuery::IsCPlusPlus(void) const {
+  return impl->is_cpp;
 }
 
 }  // namespace mx
@@ -112,7 +122,7 @@ namespace mx {
 
 class WeggliQueryImpl {};
 
-WeggliQuery::WeggliQuery(std::string_view, bool)
+WeggliQuery::WeggliQuery(std::string, bool)
     : impl() {}
 
 WeggliQuery::~WeggliQuery(void) {}
@@ -121,6 +131,14 @@ void WeggliQuery::ForEachMatch(
     std::string_view, std::function<bool(const WeggliMatchData &)>) const {}
 
 bool WeggliQuery::IsValid(void) const {
+  return false;
+}
+
+std::string_view WeggliQuery::Pattern(void) const {
+  return {};
+}
+
+bool WeggliQuery::IsCPlusPlus(void) const {
   return false;
 }
 

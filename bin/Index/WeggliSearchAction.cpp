@@ -76,9 +76,9 @@ WeggliSearchAction::~WeggliSearchAction(void) {}
 
 WeggliSearchAction::WeggliSearchAction(
     std::shared_ptr<SearchingContext> context_,
-    std::string_view syntax, bool is_cpp)
+    std::string syntax, bool is_cpp)
     : context(std::move(context_)),
-      query_tree(syntax, is_cpp) {}
+      query_tree(std::move(syntax), is_cpp) {}
 
 void WeggliSearchAction::Run(mx::Executor, mx::WorkerId) {
   if (!query_tree.IsValid()) {

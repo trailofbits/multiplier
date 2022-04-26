@@ -319,15 +319,15 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   return kj::READY_NOW;
 }
 
-kj::Promise<void> Server::weggliQuery(WeggliQueryContext context) {
+kj::Promise<void> Server::weggliQueryFragments(
+    WeggliQueryFragmentsContext context) {
 
   // Get params and result context
-  mx::rpc::Multiplier::WeggliQueryParams::Reader params =
+  mx::rpc::Multiplier::WeggliQueryFragmentsParams::Reader params =
       context.getParams();
 
   auto results = context.initResults();
-  std::string_view syntax_string =
-      std::string_view(params.getQuery().cStr(), params.getQuery().size());
+  std::string syntax_string(params.getQuery().cStr(), params.getQuery().size());
   if (syntax_string.empty()) {
     (void) results.initFragments(0u);
     return kj::READY_NOW;
@@ -374,16 +374,16 @@ kj::Promise<void> Server::weggliQuery(WeggliQueryContext context) {
   return kj::READY_NOW;
 }
 
-kj::Promise<void> Server::regexQuery(RegexQueryContext context) {
+kj::Promise<void> Server::regexQueryFragments(
+    RegexQueryFragmentsContext context) {
   // Get params and result context
-  mx::rpc::Multiplier::RegexQueryParams::Reader params =
+  mx::rpc::Multiplier::RegexQueryFragmentsParams::Reader params =
       context.getParams();
 
   auto results = context.initResults();
-  std::string_view pattern =
-      std::string_view(params.getRegex().cStr(), params.getRegex().size());
+  std::string pattern(params.getRegex().cStr(), params.getRegex().size());
   if (pattern.empty()) {
-    (void) results.initMatches(0u);
+    (void) results.initFragments(0u);
     return kj::READY_NOW;
   }
 
@@ -401,23 +401,20 @@ kj::Promise<void> Server::regexQuery(RegexQueryContext context) {
   executor.Wait();
 
   // Convert the file file:line pairs into overlapping fragment IDs.
-  std::set<std::tuple<mx::FileId, mx::FragmentId>> matches;
+  std::set<mx::FragmentId> matches;
   for (auto prefix : sc->line_results) {
     d->server_context.file_fragment_lines.ScanPrefix(
-        prefix, [&matches] (mx::FileId file_id, unsigned, mx::FragmentId frag_id) {
-      std::string file_path;
-      matches.emplace(file_id, frag_id);
+        prefix, [&matches] (mx::FileId, unsigned, mx::FragmentId frag_id) {
+      matches.emplace(frag_id);
       return true;
     });
   }
 
-  auto num_files = static_cast<unsigned>(matches.size());
-  auto match_builder = results.initMatches(num_files);
+  auto num_fragments = static_cast<unsigned>(matches.size());
+  auto match_builder = results.initFragments(num_fragments);
   auto index = 0u;
-  for (auto &match : matches) {
-    mx::rpc::RegexMatch::Builder info = match_builder[index++];
-    info.setFileId(std::get<0>(match));
-    info.setFragmentId(std::get<1>(match));
+  for (mx::FragmentId frag_id : matches) {
+    match_builder.set(index++, frag_id);
   }
 
   return kj::READY_NOW;

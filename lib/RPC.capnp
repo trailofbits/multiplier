@@ -175,7 +175,7 @@ struct Fragment @0xe5f27760091f9a3a {
 
 struct RegexMatch @0xc119a143d978fd1e {
   fileId @0 :UInt64;
-  fragmentId @1 : UInt64;
+  fragmentId @1 :UInt64;
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {
@@ -195,8 +195,9 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   downloadFragment @3 (id: UInt64) -> (fragment :Data);
 
   # Search code fragments matches with the query
-  weggliQuery @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
+  weggliQueryFragments @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
  
-  # Query for a regular expression match
-  regexQuery @5 (regex :Text) -> (matches : List(RegexMatch));
+  # Query for a regular expression match, and return the list of fragment ids
+  # overlapping with the matches.
+  regexQueryFragments @5 (regex :Text) -> (fragments :List(UInt64));
 }

@@ -17,6 +17,7 @@
 namespace mx {
 
 class WeggliQueryImpl;
+class Index;
 
 struct WeggliMatchData final {
   // raw offset of the query matches captured by Weggli.
@@ -27,23 +28,30 @@ struct WeggliMatchData final {
 };
 
 class WeggliQuery final {
+ private:
+  friend class Index;
+
+  WeggliQuery(void) = delete;
+  std::shared_ptr<WeggliQueryImpl> impl;
+
  public:
   using TreePtr = void *;
   using ResultPtr = void *;
   using ResultsPtr = void *;
   using UserDataPtr = void *;
 
-  explicit WeggliQuery(std::string_view query, bool is_cpp);
+  explicit WeggliQuery(std::string query, bool is_cpp);
 
   ~WeggliQuery();
+
 
   void ForEachMatch(std::string_view source,
                     std::function<bool(const WeggliMatchData &)> cb) const;
 
   bool IsValid(void) const;
 
- private:
-  std::unique_ptr<WeggliQueryImpl> impl;
+  std::string_view Pattern(void) const;
+  bool IsCPlusPlus(void) const;
 };
 
 }  // namespace mx
