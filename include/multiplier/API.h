@@ -722,7 +722,7 @@ class RegexQueryMatch : public TokenRange {
 
   // The actual range of matched data. This is possibly a sub-sequence of
   // `this->TokenRange::data()`.
-  std::string_view data_range;
+  std::vector<std::string_view> matched_ranges;
 
   // Fragment with the match.
   std::shared_ptr<const FragmentImpl> frag;
@@ -733,20 +733,17 @@ class RegexQueryMatch : public TokenRange {
   // Translate a data capture into a token range capture.
   std::optional<TokenRange> TranslateCapture(std::string_view capture) const;
 
-  // Try to match a specific capture group.
-  std::optional<std::string_view> MatchCapture(size_t index) const;
-
- public:
-  ~RegexQueryMatch(void);
-
   RegexQueryMatch(TokenRange range_, std::string_view data_range_,
                   std::shared_ptr<const FragmentImpl> frag_,
                   const RegexQuery &query_);
 
+ public:
+  ~RegexQueryMatch(void);
+
   // The actual range of matched data. This is possibly a sub-sequence of
   // `this->TokenRange::data()`.
   inline std::string_view data(void) const noexcept {
-    return data_range;
+    return matched_ranges[0];
   }
 
   // Return the captured tokens for a given named capture group.
@@ -765,7 +762,7 @@ class RegexQueryMatch : public TokenRange {
   std::vector<std::string> captured_variables(void) const;
 
   // Return the number of capture groups.
-  unsigned num_captures(void) const;
+  size_t num_captures(void) const;
 };
 
 class RegexQueryResultIterator {

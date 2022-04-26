@@ -134,13 +134,38 @@ void RegexQueryResultIterator::Advance(void) {
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
 RegexQueryMatch::RegexQueryMatch(TokenRange range_,
-                                 std::string_view data_range_,
+                                 std::string_view data_range,
                                  std::shared_ptr<const FragmentImpl> frag_,
                                  const RegexQuery &query_)
     : TokenRange(std::move(range_)),
-      data_range(data_range_),
       frag(std::move(frag_)),
-      query(query_.impl) {}
+      query(query_.impl) {
+
+  int num_captures = query->re.NumberOfCapturingGroups();
+  assert(1 <= num_captures);
+
+  matched_ranges.reserve(static_cast<unsigned>(num_captures));
+  matched_ranges.push_back(data_range);
+
+  std::vector<re2::StringPiece> parts;
+  parts.resize(static_cast<unsigned>(num_captures) + 2u);
+  auto ret = query->re.Match(data_range, 0, data_range.size(),
+                             re2::RE2::Anchor::UNANCHORED,
+                             &(parts[0]), num_captures + 1);
+  if (ret) {
+    // `0` is the whole range, which we've already added.
+    // `1` is to skip over the `(` and `)` that our Re2 wrapper applies.
+    for (auto i = 2; i <= num_captures; ++i) {
+      auto part = parts[static_cast<unsigned>(i)];
+      auto x = matched_ranges.size();
+      if (!part.data()) {
+        matched_ranges.emplace_back();
+      } else {
+        matched_ranges.emplace_back(part.data(), part.size());
+      }
+    }
+  }
+}
 
 // Translate a data capture into a token range catpure.
 std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
@@ -150,6 +175,7 @@ std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
   auto end_ptr = &(begin_ptr[capture.size()]);
 
 #ifndef NDEBUG
+  auto data_range = matched_ranges[0];
   auto data_begin_ptr = data_range.data();
   auto data_end_ptr = &(data_begin_ptr[data_range.size()]);
   assert(begin_ptr >= data_begin_ptr);
@@ -183,28 +209,6 @@ std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
   return std::nullopt;
 }
 
-
-// Try to match a specific capture group.
-std::optional<std::string_view>
-RegexQueryMatch::MatchCapture(size_t index) const {
-  std::vector<re2::StringPiece> parts;
-  parts.resize(index + 1u);
-
-  auto ret = query->re.Match(data_range, 0, data_range.size(),
-                             re2::RE2::Anchor::UNANCHORED,
-                             &(parts[0]), static_cast<int>(parts.size()));
-  if (!ret) {
-    return std::nullopt;
-  }
-
-  re2::StringPiece &match = parts[index];
-  if (!match.data()) {
-    return std::nullopt;
-  }
-
-  return std::string_view(match.data(), match.size());
-}
-
 // Return the captured tokens for a given named capture group.
 std::optional<TokenRange> RegexQueryMatch::captured_tokens(
     const std::string &var) const {
@@ -225,7 +229,7 @@ std::optional<std::string_view> RegexQueryMatch::captured_data(
   if (index_it == named_captures.end()) {
     return std::nullopt;
   } else {
-    return MatchCapture(index_it->second);
+    return captured_data(static_cast<unsigned>(index_it->second));
   }
 }
 
@@ -243,26 +247,23 @@ std::optional<TokenRange> RegexQueryMatch::captured_tokens(
 // Return the captured data for a given indexed capture group.
 std::optional<std::string_view> RegexQueryMatch::captured_data(
     size_t capture_index) const {
-  if (!capture_index) {
-    return data_range;
-  } else {
-    return MatchCapture(capture_index + 1u);
+  if (capture_index < matched_ranges.size()) {
+    if (auto ret = matched_ranges[capture_index]; ret.data()) {
+      return ret;
+    }
   }
+  return std::nullopt;
 }
 
 // Return the number of capture groups.
-unsigned RegexQueryMatch::num_captures(void) const {
-  auto num_captures = query->re.NumberOfCapturingGroups();
-  assert(0 < num_captures);
-
-  // NOTE(pag): RegexQuery wraps pattern with `(` and `)`.
-  return static_cast<unsigned>(num_captures) - 1u;
+size_t RegexQueryMatch::num_captures(void) const {
+  return matched_ranges.size();
 }
 
 // Return a list of matched variables.
 std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   std::vector<std::string> ret;
-  for (const auto &[name, index] : query->re.NamedCapturingGroups()) {
+  for (const auto &[name, capture_index] : query->re.NamedCapturingGroups()) {
     ret.emplace_back(name);
   }
   return ret;

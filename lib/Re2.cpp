@@ -28,10 +28,11 @@ void RegexQueryImpl::ForEachMatch(
   re2::StringPiece result;
 
   while (re2::RE2::FindAndConsume(&input, re, &result)) {
-    if (result.empty()) {
+    if (!result.data()) {
       continue;
     }
 
+    // NOTE(pag): We allow empty results.
     std::string_view match(result.data(), result.size());
     assert(contents.begin() <= match.begin());
     assert(match.end() <= contents.end());

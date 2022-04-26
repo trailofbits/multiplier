@@ -55,14 +55,14 @@ extern "C" int main(int argc, char *argv[]) {
       FLAGS_host, FLAGS_port));
 
   mx::RegexQuery query(FLAGS_query);
-  for (mx::RegexQueryMatch match : index.query_fragments(query)) {
+  for (const mx::RegexQueryMatch &match : index.query_fragments(query)) {
     mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);
     std::cout
         << frag.id() << '\t' << GetFileContaining(index, file.id())
         << std::endl;
 
-    for (auto i = 0u, max_i = match.num_captures(); i <= max_i; ++i) {
+    for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {
       if (auto data = match.captured_data(i)) {
         std::cout << "\t[" << i << "] = \t" << *data << '\n';
       }
