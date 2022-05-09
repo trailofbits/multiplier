@@ -15877,7 +15877,7 @@ class InitListExpr : public Expr {
   bool is_semantic_form(void) const;
   bool is_string_literal_initializer(void) const;
   bool is_syntactic_form(void) const;
-  bool is_transparent(void) const;
+  std::optional<bool> is_transparent(void) const;
 };
 
 using ImplicitValueInitExprRange = DerivedEntityRange<StmtIterator, ImplicitValueInitExpr>;
@@ -16448,17 +16448,13 @@ class Decl {
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   Token begin_token(void) const;
-  Token body_r_brace(void) const;
   Decl canonical_declaration(void) const;
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   Token end_token(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
   std::optional<FunctionType> function_type(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
-  Decl most_recent_declaration(void) const;
-  std::optional<Decl> next_declaration_in_context(void) const;
   std::optional<Decl> non_closure_context(void) const;
-  std::optional<Decl> previous_declaration(void) const;
   bool has_attributes(void) const;
   bool has_defining_attribute(void) const;
   bool has_owning_module(void) const;
@@ -17279,7 +17275,7 @@ class DeclaratorDecl : public ValueDecl {
   Token inner_token_start(void) const;
   Token outer_token_start(void) const;
   std::optional<Expr> trailing_requires_clause(void) const;
-  Type type_source_info(void) const;
+  std::optional<Type> type_source_info(void) const;
   Token type_spec_end_token(void) const;
   Token type_spec_start_token(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;

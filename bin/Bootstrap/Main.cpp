@@ -180,6 +180,9 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "HasBody"},
   {"Decl", "AsFunction"},
   {"Decl", "TranslationUnitDeclaration"},
+  {"Decl", "NextDeclarationInContext"},
+  {"Decl", "MostRecentDeclaration"},
+  {"Decl", "PreviousDeclaration"},
 
   // These are redundant.
   {"FunctionDecl", "ParameterDeclarations"},
@@ -507,6 +510,7 @@ class CodeGenerator {
   std::stringstream late_include_h_os;
   std::ofstream serialize_h_os;  // `bin/Index/Serialize.h`
   std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
+  std::ofstream serialize_inc_os;  // `bin/Index/Visitor.inc.h`
 
   std::vector<pasta::NamespaceDecl> pastas;
 
@@ -953,7 +957,14 @@ void CodeGenerator::RunOnOptional(
         << "    return data.cStr();\n";
 
   // Reference types.
-  } else if (gEntityClassNames.count(*element_name)) {
+  } else if (gEntityClassNames.count(element_name.value())) {
+
+    serialize_inc_os
+        << "  MX_SERIALIZE_OPTIONAL_ENTITY(" << class_name << ", " << api_name
+        << ", " << getter_name << ", " << setter_name << ", "
+        << init_name << ", " << method_name << ", " << element_name.value()
+        << ", " << nth_entity_reader << ")\n";
+
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
         << "    if (auto id" << i << " = es.EntityId(v" << i << ".value())) {\n"
@@ -988,19 +999,19 @@ void CodeGenerator::RunOnOptional(
           << "    return fragment->TypeFor(fragment, id);\n";
 
 
-    } else if (gDeclNames.count(*element_name)) {
+    } else if (gDeclNames.count(element_name.value())) {
       lib_cpp_os
-          << "    return " << (*element_name)
+          << "    return " << element_name.value()
           << "::from(fragment->DeclFor(fragment, id));\n";
 
-    } else if (gStmtNames.count(*element_name)) {
+    } else if (gStmtNames.count(element_name.value())) {
       lib_cpp_os
-          << "    return " << (*element_name)
+          << "    return " << element_name.value()
           << "::from(fragment->StmtFor(fragment, id));\n";
 
-    } else if (gTypeNames.count(*element_name)) {
+    } else if (gTypeNames.count(element_name.value())) {
       lib_cpp_os
-          << "    return " << (*element_name)
+          << "    return " << (element_name.value())
           << "::from(fragment->TypeFor(fragment, id));\n";
 
     } else {
@@ -1011,20 +1022,22 @@ void CodeGenerator::RunOnOptional(
   // Pseudo-entities.
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
 
+    serialize_inc_os
+        << "  MX_SERIALIZE_OPTIONAL_PSEUDO(" << class_name << ", " << api_name
+        << ", " << getter_name << ", " << setter_name << ", "
+        << init_name << ", " << method_name << ", " << element_name.value()
+        << ", " << nth_entity_reader << ")\n";
+
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
-        << "    auto o" << i << " = es.next_pseudo_entity_offset++;\n"
-        << "    Serialize" << (*element_name)
-        << "(es, es.pseudo_builder[o" << i << "], v" << i
-        << ".value());\n"
-        << "    b." << setter_name << "(o" << i << ");\n"
+        << "    b." << setter_name << "(es.PseudoId(v" << i << ".value()));\n"
         << "    b." << ip_setter_name << "(true);\n"
         << "  } else {\n"
         << "    b." << ip_setter_name << "(false);\n"
         << "  }\n";
 
     lib_cpp_os
-        << "    return " << (*element_name) << "(fragment, self."
+        << "    return " << element_name.value() << "(fragment, self."
         << getter_name << "());\n";
 
   // Enums, bools, ints, etc.
@@ -1194,6 +1207,21 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
 
   // Reference types.
   } else if (gEntityClassNames.count(*element_name)) {
+
+    if (optional) {
+      serialize_inc_os
+          << "  MX_SERIALIZE_OPTIONAL_ENTITY_LIST(" << class_name << ", " << api_name
+          << ", " << getter_name << ", " << setter_name << ", "
+          << init_name << ", " << method_name << ", " << element_name.value()
+          << ", " << nth_entity_reader << ")\n";
+    } else {
+      serialize_inc_os
+          << "  MX_SERIALIZE_ENTITY_LIST(" << class_name << ", " << api_name
+          << ", " << getter_name << ", " << setter_name << ", "
+          << init_name << ", " << method_name << ", " << element_name.value()
+          << ", " << nth_entity_reader << ")\n";
+    }
+
     serialize_cpp_os
         << "      sv" << i << ".set(i" << i << ", es.EntityId(e" << i
         << "));\n";
@@ -1246,11 +1274,22 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
 
   // Not reference types, need to serialize offsets.
   } else {
+    if (optional) {
+      serialize_inc_os
+          << "  MX_SERIALIZE_OPTIONAL_PSEUDO_LIST(" << class_name << ", " << api_name
+          << ", " << getter_name << ", " << setter_name << ", "
+          << init_name << ", " << method_name << ", " << element_name.value()
+          << ", " << nth_entity_reader << ")\n";
+    } else {
+      serialize_inc_os
+          << "  MX_SERIALIZE_PSEUDO_LIST(" << class_name << ", " << api_name
+          << ", " << getter_name << ", " << setter_name << ", "
+          << init_name << ", " << method_name << ", " << element_name.value()
+          << ", " << nth_entity_reader << ")\n";
+    }
+
     serialize_cpp_os
-        << "      auto o" << i << " = es.next_pseudo_entity_offset++;\n"
-        << "      sv" << i << ".set(i" << i << ", o" << i << ");\n"
-        << "      Serialize" << (*element_name)
-        << "(es, es.pseudo_builder[o" << i << "], e" << i << ");\n";
+        << "      sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
 
     lib_cpp_os
         << "vec.emplace_back(fragment, v);\n";
@@ -1299,6 +1338,14 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   const char *nth_entity_reader = nullptr;
+  const char *end_serializer = nullptr;
+
+  serialize_inc_os
+      << "#ifndef MX_ENTER_SERIALIZE_" << class_name
+      << "\n#  define MX_ENTER_SERIALIZE_" << class_name
+      << "\n#endif\n#ifndef MX_EXIT_SERIALIZE_" << class_name
+      << "\n#  define MX_EXIT_SERIALIZE_" << class_name
+      << "\n#endif\n\n";
 
   if (is_decl) {
     include_h_os
@@ -1314,11 +1361,15 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntitySerializer &es, mx::ast::Decl::Builder b, const pasta::"
+        << "(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
         << class_name << " &e) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
+
+    serialize_inc_os
+        << "MX_BEGIN_SERIALIZE_DECL(" << class_name << ")\n";
+    end_serializer = "MX_END_SERIALIZE_DECL";
 
     nth_entity_reader = "NthDecl";
 
@@ -1336,8 +1387,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntitySerializer &es, mx::ast::Stmt::Builder b, const pasta::"
+        << "(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
         << class_name << " &e) {\n";
+
+    serialize_inc_os
+        << "MX_BEGIN_SERIALIZE_STMT(" << class_name << ")\n";
+    end_serializer = "MX_END_SERIALIZE_STMT";
 
     nth_entity_reader = "NthStmt";
 
@@ -1352,22 +1407,32 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntitySerializer &es, mx::ast::Type::Builder b, const pasta::"
+        << "(EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
         << class_name << " &e) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
+
+    serialize_inc_os
+        << "MX_BEGIN_SERIALIZE_TYPE(" << class_name << ")\n";
+    end_serializer = "MX_END_SERIALIZE_TYPE";
 
     nth_entity_reader = "NthType";
 
   } else {
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntitySerializer &es, mx::ast::Pseudo::Builder b, const pasta::"
+        << "(EntityMapper &es, mx::ast::Pseudo::Builder b, const pasta::"
         << class_name << " &e) {\n";
+
+    serialize_inc_os
+        << "MX_BEGIN_SERIALIZE_PSEUDO(" << class_name << ")\n";
+    end_serializer = "MX_END_SERIALIZE_PSEUDO";
 
     nth_entity_reader = "NthPseudo";
   }
+
+  serialize_inc_os << "  MX_ENTER_SERIALIZE_" << class_name << "\n";
 
   include_h_os
       << "class " << class_name;
@@ -1380,9 +1445,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   if (cls->base) {
     std::string base_name = cls->base->record.Name();
-    std::string snake_name = CapitalCaseToSnakeCase(base_name);
-    std::string camel_name = SnakeCaseToCamelCase(snake_name);
-    std::string init_name = "init" + Capitalize(camel_name);
 
     // Inheritance.
     include_h_os
@@ -1400,6 +1462,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (!dont_serialize) {
       serialize_cpp_os
           << "  Serialize" << base_name << "(es, b, e);\n";
+
+      serialize_inc_os
+          << "  MX_SERIALIZE_BASE(" << class_name << ", " << base_name << ")\n";
     }
 
     include_h_os
@@ -1428,9 +1493,17 @@ MethodListPtr CodeGenerator::RunOnClass(
       auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(cd);
       auto [cs_getter_name, cs_setter_name, cs_init_name] = NamesFor(cs);
 
+      serialize_inc_os
+          << "  MX_SERIALIZE_DECL_LINK(" << class_name
+          << ", parent_declaration, " << cd_getter_name
+          << ", " << cd_setter_name << ", " << cd_init_name << ")\n"
+          << "  MX_SERIALIZE_STMT_LINK(" << class_name << ", parent_statement, "
+          << cs_getter_name << ", " << cs_setter_name << ", " << cs_init_name
+          << ")\n";
+
       serialize_cpp_os
-          << "  b." << cd_setter_name << "(es.parent_decl_id);\n"
-          << "  b." << cs_setter_name << "(es.parent_stmt_id);\n";
+          << "  b." << cd_setter_name << "(es.ParentDeclId(e));\n"
+          << "  b." << cs_setter_name << "(es.ParentStmtId(e));\n";
 
       lib_cpp_os
           << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
@@ -1799,6 +1872,12 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  b." << setter_name << "(es.EntityId(e."
             << method_name << "()));\n";
 
+        serialize_inc_os
+            << "  MX_SERIALIZE_ENTITY(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", Token, "
+            << nth_entity_reader << ")\n";
+
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
         const auto i = storage.AddMethod("UInt64");  // Reference.
@@ -1935,6 +2014,12 @@ MethodListPtr CodeGenerator::RunOnClass(
         const auto i = storage.AddMethod("UInt64");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
+        serialize_inc_os
+            << "  MX_SERIALIZE_ENTITY(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", "
+            << record_name << ", " << nth_entity_reader << ")\n";
+
         include_h_os
             << "  " << record_name << " " << api_name
             << "(void) const;\n";
@@ -1990,6 +2075,12 @@ MethodListPtr CodeGenerator::RunOnClass(
         const auto i = storage.AddMethod("UInt32");  // Offset in `EntityList::entities`.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
+        serialize_inc_os
+            << "  MX_SERIALIZE_PSEUDO(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << record_name << ", "
+            << nth_entity_reader << ")\n";
+
         include_h_os
             << "  " << record_name << " " << api_name
             << "(void) const;\n";
@@ -2003,10 +2094,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "}\n\n";
 
         serialize_cpp_os
-            << "  auto o" << i << " = es.next_pseudo_entity_offset++;\n"
-            << "  sv" << i << ".set(i" << i << ", o" << i << ");\n"
-            << "  Serialize" << record_name
-            << "(es, es.pseudo_builder[o" << i << "], e" << i << ");\n";
+            << "  sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
 
       } else if (gNotReferenceTypes.count(record_name)) {
         std::cerr << "unhandled record " << record_name << "\n";
@@ -2082,15 +2170,21 @@ MethodListPtr CodeGenerator::RunOnClass(
       auto [getter_name, setter_name, init_name] = NamesFor(i);
 
       static const std::string snake_name = "declarations_in_context";
-//      static const std::string api_name = SnakeCaseToAPICase(snake_name);
+      static const std::string api_name = SnakeCaseToAPICase(snake_name);
 //      static const std::string camel_name = "declarationsInContext";
 
+      serialize_inc_os
+          << "  MX_SERIALIZE_DECL_CONTEXT(" << class_name << ", " << api_name
+          << ", " << getter_name << ", " << setter_name << ", "
+          << init_name << ", AlreadyLoadedDeclarations, Decl, "
+          << nth_entity_reader << ")\n";
+
       include_h_os
-          << "  std::vector<Decl> " << snake_name << "(void) const;\n";
+          << "  std::vector<Decl> " << api_name << "(void) const;\n";
 
       lib_cpp_os
           << "std::vector<Decl> "
-          << class_name << "::" << snake_name
+          << class_name << "::" << api_name
           << "(void) const {\n"
           << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
           << "  auto list = self." << getter_name << "();\n"
@@ -2118,6 +2212,13 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   include_h_os << "};\n\n";
   serialize_cpp_os << "}\n\n";
+
+  serialize_inc_os
+      << "  MX_EXIT_SERIALIZE_" << class_name << "\n"
+      << end_serializer << "(" << class_name << ")\n"
+      << "#undef MX_ENTER_SERIALIZE_" << class_name << "\n"
+      << "#undef MX_EXIT_SERIALIZE_" << class_name << "\n\n";
+
   return seen_methods;
 }
 
@@ -2150,6 +2251,75 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Fragment.h\"\n\n"
       << "namespace mx {\n";
 
+  serialize_inc_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#ifndef MX_SERIALIZE_ENTITY\n"
+      << "#  define MX_SERIALIZE_ENTITY(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_ENTITY\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_ENTITY(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_ENTITY_LIST\n"
+      << "#  define MX_SERIALIZE_ENTITY_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_ENTITY_LIST\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_ENTITY_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_DECL_CONTEXT\n"
+      << "#  define MX_SERIALIZE_DECL_CONTEXT(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_PSEUDO\n"
+      << "#  define MX_SERIALIZE_PSEUDO(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_PSEUDO\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_PSEUDO(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_PSEUDO_LIST\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_PSEUDO_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_PSEUDO_LIST\n"
+      << "#  define MX_SERIALIZE_PSEUDO_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_BASE\n"
+      << "#  define MX_SERIALIZE_BASE(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_DECL_LINK\n"
+      << "#  define MX_SERIALIZE_DECL_LINK(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_STMT_LINK\n"
+      << "#  define MX_SERIALIZE_STMT_LINK(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_BEGIN_SERIALIZE_DECL\n"
+      << "#  define MX_BEGIN_SERIALIZE_DECL(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_BEGIN_SERIALIZE_STMT\n"
+      << "#  define MX_BEGIN_SERIALIZE_STMT(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_BEGIN_SERIALIZE_TYPE\n"
+      << "#  define MX_BEGIN_SERIALIZE_TYPE(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_BEGIN_SERIALIZE_PSEUDO\n"
+      << "#  define MX_BEGIN_SERIALIZE_PSEUDO(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_END_SERIALIZE_DECL\n"
+      << "#  define MX_END_SERIALIZE_DECL(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_END_SERIALIZE_STMT\n"
+      << "#  define MX_END_SERIALIZE_STMT(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_END_SERIALIZE_TYPE\n"
+      << "#  define MX_END_SERIALIZE_TYPE(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_END_SERIALIZE_PSEUDO\n"
+      << "#  define MX_END_SERIALIZE_PSEUDO(...)\n"
+      << "#endif\n"
+      << "\n";
+
   serialize_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
@@ -2170,6 +2340,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include \"Serialize.h\"\n\n"
+      << "#include <multiplier/RPC.capnp.h>\n"
       << "#include <pasta/AST/Decl.h>\n"
       << "#include <pasta/AST/Stmt.h>\n"
       << "#include <pasta/AST/Type.h>\n"
@@ -2177,13 +2348,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <pasta/Compile/Compiler.h>\n"
       << "#include <pasta/Compile/Job.h>\n"
       << "#include <pasta/Util/ArgumentVector.h>\n\n"
-      << "#include \"Serializer.h\"\n\n"
-      << "namespace indexer {\n\n"
-      << "void EntitySerializer::SerializeCodeEntities(\n"
-      << "    PendingFragment code, FragmentBuilder &builder) {\n"
-      << "  decl_builder = builder.initDeclarations(code.num_decl_entities);\n"
-      << "  stmt_builder = builder.initStatements(code.num_stmt_entities);\n"
-      << "  pseudo_builder = builder.initOthers(code.num_pseudo_entities);\n";
+      << "#include \"EntityMapper.h\"\n\n"
+      << "namespace indexer {\n\n";
 
   include_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -2263,8 +2429,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   serialize_h_os
-      << "class EntitySerializer;\n"
-      << "void Serialize(EntitySerializer &, const pasta::Decl &);\n";
+      << "class EntityMapper;\n";
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {
@@ -2273,7 +2438,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
         << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
-        << "(EntitySerializer &, mx::ast::Decl::Builder, const pasta::"
+        << "(EntityMapper &, mx::ast::Decl::Builder, const pasta::"
         << name << " &);\n";
   }
 
@@ -2283,16 +2448,9 @@ int CodeGenerator::RunOnClassHierarchies(void) {
         << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
-        << "(EntitySerializer &, mx::ast::Stmt::Builder, const pasta::"
+        << "(EntityMapper &, mx::ast::Stmt::Builder, const pasta::"
         << name << " &);\n";
   }
-
-  serialize_cpp_os
-      << "  for (const pasta::Decl &decl : code.decls) {\n"
-      << "    this->DeclVisitor::Accept(decl);\n"
-      << "  }\n"
-      << "  this->SerializeTypes(builder);\n"
-      << "}\n\n";
 
   for (const pasta::CXXRecordDecl &record : types) {
     auto name = record.Name();
@@ -2300,7 +2458,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
         << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
-        << "(EntitySerializer &, mx::ast::Type::Builder, const pasta::"
+        << "(EntityMapper &, mx::ast::Type::Builder, const pasta::"
         << name << " &);\n";
   }
 
@@ -2309,7 +2467,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
     if (name != "Token" && name != "TokenRange" && name != "FileToken") {
       serialize_h_os
           << "void Serialize" << name
-          << "(EntitySerializer &, mx::ast::Pseudo::Builder, const pasta::"
+          << "(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::"
           << name << " &);\n";
     }
   }
@@ -2395,6 +2553,27 @@ int CodeGenerator::RunOnClassHierarchies(void) {
   lib_cpp_os
       << "#endif\n";
 
+  serialize_inc_os
+      << "#undef MX_SERIALIZE_ENTITY\n"
+      << "#undef MX_SERIALIZE_ENTITY_LIST\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_ENTITY\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_ENTITY_LIST\n"
+      << "#undef MX_SERIALIZE_PSEUDO\n"
+      << "#undef MX_SERIALIZE_PSEUDO_LIST\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_PSEUDO\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_PSEUDO_LIST\n"
+      << "#undef MX_SERIALIZE_BASE\n"
+      << "#undef MX_SERIALIZE_DECL_LINK\n"
+      << "#undef MX_SERIALIZE_STMT_LINK\n"
+      << "#undef MX_BEGIN_SERIALIZE_DECL\n"
+      << "#undef MX_BEGIN_SERIALIZE_STMT\n"
+      << "#undef MX_BEGIN_SERIALIZE_TYPE\n"
+      << "#undef MX_BEGIN_SERIALIZE_PSEUDO\n"
+      << "#undef MX_END_SERIALIZE_DECL\n"
+      << "#undef MX_END_SERIALIZE_STMT\n"
+      << "#undef MX_END_SERIALIZE_TYPE\n"
+      << "#undef MX_END_SERIALIZE_PSEUDO\n";
+
   lib_cpp_os << "}  // namespace mx\n";
   include_h_os << "}  // namespace mx\n";
   serialize_h_os << "}  // namespace indexer\n";
@@ -2478,13 +2657,15 @@ CodeGenerator::CodeGenerator(char *argv[])
       lib_cpp_os(argv[4], std::ios::trunc | std::ios::out),
       include_h_os(argv[5], std::ios::trunc | std::ios::out),
       serialize_h_os(argv[6], std::ios::trunc | std::ios::out),
-      serialize_cpp_os(argv[7], std::ios::trunc | std::ios::out) {}
+      serialize_cpp_os(argv[7], std::ios::trunc | std::ios::out),
+      serialize_inc_os(argv[8], std::ios::trunc | std::ios::out) {}
 
 int main(int argc, char *argv[]) {
-  if (8 != argc) {
+  if (9 != argc) {
     std::cerr
         << "Usage: " << argv[0]
-        << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_CAPNP LIB_H LIB_CPP INCLUDE_H"
+        << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_AST_CAPNP LIB_AST_CPP"
+        << " INCLUDE_AST_H SERIALIZE_H SERIALIZE_CPP VISITOR_INC"
         << std::endl;
     return EXIT_FAILURE;
   }

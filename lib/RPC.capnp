@@ -126,8 +126,9 @@ struct FileInfo @0xfd1022cb187f18f8 {
 }
 
 struct Fragment @0xe5f27760091f9a3a {
-  # The unique identifier for this top-level declaration.
-  codeId @0 :UInt64;
+  # The unique identifier for this fragment (set of lexically overlapping
+  # top-level declarations).
+  id @0 :UInt64;
   
   # Inclusive range of file token IDs for the unparsed data of this fragment.
   firstFileTokenId @1 :UInt64;

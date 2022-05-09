@@ -10,7 +10,7 @@
 #include <multiplier/Types.h>
 #include <pasta/Util/File.h>
 
-#include "Serializer.h"
+#include "PendingFragment.h"
 
 namespace indexer {
 
@@ -19,7 +19,8 @@ class IndexingContext;
 void PersistFile(IndexingContext &context, mx::FileId file_id,
                  std::string file_hash, pasta::File file);
 
-void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
-                     PendingFragment fragment_info, std::string mlir);
+void PersistFragment(IndexingContext &context, EntityIdMap &entity_ids,
+                     FileIdMap &file_ids, const pasta::TokenRange &tokens,
+                     PendingFragment fragment, std::string mlir);
 
 }  // namespace indexer

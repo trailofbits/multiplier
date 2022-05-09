@@ -143,6 +143,8 @@ class EntityId {
   RawEntityId opaque{kInvalidEntityId};
 
  public:
+  EntityId(void) = default;
+
   /* implicit */ inline EntityId(RawEntityId opaque_)
       : opaque(opaque_) {}
 
@@ -153,6 +155,47 @@ class EntityId {
   /* implicit */ EntityId(FragmentTokenId id);
   /* implicit */ EntityId(TokenSubstitutionId id);
   /* implicit */ EntityId(FileTokenId id);
+
+  inline EntityId &operator=(DeclarationId id) {
+    EntityId self(id);
+    opaque = self.opaque;
+    return *this;
+  }
+
+  inline EntityId &operator=(StatementId id) {
+    EntityId self(id);
+    opaque = self.opaque;
+    return *this;
+  }
+
+  inline EntityId &operator=(TypeId id) {
+    EntityId self(id);
+    opaque = self.opaque;
+    return *this;
+  }
+
+  inline EntityId &operator=(FragmentTokenId id) {
+    EntityId self(id);
+    opaque = self.opaque;
+    return *this;
+  }
+
+  inline EntityId &operator=(TokenSubstitutionId id) {
+    EntityId self(id);
+    opaque = self.opaque;
+    return *this;
+  }
+
+  inline EntityId &operator=(FileTokenId id) {
+    EntityId self(id);
+    opaque = self.opaque;
+    return *this;
+  }
+
+  inline EntityId &operator=(RawEntityId id) {
+    opaque = id;
+    return *this;
+  }
 
   inline operator RawEntityId(void) const noexcept {
     return opaque;

@@ -19,6 +19,9 @@
 
 namespace indexer {
 
+// Recursively descends an AST, visiting declarations and statements. We focus
+// one declarations and statements here because they support inter-fragment
+// referencing.
 class EntityVisitor : protected pasta::DeclVisitor,
                       protected pasta::StmtVisitor {
  private:
@@ -30,8 +33,6 @@ class EntityVisitor : protected pasta::DeclVisitor,
   bool EnterDeclaratorDecl(const pasta::DeclaratorDecl &decl);
   bool EnterVarDecl(const pasta::VarDecl &decl);
 
-
- private:
   void VisitDeclContext(const pasta::DeclContext &dc);
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final;
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final;
@@ -54,10 +55,6 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitRecordDecl(const pasta::RecordDecl &decl) final;
   void VisitEnumConstantDecl(const pasta::EnumConstantDecl &decl) final;
   void VisitEnumDecl(const pasta::EnumDecl &decl) final;
-  void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final;
-  void VisitMSAsmStmt(const pasta::MSAsmStmt &stmt) final;
-  void VisitBreakStmt(const pasta::BreakStmt &stmt) final;
-  void VisitCompoundStmt(const pasta::CompoundStmt &stmt) final;
   void VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) final;
   void VisitDeclStmt(const pasta::DeclStmt &stmt) final;
   void VisitConceptSpecializationExpr(const pasta::ConceptSpecializationExpr &stmt) final;
@@ -72,25 +69,13 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitStmt(const pasta::Stmt &stmt) final;
 
  protected:
-  using pasta::DeclVisitor::Accept;
-  using pasta::StmtVisitor::Accept;
+  virtual bool Enter(const pasta::Decl &entity) = 0;
+  virtual bool Enter(const pasta::Stmt &entity) = 0;
 
  public:
   virtual ~EntityVisitor(void);
-  virtual bool Enter(const pasta::Decl &entity) = 0;
-  virtual bool Enter(const pasta::Stmt &entity) = 0;
-  virtual void Enter(const pasta::Decl &entity,
-                     std::vector<pasta::TemplateArgument>) = 0;
-  virtual void Enter(const pasta::Stmt &entity,
-                     std::vector<pasta::TemplateArgument>) = 0;
-  virtual void Enter(const pasta::Decl &entity,
-                     std::vector<pasta::CXXBaseSpecifier>) = 0;
-  virtual void Enter(const pasta::Decl &entity,
-                     std::vector<pasta::TemplateParameterList>) = 0;
-  virtual void Enter(const pasta::Decl &entity,
-                     const pasta::TemplateParameterList &) = 0;
-  virtual void Enter(const pasta::Stmt &entity,
-                     const pasta::TemplateParameterList &) = 0;
+  virtual void Accept(const pasta::Decl &entity);
+  virtual void Accept(const pasta::Stmt &entity);
 };
 
 }  // namespace indexer

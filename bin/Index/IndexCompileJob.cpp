@@ -19,7 +19,6 @@
 #include <multiplier/Types.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
-#include <pasta/AST/Token.h>
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
 #include <tuple>
@@ -29,9 +28,8 @@
 #include "Codegen.h"
 #include "Context.h"
 #include "Hash.h"
-#include "Label.h"
 #include "PrintTokenGraph.h"
-#include "Serializer.h"
+#include "PendingFragment.h"
 #include "Persist.h"
 #include "Util.h"
 
@@ -52,7 +50,6 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   explicit TLDFinder(std::vector<pasta::Decl> &tlds_)
       : tlds(tlds_) {}
-
 
   void VisitDeclContext(const pasta::DeclContext &dc) {;
     for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
@@ -350,7 +347,7 @@ IndexCompileJobAction::IndexCompileJobAction(
 // Look through all files referenced by the AST get their unique IDs. If this
 // is the first time seeing a file, then tokenize the file.
 void IndexCompileJobAction::MaybePersistFile(
-    mx::WorkerId worker_id, const mx::Executor &, pasta::File file) {
+    mx::WorkerId worker_id, pasta::File file) {
   if (!file.WasParsed()) {
     return;
   }
@@ -375,7 +372,7 @@ void IndexCompileJobAction::MaybePersistFile(
 }
 
 // Build and index the AST.
-void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
+void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   std::optional<mx::ProgressBarWork> parsing_progress_tracker(
       context->ast_progress.get());
   IndexingCounterRes cj_counter(context->stat, kStatCompileJob);
@@ -400,7 +397,7 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
     auto parsed_files = ast.ParsedFiles();
     for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
          it != end; ++it) {
-      MaybePersistFile(worker_id, exe, std::move(*it));
+      MaybePersistFile(worker_id, std::move(*it));
     }
   }
 
@@ -529,13 +526,14 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
         std::move(decls_for_group), begin_index, end_index);
   }
 
+  EntityIdMap entity_ids;
+
   // Create code chunks in reverse order that we see them in the AST. The hope
   // is that this will reduce contention in trying to create fragment IDs for
   // the redundant declarations that are likely to appear early in ASTs, i.e.
   // in `#include`d headers.
   std::optional<mx::ProgressBarWork> identification_progress_tracker(
       context->identification_progress.get());
-  EntityLabeller labeller;
   std::vector<PendingFragment> pending_fragments;
   for (auto it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
@@ -551,18 +549,24 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
                  begin_index, end_index),
         end_index - begin_index + 1u);
 
+    PendingFragment pending_fragment;
+    pending_fragment.fragment_id = code_id;
+    pending_fragment.decls = std::move(decls_for_group);
+    pending_fragment.begin_index = begin_index;
+    pending_fragment.end_index = end_index;
 
-
-    // We always need to enter the code for a chunk, regardless of if it
-    // `is_new`. This is because each chunk might have arbitrary references to
-    // other declarations. We need to be able to form cross-chunk references
-    // when serializing things, so we use the labeller to assign IDs to entities
-    // (decls, statements, etc.) in a uniform and deterministic way so that
-    // other threads doing similar indexing will form identically labelled
-    // chunks for the same logical entities.
-    PendingFragment pending_fragment = labeller.EnterCode(
-        code_id, std::move(decls_for_group), tok_range, begin_index, end_index);
-
+    // We always need to label the entities inside of a fragment, regardless of
+    // if fragment `is_new`. This is because each fragment might have arbitrary
+    // references to other declarations. We need to be able to form cross-
+    // fragment references when serializing things, so we use the labeller to
+    // assign IDs to entities (decls, statements, etc.) in a uniform and
+    // deterministic way so that other threads doing similar indexing will form
+    // identically labelled chunks for the same logical entities.
+    //
+    // Unfortunately, the labeller needs to be manually written as opposed to
+    // auto-generated, as our auto-generation has no concept of which AST
+    // methods descend vs. cross the tree (into other fragments).
+    pending_fragment.Label(entity_ids, tok_range);
     if (is_new) {
       pending_fragments.emplace_back(std::move(pending_fragment));
     }
@@ -572,15 +576,14 @@ void IndexCompileJobAction::Run(mx::Executor exe, mx::WorkerId worker_id) {
   // Serialize the new code chunks.
   mx::ProgressBarWork fragment_progress_tracker(
       context->serialization_progress.get());
-  EntitySerializer serializer(std::move(tok_range), labeller.TakeEntityIds(),
-                              file_ids);
+
   for (PendingFragment &pending_fragment : pending_fragments) {
 	  // Generate source IR before saving the fragments to the persistent
 	  // storage
-    auto mlir = ConvertToSourceIR(context, pending_fragment.fragment_id,
-                                  pending_fragment.decls);
-    PersistFragment(*context, serializer, std::move(pending_fragment),
-                    std::move(mlir));
+    std::string mlir = ConvertToSourceIR(context, pending_fragment.fragment_id,
+                                         pending_fragment.decls);
+    PersistFragment(*context, entity_ids, file_ids, tok_range,
+                    std::move(pending_fragment), std::move(mlir));
   }
 }
 

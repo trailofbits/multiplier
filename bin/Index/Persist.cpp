@@ -23,6 +23,7 @@
 
 #include "Compress.h"
 #include "Context.h"
+#include "EntityMapper.h"
 #include "TokenTree.h"
 #include "Util.h"
 
@@ -82,7 +83,7 @@ using TokenListBuilder =
 
 // Persist the token tree, which is a tree of substitutions, i.e. before/after
 // macro use/expansion, or x-macro file inclusion.
-static void PersistTokenTree(EntitySerializer &serializer,
+static void PersistTokenTree(EntityMapper &em,
                              SubstitutionListBuilder &subs_builder,
                              TokenListBuilder toks_builder,
                              TokenTree tree, mx::FragmentId fragment_id,
@@ -90,10 +91,10 @@ static void PersistTokenTree(EntitySerializer &serializer,
   unsigned i =0;
   for (TokenTreeNode node : tree) {
     if (std::optional<pasta::Token> pt = node.Token()) {
-      toks_builder.set(i++, serializer.EntityId(pt.value()));
+      toks_builder.set(i++, em.EntityId(pt.value()));
 
     } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
-      toks_builder.set(i++, serializer.EntityId(ft.value()));
+      toks_builder.set(i++, em.EntityId(ft.value()));
 
     } else if (auto sub = node.Substitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
@@ -108,12 +109,12 @@ static void PersistTokenTree(EntitySerializer &serializer,
           subs_builder[next_sub_offset++];
 
       unsigned num_nodes_lhs = lhs.NumNodes();
-      PersistTokenTree(serializer, subs_builder,
+      PersistTokenTree(em, subs_builder,
                        next_sub.initBeforeTokens(num_nodes_lhs), std::move(lhs),
                        fragment_id, next_sub_offset);
 
       unsigned num_nodes_rhs = rhs.NumNodes();
-      PersistTokenTree(serializer, subs_builder,
+      PersistTokenTree(em, subs_builder,
                        next_sub.initAfterTokens(num_nodes_rhs), std::move(rhs),
                        fragment_id, next_sub_offset);
     }
@@ -121,15 +122,15 @@ static void PersistTokenTree(EntitySerializer &serializer,
 }
 
 // Persist the tokens of a fragment.
-static void PersistTokens(EntitySerializer &serializer,
+static void PersistTokens(EntityMapper &em, const pasta::TokenRange &tokens,
                           uint64_t begin_index, uint64_t end_index,
-                          FragmentBuilder &fb) {
+                          mx::rpc::Fragment::Builder &fb) {
   auto num_tokens = static_cast<unsigned>(
       (end_index - begin_index) + 1u);
 
   unsigned token_data_size = 0u;
   for (auto i = begin_index; i <= end_index; ++i) {
-    pasta::Token tok = serializer.range[i];
+    pasta::Token tok = tokens[i];
     token_data_size += static_cast<unsigned>(tok.Data().size());
     token_data_size += 1u;
   }
@@ -147,9 +148,9 @@ static void PersistTokens(EntitySerializer &serializer,
   auto j = 0u;
   for (auto i = begin_index; i <= end_index; ++i, ++j) {
 
-    pasta::Token tok = serializer.range[i];
+    pasta::Token tok = tokens[i];
     if (auto file_tok = tok.FileLocation()) {
-      ftb.set(j, serializer.EntityId(*file_tok));
+      ftb.set(j, em.EntityId(*file_tok));
     } else {
       ftb.set(j, mx::kInvalidEntityId);
     }
@@ -191,22 +192,22 @@ static void PersistTokens(EntitySerializer &serializer,
 //            to go canonical->specific in the first place, and why a failure to
 //            do so results in `kInvalidEntityId` instead of just falling back
 //            on the ID of the canonical decl.
-static uint64_t IdOfRedeclInFragment(EntitySerializer &serializer,
+static uint64_t IdOfRedeclInFragment(EntityMapper &em, mx::FragmentId frag_id,
                                      pasta::Decl canon_decl) {
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
-    mx::EntityId eid = serializer.EntityId(redecl);
+    mx::EntityId eid = em.EntityId(redecl);
     if (eid == mx::kInvalidEntityId) {
       continue;
     }
     mx::VariantId vid = eid.Unpack();
     CHECK(std::holds_alternative<mx::DeclarationId>(vid));
     mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
-    if (id.fragment_id == serializer.code_id) {
+    if (id.fragment_id == frag_id) {
       return eid;
     }
   }
 
-  return serializer.EntityId(canon_decl);
+  return em.EntityId(canon_decl);
 }
 
 // Persist the token contexts. The token contexts are a kind of inverted tree,
@@ -227,9 +228,10 @@ static uint64_t IdOfRedeclInFragment(EntitySerializer &serializer,
 // me the SwitchStmt containing this token." Token contexts aren't pure linked
 // lists, though; there are special "alias" nodes that tend to link you further
 // down the lists, and so that takes some special handling.
-static void PersistTokenContexts(EntitySerializer &serializer,
-                                 uint64_t begin_index, uint64_t end_index,
-                                 FragmentBuilder &builder) {
+static void PersistTokenContexts(
+    EntityMapper &em, const pasta::TokenRange &tokens,
+    mx::FragmentId frag_id, uint64_t begin_index, uint64_t end_index,
+    mx::rpc::Fragment::Builder &fb) {
 
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
   std::map<mx::RawEntityId, DeclContextSet> contexts;
@@ -237,7 +239,7 @@ static void PersistTokenContexts(EntitySerializer &serializer,
   // First, collect only the relevant contexts for this fragment. Group them by
   // entity ID, as we store the context list inline inside of the entities.
   for (auto i = begin_index; i <= end_index; ++i) {
-    for (auto context = serializer.range[i].Context();
+    for (auto context = tokens[i].Context();
          context; context = context->Parent()) {
 
       auto c = *context;
@@ -248,19 +250,19 @@ static void PersistTokenContexts(EntitySerializer &serializer,
       // NOTE(pag): PASTA stored the canonical decl in the decl context, so
       //            it's not likely to be in the current fragment.
       if (auto decl = pasta::Decl::From(c)) {
-        const mx::RawEntityId eid = IdOfRedeclInFragment(serializer, *decl);
+        const mx::RawEntityId eid = IdOfRedeclInFragment(em, frag_id, *decl);
         if (eid != mx::kInvalidEntityId) {
           contexts[eid].insert(*context);
         }
 
       } else if (auto stmt = pasta::Stmt::From(c)) {
-        const mx::RawEntityId eid = serializer.EntityId(*stmt);
+        const mx::RawEntityId eid = em.EntityId(*stmt);
         if (eid != mx::kInvalidEntityId) {
           contexts[eid].insert(*context);
         }
 
       } else if (auto type = pasta::Type::From(c)) {
-        const mx::RawEntityId eid = serializer.EntityId(*type);
+        const mx::RawEntityId eid = em.EntityId(*type);
         if (eid != mx::kInvalidEntityId) {
           contexts[eid].insert(*context);
         }
@@ -297,21 +299,21 @@ static void PersistTokenContexts(EntitySerializer &serializer,
     // Declarations.
     if (std::holds_alternative<mx::DeclarationId>(vid)) {
       mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
-      if (id.fragment_id != serializer.code_id) {
+      if (id.fragment_id != frag_id) {
         continue;  // E.g. translation unit.
       }
 
     // Statements.
     } else if (std::holds_alternative<mx::StatementId>(vid)) {
       mx::StatementId id = std::get<mx::StatementId>(vid);
-      if (id.fragment_id != serializer.code_id) {
+      if (id.fragment_id != frag_id) {
         continue;  // Not sure how but oh well.
       }
 
     // Types.
     } else if (std::holds_alternative<mx::TypeId>(vid)) {
       mx::TypeId id = std::get<mx::TypeId>(vid);
-      if (id.fragment_id != serializer.code_id) {
+      if (id.fragment_id != frag_id) {
         continue;  // Not sure how but oh well.
       }
 
@@ -362,8 +364,8 @@ static void PersistTokenContexts(EntitySerializer &serializer,
 
   // Allocate as many token contexts as there are parsed tokens.
   CHECK_LE(begin_index, end_index);
-  auto tcb_list = builder.initTokenContexts(num_contexts);
-  auto tco_list = builder.initTokenContextOffsets(num_tokens);
+  auto tcb_list = fb.initTokenContexts(num_contexts);
+  auto tco_list = fb.initTokenContextOffsets(num_tokens);
 
   // Finally, serialize the contexts.
   auto j = 0u;
@@ -371,7 +373,7 @@ static void PersistTokenContexts(EntitySerializer &serializer,
 
     std::optional<mx::rpc::TokenContext::Builder> tcb;
 
-    for (auto context = serializer.range[i].Context();
+    for (auto context = tokens[i].Context();
          context; context = context->Parent()) {
 
       pasta::TokenContext c = *context;
@@ -504,15 +506,32 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
-                     PendingFragment code_chunk, std::string mlir) {
+void PersistFragment(IndexingContext &context, EntityIdMap &entity_ids,
+                     FileIdMap &file_ids, const pasta::TokenRange &tokens,
+                     PendingFragment frag, std::string mlir) {
 
-  serializer.PrepareToSerialize(code_chunk);
+  capnp::MallocMessageBuilder message;
+  mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
-  const mx::FragmentId code_id = code_chunk.fragment_id;
-  const pasta::Decl &leader_decl = code_chunk.decls[0];
+  // Identify all of the declarations, statements, types, and pseudo-entities,
+  // and build lists of the entities to serialize.
+  frag.Build(entity_ids, file_ids, tokens);
+
+  // Figure out parentage/inheritance between the entities.
+  frag.LabelParents(entity_ids);
+
+  // Serialize all discovered entities.
+  EntityMapper em(entity_ids, file_ids, frag);
+  frag.Serialize(em, fb);
+
+  const mx::FragmentId fragment_id = frag.fragment_id;
+  const pasta::Decl &leader_decl = frag.decls[0];
+  const uint64_t begin_index = frag.begin_index;
+  const uint64_t end_index = frag.end_index;
+
+  // Derive the macro substitution tree.
   mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-      serializer.range, code_chunk.begin_index, code_chunk.end_index);
+      tokens, frag.begin_index, frag.end_index);
   if (!maybe_tt.Succeeded()) {
     auto main_file_path =
         pasta::AST::From(leader_decl).MainFile().Path().generic_string();
@@ -521,6 +540,7 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
         << DeclToString(leader_decl)
         << PrefixedLocation(leader_decl, " at or near ")
         << " on main job file " << main_file_path;
+    return;
   }
 
   TokenTree token_tree = maybe_tt.TakeValue();
@@ -537,50 +557,40 @@ void PersistFragment(IndexingContext &context, EntitySerializer &serializer,
   pasta::FileToken max_token = file_tokens[0];
   FindFileRange(token_tree, file, &min_token, &max_token, num_substitutions);
 
-  mx::FileId file_id = serializer.FileId(file);
-  context.PutFragmentLineCoverage(file_id, code_id, min_token.Line(),
-                                  max_token.Line());
+  mx::FileId file_id = em.FileId(file);
+  fb.setId(fragment_id);
+  fb.setFirstFileTokenId(em.EntityId(min_token));
+  fb.setLastFileTokenId(em.EntityId(max_token));
+  fb.setMlir(mlir);
 
-  capnp::MallocMessageBuilder message;
-  mx::rpc::Fragment::Builder builder = message.initRoot<mx::rpc::Fragment>();
-  builder.setCodeId(code_chunk.fragment_id);
-  builder.setFirstFileTokenId(serializer.EntityId(min_token));
-  builder.setLastFileTokenId(serializer.EntityId(max_token));
-  builder.setMlir(mlir);
-
-  auto num_tlds = static_cast<unsigned>(code_chunk.decls.size());
-  auto tlds = builder.initTopLevelDeclarations(num_tlds);
+  auto num_tlds = static_cast<unsigned>(frag.decls.size());
+  auto tlds = fb.initTopLevelDeclarations(num_tlds);
   for (auto i = 0u; i < num_tlds; ++i) {
-    tlds.set(i, serializer.EntityId(code_chunk.decls[i]));
+    tlds.set(i, em.EntityId(frag.decls[i]));
   }
 
-  const auto begin_index = code_chunk.begin_index;
-  const auto end_index = code_chunk.end_index;
+  PersistTokens(em, tokens, begin_index, end_index, fb);
+  PersistTokenContexts(em, tokens, fragment_id, begin_index, end_index, fb);
 
-  PersistTokens(serializer, begin_index, end_index, builder);
-  PersistTokenContexts(serializer, begin_index, end_index, builder);
-
-  // NOTE(pag): This does the persistence of types, so we want to make sure
-  //            any that get lazily added by `EntitySerializer::EntityId(Type)`
-  //            called from `PersistTokenContexts` are visible by this point.
-  serializer.SerializeCodeEntities(std::move(code_chunk), builder);
-
-  DCHECK_GT(builder.getTokenKinds().size(), 0u);
+  DCHECK_GT(fb.getTokenKinds().size(), 0u);
 
   unsigned next_substitution_index = 0u;
   SubstitutionListBuilder substitutions_builder =
-      builder.initTokenSubstitutions(num_substitutions);
+      fb.initTokenSubstitutions(num_substitutions);
   PersistTokenTree(
-      serializer,
+      em,
       substitutions_builder,
-      builder.initUnparsedTokens(token_tree.NumNodes()),
+      fb.initUnparsedTokens(token_tree.NumNodes()),
       std::move(token_tree),
-      code_chunk.fragment_id,
+      frag.fragment_id,
       next_substitution_index);
   CHECK_EQ(next_substitution_index, num_substitutions);
 
+  context.PutFragmentLineCoverage(file_id, fragment_id, min_token.Line(),
+                                  max_token.Line());
+
   context.PutSerializedFragment(
-      code_id, CompressedMessage("fragment", message));
+      fragment_id, CompressedMessage("fragment", message));
 }
 
 }  // namespace indexer
