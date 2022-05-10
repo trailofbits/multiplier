@@ -8663,7 +8663,7 @@ Token TemplateParameterList::right_angle_token(void) const {
   return fragment->TokenFor(fragment, self.getVal9());
 }
 
-TokenRange TemplateParameterList::token_range(void) const {
+TokenRange TemplateParameterList::tokens(void) const {
   auto self = fragment->NthPseudo(offset);
   return fragment->TokenRangeFor(fragment, self.getVal10(), self.getVal11());
 }
@@ -8752,7 +8752,7 @@ std::optional<Type> TemplateArgument::null_pointer_type(void) const {
   }
 }
 
-TokenRange CXXBaseSpecifier::token_range(void) const {
+TokenRange CXXBaseSpecifier::tokens(void) const {
   auto self = fragment->NthPseudo(offset);
   return fragment->TokenRangeFor(fragment, self.getVal5(), self.getVal7());
 }
@@ -12940,7 +12940,7 @@ Token Stmt::end_token(void) const {
   return fragment->TokenFor(fragment, self.getVal5());
 }
 
-TokenRange Stmt::token_range(void) const {
+TokenRange Stmt::tokens(void) const {
   auto self = fragment->NthStmt(offset);
   return fragment->TokenRangeFor(fragment, self.getVal6(), self.getVal7());
 }
@@ -26567,7 +26567,7 @@ Token Decl::token(void) const {
   return fragment->TokenFor(fragment, self.getVal45());
 }
 
-TokenRange Decl::token_range(void) const {
+TokenRange Decl::tokens(void) const {
   auto self = fragment->NthDecl(offset);
   return fragment->TokenRangeFor(fragment, self.getVal46(), self.getVal47());
 }

@@ -203,7 +203,7 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
     const pasta::Decl &decl, pasta::Token tok, std::string_view main_file_path) {
   DCHECK(tok);  // Make sure we're dealing with a valid token.
 
-  auto decl_range = decl.TokenRange();
+  auto decl_range = decl.Tokens();
   const auto tok_index = tok.Index();
   auto begin_tok_index = tok_index;
   auto end_tok_index = tok_index;

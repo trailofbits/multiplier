@@ -39,18 +39,16 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   mx::RawEntityId parent_decl_id{mx::kInvalidEntityId};
   mx::RawEntityId parent_stmt_id{mx::kInvalidEntityId};
-  mx::RawEntityId current_decl_id{mx::kInvalidEntityId};
-  mx::RawEntityId current_stmt_id{mx::kInvalidEntityId};
 
   std::unordered_set<const void *> seen;
+
+  virtual ~ParentTrackerVisitor(void) = default;
 
   ParentTrackerVisitor(EntityIdMap &entity_ids_, PendingFragment &fragment_)
       : entity_ids(entity_ids_),
         fragment(fragment_) {}
 
   void Accept(const pasta::Decl &decl) final {
-    SaveRestoreEntityId save_parent_decl(parent_decl_id, current_decl_id);
-
     if (parent_decl_id != mx::kInvalidEntityId) {
       fragment.parent_decl_ids.emplace(decl.RawDecl(), parent_decl_id);
     }
@@ -76,13 +74,11 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    SaveRestoreEntityId save_current_decl(current_decl_id, ent_id);
+    SaveRestoreEntityId save_parent_decl(parent_decl_id, ent_id);
     this->EntityVisitor::Accept(decl);
   }
 
   void Accept(const pasta::Stmt &stmt) final {
-    SaveRestoreEntityId save_parent_stmt(parent_stmt_id, current_stmt_id);
-
     if (parent_decl_id != mx::kInvalidEntityId) {
       fragment.parent_decl_ids.emplace(stmt.RawStmt(), parent_decl_id);
     }
@@ -107,16 +103,16 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    SaveRestoreEntityId save_current_stmt(current_stmt_id, ent_id);
+    SaveRestoreEntityId save_parent_stmt(parent_stmt_id, ent_id);
     this->EntityVisitor::Accept(stmt);
   }
 
   bool Enter(const pasta::Decl &entity) final {
-    return seen.emplace(entity.RawDecl()).second;
+    return seen.insert(entity.RawDecl()).second;
   }
 
   bool Enter(const pasta::Stmt &entity) final {
-    return seen.emplace(entity.RawStmt()).second;
+    return seen.insert(entity.RawStmt()).second;
   }
 };
 

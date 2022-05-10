@@ -431,6 +431,9 @@ class File {
   // Return the ID of this file.
   FileId id(void) const noexcept;
 
+  // Return the file tokens for the file.
+  TokenList tokens(void) const noexcept;
+
   // Return the contents of the file as a UTF-8 string.
   std::string_view data(void) const noexcept;
 
@@ -591,7 +594,7 @@ class Fragment {
 
   // The range of parsed tokens in this fragment. This is equivalent to
   // `Token::in(fragment)`.
-  TokenRange parsed_tokens(void) const;
+  TokenList parsed_tokens(void) const;
 
   // Return the list of token substitutions. The original file tokens can be
   // recovered by choosing `.before()` on all substitution objets.

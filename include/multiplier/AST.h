@@ -7161,7 +7161,7 @@ class TemplateParameterList {
   Token template_keyword_token(void) const;
   Token left_angle_token(void) const;
   Token right_angle_token(void) const;
-  TokenRange token_range(void) const;
+  TokenRange tokens(void) const;
   std::vector<NamedDecl> parameters(void) const;
 };
 
@@ -7213,7 +7213,7 @@ class CXXBaseSpecifier {
       : fragment(std::move(fragment_)),
         offset(offset_) {}
 
-  TokenRange token_range(void) const;
+  TokenRange tokens(void) const;
   Token base_type_token(void) const;
   bool is_virtual(void) const;
   TagTypeKind base_kind(void) const;
@@ -9015,7 +9015,7 @@ class Stmt {
   std::vector<Stmt> children(void) const;
   Token begin_token(void) const;
   Token end_token(void) const;
-  TokenRange token_range(void) const;
+  TokenRange tokens(void) const;
   StmtKind kind(void) const;
   Stmt strip_label_like_statements(void) const;
 };
@@ -16486,7 +16486,7 @@ class Decl {
   std::vector<Decl> redeclarations(void) const;
   DeclKind kind(void) const;
   Token token(void) const;
-  TokenRange token_range(void) const;
+  TokenRange tokens(void) const;
 };
 
 using ClassScopeFunctionSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassScopeFunctionSpecializationDecl>;

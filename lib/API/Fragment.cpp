@@ -57,10 +57,10 @@ TokenRange Fragment::file_tokens(void) const {
 
 // The range of parsed tokens in this fragment. This is equivalent to
 // `Token::in(fragment)`.
-TokenRange Fragment::parsed_tokens(void) const {
+TokenList Fragment::parsed_tokens(void) const {
   auto reader = impl->TokenReader(impl);
   auto num_tokens = reader->NumTokens();
-  return TokenRange(std::move(reader), 0, num_tokens);
+  return TokenList(std::move(reader), num_tokens);
 }
 
 // Return the list of token substitutions.

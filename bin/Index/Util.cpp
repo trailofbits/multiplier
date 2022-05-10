@@ -43,7 +43,7 @@ std::string PrefixedName(const pasta::Decl &decl, const char *prefix) {
 std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix) {
   auto ft = decl.Token().FileLocation();
   if (!ft) {
-    for (auto tok : decl.TokenRange()) {
+    for (auto tok : decl.Tokens()) {
       ft = decl.Token().FileLocation();
       if (ft) {
         break;

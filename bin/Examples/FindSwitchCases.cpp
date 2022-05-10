@@ -33,7 +33,7 @@ static void FindSwitchCases(mx::Fragment fragment) {
 
         std::cout << '\t' << containing_func->name();
         auto sep = "\tcase\t";
-        for (mx::Token tok : case_->lhs().token_range()) {
+        for (mx::Token tok : case_->lhs().tokens()) {
           std::cout << sep << tok.data();
           sep = " ";
         }

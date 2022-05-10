@@ -41,7 +41,7 @@ void SerializeTemplateParameterList(EntityMapper &es, mx::ast::Pseudo::Builder b
   b.setVal7(es.EntityId(e.TemplateKeywordToken()));
   b.setVal8(es.EntityId(e.LeftAngleToken()));
   b.setVal9(es.EntityId(e.RightAngleToken()));
-  if (auto r10 = e.TokenRange(); auto rs10 = r10.Size()) {
+  if (auto r10 = e.Tokens(); auto rs10 = r10.Size()) {
     b.setVal10(es.EntityId(r10[0]));
     b.setVal11(es.EntityId(r10[rs10 - 1u]));
   } else {
@@ -113,7 +113,7 @@ void SerializeTemplateArgument(EntityMapper &es, mx::ast::Pseudo::Builder b, con
 }
 
 void SerializeCXXBaseSpecifier(EntityMapper &es, mx::ast::Pseudo::Builder b, const pasta::CXXBaseSpecifier &e) {
-  if (auto r5 = e.TokenRange(); auto rs5 = r5.Size()) {
+  if (auto r5 = e.Tokens(); auto rs5 = r5.Size()) {
     b.setVal5(es.EntityId(r5[0]));
     b.setVal7(es.EntityId(r5[rs5 - 1u]));
   } else {
@@ -1516,7 +1516,7 @@ void SerializeStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Stmt
   } while (false);
   b.setVal4(es.EntityId(e.BeginToken()));
   b.setVal5(es.EntityId(e.EndToken()));
-  if (auto r6 = e.TokenRange(); auto rs6 = r6.Size()) {
+  if (auto r6 = e.Tokens(); auto rs6 = r6.Size()) {
     b.setVal6(es.EntityId(r6[0]));
     b.setVal7(es.EntityId(r6[rs6 - 1u]));
   } else {
@@ -4589,7 +4589,7 @@ void SerializeDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::Decl
   } while (false);
   b.setVal44(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   b.setVal45(es.EntityId(e.Token()));
-  if (auto r46 = e.TokenRange(); auto rs46 = r46.Size()) {
+  if (auto r46 = e.Tokens(); auto rs46 = r46.Size()) {
     b.setVal46(es.EntityId(r46[0]));
     b.setVal47(es.EntityId(r46[rs46 - 1u]));
   } else {

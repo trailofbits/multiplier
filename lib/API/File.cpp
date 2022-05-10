@@ -56,6 +56,13 @@ FileId File::id(void) const noexcept {
   return impl->id;
 }
 
+// Return the file tokens for the file.
+TokenList File::tokens(void) const noexcept {
+  auto tokens = impl->TokenReader(impl);
+  auto num_tokens = tokens->NumTokens();
+  return TokenList(std::move(tokens), num_tokens);
+}
+
 // Return the contents of the file as a UTF-8 string.
 std::string_view File::data(void) const noexcept {
   return impl->Data();
