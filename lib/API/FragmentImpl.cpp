@@ -13,36 +13,36 @@ FragmentImpl::~FragmentImpl(void) noexcept {}
 
 // Return the token associated with a specific entity ID.
 Token FragmentImpl::TokenFor(
-    const FragmentImpl::Ptr &self, EntityId id, bool can_fail) const {
-  VariantId vid = id.Unpack();
+    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  VariantId vid = eid.Unpack();
 
   // It's a fragment token.
   if (std::holds_alternative<FragmentTokenId>(vid)) {
-    auto fid = std::get<FragmentTokenId>(vid);
+    const FragmentTokenId tid = std::get<FragmentTokenId>(vid);
 
     // It's a token inside of the current fragment.
-    if (fid.fragment_id == id) {
-      return Token(this->TokenReader(self), fid.offset);
+    if (tid.fragment_id == fragment_id) {
+      return Token(this->TokenReader(self), tid.offset);
 
     // It's a token inside of another fragment, go get the other fragment.
     } else {
-      auto other_frag = ep->FragmentFor(ep, fid.fragment_id);
+      auto other_frag = ep->FragmentFor(ep, tid.fragment_id);
       auto reader = other_frag->TokenReader(other_frag);
-      return Token(std::move(reader), fid.offset);
+      return Token(std::move(reader), tid.offset);
     }
 
   // It's a file token; go get the file.
   } else if (std::holds_alternative<FileTokenId>(vid)) {
-    auto fid = std::get<FileTokenId>(vid);
+    const FileTokenId tid = std::get<FileTokenId>(vid);
     FileImpl::Ptr file;
-    if (containing_file && containing_file->id == fid.file_id) {
+    if (containing_file && containing_file->file_id == tid.file_id) {
       file = containing_file;  // Try to use the containing file if it matches.
     } else {
-      file = ep->FileFor(ep, fid.file_id);
+      file = ep->FileFor(ep, tid.file_id);
     }
 
     auto reader = file->TokenReader(file);
-    return Token(std::move(reader), fid.offset);
+    return Token(std::move(reader), tid.offset);
 
   // An invalid ID.
   } else if (std::holds_alternative<InvalidId>(vid)) {
@@ -80,7 +80,7 @@ TokenRange FragmentImpl::TokenRangeFor(
     }
 
     // It's a token inside of the current fragment.
-    if (bfid.fragment_id == id) {
+    if (bfid.fragment_id == fragment_id) {
       return TokenRange(this->TokenReader(self), bfid.offset, efid.offset + 1u);
 
     // It's a token inside of another fragment, go get the other fragment.
@@ -104,7 +104,7 @@ TokenRange FragmentImpl::TokenRangeFor(
     }
 
     FileImpl::Ptr file;
-    if (containing_file && containing_file->id == bfid.file_id) {
+    if (containing_file && containing_file->file_id == bfid.file_id) {
       file = containing_file;  // Try to use the containing file if it matches.
     } else {
       file = ep->FileFor(ep, bfid.file_id);
@@ -126,8 +126,8 @@ TokenRange FragmentImpl::TokenRangeFor(
 }
 
 // Return the declaration associated with a specific entity ID.
-Decl FragmentImpl::DeclFor(const FragmentImpl::Ptr &self, EntityId id) const {
-  VariantId vid = id.Unpack();
+Decl FragmentImpl::DeclFor(const FragmentImpl::Ptr &self, EntityId eid) const {
+  VariantId vid = eid.Unpack();
 
   // It's a fragment token.
   if (!std::holds_alternative<DeclarationId>(vid)) {
@@ -138,7 +138,7 @@ Decl FragmentImpl::DeclFor(const FragmentImpl::Ptr &self, EntityId id) const {
   DeclarationId decl_id = std::get<DeclarationId>(vid);
 
   // It's a token inside of the current fragment.
-  if (decl_id.fragment_id == id) {
+  if (decl_id.fragment_id == fragment_id) {
     return Decl(self, decl_id.offset);
 
   // It's a token inside of another fragment, go get the other fragment.
@@ -148,8 +148,8 @@ Decl FragmentImpl::DeclFor(const FragmentImpl::Ptr &self, EntityId id) const {
 }
 
 // Return the statement associated with a specific entity ID.
-Stmt FragmentImpl::StmtFor(const FragmentImpl::Ptr &self, EntityId id) const {
-  VariantId vid = id.Unpack();
+Stmt FragmentImpl::StmtFor(const FragmentImpl::Ptr &self, EntityId eid) const {
+  VariantId vid = eid.Unpack();
 
   // It's a fragment token.
   if (!std::holds_alternative<StatementId>(vid)) {
@@ -160,7 +160,7 @@ Stmt FragmentImpl::StmtFor(const FragmentImpl::Ptr &self, EntityId id) const {
   StatementId stmt_id = std::get<StatementId>(vid);
 
   // It's a token inside of the current fragment.
-  if (stmt_id.fragment_id == id) {
+  if (stmt_id.fragment_id == fragment_id) {
     return Stmt(self, stmt_id.offset);
 
   // It's a token inside of another fragment, go get the other fragment.
@@ -171,8 +171,8 @@ Stmt FragmentImpl::StmtFor(const FragmentImpl::Ptr &self, EntityId id) const {
 
 
 // Return the type associated with a specific entity ID.
-Type FragmentImpl::TypeFor(const FragmentImpl::Ptr &self, EntityId id) const {
-  VariantId vid = id.Unpack();
+Type FragmentImpl::TypeFor(const FragmentImpl::Ptr &self, EntityId eid) const {
+  VariantId vid = eid.Unpack();
 
   // It's a fragment token.
   if (!std::holds_alternative<TypeId>(vid)) {
@@ -183,7 +183,7 @@ Type FragmentImpl::TypeFor(const FragmentImpl::Ptr &self, EntityId id) const {
   TypeId type_id = std::get<TypeId>(vid);
 
   // It's a token inside of the current fragment.
-  if (type_id.fragment_id == id) {
+  if (type_id.fragment_id == fragment_id) {
     return Type(self, type_id.offset);
 
   // It's a token inside of another fragment, go get the other fragment.

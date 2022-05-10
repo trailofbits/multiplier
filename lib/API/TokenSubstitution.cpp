@@ -25,7 +25,7 @@ TokenSubstitutionListIterator::operator*(void) const {
 
   } else if (std::holds_alternative<TokenSubstitutionId>(id)) {
     auto sub = std::get<TokenSubstitutionId>(id);
-    assert(sub.fragment_id == impl->fragment->id);
+    assert(sub.fragment_id == impl->fragment->fragment_id);
     return TokenSubstitution(impl->fragment, sub.offset, sub.kind);
 
   } else {

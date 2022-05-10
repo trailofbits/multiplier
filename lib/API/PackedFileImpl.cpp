@@ -54,7 +54,7 @@ std::string_view PackedFileImpl::NthTokenData(unsigned index) const {
 // Return the id of the Nth token.
 EntityId PackedFileImpl::NthTokenId(unsigned index) const {
   FileTokenId id;
-  id.file_id = this->id;
+  id.file_id = this->file_id;
   id.kind = NthTokenKind(index);
   id.offset = index;
   return id;
@@ -66,11 +66,11 @@ EntityId PackedFileImpl::NthFileTokenId(unsigned token_index) const {
 
 // Return the token reader for another file.
 TokenReader::Ptr PackedFileImpl::ReaderForFile(const TokenReader::Ptr &self,
-                                               mx::FileId file_id) const {
-  if (id == file_id) {
+                                               mx::FileId fid) const {
+  if (fid == file_id) {
     return self;
   } else {
-    FileImpl::Ptr ptr = ep->FileFor(ep, file_id);
+    FileImpl::Ptr ptr = ep->FileFor(ep, fid);
     return ptr->TokenReader(ptr);
   }
 }

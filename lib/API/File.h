@@ -18,7 +18,7 @@ class FileImpl {
   using Ptr = std::shared_ptr<const FileImpl>;
   using WeakPtr = std::weak_ptr<const FileImpl>;
 
-  const FileId id;
+  const FileId file_id;
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
@@ -32,7 +32,7 @@ class FileImpl {
   virtual ~FileImpl(void) noexcept;
 
   inline FileImpl(FileId id_, EntityProvider::Ptr ep_)
-      : id(id_),
+      : file_id(id_),
         ep(std::move(ep_)) {}
 
   // Return a reader for the tokens in the file.

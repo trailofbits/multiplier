@@ -61,7 +61,7 @@ std::string_view PackedFragmentImpl::NthTokenData(unsigned index) const {
 // Return the id of the Nth token.
 EntityId PackedFragmentImpl::NthTokenId(unsigned index) const {
   FragmentTokenId id;
-  id.fragment_id = this->id;
+  id.fragment_id = this->fragment_id;
   id.offset = index;
   id.kind = NthTokenKind(index);
   return id;

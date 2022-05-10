@@ -17,7 +17,7 @@ class FragmentImpl {
   using Ptr = std::shared_ptr<const FragmentImpl>;
   using WeakPtr = std::weak_ptr<const FragmentImpl>;
 
-  const FragmentId id;
+  const FragmentId fragment_id;
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
@@ -32,7 +32,7 @@ class FragmentImpl {
   virtual ~FragmentImpl(void) noexcept;
 
   inline FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_)
-      : id(id_),
+      : fragment_id(id_),
         ep(std::move(ep_)) {}
 
   // Return the ID of the file containing the first token.

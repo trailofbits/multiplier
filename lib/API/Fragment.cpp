@@ -28,7 +28,7 @@ Fragment Fragment::containing(const RegexQueryMatch &match) {
 
 // Return the ID of this fragment.
 FragmentId Fragment::id(void) const noexcept {
-  return impl->id;
+  return impl->fragment_id;
 }
 
 // The range of file tokens in this fragment.
@@ -75,12 +75,12 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
   std::vector<Decl> decls;
   TopLevelDeclListReader decl_ids = impl->Fragment().getTopLevelDeclarations();
   decls.reserve(decl_ids.size());
-  for (auto id_ : decl_ids) {
-    EntityId id(id_);
-    VariantId vid = id.Unpack();
+  for (auto eid_ : decl_ids) {
+    EntityId eid(eid_);
+    VariantId vid = eid.Unpack();
     if (std::holds_alternative<DeclarationId>(vid)) {
       auto decl_id = std::get<DeclarationId>(vid);
-      if (decl_id.fragment_id == impl->id) {
+      if (decl_id.fragment_id == impl->fragment_id) {
         decls.emplace_back(impl, decl_id.offset);
       } else {
         assert(false);

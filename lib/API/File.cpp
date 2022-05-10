@@ -18,7 +18,7 @@ File File::containing(const Fragment &fragment) {
     return File(fp);
   }
 
-  const auto frag_id = fragment.impl->id;
+  const auto frag_id = fragment.impl->fragment_id;
   const auto &ep = fragment.impl->ep;
   fp = ep->FileFor(ep, fragment.impl->FileContaingFirstToken());
 
@@ -53,7 +53,7 @@ FileList File::in(const Index &index) {
 
 // Return the ID of this file.
 FileId File::id(void) const noexcept {
-  return impl->id;
+  return impl->file_id;
 }
 
 // Return the file tokens for the file.
