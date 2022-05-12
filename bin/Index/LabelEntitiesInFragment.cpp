@@ -52,6 +52,7 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
   id.fragment_id = fragment.fragment_id;
   id.offset = static_cast<uint32_t>(fragment.decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
+  id.is_definition = IsDefinition(entity);
 
   if (entity_ids.emplace(entity.RawDecl(), id).second) {
 

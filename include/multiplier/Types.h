@@ -204,6 +204,22 @@ class EntityId {
     return opaque;
   }
 
+  inline bool operator==(RawEntityId that) const noexcept {
+    return opaque == that;
+  }
+
+  inline bool operator!=(RawEntityId that) const noexcept {
+    return opaque != that;
+  }
+
+  inline bool operator==(EntityId that) const noexcept {
+    return opaque == that.opaque;
+  }
+
+  inline bool operator!=(EntityId that) const noexcept {
+    return opaque != that.opaque;
+  }
+
   // Unpack this entity ID into a concrete type.
   VariantId Unpack(void) const noexcept;
 };

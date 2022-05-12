@@ -65,29 +65,40 @@ Index::entity(EntityId eid) const {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclarationId>(vid)) {
     DeclarationId id = std::get<DeclarationId>(vid);
+    assert(id == EntityId(id));
     if (auto frag = fragment(id.fragment_id)) {
-      return Decl(frag->impl, id.offset);
+      Decl decl(frag->impl, id.offset);
+      assert(decl.id() == eid);
+      return decl;
     }
 
   } else if (std::holds_alternative<StatementId>(vid)) {
     StatementId id = std::get<StatementId>(vid);
+    assert(id == EntityId(id));
     if (auto frag = fragment(id.fragment_id)) {
-      return Stmt(frag->impl, id.offset);
+      Stmt stmt(frag->impl, id.offset);
+      assert(stmt.id() == eid);
+      return stmt;
     }
   } else if (std::holds_alternative<TypeId>(vid)) {
     TypeId id = std::get<TypeId>(vid);
+    assert(id == EntityId(id));
     if (auto frag = fragment(id.fragment_id)) {
-      return Type(frag->impl, id.offset);
+      Type type(frag->impl, id.offset);
+      assert(type.id() == eid);
+      return type;
     }
 
   } else if (std::holds_alternative<FragmentTokenId>(vid)) {
     FragmentTokenId id = std::get<FragmentTokenId>(vid);
+    assert(id == EntityId(id));
     if (auto frag = fragment(id.fragment_id)) {
       return frag->impl->TokenFor(frag->impl, eid);
     }
 
   } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
     TokenSubstitutionId id = std::get<TokenSubstitutionId>(vid);
+    assert(id == EntityId(id));
     if (auto frag = fragment(id.fragment_id)) {
       return TokenSubstitution(frag->impl, id.offset, id.kind);
     }
@@ -95,6 +106,7 @@ Index::entity(EntityId eid) const {
   } else if (std::holds_alternative<FileTokenId>(vid)) {
     FileTokenId id = std::get<FileTokenId>(vid);
   }
+
   return NotAnEntity{};
 }
 

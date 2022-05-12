@@ -104,10 +104,10 @@ EntityId::EntityId(DeclarationId id) {
       packed.big_entity.code_id = id.fragment_id;
       packed.big_entity.entity_kind = static_cast<uint64_t>(kBigCodeEntity);
       if (id.is_definition) {
-        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind) +
-                                       kActualNumDeclKinds;
+        packed.big_entity.sub_kind = static_cast<uint64_t>(id.kind) +
+                                     kActualNumDeclKinds;
       } else {
-        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind);
+        packed.big_entity.sub_kind = static_cast<uint64_t>(id.kind);
       }
       packed.big_entity.offset = id.offset;
     }

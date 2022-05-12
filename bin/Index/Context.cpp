@@ -128,7 +128,8 @@ void IndexingContext::InitializeProgressBars(void) {
 }
 
 // Return the set of redeclarations of an entity.
-std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(mx::EntityId eid) {
+std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
+    mx::EntityId eid) {
   mx::VariantId vid = eid.Unpack();
   assert(std::holds_alternative<mx::DeclarationId>(vid));
 
@@ -156,6 +157,7 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(mx::EntityId eid)
       entity_id_to_mangled_name.ScanPrefix(
           next_new_ids[0],
           [&next_new_ids, this] (mx::RawEntityId, std::string mangled_name) {
+
             mangled_name_to_entity_id.ScanPrefix(
                 std::move(mangled_name),
                 [&next_new_ids] (std::string, mx::RawEntityId new_id) {
@@ -185,30 +187,30 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(mx::EntityId eid)
         continue;
       }
 
-      mx::EntityId new_eid(new_id);
-      mx::VariantId new_vid = new_eid.Unpack();
+      const mx::EntityId new_eid(new_id);
+      const mx::VariantId new_vid = new_eid.Unpack();
       if (!std::holds_alternative<mx::DeclarationId>(new_vid)) {
         assert(false);
         continue;
       }
 
-      mx::DeclarationId new_did = std::get<mx::DeclarationId>(new_vid);
+      const mx::DeclarationId new_did = std::get<mx::DeclarationId>(new_vid);
       if (new_did.kind != did.kind) {
         assert(false);
         continue;
       }
 
-      auto def_id_index = all_ids.size();
+      const auto def_id_index = all_ids.size();
       all_ids.push_back(new_id);
 
       // Move definitions to be first.
-      if (new_did.is_definition) {
+      if (new_did.is_definition && next_def_id_index < def_id_index) {
         std::swap(all_ids[next_def_id_index++], all_ids[def_id_index]);
       }
 
       entity_redecls.ScanPrefix(
           new_id,
-          [&next_new_ids] (mx::RawEntityId, mx::RawEntityId other_id) {
+          [&next_new_ids] (mx::RawEntityId new_id, mx::RawEntityId other_id) {
             next_new_ids.push_back(other_id);
             return true;
           });
@@ -344,7 +346,7 @@ void IndexingContext::PutSerializedFragment(mx::FragmentId id,
 
 // Link fragment declarations.
 void IndexingContext::LinkDeclarations(mx::RawEntityId a, mx::RawEntityId b) {
-  if (a != b) {
+  if (a != b && a != mx::kInvalidEntityId && b != mx::kInvalidEntityId) {
     server_context.entity_redecls.Insert(a, b);
     server_context.entity_redecls.Insert(b, a);
   }
@@ -353,12 +355,10 @@ void IndexingContext::LinkDeclarations(mx::RawEntityId a, mx::RawEntityId b) {
 // Link the mangled name of something to its entity ID.
 void IndexingContext::LinkMangledName(const std::string &name,
                                       mx::RawEntityId eid) {
-  if (name.empty()) {
-    return;
+  if (!name.empty() && eid != mx::kInvalidEntityId) {
+    server_context.entity_id_to_mangled_name.Insert(eid, name);
+    server_context.mangled_name_to_entity_id.Insert(name, eid);
   }
-
-  server_context.entity_id_to_mangled_name.Insert(eid, name);
-  server_context.mangled_name_to_entity_id.Insert(name, eid);
 }
 
 // Save an entries of the form `(file_id, line_number, fragment_id)` over

@@ -13,14 +13,18 @@
 namespace indexer {
 namespace {
 
-static void TrackRedeclarations(IndexingContext &context,
-                                EntityMapper &em,
-                                mx::RawEntityId eid,
+static void TrackRedeclarations(IndexingContext &context, EntityMapper &em,
+                                const std::string &mangled_name,
                                 std::vector<pasta::Decl> redecls) {
-  for (const pasta::Decl &redecl : redecls) {
-    if (mx::RawEntityId redecl_eid = em.EntityId(redecl);
-        redecl_eid != eid && redecl_eid != mx::kInvalidEntityId) {
-      context.LinkDeclarations(eid, redecl_eid);
+  for (const pasta::Decl &redecl_a : redecls) {
+    if (mx::RawEntityId redecl_a_eid = em.EntityId(redecl_a)) {
+      context.LinkMangledName(mangled_name,  redecl_a_eid);
+
+      for (const pasta::Decl &redecl_b : redecls) {
+        if (mx::RawEntityId redecl_b_eid = em.EntityId(redecl_b)) {
+          context.LinkDeclarations(redecl_a_eid, redecl_b_eid);
+        }
+      }
     }
   }
 }
@@ -32,6 +36,7 @@ static void TrackRedeclarations(IndexingContext &context,
 void PendingFragment::LinkDeclarations(IndexingContext &context,
                                        EntityMapper &em,
                                        NameMangler &mangler) {
+  std::string dummy_mangled_name;
   for (const pasta::Decl &decl : decls_to_serialize) {
     mx::RawEntityId eid = em.EntityId(decl);
     if (eid == mx::kInvalidEntityId) {
@@ -39,22 +44,20 @@ void PendingFragment::LinkDeclarations(IndexingContext &context,
     }
 
     if (auto func = pasta::FunctionDecl::From(decl)) {
-      TrackRedeclarations(context, em, eid, func->Redeclarations());
-      context.LinkMangledName(mangler.Mangle(decl), eid);
+      TrackRedeclarations(context, em, mangler.Mangle(decl), func->Redeclarations());
 
     } else if (auto var = pasta::VarDecl::From(decl)) {
       if (var->IsLocalVariableDeclaration()) {
         continue;
       }
 
-      TrackRedeclarations(context, em, eid, var->Redeclarations());
-      context.LinkMangledName(mangler.Mangle(decl), eid);
+      TrackRedeclarations(context, em, mangler.Mangle(decl), var->Redeclarations());
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(context, em, eid, tag->Redeclarations());
+      TrackRedeclarations(context, em, dummy_mangled_name, tag->Redeclarations());
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(context, em, eid, tpl->Redeclarations());
+      TrackRedeclarations(context, em, dummy_mangled_name, tpl->Redeclarations());
 
     } else {
       continue;
