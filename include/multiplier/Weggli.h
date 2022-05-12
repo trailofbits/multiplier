@@ -44,7 +44,6 @@ class WeggliQuery final {
 
   ~WeggliQuery();
 
-
   void ForEachMatch(std::string_view source,
                     std::function<bool(const WeggliMatchData &)> cb) const;
 

@@ -86,7 +86,7 @@ std::vector<std::string> WeggliQueryMatch::captured_variables(void) const {
 WeggliQueryResult::WeggliQueryResult(
     std::shared_ptr<WeggliQueryResultImpl> impl_)
     : impl(std::move(impl_)),
-      num_fragments(impl->fragments.size()) {}
+      num_fragments(impl ? impl->fragments.size() : 0ul) {}
 
 // Try to advance to the next result. There can be multiple results per
 // fragment.
