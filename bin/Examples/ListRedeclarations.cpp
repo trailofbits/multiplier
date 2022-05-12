@@ -41,9 +41,6 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   mx::Decl decl = std::get<mx::Decl>(maybe_decl);
-
-  std::cerr << FLAGS_declaration_id << " == " << decl.id() << " = " << (FLAGS_declaration_id == decl.id()) << '\n';
-
   for (mx::Decl redecl : decl.redeclarations()) {
     mx::Fragment fragment = mx::Fragment::containing(redecl);
     mx::File file = mx::File::containing(fragment);
