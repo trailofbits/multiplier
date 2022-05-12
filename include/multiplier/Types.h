@@ -57,6 +57,9 @@ struct DeclarationId {
   // `rpc::Fragment::declarations`.
   uint32_t offset;
 
+  // Is this declaration a definition?
+  bool is_definition;
+
   bool operator==(const DeclarationId &) const noexcept = default;
   bool operator!=(const DeclarationId &) const noexcept = default;
 };

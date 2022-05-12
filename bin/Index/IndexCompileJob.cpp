@@ -25,9 +25,9 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Codegen.h"
 #include "Context.h"
 #include "Hash.h"
+#include "NameMangler.h"
 #include "PrintTokenGraph.h"
 #include "PendingFragment.h"
 #include "Persist.h"
@@ -573,17 +573,17 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   }
   identification_progress_tracker.reset();
 
+
+
   // Serialize the new code chunks.
   mx::ProgressBarWork fragment_progress_tracker(
       context->serialization_progress.get());
 
+  NameMangler mangler(ast);
+
   for (PendingFragment &pending_fragment : pending_fragments) {
-	  // Generate source IR before saving the fragments to the persistent
-	  // storage
-    std::string mlir = ConvertToSourceIR(context, pending_fragment.fragment_id,
-                                         pending_fragment.decls);
-    PersistFragment(*context, entity_ids, file_ids, tok_range,
-                    std::move(pending_fragment), std::move(mlir));
+    PersistFragment(*context, mangler, entity_ids, file_ids, tok_range,
+                    std::move(pending_fragment));
   }
 }
 

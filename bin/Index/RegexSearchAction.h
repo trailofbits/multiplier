@@ -35,6 +35,4 @@ class RegexSearchAction final : public mx::Action {
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;
 };
 
-
-} //namespace search
-
+}  // namespace indexer

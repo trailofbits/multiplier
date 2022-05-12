@@ -15,7 +15,7 @@ Index::Index(void)
     : impl(std::make_shared<InvalidEntityProvider>()) {}
 
 FilePathList Index::file_paths(void) const {
-  return impl->ListFiles();
+  return impl->ListFiles(impl);
 }
 
 std::optional<File> Index::file(FileId id) const {
@@ -56,6 +56,46 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
   } else {
     return std::nullopt;
   }
+}
+
+// Return an entity given its ID.
+std::variant<Decl, Stmt, Type, Token, TokenSubstitution, NotAnEntity>
+Index::entity(EntityId eid) const {
+
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclarationId>(vid)) {
+    DeclarationId id = std::get<DeclarationId>(vid);
+    if (auto frag = fragment(id.fragment_id)) {
+      return Decl(frag->impl, id.offset);
+    }
+
+  } else if (std::holds_alternative<StatementId>(vid)) {
+    StatementId id = std::get<StatementId>(vid);
+    if (auto frag = fragment(id.fragment_id)) {
+      return Stmt(frag->impl, id.offset);
+    }
+  } else if (std::holds_alternative<TypeId>(vid)) {
+    TypeId id = std::get<TypeId>(vid);
+    if (auto frag = fragment(id.fragment_id)) {
+      return Type(frag->impl, id.offset);
+    }
+
+  } else if (std::holds_alternative<FragmentTokenId>(vid)) {
+    FragmentTokenId id = std::get<FragmentTokenId>(vid);
+    if (auto frag = fragment(id.fragment_id)) {
+      return frag->impl->TokenFor(frag->impl, eid);
+    }
+
+  } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
+    TokenSubstitutionId id = std::get<TokenSubstitutionId>(vid);
+    if (auto frag = fragment(id.fragment_id)) {
+      return TokenSubstitution(frag->impl, id.offset, id.kind);
+    }
+
+  } else if (std::holds_alternative<FileTokenId>(vid)) {
+    FileTokenId id = std::get<FileTokenId>(vid);
+  }
+  return NotAnEntity{};
 }
 
 WeggliQueryResult Index::query_fragments(const WeggliQuery &query) const {

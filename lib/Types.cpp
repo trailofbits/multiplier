@@ -23,7 +23,8 @@ enum EntityKind : uint64_t {
 static_assert(kNumTokensInBigFragment == (1u << kBigFragmentIdNumBits));
 
 static constexpr unsigned kEntityKindNumBits = 2;
-static constexpr uint64_t kNumDeclKinds = NumEnumerators(DeclKind{});
+static constexpr uint64_t kActualNumDeclKinds = NumEnumerators(DeclKind{});
+static constexpr uint64_t kNumDeclKinds = kActualNumDeclKinds * 2u;
 static constexpr uint64_t kNumStmtKinds = NumEnumerators(StmtKind{});
 static constexpr uint64_t kNumTypeKinds = NumEnumerators(TypeKind{});
 static constexpr uint64_t kNumTokenKinds = NumEnumerators(TokenKind{});
@@ -92,12 +93,22 @@ EntityId::EntityId(DeclarationId id) {
       packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.entity_kind =
           static_cast<uint64_t>(kSmallCodeEntity);
-      packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      if (id.is_definition) {
+        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind) +
+                                       kActualNumDeclKinds;
+      } else {
+        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      }
       packed.small_entity.offset = id.offset;
     } else {
       packed.big_entity.code_id = id.fragment_id;
       packed.big_entity.entity_kind = static_cast<uint64_t>(kBigCodeEntity);
-      packed.big_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      if (id.is_definition) {
+        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind) +
+                                       kActualNumDeclKinds;
+      } else {
+        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      }
       packed.big_entity.offset = id.offset;
     }
     opaque = packed.opaque;
@@ -266,7 +277,13 @@ VariantId EntityId::Unpack(void) const noexcept {
       if (sub_kind < kNumDeclKinds) {
         DeclarationId id;
         id.fragment_id = packed.big_entity.code_id;
-        id.kind = static_cast<DeclKind>(sub_kind);
+        if (sub_kind < kActualNumDeclKinds) {
+          id.kind = static_cast<DeclKind>(sub_kind);
+          id.is_definition = false;
+        } else {
+          id.kind = static_cast<DeclKind>(sub_kind - kActualNumDeclKinds);
+          id.is_definition = true;
+        }
         id.offset = packed.big_entity.offset;
         return id;
       }
@@ -319,7 +336,13 @@ VariantId EntityId::Unpack(void) const noexcept {
       if (sub_kind < kNumDeclKinds) {
         DeclarationId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
-        id.kind = static_cast<DeclKind>(sub_kind);
+        if (sub_kind < kActualNumDeclKinds) {
+          id.kind = static_cast<DeclKind>(sub_kind);
+          id.is_definition = false;
+        } else {
+          id.kind = static_cast<DeclKind>(sub_kind - kActualNumDeclKinds);
+          id.is_definition = true;
+        }
         id.offset = packed.small_entity.offset;
         return id;
       }

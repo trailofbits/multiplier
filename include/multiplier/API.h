@@ -451,6 +451,8 @@ class File {
 // macro expansions, file inclusions) and zero-or-more `after` tokens.
 class TokenSubstitution {
  private:
+  friend class Fragment;
+  friend class Index;
   friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const FragmentImpl> impl;
@@ -585,6 +587,12 @@ class Fragment {
   static Fragment containing(const WeggliQueryMatch &);
 
   static Fragment containing(const RegexQueryMatch &);
+
+  static Fragment containing(const Decl &);
+  static Fragment containing(const Stmt &);
+  static Fragment containing(const Type &);
+  static std::optional<Fragment> containing(const Token &);
+  static Fragment containing(const TokenSubstitution &);
 
   // Return the ID of this fragment.
   FragmentId id(void) const noexcept;
@@ -865,7 +873,7 @@ class EntityProvider {
   static Ptr from_socket(std::filesystem::path path);
 
  private:
-  friend class Index;
+  friend class Decl;
   friend class File;
   friend class FileImpl;
   friend class FileListIterator;
@@ -873,16 +881,42 @@ class EntityProvider {
   friend class FileListImpl;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
+  friend class RemoteEntityProvider;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
 
+ protected:
+
+  // Clients may make requests while the indexer is still running. For many
+  // things this doesn't generally matter, but for others it does. For example,
+  // if the indexer is still running, the the returned file list may be
+  // incomplete. Similarly, a redeclaration list may be incomplete. Caching is
+  // done client side, and we coarsely communicate whether or not the entire
+  // cache is out-of-date via non-decreasing version numbers returned by client-
+  // to-indexer requests.
+  virtual unsigned VersionNumber(void) = 0;
+
+  // Update the version number. This is basically a signal to invalidate any
+  // caches.
+  virtual void VersionNumberChanged(unsigned new_version_number) = 0;
+
+  // Cache a returned file list.
+  virtual FilePathList CacheFileList(FilePathList, unsigned) = 0;
+
+  // Cache a returned list of redeclarations.
+  virtual std::vector<RawEntityId> CacheRedeclarations(
+      std::vector<RawEntityId>, unsigned) = 0;
+
+ private:
+
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  virtual FilePathList ListFiles(void) = 0;
+  virtual FilePathList ListFiles(const Ptr &) = 0;
 
   // Download a file by its unique ID.
   virtual std::shared_ptr<const FileImpl>
@@ -897,7 +931,13 @@ class EntityProvider {
 
   virtual std::shared_ptr<RegexQueryResultImpl>
   Query(const Ptr &, const RegexQuery &query) = 0;
+
+  // Return the redeclarations of a given declaration.
+  virtual std::vector<RawEntityId> Redeclarations(
+      const Ptr &, RawEntityId eid) = 0;
 };
+
+class NotAnEntity {};
 
 // Access to the indexed code.
 class Index {
@@ -926,6 +966,10 @@ class Index {
 
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
+
+  // Return an entity given its ID.
+  std::variant<Decl, Stmt, Type, Token, TokenSubstitution, NotAnEntity>
+  entity(EntityId) const;
 
   // Run a Weggli search over the fragments in the index.
   //

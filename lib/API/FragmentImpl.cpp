@@ -137,6 +137,17 @@ Decl FragmentImpl::DeclFor(const FragmentImpl::Ptr &self, EntityId eid) const {
 
   DeclarationId decl_id = std::get<DeclarationId>(vid);
 
+#ifndef NDEBUG  // It's a token inside of the current fragment.
+  if (decl_id.fragment_id == fragment_id) {
+    Decl decl(self, decl_id.offset);
+    return decl;
+
+  // It's a token inside of another fragment, go get the other fragment.
+  } else {
+    Decl decl(ep->FragmentFor(ep, decl_id.fragment_id), decl_id.offset);
+    return decl;
+  }
+#else
   // It's a token inside of the current fragment.
   if (decl_id.fragment_id == fragment_id) {
     return Decl(self, decl_id.offset);
@@ -145,6 +156,7 @@ Decl FragmentImpl::DeclFor(const FragmentImpl::Ptr &self, EntityId eid) const {
   } else {
     return Decl(ep->FragmentFor(ep, decl_id.fragment_id), decl_id.offset);
   }
+#endif
 }
 
 // Return the statement associated with a specific entity ID.

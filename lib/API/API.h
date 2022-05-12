@@ -7,8 +7,6 @@
 #pragma once
 
 #include <multiplier/API.h>
-#include <multiplier/Weggli.h>
-#include <multiplier/Re2.h>
 
 #include <capnp/ez-rpc.h>
 #include <capnp/message.h>
@@ -16,6 +14,9 @@
 #include <capnp/serialize-packed.h>
 #include <kj/async.h>
 #include <kj/io.h>
+#include <multiplier/Weggli.h>
+#include <multiplier/Re2.h>
+#include <mutex>
 #include <optional>
 #include <string>
 
@@ -73,20 +74,38 @@ class RemoteEntityProvider final : public EntityProvider {
 
   const std::string host_port;
 
+  // Most recently observed version number.
+  std::mutex version_number_lock;
+  unsigned version_number;
+
   // Thread-local connections.
   std::deque<std::unique_ptr<ClientConnection>> tls_connections;
   std::mutex tls_connections_lock;
 
-  ClientConnection &Connection(void);
+  // Cap'n Proto doesn't allow connections to be used in separate threads. This
+  // returns an `this`-specific, thread-local connection to be used.
+  ClientConnection &Connection(const Ptr &self);
+
+  void MaybeUpdateVersionNumber(const Ptr &self, unsigned new_version_number);
 
  public:
   RemoteEntityProvider(std::string host, std::string port);
 
   virtual ~RemoteEntityProvider(void) noexcept;
 
+  // Return the version number.
+  unsigned VersionNumber(void) final;
+
+  // Update the version number. This is basically a signal to invalidate any
+  // caches.
+  void VersionNumberChanged(unsigned) final;
+
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  FilePathList ListFiles(void) final;
+  FilePathList ListFiles(const Ptr &) final;
+
+  // Cache a returned file list.
+  FilePathList CacheFileList(FilePathList files, unsigned) final;
 
   // Download a file by its unique ID.
   std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
@@ -100,17 +119,25 @@ class RemoteEntityProvider final : public EntityProvider {
 
   std::shared_ptr<RegexQueryResultImpl> Query(
       const Ptr &, const RegexQuery &) final;
+
+  std::vector<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+
+  std::vector<RawEntityId> CacheRedeclarations(
+      std::vector<RawEntityId>, unsigned) final;
 };
 
 class InvalidEntityProvider final : public EntityProvider {
  public:
   virtual ~InvalidEntityProvider(void) noexcept;
 
-  // Get the current list of parsed files, where the minimum ID
-  // in the returned list of fetched files will be `start_at`.
-  FilePathList ListFiles(void) final;
+  unsigned VersionNumber(void) final;
 
-  // Download a file by its unique ID.
+  void VersionNumberChanged(unsigned) final;
+
+  FilePathList ListFiles(const Ptr &) final;
+
+  FilePathList CacheFileList(FilePathList files, unsigned) final;
+
   std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
 
   // Download a fragment by its unique ID.
@@ -122,6 +149,11 @@ class InvalidEntityProvider final : public EntityProvider {
 
   std::shared_ptr<RegexQueryResultImpl> Query(
       const Ptr &, const RegexQuery &) final;
+
+  std::vector<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+
+  std::vector<RawEntityId> CacheRedeclarations(
+      std::vector<RawEntityId>, unsigned);
 };
 
 class FileListImpl {

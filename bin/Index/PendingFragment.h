@@ -32,6 +32,8 @@ using Pseudo = std::variant<pasta::TemplateArgument, pasta::CXXBaseSpecifier,
                             pasta::TemplateParameterList>;
 
 class EntityMapper;
+class IndexingContext;
+class NameMangler;
 
 // Summary information about a group of top-level declarations that are
 // somehow lexically/syntactically "stuck together" and thus serialized
@@ -99,6 +101,11 @@ struct PendingFragment {
 
   // Serialize the built-out fragments.
   void Serialize(EntityMapper &em, mx::rpc::Fragment::Builder &b);
+
+  // Store information persistently to enable linking of declarations across
+  // fragments.
+  void LinkDeclarations(IndexingContext &context, EntityMapper &em,
+                        NameMangler &mangler);
 };
 
 }  // namespace indexer

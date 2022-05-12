@@ -180,25 +180,32 @@ struct RegexMatch @0xc119a143d978fd1e {
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {
+
+  hello @0 () -> (versionNumber: UInt32);
   
   # Tell Multiplier to index a compile command.
-  indexCompileCommands @0 (commands :List(CompileCommand)) -> (success :Bool);
+  indexCompileCommands @1 (commands :List(CompileCommand)) -> (success :Bool);
 
   # Download a list of all files whose file ID is greater than or
   # equal to `minId`.
-  downloadFileList @1 () -> (files: List(FileInfo));
+  downloadFileList @2 () -> (versionNumber :UInt32, files: List(FileInfo));
 
   # Download a file by a file by an `mx::FileId`. Returns the file, and a list
   # of the fragment IDs associated with this file.
-  downloadFile @2 (id :UInt64) -> (file :Data, fragments :List(UInt64));
+  downloadFile @3 (id :UInt64) -> (versionNumber :UInt32, file :Data, fragments :List(UInt64));
 
   # Download a code fragment by an `mx::FragmentId`.
-  downloadFragment @3 (id: UInt64) -> (fragment :Data);
+  downloadFragment @4 (id: UInt64) -> (versionNumber :UInt32, fragment :Data);
 
   # Search code fragments matches with the query
-  weggliQueryFragments @4 (query :Text, isCpp :Bool) ->  (fragments :List(UInt64));
+  weggliQueryFragments @5 (query :Text, isCpp :Bool) ->  (versionNumber :UInt32, fragments :List(UInt64));
  
   # Query for a regular expression match, and return the list of fragment ids
   # overlapping with the matches.
-  regexQueryFragments @5 (regex :Text) -> (fragments :List(UInt64));
+  regexQueryFragments @6 (regex :Text) -> (versionNumber :UInt32, fragments :List(UInt64));
+  
+  # Expand a list of redeclarations to try to cover all redeclarations across
+  # all translation units. The first redeclaration in the list should be the
+  # definition.
+  findRedeclarations @7 (declId :UInt64) -> (versionNumber :UInt32, redeclarationIds :List(UInt64));
 }

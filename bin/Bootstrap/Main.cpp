@@ -818,9 +818,12 @@ void CodeGenerator::RunOnOptional(
   std::string capn_element_name;
   std::string cxx_element_name;
   std::string cxx_underlying_name;
+  bool is_enum = false;
+  bool is_bool = false;
   if (!element_name) {
 
   } else if (*element_name == "bool") {
+    is_bool = true;
     capn_element_name = "Bool";
     cxx_element_name = "bool";
     cxx_underlying_name = cxx_element_name;
@@ -836,11 +839,11 @@ void CodeGenerator::RunOnOptional(
     cxx_underlying_name = cxx_element_name;
 
   } else if (enum_names.count(*element_name)) {
-
     auto &types = enum_type[*element_name];
     capn_element_name = types.second;
     cxx_element_name = *element_name;
     cxx_underlying_name = types.first;
+    is_enum = true;
 
   // E.g. `optional<vector<CXXBaseSpecifier>>`, `optional<vector<FriendDecl>>`.
   } else if (*element_name == "vector") {
@@ -898,9 +901,13 @@ void CodeGenerator::RunOnOptional(
   serialize_cpp_os
       << "  auto v" << i << " = e." << method_name << "();\n";
 
+  const char *serializer = nullptr;
+
   // Strings.
   if (element_name.value() == "string" ||
       element_name.value() == "basic_string") {
+
+    serializer = "MX_SERIALIZE_OPTIONAL_TEXT";
 
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
@@ -920,6 +927,9 @@ void CodeGenerator::RunOnOptional(
   // Proto requires `:Text` fields to be `NUL`-terminated.
   } else if (*element_name == "string_view" ||
              *element_name == "basic_string_view") {
+
+    serializer = "MX_SERIALIZE_OPTIONAL_TEXT";
+
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
         << "    if (v" << i << "->empty()) {\n"
@@ -942,6 +952,9 @@ void CodeGenerator::RunOnOptional(
 
   // Filesystem paths.
   } else if (*element_name == "path") {
+
+    serializer = "MX_SERIALIZE_OPTIONAL_PATH";
+
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
         << "    b." << setter_name
@@ -959,11 +972,7 @@ void CodeGenerator::RunOnOptional(
   // Reference types.
   } else if (gEntityClassNames.count(element_name.value())) {
 
-    serialize_inc_os
-        << "  MX_SERIALIZE_OPTIONAL_ENTITY(" << class_name << ", " << api_name
-        << ", " << getter_name << ", " << setter_name << ", "
-        << init_name << ", " << method_name << ", " << element_name.value()
-        << ", " << nth_entity_reader << ")\n";
+    serializer = "MX_SERIALIZE_OPTIONAL_ENTITY";
 
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
@@ -1022,11 +1031,7 @@ void CodeGenerator::RunOnOptional(
   // Pseudo-entities.
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
 
-    serialize_inc_os
-        << "  MX_SERIALIZE_OPTIONAL_PSEUDO(" << class_name << ", " << api_name
-        << ", " << getter_name << ", " << setter_name << ", "
-        << init_name << ", " << method_name << ", " << element_name.value()
-        << ", " << nth_entity_reader << ")\n";
+    serializer = "MX_SERIALIZE_OPTIONAL_PSEUDO";
 
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
@@ -1043,6 +1048,14 @@ void CodeGenerator::RunOnOptional(
   // Enums, bools, ints, etc.
   } else {
     assert(!cxx_underlying_name.empty());
+
+    if (is_enum) {
+      serializer = "MX_SERIALIZE_OPTIONAL_ENUM";
+    } else if (is_bool) {
+      serializer = "MX_SERIALIZE_OPTIONAL_BOOL";
+    } else {
+      serializer = "MX_SERIALIZE_OPTIONAL_INT";
+    }
 
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
@@ -1061,6 +1074,12 @@ void CodeGenerator::RunOnOptional(
   lib_cpp_os
       << "  }\n"
       << "}\n\n";
+
+  serialize_inc_os
+      << "  " << serializer << "(" << class_name << ", " << api_name
+      << ", " << getter_name << ", " << setter_name << ", "
+      << init_name << ", " << method_name << ", " << element_name.value()
+      << ", " << nth_entity_reader << ")\n";
 }
 
 void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
@@ -1075,6 +1094,8 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
   std::string capn_element_name;
   std::string cxx_element_name;
 
+  const char **serializer = nullptr;
+
   if (!element_name) {
     if (optional) {
       std::cerr << "no optional element name?\n";
@@ -1086,6 +1107,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
              *element_name == "string_view" ||
              *element_name == "basic_string_view" ||
              *element_name == "path") {
+
     capn_element_name = "Text";
     cxx_element_name = "std::string_view";
 
@@ -1178,6 +1200,10 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
       << "    for (const auto &e" << i << " : v" << i << ") {\n";
 
   if (*element_name == "string" || *element_name == "basic_string") {
+
+    static const char *_serializer[] = {"MX_SERIALIZE_TEXT_LIST", "MX_SERIALIZE_OPTIONAL_TEXT_LIST"};
+    serializer = _serializer;
+
     serialize_cpp_os
         << "      sv" << i << ".set(i" << i << ", e" << i << ");\n";
 
@@ -1188,6 +1214,10 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
   // Proto requires `:Text` fields to be `NUL`-terminated.
   } else if (*element_name == "string_view" ||
              *element_name == "basic_string_view") {
+
+    static const char *_serializer[] = {"MX_SERIALIZE_TEXT_LIST", "MX_SERIALIZE_OPTIONAL_TEXT_LIST"};
+    serializer = _serializer;
+
     serialize_cpp_os
         << "      std::string se" << i << "(e" << i << ".data(), e"
         << i << ".size());\n"
@@ -1198,6 +1228,10 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
 
   // Filesystem paths.
   } else if (*element_name == "path") {
+
+    static const char *_serializer[] = {"MX_SERIALIZE_PATH_LIST", "MX_SERIALIZE_OPTIONAL_PATH_LIST"};
+    serializer = _serializer;
+
     serialize_cpp_os
         << "      sv" << i << ".set(i" << i << ", e" << i
         << ".lexically_normal().generic_string());\n";
@@ -1208,19 +1242,8 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
   // Reference types.
   } else if (gEntityClassNames.count(*element_name)) {
 
-    if (optional) {
-      serialize_inc_os
-          << "  MX_SERIALIZE_OPTIONAL_ENTITY_LIST(" << class_name << ", " << api_name
-          << ", " << getter_name << ", " << setter_name << ", "
-          << init_name << ", " << method_name << ", " << element_name.value()
-          << ", " << nth_entity_reader << ")\n";
-    } else {
-      serialize_inc_os
-          << "  MX_SERIALIZE_ENTITY_LIST(" << class_name << ", " << api_name
-          << ", " << getter_name << ", " << setter_name << ", "
-          << init_name << ", " << method_name << ", " << element_name.value()
-          << ", " << nth_entity_reader << ")\n";
-    }
+    static const char *_serializer[] = {"MX_SERIALIZE_ENTITY_LIST", "MX_SERIALIZE_OPTIONAL_ENTITY_LIST"};
+    serializer = _serializer;
 
     serialize_cpp_os
         << "      sv" << i << ".set(i" << i << ", es.EntityId(e" << i
@@ -1274,19 +1297,9 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
 
   // Not reference types, need to serialize offsets.
   } else {
-    if (optional) {
-      serialize_inc_os
-          << "  MX_SERIALIZE_OPTIONAL_PSEUDO_LIST(" << class_name << ", " << api_name
-          << ", " << getter_name << ", " << setter_name << ", "
-          << init_name << ", " << method_name << ", " << element_name.value()
-          << ", " << nth_entity_reader << ")\n";
-    } else {
-      serialize_inc_os
-          << "  MX_SERIALIZE_PSEUDO_LIST(" << class_name << ", " << api_name
-          << ", " << getter_name << ", " << setter_name << ", "
-          << init_name << ", " << method_name << ", " << element_name.value()
-          << ", " << nth_entity_reader << ")\n";
-    }
+
+    static const char *_serializer[] = {"MX_SERIALIZE_PSEUDO_LIST", "MX_SERIALIZE_OPTIONAL_PSEUDO_LIST"};
+    serializer = _serializer;
 
     serialize_cpp_os
         << "      sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
@@ -1304,6 +1317,12 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
       << "      ++i" << i << ";\n"
       << "    }\n"
       << "  } while (false);\n";
+
+  serialize_inc_os
+        << "  " << serializer[optional] << "(" << class_name << ", " << api_name
+        << ", " << getter_name << ", " << setter_name << ", "
+        << init_name << ", " << method_name << ", " << element_name.value()
+        << ", " << nth_entity_reader << ")\n";
 }
 
 MethodListPtr CodeGenerator::RunOnClass(
@@ -1505,6 +1524,25 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  b." << cd_setter_name << "(es.ParentDeclId(e));\n"
           << "  b." << cs_setter_name << "(es.ParentStmtId(e));\n";
 
+      if (class_name == "Decl") {
+        const auto def = storage.AddMethod("Bool");
+        auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
+
+        serialize_inc_os
+            << "  MX_SERIALIZE_BOOL(Decl, is_definition, " << def_getter_name
+            << ", " << def_setter_name << ", " << def_init_name
+            << ", IsThisDeclarationADefinition, bool, NthDecl)\n";
+
+        lib_cpp_os
+            << "bool Decl::is_definition(void) const {\n"
+            << "  auto self = fragment->NthDecl(offset);\n"
+            << "  return self." << def_getter_name << "();\n"
+            << "}\n\n";
+
+        serialize_cpp_os
+            << "  b." << def_setter_name << "(IsDefinition(e));\n";
+      }
+
       lib_cpp_os
           << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
           << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
@@ -1531,7 +1569,9 @@ MethodListPtr CodeGenerator::RunOnClass(
         << " protected:\n"
         << "  friend class Decl;\n"
         << "  friend class DeclIterator;\n"
+        << "  friend class Fragment;\n"
         << "  friend class FragmentImpl;\n"
+        << "  friend class Index;\n"
         << "  friend class Stmt;\n"
         << "  friend class StmtIterator;\n"
         << "  friend class TokenContext;\n"
@@ -1554,10 +1594,23 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return c.as_declaration();\n"
           << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
-          << "  std::optional<Stmt> parent_statement(void) const;\n\n"
+          << "  std::optional<Stmt> parent_statement(void) const;\n"
+          << "  std::optional<Decl> definition(void) const;\n"
+          << "  bool is_definition(void) const;\n"
+          << "  std::vector<Decl> redeclarations(void) const;\n"
+          << "  EntityId id(void) const;\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
+
+      seen_methods->emplace("Definition");  // Manual.
+      seen_methods->emplace("CanonicalDeclaration");  // Disable this.
+      seen_methods->emplace("IsCanonicalDeclaration");  // Disable this.
+      seen_methods->emplace("IsReferenced");  // Disable this.
+      seen_methods->emplace("IsThisDeclarationReferenced");  // Disable this.
+      seen_methods->emplace("IsUsed");  // Disable this.
+      seen_methods->emplace("IsFirstDeclaration");  // Disable this.
+      seen_methods->emplace("IsThisDeclarationADefinition");  // Disable this.
 
     } else if (class_name == "Stmt") {
       include_h_os
@@ -1568,7 +1621,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return c.as_statement();\n"
           << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
-          << "  std::optional<Stmt> parent_statement(void) const;\n\n"
+          << "  std::optional<Stmt> parent_statement(void) const;\n"
+          << "  EntityId id(void) const;\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -1581,6 +1635,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Type> from(const TokenContext &c) {\n"
           << "    return c.as_type();\n"
           << "  }\n\n"
+          << "  EntityId id(void) const;\n\n"
           << " protected:\n"
           << "  static TypeIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -1841,6 +1896,17 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     std::string snake_name = CapitalCaseToSnakeCase(method_name);
+    // Make this local. We have a custom implementation of `redeclarations`
+    // that calls `redeclarations_visible_in_translation_unit`, and then
+    // dispatches to the entity provider to query ther server for the full
+    // set of redeclarations.
+    if (snake_name == "redeclarations") {
+      snake_name = "redeclarations_visible_in_translation_unit";
+
+    } else if (snake_name == "is_this_declaration_a_definition") {
+      snake_name = "is_definition";
+    }
+
     std::string api_name = SnakeCaseToAPICase(snake_name);
     std::string camel_name = SnakeCaseToCamelCase(snake_name);
     auto return_type = method.ReturnType().UnqualifiedType();
@@ -1854,8 +1920,15 @@ MethodListPtr CodeGenerator::RunOnClass(
       // Handle `pasta::Token` and `pasta::FileToken` uniformly. We represent
       // both as references.
       if (record_name == "Token" || record_name == "FileToken") {
+
         const auto i = storage.AddMethod("UInt64");  // Reference.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
+
+        serialize_inc_os
+            << "  MX_SERIALIZE_ENTITY(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << record_name << ", "
+            << nth_entity_reader << ")\n";
 
         include_h_os
             << "  Token " << api_name << "(void) const;\n";
@@ -1871,12 +1944,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         serialize_cpp_os
             << "  b." << setter_name << "(es.EntityId(e."
             << method_name << "()));\n";
-
-        serialize_inc_os
-            << "  MX_SERIALIZE_ENTITY(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", Token, "
-            << nth_entity_reader << ")\n";
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
@@ -1908,8 +1975,15 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Handle `std::string`
       } else if (record_name == "string" || record_name == "basic_string") {
+
         const auto i = storage.AddMethod("Text");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
+
+        serialize_inc_os
+            << "  MX_SERIALIZE_TEXT(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << record_name << ", "
+            << nth_entity_reader << ")\n";
 
         include_h_os
             << "  std::string_view " << api_name << "(void) const;\n";
@@ -1931,8 +2005,15 @@ MethodListPtr CodeGenerator::RunOnClass(
       // `std::string`.
       } else if (record_name == "string_view" ||
                  record_name == "basic_string_view") {
+
         const auto i = storage.AddMethod("Text");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
+
+        serialize_inc_os
+            << "  MX_SERIALIZE_TEXT(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << record_name << ", "
+            << nth_entity_reader << ")\n";
 
         include_h_os
             << "  std::string_view " << api_name << "(void) const;\n";
@@ -1973,8 +2054,16 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Probably `std::filesystem::path`.
       } else if (record_name == "path") {
+
         const auto i = storage.AddMethod("Text");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
+
+        serialize_inc_os
+            << "  MX_SERIALIZE_PATH(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << record_name << ", "
+            << nth_entity_reader << ")\n";
+
         include_h_os
             << "  std::filesystem::path " << api_name << "(void) const;\n";
 
@@ -2017,8 +2106,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         serialize_inc_os
             << "  MX_SERIALIZE_ENTITY(" << class_name << ", " << api_name
             << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", "
-            << record_name << ", " << nth_entity_reader << ")\n";
+            << init_name << ", " << method_name << ", " << record_name << ", "
+            << nth_entity_reader << ")\n";
 
         include_h_os
             << "  " << record_name << " " << api_name
@@ -2121,6 +2210,12 @@ MethodListPtr CodeGenerator::RunOnClass(
         const auto i = storage.AddMethod(types.second);
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
+        serialize_inc_os
+            << "  MX_SERIALIZE_ENUM(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << enum_name << ", "
+            << nth_entity_reader << ")\n";
+
         include_h_os
             << "  " << enum_name << " " << api_name
             << "(void) const;\n";
@@ -2141,15 +2236,31 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     // Handle integral return types.
     } else if (auto int_type = SchemaIntType(return_type)) {
+      std::string cxx_int_type = CxxIntType(return_type);
       const auto i = storage.AddMethod(int_type);
       auto [getter_name, setter_name, init_name] = NamesFor(i);
 
+      if (cxx_int_type == "bool") {
+
+        serialize_inc_os
+            << "  MX_SERIALIZE_BOOL(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << cxx_int_type << ", "
+            << nth_entity_reader << ")\n";
+      } else {
+        serialize_inc_os
+            << "  MX_SERIALIZE_INT(" << class_name << ", " << api_name
+            << ", " << getter_name << ", " << setter_name << ", "
+            << init_name << ", " << method_name << ", " << cxx_int_type << ", "
+            << nth_entity_reader << ")\n";
+      }
+
       include_h_os
-          << "  " << CxxIntType(return_type) << " " << api_name
+          << "  " << cxx_int_type << " " << api_name
           << "(void) const;\n";
 
       lib_cpp_os
-          << CxxIntType(return_type) << " " << class_name << "::" << api_name
+          << cxx_int_type << " " << class_name << "::" << api_name
           << "(void) const {\n"
           << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
           << "  return self." << getter_name << "();\n"
@@ -2258,6 +2369,66 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
+      << "#ifndef MX_SERIALIZE_BOOL\n"
+      << "#  define MX_SERIALIZE_BOOL(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_INT\n"
+      << "#  define MX_SERIALIZE_INT(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_ENUM\n"
+      << "#  define MX_SERIALIZE_ENUM(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_TEXT\n"
+      << "#  define MX_SERIALIZE_TEXT(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_PATH\n"
+      << "#  define MX_SERIALIZE_PATH(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_BOOL\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_BOOL(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_INT\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_INT(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_ENUM\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_ENUM(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_TEXT\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_TEXT(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_PATH\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_PATH(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_BOOL_LIST\n"
+      << "#  define MX_SERIALIZE_BOOL_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_INT_LIST\n"
+      << "#  define MX_SERIALIZE_INT_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_ENUM_LIST\n"
+      << "#  define MX_SERIALIZE_ENUM_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_TEXT_LIST\n"
+      << "#  define MX_SERIALIZE_TEXT_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_PATH_LIST\n"
+      << "#  define MX_SERIALIZE_PATH_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_BOOL_LIST\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_BOOL_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_INT_LIST\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_INT_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_ENUM_LIST\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_ENUM_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_TEXT_LIST\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_TEXT_LIST(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_SERIALIZE_OPTIONAL_PATH_LIST\n"
+      << "#  define MX_SERIALIZE_OPTIONAL_PATH_LIST(...)\n"
+      << "#endif\n"
       << "#ifndef MX_SERIALIZE_ENTITY\n"
       << "#  define MX_SERIALIZE_ENTITY(...)\n"
       << "#endif\n"
@@ -2348,7 +2519,8 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <pasta/Compile/Compiler.h>\n"
       << "#include <pasta/Compile/Job.h>\n"
       << "#include <pasta/Util/ArgumentVector.h>\n\n"
-      << "#include \"EntityMapper.h\"\n\n"
+      << "#include \"EntityMapper.h\"\n"
+      << "#include \"Util.h\"\n\n"
       << "namespace indexer {\n\n";
 
   include_h_os
@@ -2554,6 +2726,26 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#endif\n";
 
   serialize_inc_os
+      << "#undef MX_SERIALIZE_BOOL\n"
+      << "#undef MX_SERIALIZE_INT\n"
+      << "#undef MX_SERIALIZE_ENUM\n"
+      << "#undef MX_SERIALIZE_TEXT\n"
+      << "#undef MX_SERIALIZE_PATH\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_BOOL\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_INT\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_ENUM\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_TEXT\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_PATH\n"
+      << "#undef MX_SERIALIZE_BOOL_LIST\n"
+      << "#undef MX_SERIALIZE_INT_LIST\n"
+      << "#undef MX_SERIALIZE_ENUM_LIST\n"
+      << "#undef MX_SERIALIZE_TEXT_LIST\n"
+      << "#undef MX_SERIALIZE_PATH_LIST\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_BOOL_LIST\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_INT_LIST\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_ENUM_LIST\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_TEXT_LIST\n"
+      << "#undef MX_SERIALIZE_OPTIONAL_PATH_LIST\n"
       << "#undef MX_SERIALIZE_ENTITY\n"
       << "#undef MX_SERIALIZE_ENTITY_LIST\n"
       << "#undef MX_SERIALIZE_OPTIONAL_ENTITY\n"

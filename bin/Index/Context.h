@@ -26,6 +26,7 @@ namespace mx {
 class Executor;
 class ProgressBar;
 enum WorkerId : unsigned;
+enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
@@ -40,13 +41,37 @@ enum : char {
   kFilePathToFileId,
   kFragmentHashToFragmentId,
   kFragmentIdToSerializedFragment,
-  kFragmentIdtoSourceIR
+  kFragmentIdToVersionNumber,
+  kEntityIdRedecls,
+  kEntityIdToMangledName,
+  kMangledNameToEntityId,
 };
 
 enum MetadataName : char {
+  // The next file ID that we can assign. File IDs are assigned in generally
+  // increasing order. The assignment isn't necessarily strictly linear, i.e.
+  // there may be some gaps, mostly just due to benign race conditions when
+  // multiple indexer threads are used.
   kNextFileId,
+
+  // The next ID for a "small code" fragment. Small code fragments have less
+  // than 2^16 tokens in them, i.e. most fragments are small code fragments.
+  // Fragment IDs for small code fragments fall in the range `[2^16, inf)`.
   kNextSmallCodeId,
-  kNextBigCodeId
+
+  // The next ID for a "big code" fragment. Big code fragments have at least
+  // 2^16 tokens in them. Most fragments do not fit this category; likely this
+  // is the result of auto-generated code. We rely on there being fewer than
+  // 2^16 of such fragments, and the IDs for these fall in the range of
+  // `[1, 2^16)`,
+  kNextBigCodeId,
+
+  // Fragments are tagged with a version code. The version code tells us
+  // if some of the info might be out-of-date. For example, when we serialize
+  // a fragment, we treat it as implicitly out-of-date. The idea is that we
+  // want to be able to know when we should possibly re-compute the definition
+  // and re-declarations list for a given entity.
+  kIndexingVersion,
 };
 
 enum CounterType : unsigned {
@@ -71,8 +96,19 @@ class ServerContext {
  public:
   const std::filesystem::path workspace_dir;
 
-  mx::PersistentMap<kMetaNameToId, MetadataName, uint64_t> meta_to_id;
+  mx::PersistentMap<kMetaNameToId, MetadataName, uint64_t> meta_to_value;
 
+  // The next indexing version number. This is incremented prior to starting
+  // an indexing run, and just after. The double-increment is there just in
+  // case some clients come along and issue some queries prior to indexing being
+  // finished. We want best-effort resolution of definitions/redeclarations
+  // during this time, but we don't want to commit to those results, just in
+  // case there are more redeclarations that come in betwween the client request
+  // and finishing indexing.
+  std::atomic<unsigned> version_number;
+
+  // The next file ID that can be assigned. This represents an upper bound on
+  // the total number of file IDs.
   std::atomic<mx::FileId> next_file_id;
 
   // The next ID for a "small fragment." A small fragment has fewer than
@@ -133,15 +169,23 @@ class ServerContext {
                     mx::FragmentId, std::string>
       fragment_id_to_serialized_fragment;
 
+  mx::PersistentSet<kEntityIdRedecls, mx::RawEntityId, mx::RawEntityId>
+      entity_redecls;
+
+  mx::PersistentSet<kEntityIdToMangledName, mx::RawEntityId, std::string>
+      entity_id_to_mangled_name;
+
+  mx::PersistentSet<kEntityIdToMangledName, std::string, mx::RawEntityId>
+      mangled_name_to_entity_id;
+
   void Flush(void);
 
-  mx::PersistentMap<kFragmentIdtoSourceIR, mx::FragmentId, std::string>
-      code_id_to_source_ir;
-
- public:
   ~ServerContext(void);
 
   explicit ServerContext(std::filesystem::path workspace_dir_);
+
+  // Return the set of redeclarations of an entity.
+  std::vector<mx::RawEntityId> FindRedeclarations(mx::EntityId eid);
 };
 
 template <typename K, typename V>
@@ -218,6 +262,14 @@ class IndexingContext {
 
   const unsigned num_workers;
 
+  // Version number to assign to all created fragments.
+  //
+  // NOTE(pag): This is explicitly out-of-data w.r.t. the backing storage. The
+  //            purpose is to save an older version number so that when a client
+  //            requests a fragment, we can see if we need to fixup the
+  //            canonical declarations of things.
+  const unsigned version_number;
+
   // In-memory caches that gate read/write access to
   // `ServerContext::code_hash_to_fragment_id`, because a lot of CPU is spent
   // there.
@@ -260,17 +312,19 @@ class IndexingContext {
   void PutSerializedFile(mx::FileId file_id, std::string);
 
   // Save the serialized top-level entities and the parsed tokens.
-  void PutSerializedFragment(mx::FragmentId code_id, std::string);
+  void PutSerializedFragment(mx::FragmentId id, std::string);
+
+  // Link fragment declarations.
+  void LinkDeclarations(mx::RawEntityId a, mx::RawEntityId b);
+
+  // Link the mangled name of something to its entity ID.
+  void LinkMangledName(const std::string &name, mx::RawEntityId eid);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out
   // which fragments overlap which lines.
   void PutFragmentLineCoverage(mx::FileId file_id, mx::FragmentId fragment_id,
                                unsigned start_line, unsigned end_line);
-
-  // Save the source ir contents for tlds
-  void PutSourceIRs(mx::FragmentId code_id, std::string source_ir);
-
 };
 
 class SearchingContext {

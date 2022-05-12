@@ -6,6 +6,8 @@
 
 #include "PendingFragment.h"
 
+#include "Util.h"
+
 namespace indexer {
 namespace {
 
@@ -68,10 +70,12 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
     default:
       break;
   }
+
   mx::DeclarationId id;
   id.fragment_id = fragment.fragment_id;
   id.offset = static_cast<uint32_t>(fragment.decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
+  id.is_definition = IsDefinition(entity);
 
   auto [it, added] = entity_ids.emplace(entity.RawDecl(), id);
   if (added) {

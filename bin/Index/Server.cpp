@@ -13,6 +13,9 @@
 #include <kj/debug.h>
 #include <kj/exception.h>
 #include <kj/string.h>
+#include <multiplier/Executor.h>
+#include <multiplier/PersistentMap.h>
+#include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
 #include <pasta/Compile/Job.h>
@@ -216,9 +219,18 @@ kj::Promise<void> Server::indexCompileCommands(
   return kj::READY_NOW;
 }
 
+// Say hello to the server.
+kj::Promise<void> Server::hello(HelloContext context) {
+  unsigned version_number = d->server_context.version_number.load();
+  auto results = context.initResults();
+  results.setVersionNumber(version_number);
+  return kj::READY_NOW;
+}
+
 // Download a list of file info (file id, path).
 kj::Promise<void> Server::downloadFileList(
     DownloadFileListContext context) {
+  unsigned version_number = d->server_context.version_number.load();
 
   std::vector<std::pair<mx::FileId, std::string>> paths;
   d->server_context.file_id_to_path.ScanPrefix(
@@ -232,6 +244,8 @@ kj::Promise<void> Server::downloadFileList(
 
   auto num_files = static_cast<unsigned>(paths.size());
   auto results = context.initResults();
+  results.setVersionNumber(version_number);
+
   auto files_builder = results.initFiles(num_files);
   for (auto i = 0u; i < num_files; ++i) {
     const auto &path = paths[i];
@@ -247,6 +261,8 @@ kj::Promise<void> Server::downloadFileList(
 kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
   mx::rpc::Multiplier::DownloadFileParams::Reader params =
       context.getParams();
+
+  unsigned version_number = d->server_context.version_number.load();
 
   mx::FileId file_id = params.getId();
   std::optional<std::string> maybe_contents =
@@ -283,6 +299,8 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
   capnp::Data::Reader contents_reader(
       reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
       maybe_contents.value().size());
+
+  results.setVersionNumber(version_number);
   results.setFile(contents_reader);
 
   auto fragments = results.initFragments(num_fragments);
@@ -304,7 +322,7 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   std::optional<std::string> maybe_contents =
       d->server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
   if (!maybe_contents) {
-    err << "Invalid fragment id " << fragment_id;
+    err << "Invalid fragment id " << fragment_id << "; missing data";
     return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
                          kj::heapString(err.str()));
   }
@@ -327,6 +345,8 @@ kj::Promise<void> Server::weggliQueryFragments(
       context.getParams();
 
   auto results = context.initResults();
+  results.setVersionNumber(d->server_context.version_number.load());
+
   std::string syntax_string(params.getQuery().cStr(), params.getQuery().size());
   if (syntax_string.empty()) {
     (void) results.initFragments(0u);
@@ -381,6 +401,8 @@ kj::Promise<void> Server::regexQueryFragments(
       context.getParams();
 
   auto results = context.initResults();
+  results.setVersionNumber(d->server_context.version_number.load());
+
   std::string pattern(params.getRegex().cStr(), params.getRegex().size());
   if (pattern.empty()) {
     (void) results.initFragments(0u);
@@ -415,6 +437,37 @@ kj::Promise<void> Server::regexQueryFragments(
   auto index = 0u;
   for (mx::FragmentId frag_id : matches) {
     match_builder.set(index++, frag_id);
+  }
+
+  return kj::READY_NOW;
+}
+
+kj::Promise<void> Server::findRedeclarations(FindRedeclarationsContext context) {
+  mx::rpc::Multiplier::FindRedeclarationsParams::Reader params =
+      context.getParams();
+
+  // Check the input entity IDs. They all need to be declaration IDs.
+  mx::EntityId eid(params.getDeclId());
+  mx::VariantId vid = eid.Unpack();
+
+  if (!std::holds_alternative<mx::DeclarationId>(vid)) {
+    return kj::Exception(
+        kj::Exception::Type::FAILED, __FILE__, __LINE__,
+        kj::heapString("Cannot complete operation with non-declaration entity ID"));
+  }
+
+  std::vector<mx::RawEntityId> redecl_ids =
+      d->server_context.FindRedeclarations(eid);
+
+  mx::rpc::Multiplier::FindRedeclarationsResults::Builder result =
+      context.initResults();
+
+  result.setVersionNumber(d->server_context.version_number.load());
+  auto rib = result.initRedeclarationIds(
+      static_cast<unsigned>(redecl_ids.size()));
+  auto i = 0u;
+  for (mx::RawEntityId redecl_id : redecl_ids) {
+    rib.set(i++, redecl_id);
   }
 
   return kj::READY_NOW;

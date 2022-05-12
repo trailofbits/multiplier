@@ -7138,7 +7138,9 @@ class TemplateParameterList {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7169,7 +7171,9 @@ class TemplateArgument {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7199,7 +7203,9 @@ class CXXBaseSpecifier {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7231,7 +7237,9 @@ class Type {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7252,6 +7260,8 @@ class Type {
   inline static std::optional<Type> from(const TokenContext &c) {
     return c.as_type();
   }
+
+  EntityId id(void) const;
 
  protected:
   static TypeIterator in_internal(const Fragment &fragment);
@@ -8971,7 +8981,9 @@ class Stmt {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -8995,6 +9007,7 @@ class Stmt {
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
+  EntityId id(void) const;
 
  protected:
   static StmtIterator in_internal(const Fragment &fragment);
@@ -16405,7 +16418,9 @@ class Decl {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -16429,6 +16444,10 @@ class Decl {
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
+  std::optional<Decl> definition(void) const;
+  bool is_definition(void) const;
+  std::vector<Decl> redeclarations(void) const;
+  EntityId id(void) const;
 
  protected:
   static DeclIterator in_internal(const Fragment &fragment);
@@ -16448,7 +16467,6 @@ class Decl {
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   Token begin_token(void) const;
-  Decl canonical_declaration(void) const;
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   Token end_token(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
@@ -16459,10 +16477,8 @@ class Decl {
   bool has_defining_attribute(void) const;
   bool has_owning_module(void) const;
   bool has_tag_identifier_namespace(void) const;
-  bool is_canonical_declaration(void) const;
   bool is_defined_outside_function_or_method(void) const;
   bool is_deprecated(void) const;
-  bool is_first_declaration(void) const;
   bool is_function_or_function_template(void) const;
   bool is_implicit(void) const;
   bool is_in_anonymous_namespace(void) const;
@@ -16472,18 +16488,15 @@ class Decl {
   bool is_module_private(void) const;
   bool is_out_of_line(void) const;
   bool is_parameter_pack(void) const;
-  bool is_referenced(void) const;
   bool is_template_declaration(void) const;
   bool is_template_parameter(void) const;
   bool is_template_parameter_pack(void) const;
   bool is_templated(void) const;
-  bool is_this_declaration_referenced(void) const;
   bool is_top_level_declaration_in_obj_c_container(void) const;
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;
-  bool is_used(void) const;
   bool is_weak_imported(void) const;
-  std::vector<Decl> redeclarations(void) const;
+  std::vector<Decl> redeclarations_visible_in_translation_unit(void) const;
   DeclKind kind(void) const;
   Token token(void) const;
   TokenRange tokens(void) const;
@@ -17682,7 +17695,6 @@ class FunctionDecl : public DeclaratorDecl {
   Type call_result_type(void) const;
   ConstexprSpecKind constexpr_kind(void) const;
   Type declared_return_type(void) const;
-  std::optional<FunctionDecl> definition(void) const;
   Token ellipsis_token(void) const;
   TokenRange exception_spec_source_range(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
@@ -17741,7 +17753,6 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_static(void) const;
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
-  bool is_this_declaration_a_definition(void) const;
   bool is_this_declaration_instantiated_from_a_friend_definition(void) const;
   bool is_trivial(void) const;
   bool is_trivial_for_call(void) const;
@@ -18390,7 +18401,6 @@ class TagDecl : public TypeDecl {
   static std::optional<TagDecl> from(const NamedDecl &parent);
   static std::optional<TagDecl> from(const Decl &parent);
   TokenRange brace_range(void) const;
-  std::optional<TagDecl> definition(void) const;
   Token inner_token_start(void) const;
   Token outer_token_start(void) const;
   TagTypeKind tag_kind(void) const;
@@ -18406,7 +18416,6 @@ class TagDecl : public TypeDecl {
   bool is_free_standing(void) const;
   bool is_interface(void) const;
   bool is_struct(void) const;
-  bool is_this_declaration_a_definition(void) const;
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;
@@ -19253,7 +19262,6 @@ class ObjCMethodDecl : public NamedDecl {
   bool is_property_accessor(void) const;
   bool is_redeclaration(void) const;
   bool is_synthesized_accessor_stub(void) const;
-  bool is_this_declaration_a_definition(void) const;
   bool is_this_declaration_a_designated_initializer(void) const;
   bool is_variadic(void) const;
   std::vector<ParmVarDecl> parameters(void) const;
@@ -19361,11 +19369,9 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
   static std::optional<ObjCProtocolDecl> from(const NamedDecl &parent);
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
-  ObjCProtocolDecl definition(void) const;
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;
   bool is_non_runtime_protocol(void) const;
-  bool is_this_declaration_a_definition(void) const;
   std::vector<Token> protocol_tokens(void) const;
   std::vector<ObjCProtocolDecl> protocols(void) const;
 };
@@ -19399,7 +19405,6 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   std::vector<ObjCProtocolDecl> all_referenced_protocols(void) const;
   bool declares_or_inherits_designated_initializers(void) const;
   ObjCCategoryDecl category_list_raw(void) const;
-  ObjCInterfaceDecl definition(void) const;
   Token end_of_definition_token(void) const;
   ObjCImplementationDecl implementation(void) const;
   std::string_view obj_c_runtime_name_as_string(void) const;
@@ -19413,7 +19418,6 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool is_arc_weakref_unavailable(void) const;
   bool is_implicit_interface_declaration(void) const;
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
-  bool is_this_declaration_a_definition(void) const;
   std::vector<ObjCIvarDecl> instance_variables(void) const;
   std::vector<ObjCCategoryDecl> known_categories(void) const;
   std::vector<ObjCCategoryDecl> known_extensions(void) const;

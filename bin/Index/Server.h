@@ -42,6 +42,9 @@ class Server final : public mx::rpc::Multiplier::Server {
   // Initialize the server.
   Server(ServerOptions &options_);
 
+  // Say hello to the server.
+  kj::Promise<void> hello(HelloContext context) final;
+
   // Download a list of file info (file id, paths) where the file IDs
   // are greater-than-or-equal to some minimum ID.
   kj::Promise<void> downloadFileList(
@@ -61,6 +64,8 @@ class Server final : public mx::rpc::Multiplier::Server {
   kj::Promise<void> weggliQueryFragments(WeggliQueryFragmentsContext context) final;
 
   kj::Promise<void> regexQueryFragments(RegexQueryFragmentsContext context) final;
+
+  kj::Promise<void> findRedeclarations(FindRedeclarationsContext context) final;
 };
 
 }  // namespace indexer

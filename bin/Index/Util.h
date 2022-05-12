@@ -37,4 +37,7 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 
+// Returns `true` if `decl` is a definition.
+bool IsDefinition(const pasta::Decl &decl);
+
 }  // namespace indexer

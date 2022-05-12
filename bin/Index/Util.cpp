@@ -6,6 +6,12 @@
 
 #include "Util.h"
 
+#include <clang/AST/Attr.h>
+#include <clang/AST/Decl.h>
+#include <clang/AST/DeclCXX.h>
+#include <clang/AST/DeclObjC.h>
+#include <clang/AST/DeclTemplate.h>
+
 #include <multiplier/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
@@ -215,6 +221,81 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
     }
   }
   return kind;
+}
+
+namespace {
+
+// NOTE(pag): An `alias` attribute is considered a "defining attribute".
+static bool FuncIsDefinition(clang::FunctionDecl *decl) {
+  if (decl->isThisDeclarationADefinition()) {
+    return !decl->hasAttr<clang::AliasAttr>();
+  } else {
+    const clang::FunctionDecl *def_decl = nullptr;
+    return decl->getBody(def_decl) && def_decl == decl;
+  }
+}
+
+// Treat parameters in function declarations/prototypes as just being
+// declarations and not themselves definitions.
+static bool ParamIsDefinition(clang::ParmVarDecl *decl) {
+  clang::DeclContext *dc = decl->getDeclContext();
+  clang::Decl *dc_decl = clang::Decl::castFromDeclContext(dc);
+  if (auto func = clang::dyn_cast<clang::FunctionDecl>(dc_decl)) {
+    return FuncIsDefinition(func);
+  } else {
+    return false;
+  }
+}
+
+}  // namespace
+
+// Returns `true` if `decl` is a definition.
+bool IsDefinition(const pasta::Decl &decl_) {
+  auto decl = const_cast<clang::Decl *>(decl_.RawDecl());
+
+  if (auto parm_decl = clang::dyn_cast<clang::ParmVarDecl>(decl)) {
+    return ParamIsDefinition(parm_decl);
+
+  } else if (auto func_decl = clang::dyn_cast<clang::FunctionDecl>(decl)) {
+    return FuncIsDefinition(func_decl);
+
+  } else if (clang::isa<clang::TypedefNameDecl>(decl)) {
+    return true;
+
+  } else if (clang::isa<clang::FieldDecl>(decl)) {
+    return true;
+
+  } else if (auto var_decl = clang::dyn_cast<clang::VarDecl>(decl)) {
+    return (clang::VarDecl::DeclarationOnly !=
+            var_decl->isThisDeclarationADefinition());
+
+  } else if (auto method_decl = clang::dyn_cast<clang::ObjCMethodDecl>(decl)) {
+    return method_decl->isThisDeclarationADefinition();
+
+  } else if (auto proto_decl = clang::dyn_cast<clang::ObjCProtocolDecl>(decl)) {
+    return proto_decl->isThisDeclarationADefinition();
+
+  } else if (auto face_decl = clang::dyn_cast<clang::ObjCInterfaceDecl>(decl)) {
+    return face_decl->isThisDeclarationADefinition();
+
+  } else if (auto tag_decl = clang::dyn_cast<clang::TagDecl>(decl)) {
+    return tag_decl->isThisDeclarationADefinition();
+
+  } else if (auto ctpl_decl = clang::dyn_cast<clang::ClassTemplateDecl>(decl)) {
+    return ctpl_decl->isThisDeclarationADefinition();
+
+  } else if (auto ftpl_decl = clang::dyn_cast<clang::FunctionTemplateDecl>(decl)) {
+    return ftpl_decl->isThisDeclarationADefinition();
+
+  } else if (auto vtpl_decl = clang::dyn_cast<clang::VarTemplateDecl>(decl)) {
+    return vtpl_decl->isThisDeclarationADefinition();
+
+  } else if (clang::isa<clang::EnumConstantDecl>(decl)) {
+    return true;
+
+  } else {
+    return false;
+  }
 }
 
 }  // namespace indexer

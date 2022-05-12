@@ -129,23 +129,18 @@ void CodeGenerator::GenerateSourceIRFromTLDs(
 
 // Generate source IR from the TLDs
 std::string ConvertToSourceIR(
-    std::shared_ptr<IndexingContext> context,
+    IndexingContext &context,
     mx::FragmentId code_id, const std::vector<pasta::Decl> &decls) {
 
   // Get the instance of code generator
-  if (auto codegen = context->codegen.get(); codegen) {
+  if (auto codegen = context.codegen.get()) {
     std::string ir_string;
 
-    // Generate module id from the code id
-    std::stringstream ss;
-    ss << code_id;
-
     try {
-      codegen->GenerateSourceIRFromTLDs(ss.str(), decls, ir_string);
+      codegen->GenerateSourceIRFromTLDs(
+          std::to_string(code_id), decls, ir_string);
       if (!ir_string.empty()) {
-        IndexingCounterRes ir_counter(context->stat, kStatSourceIRFragment);
-        // Add source IR string to the persistent storage
-        context->PutSourceIRs(code_id, ir_string);
+        IndexingCounterRes ir_counter(context.stat, kStatSourceIRFragment);
       }
       return ir_string;
 
@@ -171,7 +166,7 @@ void CodeGenerator::GenerateSourceIRFromTLDs(
 
 // Generate source IR from the TLDs
 std::string ConvertToSourceIR(
-    std::shared_ptr<IndexingContext>,
+    IndexingContext &,
     mx::FragmentId, const std::vector<pasta::Decl> &) {
   return {};
 }

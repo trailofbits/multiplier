@@ -16,11 +16,15 @@ DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX d
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print function names");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
-DEFINE_bool(unparsed, false, "Show original source code?");
 
 static void PrintFunctionNames(mx::Fragment fragment) {
   for (mx::FunctionDecl func : mx::FunctionDecl::in(fragment)) {
-    std::cout << fragment.id() << '\t' << func.name() << '\n';
+
+    std::cout
+        << mx::File::containing(fragment).id() << '\t'
+        << fragment.id() << '\t' << func.id() << '\t'
+        << (func.is_definition() ? "def\t" : "decl\t")
+        << func.name() << '\n';
   }
 }
 
@@ -61,8 +65,11 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
   } else {
-    std::cerr << "One of --fragment_id or --file_id is required" << std::endl;
-    return EXIT_FAILURE;
+    for (mx::File file : mx::File::in(index)) {
+      for (mx::Fragment fragment : mx::Fragment::in(file)) {
+        PrintFunctionNames(std::move(fragment));
+      }
+    }
   }
 
   return EXIT_SUCCESS;

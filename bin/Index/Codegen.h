@@ -8,12 +8,14 @@
 
 #include <memory>
 #include <multiplier/Action.h>
-
+#include <multiplier/Types.h>
 #include <pasta/AST/Decl.h>
-
-#include "Context.h"
+#include <string>
+#include <vector>
 
 namespace indexer {
+
+class IndexingContext;
 
 class CodeGenerator {
  public:
@@ -41,7 +43,7 @@ class CodeGenerator {
 // AST node and generate source ir for function decl found.
 
 std::string ConvertToSourceIR(
-    std::shared_ptr<IndexingContext> context,
-    mx::FragmentId code_id, const std::vector<pasta::Decl> &decls);
+    IndexingContext &context, mx::FragmentId code_id,
+    const std::vector<pasta::Decl> &decls);
 
 }  // namespace indexer

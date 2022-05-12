@@ -21,6 +21,7 @@
 #include <sstream>
 #include <utility>
 
+#include "Codegen.h"
 #include "Compress.h"
 #include "Context.h"
 #include "EntityMapper.h"
@@ -506,9 +507,10 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(IndexingContext &context, EntityIdMap &entity_ids,
-                     FileIdMap &file_ids, const pasta::TokenRange &tokens,
-                     PendingFragment frag, std::string mlir) {
+void PersistFragment(IndexingContext &context, NameMangler &mangler,
+                     EntityIdMap &entity_ids, FileIdMap &file_ids,
+                     const pasta::TokenRange &tokens,
+                     PendingFragment frag) {
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
@@ -561,7 +563,10 @@ void PersistFragment(IndexingContext &context, EntityIdMap &entity_ids,
   fb.setId(fragment_id);
   fb.setFirstFileTokenId(em.EntityId(min_token));
   fb.setLastFileTokenId(em.EntityId(max_token));
-  fb.setMlir(mlir);
+
+  // Generate source IR before saving the fragments to the persistent
+  // storage.
+  fb.setMlir(ConvertToSourceIR(context, fragment_id, frag.decls));
 
   auto num_tlds = static_cast<unsigned>(frag.decls.size());
   auto tlds = fb.initTopLevelDeclarations(num_tlds);
@@ -591,6 +596,8 @@ void PersistFragment(IndexingContext &context, EntityIdMap &entity_ids,
 
   context.PutSerializedFragment(
       fragment_id, CompressedMessage("fragment", message));
+
+  frag.LinkDeclarations(context, em, mangler);
 }
 
 }  // namespace indexer

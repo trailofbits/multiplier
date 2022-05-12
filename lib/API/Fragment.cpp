@@ -26,6 +26,32 @@ Fragment Fragment::containing(const RegexQueryMatch &match) {
   return Fragment(match.frag);
 }
 
+Fragment Fragment::containing(const Decl &entity) {
+  return Fragment(entity.fragment);
+}
+
+Fragment Fragment::containing(const Stmt &entity) {
+  return Fragment(entity.fragment);
+}
+
+Fragment Fragment::containing(const Type &entity) {
+  return Fragment(entity.fragment);
+}
+
+std::optional<Fragment> Fragment::containing(const Token &entity) {
+  if (auto frag = dynamic_cast<const PackedFragmentImpl *>(entity.impl.get())) {
+    std::shared_ptr<const FragmentImpl> ptr(entity.impl, frag);
+    return Fragment(std::move(ptr));
+  } else {
+    return std::nullopt;
+  }
+}
+
+
+Fragment Fragment::containing(const TokenSubstitution &entity) {
+  return Fragment(entity.impl);
+}
+
 // Return the ID of this fragment.
 FragmentId Fragment::id(void) const noexcept {
   return impl->fragment_id;
