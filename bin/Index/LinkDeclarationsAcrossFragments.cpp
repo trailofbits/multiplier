@@ -44,20 +44,24 @@ void PendingFragment::LinkDeclarations(IndexingContext &context,
     }
 
     if (auto func = pasta::FunctionDecl::From(decl)) {
-      TrackRedeclarations(context, em, mangler.Mangle(decl), func->Redeclarations());
+      TrackRedeclarations(context, em, mangler.Mangle(decl),
+                          func->Redeclarations());
 
     } else if (auto var = pasta::VarDecl::From(decl)) {
       if (var->IsLocalVariableDeclaration()) {
         continue;
       }
 
-      TrackRedeclarations(context, em, mangler.Mangle(decl), var->Redeclarations());
+      TrackRedeclarations(context, em, mangler.Mangle(decl),
+                          var->Redeclarations());
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(context, em, dummy_mangled_name, tag->Redeclarations());
+      TrackRedeclarations(context, em, dummy_mangled_name,
+                          tag->Redeclarations());
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(context, em, dummy_mangled_name, tpl->Redeclarations());
+      TrackRedeclarations(context, em, dummy_mangled_name,
+                          tpl->Redeclarations());
 
     } else {
       continue;

@@ -29,6 +29,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "../Index/Pseudo.h"
+
 #define IGNORE(name)
 #define DECL_NAME(name) #name "Decl",
 #define TYPE_NAME(name) #name "Type",
@@ -82,14 +84,13 @@ static const std::unordered_set<std::string> gTypeNames{
   PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
 };
 
-#define FRAGMENT_NON_REF_TYPES \
-    "TemplateParameter", \
-    "TemplateArgument", \
-    "CXXBaseSpecifier", \
-    "TemplateParameterList"
+#define PSEUDO_ENTITY_TYPE_NAME_STRING(n) #n ,
 
+#define FRAGMENT_NON_REF_TYPES \
+    PSEUDO_ENTITY_TYPES(PSEUDO_ENTITY_TYPE_NAME_STRING)
 
 #define NON_REF_TYPES FRAGMENT_NON_REF_TYPES
+
 //#define NON_REF_TYPES \
 //    "IncludePath", \
 //    "Compiler", \
@@ -142,7 +143,7 @@ static const std::unordered_set<std::string> gConcreteClassNames{
   "Token",
   "TokenRange",
   "FileToken",
-  NON_REF_TYPES,
+  NON_REF_TYPES
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
   PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, IGNORE)
@@ -976,13 +977,11 @@ void CodeGenerator::RunOnOptional(
 
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
-        << "    if (auto id" << i << " = es.EntityId(v" << i << ".value())) {\n"
-        << "      b." << setter_name << "(id" << i << ");\n"
-        << "      b." << ip_setter_name << "(true);\n"
-        << "    } else {\n"
-        << "      b." << ip_setter_name << "(false);\n"
-        << "    }\n"
+        << "    auto id" << i << " = es.EntityId(v" << i << ".value());"
+        << "    b." << setter_name << "(id" << i << ");\n"
+        << "    b." << ip_setter_name << "(id" << i << " != mx::kInvalidEntityId);\n"
         << "  } else {\n"
+        << "    b." << setter_name << "(mx::kInvalidEntityId);\n"
         << "    b." << ip_setter_name << "(false);\n"
         << "  }\n";
 
@@ -1387,7 +1386,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  (void) e;\n";
 
     serialize_inc_os
-        << "MX_BEGIN_SERIALIZE_DECL(" << class_name << ")\n";
+        << "MX_BEGIN_SERIALIZE_DECL(" << class_name << ")\n"
+        << "  MX_ENTER_SERIALIZE_" << class_name << "\n";
     end_serializer = "MX_END_SERIALIZE_DECL";
 
     nth_entity_reader = "NthDecl";
@@ -1410,7 +1410,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << class_name << " &e) {\n";
 
     serialize_inc_os
-        << "MX_BEGIN_SERIALIZE_STMT(" << class_name << ")\n";
+        << "MX_BEGIN_SERIALIZE_STMT(" << class_name << ")\n"
+        << "  MX_ENTER_SERIALIZE_" << class_name << "\n";
     end_serializer = "MX_END_SERIALIZE_STMT";
 
     nth_entity_reader = "NthStmt";
@@ -1433,25 +1434,32 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  (void) e;\n";
 
     serialize_inc_os
-        << "MX_BEGIN_SERIALIZE_TYPE(" << class_name << ")\n";
+        << "MX_BEGIN_SERIALIZE_TYPE(" << class_name << ")\n"
+        << "  MX_ENTER_SERIALIZE_" << class_name << "\n";
     end_serializer = "MX_END_SERIALIZE_TYPE";
 
     nth_entity_reader = "NthType";
 
   } else {
+    auto pk = storage.AddMethod("UInt8");  // pseudo kind.
+    auto [pk_getter_name, pk_setter_name, pk_init_name] = NamesFor(pk);
+
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(EntityMapper &es, mx::ast::Pseudo::Builder b, const pasta::"
-        << class_name << " &e) {\n";
+        << class_name << " &e) {\n  b." << pk_setter_name
+        << "(static_cast<uint8_t>(pasta::PseudoEntityKind::k" << class_name << "));\n";
 
     serialize_inc_os
-        << "MX_BEGIN_SERIALIZE_PSEUDO(" << class_name << ")\n";
+        << "MX_BEGIN_SERIALIZE_PSEUDO(" << class_name << ")\n"
+        << "  MX_ENTER_SERIALIZE_" << class_name << "\n"
+        << "  MX_SERIALIZE_PSEUDO_KIND(" << class_name << ", " << pk_getter_name
+        << ", " << pk_setter_name << ")\n";
+
     end_serializer = "MX_END_SERIALIZE_PSEUDO";
 
     nth_entity_reader = "NthPseudo";
   }
-
-  serialize_inc_os << "  MX_ENTER_SERIALIZE_" << class_name << "\n";
 
   include_h_os
       << "class " << class_name;
@@ -2489,6 +2497,9 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#ifndef MX_END_SERIALIZE_PSEUDO\n"
       << "#  define MX_END_SERIALIZE_PSEUDO(...)\n"
       << "#endif\n"
+      << "#ifndef MX_SERIALIZE_PSEUDO_KIND\n"
+      << "#  define MX_SERIALIZE_PSEUDO_KIND(...)\n"
+      << "#endif\n"
       << "\n";
 
   serialize_h_os
@@ -2761,6 +2772,7 @@ int CodeGenerator::RunOnClassHierarchies(void) {
       << "#undef MX_BEGIN_SERIALIZE_STMT\n"
       << "#undef MX_BEGIN_SERIALIZE_TYPE\n"
       << "#undef MX_BEGIN_SERIALIZE_PSEUDO\n"
+      << "#undef MX_SERIALIZE_PSEUDO_KIND\n"
       << "#undef MX_END_SERIALIZE_DECL\n"
       << "#undef MX_END_SERIALIZE_STMT\n"
       << "#undef MX_END_SERIALIZE_TYPE\n"

@@ -37,7 +37,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       fragment_id_to_serialized_fragment(workspace_dir),
       entity_redecls(workspace_dir),
       entity_id_to_mangled_name(workspace_dir),
-      mangled_name_to_entity_id(workspace_dir) {
+      mangled_name_to_entity_id(workspace_dir),
+      entity_id_use_to_fragment_id(workspace_dir) {
 
   // Clients all default-initialize their version numbers to `0`, so we default
   // the server to `1` so that clients are always out-of-date.
@@ -358,6 +359,13 @@ void IndexingContext::LinkMangledName(const std::string &name,
   if (!name.empty() && eid != mx::kInvalidEntityId) {
     server_context.entity_id_to_mangled_name.Insert(eid, name);
     server_context.mangled_name_to_entity_id.Insert(name, eid);
+  }
+}
+
+// Link an entity to the fragment that uses the entity.
+void IndexingContext::LinkUseInFragment(mx::RawEntityId a, mx::FragmentId b) {
+  if (a != mx::kInvalidEntityId && b != mx::kInvalidEntityId) {
+    server_context.entity_id_use_to_fragment_id.Insert(a, b);
   }
 }
 

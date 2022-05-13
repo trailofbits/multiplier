@@ -48,7 +48,6 @@ void RegexSearchAction::QueryExprInFile(mx::FileId file_id) {
       offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
     }
 
-    LOG(INFO) << "Looking for RE2 matches in file with id " << file_id;
     regex.ForEachMatch(
         file_contents,
         [=] (std::string_view, unsigned begin, unsigned end) -> bool {

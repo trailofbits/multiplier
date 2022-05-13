@@ -598,6 +598,7 @@ void PersistFragment(IndexingContext &context, NameMangler &mangler,
       fragment_id, CompressedMessage("fragment", message));
 
   frag.LinkDeclarations(context, em, mangler);
+  frag.FindDeclarationUses(context, fragment_id, fb);
 }
 
 }  // namespace indexer

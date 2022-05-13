@@ -258,6 +258,7 @@ enum class FileType : signed char;
 enum class CompilerName : unsigned;
 enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
+enum class PseudoEntityKind : unsigned char;
 }  // namespace pasta
 namespace mx {
 
@@ -6734,6 +6735,24 @@ inline static constexpr unsigned NumEnumerators(TargetLanguage) {
 }
 
 const char *EnumeratorName(TargetLanguage);
+
+enum class PseudoEntityKind : unsigned char {
+  TEMPLATE_ARGUMENT,
+  TEMPLATE_PARAMETER_LIST,
+  CXX_BASE_SPECIFIER,
+};
+
+PseudoEntityKind FromPasta(pasta::PseudoEntityKind pasta_val);
+
+inline static const char *EnumerationName(PseudoEntityKind) {
+  return "PseudoEntityKind";
+}
+
+inline static constexpr unsigned NumEnumerators(PseudoEntityKind) {
+  return 3;
+}
+
+const char *EnumeratorName(PseudoEntityKind);
 
 class Token;
 class TokenRange;

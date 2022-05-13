@@ -8612,65 +8612,83 @@ const char *EnumeratorName(TargetLanguage e) {
   }
 }
 
-#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-unsigned TemplateParameterList::num_parameters(void) const {
-  auto self = fragment->NthPseudo(offset);
-  return self.getVal0();
+PseudoEntityKind FromPasta(pasta::PseudoEntityKind e) {
+  switch (static_cast<unsigned char>(e)) {
+    case 0: return PseudoEntityKind::TEMPLATE_ARGUMENT;
+    case 1: return PseudoEntityKind::TEMPLATE_PARAMETER_LIST;
+    case 2: return PseudoEntityKind::CXX_BASE_SPECIFIER;
+    default: __builtin_unreachable();
+  }
 }
 
-unsigned TemplateParameterList::num_required_parameters(void) const {
+const char *EnumeratorName(PseudoEntityKind e) {
+  switch (e) {
+    case PseudoEntityKind::TEMPLATE_ARGUMENT: return "TEMPLATE_ARGUMENT";
+    case PseudoEntityKind::TEMPLATE_PARAMETER_LIST: return "TEMPLATE_PARAMETER_LIST";
+    case PseudoEntityKind::CXX_BASE_SPECIFIER: return "CXX_BASE_SPECIFIER";
+    default: return "<invalid>";
+  }
+}
+
+#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
+unsigned TemplateParameterList::num_parameters(void) const {
   auto self = fragment->NthPseudo(offset);
   return self.getVal1();
 }
 
-unsigned TemplateParameterList::depth(void) const {
+unsigned TemplateParameterList::num_required_parameters(void) const {
   auto self = fragment->NthPseudo(offset);
   return self.getVal2();
 }
 
-bool TemplateParameterList::has_unexpanded_parameter_pack(void) const {
+unsigned TemplateParameterList::depth(void) const {
   auto self = fragment->NthPseudo(offset);
   return self.getVal3();
 }
 
-bool TemplateParameterList::has_parameter_pack(void) const {
+bool TemplateParameterList::has_unexpanded_parameter_pack(void) const {
   auto self = fragment->NthPseudo(offset);
   return self.getVal4();
 }
 
+bool TemplateParameterList::has_parameter_pack(void) const {
+  auto self = fragment->NthPseudo(offset);
+  return self.getVal5();
+}
+
 std::optional<Expr> TemplateParameterList::requires_clause(void) const {
   auto self = fragment->NthPseudo(offset);
-  if (!self.getVal6()) {
+  if (!self.getVal7()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal5());
+    EntityId id(self.getVal6());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 Token TemplateParameterList::template_keyword_token(void) const {
   auto self = fragment->NthPseudo(offset);
-  return fragment->TokenFor(fragment, self.getVal7());
+  return fragment->TokenFor(fragment, self.getVal8());
 }
 
 Token TemplateParameterList::left_angle_token(void) const {
   auto self = fragment->NthPseudo(offset);
-  return fragment->TokenFor(fragment, self.getVal8());
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 Token TemplateParameterList::right_angle_token(void) const {
   auto self = fragment->NthPseudo(offset);
-  return fragment->TokenFor(fragment, self.getVal9());
+  return fragment->TokenFor(fragment, self.getVal10());
 }
 
 TokenRange TemplateParameterList::tokens(void) const {
   auto self = fragment->NthPseudo(offset);
-  return fragment->TokenRangeFor(fragment, self.getVal10(), self.getVal11());
+  return fragment->TokenRangeFor(fragment, self.getVal11(), self.getVal12());
 }
 
 std::vector<NamedDecl> TemplateParameterList::parameters(void) const {
   auto self = fragment->NthPseudo(offset);
-  auto list = self.getVal12();
+  auto list = self.getVal13();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -8684,55 +8702,45 @@ std::vector<NamedDecl> TemplateParameterList::parameters(void) const {
 
 TemplateArgumentKind TemplateArgument::kind(void) const {
   auto self = fragment->NthPseudo(offset);
-  return static_cast<TemplateArgumentKind>(self.getVal13());
+  return static_cast<TemplateArgumentKind>(self.getVal14());
 }
 
 bool TemplateArgument::is_null(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal3();
+  return self.getVal4();
 }
 
 bool TemplateArgument::is_dependent(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal4();
+  return self.getVal5();
 }
 
 bool TemplateArgument::is_instantiation_dependent(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal6();
+  return self.getVal7();
 }
 
 bool TemplateArgument::contains_unexpanded_parameter_pack(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal14();
+  return self.getVal15();
 }
 
 bool TemplateArgument::is_pack_expansion(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal15();
+  return self.getVal16();
 }
 
 std::optional<ValueDecl> TemplateArgument::as_declaration(void) const {
   auto self = fragment->NthPseudo(offset);
-  if (!self.getVal16()) {
+  if (!self.getVal17()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal5());
+    EntityId id(self.getVal6());
     return ValueDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<Type> TemplateArgument::as_type(void) const {
-  auto self = fragment->NthPseudo(offset);
-  if (!self.getVal17()) {
-    return std::nullopt;
-  } else {
-    EntityId id(self.getVal7());
-    return fragment->TypeFor(fragment, id);
-  }
-}
-
-std::optional<Type> TemplateArgument::parameter_type_for_declaration(void) const {
   auto self = fragment->NthPseudo(offset);
   if (!self.getVal18()) {
     return std::nullopt;
@@ -8742,7 +8750,7 @@ std::optional<Type> TemplateArgument::parameter_type_for_declaration(void) const
   }
 }
 
-std::optional<Type> TemplateArgument::null_pointer_type(void) const {
+std::optional<Type> TemplateArgument::parameter_type_for_declaration(void) const {
   auto self = fragment->NthPseudo(offset);
   if (!self.getVal19()) {
     return std::nullopt;
@@ -8752,59 +8760,69 @@ std::optional<Type> TemplateArgument::null_pointer_type(void) const {
   }
 }
 
+std::optional<Type> TemplateArgument::null_pointer_type(void) const {
+  auto self = fragment->NthPseudo(offset);
+  if (!self.getVal20()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal10());
+    return fragment->TypeFor(fragment, id);
+  }
+}
+
 TokenRange CXXBaseSpecifier::tokens(void) const {
   auto self = fragment->NthPseudo(offset);
-  return fragment->TokenRangeFor(fragment, self.getVal5(), self.getVal7());
+  return fragment->TokenRangeFor(fragment, self.getVal6(), self.getVal8());
 }
 
 Token CXXBaseSpecifier::base_type_token(void) const {
   auto self = fragment->NthPseudo(offset);
-  return fragment->TokenFor(fragment, self.getVal8());
+  return fragment->TokenFor(fragment, self.getVal9());
 }
 
 bool CXXBaseSpecifier::is_virtual(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal3();
+  return self.getVal4();
 }
 
 TagTypeKind CXXBaseSpecifier::base_kind(void) const {
   auto self = fragment->NthPseudo(offset);
-  return static_cast<TagTypeKind>(self.getVal13());
+  return static_cast<TagTypeKind>(self.getVal14());
 }
 
 bool CXXBaseSpecifier::is_pack_expansion(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal4();
+  return self.getVal5();
 }
 
 bool CXXBaseSpecifier::constructors_are_inherited(void) const {
   auto self = fragment->NthPseudo(offset);
-  return self.getVal6();
+  return self.getVal7();
 }
 
 std::optional<Token> CXXBaseSpecifier::ellipsis(void) const {
   auto self = fragment->NthPseudo(offset);
-  if (!self.getVal14()) {
+  if (!self.getVal15()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal9());
+    EntityId id(self.getVal10());
     return fragment->TokenFor(fragment, id);
   }
 }
 
 AccessSpecifier CXXBaseSpecifier::semantic_access_specifier(void) const {
   auto self = fragment->NthPseudo(offset);
-  return static_cast<AccessSpecifier>(self.getVal20());
+  return static_cast<AccessSpecifier>(self.getVal21());
 }
 
 AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const {
   auto self = fragment->NthPseudo(offset);
-  return static_cast<AccessSpecifier>(self.getVal21());
+  return static_cast<AccessSpecifier>(self.getVal22());
 }
 
 Type CXXBaseSpecifier::base_type(void) const {
   auto self = fragment->NthPseudo(offset);
-  EntityId id(self.getVal10());
+  EntityId id(self.getVal11());
   return fragment->TypeFor(fragment, id);
 }
 

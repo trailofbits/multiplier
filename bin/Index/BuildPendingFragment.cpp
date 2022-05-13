@@ -212,7 +212,7 @@ void FragmentBuilder::Accept(const pasta::Decl &entity) {
 
     PASTA_FOR_EACH_DECL_IMPL(MX_VISIT_DECL, PASTA_IGNORE_ABSTRACT)
 
-#undef MX_SERIALIZE_DECL
+#undef MX_VISIT_DECL
   }
 }
 

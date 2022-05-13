@@ -50,8 +50,6 @@ void WeggliSearchAction::QuerySyntaxInFile(mx::FileId file_id) {
       eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
     }
 
-    LOG(INFO) << "Looking for Weggli matches in file with id " << file_id;
-
     query_tree.ForEachMatch(
         file_contents,
         [=] (const mx::WeggliMatchData &match) -> bool {

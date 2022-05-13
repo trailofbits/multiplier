@@ -208,4 +208,9 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   # all translation units. The first redeclaration in the list should be the
   # definition.
   findRedeclarations @7 (declId :UInt64) -> (versionNumber :UInt32, redeclarationIds :List(UInt64));
+  
+  # Given a list of declaration IDs that all logically represent the same
+  # declaration, return a list of fragment IDs that contain some kind of use
+  # of the declarations.
+  findUses @8 (redeclarationIds :List(UInt64)) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
 }

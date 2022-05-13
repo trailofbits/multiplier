@@ -9,6 +9,8 @@
 #include <string>
 #include <string_view>
 
+#include "Pseudo.h"
+
 namespace pasta {
 class Decl;
 class FileToken;

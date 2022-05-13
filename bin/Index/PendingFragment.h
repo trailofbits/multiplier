@@ -106,6 +106,12 @@ struct PendingFragment {
   // fragments.
   void LinkDeclarations(IndexingContext &context, EntityMapper &em,
                         NameMangler &mangler);
+
+  // Identify all unique entity IDs used by this fragment, and map them to the
+  // fragment ID in the data store.
+  void FindDeclarationUses(
+      IndexingContext &context, mx::FragmentId fragment_id,
+      mx::rpc::Fragment::Builder &b);
 };
 
 }  // namespace indexer

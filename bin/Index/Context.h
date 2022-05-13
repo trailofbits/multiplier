@@ -45,6 +45,7 @@ enum : char {
   kEntityIdRedecls,
   kEntityIdToMangledName,
   kMangledNameToEntityId,
+  kEntityIdUseToFragmentId,
 };
 
 enum MetadataName : char {
@@ -169,14 +170,27 @@ class ServerContext {
                     mx::FragmentId, std::string>
       fragment_id_to_serialized_fragment;
 
+  // Each time we come across a redeclarable declaration, we add in the TU-
+  // specific complete graph of `(redecl_i, redecl_j)` pairs to this set, so
+  // that given a declaration ID, we can try to expand out and find the set of
+  // all redeclarations by hopping from one of these graphs to another.
   mx::PersistentSet<kEntityIdRedecls, mx::RawEntityId, mx::RawEntityId>
       entity_redecls;
 
+  // Maps entity IDs of functions and (non-local) variables to their mangled
+  // names. We use this in combination with `mangled_name_to_entity_id` to
+  // find redeclarations of a given entity.
   mx::PersistentSet<kEntityIdToMangledName, mx::RawEntityId, std::string>
       entity_id_to_mangled_name;
 
-  mx::PersistentSet<kEntityIdToMangledName, std::string, mx::RawEntityId>
+  // Maps mangled names of functions and (non-local) variables to their
+  // entity IDs.
+  mx::PersistentSet<kMangledNameToEntityId, std::string, mx::RawEntityId>
       mangled_name_to_entity_id;
+
+  // Maps uses of entities to the IDs of fragments that use the entities.
+  mx::PersistentSet<kEntityIdUseToFragmentId, mx::RawEntityId, mx::FragmentId>
+      entity_id_use_to_fragment_id;
 
   void Flush(void);
 
@@ -319,6 +333,9 @@ class IndexingContext {
 
   // Link the mangled name of something to its entity ID.
   void LinkMangledName(const std::string &name, mx::RawEntityId eid);
+
+  // Link an entity to the fragment that uses the entity.
+  void LinkUseInFragment(mx::RawEntityId a, mx::FragmentId b);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out

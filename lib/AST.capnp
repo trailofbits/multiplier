@@ -840,27 +840,28 @@ struct Type @0xd739e808bc1b3fd7 {
 }
 
 struct Pseudo @0xa5b20a8972c73a6b {
-  val13 @0 :UInt8;
-  val20 @1 :UInt8;
-  val21 @2 :UInt8;
-  val12 @3 :List(UInt64);
-  val3 @4 :Bool;
-  val4 @5 :Bool;
-  val6 @6 :Bool;
-  val14 @7 :Bool;
-  val15 @8 :Bool;
-  val16 @9 :Bool;
-  val17 @10 :Bool;
-  val18 @11 :Bool;
-  val19 @12 :Bool;
-  val5 @13 :UInt64;
-  val7 @14 :UInt64;
-  val8 @15 :UInt64;
-  val9 @16 :UInt64;
-  val10 @17 :UInt64;
-  val11 @18 :UInt64;
-  val0 @19 :UInt32;
-  val1 @20 :UInt32;
-  val2 @21 :UInt32;
+  val13 @0 :List(UInt64);
+  val4 @1 :Bool;
+  val5 @2 :Bool;
+  val7 @3 :Bool;
+  val15 @4 :Bool;
+  val16 @5 :Bool;
+  val17 @6 :Bool;
+  val18 @7 :Bool;
+  val19 @8 :Bool;
+  val20 @9 :Bool;
+  val6 @10 :UInt64;
+  val8 @11 :UInt64;
+  val9 @12 :UInt64;
+  val10 @13 :UInt64;
+  val11 @14 :UInt64;
+  val12 @15 :UInt64;
+  val1 @16 :UInt32;
+  val2 @17 :UInt32;
+  val3 @18 :UInt32;
+  val0 @19 :UInt8;
+  val14 @20 :UInt8;
+  val21 @21 :UInt8;
+  val22 @22 :UInt8;
 }
 

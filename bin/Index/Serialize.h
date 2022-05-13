@@ -650,6 +650,7 @@ enum class FileType : signed char;
 enum class CompilerName : unsigned;
 enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
+enum class PseudoEntityKind : unsigned char;
 }  // namespace pasta
 namespace indexer {
 class EntityMapper;

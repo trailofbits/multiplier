@@ -126,6 +126,9 @@
 #ifndef MX_END_SERIALIZE_PSEUDO
 #  define MX_END_SERIALIZE_PSEUDO(...)
 #endif
+#ifndef MX_SERIALIZE_PSEUDO_KIND
+#  define MX_SERIALIZE_PSEUDO_KIND(...)
+#endif
 
 #ifndef MX_ENTER_SERIALIZE_TemplateParameterList
 #  define MX_ENTER_SERIALIZE_TemplateParameterList
@@ -136,16 +139,17 @@
 
 MX_BEGIN_SERIALIZE_PSEUDO(TemplateParameterList)
   MX_ENTER_SERIALIZE_TemplateParameterList
-  MX_SERIALIZE_INT(TemplateParameterList, num_parameters, getVal0, setVal0, initVal0, NumParameters, unsigned, NthPseudo)
-  MX_SERIALIZE_INT(TemplateParameterList, num_required_parameters, getVal1, setVal1, initVal1, NumRequiredParameters, unsigned, NthPseudo)
-  MX_SERIALIZE_INT(TemplateParameterList, depth, getVal2, setVal2, initVal2, Depth, unsigned, NthPseudo)
-  MX_SERIALIZE_BOOL(TemplateParameterList, has_unexpanded_parameter_pack, getVal3, setVal3, initVal3, HasUnexpandedParameterPack, bool, NthPseudo)
-  MX_SERIALIZE_BOOL(TemplateParameterList, has_parameter_pack, getVal4, setVal4, initVal4, HasParameterPack, bool, NthPseudo)
-  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateParameterList, requires_clause, getVal5, setVal5, initVal5, RequiresClause, Expr, NthPseudo)
-  MX_SERIALIZE_ENTITY(TemplateParameterList, template_keyword_token, getVal7, setVal7, initVal7, TemplateKeywordToken, Token, NthPseudo)
-  MX_SERIALIZE_ENTITY(TemplateParameterList, left_angle_token, getVal8, setVal8, initVal8, LeftAngleToken, Token, NthPseudo)
-  MX_SERIALIZE_ENTITY(TemplateParameterList, right_angle_token, getVal9, setVal9, initVal9, RightAngleToken, Token, NthPseudo)
-  MX_SERIALIZE_ENTITY_LIST(TemplateParameterList, parameters, getVal12, setVal12, initVal12, Parameters, NamedDecl, NthPseudo)
+  MX_SERIALIZE_PSEUDO_KIND(TemplateParameterList, getVal0, setVal0)
+  MX_SERIALIZE_INT(TemplateParameterList, num_parameters, getVal1, setVal1, initVal1, NumParameters, unsigned, NthPseudo)
+  MX_SERIALIZE_INT(TemplateParameterList, num_required_parameters, getVal2, setVal2, initVal2, NumRequiredParameters, unsigned, NthPseudo)
+  MX_SERIALIZE_INT(TemplateParameterList, depth, getVal3, setVal3, initVal3, Depth, unsigned, NthPseudo)
+  MX_SERIALIZE_BOOL(TemplateParameterList, has_unexpanded_parameter_pack, getVal4, setVal4, initVal4, HasUnexpandedParameterPack, bool, NthPseudo)
+  MX_SERIALIZE_BOOL(TemplateParameterList, has_parameter_pack, getVal5, setVal5, initVal5, HasParameterPack, bool, NthPseudo)
+  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateParameterList, requires_clause, getVal6, setVal6, initVal6, RequiresClause, Expr, NthPseudo)
+  MX_SERIALIZE_ENTITY(TemplateParameterList, template_keyword_token, getVal8, setVal8, initVal8, TemplateKeywordToken, Token, NthPseudo)
+  MX_SERIALIZE_ENTITY(TemplateParameterList, left_angle_token, getVal9, setVal9, initVal9, LeftAngleToken, Token, NthPseudo)
+  MX_SERIALIZE_ENTITY(TemplateParameterList, right_angle_token, getVal10, setVal10, initVal10, RightAngleToken, Token, NthPseudo)
+  MX_SERIALIZE_ENTITY_LIST(TemplateParameterList, parameters, getVal13, setVal13, initVal13, Parameters, NamedDecl, NthPseudo)
   MX_EXIT_SERIALIZE_TemplateParameterList
 MX_END_SERIALIZE_PSEUDO(TemplateParameterList)
 #undef MX_ENTER_SERIALIZE_TemplateParameterList
@@ -160,16 +164,17 @@ MX_END_SERIALIZE_PSEUDO(TemplateParameterList)
 
 MX_BEGIN_SERIALIZE_PSEUDO(TemplateArgument)
   MX_ENTER_SERIALIZE_TemplateArgument
-  MX_SERIALIZE_ENUM(TemplateArgument, kind, getVal13, setVal13, initVal13, Kind, TemplateArgumentKind, NthPseudo)
-  MX_SERIALIZE_BOOL(TemplateArgument, is_null, getVal3, setVal3, initVal3, IsNull, bool, NthPseudo)
-  MX_SERIALIZE_BOOL(TemplateArgument, is_dependent, getVal4, setVal4, initVal4, IsDependent, bool, NthPseudo)
-  MX_SERIALIZE_BOOL(TemplateArgument, is_instantiation_dependent, getVal6, setVal6, initVal6, IsInstantiationDependent, bool, NthPseudo)
-  MX_SERIALIZE_BOOL(TemplateArgument, contains_unexpanded_parameter_pack, getVal14, setVal14, initVal14, ContainsUnexpandedParameterPack, bool, NthPseudo)
-  MX_SERIALIZE_BOOL(TemplateArgument, is_pack_expansion, getVal15, setVal15, initVal15, IsPackExpansion, bool, NthPseudo)
-  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, as_declaration, getVal5, setVal5, initVal5, AsDeclaration, ValueDecl, NthPseudo)
-  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, as_type, getVal7, setVal7, initVal7, AsType, Type, NthPseudo)
-  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, parameter_type_for_declaration, getVal8, setVal8, initVal8, ParameterTypeForDeclaration, Type, NthPseudo)
-  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, null_pointer_type, getVal9, setVal9, initVal9, NullPointerType, Type, NthPseudo)
+  MX_SERIALIZE_PSEUDO_KIND(TemplateArgument, getVal0, setVal0)
+  MX_SERIALIZE_ENUM(TemplateArgument, kind, getVal14, setVal14, initVal14, Kind, TemplateArgumentKind, NthPseudo)
+  MX_SERIALIZE_BOOL(TemplateArgument, is_null, getVal4, setVal4, initVal4, IsNull, bool, NthPseudo)
+  MX_SERIALIZE_BOOL(TemplateArgument, is_dependent, getVal5, setVal5, initVal5, IsDependent, bool, NthPseudo)
+  MX_SERIALIZE_BOOL(TemplateArgument, is_instantiation_dependent, getVal7, setVal7, initVal7, IsInstantiationDependent, bool, NthPseudo)
+  MX_SERIALIZE_BOOL(TemplateArgument, contains_unexpanded_parameter_pack, getVal15, setVal15, initVal15, ContainsUnexpandedParameterPack, bool, NthPseudo)
+  MX_SERIALIZE_BOOL(TemplateArgument, is_pack_expansion, getVal16, setVal16, initVal16, IsPackExpansion, bool, NthPseudo)
+  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, as_declaration, getVal6, setVal6, initVal6, AsDeclaration, ValueDecl, NthPseudo)
+  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, as_type, getVal8, setVal8, initVal8, AsType, Type, NthPseudo)
+  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, parameter_type_for_declaration, getVal9, setVal9, initVal9, ParameterTypeForDeclaration, Type, NthPseudo)
+  MX_SERIALIZE_OPTIONAL_ENTITY(TemplateArgument, null_pointer_type, getVal10, setVal10, initVal10, NullPointerType, Type, NthPseudo)
   MX_EXIT_SERIALIZE_TemplateArgument
 MX_END_SERIALIZE_PSEUDO(TemplateArgument)
 #undef MX_ENTER_SERIALIZE_TemplateArgument
@@ -184,15 +189,16 @@ MX_END_SERIALIZE_PSEUDO(TemplateArgument)
 
 MX_BEGIN_SERIALIZE_PSEUDO(CXXBaseSpecifier)
   MX_ENTER_SERIALIZE_CXXBaseSpecifier
-  MX_SERIALIZE_ENTITY(CXXBaseSpecifier, base_type_token, getVal8, setVal8, initVal8, BaseTypeToken, Token, NthPseudo)
-  MX_SERIALIZE_BOOL(CXXBaseSpecifier, is_virtual, getVal3, setVal3, initVal3, IsVirtual, bool, NthPseudo)
-  MX_SERIALIZE_ENUM(CXXBaseSpecifier, base_kind, getVal13, setVal13, initVal13, BaseKind, TagTypeKind, NthPseudo)
-  MX_SERIALIZE_BOOL(CXXBaseSpecifier, is_pack_expansion, getVal4, setVal4, initVal4, IsPackExpansion, bool, NthPseudo)
-  MX_SERIALIZE_BOOL(CXXBaseSpecifier, constructors_are_inherited, getVal6, setVal6, initVal6, ConstructorsAreInherited, bool, NthPseudo)
-  MX_SERIALIZE_OPTIONAL_ENTITY(CXXBaseSpecifier, ellipsis, getVal9, setVal9, initVal9, Ellipsis, Token, NthPseudo)
-  MX_SERIALIZE_ENUM(CXXBaseSpecifier, semantic_access_specifier, getVal20, setVal20, initVal20, SemanticAccessSpecifier, AccessSpecifier, NthPseudo)
-  MX_SERIALIZE_ENUM(CXXBaseSpecifier, lexical_access_specifier, getVal21, setVal21, initVal21, LexicalAccessSpecifier, AccessSpecifier, NthPseudo)
-  MX_SERIALIZE_ENTITY(CXXBaseSpecifier, base_type, getVal10, setVal10, initVal10, BaseType, Type, NthPseudo)
+  MX_SERIALIZE_PSEUDO_KIND(CXXBaseSpecifier, getVal0, setVal0)
+  MX_SERIALIZE_ENTITY(CXXBaseSpecifier, base_type_token, getVal9, setVal9, initVal9, BaseTypeToken, Token, NthPseudo)
+  MX_SERIALIZE_BOOL(CXXBaseSpecifier, is_virtual, getVal4, setVal4, initVal4, IsVirtual, bool, NthPseudo)
+  MX_SERIALIZE_ENUM(CXXBaseSpecifier, base_kind, getVal14, setVal14, initVal14, BaseKind, TagTypeKind, NthPseudo)
+  MX_SERIALIZE_BOOL(CXXBaseSpecifier, is_pack_expansion, getVal5, setVal5, initVal5, IsPackExpansion, bool, NthPseudo)
+  MX_SERIALIZE_BOOL(CXXBaseSpecifier, constructors_are_inherited, getVal7, setVal7, initVal7, ConstructorsAreInherited, bool, NthPseudo)
+  MX_SERIALIZE_OPTIONAL_ENTITY(CXXBaseSpecifier, ellipsis, getVal10, setVal10, initVal10, Ellipsis, Token, NthPseudo)
+  MX_SERIALIZE_ENUM(CXXBaseSpecifier, semantic_access_specifier, getVal21, setVal21, initVal21, SemanticAccessSpecifier, AccessSpecifier, NthPseudo)
+  MX_SERIALIZE_ENUM(CXXBaseSpecifier, lexical_access_specifier, getVal22, setVal22, initVal22, LexicalAccessSpecifier, AccessSpecifier, NthPseudo)
+  MX_SERIALIZE_ENTITY(CXXBaseSpecifier, base_type, getVal11, setVal11, initVal11, BaseType, Type, NthPseudo)
   MX_EXIT_SERIALIZE_CXXBaseSpecifier
 MX_END_SERIALIZE_PSEUDO(CXXBaseSpecifier)
 #undef MX_ENTER_SERIALIZE_CXXBaseSpecifier
@@ -8237,6 +8243,7 @@ MX_END_SERIALIZE_DECL(EmptyDecl)
 #undef MX_BEGIN_SERIALIZE_STMT
 #undef MX_BEGIN_SERIALIZE_TYPE
 #undef MX_BEGIN_SERIALIZE_PSEUDO
+#undef MX_SERIALIZE_PSEUDO_KIND
 #undef MX_END_SERIALIZE_DECL
 #undef MX_END_SERIALIZE_STMT
 #undef MX_END_SERIALIZE_TYPE
