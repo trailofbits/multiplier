@@ -7303,7 +7303,7 @@ class Type {
   }
 
   EntityId id(void) const;
-  UseIterator<TypeUseSelector> uses(void) const;
+  UseRange<TypeUseSelector> uses(void) const;
 
  protected:
   static TypeIterator in_internal(const Fragment &fragment);
@@ -9976,7 +9976,7 @@ class Stmt {
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
   EntityId id(void) const;
-  UseIterator<StmtUseSelector> uses(void) const;
+  UseRange<StmtUseSelector> uses(void) const;
 
  protected:
   static StmtIterator in_internal(const Fragment &fragment);
@@ -24214,7 +24214,7 @@ class Decl {
   bool is_definition(void) const;
   std::vector<Decl> redeclarations(void) const;
   EntityId id(void) const;
-  UseIterator<DeclUseSelector> uses(void) const;
+  UseRange<DeclUseSelector> uses(void) const;
 
  protected:
   static DeclIterator in_internal(const Fragment &fragment);

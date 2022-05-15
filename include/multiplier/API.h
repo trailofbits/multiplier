@@ -19,6 +19,7 @@
 #include "AST.h"  // Auto-generated.
 #include "Iterator.h"
 #include "Types.h"
+#include "Use.h"
 
 namespace mx {
 
@@ -116,6 +117,10 @@ class Token {
 
   // Return the version of this token from a file, if any.
   std::optional<Token> file_token(void) const;
+
+  // Return the set of all uses of this token within its fragment (if it's a
+  // fragment token).
+  UseRange<TokenUseSelector> uses(void) const;
 };
 
 // Forward-only iterator over a sequence of tokens.

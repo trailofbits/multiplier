@@ -1723,7 +1723,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  std::vector<Decl> redeclarations(void) const;\n"
           << "  EntityId id(void) const;\n"
-          << "  UseIterator<DeclUseSelector> uses(void) const;\n\n"
+          << "  UseRange<DeclUseSelector> uses(void) const;\n\n"
+//          << "  DeclReferenceRange references(void) const;\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -1756,7 +1757,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  EntityId id(void) const;\n"
-          << "  UseIterator<StmtUseSelector> uses(void) const;\n\n"
+          << "  UseRange<StmtUseSelector> uses(void) const;\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -1773,7 +1774,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return c.as_type();\n"
           << "  }\n\n"
           << "  EntityId id(void) const;\n"
-          << "  UseIterator<TypeUseSelector> uses(void) const;\n\n"
+          << "  UseRange<TypeUseSelector> uses(void) const;\n\n"
           << " protected:\n"
           << "  static TypeIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";

@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "API.h"
+#include "Fragment.h"
 
 namespace mx {
 
@@ -18,27 +19,17 @@ class UseIteratorImpl {
   std::vector<RawEntityId> search_ids;
   std::vector<FragmentId> fragment_ids;
 
-  std::shared_ptr<const FragmentImpl> fragment;
+  UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
+  UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity);
+  UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity);
+  UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity);
 
-  unsigned fragment_offset{0};
-  unsigned list_offset{0};
-
-  enum List {
-    kDecl,
-    kStmt,
-    kType,
-    kPseudo,
-  } list{kDecl};
-
-  UseIteratorImpl(std::shared_ptr<EntityProvider> ep_, Decl &entity);
-  UseIteratorImpl(std::shared_ptr<EntityProvider> ep_, Stmt &entity);
-  // TODO(pag): Add `Type` and `Token` use iterators!!
-
-  bool FindNextDecl(std::optional<UseBase> &use);
-  bool FindNextStmt(std::optional<UseBase> &use);
-  bool FindNextType(std::optional<UseBase> &use);
-  bool FindNextPseudo(std::optional<UseBase> &use);
-  bool FindNext(std::optional<UseBase> &use);
+  // Methods for finding the next user.
+  bool FindNextDecl(UseIteratorBase &self);
+  bool FindNextStmt(UseIteratorBase &self);
+  bool FindNextType(UseIteratorBase &self);
+  bool FindNextPseudo(UseIteratorBase &self);
+  bool FindNext(UseIteratorBase &self);
 };
 
 }  // namespace mx

@@ -7,6 +7,7 @@
 #include "Token.h"
 #include "File.h"
 #include "Fragment.h"
+#include "Use.h"
 
 namespace mx {
 namespace {
@@ -87,6 +88,17 @@ std::optional<Token> Token::file_token(void) const {
   }
 
   return Token(std::move(fr), fid.offset);
+}
+
+// Return the set of all uses of this token within its fragment (if it's a
+// fragment token).
+UseRange<TokenUseSelector> Token::uses(void) const {
+  if (auto frag = Fragment::containing(*this)) {
+    FragmentImpl::Ptr frag_ptr = std::move(frag->impl);
+    return std::make_shared<UseIteratorImpl>(std::move(frag_ptr), *this);
+  } else {
+    return {};
+  }
 }
 
 // Return the list of parsed tokens in the fragment. This doesn't

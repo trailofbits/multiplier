@@ -7,6 +7,7 @@
 #pragma once
 
 #include <bitset>
+#include <new>
 
 #include "Iterator.h"
 
@@ -49,14 +50,18 @@ class UseBase {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Stmt;
+  friend class UseIteratorBase;
+  friend class UseIteratorImpl;
 
  protected:
   UseSelectorSet selectors;
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
-  UseKind kind;
+  unsigned offset{0};
+  UseKind kind{UseKind::DECLARATION};
 
  public:
+  UseBase(void) = default;
+
   UseBase(Decl decl, UseSelectorSet selectors_);
   UseBase(Stmt decl, UseSelectorSet selectors_);
   UseBase(Type decl, UseSelectorSet selectors_);
@@ -106,8 +111,14 @@ class UseIteratorImpl;
 
 class UseIteratorBase {
  protected:
+  friend class UseIteratorImpl;
+
   std::shared_ptr<UseIteratorImpl> impl;
-  std::optional<UseBase> use;
+  UseBase use;
+  unsigned fragment_offset{0u};
+  unsigned list_offset{0u};
+
+  UseIteratorBase(void) = default;
 
   inline UseIteratorBase(std::shared_ptr<UseIteratorImpl> impl_)
       : impl(std::move(impl_)) {
@@ -119,9 +130,6 @@ class UseIteratorBase {
 
 template <typename Selector>
 class UseIterator : public UseIteratorBase {
- private:
-  using UseIteratorBase::UseIteratorBase;
-
  public:
   using UseT = Use<Selector>;
   using Self = UseIterator<Selector>;
@@ -132,9 +140,11 @@ class UseIterator : public UseIteratorBase {
   bool operator!=(const Self &) = delete;
 
   UseIterator(void) = default;
+  inline UseIterator(std::shared_ptr<UseIteratorImpl> impl_)
+      : UseIteratorBase(std::move(impl_)) {}
 
   inline bool operator!=(IteratorEnd) const {
-    return impl;
+    return !!impl;
   }
 
   inline bool operator==(IteratorEnd) const {
@@ -142,27 +152,57 @@ class UseIterator : public UseIteratorBase {
   }
 
   inline operator bool(void) const {
-    return impl;
+    return !!impl;
   }
 
   // Return the current token pointed to by the iterator.
   inline UseT operator*(void) && noexcept {
-    return std::move(reinterpret_cast<const UseT &>(use.value()));
+    return std::move(*std::launder(reinterpret_cast<UseT *>(&use)));
   }
 
   // Return the current token pointed to by the iterator.
   inline const UseT &operator*(void) const & noexcept {
-    return reinterpret_cast<const UseT &>(use.value());
+    return *std::launder(reinterpret_cast<const UseT *>(&use));
   }
 
   inline const UseT *operator->(void) const & noexcept {
-    return std::addressof(use.value());
+    return std::launder(reinterpret_cast<const UseT *>(&use));
   }
 
   // Pre-increment.
   inline Self &operator++(void) & noexcept{
     Advance();
     return *this;
+  }
+};
+
+// Range of uses.
+template <typename Selector>
+class UseRange {
+ private:
+  friend class Decl;
+  friend class Stmt;
+  friend class Type;
+  friend class Token;
+
+  std::shared_ptr<UseIteratorImpl> impl;
+
+  inline /* implicit */ UseRange(std::shared_ptr<UseIteratorImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+ public:
+  UseRange(void) = default;
+
+  inline UseIterator<Selector> begin(void) && noexcept {
+    return UseIterator<Selector>(std::move(impl));
+  }
+
+  inline UseIterator<Selector> begin(void) const & noexcept {
+    return UseIterator<Selector>(impl);
+  }
+
+  inline IteratorEnd end(void) const noexcept {
+    return {};
   }
 };
 

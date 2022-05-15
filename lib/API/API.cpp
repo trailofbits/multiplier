@@ -19,6 +19,7 @@
 #include "Fragment.h"
 #include "Re2.h"
 #include "Token.h"
+#include "Use.h"
 #include "Weggli.h"
 #include "../Re2.h"
 
@@ -544,6 +545,10 @@ std::vector<Decl> Decl::redeclarations(void) const {
   return redecls;
 }
 
+UseRange<DeclUseSelector> Decl::uses(void) const {
+  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+}
+
 DeclIterator Decl::in_internal(const Fragment &fragment) {
   return DeclIterator(
       fragment.impl, 0u, fragment.impl->Fragment().getDeclarations().size());
@@ -562,6 +567,10 @@ StmtIterator Stmt::in_internal(const Fragment &fragment) {
       fragment.impl, 0u, fragment.impl->Fragment().getStatements().size());
 }
 
+UseRange<StmtUseSelector> Stmt::uses(void) const {
+  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+}
+
 EntityId Type::id(void) const {
   TypeId eid;
   eid.fragment_id = fragment->fragment_id;
@@ -573,6 +582,10 @@ EntityId Type::id(void) const {
 TypeIterator Type::in_internal(const Fragment &fragment) {
   return TypeIterator(
       fragment.impl, 0u, fragment.impl->Fragment().getTypes().size());
+}
+
+UseRange<TypeUseSelector> Type::uses(void) const {
+  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
 
 }  // namespace mx

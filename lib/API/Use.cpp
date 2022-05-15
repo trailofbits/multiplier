@@ -66,31 +66,45 @@ namespace {
 
 }  // namespace
 
-UseIteratorImpl::UseIteratorImpl(
-    std::shared_ptr<EntityProvider> ep_, Decl &entity)
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     : ep(std::move(ep_)) {
   ep->FillUses(ep, entity.id(), search_ids, fragment_ids);
 }
 
-UseIteratorImpl::UseIteratorImpl(
-    std::shared_ptr<EntityProvider> ep_, Stmt &entity)
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
     : ep(std::move(ep_)),
       search_ids(1u),
-      fragment_ids(1u),
-      fragment(entity.fragment) {
+      fragment_ids(1u) {
   search_ids[0] = entity.id();
   fragment_ids[0] = entity.fragment->fragment_id;
 }
 
-bool UseIteratorImpl::FindNextDecl(std::optional<UseBase> &use) {
-  if (list_offset >= fragment->num_decls) {
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
+    : ep(std::move(ep_)),
+      search_ids(1u),
+      fragment_ids(1u) {
+  search_ids[0] = entity.id();
+  fragment_ids[0] = entity.fragment->fragment_id;
+}
+
+UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
+    : ep(frag->ep),
+      search_ids(1u),
+      fragment_ids(1u) {
+  search_ids[0] = entity.id();
+  fragment_ids[0] = frag->fragment_id;
+}
+
+bool UseIteratorImpl::FindNextDecl(UseIteratorBase &self) {
+  if (self.list_offset >= self.use.fragment->num_decls) {
     return false;
   }
 
-  const unsigned offset = list_offset++;
-  mx::ast::Decl::Reader reader = fragment->NthDecl(offset);
+  self.use.offset = self.list_offset++;
+  mx::ast::Decl::Reader reader = self.use.fragment->NthDecl(self.use.offset);
   bool found = false;
-  UseSelectorSet selectors;
+
+  self.use.selectors.reset();
 
   for (auto eid : search_ids) {
     switch (Get_Decl_Kind(reader)) {
@@ -98,7 +112,7 @@ bool UseIteratorImpl::FindNextDecl(std::optional<UseBase> &use) {
 #define MX_BEGIN_VISIT_ABSTRACT_DECL(name)
 #define MX_BEGIN_VISIT_DECL(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, selectors, reader, found); \
+      FindUses_ ## name (eid, self.use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -106,24 +120,19 @@ bool UseIteratorImpl::FindNextDecl(std::optional<UseBase> &use) {
     }
   }
 
-  if (!found) {
-    return false;
-  }
-
-  use.emplace(Decl(fragment, offset), std::move(selectors));
-
-  return true;
+  return found;
 }
 
-bool UseIteratorImpl::FindNextStmt(std::optional<UseBase> &use) {
-  if (list_offset >= fragment->num_stmts) {
+bool UseIteratorImpl::FindNextStmt(UseIteratorBase &self) {
+  if (self.list_offset >= self.use.fragment->num_stmts) {
     return false;
   }
 
-  const unsigned offset = list_offset++;
-  mx::ast::Stmt::Reader reader = fragment->NthStmt(offset);
+  self.use.offset = self.list_offset++;
+  mx::ast::Stmt::Reader reader = self.use.fragment->NthStmt(self.use.offset);
   bool found = false;
-  UseSelectorSet selectors;
+
+  self.use.selectors.reset();
 
   for (auto eid : search_ids) {
     switch (Get_Stmt_Kind(reader)) {
@@ -131,7 +140,7 @@ bool UseIteratorImpl::FindNextStmt(std::optional<UseBase> &use) {
 #define MX_BEGIN_VISIT_ABSTRACT_STMT(name)
 #define MX_BEGIN_VISIT_STMT(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, selectors, reader, found); \
+      FindUses_ ## name (eid, self.use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -139,24 +148,19 @@ bool UseIteratorImpl::FindNextStmt(std::optional<UseBase> &use) {
     }
   }
 
-  if (!found) {
-    return false;
-  }
-
-  use.emplace(Stmt(fragment, offset), std::move(selectors));
-
-  return true;
+  return found;
 }
 
-bool UseIteratorImpl::FindNextType(std::optional<UseBase> &use) {
-  if (list_offset >= fragment->num_types) {
+bool UseIteratorImpl::FindNextType(UseIteratorBase &self) {
+  if (self.list_offset >= self.use.fragment->num_types) {
     return false;
   }
 
-  const unsigned offset = list_offset++;
-  mx::ast::Type::Reader reader = fragment->NthType(offset);
+  self.use.offset = self.list_offset++;
+  mx::ast::Type::Reader reader = self.use.fragment->NthType(self.use.offset);
   bool found = false;
-  UseSelectorSet selectors;
+
+  self.use.selectors.reset();
 
   for (auto eid : search_ids) {
     switch (Get_Type_Kind(reader)) {
@@ -164,7 +168,7 @@ bool UseIteratorImpl::FindNextType(std::optional<UseBase> &use) {
 #define MX_BEGIN_VISIT_ABSTRACT_TYPE(name)
 #define MX_BEGIN_VISIT_TYPE(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, selectors, reader, found); \
+      FindUses_ ## name (eid, self.use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -172,111 +176,96 @@ bool UseIteratorImpl::FindNextType(std::optional<UseBase> &use) {
     }
   }
 
-  if (!found) {
-    return false;
-  }
-
-  use.emplace(Type(fragment, offset), std::move(selectors));
-
-  return true;
+  return found;
 }
 
-bool UseIteratorImpl::FindNextPseudo(std::optional<UseBase> &use) {
-  if (list_offset >= fragment->num_pseudos) {
+bool UseIteratorImpl::FindNextPseudo(UseIteratorBase &self) {
+  if (self.list_offset >= self.use.fragment->num_pseudos) {
     return false;
   }
 
   TemplateArgument *dummy = nullptr;
-  const unsigned offset = list_offset++;
-  mx::ast::Pseudo::Reader reader = fragment->NthPseudo(offset);
+  self.use.offset = self.list_offset++;
+  self.use.selectors.reset();
+  mx::ast::Pseudo::Reader reader =
+      self.use.fragment->NthPseudo(self.use.offset);
   bool found = false;
-  UseSelectorSet selectors;
 
   for (auto eid : search_ids) {
     switch (Get_PseudoKind(reader, dummy)) {
       case PseudoKind::CXX_BASE_SPECIFIER:
-        FindUses_CXXBaseSpecifier(eid, selectors, reader, found);
+        self.use.kind = UseKind::CXX_BASE_SPECIFIER;
+        FindUses_CXXBaseSpecifier(eid, self.use.selectors, reader, found);
         break;
       case PseudoKind::TEMPLATE_ARGUMENT:
-        FindUses_TemplateArgument(eid, selectors, reader, found);
+        self.use.kind = UseKind::TEMPLATE_ARGUMENT;
+        FindUses_TemplateArgument(eid, self.use.selectors, reader, found);
         break;
       case PseudoKind::TEMPLATE_PARAMETER_LIST:
-        FindUses_TemplateParameterList(eid, selectors, reader, found);
+        self.use.kind = UseKind::TEMPLATE_PARAMETER_LIST;
+        FindUses_TemplateParameterList(eid, self.use.selectors, reader, found);
         break;
     }
   }
 
-  if (!found) {
-    return false;
-  }
-
-  switch (Get_PseudoKind(reader, dummy)) {
-    case PseudoKind::CXX_BASE_SPECIFIER:
-      use.emplace(CXXBaseSpecifier(fragment, offset), std::move(selectors));
-      return true;
-    case PseudoKind::TEMPLATE_ARGUMENT:
-      use.emplace(TemplateArgument(fragment, offset), std::move(selectors));
-      return true;
-    case PseudoKind::TEMPLATE_PARAMETER_LIST:
-      use.emplace(TemplateParameterList(fragment, offset), std::move(selectors));
-      return true;
-  }
-
-  return false;
+  return found;
 }
 
-bool UseIteratorImpl::FindNext(std::optional<UseBase> &use) {
+bool UseIteratorImpl::FindNext(UseIteratorBase &self) {
   for (;;) {
-    if (!fragment) {
-      if (fragment_offset >= fragment_ids.size()) {
+    if (!self.use.fragment) {
+      if (self.fragment_offset >= fragment_ids.size()) {
         return false;
 
       } else {
-        fragment = ep->FragmentFor(ep, fragment_ids[fragment_offset++]);
-        if (!fragment) {
+        self.use.fragment = ep->FragmentFor(
+            ep, fragment_ids[self.fragment_offset++]);
+        if (!self.use.fragment) {
           continue;  // Skip to next; didn't find for some reason.
         }
       }
     }
 
-    switch (list) {
-      case kDecl:
-        if (FindNextDecl(use)) {
+    switch (self.use.kind) {
+      case UseKind::DECLARATION:
+        if (FindNextDecl(self)) {
           return true;
 
         } else {
           // Skip to next list; didn't find.
-          list = kStmt;
-          list_offset = 0u;
+          self.use.kind = UseKind::STATEMENT;
+          self.list_offset = 0u;
           continue;
         }
-      case kStmt:
-        if (FindNextStmt(use)) {
+      case UseKind::STATEMENT:
+        if (FindNextStmt(self)) {
           return true;
         } else {
           // Skip to next list; didn't find.
-          list = kType;
-          list_offset = 0u;
+          self.use.kind = UseKind::TYPE;
+          self.list_offset = 0u;
           continue;
         }
-      case kType:
-        if (FindNextType(use)) {
+      case UseKind::TYPE:
+        if (FindNextType(self)) {
           return true;
         } else {
           // Skip to next list; didn't find.
-          list = kPseudo;
-          list_offset = 0u;
+          self.use.kind = UseKind::CXX_BASE_SPECIFIER;
+          self.list_offset = 0u;
           continue;
         }
-      case kPseudo:
-        if (FindNextPseudo(use)) {
+      case UseKind::CXX_BASE_SPECIFIER:
+      case UseKind::TEMPLATE_ARGUMENT:
+      case UseKind::TEMPLATE_PARAMETER_LIST:
+        if (FindNextPseudo(self)) {
           return true;
 
         } else {
           // Skip to next fragment; didn't find.
-          fragment.reset();
-          list_offset = 0u;
-          list = kDecl;
+          self.use.fragment.reset();
+          self.list_offset = 0u;
+          self.use.kind = UseKind::DECLARATION;
           continue;
         }
     }
@@ -286,8 +275,7 @@ bool UseIteratorImpl::FindNext(std::optional<UseBase> &use) {
 }
 
 void UseIteratorBase::Advance(void) {
-  use.reset();
-  if (!impl->FindNext(use)) {
+  if (!impl->FindNext(*this)) {
     impl.reset();
   }
 }
@@ -330,7 +318,7 @@ UseBase::UseBase(TemplateParameterList entity, UseSelectorSet selectors_)
       kind(UseKind::TEMPLATE_PARAMETER_LIST) {}
 
 std::optional<Decl> UseBase::as_declaration(void) const {
-  if (kind == UseKind::DECLARATION) {
+  if (kind == UseKind::DECLARATION && fragment && offset < fragment->num_decls) {
     return Decl(fragment, offset);
   } else {
     return std::nullopt;
@@ -338,7 +326,7 @@ std::optional<Decl> UseBase::as_declaration(void) const {
 }
 
 std::optional<Stmt> UseBase::as_statement(void) const {
-  if (kind == UseKind::STATEMENT) {
+  if (kind == UseKind::STATEMENT && fragment && offset < fragment->num_stmts) {
     return Stmt(fragment, offset);
   } else {
     return std::nullopt;
@@ -346,7 +334,7 @@ std::optional<Stmt> UseBase::as_statement(void) const {
 }
 
 std::optional<Type> UseBase::as_type(void) const {
-  if (kind == UseKind::TYPE) {
+  if (kind == UseKind::TYPE && fragment && offset < fragment->num_types) {
     return Type(fragment, offset);
   } else {
     return std::nullopt;
@@ -354,7 +342,8 @@ std::optional<Type> UseBase::as_type(void) const {
 }
 
 std::optional<CXXBaseSpecifier> UseBase::as_cxx_base_specifier(void) const {
-  if (kind == UseKind::CXX_BASE_SPECIFIER) {
+  if (kind == UseKind::CXX_BASE_SPECIFIER && fragment &&
+      offset < fragment->num_pseudos) {
     return CXXBaseSpecifier(fragment, offset);
   } else {
     return std::nullopt;
@@ -362,15 +351,18 @@ std::optional<CXXBaseSpecifier> UseBase::as_cxx_base_specifier(void) const {
 }
 
 std::optional<TemplateArgument> UseBase::as_template_argument(void) const {
-  if (kind == UseKind::TEMPLATE_ARGUMENT) {
+  if (kind == UseKind::TEMPLATE_ARGUMENT && fragment &&
+      offset < fragment->num_pseudos) {
     return TemplateArgument(fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
-std::optional<TemplateParameterList> UseBase::as_template_parameter_list(void) const {
-  if (kind == UseKind::TEMPLATE_PARAMETER_LIST) {
+std::optional<TemplateParameterList>
+UseBase::as_template_parameter_list(void) const {
+  if (kind == UseKind::TEMPLATE_PARAMETER_LIST && fragment &&
+      offset < fragment->num_pseudos) {
     return TemplateParameterList(fragment, offset);
   } else {
     return std::nullopt;
