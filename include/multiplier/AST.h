@@ -16,6 +16,7 @@
 
 #include "Iterator.h"
 #include "Types.h"
+#include "Use.h"
 
 namespace pasta {
 enum class TokenRole : unsigned short;
@@ -258,7 +259,7 @@ enum class FileType : signed char;
 enum class CompilerName : unsigned;
 enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
-enum class PseudoEntityKind : unsigned char;
+enum class PseudoKind : unsigned char;
 }  // namespace pasta
 namespace mx {
 
@@ -269,6 +270,7 @@ class StmtIterator;
 class Token;
 class TokenContext;class TokenContextIterator;
 class TokenRange;
+class UseBase;
 
 enum class DeclKind : unsigned char {
   ACCESS_SPEC,
@@ -4811,8 +4813,8 @@ inline static constexpr unsigned NumEnumerators(ParameterABI) {
 const char *EnumeratorName(ParameterABI);
 
 enum class ParenLocsOffsets : unsigned char {
-  L_PAREN,
-  R_PAREN,
+  L_PAREN_TOKEN,
+  R_PAREN_TOKEN,
   TOTAL,
 };
 
@@ -5726,8 +5728,8 @@ enum class TokenKind : unsigned short {
   R_SQUARE,
   L_PARENTHESIS,
   R_PARENTHESIS,
-  L_BRACE,
-  R_BRACE,
+  L_BRACE_TOKEN,
+  R_BRACE_TOKEN,
   PERIOD,
   ELLIPSIS,
   AMP,
@@ -6736,23 +6738,23 @@ inline static constexpr unsigned NumEnumerators(TargetLanguage) {
 
 const char *EnumeratorName(TargetLanguage);
 
-enum class PseudoEntityKind : unsigned char {
+enum class PseudoKind : unsigned char {
   TEMPLATE_ARGUMENT,
   TEMPLATE_PARAMETER_LIST,
   CXX_BASE_SPECIFIER,
 };
 
-PseudoEntityKind FromPasta(pasta::PseudoEntityKind pasta_val);
+PseudoKind FromPasta(pasta::PseudoKind pasta_val);
 
-inline static const char *EnumerationName(PseudoEntityKind) {
-  return "PseudoEntityKind";
+inline static const char *EnumerationName(PseudoKind) {
+  return "PseudoKind";
 }
 
-inline static constexpr unsigned NumEnumerators(PseudoEntityKind) {
+inline static constexpr unsigned NumEnumerators(PseudoKind) {
   return 3;
 }
 
-const char *EnumeratorName(PseudoEntityKind);
+const char *EnumeratorName(PseudoKind);
 
 class Token;
 class TokenRange;
@@ -7165,6 +7167,10 @@ class TemplateParameterList {
   friend class TokenContext;
   friend class Type;
   friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7198,6 +7204,10 @@ class TemplateArgument {
   friend class TokenContext;
   friend class Type;
   friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7230,6 +7240,10 @@ class CXXBaseSpecifier {
   friend class TokenContext;
   friend class Type;
   friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7244,7 +7258,7 @@ class CXXBaseSpecifier {
   TagTypeKind base_kind(void) const;
   bool is_pack_expansion(void) const;
   bool constructors_are_inherited(void) const;
-  std::optional<Token> ellipsis(void) const;
+  std::optional<Token> ellipsis_token(void) const;
   AccessSpecifier semantic_access_specifier(void) const;
   AccessSpecifier lexical_access_specifier(void) const;
   Type base_type(void) const;
@@ -7264,6 +7278,10 @@ class Type {
   friend class TokenContext;
   friend class Type;
   friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -7276,11 +7294,16 @@ class Type {
     return self;
   }
 
+  inline static std::optional<Type> from(const std::optional<Type> &self) {
+    return self;
+  }
+
   inline static std::optional<Type> from(const TokenContext &c) {
     return c.as_type();
   }
 
   EntityId id(void) const;
+  UseIterator<TypeUseSelector> uses(void) const;
 
  protected:
   static TypeIterator in_internal(const Fragment &fragment);
@@ -7314,7 +7337,6 @@ class Type {
   std::optional<RecordType> as_structure_type(void) const;
   std::optional<TagDecl> as_tag_declaration(void) const;
   std::optional<RecordType> as_union_type(void) const;
-  Type canonical_type_internal(void) const;
   std::optional<AutoType> contained_auto_type(void) const;
   std::optional<DeducedType> contained_deduced_type(void) const;
   Linkage linkage(void) const;
@@ -7592,8 +7614,21 @@ class TemplateTypeParmType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::TEMPLATE_TYPE_PARM;
+  }
+
   static std::optional<TemplateTypeParmType> from(const TokenContext &c);
   static std::optional<TemplateTypeParmType> from(const Type &parent);
+
+  inline static std::optional<TemplateTypeParmType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return TemplateTypeParmType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   TemplateTypeParmDecl declaration(void) const;
   bool is_parameter_pack(void) const;
@@ -7615,8 +7650,21 @@ class TemplateSpecializationType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::TEMPLATE_SPECIALIZATION;
+  }
+
   static std::optional<TemplateSpecializationType> from(const TokenContext &c);
   static std::optional<TemplateSpecializationType> from(const Type &parent);
+
+  inline static std::optional<TemplateSpecializationType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return TemplateSpecializationType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type aliased_type(void) const;
   bool is_current_instantiation(void) const;
@@ -7642,6 +7690,15 @@ class TagType : public Type {
 
   static std::optional<TagType> from(const TokenContext &c);
   static std::optional<TagType> from(const Type &parent);
+
+  inline static std::optional<TagType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return TagType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   TagDecl declaration(void) const;
   bool is_being_defined(void) const;
 };
@@ -7662,9 +7719,31 @@ class RecordType : public TagType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::RECORD;
+  }
+
   static std::optional<RecordType> from(const TokenContext &c);
   static std::optional<RecordType> from(const TagType &parent);
+
+  inline static std::optional<RecordType> from(const std::optional<TagType> &parent) {
+    if (parent) {
+      return RecordType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RecordType> from(const Type &parent);
+
+  inline static std::optional<RecordType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return RecordType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool has_const_fields(void) const;
   bool is_sugared(void) const;
@@ -7686,9 +7765,31 @@ class EnumType : public TagType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::ENUM;
+  }
+
   static std::optional<EnumType> from(const TokenContext &c);
   static std::optional<EnumType> from(const TagType &parent);
+
+  inline static std::optional<EnumType> from(const std::optional<TagType> &parent) {
+    if (parent) {
+      return EnumType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<EnumType> from(const Type &parent);
+
+  inline static std::optional<EnumType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return EnumType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -7708,8 +7809,21 @@ class SubstTemplateTypeParmType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::SUBST_TEMPLATE_TYPE_PARM;
+  }
+
   static std::optional<SubstTemplateTypeParmType> from(const TokenContext &c);
   static std::optional<SubstTemplateTypeParmType> from(const Type &parent);
+
+  inline static std::optional<SubstTemplateTypeParmType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return SubstTemplateTypeParmType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   TemplateTypeParmType replaced_parameter(void) const;
   Type replacement_type(void) const;
@@ -7731,8 +7845,21 @@ class SubstTemplateTypeParmPackType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::SUBST_TEMPLATE_TYPE_PARM_PACK;
+  }
+
   static std::optional<SubstTemplateTypeParmPackType> from(const TokenContext &c);
   static std::optional<SubstTemplateTypeParmPackType> from(const Type &parent);
+
+  inline static std::optional<SubstTemplateTypeParmPackType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return SubstTemplateTypeParmPackType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   TemplateTypeParmType replaced_parameter(void) const;
   bool is_sugared(void) const;
@@ -7755,6 +7882,15 @@ class ReferenceType : public Type {
 
   static std::optional<ReferenceType> from(const TokenContext &c);
   static std::optional<ReferenceType> from(const Type &parent);
+
+  inline static std::optional<ReferenceType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ReferenceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type pointee_type_as_written(void) const;
   bool is_inner_reference(void) const;
   bool is_spelled_as_l_value(void) const;
@@ -7776,9 +7912,31 @@ class RValueReferenceType : public ReferenceType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::R_VALUE_REFERENCE;
+  }
+
   static std::optional<RValueReferenceType> from(const TokenContext &c);
   static std::optional<RValueReferenceType> from(const ReferenceType &parent);
+
+  inline static std::optional<RValueReferenceType> from(const std::optional<ReferenceType> &parent) {
+    if (parent) {
+      return RValueReferenceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RValueReferenceType> from(const Type &parent);
+
+  inline static std::optional<RValueReferenceType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return RValueReferenceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -7799,9 +7957,31 @@ class LValueReferenceType : public ReferenceType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::L_VALUE_REFERENCE;
+  }
+
   static std::optional<LValueReferenceType> from(const TokenContext &c);
   static std::optional<LValueReferenceType> from(const ReferenceType &parent);
+
+  inline static std::optional<LValueReferenceType> from(const std::optional<ReferenceType> &parent) {
+    if (parent) {
+      return LValueReferenceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<LValueReferenceType> from(const Type &parent);
+
+  inline static std::optional<LValueReferenceType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return LValueReferenceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -7821,8 +8001,21 @@ class PointerType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::POINTER;
+  }
+
   static std::optional<PointerType> from(const TokenContext &c);
   static std::optional<PointerType> from(const Type &parent);
+
+  inline static std::optional<PointerType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return PointerType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -7842,8 +8035,21 @@ class PipeType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::PIPE;
+  }
+
   static std::optional<PipeType> from(const TokenContext &c);
   static std::optional<PipeType> from(const Type &parent);
+
+  inline static std::optional<PipeType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return PipeType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type element_type(void) const;
   bool is_read_only(void) const;
@@ -7865,8 +8071,21 @@ class ParenType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::PAREN;
+  }
+
   static std::optional<ParenType> from(const TokenContext &c);
   static std::optional<ParenType> from(const Type &parent);
+
+  inline static std::optional<ParenType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ParenType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type inner_type(void) const;
   bool is_sugared(void) const;
@@ -7887,8 +8106,21 @@ class PackExpansionType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::PACK_EXPANSION;
+  }
+
   static std::optional<PackExpansionType> from(const TokenContext &c);
   static std::optional<PackExpansionType> from(const Type &parent);
+
+  inline static std::optional<PackExpansionType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return PackExpansionType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   std::optional<unsigned> num_expansions(void) const;
   Type pattern(void) const;
@@ -7910,8 +8142,21 @@ class ObjCTypeParamType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::OBJ_C_TYPE_PARAM;
+  }
+
   static std::optional<ObjCTypeParamType> from(const TokenContext &c);
   static std::optional<ObjCTypeParamType> from(const Type &parent);
+
+  inline static std::optional<ObjCTypeParamType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ObjCTypeParamType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   ObjCTypeParamDecl declaration(void) const;
   bool is_sugared(void) const;
@@ -7932,8 +8177,21 @@ class ObjCObjectType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::OBJ_C_OBJECT;
+  }
+
   static std::optional<ObjCObjectType> from(const TokenContext &c);
   static std::optional<ObjCObjectType> from(const Type &parent);
+
+  inline static std::optional<ObjCObjectType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ObjCObjectType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type base_type(void) const;
   ObjCInterfaceDecl interface(void) const;
@@ -7973,9 +8231,31 @@ class ObjCInterfaceType : public ObjCObjectType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::OBJ_C_INTERFACE;
+  }
+
   static std::optional<ObjCInterfaceType> from(const TokenContext &c);
   static std::optional<ObjCInterfaceType> from(const ObjCObjectType &parent);
+
+  inline static std::optional<ObjCInterfaceType> from(const std::optional<ObjCObjectType> &parent) {
+    if (parent) {
+      return ObjCInterfaceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCInterfaceType> from(const Type &parent);
+
+  inline static std::optional<ObjCInterfaceType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ObjCInterfaceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCInterfaceDecl declaration(void) const;
 };
 
@@ -7994,8 +8274,21 @@ class ObjCObjectPointerType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::OBJ_C_OBJECT_POINTER;
+  }
+
   static std::optional<ObjCObjectPointerType> from(const TokenContext &c);
   static std::optional<ObjCObjectPointerType> from(const Type &parent);
+
+  inline static std::optional<ObjCObjectPointerType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ObjCObjectPointerType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   ObjCInterfaceDecl interface_declaration(void) const;
   ObjCInterfaceType interface_type(void) const;
@@ -8030,8 +8323,21 @@ class MemberPointerType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::MEMBER_POINTER;
+  }
+
   static std::optional<MemberPointerType> from(const TokenContext &c);
   static std::optional<MemberPointerType> from(const Type &parent);
+
+  inline static std::optional<MemberPointerType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return MemberPointerType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type class_(void) const;
   CXXRecordDecl most_recent_cxx_record_declaration(void) const;
@@ -8057,6 +8363,15 @@ class MatrixType : public Type {
 
   static std::optional<MatrixType> from(const TokenContext &c);
   static std::optional<MatrixType> from(const Type &parent);
+
+  inline static std::optional<MatrixType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return MatrixType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type element_type(void) const;
   bool is_sugared(void) const;
@@ -8078,9 +8393,31 @@ class DependentSizedMatrixType : public MatrixType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_SIZED_MATRIX;
+  }
+
   static std::optional<DependentSizedMatrixType> from(const TokenContext &c);
   static std::optional<DependentSizedMatrixType> from(const MatrixType &parent);
+
+  inline static std::optional<DependentSizedMatrixType> from(const std::optional<MatrixType> &parent) {
+    if (parent) {
+      return DependentSizedMatrixType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentSizedMatrixType> from(const Type &parent);
+
+  inline static std::optional<DependentSizedMatrixType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentSizedMatrixType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token attribute_token(void) const;
   Expr column_expression(void) const;
   Expr row_expression(void) const;
@@ -8102,9 +8439,31 @@ class ConstantMatrixType : public MatrixType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::CONSTANT_MATRIX;
+  }
+
   static std::optional<ConstantMatrixType> from(const TokenContext &c);
   static std::optional<ConstantMatrixType> from(const MatrixType &parent);
+
+  inline static std::optional<ConstantMatrixType> from(const std::optional<MatrixType> &parent) {
+    if (parent) {
+      return ConstantMatrixType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConstantMatrixType> from(const Type &parent);
+
+  inline static std::optional<ConstantMatrixType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ConstantMatrixType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using MacroQualifiedTypeRange = DerivedEntityRange<TypeIterator, MacroQualifiedType>;
@@ -8122,8 +8481,21 @@ class MacroQualifiedType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::MACRO_QUALIFIED;
+  }
+
   static std::optional<MacroQualifiedType> from(const TokenContext &c);
   static std::optional<MacroQualifiedType> from(const Type &parent);
+
+  inline static std::optional<MacroQualifiedType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return MacroQualifiedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type modified_type(void) const;
   Type underlying_type(void) const;
@@ -8145,8 +8517,21 @@ class InjectedClassNameType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::INJECTED_CLASS_NAME;
+  }
+
   static std::optional<InjectedClassNameType> from(const TokenContext &c);
   static std::optional<InjectedClassNameType> from(const Type &parent);
+
+  inline static std::optional<InjectedClassNameType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return InjectedClassNameType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   CXXRecordDecl declaration(void) const;
   Type injected_specialization_type(void) const;
@@ -8171,6 +8556,15 @@ class FunctionType : public Type {
 
   static std::optional<FunctionType> from(const TokenContext &c);
   static std::optional<FunctionType> from(const Type &parent);
+
+  inline static std::optional<FunctionType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return FunctionType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CallingConv call_conv(void) const;
   Type call_result_type(void) const;
   bool cmse_ns_call_attribute(void) const;
@@ -8198,9 +8592,31 @@ class FunctionProtoType : public FunctionType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::FUNCTION_PROTO;
+  }
+
   static std::optional<FunctionProtoType> from(const TokenContext &c);
   static std::optional<FunctionProtoType> from(const FunctionType &parent);
+
+  inline static std::optional<FunctionProtoType> from(const std::optional<FunctionType> &parent) {
+    if (parent) {
+      return FunctionProtoType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionProtoType> from(const Type &parent);
+
+  inline static std::optional<FunctionProtoType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return FunctionProtoType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CanThrowResult can_throw(void) const;
   Type desugar(void) const;
   std::vector<Type> exceptions(void) const;
@@ -8241,9 +8657,31 @@ class FunctionNoProtoType : public FunctionType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::FUNCTION_NO_PROTO;
+  }
+
   static std::optional<FunctionNoProtoType> from(const TokenContext &c);
   static std::optional<FunctionNoProtoType> from(const FunctionType &parent);
+
+  inline static std::optional<FunctionNoProtoType> from(const std::optional<FunctionType> &parent) {
+    if (parent) {
+      return FunctionNoProtoType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionNoProtoType> from(const Type &parent);
+
+  inline static std::optional<FunctionNoProtoType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return FunctionNoProtoType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -8263,8 +8701,21 @@ class ExtIntType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::EXT_INT;
+  }
+
   static std::optional<ExtIntType> from(const TokenContext &c);
   static std::optional<ExtIntType> from(const Type &parent);
+
+  inline static std::optional<ExtIntType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ExtIntType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_signed(void) const;
   bool is_sugared(void) const;
@@ -8286,8 +8737,21 @@ class DependentVectorType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_VECTOR;
+  }
+
   static std::optional<DependentVectorType> from(const TokenContext &c);
   static std::optional<DependentVectorType> from(const Type &parent);
+
+  inline static std::optional<DependentVectorType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentVectorType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Token attribute_token(void) const;
   Type element_type(void) const;
@@ -8311,8 +8775,21 @@ class DependentSizedExtVectorType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_SIZED_EXT_VECTOR;
+  }
+
   static std::optional<DependentSizedExtVectorType> from(const TokenContext &c);
   static std::optional<DependentSizedExtVectorType> from(const Type &parent);
+
+  inline static std::optional<DependentSizedExtVectorType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentSizedExtVectorType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Token attribute_token(void) const;
   Type element_type(void) const;
@@ -8335,8 +8812,21 @@ class DependentExtIntType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_EXT_INT;
+  }
+
   static std::optional<DependentExtIntType> from(const TokenContext &c);
   static std::optional<DependentExtIntType> from(const Type &parent);
+
+  inline static std::optional<DependentExtIntType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentExtIntType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Expr num_bits_expression(void) const;
   bool is_signed(void) const;
@@ -8359,8 +8849,21 @@ class DependentAddressSpaceType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_ADDRESS_SPACE;
+  }
+
   static std::optional<DependentAddressSpaceType> from(const TokenContext &c);
   static std::optional<DependentAddressSpaceType> from(const Type &parent);
+
+  inline static std::optional<DependentAddressSpaceType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentAddressSpaceType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Expr addr_space_expression(void) const;
   Token attribute_token(void) const;
@@ -8384,6 +8887,15 @@ class DeducedType : public Type {
 
   static std::optional<DeducedType> from(const TokenContext &c);
   static std::optional<DeducedType> from(const Type &parent);
+
+  inline static std::optional<DeducedType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DeducedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type resolved_type(void) const;
   bool is_deduced(void) const;
@@ -8406,9 +8918,31 @@ class DeducedTemplateSpecializationType : public DeducedType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;
+  }
+
   static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &c);
   static std::optional<DeducedTemplateSpecializationType> from(const DeducedType &parent);
+
+  inline static std::optional<DeducedTemplateSpecializationType> from(const std::optional<DeducedType> &parent) {
+    if (parent) {
+      return DeducedTemplateSpecializationType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DeducedTemplateSpecializationType> from(const Type &parent);
+
+  inline static std::optional<DeducedTemplateSpecializationType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DeducedTemplateSpecializationType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using AutoTypeRange = DerivedEntityRange<TypeIterator, AutoType>;
@@ -8427,9 +8961,31 @@ class AutoType : public DeducedType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::AUTO;
+  }
+
   static std::optional<AutoType> from(const TokenContext &c);
   static std::optional<AutoType> from(const DeducedType &parent);
+
+  inline static std::optional<AutoType> from(const std::optional<DeducedType> &parent) {
+    if (parent) {
+      return AutoType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AutoType> from(const Type &parent);
+
+  inline static std::optional<AutoType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return AutoType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   AutoTypeKeyword keyword(void) const;
   std::vector<TemplateArgument> type_constraint_arguments(void) const;
   ConceptDecl type_constraint_concept(void) const;
@@ -8452,8 +9008,21 @@ class DecltypeType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DECLTYPE;
+  }
+
   static std::optional<DecltypeType> from(const TokenContext &c);
   static std::optional<DecltypeType> from(const Type &parent);
+
+  inline static std::optional<DecltypeType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DecltypeType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Expr underlying_expression(void) const;
   Type underlying_type(void) const;
@@ -8475,8 +9044,21 @@ class ComplexType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::COMPLEX;
+  }
+
   static std::optional<ComplexType> from(const TokenContext &c);
   static std::optional<ComplexType> from(const Type &parent);
+
+  inline static std::optional<ComplexType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ComplexType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type element_type(void) const;
   bool is_sugared(void) const;
@@ -8497,8 +9079,21 @@ class BuiltinType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::BUILTIN;
+  }
+
   static std::optional<BuiltinType> from(const TokenContext &c);
   static std::optional<BuiltinType> from(const Type &parent);
+
+  inline static std::optional<BuiltinType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return BuiltinType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_floating_point(void) const;
   bool is_integer(void) const;
@@ -8522,8 +9117,21 @@ class BlockPointerType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::BLOCK_POINTER;
+  }
+
   static std::optional<BlockPointerType> from(const TokenContext &c);
   static std::optional<BlockPointerType> from(const Type &parent);
+
+  inline static std::optional<BlockPointerType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return BlockPointerType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -8543,8 +9151,21 @@ class AttributedType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::ATTRIBUTED;
+  }
+
   static std::optional<AttributedType> from(const TokenContext &c);
   static std::optional<AttributedType> from(const Type &parent);
+
+  inline static std::optional<AttributedType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return AttributedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   AttributeKind attribute_kind(void) const;
   Type equivalent_type(void) const;
@@ -8571,8 +9192,21 @@ class AtomicType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::ATOMIC;
+  }
+
   static std::optional<AtomicType> from(const TokenContext &c);
   static std::optional<AtomicType> from(const Type &parent);
+
+  inline static std::optional<AtomicType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return AtomicType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type value_type(void) const;
   bool is_sugared(void) const;
@@ -8595,6 +9229,15 @@ class ArrayType : public Type {
 
   static std::optional<ArrayType> from(const TokenContext &c);
   static std::optional<ArrayType> from(const Type &parent);
+
+  inline static std::optional<ArrayType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type element_type(void) const;
   ArrayTypeArraySizeModifier size_modifier(void) const;
 };
@@ -8615,9 +9258,31 @@ class VariableArrayType : public ArrayType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::VARIABLE_ARRAY;
+  }
+
   static std::optional<VariableArrayType> from(const TokenContext &c);
   static std::optional<VariableArrayType> from(const ArrayType &parent);
+
+  inline static std::optional<VariableArrayType> from(const std::optional<ArrayType> &parent) {
+    if (parent) {
+      return VariableArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VariableArrayType> from(const Type &parent);
+
+  inline static std::optional<VariableArrayType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return VariableArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   TokenRange brackets_range(void) const;
   Token l_bracket_token(void) const;
@@ -8642,9 +9307,31 @@ class IncompleteArrayType : public ArrayType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::INCOMPLETE_ARRAY;
+  }
+
   static std::optional<IncompleteArrayType> from(const TokenContext &c);
   static std::optional<IncompleteArrayType> from(const ArrayType &parent);
+
+  inline static std::optional<IncompleteArrayType> from(const std::optional<ArrayType> &parent) {
+    if (parent) {
+      return IncompleteArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<IncompleteArrayType> from(const Type &parent);
+
+  inline static std::optional<IncompleteArrayType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return IncompleteArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -8665,9 +9352,31 @@ class DependentSizedArrayType : public ArrayType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_SIZED_ARRAY;
+  }
+
   static std::optional<DependentSizedArrayType> from(const TokenContext &c);
   static std::optional<DependentSizedArrayType> from(const ArrayType &parent);
+
+  inline static std::optional<DependentSizedArrayType> from(const std::optional<ArrayType> &parent) {
+    if (parent) {
+      return DependentSizedArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentSizedArrayType> from(const Type &parent);
+
+  inline static std::optional<DependentSizedArrayType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentSizedArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   TokenRange brackets_range(void) const;
   Token l_bracket_token(void) const;
@@ -8692,9 +9401,31 @@ class ConstantArrayType : public ArrayType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::CONSTANT_ARRAY;
+  }
+
   static std::optional<ConstantArrayType> from(const TokenContext &c);
   static std::optional<ConstantArrayType> from(const ArrayType &parent);
+
+  inline static std::optional<ConstantArrayType> from(const std::optional<ArrayType> &parent) {
+    if (parent) {
+      return ConstantArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConstantArrayType> from(const Type &parent);
+
+  inline static std::optional<ConstantArrayType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ConstantArrayType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   std::optional<Expr> size_expression(void) const;
   bool is_sugared(void) const;
@@ -8715,8 +9446,21 @@ class AdjustedType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::ADJUSTED;
+  }
+
   static std::optional<AdjustedType> from(const TokenContext &c);
   static std::optional<AdjustedType> from(const Type &parent);
+
+  inline static std::optional<AdjustedType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return AdjustedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type resolved_type(void) const;
   Type original_type(void) const;
@@ -8739,9 +9483,31 @@ class DecayedType : public AdjustedType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DECAYED;
+  }
+
   static std::optional<DecayedType> from(const TokenContext &c);
   static std::optional<DecayedType> from(const AdjustedType &parent);
+
+  inline static std::optional<DecayedType> from(const std::optional<AdjustedType> &parent) {
+    if (parent) {
+      return DecayedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DecayedType> from(const Type &parent);
+
+  inline static std::optional<DecayedType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DecayedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using TypeWithKeywordRange = DerivedEntityRange<TypeIterator, TypeWithKeyword>;
@@ -8761,6 +9527,15 @@ class TypeWithKeyword : public Type {
 
   static std::optional<TypeWithKeyword> from(const TokenContext &c);
   static std::optional<TypeWithKeyword> from(const Type &parent);
+
+  inline static std::optional<TypeWithKeyword> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return TypeWithKeyword::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ElaboratedTypeKeyword keyword(void) const;
 };
 
@@ -8780,9 +9555,31 @@ class ElaboratedType : public TypeWithKeyword {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::ELABORATED;
+  }
+
   static std::optional<ElaboratedType> from(const TokenContext &c);
   static std::optional<ElaboratedType> from(const TypeWithKeyword &parent);
+
+  inline static std::optional<ElaboratedType> from(const std::optional<TypeWithKeyword> &parent) {
+    if (parent) {
+      return ElaboratedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ElaboratedType> from(const Type &parent);
+
+  inline static std::optional<ElaboratedType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ElaboratedType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type named_type(void) const;
   std::optional<TagDecl> owned_tag_declaration(void) const;
@@ -8805,9 +9602,31 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_TEMPLATE_SPECIALIZATION;
+  }
+
   static std::optional<DependentTemplateSpecializationType> from(const TokenContext &c);
   static std::optional<DependentTemplateSpecializationType> from(const TypeWithKeyword &parent);
+
+  inline static std::optional<DependentTemplateSpecializationType> from(const std::optional<TypeWithKeyword> &parent) {
+    if (parent) {
+      return DependentTemplateSpecializationType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentTemplateSpecializationType> from(const Type &parent);
+
+  inline static std::optional<DependentTemplateSpecializationType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentTemplateSpecializationType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
   std::vector<TemplateArgument> template_arguments(void) const;
@@ -8829,9 +9648,31 @@ class DependentNameType : public TypeWithKeyword {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::DEPENDENT_NAME;
+  }
+
   static std::optional<DependentNameType> from(const TokenContext &c);
   static std::optional<DependentNameType> from(const TypeWithKeyword &parent);
+
+  inline static std::optional<DependentNameType> from(const std::optional<TypeWithKeyword> &parent) {
+    if (parent) {
+      return DependentNameType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentNameType> from(const Type &parent);
+
+  inline static std::optional<DependentNameType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return DependentNameType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   bool is_sugared(void) const;
 };
@@ -8851,8 +9692,21 @@ class VectorType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::VECTOR;
+  }
+
   static std::optional<VectorType> from(const TokenContext &c);
   static std::optional<VectorType> from(const Type &parent);
+
+  inline static std::optional<VectorType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return VectorType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type element_type(void) const;
   VectorTypeVectorKind vector_kind(void) const;
@@ -8875,9 +9729,31 @@ class ExtVectorType : public VectorType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::EXT_VECTOR;
+  }
+
   static std::optional<ExtVectorType> from(const TokenContext &c);
   static std::optional<ExtVectorType> from(const VectorType &parent);
+
+  inline static std::optional<ExtVectorType> from(const std::optional<VectorType> &parent) {
+    if (parent) {
+      return ExtVectorType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExtVectorType> from(const Type &parent);
+
+  inline static std::optional<ExtVectorType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return ExtVectorType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using UnresolvedUsingTypeRange = DerivedEntityRange<TypeIterator, UnresolvedUsingType>;
@@ -8895,8 +9771,21 @@ class UnresolvedUsingType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::UNRESOLVED_USING;
+  }
+
   static std::optional<UnresolvedUsingType> from(const TokenContext &c);
   static std::optional<UnresolvedUsingType> from(const Type &parent);
+
+  inline static std::optional<UnresolvedUsingType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return UnresolvedUsingType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   UnresolvedUsingTypenameDecl declaration(void) const;
   bool is_sugared(void) const;
@@ -8917,8 +9806,21 @@ class UnaryTransformType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::UNARY_TRANSFORM;
+  }
+
   static std::optional<UnaryTransformType> from(const TokenContext &c);
   static std::optional<UnaryTransformType> from(const Type &parent);
+
+  inline static std::optional<UnaryTransformType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return UnaryTransformType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type base_type(void) const;
   UnaryTransformTypeUTTKind utt_kind(void) const;
@@ -8941,8 +9843,21 @@ class TypedefType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::TYPEDEF;
+  }
+
   static std::optional<TypedefType> from(const TokenContext &c);
   static std::optional<TypedefType> from(const Type &parent);
+
+  inline static std::optional<TypedefType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return TypedefType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   TypedefNameDecl declaration(void) const;
   bool is_sugared(void) const;
@@ -8963,8 +9878,21 @@ class TypeOfType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::TYPE_OF;
+  }
+
   static std::optional<TypeOfType> from(const TokenContext &c);
   static std::optional<TypeOfType> from(const Type &parent);
+
+  inline static std::optional<TypeOfType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return TypeOfType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Type underlying_type(void) const;
   bool is_sugared(void) const;
@@ -8985,8 +9913,21 @@ class TypeOfExprType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::TYPE_OF_EXPR;
+  }
+
   static std::optional<TypeOfExprType> from(const TokenContext &c);
   static std::optional<TypeOfExprType> from(const Type &parent);
+
+  inline static std::optional<TypeOfExprType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return TypeOfExprType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type desugar(void) const;
   Expr underlying_expression(void) const;
   bool is_sugared(void) const;
@@ -9008,6 +9949,10 @@ class Stmt {
   friend class TokenContext;
   friend class Type;
   friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -9020,6 +9965,10 @@ class Stmt {
     return self;
   }
 
+  inline static std::optional<Stmt> from(const std::optional<Stmt> &self) {
+    return self;
+  }
+
   inline static std::optional<Stmt> from(const TokenContext &c) {
     return c.as_statement();
   }
@@ -9027,6 +9976,7 @@ class Stmt {
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
   EntityId id(void) const;
+  UseIterator<StmtUseSelector> uses(void) const;
 
  protected:
   static StmtIterator in_internal(const Fragment &fragment);
@@ -9069,11 +10019,24 @@ class SEHTryStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SEH_TRY_STMT;
+  }
+
   static SEHTryStmtContainingStmtRange containing(const Decl &decl);
   static SEHTryStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SEHTryStmt> from(const TokenContext &c);
   static std::optional<SEHTryStmt> from(const Stmt &parent);
+
+  inline static std::optional<SEHTryStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SEHTryStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   SEHExceptStmt except_handler(void) const;
   SEHFinallyStmt finally_handler(void) const;
   Stmt handler(void) const;
@@ -9099,11 +10062,24 @@ class SEHLeaveStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SEH_LEAVE_STMT;
+  }
+
   static SEHLeaveStmtContainingStmtRange containing(const Decl &decl);
   static SEHLeaveStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SEHLeaveStmt> from(const TokenContext &c);
   static std::optional<SEHLeaveStmt> from(const Stmt &parent);
+
+  inline static std::optional<SEHLeaveStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SEHLeaveStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token leave_token(void) const;
 };
 
@@ -9124,11 +10100,24 @@ class SEHFinallyStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SEH_FINALLY_STMT;
+  }
+
   static SEHFinallyStmtContainingStmtRange containing(const Decl &decl);
   static SEHFinallyStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SEHFinallyStmt> from(const TokenContext &c);
   static std::optional<SEHFinallyStmt> from(const Stmt &parent);
+
+  inline static std::optional<SEHFinallyStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SEHFinallyStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CompoundStmt block(void) const;
   Token finally_token(void) const;
 };
@@ -9150,11 +10139,24 @@ class SEHExceptStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SEH_EXCEPT_STMT;
+  }
+
   static SEHExceptStmtContainingStmtRange containing(const Decl &decl);
   static SEHExceptStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SEHExceptStmt> from(const TokenContext &c);
   static std::optional<SEHExceptStmt> from(const Stmt &parent);
+
+  inline static std::optional<SEHExceptStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SEHExceptStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CompoundStmt block(void) const;
   Token except_token(void) const;
   Expr filter_expression(void) const;
@@ -9177,11 +10179,24 @@ class ReturnStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::RETURN_STMT;
+  }
+
   static ReturnStmtContainingStmtRange containing(const Decl &decl);
   static ReturnStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ReturnStmt> from(const TokenContext &c);
   static std::optional<ReturnStmt> from(const Stmt &parent);
+
+  inline static std::optional<ReturnStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ReturnStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<VarDecl> nrvo_candidate(void) const;
   std::optional<Expr> return_value(void) const;
   Token return_token(void) const;
@@ -9204,11 +10219,24 @@ class ObjCForCollectionStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_FOR_COLLECTION_STMT;
+  }
+
   static ObjCForCollectionStmtContainingStmtRange containing(const Decl &decl);
   static ObjCForCollectionStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCForCollectionStmt> from(const TokenContext &c);
   static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
+
+  inline static std::optional<ObjCForCollectionStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCForCollectionStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt body(void) const;
   Expr collection(void) const;
   Stmt element(void) const;
@@ -9233,11 +10261,24 @@ class ObjCAutoreleasePoolStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;
+  }
+
   static ObjCAutoreleasePoolStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAutoreleasePoolStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &c);
   static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent);
+
+  inline static std::optional<ObjCAutoreleasePoolStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCAutoreleasePoolStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_token(void) const;
   Stmt sub_statement(void) const;
 };
@@ -9259,11 +10300,24 @@ class ObjCAtTryStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_AT_TRY_STMT;
+  }
+
   static ObjCAtTryStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtTryStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAtTryStmt> from(const TokenContext &c);
   static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
+
+  inline static std::optional<ObjCAtTryStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCAtTryStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_try_token(void) const;
   ObjCAtFinallyStmt finally_statement(void) const;
   Stmt try_body(void) const;
@@ -9287,11 +10341,24 @@ class ObjCAtThrowStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_AT_THROW_STMT;
+  }
+
   static ObjCAtThrowStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtThrowStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAtThrowStmt> from(const TokenContext &c);
   static std::optional<ObjCAtThrowStmt> from(const Stmt &parent);
+
+  inline static std::optional<ObjCAtThrowStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCAtThrowStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr throw_expression(void) const;
   Token throw_token(void) const;
 };
@@ -9313,11 +10380,24 @@ class ObjCAtSynchronizedStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;
+  }
+
   static ObjCAtSynchronizedStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtSynchronizedStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAtSynchronizedStmt> from(const TokenContext &c);
   static std::optional<ObjCAtSynchronizedStmt> from(const Stmt &parent);
+
+  inline static std::optional<ObjCAtSynchronizedStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCAtSynchronizedStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_synchronized_token(void) const;
   CompoundStmt synch_body(void) const;
   Expr synch_expression(void) const;
@@ -9340,11 +10420,24 @@ class ObjCAtFinallyStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_AT_FINALLY_STMT;
+  }
+
   static ObjCAtFinallyStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtFinallyStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAtFinallyStmt> from(const TokenContext &c);
   static std::optional<ObjCAtFinallyStmt> from(const Stmt &parent);
+
+  inline static std::optional<ObjCAtFinallyStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCAtFinallyStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_finally_token(void) const;
   Stmt finally_body(void) const;
 };
@@ -9366,11 +10459,24 @@ class ObjCAtCatchStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_AT_CATCH_STMT;
+  }
+
   static ObjCAtCatchStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtCatchStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAtCatchStmt> from(const TokenContext &c);
   static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
+
+  inline static std::optional<ObjCAtCatchStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCAtCatchStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_catch_token(void) const;
   Stmt catch_body(void) const;
   VarDecl catch_parameter_declaration(void) const;
@@ -9400,6 +10506,15 @@ class OMPExecutableDirective : public Stmt {
 
   static std::optional<OMPExecutableDirective> from(const TokenContext &c);
   static std::optional<OMPExecutableDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPExecutableDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPExecutableDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt associated_statement(void) const;
   CapturedStmt innermost_captured_statement(void) const;
   Stmt raw_statement(void) const;
@@ -9426,12 +10541,34 @@ class OMPDispatchDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_DISPATCH_DIRECTIVE;
+  }
+
   static OMPDispatchDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDispatchDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPDispatchDirective> from(const TokenContext &c);
   static std::optional<OMPDispatchDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPDispatchDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPDispatchDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDispatchDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPDispatchDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPDispatchDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token target_call_token(void) const;
 };
 
@@ -9453,12 +10590,34 @@ class OMPDepobjDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_DEPOBJ_DIRECTIVE;
+  }
+
   static OMPDepobjDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDepobjDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPDepobjDirective> from(const TokenContext &c);
   static std::optional<OMPDepobjDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPDepobjDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPDepobjDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDepobjDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPDepobjDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPDepobjDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPCriticalDirectiveRange = DerivedEntityRange<StmtIterator, OMPCriticalDirective>;
@@ -9479,12 +10638,34 @@ class OMPCriticalDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_CRITICAL_DIRECTIVE;
+  }
+
   static OMPCriticalDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPCriticalDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPCriticalDirective> from(const TokenContext &c);
   static std::optional<OMPCriticalDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPCriticalDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPCriticalDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPCriticalDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPCriticalDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPCriticalDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPCancellationPointDirectiveRange = DerivedEntityRange<StmtIterator, OMPCancellationPointDirective>;
@@ -9505,12 +10686,34 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;
+  }
+
   static OMPCancellationPointDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPCancellationPointDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPCancellationPointDirective> from(const TokenContext &c);
   static std::optional<OMPCancellationPointDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPCancellationPointDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPCancellationPointDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPCancellationPointDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPCancellationPointDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPCancellationPointDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPCancelDirectiveRange = DerivedEntityRange<StmtIterator, OMPCancelDirective>;
@@ -9531,12 +10734,34 @@ class OMPCancelDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_CANCEL_DIRECTIVE;
+  }
+
   static OMPCancelDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPCancelDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPCancelDirective> from(const TokenContext &c);
   static std::optional<OMPCancelDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPCancelDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPCancelDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPCancelDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPCancelDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPCancelDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPBarrierDirectiveRange = DerivedEntityRange<StmtIterator, OMPBarrierDirective>;
@@ -9557,12 +10782,34 @@ class OMPBarrierDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_BARRIER_DIRECTIVE;
+  }
+
   static OMPBarrierDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPBarrierDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPBarrierDirective> from(const TokenContext &c);
   static std::optional<OMPBarrierDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPBarrierDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPBarrierDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPBarrierDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPBarrierDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPBarrierDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPAtomicDirectiveRange = DerivedEntityRange<StmtIterator, OMPAtomicDirective>;
@@ -9583,12 +10830,34 @@ class OMPAtomicDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_ATOMIC_DIRECTIVE;
+  }
+
   static OMPAtomicDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPAtomicDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPAtomicDirective> from(const TokenContext &c);
   static std::optional<OMPAtomicDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPAtomicDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPAtomicDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPAtomicDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPAtomicDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPAtomicDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr expression(void) const;
   Expr update_expression(void) const;
   Expr v(void) const;
@@ -9615,12 +10884,34 @@ class OMPTeamsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TEAMS_DIRECTIVE;
+  }
+
   static OMPTeamsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTeamsDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTeamsDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTeamsDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTeamsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTaskyieldDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskyieldDirective>;
@@ -9641,12 +10932,34 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TASKYIELD_DIRECTIVE;
+  }
+
   static OMPTaskyieldDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskyieldDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTaskyieldDirective> from(const TokenContext &c);
   static std::optional<OMPTaskyieldDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTaskyieldDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTaskyieldDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskyieldDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTaskyieldDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTaskyieldDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTaskwaitDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskwaitDirective>;
@@ -9667,12 +10980,34 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TASKWAIT_DIRECTIVE;
+  }
+
   static OMPTaskwaitDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskwaitDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTaskwaitDirective> from(const TokenContext &c);
   static std::optional<OMPTaskwaitDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTaskwaitDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTaskwaitDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskwaitDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTaskwaitDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTaskwaitDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTaskgroupDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskgroupDirective>;
@@ -9693,12 +11028,34 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TASKGROUP_DIRECTIVE;
+  }
+
   static OMPTaskgroupDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskgroupDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTaskgroupDirective> from(const TokenContext &c);
   static std::optional<OMPTaskgroupDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTaskgroupDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTaskgroupDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskgroupDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTaskgroupDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTaskgroupDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr reduction_reference(void) const;
 };
 
@@ -9720,12 +11077,34 @@ class OMPTaskDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TASK_DIRECTIVE;
+  }
+
   static OMPTaskDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTaskDirective> from(const TokenContext &c);
   static std::optional<OMPTaskDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTaskDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTaskDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTaskDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTaskDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_cancel(void) const;
 };
 
@@ -9747,12 +11126,34 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_UPDATE_DIRECTIVE;
+  }
+
   static OMPTargetUpdateDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetUpdateDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetUpdateDirective> from(const TokenContext &c);
   static std::optional<OMPTargetUpdateDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetUpdateDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetUpdateDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetUpdateDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetUpdateDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetUpdateDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetTeamsDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDirective>;
@@ -9773,12 +11174,34 @@ class OMPTargetTeamsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_TEAMS_DIRECTIVE;
+  }
+
   static OMPTargetTeamsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetTeamsDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetParallelDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelDirective>;
@@ -9799,12 +11222,34 @@ class OMPTargetParallelDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_PARALLEL_DIRECTIVE;
+  }
+
   static OMPTargetParallelDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetParallelDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetParallelDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetParallelDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetParallelDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetParallelDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetParallelDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetParallelDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -9827,12 +11272,34 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE;
+  }
+
   static OMPTargetExitDataDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetExitDataDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetExitDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetExitDataDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetExitDataDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetExitDataDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetExitDataDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetExitDataDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetExitDataDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetEnterDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetEnterDataDirective>;
@@ -9853,12 +11320,34 @@ class OMPTargetEnterDataDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_ENTER_DATA_DIRECTIVE;
+  }
+
   static OMPTargetEnterDataDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetEnterDataDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetEnterDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetEnterDataDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetEnterDataDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetEnterDataDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetEnterDataDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetEnterDataDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetEnterDataDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetDirective>;
@@ -9879,12 +11368,34 @@ class OMPTargetDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_DIRECTIVE;
+  }
+
   static OMPTargetDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetDirective> from(const TokenContext &c);
   static std::optional<OMPTargetDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetDataDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetDataDirective>;
@@ -9905,12 +11416,34 @@ class OMPTargetDataDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_DATA_DIRECTIVE;
+  }
+
   static OMPTargetDataDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetDataDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetDataDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetDataDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetDataDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetDataDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetDataDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetDataDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPSingleDirectiveRange = DerivedEntityRange<StmtIterator, OMPSingleDirective>;
@@ -9931,12 +11464,34 @@ class OMPSingleDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_SINGLE_DIRECTIVE;
+  }
+
   static OMPSingleDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSingleDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPSingleDirective> from(const TokenContext &c);
   static std::optional<OMPSingleDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPSingleDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPSingleDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPSingleDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPSingleDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPSingleDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPSectionsDirectiveRange = DerivedEntityRange<StmtIterator, OMPSectionsDirective>;
@@ -9957,12 +11512,34 @@ class OMPSectionsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_SECTIONS_DIRECTIVE;
+  }
+
   static OMPSectionsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSectionsDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPSectionsDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPSectionsDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPSectionsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPSectionsDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPSectionsDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPSectionsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -9985,12 +11562,34 @@ class OMPSectionDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_SECTION_DIRECTIVE;
+  }
+
   static OMPSectionDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSectionDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPSectionDirective> from(const TokenContext &c);
   static std::optional<OMPSectionDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPSectionDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPSectionDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPSectionDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPSectionDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPSectionDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_cancel(void) const;
 };
 
@@ -10012,12 +11611,34 @@ class OMPScanDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_SCAN_DIRECTIVE;
+  }
+
   static OMPScanDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPScanDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPScanDirective> from(const TokenContext &c);
   static std::optional<OMPScanDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPScanDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPScanDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPScanDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPScanDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPScanDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPParallelSectionsDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelSectionsDirective>;
@@ -10038,12 +11659,34 @@ class OMPParallelSectionsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE;
+  }
+
   static OMPParallelSectionsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelSectionsDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPParallelSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPParallelSectionsDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPParallelSectionsDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPParallelSectionsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelSectionsDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPParallelSectionsDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPParallelSectionsDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -10066,12 +11709,34 @@ class OMPParallelMasterDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_PARALLEL_MASTER_DIRECTIVE;
+  }
+
   static OMPParallelMasterDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelMasterDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPParallelMasterDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPParallelMasterDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPParallelMasterDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelMasterDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPParallelMasterDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPParallelMasterDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
 };
 
@@ -10093,12 +11758,34 @@ class OMPParallelDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_PARALLEL_DIRECTIVE;
+  }
+
   static OMPParallelDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPParallelDirective> from(const TokenContext &c);
   static std::optional<OMPParallelDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPParallelDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPParallelDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPParallelDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPParallelDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -10121,12 +11808,34 @@ class OMPOrderedDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_ORDERED_DIRECTIVE;
+  }
+
   static OMPOrderedDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPOrderedDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPOrderedDirective> from(const TokenContext &c);
   static std::optional<OMPOrderedDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPOrderedDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPOrderedDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPOrderedDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPOrderedDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPOrderedDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPMasterDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterDirective>;
@@ -10147,12 +11856,34 @@ class OMPMasterDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_MASTER_DIRECTIVE;
+  }
+
   static OMPMasterDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMasterDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPMasterDirective> from(const TokenContext &c);
   static std::optional<OMPMasterDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPMasterDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPMasterDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMasterDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPMasterDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPMasterDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPMaskedDirectiveRange = DerivedEntityRange<StmtIterator, OMPMaskedDirective>;
@@ -10173,12 +11904,34 @@ class OMPMaskedDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_MASKED_DIRECTIVE;
+  }
+
   static OMPMaskedDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMaskedDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPMaskedDirective> from(const TokenContext &c);
   static std::optional<OMPMaskedDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPMaskedDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPMaskedDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMaskedDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPMaskedDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPMaskedDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPLoopBasedDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopBasedDirective>;
@@ -10204,7 +11957,25 @@ class OMPLoopBasedDirective : public OMPExecutableDirective {
 
   static std::optional<OMPLoopBasedDirective> from(const TokenContext &c);
   static std::optional<OMPLoopBasedDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPLoopBasedDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPLoopBasedDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPLoopBasedDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPLoopBasedDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPLoopBasedDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPUnrollDirectiveRange = DerivedEntityRange<StmtIterator, OMPUnrollDirective>;
@@ -10226,13 +11997,44 @@ class OMPUnrollDirective : public OMPLoopBasedDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_UNROLL_DIRECTIVE;
+  }
+
   static OMPUnrollDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPUnrollDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPUnrollDirective> from(const TokenContext &c);
   static std::optional<OMPUnrollDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPUnrollDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPUnrollDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPUnrollDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPUnrollDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPUnrollDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPUnrollDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPUnrollDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPUnrollDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt pre_initializers(void) const;
   Stmt transformed_statement(void) const;
 };
@@ -10256,13 +12058,44 @@ class OMPTileDirective : public OMPLoopBasedDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TILE_DIRECTIVE;
+  }
+
   static OMPTileDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTileDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTileDirective> from(const TokenContext &c);
   static std::optional<OMPTileDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTileDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTileDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTileDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTileDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTileDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTileDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTileDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTileDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt pre_initializers(void) const;
   Stmt transformed_statement(void) const;
 };
@@ -10291,8 +12124,35 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
 
   static std::optional<OMPLoopDirective> from(const TokenContext &c);
   static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPLoopDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPLoopDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPLoopDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> counters(void) const;
   std::vector<Expr> dependent_counters(void) const;
   std::vector<Expr> dependent_initializers(void) const;
@@ -10353,14 +12213,54 @@ class OMPForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_FOR_SIMD_DIRECTIVE;
+  }
+
   static OMPForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPForSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPForSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPForSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPForSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPForSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPForDirectiveRange = DerivedEntityRange<StmtIterator, OMPForDirective>;
@@ -10383,14 +12283,54 @@ class OMPForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_FOR_DIRECTIVE;
+  }
+
   static OMPForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPForDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPForDirective> from(const TokenContext &c);
   static std::optional<OMPForDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPForDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPForDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPForDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPForDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPForDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -10415,14 +12355,54 @@ class OMPDistributeSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE;
+  }
+
   static OMPDistributeSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPDistributeSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPDistributeSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPDistributeSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPDistributeSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeParallelForSimdDirective>;
@@ -10445,14 +12425,54 @@ class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
+  }
+
   static OMPDistributeParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPDistributeParallelForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPDistributeParallelForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPDistributeParallelForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeParallelForSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPDistributeParallelForSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPDistributeParallelForDirective>;
@@ -10475,14 +12495,54 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
+  }
+
   static OMPDistributeParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeParallelForDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -10507,14 +12567,54 @@ class OMPDistributeDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_DISTRIBUTE_DIRECTIVE;
+  }
+
   static OMPDistributeDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPDistributeDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPDistributeDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPDistributeDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDistributeDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPDistributeDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTeamsDistributeSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeSimdDirective>;
@@ -10537,14 +12637,54 @@ class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
+  }
+
   static OMPTeamsDistributeSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTeamsDistributeSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTeamsDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeParallelForSimdDirective>;
@@ -10567,14 +12707,54 @@ class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
+  }
+
   static OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTeamsDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeParallelForDirective>;
@@ -10597,14 +12777,54 @@ class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
+  }
+
   static OMPTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTeamsDistributeParallelForDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -10629,14 +12849,54 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE;
+  }
+
   static OMPTeamsDistributeDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTeamsDistributeDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskLoopSimdDirective>;
@@ -10659,14 +12919,54 @@ class OMPTaskLoopSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE;
+  }
+
   static OMPTaskLoopSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskLoopSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTaskLoopSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTaskLoopSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTaskLoopSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskLoopSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTaskLoopSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPTaskLoopDirective>;
@@ -10689,14 +12989,54 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TASK_LOOP_DIRECTIVE;
+  }
+
   static OMPTaskLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPTaskLoopDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTaskLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTaskLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskLoopDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTaskLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTaskLoopDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTaskLoopDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_cancel(void) const;
 };
 
@@ -10720,14 +13060,54 @@ class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
+  }
+
   static OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetTeamsDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeParallelForSimdDirective>;
@@ -10750,14 +13130,54 @@ class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
+  }
+
   static OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetTeamsDistributeParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeParallelForDirective>;
@@ -10780,14 +13200,54 @@ class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
+  }
+
   static OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -10812,14 +13272,54 @@ class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE;
+  }
+
   static OMPTargetTeamsDistributeDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetTeamsDistributeDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetTeamsDistributeDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetTeamsDistributeDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetSimdDirective>;
@@ -10842,14 +13342,54 @@ class OMPTargetSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_SIMD_DIRECTIVE;
+  }
+
   static OMPTargetSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTargetSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTargetSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTargetSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTargetSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelForSimdDirective>;
@@ -10872,14 +13412,54 @@ class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE;
+  }
+
   static OMPTargetParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTargetParallelForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTargetParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTargetParallelForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTargetParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetParallelForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetParallelForSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetParallelForSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPTargetParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelForDirective>;
@@ -10902,14 +13482,54 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE;
+  }
+
   static OMPTargetParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTargetParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPTargetParallelForDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPTargetParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPTargetParallelForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPTargetParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetParallelForDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPTargetParallelForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPTargetParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTargetParallelForDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPTargetParallelForDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPTargetParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -10934,14 +13554,54 @@ class OMPSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_SIMD_DIRECTIVE;
+  }
+
   static OMPSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPSimdDirective> from(const TokenContext &c);
   static std::optional<OMPSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPParallelMasterTaskLoopSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterTaskLoopSimdDirective>;
@@ -10964,14 +13624,54 @@ class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
+  }
+
   static OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPParallelMasterTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMasterTaskLoopDirective>;
@@ -10994,14 +13694,54 @@ class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE;
+  }
+
   static OMPParallelMasterTaskLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelMasterTaskLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPParallelMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_cancel(void) const;
 };
 
@@ -11025,14 +13765,54 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE;
+  }
+
   static OMPParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPParallelForSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelForSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelForSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPParallelForSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPParallelForDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelForDirective>;
@@ -11055,14 +13835,54 @@ class OMPParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_PARALLEL_FOR_DIRECTIVE;
+  }
+
   static OMPParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPParallelForDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPParallelForDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelForDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPParallelForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelForDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPParallelForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPParallelForDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPParallelForDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPParallelForDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;
 };
@@ -11087,14 +13907,54 @@ class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
+  }
+
   static OMPMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPMasterTaskLoopSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPMasterTaskLoopSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPMasterTaskLoopSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPMasterTaskLoopSimdDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopSimdDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPMasterTaskLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterTaskLoopDirective>;
@@ -11117,14 +13977,54 @@ class OMPMasterTaskLoopDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE;
+  }
+
   static OMPMasterTaskLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMasterTaskLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPMasterTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPMasterTaskLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPMasterTaskLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPMasterTaskLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPMasterTaskLoopDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPMasterTaskLoopDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPMasterTaskLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_cancel(void) const;
 };
 
@@ -11146,12 +14046,34 @@ class OMPInteropDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_INTEROP_DIRECTIVE;
+  }
+
   static OMPInteropDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPInteropDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPInteropDirective> from(const TokenContext &c);
   static std::optional<OMPInteropDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPInteropDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPInteropDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPInteropDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPInteropDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPInteropDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPFlushDirectiveRange = DerivedEntityRange<StmtIterator, OMPFlushDirective>;
@@ -11172,12 +14094,34 @@ class OMPFlushDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_FLUSH_DIRECTIVE;
+  }
+
   static OMPFlushDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPFlushDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPFlushDirective> from(const TokenContext &c);
   static std::optional<OMPFlushDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPFlushDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPFlushDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPFlushDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPFlushDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPFlushDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPCanonicalLoopRange = DerivedEntityRange<StmtIterator, OMPCanonicalLoop>;
@@ -11197,11 +14141,24 @@ class OMPCanonicalLoop : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_CANONICAL_LOOP;
+  }
+
   static OMPCanonicalLoopContainingStmtRange containing(const Decl &decl);
   static OMPCanonicalLoopContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPCanonicalLoop> from(const TokenContext &c);
   static std::optional<OMPCanonicalLoop> from(const Stmt &parent);
+
+  inline static std::optional<OMPCanonicalLoop> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPCanonicalLoop::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CapturedStmt distance_func(void) const;
   Stmt loop_statement(void) const;
   CapturedStmt loop_variable_func(void) const;
@@ -11225,11 +14182,24 @@ class NullStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::NULL_STMT;
+  }
+
   static NullStmtContainingStmtRange containing(const Decl &decl);
   static NullStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<NullStmt> from(const TokenContext &c);
   static std::optional<NullStmt> from(const Stmt &parent);
+
+  inline static std::optional<NullStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return NullStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token semi_token(void) const;
   bool has_leading_empty_macro(void) const;
 };
@@ -11251,11 +14221,24 @@ class MSDependentExistsStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::MS_DEPENDENT_EXISTS_STMT;
+  }
+
   static MSDependentExistsStmtContainingStmtRange containing(const Decl &decl);
   static MSDependentExistsStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<MSDependentExistsStmt> from(const TokenContext &c);
   static std::optional<MSDependentExistsStmt> from(const Stmt &parent);
+
+  inline static std::optional<MSDependentExistsStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return MSDependentExistsStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token keyword_token(void) const;
   CompoundStmt sub_statement(void) const;
   bool is_if_exists(void) const;
@@ -11279,11 +14262,24 @@ class IndirectGotoStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::INDIRECT_GOTO_STMT;
+  }
+
   static IndirectGotoStmtContainingStmtRange containing(const Decl &decl);
   static IndirectGotoStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<IndirectGotoStmt> from(const TokenContext &c);
   static std::optional<IndirectGotoStmt> from(const Stmt &parent);
+
+  inline static std::optional<IndirectGotoStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return IndirectGotoStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<LabelDecl> constant_target(void) const;
   Token goto_token(void) const;
   Token star_token(void) const;
@@ -11307,11 +14303,24 @@ class IfStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::IF_STMT;
+  }
+
   static IfStmtContainingStmtRange containing(const Decl &decl);
   static IfStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<IfStmt> from(const TokenContext &c);
   static std::optional<IfStmt> from(const Stmt &parent);
+
+  inline static std::optional<IfStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return IfStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
   std::optional<DeclStmt> condition_variable_declaration_statement(void) const;
@@ -11346,11 +14355,24 @@ class GotoStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::GOTO_STMT;
+  }
+
   static GotoStmtContainingStmtRange containing(const Decl &decl);
   static GotoStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<GotoStmt> from(const TokenContext &c);
   static std::optional<GotoStmt> from(const Stmt &parent);
+
+  inline static std::optional<GotoStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return GotoStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token goto_token(void) const;
   LabelDecl label(void) const;
   Token label_token(void) const;
@@ -11373,11 +14395,24 @@ class ForStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::FOR_STMT;
+  }
+
   static ForStmtContainingStmtRange containing(const Decl &decl);
   static ForStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ForStmt> from(const TokenContext &c);
   static std::optional<ForStmt> from(const Stmt &parent);
+
+  inline static std::optional<ForStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ForStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt body(void) const;
   std::optional<Expr> condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
@@ -11406,11 +14441,24 @@ class DoStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DO_STMT;
+  }
+
   static DoStmtContainingStmtRange containing(const Decl &decl);
   static DoStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DoStmt> from(const TokenContext &c);
   static std::optional<DoStmt> from(const Stmt &parent);
+
+  inline static std::optional<DoStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DoStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt body(void) const;
   Expr condition(void) const;
   Token do_token(void) const;
@@ -11435,11 +14483,24 @@ class DeclStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DECL_STMT;
+  }
+
   static DeclStmtContainingStmtRange containing(const Decl &decl);
   static DeclStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DeclStmt> from(const TokenContext &c);
   static std::optional<DeclStmt> from(const Stmt &parent);
+
+  inline static std::optional<DeclStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DeclStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Decl> declarations(void) const;
   std::optional<Decl> single_declaration(void) const;
   bool is_single_declaration(void) const;
@@ -11462,11 +14523,24 @@ class CoroutineBodyStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::COROUTINE_BODY_STMT;
+  }
+
   static CoroutineBodyStmtContainingStmtRange containing(const Decl &decl);
   static CoroutineBodyStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CoroutineBodyStmt> from(const TokenContext &c);
   static std::optional<CoroutineBodyStmt> from(const Stmt &parent);
+
+  inline static std::optional<CoroutineBodyStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CoroutineBodyStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr allocate(void) const;
   Stmt body(void) const;
   Expr deallocate(void) const;
@@ -11501,11 +14575,24 @@ class CoreturnStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CORETURN_STMT;
+  }
+
   static CoreturnStmtContainingStmtRange containing(const Decl &decl);
   static CoreturnStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CoreturnStmt> from(const TokenContext &c);
   static std::optional<CoreturnStmt> from(const Stmt &parent);
+
+  inline static std::optional<CoreturnStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CoreturnStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token keyword_token(void) const;
   Expr operand(void) const;
   Expr promise_call(void) const;
@@ -11529,11 +14616,24 @@ class ContinueStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CONTINUE_STMT;
+  }
+
   static ContinueStmtContainingStmtRange containing(const Decl &decl);
   static ContinueStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ContinueStmt> from(const TokenContext &c);
   static std::optional<ContinueStmt> from(const Stmt &parent);
+
+  inline static std::optional<ContinueStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ContinueStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token continue_token(void) const;
 };
 
@@ -11554,11 +14654,24 @@ class CompoundStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::COMPOUND_STMT;
+  }
+
   static CompoundStmtContainingStmtRange containing(const Decl &decl);
   static CompoundStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CompoundStmt> from(const TokenContext &c);
   static std::optional<CompoundStmt> from(const Stmt &parent);
+
+  inline static std::optional<CompoundStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CompoundStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token left_brace_token(void) const;
   Token right_brace_token(void) const;
   std::optional<Stmt> statement_expression_result(void) const;
@@ -11581,11 +14694,24 @@ class CapturedStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CAPTURED_STMT;
+  }
+
   static CapturedStmtContainingStmtRange containing(const Decl &decl);
   static CapturedStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CapturedStmt> from(const TokenContext &c);
   static std::optional<CapturedStmt> from(const Stmt &parent);
+
+  inline static std::optional<CapturedStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CapturedStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CapturedDecl captured_declaration(void) const;
   RecordDecl captured_record_declaration(void) const;
   CapturedRegionKind captured_region_kind(void) const;
@@ -11609,11 +14735,24 @@ class CXXTryStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_TRY_STMT;
+  }
+
   static CXXTryStmtContainingStmtRange containing(const Decl &decl);
   static CXXTryStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXTryStmt> from(const TokenContext &c);
   static std::optional<CXXTryStmt> from(const Stmt &parent);
+
+  inline static std::optional<CXXTryStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXTryStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CompoundStmt try_block(void) const;
   Token try_token(void) const;
   std::vector<CXXCatchStmt> handlers(void) const;
@@ -11636,11 +14775,24 @@ class CXXForRangeStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_FOR_RANGE_STMT;
+  }
+
   static CXXForRangeStmtContainingStmtRange containing(const Decl &decl);
   static CXXForRangeStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXForRangeStmt> from(const TokenContext &c);
   static std::optional<CXXForRangeStmt> from(const Stmt &parent);
+
+  inline static std::optional<CXXForRangeStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXForRangeStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   DeclStmt begin_statement(void) const;
   Stmt body(void) const;
   Token coawait_token(void) const;
@@ -11674,11 +14826,24 @@ class CXXCatchStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_CATCH_STMT;
+  }
+
   static CXXCatchStmtContainingStmtRange containing(const Decl &decl);
   static CXXCatchStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXCatchStmt> from(const TokenContext &c);
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
+
+  inline static std::optional<CXXCatchStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXCatchStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token catch_token(void) const;
   Type caught_type(void) const;
   std::optional<VarDecl> exception_declaration(void) const;
@@ -11702,11 +14867,24 @@ class BreakStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::BREAK_STMT;
+  }
+
   static BreakStmtContainingStmtRange containing(const Decl &decl);
   static BreakStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<BreakStmt> from(const TokenContext &c);
   static std::optional<BreakStmt> from(const Stmt &parent);
+
+  inline static std::optional<BreakStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return BreakStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token break_token(void) const;
 };
 
@@ -11732,6 +14910,15 @@ class AsmStmt : public Stmt {
 
   static std::optional<AsmStmt> from(const TokenContext &c);
   static std::optional<AsmStmt> from(const Stmt &parent);
+
+  inline static std::optional<AsmStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return AsmStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::string_view generate_assembly_string(void) const;
   Token assembly_token(void) const;
   std::vector<Expr> inputs(void) const;
@@ -11763,12 +14950,34 @@ class MSAsmStmt : public AsmStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::MS_ASM_STMT;
+  }
+
   static MSAsmStmtContainingStmtRange containing(const Decl &decl);
   static MSAsmStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<MSAsmStmt> from(const TokenContext &c);
   static std::optional<MSAsmStmt> from(const AsmStmt &parent);
+
+  inline static std::optional<MSAsmStmt> from(const std::optional<AsmStmt> &parent) {
+    if (parent) {
+      return MSAsmStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSAsmStmt> from(const Stmt &parent);
+
+  inline static std::optional<MSAsmStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return MSAsmStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<std::string_view> all_constraints(void) const;
   std::vector<Expr> all_expressions(void) const;
   std::string_view assembly_string(void) const;
@@ -11794,12 +15003,34 @@ class GCCAsmStmt : public AsmStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::GCC_ASM_STMT;
+  }
+
   static GCCAsmStmtContainingStmtRange containing(const Decl &decl);
   static GCCAsmStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<GCCAsmStmt> from(const TokenContext &c);
   static std::optional<GCCAsmStmt> from(const AsmStmt &parent);
+
+  inline static std::optional<GCCAsmStmt> from(const std::optional<AsmStmt> &parent) {
+    if (parent) {
+      return GCCAsmStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<GCCAsmStmt> from(const Stmt &parent);
+
+  inline static std::optional<GCCAsmStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return GCCAsmStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   StringLiteral assembly_string(void) const;
   Token r_paren_token(void) const;
   bool is_assembly_goto(void) const;
@@ -11830,11 +15061,24 @@ class WhileStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::WHILE_STMT;
+  }
+
   static WhileStmtContainingStmtRange containing(const Decl &decl);
   static WhileStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<WhileStmt> from(const TokenContext &c);
   static std::optional<WhileStmt> from(const Stmt &parent);
+
+  inline static std::optional<WhileStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return WhileStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt body(void) const;
   Expr condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
@@ -11867,6 +15111,15 @@ class ValueStmt : public Stmt {
 
   static std::optional<ValueStmt> from(const TokenContext &c);
   static std::optional<ValueStmt> from(const Stmt &parent);
+
+  inline static std::optional<ValueStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ValueStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> expression_statement(void) const;
 };
 
@@ -11888,12 +15141,34 @@ class LabelStmt : public ValueStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::LABEL_STMT;
+  }
+
   static LabelStmtContainingStmtRange containing(const Decl &decl);
   static LabelStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<LabelStmt> from(const TokenContext &c);
   static std::optional<LabelStmt> from(const ValueStmt &parent);
+
+  inline static std::optional<LabelStmt> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return LabelStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<LabelStmt> from(const Stmt &parent);
+
+  inline static std::optional<LabelStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return LabelStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   LabelDecl declaration(void) const;
   Token identifier_token(void) const;
   std::string_view name(void) const;
@@ -11924,7 +15199,25 @@ class Expr : public ValueStmt {
 
   static std::optional<Expr> from(const TokenContext &c);
   static std::optional<Expr> from(const ValueStmt &parent);
+
+  inline static std::optional<Expr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return Expr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<Expr> from(const Stmt &parent);
+
+  inline static std::optional<Expr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return Expr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_side_effects(void) const;
   Expr ignore_casts(void) const;
   Expr ignore_conversion_operator_single_step(void) const;
@@ -11992,13 +15285,44 @@ class DesignatedInitUpdateExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;
+  }
+
   static DesignatedInitUpdateExprContainingStmtRange containing(const Decl &decl);
   static DesignatedInitUpdateExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DesignatedInitUpdateExpr> from(const TokenContext &c);
   static std::optional<DesignatedInitUpdateExpr> from(const Expr &parent);
+
+  inline static std::optional<DesignatedInitUpdateExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return DesignatedInitUpdateExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DesignatedInitUpdateExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<DesignatedInitUpdateExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return DesignatedInitUpdateExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DesignatedInitUpdateExpr> from(const Stmt &parent);
+
+  inline static std::optional<DesignatedInitUpdateExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DesignatedInitUpdateExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   InitListExpr updater(void) const;
 };
@@ -12022,13 +15346,44 @@ class DesignatedInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DESIGNATED_INIT_EXPR;
+  }
+
   static DesignatedInitExprContainingStmtRange containing(const Decl &decl);
   static DesignatedInitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DesignatedInitExpr> from(const TokenContext &c);
   static std::optional<DesignatedInitExpr> from(const Expr &parent);
+
+  inline static std::optional<DesignatedInitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return DesignatedInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DesignatedInitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<DesignatedInitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return DesignatedInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DesignatedInitExpr> from(const Stmt &parent);
+
+  inline static std::optional<DesignatedInitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DesignatedInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   TokenRange designators_source_range(void) const;
   Token equal_or_colon_token(void) const;
   Expr initializer(void) const;
@@ -12056,13 +15411,44 @@ class DependentScopeDeclRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;
+  }
+
   static DependentScopeDeclRefExprContainingStmtRange containing(const Decl &decl);
   static DependentScopeDeclRefExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DependentScopeDeclRefExpr> from(const TokenContext &c);
   static std::optional<DependentScopeDeclRefExpr> from(const Expr &parent);
+
+  inline static std::optional<DependentScopeDeclRefExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return DependentScopeDeclRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentScopeDeclRefExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<DependentScopeDeclRefExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return DependentScopeDeclRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentScopeDeclRefExpr> from(const Stmt &parent);
+
+  inline static std::optional<DependentScopeDeclRefExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DependentScopeDeclRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token l_angle_token(void) const;
   Token r_angle_token(void) const;
   Token template_keyword_token(void) const;
@@ -12089,13 +15475,44 @@ class DependentCoawaitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DEPENDENT_COAWAIT_EXPR;
+  }
+
   static DependentCoawaitExprContainingStmtRange containing(const Decl &decl);
   static DependentCoawaitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DependentCoawaitExpr> from(const TokenContext &c);
   static std::optional<DependentCoawaitExpr> from(const Expr &parent);
+
+  inline static std::optional<DependentCoawaitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return DependentCoawaitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentCoawaitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<DependentCoawaitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return DependentCoawaitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DependentCoawaitExpr> from(const Stmt &parent);
+
+  inline static std::optional<DependentCoawaitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DependentCoawaitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token keyword_token(void) const;
   Expr operand(void) const;
   UnresolvedLookupExpr operator_coawait_lookup(void) const;
@@ -12120,13 +15537,44 @@ class DeclRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DECL_REF_EXPR;
+  }
+
   static DeclRefExprContainingStmtRange containing(const Decl &decl);
   static DeclRefExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DeclRefExpr> from(const TokenContext &c);
   static std::optional<DeclRefExpr> from(const Expr &parent);
+
+  inline static std::optional<DeclRefExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return DeclRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DeclRefExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<DeclRefExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return DeclRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DeclRefExpr> from(const Stmt &parent);
+
+  inline static std::optional<DeclRefExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DeclRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ValueDecl declaration(void) const;
   NamedDecl found_declaration(void) const;
   Token l_angle_token(void) const;
@@ -12165,8 +15613,35 @@ class CoroutineSuspendExpr : public Expr {
 
   static std::optional<CoroutineSuspendExpr> from(const TokenContext &c);
   static std::optional<CoroutineSuspendExpr> from(const Expr &parent);
+
+  inline static std::optional<CoroutineSuspendExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CoroutineSuspendExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoroutineSuspendExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CoroutineSuspendExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CoroutineSuspendExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoroutineSuspendExpr> from(const Stmt &parent);
+
+  inline static std::optional<CoroutineSuspendExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CoroutineSuspendExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr common_expression(void) const;
   Token keyword_token(void) const;
   OpaqueValueExpr opaque_value(void) const;
@@ -12195,14 +15670,54 @@ class CoawaitExpr : public CoroutineSuspendExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::COAWAIT_EXPR;
+  }
+
   static CoawaitExprContainingStmtRange containing(const Decl &decl);
   static CoawaitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CoawaitExpr> from(const TokenContext &c);
   static std::optional<CoawaitExpr> from(const CoroutineSuspendExpr &parent);
+
+  inline static std::optional<CoawaitExpr> from(const std::optional<CoroutineSuspendExpr> &parent) {
+    if (parent) {
+      return CoawaitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoawaitExpr> from(const Expr &parent);
+
+  inline static std::optional<CoawaitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CoawaitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoawaitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CoawaitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CoawaitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoawaitExpr> from(const Stmt &parent);
+
+  inline static std::optional<CoawaitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CoawaitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr operand(void) const;
   bool is_implicit(void) const;
 };
@@ -12227,14 +15742,54 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::COYIELD_EXPR;
+  }
+
   static CoyieldExprContainingStmtRange containing(const Decl &decl);
   static CoyieldExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CoyieldExpr> from(const TokenContext &c);
   static std::optional<CoyieldExpr> from(const CoroutineSuspendExpr &parent);
+
+  inline static std::optional<CoyieldExpr> from(const std::optional<CoroutineSuspendExpr> &parent) {
+    if (parent) {
+      return CoyieldExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoyieldExpr> from(const Expr &parent);
+
+  inline static std::optional<CoyieldExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CoyieldExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoyieldExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CoyieldExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CoyieldExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CoyieldExpr> from(const Stmt &parent);
+
+  inline static std::optional<CoyieldExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CoyieldExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr operand(void) const;
 };
 
@@ -12257,17 +15812,47 @@ class ConvertVectorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CONVERT_VECTOR_EXPR;
+  }
+
   static ConvertVectorExprContainingStmtRange containing(const Decl &decl);
   static ConvertVectorExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ConvertVectorExpr> from(const TokenContext &c);
   static std::optional<ConvertVectorExpr> from(const Expr &parent);
+
+  inline static std::optional<ConvertVectorExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ConvertVectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConvertVectorExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ConvertVectorExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ConvertVectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConvertVectorExpr> from(const Stmt &parent);
+
+  inline static std::optional<ConvertVectorExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ConvertVectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
   Expr src_expression(void) const;
-  Type type_source_info(void) const;
 };
 
 using ConceptSpecializationExprRange = DerivedEntityRange<StmtIterator, ConceptSpecializationExpr>;
@@ -12289,13 +15874,44 @@ class ConceptSpecializationExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
+  }
+
   static ConceptSpecializationExprContainingStmtRange containing(const Decl &decl);
   static ConceptSpecializationExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ConceptSpecializationExpr> from(const TokenContext &c);
   static std::optional<ConceptSpecializationExpr> from(const Expr &parent);
+
+  inline static std::optional<ConceptSpecializationExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ConceptSpecializationExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConceptSpecializationExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ConceptSpecializationExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ConceptSpecializationExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConceptSpecializationExpr> from(const Stmt &parent);
+
+  inline static std::optional<ConceptSpecializationExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ConceptSpecializationExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<TemplateArgument> template_arguments(void) const;
   bool is_satisfied(void) const;
 };
@@ -12319,16 +15935,46 @@ class CompoundLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::COMPOUND_LITERAL_EXPR;
+  }
+
   static CompoundLiteralExprContainingStmtRange containing(const Decl &decl);
   static CompoundLiteralExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CompoundLiteralExpr> from(const TokenContext &c);
   static std::optional<CompoundLiteralExpr> from(const Expr &parent);
+
+  inline static std::optional<CompoundLiteralExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CompoundLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CompoundLiteralExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CompoundLiteralExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CompoundLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CompoundLiteralExpr> from(const Stmt &parent);
+
+  inline static std::optional<CompoundLiteralExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CompoundLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr initializer(void) const;
   Token l_paren_token(void) const;
-  Type type_source_info(void) const;
   bool is_file_scope(void) const;
 };
 
@@ -12351,13 +15997,44 @@ class ChooseExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CHOOSE_EXPR;
+  }
+
   static ChooseExprContainingStmtRange containing(const Decl &decl);
   static ChooseExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ChooseExpr> from(const TokenContext &c);
   static std::optional<ChooseExpr> from(const Expr &parent);
+
+  inline static std::optional<ChooseExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ChooseExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ChooseExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ChooseExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ChooseExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ChooseExpr> from(const Stmt &parent);
+
+  inline static std::optional<ChooseExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ChooseExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token builtin_token(void) const;
   Expr chosen_sub_expression(void) const;
   Expr condition(void) const;
@@ -12387,13 +16064,44 @@ class CharacterLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CHARACTER_LITERAL;
+  }
+
   static CharacterLiteralContainingStmtRange containing(const Decl &decl);
   static CharacterLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CharacterLiteral> from(const TokenContext &c);
   static std::optional<CharacterLiteral> from(const Expr &parent);
+
+  inline static std::optional<CharacterLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CharacterLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CharacterLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<CharacterLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CharacterLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CharacterLiteral> from(const Stmt &parent);
+
+  inline static std::optional<CharacterLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CharacterLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
 };
 
@@ -12421,8 +16129,35 @@ class CastExpr : public Expr {
 
   static std::optional<CastExpr> from(const TokenContext &c);
   static std::optional<CastExpr> from(const Expr &parent);
+
+  inline static std::optional<CastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CastKind cast_kind(void) const;
   std::string_view cast_kind_name(void) const;
   std::optional<NamedDecl> conversion_function(void) const;
@@ -12452,14 +16187,54 @@ class ImplicitCastExpr : public CastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::IMPLICIT_CAST_EXPR;
+  }
+
   static ImplicitCastExprContainingStmtRange containing(const Decl &decl);
   static ImplicitCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ImplicitCastExpr> from(const TokenContext &c);
   static std::optional<ImplicitCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<ImplicitCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return ImplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitCastExpr> from(const Expr &parent);
+
+  inline static std::optional<ImplicitCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ImplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ImplicitCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ImplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<ImplicitCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ImplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool is_part_of_explicit_cast(void) const;
 };
 
@@ -12488,11 +16263,46 @@ class ExplicitCastExpr : public CastExpr {
 
   static std::optional<ExplicitCastExpr> from(const TokenContext &c);
   static std::optional<ExplicitCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<ExplicitCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return ExplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExplicitCastExpr> from(const Expr &parent);
+
+  inline static std::optional<ExplicitCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ExplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExplicitCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ExplicitCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ExplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExplicitCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<ExplicitCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ExplicitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type type_as_written(void) const;
-  Type type_info_as_written(void) const;
 };
 
 using CXXNamedCastExprRange = DerivedEntityRange<StmtIterator, CXXNamedCastExpr>;
@@ -12521,10 +16331,55 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
 
   static std::optional<CXXNamedCastExpr> from(const TokenContext &c);
   static std::optional<CXXNamedCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CXXNamedCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CXXNamedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNamedCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CXXNamedCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CXXNamedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNamedCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXNamedCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXNamedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNamedCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXNamedCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXNamedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNamedCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXNamedCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXNamedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   TokenRange angle_brackets(void) const;
   std::string_view cast_name(void) const;
   Token operator_token(void) const;
@@ -12553,16 +16408,74 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_DYNAMIC_CAST_EXPR;
+  }
+
   static CXXDynamicCastExprContainingStmtRange containing(const Decl &decl);
   static CXXDynamicCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXDynamicCastExpr> from(const TokenContext &c);
   static std::optional<CXXDynamicCastExpr> from(const CXXNamedCastExpr &parent);
+
+  inline static std::optional<CXXDynamicCastExpr> from(const std::optional<CXXNamedCastExpr> &parent) {
+    if (parent) {
+      return CXXDynamicCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDynamicCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CXXDynamicCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CXXDynamicCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDynamicCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CXXDynamicCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CXXDynamicCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDynamicCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXDynamicCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXDynamicCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDynamicCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXDynamicCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXDynamicCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDynamicCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXDynamicCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXDynamicCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool is_always_null(void) const;
 };
 
@@ -12588,16 +16501,74 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_CONST_CAST_EXPR;
+  }
+
   static CXXConstCastExprContainingStmtRange containing(const Decl &decl);
   static CXXConstCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXConstCastExpr> from(const TokenContext &c);
   static std::optional<CXXConstCastExpr> from(const CXXNamedCastExpr &parent);
+
+  inline static std::optional<CXXConstCastExpr> from(const std::optional<CXXNamedCastExpr> &parent) {
+    if (parent) {
+      return CXXConstCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CXXConstCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CXXConstCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CXXConstCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CXXConstCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXConstCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXConstCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXConstCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXConstCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXConstCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXConstCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using CXXAddrspaceCastExprRange = DerivedEntityRange<StmtIterator, CXXAddrspaceCastExpr>;
@@ -12622,16 +16593,74 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_ADDRSPACE_CAST_EXPR;
+  }
+
   static CXXAddrspaceCastExprContainingStmtRange containing(const Decl &decl);
   static CXXAddrspaceCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXAddrspaceCastExpr> from(const TokenContext &c);
   static std::optional<CXXAddrspaceCastExpr> from(const CXXNamedCastExpr &parent);
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<CXXNamedCastExpr> &parent) {
+    if (parent) {
+      return CXXAddrspaceCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXAddrspaceCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CXXAddrspaceCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXAddrspaceCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CXXAddrspaceCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXAddrspaceCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXAddrspaceCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXAddrspaceCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXAddrspaceCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXAddrspaceCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXAddrspaceCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using CXXStaticCastExprRange = DerivedEntityRange<StmtIterator, CXXStaticCastExpr>;
@@ -12656,16 +16685,74 @@ class CXXStaticCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_STATIC_CAST_EXPR;
+  }
+
   static CXXStaticCastExprContainingStmtRange containing(const Decl &decl);
   static CXXStaticCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXStaticCastExpr> from(const TokenContext &c);
   static std::optional<CXXStaticCastExpr> from(const CXXNamedCastExpr &parent);
+
+  inline static std::optional<CXXStaticCastExpr> from(const std::optional<CXXNamedCastExpr> &parent) {
+    if (parent) {
+      return CXXStaticCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXStaticCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CXXStaticCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CXXStaticCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXStaticCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CXXStaticCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CXXStaticCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXStaticCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXStaticCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXStaticCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXStaticCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXStaticCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXStaticCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXStaticCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXStaticCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXStaticCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using CXXReinterpretCastExprRange = DerivedEntityRange<StmtIterator, CXXReinterpretCastExpr>;
@@ -12690,16 +16777,74 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_REINTERPRET_CAST_EXPR;
+  }
+
   static CXXReinterpretCastExprContainingStmtRange containing(const Decl &decl);
   static CXXReinterpretCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXReinterpretCastExpr> from(const TokenContext &c);
   static std::optional<CXXReinterpretCastExpr> from(const CXXNamedCastExpr &parent);
+
+  inline static std::optional<CXXReinterpretCastExpr> from(const std::optional<CXXNamedCastExpr> &parent) {
+    if (parent) {
+      return CXXReinterpretCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXReinterpretCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CXXReinterpretCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CXXReinterpretCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXReinterpretCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CXXReinterpretCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CXXReinterpretCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXReinterpretCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXReinterpretCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXReinterpretCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXReinterpretCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXReinterpretCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXReinterpretCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXReinterpretCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXReinterpretCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXReinterpretCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using CXXFunctionalCastExprRange = DerivedEntityRange<StmtIterator, CXXFunctionalCastExpr>;
@@ -12723,15 +16868,64 @@ class CXXFunctionalCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_FUNCTIONAL_CAST_EXPR;
+  }
+
   static CXXFunctionalCastExprContainingStmtRange containing(const Decl &decl);
   static CXXFunctionalCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXFunctionalCastExpr> from(const TokenContext &c);
   static std::optional<CXXFunctionalCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CXXFunctionalCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CXXFunctionalCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXFunctionalCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CXXFunctionalCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CXXFunctionalCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXFunctionalCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXFunctionalCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXFunctionalCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXFunctionalCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXFunctionalCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXFunctionalCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXFunctionalCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXFunctionalCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXFunctionalCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   bool is_list_initialization(void) const;
@@ -12758,15 +16952,64 @@ class CStyleCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::C_STYLE_CAST_EXPR;
+  }
+
   static CStyleCastExprContainingStmtRange containing(const Decl &decl);
   static CStyleCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CStyleCastExpr> from(const TokenContext &c);
   static std::optional<CStyleCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<CStyleCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return CStyleCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CStyleCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<CStyleCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return CStyleCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CStyleCastExpr> from(const Expr &parent);
+
+  inline static std::optional<CStyleCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CStyleCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CStyleCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CStyleCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CStyleCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CStyleCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<CStyleCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CStyleCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
 };
@@ -12792,15 +17035,64 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::BUILTIN_BIT_CAST_EXPR;
+  }
+
   static BuiltinBitCastExprContainingStmtRange containing(const Decl &decl);
   static BuiltinBitCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<BuiltinBitCastExpr> from(const TokenContext &c);
   static std::optional<BuiltinBitCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<BuiltinBitCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return BuiltinBitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BuiltinBitCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<BuiltinBitCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return BuiltinBitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BuiltinBitCastExpr> from(const Expr &parent);
+
+  inline static std::optional<BuiltinBitCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return BuiltinBitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BuiltinBitCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<BuiltinBitCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return BuiltinBitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BuiltinBitCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<BuiltinBitCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return BuiltinBitCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using ObjCBridgedCastExprRange = DerivedEntityRange<StmtIterator, ObjCBridgedCastExpr>;
@@ -12824,15 +17116,64 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;
+  }
+
   static ObjCBridgedCastExprContainingStmtRange containing(const Decl &decl);
   static ObjCBridgedCastExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCBridgedCastExpr> from(const TokenContext &c);
   static std::optional<ObjCBridgedCastExpr> from(const ExplicitCastExpr &parent);
+
+  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
+    if (parent) {
+      return ObjCBridgedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBridgedCastExpr> from(const CastExpr &parent);
+
+  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<CastExpr> &parent) {
+    if (parent) {
+      return ObjCBridgedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBridgedCastExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCBridgedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBridgedCastExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCBridgedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBridgedCastExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCBridgedCastExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token bridge_keyword_token(void) const;
   ObjCBridgeCastKind bridge_kind(void) const;
   std::string_view bridge_kind_name(void) const;
@@ -12858,13 +17199,44 @@ class CallExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CALL_EXPR;
+  }
+
   static CallExprContainingStmtRange containing(const Decl &decl);
   static CallExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CallExpr> from(const TokenContext &c);
   static std::optional<CallExpr> from(const Expr &parent);
+
+  inline static std::optional<CallExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CallExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CallExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CallExpr> from(const Stmt &parent);
+
+  inline static std::optional<CallExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> arguments(void) const;
   CallExprADLCallKind adl_call_kind(void) const;
   Type call_return_type(void) const;
@@ -12900,14 +17272,54 @@ class CXXOperatorCallExpr : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_OPERATOR_CALL_EXPR;
+  }
+
   static CXXOperatorCallExprContainingStmtRange containing(const Decl &decl);
   static CXXOperatorCallExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXOperatorCallExpr> from(const TokenContext &c);
   static std::optional<CXXOperatorCallExpr> from(const CallExpr &parent);
+
+  inline static std::optional<CXXOperatorCallExpr> from(const std::optional<CallExpr> &parent) {
+    if (parent) {
+      return CXXOperatorCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXOperatorCallExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXOperatorCallExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXOperatorCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXOperatorCallExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXOperatorCallExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXOperatorCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXOperatorCallExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXOperatorCallExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXOperatorCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   OverloadedOperatorKind operator_(void) const;
   Token operator_token(void) const;
   bool is_assignment_operation(void) const;
@@ -12935,14 +17347,54 @@ class CXXMemberCallExpr : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_MEMBER_CALL_EXPR;
+  }
+
   static CXXMemberCallExprContainingStmtRange containing(const Decl &decl);
   static CXXMemberCallExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXMemberCallExpr> from(const TokenContext &c);
   static std::optional<CXXMemberCallExpr> from(const CallExpr &parent);
+
+  inline static std::optional<CXXMemberCallExpr> from(const std::optional<CallExpr> &parent) {
+    if (parent) {
+      return CXXMemberCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXMemberCallExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXMemberCallExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXMemberCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXMemberCallExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXMemberCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXMemberCallExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXMemberCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr implicit_object_argument(void) const;
   std::optional<CXXMethodDecl> method_declaration(void) const;
   Type object_type(void) const;
@@ -12969,14 +17421,54 @@ class CUDAKernelCallExpr : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CUDA_KERNEL_CALL_EXPR;
+  }
+
   static CUDAKernelCallExprContainingStmtRange containing(const Decl &decl);
   static CUDAKernelCallExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CUDAKernelCallExpr> from(const TokenContext &c);
   static std::optional<CUDAKernelCallExpr> from(const CallExpr &parent);
+
+  inline static std::optional<CUDAKernelCallExpr> from(const std::optional<CallExpr> &parent) {
+    if (parent) {
+      return CUDAKernelCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CUDAKernelCallExpr> from(const Expr &parent);
+
+  inline static std::optional<CUDAKernelCallExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CUDAKernelCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CUDAKernelCallExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CUDAKernelCallExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CUDAKernelCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CUDAKernelCallExpr> from(const Stmt &parent);
+
+  inline static std::optional<CUDAKernelCallExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CUDAKernelCallExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CallExpr config(void) const;
 };
 
@@ -13000,14 +17492,54 @@ class UserDefinedLiteral : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::USER_DEFINED_LITERAL;
+  }
+
   static UserDefinedLiteralContainingStmtRange containing(const Decl &decl);
   static UserDefinedLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<UserDefinedLiteral> from(const TokenContext &c);
   static std::optional<UserDefinedLiteral> from(const CallExpr &parent);
+
+  inline static std::optional<UserDefinedLiteral> from(const std::optional<CallExpr> &parent) {
+    if (parent) {
+      return UserDefinedLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UserDefinedLiteral> from(const Expr &parent);
+
+  inline static std::optional<UserDefinedLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return UserDefinedLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UserDefinedLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<UserDefinedLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return UserDefinedLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UserDefinedLiteral> from(const Stmt &parent);
+
+  inline static std::optional<UserDefinedLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return UserDefinedLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr cooked_literal(void) const;
   UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const;
   Token ud_suffix_token(void) const;
@@ -13032,13 +17564,44 @@ class CXXUuidofExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_UUIDOF_EXPR;
+  }
+
   static CXXUuidofExprContainingStmtRange containing(const Decl &decl);
   static CXXUuidofExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXUuidofExpr> from(const TokenContext &c);
   static std::optional<CXXUuidofExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXUuidofExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXUuidofExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXUuidofExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXUuidofExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXUuidofExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXUuidofExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXUuidofExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXUuidofExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> expression_operand(void) const;
   MSGuidDecl guid_declaration(void) const;
   Type type_operand(void) const;
@@ -13065,18 +17628,48 @@ class CXXUnresolvedConstructExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;
+  }
+
   static CXXUnresolvedConstructExprContainingStmtRange containing(const Decl &decl);
   static CXXUnresolvedConstructExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXUnresolvedConstructExpr> from(const TokenContext &c);
   static std::optional<CXXUnresolvedConstructExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXUnresolvedConstructExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXUnresolvedConstructExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXUnresolvedConstructExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXUnresolvedConstructExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXUnresolvedConstructExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXUnresolvedConstructExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXUnresolvedConstructExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXUnresolvedConstructExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> arguments(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   Type type_as_written(void) const;
-  Type type_source_info(void) const;
   bool is_list_initialization(void) const;
 };
 
@@ -13099,13 +17692,44 @@ class CXXTypeidExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_TYPEID_EXPR;
+  }
+
   static CXXTypeidExprContainingStmtRange containing(const Decl &decl);
   static CXXTypeidExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXTypeidExpr> from(const TokenContext &c);
   static std::optional<CXXTypeidExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXTypeidExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXTypeidExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXTypeidExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXTypeidExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXTypeidExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXTypeidExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXTypeidExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXTypeidExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> expression_operand(void) const;
   Type type_operand(void) const;
   Type type_operand_source_info(void) const;
@@ -13133,13 +17757,44 @@ class CXXThrowExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_THROW_EXPR;
+  }
+
   static CXXThrowExprContainingStmtRange containing(const Decl &decl);
   static CXXThrowExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXThrowExpr> from(const TokenContext &c);
   static std::optional<CXXThrowExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXThrowExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXThrowExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXThrowExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXThrowExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXThrowExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXThrowExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXThrowExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXThrowExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> sub_expression(void) const;
   Token throw_token(void) const;
   bool is_thrown_variable_in_scope(void) const;
@@ -13164,13 +17819,44 @@ class CXXThisExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_THIS_EXPR;
+  }
+
   static CXXThisExprContainingStmtRange containing(const Decl &decl);
   static CXXThisExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXThisExpr> from(const TokenContext &c);
   static std::optional<CXXThisExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXThisExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXThisExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXThisExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXThisExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXThisExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXThisExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXThisExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXThisExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
   bool is_implicit(void) const;
 };
@@ -13194,13 +17880,44 @@ class CXXStdInitializerListExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;
+  }
+
   static CXXStdInitializerListExprContainingStmtRange containing(const Decl &decl);
   static CXXStdInitializerListExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXStdInitializerListExpr> from(const TokenContext &c);
   static std::optional<CXXStdInitializerListExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXStdInitializerListExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXStdInitializerListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXStdInitializerListExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXStdInitializerListExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXStdInitializerListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXStdInitializerListExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXStdInitializerListExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXStdInitializerListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr sub_expression(void) const;
 };
 
@@ -13223,15 +17940,45 @@ class CXXScalarValueInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;
+  }
+
   static CXXScalarValueInitExprContainingStmtRange containing(const Decl &decl);
   static CXXScalarValueInitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXScalarValueInitExpr> from(const TokenContext &c);
   static std::optional<CXXScalarValueInitExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXScalarValueInitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXScalarValueInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXScalarValueInitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXScalarValueInitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXScalarValueInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXScalarValueInitExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXScalarValueInitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXScalarValueInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token r_paren_token(void) const;
-  Type type_source_info(void) const;
 };
 
 using CXXRewrittenBinaryOperatorRange = DerivedEntityRange<StmtIterator, CXXRewrittenBinaryOperator>;
@@ -13253,13 +18000,44 @@ class CXXRewrittenBinaryOperator : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
+  }
+
   static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Decl &decl);
   static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXRewrittenBinaryOperator> from(const TokenContext &c);
   static std::optional<CXXRewrittenBinaryOperator> from(const Expr &parent);
+
+  inline static std::optional<CXXRewrittenBinaryOperator> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXRewrittenBinaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXRewrittenBinaryOperator> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXRewrittenBinaryOperator> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXRewrittenBinaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent);
+
+  inline static std::optional<CXXRewrittenBinaryOperator> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXRewrittenBinaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr lhs(void) const;
   BinaryOperatorKind opcode(void) const;
   std::string_view opcode_string(void) const;
@@ -13291,20 +18069,50 @@ class CXXPseudoDestructorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR;
+  }
+
   static CXXPseudoDestructorExprContainingStmtRange containing(const Decl &decl);
   static CXXPseudoDestructorExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXPseudoDestructorExpr> from(const TokenContext &c);
   static std::optional<CXXPseudoDestructorExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXPseudoDestructorExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXPseudoDestructorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXPseudoDestructorExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXPseudoDestructorExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXPseudoDestructorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXPseudoDestructorExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXPseudoDestructorExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXPseudoDestructorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Token colon_colon_token(void) const;
   Type destroyed_type(void) const;
-  Type destroyed_type_info(void) const;
   Token destroyed_type_token(void) const;
   Token operator_token(void) const;
-  Type scope_type_info(void) const;
+  Type scope_type(void) const;
   Token tilde_token(void) const;
   bool has_qualifier(void) const;
   bool is_arrow(void) const;
@@ -13329,13 +18137,44 @@ class CXXNullPtrLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_NULL_PTR_LITERAL_EXPR;
+  }
+
   static CXXNullPtrLiteralExprContainingStmtRange containing(const Decl &decl);
   static CXXNullPtrLiteralExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXNullPtrLiteralExpr> from(const TokenContext &c);
   static std::optional<CXXNullPtrLiteralExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXNullPtrLiteralExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXNullPtrLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNullPtrLiteralExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXNullPtrLiteralExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXNullPtrLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNullPtrLiteralExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXNullPtrLiteralExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXNullPtrLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
 };
 
@@ -13358,13 +18197,44 @@ class CXXNoexceptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_NOEXCEPT_EXPR;
+  }
+
   static CXXNoexceptExprContainingStmtRange containing(const Decl &decl);
   static CXXNoexceptExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXNoexceptExpr> from(const TokenContext &c);
   static std::optional<CXXNoexceptExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXNoexceptExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXNoexceptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNoexceptExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXNoexceptExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXNoexceptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNoexceptExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXNoexceptExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXNoexceptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr operand(void) const;
   bool value(void) const;
 };
@@ -13388,16 +18258,46 @@ class CXXNewExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_NEW_EXPR;
+  }
+
   static CXXNewExprContainingStmtRange containing(const Decl &decl);
   static CXXNewExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXNewExpr> from(const TokenContext &c);
   static std::optional<CXXNewExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXNewExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXNewExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNewExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXNewExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXNewExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXNewExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXNewExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXNewExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool does_usual_array_delete_want_size(void) const;
   Type allocated_type(void) const;
-  Type allocated_type_source_info(void) const;
   std::optional<Expr> array_size(void) const;
   std::optional<CXXConstructExpr> construct_expression(void) const;
   TokenRange direct_initializer_range(void) const;
@@ -13434,13 +18334,44 @@ class CXXInheritedCtorInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;
+  }
+
   static CXXInheritedCtorInitExprContainingStmtRange containing(const Decl &decl);
   static CXXInheritedCtorInitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &c);
   static std::optional<CXXInheritedCtorInitExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXInheritedCtorInitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXInheritedCtorInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXInheritedCtorInitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXInheritedCtorInitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXInheritedCtorInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXInheritedCtorInitExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXInheritedCtorInitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXInheritedCtorInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool constructs_virtual_base(void) const;
   CXXConstructExprConstructionKind construction_kind(void) const;
   CXXConstructorDecl constructor(void) const;
@@ -13467,13 +18398,44 @@ class CXXFoldExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_FOLD_EXPR;
+  }
+
   static CXXFoldExprContainingStmtRange containing(const Decl &decl);
   static CXXFoldExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXFoldExpr> from(const TokenContext &c);
   static std::optional<CXXFoldExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXFoldExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXFoldExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXFoldExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXFoldExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXFoldExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXFoldExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXFoldExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXFoldExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   UnresolvedLookupExpr callee(void) const;
   Token ellipsis_token(void) const;
   Expr initializer(void) const;
@@ -13507,13 +18469,44 @@ class CXXDependentScopeMemberExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;
+  }
+
   static CXXDependentScopeMemberExprContainingStmtRange containing(const Decl &decl);
   static CXXDependentScopeMemberExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXDependentScopeMemberExpr> from(const TokenContext &c);
   static std::optional<CXXDependentScopeMemberExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXDependentScopeMemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXDependentScopeMemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXDependentScopeMemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Type base_type(void) const;
   std::optional<NamedDecl> first_qualifier_found_in_scope(void) const;
@@ -13547,13 +18540,44 @@ class CXXDeleteExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_DELETE_EXPR;
+  }
+
   static CXXDeleteExprContainingStmtRange containing(const Decl &decl);
   static CXXDeleteExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXDeleteExpr> from(const TokenContext &c);
   static std::optional<CXXDeleteExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXDeleteExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXDeleteExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDeleteExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXDeleteExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXDeleteExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDeleteExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXDeleteExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXDeleteExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool does_usual_array_delete_want_size(void) const;
   Expr argument(void) const;
   Type destroyed_type(void) const;
@@ -13582,13 +18606,44 @@ class CXXDefaultInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_DEFAULT_INIT_EXPR;
+  }
+
   static CXXDefaultInitExprContainingStmtRange containing(const Decl &decl);
   static CXXDefaultInitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXDefaultInitExpr> from(const TokenContext &c);
   static std::optional<CXXDefaultInitExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXDefaultInitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXDefaultInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDefaultInitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXDefaultInitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXDefaultInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDefaultInitExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXDefaultInitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXDefaultInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> expression(void) const;
   FieldDecl field(void) const;
   Token used_token(void) const;
@@ -13613,13 +18668,44 @@ class CXXDefaultArgExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_DEFAULT_ARG_EXPR;
+  }
+
   static CXXDefaultArgExprContainingStmtRange containing(const Decl &decl);
   static CXXDefaultArgExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXDefaultArgExpr> from(const TokenContext &c);
   static std::optional<CXXDefaultArgExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXDefaultArgExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXDefaultArgExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDefaultArgExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXDefaultArgExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXDefaultArgExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDefaultArgExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXDefaultArgExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXDefaultArgExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr expression(void) const;
   ParmVarDecl parameter(void) const;
   Token used_token(void) const;
@@ -13644,13 +18730,44 @@ class CXXConstructExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_CONSTRUCT_EXPR;
+  }
+
   static CXXConstructExprContainingStmtRange containing(const Decl &decl);
   static CXXConstructExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXConstructExpr> from(const TokenContext &c);
   static std::optional<CXXConstructExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXConstructExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXConstructExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstructExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXConstructExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXConstructExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstructExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXConstructExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXConstructExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> arguments(void) const;
   CXXConstructExprConstructionKind construction_kind(void) const;
   CXXConstructorDecl constructor(void) const;
@@ -13683,15 +18800,54 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;
+  }
+
   static CXXTemporaryObjectExprContainingStmtRange containing(const Decl &decl);
   static CXXTemporaryObjectExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXTemporaryObjectExpr> from(const TokenContext &c);
   static std::optional<CXXTemporaryObjectExpr> from(const CXXConstructExpr &parent);
+
+  inline static std::optional<CXXTemporaryObjectExpr> from(const std::optional<CXXConstructExpr> &parent) {
+    if (parent) {
+      return CXXTemporaryObjectExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXTemporaryObjectExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXTemporaryObjectExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXTemporaryObjectExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXTemporaryObjectExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXTemporaryObjectExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXTemporaryObjectExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXTemporaryObjectExpr> from(const Stmt &parent);
-  Type type_source_info(void) const;
+
+  inline static std::optional<CXXTemporaryObjectExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXTemporaryObjectExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using CXXBoolLiteralExprRange = DerivedEntityRange<StmtIterator, CXXBoolLiteralExpr>;
@@ -13713,13 +18869,44 @@ class CXXBoolLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_BOOL_LITERAL_EXPR;
+  }
+
   static CXXBoolLiteralExprContainingStmtRange containing(const Decl &decl);
   static CXXBoolLiteralExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXBoolLiteralExpr> from(const TokenContext &c);
   static std::optional<CXXBoolLiteralExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXBoolLiteralExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXBoolLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXBoolLiteralExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXBoolLiteralExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXBoolLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXBoolLiteralExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXBoolLiteralExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXBoolLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
   bool value(void) const;
 };
@@ -13743,13 +18930,44 @@ class CXXBindTemporaryExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CXX_BIND_TEMPORARY_EXPR;
+  }
+
   static CXXBindTemporaryExprContainingStmtRange containing(const Decl &decl);
   static CXXBindTemporaryExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CXXBindTemporaryExpr> from(const TokenContext &c);
   static std::optional<CXXBindTemporaryExpr> from(const Expr &parent);
+
+  inline static std::optional<CXXBindTemporaryExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CXXBindTemporaryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXBindTemporaryExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<CXXBindTemporaryExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CXXBindTemporaryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXBindTemporaryExpr> from(const Stmt &parent);
+
+  inline static std::optional<CXXBindTemporaryExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CXXBindTemporaryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr sub_expression(void) const;
 };
 
@@ -13772,13 +18990,44 @@ class BlockExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::BLOCK_EXPR;
+  }
+
   static BlockExprContainingStmtRange containing(const Decl &decl);
   static BlockExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<BlockExpr> from(const TokenContext &c);
   static std::optional<BlockExpr> from(const Expr &parent);
+
+  inline static std::optional<BlockExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return BlockExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BlockExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<BlockExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return BlockExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BlockExpr> from(const Stmt &parent);
+
+  inline static std::optional<BlockExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return BlockExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   BlockDecl block_declaration(void) const;
   Stmt body(void) const;
   Token caret_token(void) const;
@@ -13804,13 +19053,44 @@ class BinaryOperator : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::BINARY_OPERATOR;
+  }
+
   static BinaryOperatorContainingStmtRange containing(const Decl &decl);
   static BinaryOperatorContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<BinaryOperator> from(const TokenContext &c);
   static std::optional<BinaryOperator> from(const Expr &parent);
+
+  inline static std::optional<BinaryOperator> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return BinaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BinaryOperator> from(const ValueStmt &parent);
+
+  inline static std::optional<BinaryOperator> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return BinaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BinaryOperator> from(const Stmt &parent);
+
+  inline static std::optional<BinaryOperator> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return BinaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr lhs(void) const;
   BinaryOperatorKind opcode(void) const;
   std::string_view opcode_string(void) const;
@@ -13852,14 +19132,54 @@ class CompoundAssignOperator : public BinaryOperator {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::COMPOUND_ASSIGN_OPERATOR;
+  }
+
   static CompoundAssignOperatorContainingStmtRange containing(const Decl &decl);
   static CompoundAssignOperatorContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CompoundAssignOperator> from(const TokenContext &c);
   static std::optional<CompoundAssignOperator> from(const BinaryOperator &parent);
+
+  inline static std::optional<CompoundAssignOperator> from(const std::optional<BinaryOperator> &parent) {
+    if (parent) {
+      return CompoundAssignOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CompoundAssignOperator> from(const Expr &parent);
+
+  inline static std::optional<CompoundAssignOperator> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return CompoundAssignOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CompoundAssignOperator> from(const ValueStmt &parent);
+
+  inline static std::optional<CompoundAssignOperator> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return CompoundAssignOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CompoundAssignOperator> from(const Stmt &parent);
+
+  inline static std::optional<CompoundAssignOperator> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CompoundAssignOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type computation_lhs_type(void) const;
   Type computation_result_type(void) const;
 };
@@ -13883,13 +19203,44 @@ class AtomicExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::ATOMIC_EXPR;
+  }
+
   static AtomicExprContainingStmtRange containing(const Decl &decl);
   static AtomicExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<AtomicExpr> from(const TokenContext &c);
   static std::optional<AtomicExpr> from(const Expr &parent);
+
+  inline static std::optional<AtomicExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return AtomicExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AtomicExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<AtomicExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return AtomicExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AtomicExpr> from(const Stmt &parent);
+
+  inline static std::optional<AtomicExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return AtomicExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token builtin_token(void) const;
   AtomicExprAtomicOp operation(void) const;
   Expr order(void) const;
@@ -13926,13 +19277,44 @@ class AsTypeExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::AS_TYPE_EXPR;
+  }
+
   static AsTypeExprContainingStmtRange containing(const Decl &decl);
   static AsTypeExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<AsTypeExpr> from(const TokenContext &c);
   static std::optional<AsTypeExpr> from(const Expr &parent);
+
+  inline static std::optional<AsTypeExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return AsTypeExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AsTypeExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<AsTypeExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return AsTypeExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AsTypeExpr> from(const Stmt &parent);
+
+  inline static std::optional<AsTypeExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return AsTypeExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
   Expr src_expression(void) const;
@@ -13957,16 +19339,46 @@ class ArrayTypeTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
+  }
+
   static ArrayTypeTraitExprContainingStmtRange containing(const Decl &decl);
   static ArrayTypeTraitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ArrayTypeTraitExpr> from(const TokenContext &c);
   static std::optional<ArrayTypeTraitExpr> from(const Expr &parent);
+
+  inline static std::optional<ArrayTypeTraitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ArrayTypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArrayTypeTraitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ArrayTypeTraitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ArrayTypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
+
+  inline static std::optional<ArrayTypeTraitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ArrayTypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr dimension_expression(void) const;
   Type queried_type(void) const;
-  Type queried_type_source_info(void) const;
   ArrayTypeTrait trait(void) const;
 };
 
@@ -13989,13 +19401,44 @@ class ArraySubscriptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::ARRAY_SUBSCRIPT_EXPR;
+  }
+
   static ArraySubscriptExprContainingStmtRange containing(const Decl &decl);
   static ArraySubscriptExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ArraySubscriptExpr> from(const TokenContext &c);
   static std::optional<ArraySubscriptExpr> from(const Expr &parent);
+
+  inline static std::optional<ArraySubscriptExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ArraySubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArraySubscriptExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ArraySubscriptExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ArraySubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArraySubscriptExpr> from(const Stmt &parent);
+
+  inline static std::optional<ArraySubscriptExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ArraySubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Expr index(void) const;
   Expr lhs(void) const;
@@ -14022,13 +19465,44 @@ class ArrayInitLoopExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::ARRAY_INIT_LOOP_EXPR;
+  }
+
   static ArrayInitLoopExprContainingStmtRange containing(const Decl &decl);
   static ArrayInitLoopExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ArrayInitLoopExpr> from(const TokenContext &c);
   static std::optional<ArrayInitLoopExpr> from(const Expr &parent);
+
+  inline static std::optional<ArrayInitLoopExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ArrayInitLoopExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArrayInitLoopExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ArrayInitLoopExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ArrayInitLoopExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArrayInitLoopExpr> from(const Stmt &parent);
+
+  inline static std::optional<ArrayInitLoopExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ArrayInitLoopExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   OpaqueValueExpr common_expression(void) const;
   Expr sub_expression(void) const;
 };
@@ -14052,13 +19526,44 @@ class ArrayInitIndexExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::ARRAY_INIT_INDEX_EXPR;
+  }
+
   static ArrayInitIndexExprContainingStmtRange containing(const Decl &decl);
   static ArrayInitIndexExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ArrayInitIndexExpr> from(const TokenContext &c);
   static std::optional<ArrayInitIndexExpr> from(const Expr &parent);
+
+  inline static std::optional<ArrayInitIndexExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ArrayInitIndexExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArrayInitIndexExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ArrayInitIndexExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ArrayInitIndexExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ArrayInitIndexExpr> from(const Stmt &parent);
+
+  inline static std::optional<ArrayInitIndexExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ArrayInitIndexExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using AddrLabelExprRange = DerivedEntityRange<StmtIterator, AddrLabelExpr>;
@@ -14080,13 +19585,44 @@ class AddrLabelExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::ADDR_LABEL_EXPR;
+  }
+
   static AddrLabelExprContainingStmtRange containing(const Decl &decl);
   static AddrLabelExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<AddrLabelExpr> from(const TokenContext &c);
   static std::optional<AddrLabelExpr> from(const Expr &parent);
+
+  inline static std::optional<AddrLabelExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return AddrLabelExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AddrLabelExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<AddrLabelExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return AddrLabelExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AddrLabelExpr> from(const Stmt &parent);
+
+  inline static std::optional<AddrLabelExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return AddrLabelExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token amp_amp_token(void) const;
   LabelDecl label(void) const;
   Token label_token(void) const;
@@ -14116,8 +19652,35 @@ class AbstractConditionalOperator : public Expr {
 
   static std::optional<AbstractConditionalOperator> from(const TokenContext &c);
   static std::optional<AbstractConditionalOperator> from(const Expr &parent);
+
+  inline static std::optional<AbstractConditionalOperator> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return AbstractConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AbstractConditionalOperator> from(const ValueStmt &parent);
+
+  inline static std::optional<AbstractConditionalOperator> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return AbstractConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AbstractConditionalOperator> from(const Stmt &parent);
+
+  inline static std::optional<AbstractConditionalOperator> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return AbstractConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token colon_token(void) const;
   Expr condition(void) const;
   Expr false_expression(void) const;
@@ -14145,14 +19708,54 @@ class ConditionalOperator : public AbstractConditionalOperator {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CONDITIONAL_OPERATOR;
+  }
+
   static ConditionalOperatorContainingStmtRange containing(const Decl &decl);
   static ConditionalOperatorContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ConditionalOperator> from(const TokenContext &c);
   static std::optional<ConditionalOperator> from(const AbstractConditionalOperator &parent);
+
+  inline static std::optional<ConditionalOperator> from(const std::optional<AbstractConditionalOperator> &parent) {
+    if (parent) {
+      return ConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConditionalOperator> from(const Expr &parent);
+
+  inline static std::optional<ConditionalOperator> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConditionalOperator> from(const ValueStmt &parent);
+
+  inline static std::optional<ConditionalOperator> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConditionalOperator> from(const Stmt &parent);
+
+  inline static std::optional<ConditionalOperator> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr lhs(void) const;
   Expr rhs(void) const;
 };
@@ -14177,14 +19780,54 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::BINARY_CONDITIONAL_OPERATOR;
+  }
+
   static BinaryConditionalOperatorContainingStmtRange containing(const Decl &decl);
   static BinaryConditionalOperatorContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<BinaryConditionalOperator> from(const TokenContext &c);
   static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
+
+  inline static std::optional<BinaryConditionalOperator> from(const std::optional<AbstractConditionalOperator> &parent) {
+    if (parent) {
+      return BinaryConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BinaryConditionalOperator> from(const Expr &parent);
+
+  inline static std::optional<BinaryConditionalOperator> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return BinaryConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BinaryConditionalOperator> from(const ValueStmt &parent);
+
+  inline static std::optional<BinaryConditionalOperator> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return BinaryConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BinaryConditionalOperator> from(const Stmt &parent);
+
+  inline static std::optional<BinaryConditionalOperator> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return BinaryConditionalOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr common(void) const;
   OpaqueValueExpr opaque_value(void) const;
 };
@@ -14208,17 +19851,48 @@ class VAArgExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::VA_ARG_EXPR;
+  }
+
   static VAArgExprContainingStmtRange containing(const Decl &decl);
   static VAArgExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<VAArgExpr> from(const TokenContext &c);
   static std::optional<VAArgExpr> from(const Expr &parent);
+
+  inline static std::optional<VAArgExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return VAArgExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VAArgExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<VAArgExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return VAArgExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VAArgExpr> from(const Stmt &parent);
+
+  inline static std::optional<VAArgExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return VAArgExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
   Expr sub_expression(void) const;
-  Type written_type_info(void) const;
+  Type written_type(void) const;
   bool is_microsoft_abi(void) const;
 };
 
@@ -14241,13 +19915,44 @@ class UnaryOperator : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::UNARY_OPERATOR;
+  }
+
   static UnaryOperatorContainingStmtRange containing(const Decl &decl);
   static UnaryOperatorContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<UnaryOperator> from(const TokenContext &c);
   static std::optional<UnaryOperator> from(const Expr &parent);
+
+  inline static std::optional<UnaryOperator> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return UnaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnaryOperator> from(const ValueStmt &parent);
+
+  inline static std::optional<UnaryOperator> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return UnaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnaryOperator> from(const Stmt &parent);
+
+  inline static std::optional<UnaryOperator> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return UnaryOperator::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool can_overflow(void) const;
   UnaryOperatorKind opcode(void) const;
   Token operator_token(void) const;
@@ -14280,16 +19985,46 @@ class UnaryExprOrTypeTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
+  }
+
   static UnaryExprOrTypeTraitExprContainingStmtRange containing(const Decl &decl);
   static UnaryExprOrTypeTraitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<UnaryExprOrTypeTraitExpr> from(const TokenContext &c);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Expr &parent);
+
+  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return UnaryExprOrTypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnaryExprOrTypeTraitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return UnaryExprOrTypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Stmt &parent);
+
+  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return UnaryExprOrTypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> argument_expression(void) const;
   std::optional<Type> argument_type(void) const;
-  std::optional<Type> argument_type_info(void) const;
   Token operator_token(void) const;
   Token r_paren_token(void) const;
   Type type_of_argument(void) const;
@@ -14315,13 +20050,44 @@ class TypoExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::TYPO_EXPR;
+  }
+
   static TypoExprContainingStmtRange containing(const Decl &decl);
   static TypoExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<TypoExpr> from(const TokenContext &c);
   static std::optional<TypoExpr> from(const Expr &parent);
+
+  inline static std::optional<TypoExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return TypoExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypoExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<TypoExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return TypoExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypoExpr> from(const Stmt &parent);
+
+  inline static std::optional<TypoExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return TypoExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using TypeTraitExprRange = DerivedEntityRange<StmtIterator, TypeTraitExpr>;
@@ -14343,13 +20109,44 @@ class TypeTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::TYPE_TRAIT_EXPR;
+  }
+
   static TypeTraitExprContainingStmtRange containing(const Decl &decl);
   static TypeTraitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<TypeTraitExpr> from(const TokenContext &c);
   static std::optional<TypeTraitExpr> from(const Expr &parent);
+
+  inline static std::optional<TypeTraitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return TypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeTraitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<TypeTraitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return TypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeTraitExpr> from(const Stmt &parent);
+
+  inline static std::optional<TypeTraitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return TypeTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   TypeTrait trait(void) const;
   std::optional<bool> value(void) const;
   std::vector<Type> arguments(void) const;
@@ -14374,13 +20171,44 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR;
+  }
+
   static SubstNonTypeTemplateParmPackExprContainingStmtRange containing(const Decl &decl);
   static SubstNonTypeTemplateParmPackExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const TokenContext &c);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Expr &parent);
+
+  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return SubstNonTypeTemplateParmPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return SubstNonTypeTemplateParmPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Stmt &parent);
+
+  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SubstNonTypeTemplateParmPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   NonTypeTemplateParmDecl parameter_pack(void) const;
   Token parameter_pack_token(void) const;
 };
@@ -14404,13 +20232,44 @@ class SubstNonTypeTemplateParmExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;
+  }
+
   static SubstNonTypeTemplateParmExprContainingStmtRange containing(const Decl &decl);
   static SubstNonTypeTemplateParmExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SubstNonTypeTemplateParmExpr> from(const TokenContext &c);
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Expr &parent);
+
+  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return SubstNonTypeTemplateParmExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SubstNonTypeTemplateParmExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return SubstNonTypeTemplateParmExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent);
+
+  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SubstNonTypeTemplateParmExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token name_token(void) const;
   NonTypeTemplateParmDecl parameter(void) const;
   Type parameter_type(void) const;
@@ -14437,13 +20296,44 @@ class StringLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::STRING_LITERAL;
+  }
+
   static StringLiteralContainingStmtRange containing(const Decl &decl);
   static StringLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<StringLiteral> from(const TokenContext &c);
   static std::optional<StringLiteral> from(const Expr &parent);
+
+  inline static std::optional<StringLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return StringLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<StringLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<StringLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return StringLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<StringLiteral> from(const Stmt &parent);
+
+  inline static std::optional<StringLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return StringLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<bool> contains_non_ascii(void) const;
   std::optional<bool> contains_non_ascii_or_null(void) const;
   std::string_view bytes(void) const;
@@ -14475,13 +20365,44 @@ class StmtExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::STMT_EXPR;
+  }
+
   static StmtExprContainingStmtRange containing(const Decl &decl);
   static StmtExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<StmtExpr> from(const TokenContext &c);
   static std::optional<StmtExpr> from(const Expr &parent);
+
+  inline static std::optional<StmtExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return StmtExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<StmtExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<StmtExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return StmtExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<StmtExpr> from(const Stmt &parent);
+
+  inline static std::optional<StmtExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return StmtExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   CompoundStmt sub_statement(void) const;
@@ -14506,13 +20427,44 @@ class SourceLocExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SOURCE_LOC_EXPR;
+  }
+
   static SourceLocExprContainingStmtRange containing(const Decl &decl);
   static SourceLocExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SourceLocExpr> from(const TokenContext &c);
   static std::optional<SourceLocExpr> from(const Expr &parent);
+
+  inline static std::optional<SourceLocExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return SourceLocExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SourceLocExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<SourceLocExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return SourceLocExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SourceLocExpr> from(const Stmt &parent);
+
+  inline static std::optional<SourceLocExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SourceLocExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::string_view builtin_string(void) const;
   SourceLocExprIdentKind identifier_kind(void) const;
   Token token(void) const;
@@ -14539,13 +20491,44 @@ class SizeOfPackExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SIZE_OF_PACK_EXPR;
+  }
+
   static SizeOfPackExprContainingStmtRange containing(const Decl &decl);
   static SizeOfPackExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SizeOfPackExpr> from(const TokenContext &c);
   static std::optional<SizeOfPackExpr> from(const Expr &parent);
+
+  inline static std::optional<SizeOfPackExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return SizeOfPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SizeOfPackExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<SizeOfPackExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return SizeOfPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SizeOfPackExpr> from(const Stmt &parent);
+
+  inline static std::optional<SizeOfPackExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SizeOfPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token operator_token(void) const;
   NamedDecl pack(void) const;
   std::optional<unsigned> pack_length(void) const;
@@ -14574,13 +20557,44 @@ class ShuffleVectorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SHUFFLE_VECTOR_EXPR;
+  }
+
   static ShuffleVectorExprContainingStmtRange containing(const Decl &decl);
   static ShuffleVectorExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ShuffleVectorExpr> from(const TokenContext &c);
   static std::optional<ShuffleVectorExpr> from(const Expr &parent);
+
+  inline static std::optional<ShuffleVectorExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ShuffleVectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ShuffleVectorExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ShuffleVectorExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ShuffleVectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ShuffleVectorExpr> from(const Stmt &parent);
+
+  inline static std::optional<ShuffleVectorExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ShuffleVectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
 };
@@ -14604,18 +20618,48 @@ class SYCLUniqueStableNameExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
+  }
+
   static SYCLUniqueStableNameExprContainingStmtRange containing(const Decl &decl);
   static SYCLUniqueStableNameExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SYCLUniqueStableNameExpr> from(const TokenContext &c);
   static std::optional<SYCLUniqueStableNameExpr> from(const Expr &parent);
+
+  inline static std::optional<SYCLUniqueStableNameExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return SYCLUniqueStableNameExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SYCLUniqueStableNameExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<SYCLUniqueStableNameExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return SYCLUniqueStableNameExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<SYCLUniqueStableNameExpr> from(const Stmt &parent);
+
+  inline static std::optional<SYCLUniqueStableNameExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SYCLUniqueStableNameExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::string_view compute_name(void) const;
   Token l_paren_token(void) const;
   Token token(void) const;
   Token r_paren_token(void) const;
-  Type type_source_info(void) const;
 };
 
 using RequiresExprRange = DerivedEntityRange<StmtIterator, RequiresExpr>;
@@ -14637,13 +20681,44 @@ class RequiresExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::REQUIRES_EXPR;
+  }
+
   static RequiresExprContainingStmtRange containing(const Decl &decl);
   static RequiresExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<RequiresExpr> from(const TokenContext &c);
   static std::optional<RequiresExpr> from(const Expr &parent);
+
+  inline static std::optional<RequiresExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return RequiresExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RequiresExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<RequiresExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return RequiresExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RequiresExpr> from(const Stmt &parent);
+
+  inline static std::optional<RequiresExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return RequiresExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   RequiresExprBodyDecl body(void) const;
   std::vector<ParmVarDecl> local_parameters(void) const;
   Token r_brace_token(void) const;
@@ -14670,13 +20745,44 @@ class RecoveryExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::RECOVERY_EXPR;
+  }
+
   static RecoveryExprContainingStmtRange containing(const Decl &decl);
   static RecoveryExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<RecoveryExpr> from(const TokenContext &c);
   static std::optional<RecoveryExpr> from(const Expr &parent);
+
+  inline static std::optional<RecoveryExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return RecoveryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RecoveryExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<RecoveryExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return RecoveryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RecoveryExpr> from(const Stmt &parent);
+
+  inline static std::optional<RecoveryExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return RecoveryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> sub_expressions(void) const;
 };
 
@@ -14699,13 +20805,44 @@ class PseudoObjectExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::PSEUDO_OBJECT_EXPR;
+  }
+
   static PseudoObjectExprContainingStmtRange containing(const Decl &decl);
   static PseudoObjectExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<PseudoObjectExpr> from(const TokenContext &c);
   static std::optional<PseudoObjectExpr> from(const Expr &parent);
+
+  inline static std::optional<PseudoObjectExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return PseudoObjectExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<PseudoObjectExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<PseudoObjectExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return PseudoObjectExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<PseudoObjectExpr> from(const Stmt &parent);
+
+  inline static std::optional<PseudoObjectExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return PseudoObjectExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr result_expression(void) const;
   Expr syntactic_form(void) const;
   std::vector<Expr> semantics(void) const;
@@ -14731,13 +20868,44 @@ class PredefinedExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::PREDEFINED_EXPR;
+  }
+
   static PredefinedExprContainingStmtRange containing(const Decl &decl);
   static PredefinedExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<PredefinedExpr> from(const TokenContext &c);
   static std::optional<PredefinedExpr> from(const Expr &parent);
+
+  inline static std::optional<PredefinedExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return PredefinedExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<PredefinedExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<PredefinedExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return PredefinedExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<PredefinedExpr> from(const Stmt &parent);
+
+  inline static std::optional<PredefinedExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return PredefinedExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   StringLiteral function_name(void) const;
   PredefinedExprIdentKind identifier_kind(void) const;
   std::string_view identifier_kind_name(void) const;
@@ -14763,13 +20931,44 @@ class ParenListExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::PAREN_LIST_EXPR;
+  }
+
   static ParenListExprContainingStmtRange containing(const Decl &decl);
   static ParenListExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ParenListExpr> from(const TokenContext &c);
   static std::optional<ParenListExpr> from(const Expr &parent);
+
+  inline static std::optional<ParenListExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ParenListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParenListExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ParenListExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ParenListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParenListExpr> from(const Stmt &parent);
+
+  inline static std::optional<ParenListExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ParenListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   std::vector<Expr> expressions(void) const;
@@ -14794,15 +20993,46 @@ class ParenExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::PAREN_EXPR;
+  }
+
   static ParenExprContainingStmtRange containing(const Decl &decl);
   static ParenExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ParenExpr> from(const TokenContext &c);
   static std::optional<ParenExpr> from(const Expr &parent);
+
+  inline static std::optional<ParenExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ParenExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParenExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ParenExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ParenExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParenExpr> from(const Stmt &parent);
-  Token l_paren(void) const;
-  Token r_paren(void) const;
+
+  inline static std::optional<ParenExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ParenExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Token l_paren_token(void) const;
+  Token r_paren_token(void) const;
   Expr sub_expression(void) const;
 };
 
@@ -14825,13 +21055,44 @@ class PackExpansionExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::PACK_EXPANSION_EXPR;
+  }
+
   static PackExpansionExprContainingStmtRange containing(const Decl &decl);
   static PackExpansionExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<PackExpansionExpr> from(const TokenContext &c);
   static std::optional<PackExpansionExpr> from(const Expr &parent);
+
+  inline static std::optional<PackExpansionExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return PackExpansionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<PackExpansionExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<PackExpansionExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return PackExpansionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<PackExpansionExpr> from(const Stmt &parent);
+
+  inline static std::optional<PackExpansionExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return PackExpansionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token ellipsis_token(void) const;
   std::optional<unsigned> num_expansions(void) const;
   Expr pattern(void) const;
@@ -14861,8 +21122,35 @@ class OverloadExpr : public Expr {
 
   static std::optional<OverloadExpr> from(const TokenContext &c);
   static std::optional<OverloadExpr> from(const Expr &parent);
+
+  inline static std::optional<OverloadExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return OverloadExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OverloadExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<OverloadExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return OverloadExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OverloadExpr> from(const Stmt &parent);
+
+  inline static std::optional<OverloadExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OverloadExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token l_angle_token(void) const;
   Token name_token(void) const;
   CXXRecordDecl naming_class(void) const;
@@ -14892,14 +21180,54 @@ class UnresolvedMemberExpr : public OverloadExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::UNRESOLVED_MEMBER_EXPR;
+  }
+
   static UnresolvedMemberExprContainingStmtRange containing(const Decl &decl);
   static UnresolvedMemberExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<UnresolvedMemberExpr> from(const TokenContext &c);
   static std::optional<UnresolvedMemberExpr> from(const OverloadExpr &parent);
+
+  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<OverloadExpr> &parent) {
+    if (parent) {
+      return UnresolvedMemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedMemberExpr> from(const Expr &parent);
+
+  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return UnresolvedMemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return UnresolvedMemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedMemberExpr> from(const Stmt &parent);
+
+  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return UnresolvedMemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Type base_type(void) const;
   Token member_token(void) const;
@@ -14929,14 +21257,54 @@ class UnresolvedLookupExpr : public OverloadExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::UNRESOLVED_LOOKUP_EXPR;
+  }
+
   static UnresolvedLookupExprContainingStmtRange containing(const Decl &decl);
   static UnresolvedLookupExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<UnresolvedLookupExpr> from(const TokenContext &c);
   static std::optional<UnresolvedLookupExpr> from(const OverloadExpr &parent);
+
+  inline static std::optional<UnresolvedLookupExpr> from(const std::optional<OverloadExpr> &parent) {
+    if (parent) {
+      return UnresolvedLookupExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedLookupExpr> from(const Expr &parent);
+
+  inline static std::optional<UnresolvedLookupExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return UnresolvedLookupExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedLookupExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<UnresolvedLookupExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return UnresolvedLookupExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedLookupExpr> from(const Stmt &parent);
+
+  inline static std::optional<UnresolvedLookupExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return UnresolvedLookupExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool is_overloaded(void) const;
   bool requires_adl(void) const;
 };
@@ -14960,13 +21328,44 @@ class OpaqueValueExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OPAQUE_VALUE_EXPR;
+  }
+
   static OpaqueValueExprContainingStmtRange containing(const Decl &decl);
   static OpaqueValueExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OpaqueValueExpr> from(const TokenContext &c);
   static std::optional<OpaqueValueExpr> from(const Expr &parent);
+
+  inline static std::optional<OpaqueValueExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return OpaqueValueExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OpaqueValueExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<OpaqueValueExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return OpaqueValueExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OpaqueValueExpr> from(const Stmt &parent);
+
+  inline static std::optional<OpaqueValueExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OpaqueValueExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
   Expr source_expression(void) const;
   bool is_unique(void) const;
@@ -14991,16 +21390,46 @@ class OffsetOfExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OFFSET_OF_EXPR;
+  }
+
   static OffsetOfExprContainingStmtRange containing(const Decl &decl);
   static OffsetOfExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OffsetOfExpr> from(const TokenContext &c);
   static std::optional<OffsetOfExpr> from(const Expr &parent);
+
+  inline static std::optional<OffsetOfExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return OffsetOfExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OffsetOfExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<OffsetOfExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return OffsetOfExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OffsetOfExpr> from(const Stmt &parent);
+
+  inline static std::optional<OffsetOfExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OffsetOfExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token operator_token(void) const;
   Token r_paren_token(void) const;
-  Type type_source_info(void) const;
 };
 
 using ObjCSubscriptRefExprRange = DerivedEntityRange<StmtIterator, ObjCSubscriptRefExpr>;
@@ -15022,17 +21451,48 @@ class ObjCSubscriptRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;
+  }
+
   static ObjCSubscriptRefExprContainingStmtRange containing(const Decl &decl);
   static ObjCSubscriptRefExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCSubscriptRefExpr> from(const TokenContext &c);
   static std::optional<ObjCSubscriptRefExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCSubscriptRefExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCSubscriptRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCSubscriptRefExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCSubscriptRefExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCSubscriptRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCSubscriptRefExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCSubscriptRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCMethodDecl at_index_method_declaration(void) const;
   Expr base_expression(void) const;
   Expr key_expression(void) const;
-  Token r_bracket(void) const;
+  Token r_bracket_token(void) const;
   bool is_array_subscript_reference_expression(void) const;
 };
 
@@ -15055,13 +21515,44 @@ class ObjCStringLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_STRING_LITERAL;
+  }
+
   static ObjCStringLiteralContainingStmtRange containing(const Decl &decl);
   static ObjCStringLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCStringLiteral> from(const TokenContext &c);
   static std::optional<ObjCStringLiteral> from(const Expr &parent);
+
+  inline static std::optional<ObjCStringLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCStringLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCStringLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCStringLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCStringLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCStringLiteral> from(const Stmt &parent);
+
+  inline static std::optional<ObjCStringLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCStringLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_token(void) const;
   StringLiteral string(void) const;
 };
@@ -15085,13 +21576,44 @@ class ObjCSelectorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_SELECTOR_EXPR;
+  }
+
   static ObjCSelectorExprContainingStmtRange containing(const Decl &decl);
   static ObjCSelectorExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCSelectorExpr> from(const TokenContext &c);
   static std::optional<ObjCSelectorExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCSelectorExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCSelectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCSelectorExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCSelectorExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCSelectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCSelectorExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCSelectorExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCSelectorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_token(void) const;
   Token r_paren_token(void) const;
 };
@@ -15115,13 +21637,44 @@ class ObjCProtocolExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_PROTOCOL_EXPR;
+  }
+
   static ObjCProtocolExprContainingStmtRange containing(const Decl &decl);
   static ObjCProtocolExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCProtocolExpr> from(const TokenContext &c);
   static std::optional<ObjCProtocolExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCProtocolExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCProtocolExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCProtocolExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCProtocolExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCProtocolExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCProtocolExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCProtocolExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCProtocolExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_token(void) const;
   ObjCProtocolDecl protocol(void) const;
   Token protocol_id_token(void) const;
@@ -15147,13 +21700,44 @@ class ObjCPropertyRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_PROPERTY_REF_EXPR;
+  }
+
   static ObjCPropertyRefExprContainingStmtRange containing(const Decl &decl);
   static ObjCPropertyRefExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCPropertyRefExpr> from(const TokenContext &c);
   static std::optional<ObjCPropertyRefExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCPropertyRefExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCPropertyRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCPropertyRefExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCPropertyRefExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCPropertyRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCPropertyRefExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCPropertyRefExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCPropertyRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   ObjCInterfaceDecl class_receiver(void) const;
   ObjCPropertyDecl explicit_property(void) const;
@@ -15191,17 +21775,48 @@ class ObjCMessageExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_MESSAGE_EXPR;
+  }
+
   static ObjCMessageExprContainingStmtRange containing(const Decl &decl);
   static ObjCMessageExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCMessageExpr> from(const TokenContext &c);
   static std::optional<ObjCMessageExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCMessageExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCMessageExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCMessageExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCMessageExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCMessageExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCMessageExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCMessageExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCMessageExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> arguments(void) const;
   Type call_return_type(void) const;
   Type class_receiver(void) const;
-  Type class_receiver_type_info(void) const;
+  Type class_receiver_type(void) const;
   Expr instance_receiver(void) const;
   Token left_token(void) const;
   ObjCMethodDecl method_declaration(void) const;
@@ -15240,13 +21855,44 @@ class ObjCIvarRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_IVAR_REF_EXPR;
+  }
+
   static ObjCIvarRefExprContainingStmtRange containing(const Decl &decl);
   static ObjCIvarRefExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCIvarRefExpr> from(const TokenContext &c);
   static std::optional<ObjCIvarRefExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCIvarRefExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCIvarRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIvarRefExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCIvarRefExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCIvarRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIvarRefExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCIvarRefExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCIvarRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   ObjCIvarDecl declaration(void) const;
   Token token(void) const;
@@ -15274,13 +21920,44 @@ class ObjCIsaExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_ISA_EXPR;
+  }
+
   static ObjCIsaExprContainingStmtRange containing(const Decl &decl);
   static ObjCIsaExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCIsaExpr> from(const TokenContext &c);
   static std::optional<ObjCIsaExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCIsaExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCIsaExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIsaExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCIsaExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCIsaExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIsaExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCIsaExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCIsaExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Token base_token_end(void) const;
   Token isa_member_token(void) const;
@@ -15307,13 +21984,44 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;
+  }
+
   static ObjCIndirectCopyRestoreExprContainingStmtRange containing(const Decl &decl);
   static ObjCIndirectCopyRestoreExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const TokenContext &c);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCIndirectCopyRestoreExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCIndirectCopyRestoreExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCIndirectCopyRestoreExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCIndirectCopyRestoreExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCIndirectCopyRestoreExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCIndirectCopyRestoreExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr sub_expression(void) const;
   bool should_copy(void) const;
 };
@@ -15337,16 +22045,46 @@ class ObjCEncodeExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_ENCODE_EXPR;
+  }
+
   static ObjCEncodeExprContainingStmtRange containing(const Decl &decl);
   static ObjCEncodeExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCEncodeExpr> from(const TokenContext &c);
   static std::optional<ObjCEncodeExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCEncodeExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCEncodeExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCEncodeExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCEncodeExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCEncodeExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCEncodeExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCEncodeExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCEncodeExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_token(void) const;
   Type encoded_type(void) const;
-  Type encoded_type_source_info(void) const;
   Token r_paren_token(void) const;
 };
 
@@ -15369,13 +22107,44 @@ class ObjCDictionaryLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_DICTIONARY_LITERAL;
+  }
+
   static ObjCDictionaryLiteralContainingStmtRange containing(const Decl &decl);
   static ObjCDictionaryLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCDictionaryLiteral> from(const TokenContext &c);
   static std::optional<ObjCDictionaryLiteral> from(const Expr &parent);
+
+  inline static std::optional<ObjCDictionaryLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCDictionaryLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCDictionaryLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCDictionaryLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCDictionaryLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCDictionaryLiteral> from(const Stmt &parent);
+
+  inline static std::optional<ObjCDictionaryLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCDictionaryLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCMethodDecl dictionary_with_objects_method(void) const;
 };
 
@@ -15398,13 +22167,44 @@ class ObjCBoxedExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_BOXED_EXPR;
+  }
+
   static ObjCBoxedExprContainingStmtRange containing(const Decl &decl);
   static ObjCBoxedExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCBoxedExpr> from(const TokenContext &c);
   static std::optional<ObjCBoxedExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCBoxedExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCBoxedExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBoxedExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCBoxedExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCBoxedExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBoxedExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCBoxedExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCBoxedExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_token(void) const;
   ObjCMethodDecl boxing_method(void) const;
   Expr sub_expression(void) const;
@@ -15430,13 +22230,44 @@ class ObjCBoolLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
+  }
+
   static ObjCBoolLiteralExprContainingStmtRange containing(const Decl &decl);
   static ObjCBoolLiteralExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCBoolLiteralExpr> from(const TokenContext &c);
   static std::optional<ObjCBoolLiteralExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCBoolLiteralExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCBoolLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBoolLiteralExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCBoolLiteralExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCBoolLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCBoolLiteralExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCBoolLiteralExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCBoolLiteralExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
   bool value(void) const;
 };
@@ -15460,13 +22291,44 @@ class ObjCAvailabilityCheckExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR;
+  }
+
   static ObjCAvailabilityCheckExprContainingStmtRange containing(const Decl &decl);
   static ObjCAvailabilityCheckExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAvailabilityCheckExpr> from(const TokenContext &c);
   static std::optional<ObjCAvailabilityCheckExpr> from(const Expr &parent);
+
+  inline static std::optional<ObjCAvailabilityCheckExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCAvailabilityCheckExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCAvailabilityCheckExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCAvailabilityCheckExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCAvailabilityCheckExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCAvailabilityCheckExpr> from(const Stmt &parent);
+
+  inline static std::optional<ObjCAvailabilityCheckExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCAvailabilityCheckExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_version(void) const;
 };
 
@@ -15489,13 +22351,44 @@ class ObjCArrayLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OBJ_C_ARRAY_LITERAL;
+  }
+
   static ObjCArrayLiteralContainingStmtRange containing(const Decl &decl);
   static ObjCArrayLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ObjCArrayLiteral> from(const TokenContext &c);
   static std::optional<ObjCArrayLiteral> from(const Expr &parent);
+
+  inline static std::optional<ObjCArrayLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ObjCArrayLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCArrayLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<ObjCArrayLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ObjCArrayLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCArrayLiteral> from(const Stmt &parent);
+
+  inline static std::optional<ObjCArrayLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ObjCArrayLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCMethodDecl array_with_objects_method(void) const;
   std::vector<Expr> elements(void) const;
 };
@@ -15519,13 +22412,44 @@ class OMPIteratorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_ITERATOR_EXPR;
+  }
+
   static OMPIteratorExprContainingStmtRange containing(const Decl &decl);
   static OMPIteratorExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPIteratorExpr> from(const TokenContext &c);
   static std::optional<OMPIteratorExpr> from(const Expr &parent);
+
+  inline static std::optional<OMPIteratorExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return OMPIteratorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPIteratorExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<OMPIteratorExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return OMPIteratorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPIteratorExpr> from(const Stmt &parent);
+
+  inline static std::optional<OMPIteratorExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPIteratorExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token iterator_kw_token(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
@@ -15550,13 +22474,44 @@ class OMPArrayShapingExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_ARRAY_SHAPING_EXPR;
+  }
+
   static OMPArrayShapingExprContainingStmtRange containing(const Decl &decl);
   static OMPArrayShapingExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPArrayShapingExpr> from(const TokenContext &c);
   static std::optional<OMPArrayShapingExpr> from(const Expr &parent);
+
+  inline static std::optional<OMPArrayShapingExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return OMPArrayShapingExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPArrayShapingExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<OMPArrayShapingExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return OMPArrayShapingExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPArrayShapingExpr> from(const Stmt &parent);
+
+  inline static std::optional<OMPArrayShapingExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPArrayShapingExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   std::vector<Expr> dimensions(void) const;
   Token l_paren_token(void) const;
@@ -15582,16 +22537,47 @@ class OMPArraySectionExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_ARRAY_SECTION_EXPR;
+  }
+
   static OMPArraySectionExprContainingStmtRange containing(const Decl &decl);
   static OMPArraySectionExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPArraySectionExpr> from(const TokenContext &c);
   static std::optional<OMPArraySectionExpr> from(const Expr &parent);
+
+  inline static std::optional<OMPArraySectionExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return OMPArraySectionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPArraySectionExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<OMPArraySectionExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return OMPArraySectionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPArraySectionExpr> from(const Stmt &parent);
+
+  inline static std::optional<OMPArraySectionExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPArraySectionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
-  Token colon_token_first(void) const;
-  Token colon_token_second(void) const;
+  Token first_colon_token(void) const;
+  Token second_colon_token(void) const;
   Expr length(void) const;
   Expr lower_bound(void) const;
   Token r_bracket_token(void) const;
@@ -15617,13 +22603,44 @@ class NoInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::NO_INIT_EXPR;
+  }
+
   static NoInitExprContainingStmtRange containing(const Decl &decl);
   static NoInitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<NoInitExpr> from(const TokenContext &c);
   static std::optional<NoInitExpr> from(const Expr &parent);
+
+  inline static std::optional<NoInitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return NoInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NoInitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<NoInitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return NoInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NoInitExpr> from(const Stmt &parent);
+
+  inline static std::optional<NoInitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return NoInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using MemberExprRange = DerivedEntityRange<StmtIterator, MemberExpr>;
@@ -15645,13 +22662,44 @@ class MemberExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::MEMBER_EXPR;
+  }
+
   static MemberExprContainingStmtRange containing(const Decl &decl);
   static MemberExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<MemberExpr> from(const TokenContext &c);
   static std::optional<MemberExpr> from(const Expr &parent);
+
+  inline static std::optional<MemberExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return MemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MemberExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<MemberExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return MemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MemberExpr> from(const Stmt &parent);
+
+  inline static std::optional<MemberExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return MemberExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Token l_angle_token(void) const;
   ValueDecl member_declaration(void) const;
@@ -15687,13 +22735,44 @@ class MatrixSubscriptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::MATRIX_SUBSCRIPT_EXPR;
+  }
+
   static MatrixSubscriptExprContainingStmtRange containing(const Decl &decl);
   static MatrixSubscriptExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<MatrixSubscriptExpr> from(const TokenContext &c);
   static std::optional<MatrixSubscriptExpr> from(const Expr &parent);
+
+  inline static std::optional<MatrixSubscriptExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return MatrixSubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MatrixSubscriptExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<MatrixSubscriptExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return MatrixSubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MatrixSubscriptExpr> from(const Stmt &parent);
+
+  inline static std::optional<MatrixSubscriptExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return MatrixSubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Expr column_index(void) const;
   Token r_bracket_token(void) const;
@@ -15720,13 +22799,44 @@ class MaterializeTemporaryExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::MATERIALIZE_TEMPORARY_EXPR;
+  }
+
   static MaterializeTemporaryExprContainingStmtRange containing(const Decl &decl);
   static MaterializeTemporaryExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<MaterializeTemporaryExpr> from(const TokenContext &c);
   static std::optional<MaterializeTemporaryExpr> from(const Expr &parent);
+
+  inline static std::optional<MaterializeTemporaryExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return MaterializeTemporaryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MaterializeTemporaryExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<MaterializeTemporaryExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return MaterializeTemporaryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent);
+
+  inline static std::optional<MaterializeTemporaryExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return MaterializeTemporaryExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<ValueDecl> extending_declaration(void) const;
   std::optional<LifetimeExtendedTemporaryDecl> lifetime_extended_temporary_declaration(void) const;
   StorageDuration storage_duration(void) const;
@@ -15754,13 +22864,44 @@ class MSPropertySubscriptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
+  }
+
   static MSPropertySubscriptExprContainingStmtRange containing(const Decl &decl);
   static MSPropertySubscriptExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<MSPropertySubscriptExpr> from(const TokenContext &c);
   static std::optional<MSPropertySubscriptExpr> from(const Expr &parent);
+
+  inline static std::optional<MSPropertySubscriptExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return MSPropertySubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSPropertySubscriptExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<MSPropertySubscriptExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return MSPropertySubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSPropertySubscriptExpr> from(const Stmt &parent);
+
+  inline static std::optional<MSPropertySubscriptExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return MSPropertySubscriptExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base(void) const;
   Expr index(void) const;
   Token r_bracket_token(void) const;
@@ -15785,13 +22926,44 @@ class MSPropertyRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::MS_PROPERTY_REF_EXPR;
+  }
+
   static MSPropertyRefExprContainingStmtRange containing(const Decl &decl);
   static MSPropertyRefExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<MSPropertyRefExpr> from(const TokenContext &c);
   static std::optional<MSPropertyRefExpr> from(const Expr &parent);
+
+  inline static std::optional<MSPropertyRefExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return MSPropertyRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSPropertyRefExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<MSPropertyRefExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return MSPropertyRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSPropertyRefExpr> from(const Stmt &parent);
+
+  inline static std::optional<MSPropertyRefExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return MSPropertyRefExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr base_expression(void) const;
   Token member_token(void) const;
   MSPropertyDecl property_declaration(void) const;
@@ -15818,13 +22990,44 @@ class LambdaExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::LAMBDA_EXPR;
+  }
+
   static LambdaExprContainingStmtRange containing(const Decl &decl);
   static LambdaExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<LambdaExpr> from(const TokenContext &c);
   static std::optional<LambdaExpr> from(const Expr &parent);
+
+  inline static std::optional<LambdaExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return LambdaExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<LambdaExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<LambdaExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return LambdaExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<LambdaExpr> from(const Stmt &parent);
+
+  inline static std::optional<LambdaExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return LambdaExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt body(void) const;
   CXXMethodDecl call_operator(void) const;
   LambdaCaptureDefault capture_default(void) const;
@@ -15860,13 +23063,44 @@ class IntegerLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::INTEGER_LITERAL;
+  }
+
   static IntegerLiteralContainingStmtRange containing(const Decl &decl);
   static IntegerLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<IntegerLiteral> from(const TokenContext &c);
   static std::optional<IntegerLiteral> from(const Expr &parent);
+
+  inline static std::optional<IntegerLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return IntegerLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<IntegerLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<IntegerLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return IntegerLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<IntegerLiteral> from(const Stmt &parent);
+
+  inline static std::optional<IntegerLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return IntegerLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
 };
 
@@ -15889,13 +23123,44 @@ class InitListExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::INIT_LIST_EXPR;
+  }
+
   static InitListExprContainingStmtRange containing(const Decl &decl);
   static InitListExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<InitListExpr> from(const TokenContext &c);
   static std::optional<InitListExpr> from(const Expr &parent);
+
+  inline static std::optional<InitListExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return InitListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<InitListExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<InitListExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return InitListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<InitListExpr> from(const Stmt &parent);
+
+  inline static std::optional<InitListExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return InitListExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> array_filler(void) const;
   std::optional<FieldDecl> initialized_field_in_union(void) const;
   Token l_brace_token(void) const;
@@ -15931,13 +23196,44 @@ class ImplicitValueInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::IMPLICIT_VALUE_INIT_EXPR;
+  }
+
   static ImplicitValueInitExprContainingStmtRange containing(const Decl &decl);
   static ImplicitValueInitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ImplicitValueInitExpr> from(const TokenContext &c);
   static std::optional<ImplicitValueInitExpr> from(const Expr &parent);
+
+  inline static std::optional<ImplicitValueInitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ImplicitValueInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitValueInitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ImplicitValueInitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ImplicitValueInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitValueInitExpr> from(const Stmt &parent);
+
+  inline static std::optional<ImplicitValueInitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ImplicitValueInitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using ImaginaryLiteralRange = DerivedEntityRange<StmtIterator, ImaginaryLiteral>;
@@ -15959,13 +23255,44 @@ class ImaginaryLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::IMAGINARY_LITERAL;
+  }
+
   static ImaginaryLiteralContainingStmtRange containing(const Decl &decl);
   static ImaginaryLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ImaginaryLiteral> from(const TokenContext &c);
   static std::optional<ImaginaryLiteral> from(const Expr &parent);
+
+  inline static std::optional<ImaginaryLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ImaginaryLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImaginaryLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<ImaginaryLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ImaginaryLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImaginaryLiteral> from(const Stmt &parent);
+
+  inline static std::optional<ImaginaryLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ImaginaryLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr sub_expression(void) const;
 };
 
@@ -15988,13 +23315,44 @@ class GenericSelectionExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::GENERIC_SELECTION_EXPR;
+  }
+
   static GenericSelectionExprContainingStmtRange containing(const Decl &decl);
   static GenericSelectionExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<GenericSelectionExpr> from(const TokenContext &c);
   static std::optional<GenericSelectionExpr> from(const Expr &parent);
+
+  inline static std::optional<GenericSelectionExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return GenericSelectionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<GenericSelectionExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<GenericSelectionExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return GenericSelectionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<GenericSelectionExpr> from(const Stmt &parent);
+
+  inline static std::optional<GenericSelectionExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return GenericSelectionExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> association_expressions(void) const;
   Expr controlling_expression(void) const;
   Token default_token(void) const;
@@ -16023,13 +23381,44 @@ class GNUNullExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::GNU_NULL_EXPR;
+  }
+
   static GNUNullExprContainingStmtRange containing(const Decl &decl);
   static GNUNullExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<GNUNullExpr> from(const TokenContext &c);
   static std::optional<GNUNullExpr> from(const Expr &parent);
+
+  inline static std::optional<GNUNullExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return GNUNullExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<GNUNullExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<GNUNullExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return GNUNullExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<GNUNullExpr> from(const Stmt &parent);
+
+  inline static std::optional<GNUNullExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return GNUNullExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token_token(void) const;
 };
 
@@ -16052,13 +23441,44 @@ class FunctionParmPackExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::FUNCTION_PARM_PACK_EXPR;
+  }
+
   static FunctionParmPackExprContainingStmtRange containing(const Decl &decl);
   static FunctionParmPackExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<FunctionParmPackExpr> from(const TokenContext &c);
   static std::optional<FunctionParmPackExpr> from(const Expr &parent);
+
+  inline static std::optional<FunctionParmPackExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return FunctionParmPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionParmPackExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<FunctionParmPackExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return FunctionParmPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionParmPackExpr> from(const Stmt &parent);
+
+  inline static std::optional<FunctionParmPackExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return FunctionParmPackExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   VarDecl parameter_pack(void) const;
   Token parameter_pack_token(void) const;
   std::vector<VarDecl> expansions(void) const;
@@ -16088,8 +23508,35 @@ class FullExpr : public Expr {
 
   static std::optional<FullExpr> from(const TokenContext &c);
   static std::optional<FullExpr> from(const Expr &parent);
+
+  inline static std::optional<FullExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return FullExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FullExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<FullExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return FullExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FullExpr> from(const Stmt &parent);
+
+  inline static std::optional<FullExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return FullExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr sub_expression(void) const;
 };
 
@@ -16113,14 +23560,54 @@ class ExprWithCleanups : public FullExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::EXPR_WITH_CLEANUPS;
+  }
+
   static ExprWithCleanupsContainingStmtRange containing(const Decl &decl);
   static ExprWithCleanupsContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ExprWithCleanups> from(const TokenContext &c);
   static std::optional<ExprWithCleanups> from(const FullExpr &parent);
+
+  inline static std::optional<ExprWithCleanups> from(const std::optional<FullExpr> &parent) {
+    if (parent) {
+      return ExprWithCleanups::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExprWithCleanups> from(const Expr &parent);
+
+  inline static std::optional<ExprWithCleanups> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ExprWithCleanups::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExprWithCleanups> from(const ValueStmt &parent);
+
+  inline static std::optional<ExprWithCleanups> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ExprWithCleanups::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExprWithCleanups> from(const Stmt &parent);
+
+  inline static std::optional<ExprWithCleanups> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ExprWithCleanups::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool cleanups_have_side_effects(void) const;
 };
 
@@ -16144,14 +23631,54 @@ class ConstantExpr : public FullExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CONSTANT_EXPR;
+  }
+
   static ConstantExprContainingStmtRange containing(const Decl &decl);
   static ConstantExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ConstantExpr> from(const TokenContext &c);
   static std::optional<ConstantExpr> from(const FullExpr &parent);
+
+  inline static std::optional<ConstantExpr> from(const std::optional<FullExpr> &parent) {
+    if (parent) {
+      return ConstantExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConstantExpr> from(const Expr &parent);
+
+  inline static std::optional<ConstantExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ConstantExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConstantExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ConstantExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ConstantExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConstantExpr> from(const Stmt &parent);
+
+  inline static std::optional<ConstantExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ConstantExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ConstantExprResultStorageKind result_storage_kind(void) const;
   bool has_ap_value_result(void) const;
   bool is_immediate_invocation(void) const;
@@ -16176,13 +23703,44 @@ class FloatingLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::FLOATING_LITERAL;
+  }
+
   static FloatingLiteralContainingStmtRange containing(const Decl &decl);
   static FloatingLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<FloatingLiteral> from(const TokenContext &c);
   static std::optional<FloatingLiteral> from(const Expr &parent);
+
+  inline static std::optional<FloatingLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return FloatingLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FloatingLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<FloatingLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return FloatingLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FloatingLiteral> from(const Stmt &parent);
+
+  inline static std::optional<FloatingLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return FloatingLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
   bool is_exact(void) const;
 };
@@ -16206,13 +23764,44 @@ class FixedPointLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::FIXED_POINT_LITERAL;
+  }
+
   static FixedPointLiteralContainingStmtRange containing(const Decl &decl);
   static FixedPointLiteralContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<FixedPointLiteral> from(const TokenContext &c);
   static std::optional<FixedPointLiteral> from(const Expr &parent);
+
+  inline static std::optional<FixedPointLiteral> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return FixedPointLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FixedPointLiteral> from(const ValueStmt &parent);
+
+  inline static std::optional<FixedPointLiteral> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return FixedPointLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FixedPointLiteral> from(const Stmt &parent);
+
+  inline static std::optional<FixedPointLiteral> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return FixedPointLiteral::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token token(void) const;
 };
 
@@ -16235,13 +23824,44 @@ class ExtVectorElementExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::EXT_VECTOR_ELEMENT_EXPR;
+  }
+
   static ExtVectorElementExprContainingStmtRange containing(const Decl &decl);
   static ExtVectorElementExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ExtVectorElementExpr> from(const TokenContext &c);
   static std::optional<ExtVectorElementExpr> from(const Expr &parent);
+
+  inline static std::optional<ExtVectorElementExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ExtVectorElementExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExtVectorElementExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ExtVectorElementExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ExtVectorElementExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExtVectorElementExpr> from(const Stmt &parent);
+
+  inline static std::optional<ExtVectorElementExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ExtVectorElementExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool contains_duplicate_elements(void) const;
   Token accessor_token(void) const;
   Expr base(void) const;
@@ -16267,13 +23887,44 @@ class ExpressionTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::EXPRESSION_TRAIT_EXPR;
+  }
+
   static ExpressionTraitExprContainingStmtRange containing(const Decl &decl);
   static ExpressionTraitExprContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<ExpressionTraitExpr> from(const TokenContext &c);
   static std::optional<ExpressionTraitExpr> from(const Expr &parent);
+
+  inline static std::optional<ExpressionTraitExpr> from(const std::optional<Expr> &parent) {
+    if (parent) {
+      return ExpressionTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExpressionTraitExpr> from(const ValueStmt &parent);
+
+  inline static std::optional<ExpressionTraitExpr> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return ExpressionTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ExpressionTraitExpr> from(const Stmt &parent);
+
+  inline static std::optional<ExpressionTraitExpr> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return ExpressionTraitExpr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr queried_expression(void) const;
   ExpressionTrait trait(void) const;
   bool value(void) const;
@@ -16297,12 +23948,34 @@ class AttributedStmt : public ValueStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::ATTRIBUTED_STMT;
+  }
+
   static AttributedStmtContainingStmtRange containing(const Decl &decl);
   static AttributedStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<AttributedStmt> from(const TokenContext &c);
   static std::optional<AttributedStmt> from(const ValueStmt &parent);
+
+  inline static std::optional<AttributedStmt> from(const std::optional<ValueStmt> &parent) {
+    if (parent) {
+      return AttributedStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AttributedStmt> from(const Stmt &parent);
+
+  inline static std::optional<AttributedStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return AttributedStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token attribute_token(void) const;
   Stmt sub_statement(void) const;
 };
@@ -16324,11 +23997,24 @@ class SwitchStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::SWITCH_STMT;
+  }
+
   static SwitchStmtContainingStmtRange containing(const Decl &decl);
   static SwitchStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<SwitchStmt> from(const TokenContext &c);
   static std::optional<SwitchStmt> from(const Stmt &parent);
+
+  inline static std::optional<SwitchStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SwitchStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Stmt body(void) const;
   Expr condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;
@@ -16365,6 +24051,15 @@ class SwitchCase : public Stmt {
 
   static std::optional<SwitchCase> from(const TokenContext &c);
   static std::optional<SwitchCase> from(const Stmt &parent);
+
+  inline static std::optional<SwitchCase> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return SwitchCase::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token colon_token(void) const;
   Token keyword_token(void) const;
   std::optional<SwitchCase> next_switch_case(void) const;
@@ -16389,12 +24084,34 @@ class DefaultStmt : public SwitchCase {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::DEFAULT_STMT;
+  }
+
   static DefaultStmtContainingStmtRange containing(const Decl &decl);
   static DefaultStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<DefaultStmt> from(const TokenContext &c);
   static std::optional<DefaultStmt> from(const SwitchCase &parent);
+
+  inline static std::optional<DefaultStmt> from(const std::optional<SwitchCase> &parent) {
+    if (parent) {
+      return DefaultStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DefaultStmt> from(const Stmt &parent);
+
+  inline static std::optional<DefaultStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return DefaultStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token default_token(void) const;
 };
 
@@ -16416,12 +24133,34 @@ class CaseStmt : public SwitchCase {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::CASE_STMT;
+  }
+
   static CaseStmtContainingStmtRange containing(const Decl &decl);
   static CaseStmtContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<CaseStmt> from(const TokenContext &c);
   static std::optional<CaseStmt> from(const SwitchCase &parent);
+
+  inline static std::optional<CaseStmt> from(const std::optional<SwitchCase> &parent) {
+    if (parent) {
+      return CaseStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CaseStmt> from(const Stmt &parent);
+
+  inline static std::optional<CaseStmt> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return CaseStmt::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool case_statement_is_gnu_range(void) const;
   Token case_token(void) const;
   Token ellipsis_token(void) const;
@@ -16445,6 +24184,10 @@ class Decl {
   friend class TokenContext;
   friend class Type;
   friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset;
 
@@ -16454,6 +24197,10 @@ class Decl {
         offset(offset_) {}
 
   inline static std::optional<Decl> from(const Decl &self) {
+    return self;
+  }
+
+  inline static std::optional<Decl> from(const std::optional<Decl> &self) {
     return self;
   }
 
@@ -16467,6 +24214,7 @@ class Decl {
   bool is_definition(void) const;
   std::vector<Decl> redeclarations(void) const;
   EntityId id(void) const;
+  UseIterator<DeclUseSelector> uses(void) const;
 
  protected:
   static DeclIterator in_internal(const Fragment &fragment);
@@ -16538,11 +24286,24 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
+  }
+
   static ClassScopeFunctionSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static ClassScopeFunctionSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
+
+  inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ClassScopeFunctionSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CXXMethodDecl specialization(void) const;
   bool has_explicit_template_arguments(void) const;
 };
@@ -16564,11 +24325,24 @@ class CapturedDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CAPTURED;
+  }
+
   static CapturedDeclContainingDeclRange containing(const Decl &decl);
   static CapturedDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<CapturedDecl> from(const TokenContext &c);
   static std::optional<CapturedDecl> from(const Decl &parent);
+
+  inline static std::optional<CapturedDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return CapturedDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ImplicitParamDecl context_parameter(void) const;
   bool is_nothrow(void) const;
   std::vector<ImplicitParamDecl> parameters(void) const;
@@ -16592,11 +24366,24 @@ class BlockDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::BLOCK;
+  }
+
   static BlockDeclContainingDeclRange containing(const Decl &decl);
   static BlockDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<BlockDecl> from(const TokenContext &c);
   static std::optional<BlockDecl> from(const Decl &parent);
+
+  inline static std::optional<BlockDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return BlockDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool block_missing_return_type(void) const;
   bool can_avoid_copy_to_heap(void) const;
   bool captures_cxx_this(void) const;
@@ -16630,11 +24417,24 @@ class AccessSpecDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::ACCESS_SPEC;
+  }
+
   static AccessSpecDeclContainingDeclRange containing(const Decl &decl);
   static AccessSpecDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<AccessSpecDecl> from(const TokenContext &c);
   static std::optional<AccessSpecDecl> from(const Decl &parent);
+
+  inline static std::optional<AccessSpecDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return AccessSpecDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token access_specifier_token(void) const;
   Token colon_token(void) const;
 };
@@ -16661,6 +24461,15 @@ class OMPDeclarativeDirectiveDecl : public Decl {
 
   static std::optional<OMPDeclarativeDirectiveDecl> from(const TokenContext &c);
   static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPDeclarativeDirectiveDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPDeclarativeDirectiveDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPThreadPrivateDeclRange = DerivedEntityRange<DeclIterator, OMPThreadPrivateDecl>;
@@ -16681,12 +24490,34 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OMP_THREAD_PRIVATE;
+  }
+
   static OMPThreadPrivateDeclContainingDeclRange containing(const Decl &decl);
   static OMPThreadPrivateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<OMPThreadPrivateDecl> from(const TokenContext &c);
   static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
+
+  inline static std::optional<OMPThreadPrivateDecl> from(const std::optional<OMPDeclarativeDirectiveDecl> &parent) {
+    if (parent) {
+      return OMPThreadPrivateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPThreadPrivateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPThreadPrivateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> varlists(void) const;
 };
 
@@ -16708,12 +24539,34 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OMP_REQUIRES;
+  }
+
   static OMPRequiresDeclContainingDeclRange containing(const Decl &decl);
   static OMPRequiresDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<OMPRequiresDecl> from(const TokenContext &c);
   static std::optional<OMPRequiresDecl> from(const OMPDeclarativeDirectiveDecl &parent);
+
+  inline static std::optional<OMPRequiresDecl> from(const std::optional<OMPDeclarativeDirectiveDecl> &parent) {
+    if (parent) {
+      return OMPRequiresDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPRequiresDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPRequiresDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPRequiresDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPAllocateDeclRange = DerivedEntityRange<DeclIterator, OMPAllocateDecl>;
@@ -16734,12 +24587,34 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OMP_ALLOCATE;
+  }
+
   static OMPAllocateDeclContainingDeclRange containing(const Decl &decl);
   static OMPAllocateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<OMPAllocateDecl> from(const TokenContext &c);
   static std::optional<OMPAllocateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
+
+  inline static std::optional<OMPAllocateDecl> from(const std::optional<OMPDeclarativeDirectiveDecl> &parent) {
+    if (parent) {
+      return OMPAllocateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPAllocateDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPAllocateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPAllocateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Expr> varlists(void) const;
 };
 
@@ -16760,11 +24635,24 @@ class TranslationUnitDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TRANSLATION_UNIT;
+  }
+
   static TranslationUnitDeclContainingDeclRange containing(const Decl &decl);
   static TranslationUnitDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TranslationUnitDecl> from(const TokenContext &c);
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
+
+  inline static std::optional<TranslationUnitDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TranslationUnitDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -16785,11 +24673,24 @@ class StaticAssertDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::STATIC_ASSERT;
+  }
+
   static StaticAssertDeclContainingDeclRange containing(const Decl &decl);
   static StaticAssertDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<StaticAssertDecl> from(const TokenContext &c);
   static std::optional<StaticAssertDecl> from(const Decl &parent);
+
+  inline static std::optional<StaticAssertDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return StaticAssertDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr assert_expression(void) const;
   StringLiteral message(void) const;
   Token r_paren_token(void) const;
@@ -16813,11 +24714,24 @@ class RequiresExprBodyDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::REQUIRES_EXPR_BODY;
+  }
+
   static RequiresExprBodyDeclContainingDeclRange containing(const Decl &decl);
   static RequiresExprBodyDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<RequiresExprBodyDecl> from(const TokenContext &c);
   static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
+
+  inline static std::optional<RequiresExprBodyDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return RequiresExprBodyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -16838,11 +24752,24 @@ class PragmaDetectMismatchDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::PRAGMA_DETECT_MISMATCH;
+  }
+
   static PragmaDetectMismatchDeclContainingDeclRange containing(const Decl &decl);
   static PragmaDetectMismatchDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &c);
   static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
+
+  inline static std::optional<PragmaDetectMismatchDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return PragmaDetectMismatchDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::string_view name(void) const;
   std::string_view value(void) const;
 };
@@ -16864,11 +24791,24 @@ class PragmaCommentDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::PRAGMA_COMMENT;
+  }
+
   static PragmaCommentDeclContainingDeclRange containing(const Decl &decl);
   static PragmaCommentDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<PragmaCommentDecl> from(const TokenContext &c);
   static std::optional<PragmaCommentDecl> from(const Decl &parent);
+
+  inline static std::optional<PragmaCommentDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return PragmaCommentDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::string_view argument(void) const;
   PragmaMSCommentKind comment_kind(void) const;
 };
@@ -16890,11 +24830,24 @@ class ObjCPropertyImplDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_PROPERTY_IMPL;
+  }
+
   static ObjCPropertyImplDeclContainingDeclRange containing(const Decl &decl);
   static ObjCPropertyImplDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCPropertyImplDecl> from(const TokenContext &c);
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCPropertyImplDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCPropertyImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr getter_cxx_constructor(void) const;
   ObjCMethodDecl getter_method_declaration(void) const;
   ObjCPropertyDecl property_declaration(void) const;
@@ -16923,13 +24876,25 @@ class NamedDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::NAMED;
+  }
+
   static NamedDeclContainingDeclRange containing(const Decl &decl);
   static NamedDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<NamedDecl> from(const TokenContext &c);
   static std::optional<NamedDecl> from(const Decl &parent);
+
+  inline static std::optional<NamedDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return NamedDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Linkage formal_linkage(void) const;
-  Linkage linkage_internal(void) const;
   std::string_view name(void) const;
   std::optional<ObjCStringFormatFamily> obj_cf_string_formatting_family(void) const;
   std::string_view qualified_name_as_string(void) const;
@@ -16963,12 +24928,34 @@ class LabelDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::LABEL;
+  }
+
   static LabelDeclContainingDeclRange containing(const Decl &decl);
   static LabelDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<LabelDecl> from(const TokenContext &c);
   static std::optional<LabelDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<LabelDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return LabelDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<LabelDecl> from(const Decl &parent);
+
+  inline static std::optional<LabelDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return LabelDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::string_view ms_assembly_label(void) const;
   LabelStmt statement(void) const;
   bool is_gnu_local(void) const;
@@ -16994,12 +24981,34 @@ class BaseUsingDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::BASE_USING;
+  }
+
   static BaseUsingDeclContainingDeclRange containing(const Decl &decl);
   static BaseUsingDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<BaseUsingDecl> from(const TokenContext &c);
   static std::optional<BaseUsingDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<BaseUsingDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return BaseUsingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BaseUsingDecl> from(const Decl &parent);
+
+  inline static std::optional<BaseUsingDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return BaseUsingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<UsingShadowDecl> shadows(void) const;
 };
 
@@ -17022,13 +25031,44 @@ class UsingEnumDecl : public BaseUsingDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::USING_ENUM;
+  }
+
   static UsingEnumDeclContainingDeclRange containing(const Decl &decl);
   static UsingEnumDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UsingEnumDecl> from(const TokenContext &c);
   static std::optional<UsingEnumDecl> from(const BaseUsingDecl &parent);
+
+  inline static std::optional<UsingEnumDecl> from(const std::optional<BaseUsingDecl> &parent) {
+    if (parent) {
+      return UsingEnumDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UsingEnumDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UsingEnumDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UsingEnumDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UsingEnumDecl> from(const Decl &parent);
+
+  inline static std::optional<UsingEnumDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UsingEnumDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   EnumDecl enum_declaration(void) const;
   Token enum_token(void) const;
   Token using_token(void) const;
@@ -17053,13 +25093,44 @@ class UsingDecl : public BaseUsingDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::USING;
+  }
+
   static UsingDeclContainingDeclRange containing(const Decl &decl);
   static UsingDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UsingDecl> from(const TokenContext &c);
   static std::optional<UsingDecl> from(const BaseUsingDecl &parent);
+
+  inline static std::optional<UsingDecl> from(const std::optional<BaseUsingDecl> &parent) {
+    if (parent) {
+      return UsingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UsingDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UsingDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UsingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UsingDecl> from(const Decl &parent);
+
+  inline static std::optional<UsingDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UsingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token using_token(void) const;
   bool has_typename(void) const;
   bool is_access_declaration(void) const;
@@ -17083,12 +25154,34 @@ class ValueDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::VALUE;
+  }
+
   static ValueDeclContainingDeclRange containing(const Decl &decl);
   static ValueDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ValueDecl> from(const TokenContext &c);
   static std::optional<ValueDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ValueDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ValueDecl> from(const Decl &parent);
+
+  inline static std::optional<ValueDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type type(void) const;
   bool is_weak(void) const;
 };
@@ -17112,13 +25205,44 @@ class UnresolvedUsingValueDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::UNRESOLVED_USING_VALUE;
+  }
+
   static UnresolvedUsingValueDeclContainingDeclRange containing(const Decl &decl);
   static UnresolvedUsingValueDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingValueDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return UnresolvedUsingValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedUsingValueDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UnresolvedUsingValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedUsingValueDecl> from(const Decl &parent);
+
+  inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UnresolvedUsingValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token ellipsis_token(void) const;
   Token using_token(void) const;
   bool is_access_declaration(void) const;
@@ -17144,13 +25268,44 @@ class TemplateParamObjectDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TEMPLATE_PARAM_OBJECT;
+  }
+
   static TemplateParamObjectDeclContainingDeclRange containing(const Decl &decl);
   static TemplateParamObjectDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TemplateParamObjectDecl> from(const TokenContext &c);
   static std::optional<TemplateParamObjectDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<TemplateParamObjectDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return TemplateParamObjectDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TemplateParamObjectDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TemplateParamObjectDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TemplateParamObjectDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TemplateParamObjectDecl> from(const Decl &parent);
+
+  inline static std::optional<TemplateParamObjectDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TemplateParamObjectDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPDeclareReductionDeclRange = DerivedEntityRange<DeclIterator, OMPDeclareReductionDecl>;
@@ -17172,13 +25327,44 @@ class OMPDeclareReductionDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OMP_DECLARE_REDUCTION;
+  }
+
   static OMPDeclareReductionDeclContainingDeclRange containing(const Decl &decl);
   static OMPDeclareReductionDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<OMPDeclareReductionDecl> from(const TokenContext &c);
   static std::optional<OMPDeclareReductionDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return OMPDeclareReductionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDeclareReductionDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return OMPDeclareReductionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPDeclareReductionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr combiner(void) const;
   Expr combiner_in(void) const;
   Expr combiner_out(void) const;
@@ -17186,7 +25372,6 @@ class OMPDeclareReductionDecl : public ValueDecl {
   Expr initializer_private(void) const;
   Expr initializer(void) const;
   OMPDeclareReductionDeclInitKind initializer_kind(void) const;
-  OMPDeclareReductionDecl prev_declaration_in_scope(void) const;
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -17209,13 +25394,44 @@ class MSGuidDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::MS_GUID;
+  }
+
   static MSGuidDeclContainingDeclRange containing(const Decl &decl);
   static MSGuidDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<MSGuidDecl> from(const TokenContext &c);
   static std::optional<MSGuidDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<MSGuidDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return MSGuidDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSGuidDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<MSGuidDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return MSGuidDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSGuidDecl> from(const Decl &parent);
+
+  inline static std::optional<MSGuidDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return MSGuidDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using IndirectFieldDeclRange = DerivedEntityRange<DeclIterator, IndirectFieldDecl>;
@@ -17237,13 +25453,44 @@ class IndirectFieldDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::INDIRECT_FIELD;
+  }
+
   static IndirectFieldDeclContainingDeclRange containing(const Decl &decl);
   static IndirectFieldDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<IndirectFieldDecl> from(const TokenContext &c);
   static std::optional<IndirectFieldDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<IndirectFieldDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return IndirectFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<IndirectFieldDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<IndirectFieldDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return IndirectFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<IndirectFieldDecl> from(const Decl &parent);
+
+  inline static std::optional<IndirectFieldDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return IndirectFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<NamedDecl> chain(void) const;
   std::optional<FieldDecl> anonymous_field(void) const;
   std::optional<VarDecl> variable_declaration(void) const;
@@ -17268,13 +25515,44 @@ class EnumConstantDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::ENUM_CONSTANT;
+  }
+
   static EnumConstantDeclContainingDeclRange containing(const Decl &decl);
   static EnumConstantDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<EnumConstantDecl> from(const TokenContext &c);
   static std::optional<EnumConstantDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<EnumConstantDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return EnumConstantDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<EnumConstantDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<EnumConstantDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return EnumConstantDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<EnumConstantDecl> from(const Decl &parent);
+
+  inline static std::optional<EnumConstantDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return EnumConstantDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> initializer_expression(void) const;
 };
 
@@ -17297,17 +25575,47 @@ class DeclaratorDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::DECLARATOR;
+  }
+
   static DeclaratorDeclContainingDeclRange containing(const Decl &decl);
   static DeclaratorDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<DeclaratorDecl> from(const TokenContext &c);
   static std::optional<DeclaratorDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<DeclaratorDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return DeclaratorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DeclaratorDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<DeclaratorDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return DeclaratorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DeclaratorDecl> from(const Decl &parent);
-  Token inner_token_start(void) const;
-  Token outer_token_start(void) const;
+
+  inline static std::optional<DeclaratorDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return DeclaratorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Token first_inner_token(void) const;
+  Token first_outer_token(void) const;
   std::optional<Expr> trailing_requires_clause(void) const;
-  std::optional<Type> type_source_info(void) const;
   Token type_spec_end_token(void) const;
   Token type_spec_start_token(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;
@@ -17333,14 +25641,54 @@ class VarDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::VAR;
+  }
+
   static VarDeclContainingDeclRange containing(const Decl &decl);
   static VarDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<VarDecl> from(const TokenContext &c);
   static std::optional<VarDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<VarDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return VarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<VarDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return VarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<VarDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return VarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarDecl> from(const Decl &parent);
+
+  inline static std::optional<VarDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return VarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<VarDecl> acting_definition(void) const;
   std::optional<Expr> initializer(void) const;
   VarDeclInitializationStyle initializer_style(void) const;
@@ -17413,15 +25761,64 @@ class ParmVarDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::PARM_VAR;
+  }
+
   static ParmVarDeclContainingDeclRange containing(const Decl &decl);
   static ParmVarDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ParmVarDecl> from(const TokenContext &c);
   static std::optional<ParmVarDecl> from(const VarDecl &parent);
+
+  inline static std::optional<ParmVarDecl> from(const std::optional<VarDecl> &parent) {
+    if (parent) {
+      return ParmVarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParmVarDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<ParmVarDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return ParmVarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParmVarDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<ParmVarDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return ParmVarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParmVarDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ParmVarDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ParmVarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ParmVarDecl> from(const Decl &parent);
+
+  inline static std::optional<ParmVarDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ParmVarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> default_argument(void) const;
   TokenRange default_argument_range(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
@@ -17457,15 +25854,64 @@ class OMPCapturedExprDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OMP_CAPTURED_EXPR;
+  }
+
   static OMPCapturedExprDeclContainingDeclRange containing(const Decl &decl);
   static OMPCapturedExprDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<OMPCapturedExprDecl> from(const TokenContext &c);
   static std::optional<OMPCapturedExprDecl> from(const VarDecl &parent);
+
+  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<VarDecl> &parent) {
+    if (parent) {
+      return OMPCapturedExprDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPCapturedExprDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return OMPCapturedExprDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPCapturedExprDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return OMPCapturedExprDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPCapturedExprDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return OMPCapturedExprDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPCapturedExprDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPCapturedExprDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using ImplicitParamDeclRange = DerivedEntityRange<DeclIterator, ImplicitParamDecl>;
@@ -17489,15 +25935,64 @@ class ImplicitParamDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::IMPLICIT_PARAM;
+  }
+
   static ImplicitParamDeclContainingDeclRange containing(const Decl &decl);
   static ImplicitParamDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ImplicitParamDecl> from(const TokenContext &c);
   static std::optional<ImplicitParamDecl> from(const VarDecl &parent);
+
+  inline static std::optional<ImplicitParamDecl> from(const std::optional<VarDecl> &parent) {
+    if (parent) {
+      return ImplicitParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitParamDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<ImplicitParamDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return ImplicitParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitParamDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<ImplicitParamDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return ImplicitParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitParamDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ImplicitParamDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ImplicitParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ImplicitParamDecl> from(const Decl &parent);
+
+  inline static std::optional<ImplicitParamDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ImplicitParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ImplicitParamDeclImplicitParamKind parameter_kind(void) const;
 };
 
@@ -17522,15 +26017,64 @@ class DecompositionDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::DECOMPOSITION;
+  }
+
   static DecompositionDeclContainingDeclRange containing(const Decl &decl);
   static DecompositionDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<DecompositionDecl> from(const TokenContext &c);
   static std::optional<DecompositionDecl> from(const VarDecl &parent);
+
+  inline static std::optional<DecompositionDecl> from(const std::optional<VarDecl> &parent) {
+    if (parent) {
+      return DecompositionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DecompositionDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<DecompositionDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return DecompositionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DecompositionDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<DecompositionDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return DecompositionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DecompositionDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<DecompositionDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return DecompositionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<DecompositionDecl> from(const Decl &parent);
+
+  inline static std::optional<DecompositionDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return DecompositionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<BindingDecl> bindings(void) const;
 };
 
@@ -17555,15 +26099,64 @@ class VarTemplateSpecializationDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::VAR_TEMPLATE_SPECIALIZATION;
+  }
+
   static VarTemplateSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static VarTemplateSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &c);
   static std::optional<VarTemplateSpecializationDecl> from(const VarDecl &parent);
+
+  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<VarDecl> &parent) {
+    if (parent) {
+      return VarTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplateSpecializationDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return VarTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplateSpecializationDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return VarTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplateSpecializationDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return VarTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplateSpecializationDecl> from(const Decl &parent);
+
+  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return VarTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token extern_token(void) const;
   TemplateSpecializationKind specialization_kind(void) const;
   std::vector<TemplateArgument> template_arguments(void) const;
@@ -17597,16 +26190,74 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
+  }
+
   static VarTemplatePartialSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static VarTemplatePartialSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &c);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarTemplateSpecializationDecl &parent);
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<VarTemplateSpecializationDecl> &parent) {
+    if (parent) {
+      return VarTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarDecl &parent);
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<VarDecl> &parent) {
+    if (parent) {
+      return VarTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplatePartialSpecializationDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return VarTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplatePartialSpecializationDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return VarTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplatePartialSpecializationDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return VarTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplatePartialSpecializationDecl> from(const Decl &parent);
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return VarTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using NonTypeTemplateParmDeclRange = DerivedEntityRange<DeclIterator, NonTypeTemplateParmDecl>;
@@ -17629,14 +26280,54 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::NON_TYPE_TEMPLATE_PARM;
+  }
+
   static NonTypeTemplateParmDeclContainingDeclRange containing(const Decl &decl);
   static NonTypeTemplateParmDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<NonTypeTemplateParmDecl> from(const TokenContext &c);
   static std::optional<NonTypeTemplateParmDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return NonTypeTemplateParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NonTypeTemplateParmDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return NonTypeTemplateParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NonTypeTemplateParmDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return NonTypeTemplateParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent);
+
+  inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return NonTypeTemplateParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool default_argument_was_inherited(void) const;
   Expr default_argument(void) const;
   Token default_argument_token(void) const;
@@ -17669,14 +26360,54 @@ class MSPropertyDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::MS_PROPERTY;
+  }
+
   static MSPropertyDeclContainingDeclRange containing(const Decl &decl);
   static MSPropertyDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<MSPropertyDecl> from(const TokenContext &c);
   static std::optional<MSPropertyDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<MSPropertyDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return MSPropertyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSPropertyDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<MSPropertyDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return MSPropertyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSPropertyDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<MSPropertyDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return MSPropertyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<MSPropertyDecl> from(const Decl &parent);
+
+  inline static std::optional<MSPropertyDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return MSPropertyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool has_getter(void) const;
   bool has_setter(void) const;
 };
@@ -17701,14 +26432,54 @@ class FunctionDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::FUNCTION;
+  }
+
   static FunctionDeclContainingDeclRange containing(const Decl &decl);
   static FunctionDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<FunctionDecl> from(const TokenContext &c);
   static std::optional<FunctionDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<FunctionDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return FunctionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<FunctionDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return FunctionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<FunctionDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return FunctionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionDecl> from(const Decl &parent);
+
+  inline static std::optional<FunctionDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return FunctionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
   bool does_this_declaration_have_a_body(void) const;
   Type call_result_type(void) const;
@@ -17772,6 +26543,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_static(void) const;
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
+  bool is_definition(void) const;
   bool is_this_declaration_instantiated_from_a_friend_definition(void) const;
   bool is_trivial(void) const;
   bool is_trivial_for_call(void) const;
@@ -17806,16 +26578,64 @@ class CXXMethodDecl : public FunctionDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CXX_METHOD;
+  }
+
   static CXXMethodDeclContainingDeclRange containing(const Decl &decl);
   static CXXMethodDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<CXXMethodDecl> from(const TokenContext &c);
   static std::optional<CXXMethodDecl> from(const FunctionDecl &parent);
+
+  inline static std::optional<CXXMethodDecl> from(const std::optional<FunctionDecl> &parent) {
+    if (parent) {
+      return CXXMethodDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXMethodDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<CXXMethodDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return CXXMethodDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXMethodDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<CXXMethodDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return CXXMethodDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXMethodDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<CXXMethodDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return CXXMethodDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXMethodDecl> from(const Decl &parent);
-  CXXRecordDecl parent(void) const;
+
+  inline static std::optional<CXXMethodDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return CXXMethodDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   RefQualifierKind reference_qualifier(void) const;
   Type this_object_type(void) const;
   Type this_type(void) const;
@@ -17828,6 +26648,7 @@ class CXXMethodDecl : public FunctionDecl {
   bool is_virtual(void) const;
   bool is_volatile(void) const;
   std::vector<CXXMethodDecl> overridden_methods(void) const;
+  std::vector<ParmVarDecl> parameter_declarations(void) const;
 };
 
 using CXXDestructorDeclRange = DerivedEntityRange<DeclIterator, CXXDestructorDecl>;
@@ -17852,16 +26673,74 @@ class CXXDestructorDecl : public CXXMethodDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CXX_DESTRUCTOR;
+  }
+
   static CXXDestructorDeclContainingDeclRange containing(const Decl &decl);
   static CXXDestructorDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<CXXDestructorDecl> from(const TokenContext &c);
   static std::optional<CXXDestructorDecl> from(const CXXMethodDecl &parent);
+
+  inline static std::optional<CXXDestructorDecl> from(const std::optional<CXXMethodDecl> &parent) {
+    if (parent) {
+      return CXXDestructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDestructorDecl> from(const FunctionDecl &parent);
+
+  inline static std::optional<CXXDestructorDecl> from(const std::optional<FunctionDecl> &parent) {
+    if (parent) {
+      return CXXDestructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDestructorDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<CXXDestructorDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return CXXDestructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDestructorDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<CXXDestructorDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return CXXDestructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDestructorDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<CXXDestructorDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return CXXDestructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDestructorDecl> from(const Decl &parent);
+
+  inline static std::optional<CXXDestructorDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return CXXDestructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<FunctionDecl> operator_delete(void) const;
   std::optional<Expr> operator_delete_this_argument(void) const;
 };
@@ -17888,16 +26767,74 @@ class CXXConversionDecl : public CXXMethodDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CXX_CONVERSION;
+  }
+
   static CXXConversionDeclContainingDeclRange containing(const Decl &decl);
   static CXXConversionDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<CXXConversionDecl> from(const TokenContext &c);
   static std::optional<CXXConversionDecl> from(const CXXMethodDecl &parent);
+
+  inline static std::optional<CXXConversionDecl> from(const std::optional<CXXMethodDecl> &parent) {
+    if (parent) {
+      return CXXConversionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConversionDecl> from(const FunctionDecl &parent);
+
+  inline static std::optional<CXXConversionDecl> from(const std::optional<FunctionDecl> &parent) {
+    if (parent) {
+      return CXXConversionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConversionDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<CXXConversionDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return CXXConversionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConversionDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<CXXConversionDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return CXXConversionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConversionDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<CXXConversionDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return CXXConversionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConversionDecl> from(const Decl &parent);
+
+  inline static std::optional<CXXConversionDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return CXXConversionDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Type conversion_type(void) const;
   bool is_explicit(void) const;
   bool is_lambda_to_block_pointer_conversion(void) const;
@@ -17925,16 +26862,74 @@ class CXXConstructorDecl : public CXXMethodDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CXX_CONSTRUCTOR;
+  }
+
   static CXXConstructorDeclContainingDeclRange containing(const Decl &decl);
   static CXXConstructorDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<CXXConstructorDecl> from(const TokenContext &c);
   static std::optional<CXXConstructorDecl> from(const CXXMethodDecl &parent);
+
+  inline static std::optional<CXXConstructorDecl> from(const std::optional<CXXMethodDecl> &parent) {
+    if (parent) {
+      return CXXConstructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstructorDecl> from(const FunctionDecl &parent);
+
+  inline static std::optional<CXXConstructorDecl> from(const std::optional<FunctionDecl> &parent) {
+    if (parent) {
+      return CXXConstructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstructorDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<CXXConstructorDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return CXXConstructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstructorDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<CXXConstructorDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return CXXConstructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstructorDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<CXXConstructorDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return CXXConstructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXConstructorDecl> from(const Decl &parent);
+
+  inline static std::optional<CXXConstructorDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return CXXConstructorDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<CXXConstructorDecl> target_constructor(void) const;
   bool is_default_constructor(void) const;
   bool is_delegating_constructor(void) const;
@@ -17964,18 +26959,68 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CXX_DEDUCTION_GUIDE;
+  }
+
   static CXXDeductionGuideDeclContainingDeclRange containing(const Decl &decl);
   static CXXDeductionGuideDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<CXXDeductionGuideDecl> from(const TokenContext &c);
   static std::optional<CXXDeductionGuideDecl> from(const FunctionDecl &parent);
+
+  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<FunctionDecl> &parent) {
+    if (parent) {
+      return CXXDeductionGuideDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDeductionGuideDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return CXXDeductionGuideDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDeductionGuideDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return CXXDeductionGuideDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDeductionGuideDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return CXXDeductionGuideDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXDeductionGuideDecl> from(const Decl &parent);
+
+  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return CXXDeductionGuideDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   CXXConstructorDecl corresponding_constructor(void) const;
   bool is_copy_deduction_candidate(void) const;
   bool is_explicit(void) const;
+  std::vector<ParmVarDecl> parameter_declarations(void) const;
 };
 
 using FieldDeclRange = DerivedEntityRange<DeclIterator, FieldDecl>;
@@ -17998,19 +27043,58 @@ class FieldDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::FIELD;
+  }
+
   static FieldDeclContainingDeclRange containing(const Decl &decl);
   static FieldDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<FieldDecl> from(const TokenContext &c);
   static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<FieldDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return FieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FieldDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<FieldDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return FieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FieldDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<FieldDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return FieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FieldDecl> from(const Decl &parent);
+
+  inline static std::optional<FieldDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return FieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Expr> bit_width(void) const;
   std::optional<VariableArrayType> captured_vla_type(void) const;
   InClassInitStyle in_class_initializer_style(void) const;
   std::optional<Expr> in_class_initializer(void) const;
-  RecordDecl parent(void) const;
   bool has_captured_vla_type(void) const;
   bool has_in_class_initializer(void) const;
   bool is_anonymous_struct_or_union(void) const;
@@ -18042,15 +27126,64 @@ class ObjCIvarDecl : public FieldDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_IVAR;
+  }
+
   static ObjCIvarDeclContainingDeclRange containing(const Decl &decl);
   static ObjCIvarDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCIvarDecl> from(const TokenContext &c);
   static std::optional<ObjCIvarDecl> from(const FieldDecl &parent);
+
+  inline static std::optional<ObjCIvarDecl> from(const std::optional<FieldDecl> &parent) {
+    if (parent) {
+      return ObjCIvarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIvarDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<ObjCIvarDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return ObjCIvarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIvarDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<ObjCIvarDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return ObjCIvarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIvarDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCIvarDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCIvarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCIvarDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCIvarDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCIvarDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCIvarDeclAccessControl access_control(void) const;
   ObjCIvarDeclAccessControl canonical_access_control(void) const;
   ObjCInterfaceDecl containing_interface(void) const;
@@ -18079,15 +27212,64 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_AT_DEFS_FIELD;
+  }
+
   static ObjCAtDefsFieldDeclContainingDeclRange containing(const Decl &decl);
   static ObjCAtDefsFieldDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCAtDefsFieldDecl> from(const TokenContext &c);
   static std::optional<ObjCAtDefsFieldDecl> from(const FieldDecl &parent);
+
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<FieldDecl> &parent) {
+    if (parent) {
+      return ObjCAtDefsFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCAtDefsFieldDecl> from(const DeclaratorDecl &parent);
+
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<DeclaratorDecl> &parent) {
+    if (parent) {
+      return ObjCAtDefsFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCAtDefsFieldDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return ObjCAtDefsFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCAtDefsFieldDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCAtDefsFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCAtDefsFieldDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using BindingDeclRange = DerivedEntityRange<DeclIterator, BindingDecl>;
@@ -18109,13 +27291,44 @@ class BindingDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::BINDING;
+  }
+
   static BindingDeclContainingDeclRange containing(const Decl &decl);
   static BindingDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<BindingDecl> from(const TokenContext &c);
   static std::optional<BindingDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<BindingDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return BindingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BindingDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<BindingDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return BindingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BindingDecl> from(const Decl &parent);
+
+  inline static std::optional<BindingDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return BindingDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr binding(void) const;
   ValueDecl decomposed_declaration(void) const;
   VarDecl holding_variable(void) const;
@@ -18145,8 +27358,35 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
 
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const TokenContext &c);
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return OMPDeclarativeDirectiveValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return OMPDeclarativeDirectiveValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPDeclarativeDirectiveValueDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPDeclareMapperDeclRange = DerivedEntityRange<DeclIterator, OMPDeclareMapperDecl>;
@@ -18169,16 +27409,55 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OMP_DECLARE_MAPPER;
+  }
+
   static OMPDeclareMapperDeclContainingDeclRange containing(const Decl &decl);
   static OMPDeclareMapperDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<OMPDeclareMapperDecl> from(const TokenContext &c);
   static std::optional<OMPDeclareMapperDecl> from(const OMPDeclarativeDirectiveValueDecl &parent);
+
+  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<OMPDeclarativeDirectiveValueDecl> &parent) {
+    if (parent) {
+      return OMPDeclareMapperDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDeclareMapperDecl> from(const ValueDecl &parent);
+
+  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<ValueDecl> &parent) {
+    if (parent) {
+      return OMPDeclareMapperDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDeclareMapperDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return OMPDeclareMapperDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
+
+  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return OMPDeclareMapperDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr mapper_variable_reference(void) const;
-  OMPDeclareMapperDecl prev_declaration_in_scope(void) const;
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -18200,12 +27479,34 @@ class UsingShadowDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::USING_SHADOW;
+  }
+
   static UsingShadowDeclContainingDeclRange containing(const Decl &decl);
   static UsingShadowDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UsingShadowDecl> from(const TokenContext &c);
   static std::optional<UsingShadowDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UsingShadowDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UsingShadowDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UsingShadowDecl> from(const Decl &parent);
+
+  inline static std::optional<UsingShadowDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UsingShadowDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   BaseUsingDecl introducer(void) const;
   std::optional<UsingShadowDecl> next_using_shadow_declaration(void) const;
   NamedDecl target_declaration(void) const;
@@ -18230,19 +27531,49 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CONSTRUCTOR_USING_SHADOW;
+  }
+
   static ConstructorUsingShadowDeclContainingDeclRange containing(const Decl &decl);
   static ConstructorUsingShadowDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ConstructorUsingShadowDecl> from(const TokenContext &c);
   static std::optional<ConstructorUsingShadowDecl> from(const UsingShadowDecl &parent);
+
+  inline static std::optional<ConstructorUsingShadowDecl> from(const std::optional<UsingShadowDecl> &parent) {
+    if (parent) {
+      return ConstructorUsingShadowDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConstructorUsingShadowDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ConstructorUsingShadowDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ConstructorUsingShadowDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent);
+
+  inline static std::optional<ConstructorUsingShadowDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ConstructorUsingShadowDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool constructs_virtual_base(void) const;
   CXXRecordDecl constructed_base_class(void) const;
   std::optional<ConstructorUsingShadowDecl> constructed_base_class_shadow_declaration(void) const;
   CXXRecordDecl nominated_base_class(void) const;
   std::optional<ConstructorUsingShadowDecl> nominated_base_class_shadow_declaration(void) const;
-  CXXRecordDecl parent(void) const;
 };
 
 using UsingPackDeclRange = DerivedEntityRange<DeclIterator, UsingPackDecl>;
@@ -18263,12 +27594,34 @@ class UsingPackDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::USING_PACK;
+  }
+
   static UsingPackDeclContainingDeclRange containing(const Decl &decl);
   static UsingPackDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UsingPackDecl> from(const TokenContext &c);
   static std::optional<UsingPackDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UsingPackDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UsingPackDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UsingPackDecl> from(const Decl &parent);
+
+  inline static std::optional<UsingPackDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UsingPackDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<NamedDecl> expansions(void) const;
   NamedDecl instantiated_from_using_declaration(void) const;
 };
@@ -18291,12 +27644,34 @@ class UsingDirectiveDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::USING_DIRECTIVE;
+  }
+
   static UsingDirectiveDeclContainingDeclRange containing(const Decl &decl);
   static UsingDirectiveDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UsingDirectiveDecl> from(const TokenContext &c);
   static std::optional<UsingDirectiveDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UsingDirectiveDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UsingDirectiveDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UsingDirectiveDecl> from(const Decl &parent);
+
+  inline static std::optional<UsingDirectiveDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UsingDirectiveDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token identifier_token(void) const;
   Token namespace_key_token(void) const;
   NamedDecl nominated_namespace_as_written(void) const;
@@ -18321,12 +27696,34 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::UNRESOLVED_USING_IF_EXISTS;
+  }
+
   static UnresolvedUsingIfExistsDeclContainingDeclRange containing(const Decl &decl);
   static UnresolvedUsingIfExistsDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UnresolvedUsingIfExistsDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingIfExistsDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UnresolvedUsingIfExistsDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UnresolvedUsingIfExistsDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedUsingIfExistsDecl> from(const Decl &parent);
+
+  inline static std::optional<UnresolvedUsingIfExistsDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UnresolvedUsingIfExistsDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using TypeDeclRange = DerivedEntityRange<DeclIterator, TypeDecl>;
@@ -18347,12 +27744,34 @@ class TypeDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TYPE;
+  }
+
   static TypeDeclContainingDeclRange containing(const Decl &decl);
   static TypeDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TypeDecl> from(const TokenContext &c);
   static std::optional<TypeDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TypeDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TypeDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeDecl> from(const Decl &parent);
+
+  inline static std::optional<TypeDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TypeDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<Type> type_for_declaration(void) const;
 };
 
@@ -18375,13 +27794,44 @@ class TemplateTypeParmDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TEMPLATE_TYPE_PARM;
+  }
+
   static TemplateTypeParmDeclContainingDeclRange containing(const Decl &decl);
   static TemplateTypeParmDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TemplateTypeParmDecl> from(const TokenContext &c);
   static std::optional<TemplateTypeParmDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<TemplateTypeParmDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return TemplateTypeParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TemplateTypeParmDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TemplateTypeParmDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TemplateTypeParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
+
+  inline static std::optional<TemplateTypeParmDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TemplateTypeParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool default_argument_was_inherited(void) const;
   Type default_argument(void) const;
   Type default_argument_info(void) const;
@@ -18412,16 +27862,47 @@ class TagDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TAG;
+  }
+
   static TagDeclContainingDeclRange containing(const Decl &decl);
   static TagDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TagDecl> from(const TokenContext &c);
   static std::optional<TagDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<TagDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return TagDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TagDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TagDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TagDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TagDecl> from(const Decl &parent);
+
+  inline static std::optional<TagDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TagDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   TokenRange brace_range(void) const;
-  Token inner_token_start(void) const;
-  Token outer_token_start(void) const;
+  Token first_inner_token(void) const;
+  Token first_outer_token(void) const;
   TagTypeKind tag_kind(void) const;
   std::optional<TypedefNameDecl> typedef_name_for_anonymous_declaration(void) const;
   bool has_name_for_linkage(void) const;
@@ -18435,6 +27916,7 @@ class TagDecl : public TypeDecl {
   bool is_free_standing(void) const;
   bool is_interface(void) const;
   bool is_struct(void) const;
+  bool is_definition(void) const;
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;
@@ -18461,17 +27943,56 @@ class RecordDecl : public TagDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::RECORD;
+  }
+
   static RecordDeclContainingDeclRange containing(const Decl &decl);
   static RecordDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<RecordDecl> from(const TokenContext &c);
   static std::optional<RecordDecl> from(const TagDecl &parent);
+
+  inline static std::optional<RecordDecl> from(const std::optional<TagDecl> &parent) {
+    if (parent) {
+      return RecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RecordDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<RecordDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return RecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RecordDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<RecordDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return RecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RecordDecl> from(const Decl &parent);
+
+  inline static std::optional<RecordDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return RecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool can_pass_in_registers(void) const;
   std::vector<FieldDecl> fields(void) const;
-  std::optional<FieldDecl> find_first_named_data_member(void) const;
   RecordDeclArgPassingKind argument_passing_restrictions(void) const;
   bool has_flexible_array_member(void) const;
   bool has_loaded_fields_from_external_storage(void) const;
@@ -18514,15 +28035,64 @@ class CXXRecordDecl : public RecordDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CXX_RECORD;
+  }
+
   static CXXRecordDeclContainingDeclRange containing(const Decl &decl);
   static CXXRecordDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<CXXRecordDecl> from(const TokenContext &c);
   static std::optional<CXXRecordDecl> from(const RecordDecl &parent);
+
+  inline static std::optional<CXXRecordDecl> from(const std::optional<RecordDecl> &parent) {
+    if (parent) {
+      return CXXRecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXRecordDecl> from(const TagDecl &parent);
+
+  inline static std::optional<CXXRecordDecl> from(const std::optional<TagDecl> &parent) {
+    if (parent) {
+      return CXXRecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXRecordDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<CXXRecordDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return CXXRecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXRecordDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<CXXRecordDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return CXXRecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<CXXRecordDecl> from(const Decl &parent);
+
+  inline static std::optional<CXXRecordDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return CXXRecordDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<bool> allow_const_default_initializer(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
   std::optional<MSInheritanceModel> calculate_inheritance_model(void) const;
@@ -18536,7 +28106,7 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<Decl> lambda_context_declaration(void) const;
   std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
   std::optional<unsigned> lambda_mangling_number(void) const;
-  std::optional<Type> lambda_type_info(void) const;
+  std::optional<Type> lambda_type(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
   std::optional<unsigned> num_bases(void) const;
@@ -18661,16 +28231,74 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;
+  }
+
   static ClassTemplateSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static ClassTemplateSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassTemplateSpecializationDecl> from(const CXXRecordDecl &parent);
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<CXXRecordDecl> &parent) {
+    if (parent) {
+      return ClassTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateSpecializationDecl> from(const RecordDecl &parent);
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<RecordDecl> &parent) {
+    if (parent) {
+      return ClassTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateSpecializationDecl> from(const TagDecl &parent);
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<TagDecl> &parent) {
+    if (parent) {
+      return ClassTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateSpecializationDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return ClassTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateSpecializationDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ClassTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateSpecializationDecl> from(const Decl &parent);
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ClassTemplateSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token extern_token(void) const;
   Token point_of_instantiation(void) const;
   TemplateSpecializationKind specialization_kind(void) const;
@@ -18706,17 +28334,84 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
+  }
+
   static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const ClassTemplateSpecializationDecl &parent);
+
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<ClassTemplateSpecializationDecl> &parent) {
+    if (parent) {
+      return ClassTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const CXXRecordDecl &parent);
+
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<CXXRecordDecl> &parent) {
+    if (parent) {
+      return ClassTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const RecordDecl &parent);
+
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<RecordDecl> &parent) {
+    if (parent) {
+      return ClassTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const TagDecl &parent);
+
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<TagDecl> &parent) {
+    if (parent) {
+      return ClassTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return ClassTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ClassTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const Decl &parent);
+
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ClassTemplatePartialSpecializationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using EnumDeclRange = DerivedEntityRange<DeclIterator, EnumDecl>;
@@ -18739,19 +28434,58 @@ class EnumDecl : public TagDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::ENUM;
+  }
+
   static EnumDeclContainingDeclRange containing(const Decl &decl);
   static EnumDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<EnumDecl> from(const TokenContext &c);
   static std::optional<EnumDecl> from(const TagDecl &parent);
+
+  inline static std::optional<EnumDecl> from(const std::optional<TagDecl> &parent) {
+    if (parent) {
+      return EnumDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<EnumDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<EnumDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return EnumDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<EnumDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<EnumDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return EnumDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<EnumDecl> from(const Decl &parent);
+
+  inline static std::optional<EnumDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return EnumDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<EnumConstantDecl> enumerators(void) const;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
   std::optional<Type> integer_type(void) const;
   TokenRange integer_type_range(void) const;
-  std::optional<Type> integer_type_source_info(void) const;
   std::optional<unsigned> odr_hash(void) const;
   Type promotion_type(void) const;
   std::optional<EnumDecl> template_instantiation_pattern(void) const;
@@ -18784,13 +28518,44 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::UNRESOLVED_USING_TYPENAME;
+  }
+
   static UnresolvedUsingTypenameDeclContainingDeclRange containing(const Decl &decl);
   static UnresolvedUsingTypenameDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<UnresolvedUsingTypenameDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingTypenameDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return UnresolvedUsingTypenameDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedUsingTypenameDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return UnresolvedUsingTypenameDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent);
+
+  inline static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return UnresolvedUsingTypenameDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token ellipsis_token(void) const;
   Token typename_token(void) const;
   Token using_token(void) const;
@@ -18816,15 +28581,46 @@ class TypedefNameDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TYPEDEF_NAME;
+  }
+
   static TypedefNameDeclContainingDeclRange containing(const Decl &decl);
   static TypedefNameDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TypedefNameDecl> from(const TokenContext &c);
   static std::optional<TypedefNameDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<TypedefNameDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return TypedefNameDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypedefNameDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TypedefNameDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TypedefNameDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypedefNameDecl> from(const Decl &parent);
+
+  inline static std::optional<TypedefNameDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TypedefNameDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;
-  Type type_source_info(void) const;
+  Type type(void) const;
   Type underlying_type(void) const;
   bool is_moded(void) const;
   bool is_transparent_tag(void) const;
@@ -18850,14 +28646,54 @@ class TypedefDecl : public TypedefNameDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TYPEDEF;
+  }
+
   static TypedefDeclContainingDeclRange containing(const Decl &decl);
   static TypedefDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TypedefDecl> from(const TokenContext &c);
   static std::optional<TypedefDecl> from(const TypedefNameDecl &parent);
+
+  inline static std::optional<TypedefDecl> from(const std::optional<TypedefNameDecl> &parent) {
+    if (parent) {
+      return TypedefDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypedefDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<TypedefDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return TypedefDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypedefDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TypedefDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TypedefDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypedefDecl> from(const Decl &parent);
+
+  inline static std::optional<TypedefDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TypedefDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using TypeAliasDeclRange = DerivedEntityRange<DeclIterator, TypeAliasDecl>;
@@ -18880,14 +28716,54 @@ class TypeAliasDecl : public TypedefNameDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TYPE_ALIAS;
+  }
+
   static TypeAliasDeclContainingDeclRange containing(const Decl &decl);
   static TypeAliasDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TypeAliasDecl> from(const TokenContext &c);
   static std::optional<TypeAliasDecl> from(const TypedefNameDecl &parent);
+
+  inline static std::optional<TypeAliasDecl> from(const std::optional<TypedefNameDecl> &parent) {
+    if (parent) {
+      return TypeAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeAliasDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<TypeAliasDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return TypeAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeAliasDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TypeAliasDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TypeAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeAliasDecl> from(const Decl &parent);
+
+  inline static std::optional<TypeAliasDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TypeAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<TypeAliasTemplateDecl> described_alias_template(void) const;
 };
 
@@ -18911,14 +28787,54 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_TYPE_PARAM;
+  }
+
   static ObjCTypeParamDeclContainingDeclRange containing(const Decl &decl);
   static ObjCTypeParamDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCTypeParamDecl> from(const TokenContext &c);
   static std::optional<ObjCTypeParamDecl> from(const TypedefNameDecl &parent);
+
+  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<TypedefNameDecl> &parent) {
+    if (parent) {
+      return ObjCTypeParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCTypeParamDecl> from(const TypeDecl &parent);
+
+  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<TypeDecl> &parent) {
+    if (parent) {
+      return ObjCTypeParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCTypeParamDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCTypeParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCTypeParamDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCTypeParamDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token colon_token(void) const;
   ObjCTypeParamVariance variance(void) const;
   Token variance_token(void) const;
@@ -18943,12 +28859,34 @@ class TemplateDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TEMPLATE;
+  }
+
   static TemplateDeclContainingDeclRange containing(const Decl &decl);
   static TemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TemplateDecl> from(const TokenContext &c);
   static std::optional<TemplateDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TemplateDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<TemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using RedeclarableTemplateDeclRange = DerivedEntityRange<DeclIterator, RedeclarableTemplateDecl>;
@@ -18970,13 +28908,44 @@ class RedeclarableTemplateDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::REDECLARABLE_TEMPLATE;
+  }
+
   static RedeclarableTemplateDeclContainingDeclRange containing(const Decl &decl);
   static RedeclarableTemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<RedeclarableTemplateDecl> from(const TokenContext &c);
   static std::optional<RedeclarableTemplateDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<RedeclarableTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return RedeclarableTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RedeclarableTemplateDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<RedeclarableTemplateDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return RedeclarableTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<RedeclarableTemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<RedeclarableTemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return RedeclarableTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using FunctionTemplateDeclRange = DerivedEntityRange<DeclIterator, FunctionTemplateDecl>;
@@ -18999,14 +28968,54 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::FUNCTION_TEMPLATE;
+  }
+
   static FunctionTemplateDeclContainingDeclRange containing(const Decl &decl);
   static FunctionTemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<FunctionTemplateDecl> from(const TokenContext &c);
   static std::optional<FunctionTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+
+  inline static std::optional<FunctionTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
+    if (parent) {
+      return FunctionTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionTemplateDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<FunctionTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return FunctionTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionTemplateDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<FunctionTemplateDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return FunctionTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<FunctionTemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<FunctionTemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return FunctionTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using ClassTemplateDeclRange = DerivedEntityRange<DeclIterator, ClassTemplateDecl>;
@@ -19029,14 +29038,54 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CLASS_TEMPLATE;
+  }
+
   static ClassTemplateDeclContainingDeclRange containing(const Decl &decl);
   static ClassTemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ClassTemplateDecl> from(const TokenContext &c);
   static std::optional<ClassTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+
+  inline static std::optional<ClassTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
+    if (parent) {
+      return ClassTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<ClassTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return ClassTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ClassTemplateDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ClassTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ClassTemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<ClassTemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ClassTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using VarTemplateDeclRange = DerivedEntityRange<DeclIterator, VarTemplateDecl>;
@@ -19059,14 +29108,54 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::VAR_TEMPLATE;
+  }
+
   static VarTemplateDeclContainingDeclRange containing(const Decl &decl);
   static VarTemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<VarTemplateDecl> from(const TokenContext &c);
   static std::optional<VarTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+
+  inline static std::optional<VarTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
+    if (parent) {
+      return VarTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplateDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<VarTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return VarTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplateDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<VarTemplateDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return VarTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<VarTemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<VarTemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return VarTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using TypeAliasTemplateDeclRange = DerivedEntityRange<DeclIterator, TypeAliasTemplateDecl>;
@@ -19089,14 +29178,56 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TYPE_ALIAS_TEMPLATE;
+  }
+
   static TypeAliasTemplateDeclContainingDeclRange containing(const Decl &decl);
   static TypeAliasTemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TypeAliasTemplateDecl> from(const TokenContext &c);
   static std::optional<TypeAliasTemplateDecl> from(const RedeclarableTemplateDecl &parent);
+
+  inline static std::optional<TypeAliasTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
+    if (parent) {
+      return TypeAliasTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeAliasTemplateDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<TypeAliasTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return TypeAliasTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeAliasTemplateDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TypeAliasTemplateDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TypeAliasTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TypeAliasTemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<TypeAliasTemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TypeAliasTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  TypeAliasTemplateDecl instantiated_from_member_template(void) const;
+  TypeAliasDecl templated_declaration(void) const;
 };
 
 using ConceptDeclRange = DerivedEntityRange<DeclIterator, ConceptDecl>;
@@ -19118,13 +29249,44 @@ class ConceptDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::CONCEPT;
+  }
+
   static ConceptDeclContainingDeclRange containing(const Decl &decl);
   static ConceptDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ConceptDecl> from(const TokenContext &c);
   static std::optional<ConceptDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<ConceptDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return ConceptDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConceptDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ConceptDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ConceptDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ConceptDecl> from(const Decl &parent);
+
+  inline static std::optional<ConceptDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ConceptDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Expr constraint_expression(void) const;
   bool is_type_concept(void) const;
 };
@@ -19148,13 +29310,44 @@ class BuiltinTemplateDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::BUILTIN_TEMPLATE;
+  }
+
   static BuiltinTemplateDeclContainingDeclRange containing(const Decl &decl);
   static BuiltinTemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<BuiltinTemplateDecl> from(const TokenContext &c);
   static std::optional<BuiltinTemplateDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<BuiltinTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return BuiltinTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BuiltinTemplateDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<BuiltinTemplateDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return BuiltinTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<BuiltinTemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return BuiltinTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using TemplateTemplateParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTemplateParmDecl>;
@@ -19176,13 +29369,44 @@ class TemplateTemplateParmDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::TEMPLATE_TEMPLATE_PARM;
+  }
+
   static TemplateTemplateParmDeclContainingDeclRange containing(const Decl &decl);
   static TemplateTemplateParmDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<TemplateTemplateParmDecl> from(const TokenContext &c);
   static std::optional<TemplateTemplateParmDecl> from(const TemplateDecl &parent);
+
+  inline static std::optional<TemplateTemplateParmDecl> from(const std::optional<TemplateDecl> &parent) {
+    if (parent) {
+      return TemplateTemplateParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TemplateTemplateParmDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<TemplateTemplateParmDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return TemplateTemplateParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<TemplateTemplateParmDecl> from(const Decl &parent);
+
+  inline static std::optional<TemplateTemplateParmDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return TemplateTemplateParmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using ObjCPropertyDeclRange = DerivedEntityRange<DeclIterator, ObjCPropertyDecl>;
@@ -19203,12 +29427,34 @@ class ObjCPropertyDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_PROPERTY;
+  }
+
   static ObjCPropertyDeclContainingDeclRange containing(const Decl &decl);
   static ObjCPropertyDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCPropertyDecl> from(const TokenContext &c);
   static std::optional<ObjCPropertyDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCPropertyDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCPropertyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCPropertyDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCPropertyDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCPropertyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token at_token(void) const;
   ObjCMethodDecl getter_method_declaration(void) const;
   Token getter_name_token(void) const;
@@ -19220,7 +29466,6 @@ class ObjCPropertyDecl : public NamedDecl {
   ObjCMethodDecl setter_method_declaration(void) const;
   Token setter_name_token(void) const;
   Type type(void) const;
-  Type type_source_info(void) const;
   bool is_atomic(void) const;
   bool is_class_property(void) const;
   bool is_direct_property(void) const;
@@ -19248,23 +29493,44 @@ class ObjCMethodDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_METHOD;
+  }
+
   static ObjCMethodDeclContainingDeclRange containing(const Decl &decl);
   static ObjCMethodDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCMethodDecl> from(const TokenContext &c);
   static std::optional<ObjCMethodDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCMethodDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCMethodDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCMethodDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCMethodDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCMethodDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool defined_in_ns_object(void) const;
   ObjCPropertyDecl find_property_declaration(void) const;
   ObjCCategoryDecl category(void) const;
   ObjCInterfaceDecl class_interface(void) const;
-  ImplicitParamDecl cmd_declaration(void) const;
+  ImplicitParamDecl command_declaration(void) const;
   Token declarator_end_token(void) const;
   ObjCMethodDeclImplementationControl implementation_control(void) const;
   ObjCMethodFamily method_family(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
   Type return_type(void) const;
-  Type return_type_source_info(void) const;
   TokenRange return_type_source_range(void) const;
   Token selector_start_token(void) const;
   ImplicitParamDecl self_declaration(void) const;
@@ -19281,6 +29547,7 @@ class ObjCMethodDecl : public NamedDecl {
   bool is_property_accessor(void) const;
   bool is_redeclaration(void) const;
   bool is_synthesized_accessor_stub(void) const;
+  bool is_definition(void) const;
   bool is_this_declaration_a_designated_initializer(void) const;
   bool is_variadic(void) const;
   std::vector<ParmVarDecl> parameters(void) const;
@@ -19306,12 +29573,34 @@ class ObjCContainerDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_CONTAINER;
+  }
+
   static ObjCContainerDeclContainingDeclRange containing(const Decl &decl);
   static ObjCContainerDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCContainerDecl> from(const TokenContext &c);
   static std::optional<ObjCContainerDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCContainerDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCContainerDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCContainerDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCContainerDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCContainerDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<ObjCMethodDecl> class_methods(void) const;
   std::vector<ObjCPropertyDecl> class_properties(void) const;
   TokenRange at_end_range(void) const;
@@ -19342,13 +29631,44 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_CATEGORY;
+  }
+
   static ObjCCategoryDeclContainingDeclRange containing(const Decl &decl);
   static ObjCCategoryDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCCategoryDecl> from(const TokenContext &c);
   static std::optional<ObjCCategoryDecl> from(const ObjCContainerDecl &parent);
+
+  inline static std::optional<ObjCCategoryDecl> from(const std::optional<ObjCContainerDecl> &parent) {
+    if (parent) {
+      return ObjCCategoryDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCCategoryDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCCategoryDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCCategoryDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCCategoryDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCCategoryDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCCategoryDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   bool is_class_extension(void) const;
   Token category_name_token(void) const;
   ObjCInterfaceDecl class_interface(void) const;
@@ -19356,7 +29676,6 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   Token instance_variable_l_brace_token(void) const;
   Token instance_variable_r_brace_token(void) const;
   ObjCCategoryDecl next_class_category(void) const;
-  ObjCCategoryDecl next_class_category_raw(void) const;
   std::vector<ObjCIvarDecl> instance_variables(void) const;
   std::vector<Token> protocol_tokens(void) const;
   std::vector<ObjCProtocolDecl> protocols(void) const;
@@ -19381,16 +29700,48 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_PROTOCOL;
+  }
+
   static ObjCProtocolDeclContainingDeclRange containing(const Decl &decl);
   static ObjCProtocolDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCProtocolDecl> from(const TokenContext &c);
   static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
+
+  inline static std::optional<ObjCProtocolDecl> from(const std::optional<ObjCContainerDecl> &parent) {
+    if (parent) {
+      return ObjCProtocolDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCProtocolDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCProtocolDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCProtocolDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCProtocolDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCProtocolDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;
   bool is_non_runtime_protocol(void) const;
+  bool is_definition(void) const;
   std::vector<Token> protocol_tokens(void) const;
   std::vector<ObjCProtocolDecl> protocols(void) const;
 };
@@ -19414,29 +29765,59 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_INTERFACE;
+  }
+
   static ObjCInterfaceDeclContainingDeclRange containing(const Decl &decl);
   static ObjCInterfaceDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCInterfaceDecl> from(const TokenContext &c);
   static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
+
+  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<ObjCContainerDecl> &parent) {
+    if (parent) {
+      return ObjCInterfaceDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCInterfaceDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCInterfaceDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCInterfaceDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<ObjCProtocolDecl> all_referenced_protocols(void) const;
   bool declares_or_inherits_designated_initializers(void) const;
-  ObjCCategoryDecl category_list_raw(void) const;
   Token end_of_definition_token(void) const;
   ObjCImplementationDecl implementation(void) const;
   std::string_view obj_c_runtime_name_as_string(void) const;
   std::optional<ObjCInterfaceDecl> super_class(void) const;
   Token super_class_token(void) const;
-  std::optional<Type> super_class_type_info(void) const;
-  std::optional<ObjCObjectType> super_class_type(void) const;
+  std::optional<Type> super_class_type(void) const;
   Type type_for_declaration(void) const;
   bool has_definition(void) const;
   bool has_designated_initializers(void) const;
   bool is_arc_weakref_unavailable(void) const;
   bool is_implicit_interface_declaration(void) const;
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
+  bool is_definition(void) const;
   std::vector<ObjCIvarDecl> instance_variables(void) const;
   std::vector<ObjCCategoryDecl> known_categories(void) const;
   std::vector<ObjCCategoryDecl> known_extensions(void) const;
@@ -19465,13 +29846,44 @@ class ObjCImplDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_IMPL;
+  }
+
   static ObjCImplDeclContainingDeclRange containing(const Decl &decl);
   static ObjCImplDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCImplDecl> from(const TokenContext &c);
   static std::optional<ObjCImplDecl> from(const ObjCContainerDecl &parent);
+
+  inline static std::optional<ObjCImplDecl> from(const std::optional<ObjCContainerDecl> &parent) {
+    if (parent) {
+      return ObjCImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCImplDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCImplDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCImplDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCImplDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCInterfaceDecl class_interface(void) const;
   std::vector<ObjCPropertyImplDecl> property_implementations(void) const;
 };
@@ -19496,14 +29908,54 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_CATEGORY_IMPL;
+  }
+
   static ObjCCategoryImplDeclContainingDeclRange containing(const Decl &decl);
   static ObjCCategoryImplDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCCategoryImplDecl> from(const TokenContext &c);
   static std::optional<ObjCCategoryImplDecl> from(const ObjCImplDecl &parent);
+
+  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<ObjCImplDecl> &parent) {
+    if (parent) {
+      return ObjCCategoryImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCCategoryImplDecl> from(const ObjCContainerDecl &parent);
+
+  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<ObjCContainerDecl> &parent) {
+    if (parent) {
+      return ObjCCategoryImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCCategoryImplDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCCategoryImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCCategoryImplDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCCategoryImplDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCCategoryDecl category_declaration(void) const;
   Token category_name_token(void) const;
 };
@@ -19528,14 +29980,54 @@ class ObjCImplementationDecl : public ObjCImplDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_IMPLEMENTATION;
+  }
+
   static ObjCImplementationDeclContainingDeclRange containing(const Decl &decl);
   static ObjCImplementationDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCImplementationDecl> from(const TokenContext &c);
   static std::optional<ObjCImplementationDecl> from(const ObjCImplDecl &parent);
+
+  inline static std::optional<ObjCImplementationDecl> from(const std::optional<ObjCImplDecl> &parent) {
+    if (parent) {
+      return ObjCImplementationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCImplementationDecl> from(const ObjCContainerDecl &parent);
+
+  inline static std::optional<ObjCImplementationDecl> from(const std::optional<ObjCContainerDecl> &parent) {
+    if (parent) {
+      return ObjCImplementationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCImplementationDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCImplementationDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCImplementationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCImplementationDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCImplementationDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCImplementationDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token instance_variable_l_brace_token(void) const;
   Token instance_variable_r_brace_token(void) const;
   std::string_view obj_c_runtime_name_as_string(void) const;
@@ -19564,12 +30056,34 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::OBJ_C_COMPATIBLE_ALIAS;
+  }
+
   static ObjCCompatibleAliasDeclContainingDeclRange containing(const Decl &decl);
   static ObjCCompatibleAliasDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ObjCCompatibleAliasDecl> from(const TokenContext &c);
   static std::optional<ObjCCompatibleAliasDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<ObjCCompatibleAliasDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return ObjCCompatibleAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
+
+  inline static std::optional<ObjCCompatibleAliasDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ObjCCompatibleAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   ObjCInterfaceDecl class_interface(void) const;
 };
 
@@ -19591,12 +30105,34 @@ class NamespaceDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::NAMESPACE;
+  }
+
   static NamespaceDeclContainingDeclRange containing(const Decl &decl);
   static NamespaceDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<NamespaceDecl> from(const TokenContext &c);
   static std::optional<NamespaceDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<NamespaceDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return NamespaceDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NamespaceDecl> from(const Decl &parent);
+
+  inline static std::optional<NamespaceDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return NamespaceDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -19618,12 +30154,34 @@ class NamespaceAliasDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::NAMESPACE_ALIAS;
+  }
+
   static NamespaceAliasDeclContainingDeclRange containing(const Decl &decl);
   static NamespaceAliasDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<NamespaceAliasDecl> from(const TokenContext &c);
   static std::optional<NamespaceAliasDecl> from(const NamedDecl &parent);
+
+  inline static std::optional<NamespaceAliasDecl> from(const std::optional<NamedDecl> &parent) {
+    if (parent) {
+      return NamespaceAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NamespaceAliasDecl> from(const Decl &parent);
+
+  inline static std::optional<NamespaceAliasDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return NamespaceAliasDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token alias_token(void) const;
   NamedDecl aliased_namespace(void) const;
   Token namespace_token(void) const;
@@ -19647,11 +30205,24 @@ class LinkageSpecDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::LINKAGE_SPEC;
+  }
+
   static LinkageSpecDeclContainingDeclRange containing(const Decl &decl);
   static LinkageSpecDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<LinkageSpecDecl> from(const TokenContext &c);
   static std::optional<LinkageSpecDecl> from(const Decl &parent);
+
+  inline static std::optional<LinkageSpecDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return LinkageSpecDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -19672,11 +30243,24 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::LIFETIME_EXTENDED_TEMPORARY;
+  }
+
   static LifetimeExtendedTemporaryDeclContainingDeclRange containing(const Decl &decl);
   static LifetimeExtendedTemporaryDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<LifetimeExtendedTemporaryDecl> from(const TokenContext &c);
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
+
+  inline static std::optional<LifetimeExtendedTemporaryDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return LifetimeExtendedTemporaryDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Stmt> children_expression(void) const;
   ValueDecl extending_declaration(void) const;
   StorageDuration storage_duration(void) const;
@@ -19700,11 +30284,24 @@ class ImportDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::IMPORT;
+  }
+
   static ImportDeclContainingDeclRange containing(const Decl &decl);
   static ImportDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ImportDecl> from(const TokenContext &c);
   static std::optional<ImportDecl> from(const Decl &parent);
+
+  inline static std::optional<ImportDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ImportDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Token> identifier_tokens(void) const;
 };
 
@@ -19725,11 +30322,24 @@ class FriendTemplateDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::FRIEND_TEMPLATE;
+  }
+
   static FriendTemplateDeclContainingDeclRange containing(const Decl &decl);
   static FriendTemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<FriendTemplateDecl> from(const TokenContext &c);
   static std::optional<FriendTemplateDecl> from(const Decl &parent);
+
+  inline static std::optional<FriendTemplateDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return FriendTemplateDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using FriendDeclRange = DerivedEntityRange<DeclIterator, FriendDecl>;
@@ -19749,11 +30359,24 @@ class FriendDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::FRIEND;
+  }
+
   static FriendDeclContainingDeclRange containing(const Decl &decl);
   static FriendDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<FriendDecl> from(const TokenContext &c);
   static std::optional<FriendDecl> from(const Decl &parent);
+
+  inline static std::optional<FriendDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return FriendDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::optional<NamedDecl> friend_declaration(void) const;
   Token friend_token(void) const;
   Type friend_type(void) const;
@@ -19778,11 +30401,24 @@ class FileScopeAsmDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::FILE_SCOPE_ASM;
+  }
+
   static FileScopeAsmDeclContainingDeclRange containing(const Decl &decl);
   static FileScopeAsmDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<FileScopeAsmDecl> from(const TokenContext &c);
   static std::optional<FileScopeAsmDecl> from(const Decl &parent);
+
+  inline static std::optional<FileScopeAsmDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return FileScopeAsmDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token assembly_token(void) const;
   StringLiteral assembly_string(void) const;
   Token r_paren_token(void) const;
@@ -19805,11 +30441,24 @@ class ExternCContextDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::EXTERN_C_CONTEXT;
+  }
+
   static ExternCContextDeclContainingDeclRange containing(const Decl &decl);
   static ExternCContextDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ExternCContextDecl> from(const TokenContext &c);
   static std::optional<ExternCContextDecl> from(const Decl &parent);
+
+  inline static std::optional<ExternCContextDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ExternCContextDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   std::vector<Decl> declarations_in_context(void) const;
 };
 
@@ -19830,11 +30479,24 @@ class ExportDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::EXPORT;
+  }
+
   static ExportDeclContainingDeclRange containing(const Decl &decl);
   static ExportDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<ExportDecl> from(const TokenContext &c);
   static std::optional<ExportDecl> from(const Decl &parent);
+
+  inline static std::optional<ExportDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return ExportDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   Token export_token(void) const;
   Token r_brace_token(void) const;
   bool has_braces(void) const;
@@ -19858,12 +30520,595 @@ class EmptyDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline static constexpr DeclKind static_kind(void) {
+    return DeclKind::EMPTY;
+  }
+
   static EmptyDeclContainingDeclRange containing(const Decl &decl);
   static EmptyDeclContainingDeclRange containing(const Stmt &stmt);
 
   static std::optional<EmptyDecl> from(const TokenContext &c);
   static std::optional<EmptyDecl> from(const Decl &parent);
+
+  inline static std::optional<EmptyDecl> from(const std::optional<Decl> &parent) {
+    if (parent) {
+      return EmptyDecl::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
+
+enum class DeclUseSelector : unsigned short {
+  ACTING_DEFINITION,
+  ALIASED_NAMESPACE,
+  ANONYMOUS_DECLARATION_WITH_TYPEDEF_NAME,
+  ANONYMOUS_FIELD,
+  ARRAY_WITH_OBJECTS_METHOD,
+  AS_CXX_RECORD_DECLARATION,
+  AS_DECLARATION,
+  AS_RECORD_DECLARATION,
+  AS_TAG_DECLARATION,
+  AT_INDEX_METHOD_DECLARATION,
+  BLOCK_DECLARATION,
+  BLOCK_MANGLING_CONTEXT_DECLARATION,
+  BODY,
+  BOXING_METHOD,
+  CALL_OPERATOR,
+  CALLEE_DECLARATION,
+  CAPTURED_DECLARATION,
+  CAPTURED_RECORD_DECLARATION,
+  CATCH_PARAMETER_DECLARATION,
+  CATEGORY,
+  CATEGORY_DECLARATION,
+  CLASS_INTERFACE,
+  CLASS_RECEIVER,
+  COMMAND_DECLARATION,
+  CONDITION_VARIABLE,
+  CONSTANT_TARGET,
+  CONSTRUCTED_BASE_CLASS,
+  CONSTRUCTED_BASE_CLASS_SHADOW_DECLARATION,
+  CONSTRUCTOR,
+  CONTAINING_INTERFACE,
+  CONTEXT_PARAMETER,
+  CONVERSION_FUNCTION,
+  CORRESPONDING_CONSTRUCTOR,
+  DECLARATION,
+  DECOMPOSED_DECLARATION,
+  DESCRIBED_ALIAS_TEMPLATE,
+  DESTRUCTOR,
+  DICTIONARY_WITH_OBJECTS_METHOD,
+  DIRECT_CALLEE,
+  ENUM_DECLARATION,
+  EXCEPTION_DECLARATION,
+  EXCEPTION_SPEC_DECLARATION,
+  EXCEPTION_SPEC_TEMPLATE,
+  EXPLICIT_PROPERTY,
+  EXTENDING_DECLARATION,
+  FIELD,
+  FIND_PROPERTY_DECLARATION,
+  FIRST_QUALIFIER_FOUND_IN_SCOPE,
+  FOUND_DECLARATION,
+  FRIEND_DECLARATION,
+  GETTER_METHOD_DECLARATION,
+  GUID_DECLARATION,
+  HOLDING_VARIABLE,
+  IMPLEMENTATION,
+  IMPLICIT_PROPERTY_GETTER,
+  IMPLICIT_PROPERTY_SETTER,
+  INITIALIZED_FIELD_IN_UNION,
+  INITIALIZING_DECLARATION,
+  INSTANTIATED_FROM_MEMBER_CLASS,
+  INSTANTIATED_FROM_MEMBER_ENUM,
+  INSTANTIATED_FROM_MEMBER_FUNCTION,
+  INSTANTIATED_FROM_MEMBER_TEMPLATE,
+  INSTANTIATED_FROM_STATIC_DATA_MEMBER,
+  INSTANTIATED_FROM_USING_DECLARATION,
+  INTERFACE,
+  INTERFACE_DECLARATION,
+  INTRODUCER,
+  IS_LOCAL_CLASS,
+  IS_OBJ_C_REQUIRES_PROPERTY_DEFINITIONS,
+  LABEL,
+  LAMBDA_CALL_OPERATOR,
+  LAMBDA_CLASS,
+  LAMBDA_CONTEXT_DECLARATION,
+  LIFETIME_EXTENDED_TEMPORARY_DECLARATION,
+  LOOP_VARIABLE,
+  MEMBER_DECLARATION,
+  METHOD_DECLARATION,
+  MOST_RECENT_CXX_RECORD_DECLARATION,
+  NAMING_CLASS,
+  NEXT_CLASS_CATEGORY,
+  NEXT_INSTANCE_VARIABLE,
+  NEXT_USING_SHADOW_DECLARATION,
+  NOMINATED_BASE_CLASS,
+  NOMINATED_BASE_CLASS_SHADOW_DECLARATION,
+  NOMINATED_NAMESPACE_AS_WRITTEN,
+  NON_CLOSURE_CONTEXT,
+  NRVO_CANDIDATE,
+  OPERATOR_DELETE,
+  OPERATOR_NEW,
+  OWNED_TAG_DECLARATION,
+  PACK,
+  PARAMETER,
+  PARAMETER_PACK,
+  POINTEE_CXX_RECORD_DECLARATION,
+  PROMISE_DECLARATION,
+  PROPERTY_DECLARATION,
+  PROPERTY_INSTANCE_VARIABLE_DECLARATION,
+  PROTOCOL,
+  RECEIVER_INTERFACE,
+  RECORD_DECLARATION,
+  REFERENCED_DECLARATION_OF_CALLEE,
+  SELF_DECLARATION,
+  SETTER_METHOD_DECLARATION,
+  SINGLE_DECLARATION,
+  SOURCE_BIT_FIELD,
+  SPECIALIZATION,
+  SUPER_CLASS,
+  TARGET_CONSTRUCTOR,
+  TARGET_DECLARATION,
+  TARGET_UNION_FIELD,
+  TEMPLATE_INSTANTIATION_PATTERN,
+  TEMPLATED_DECLARATION,
+  TYPE_CONSTRAINT_CONCEPT,
+  TYPEDEF_NAME_FOR_ANONYMOUS_DECLARATION,
+  UNDERLYING_DECLARATION,
+  VARIABLE_DECLARATION,
+};
+
+inline static const char *EnumerationName(DeclUseSelector) {
+  return "DeclUseSelector";
+}
+
+inline static constexpr unsigned NumEnumerators(DeclUseSelector) {
+  return 116;
+}
+
+const char *EnumeratorName(DeclUseSelector);
+
+enum class StmtUseSelector : unsigned short {
+  ADDR_SPACE_EXPRESSION,
+  ALLOCATE,
+  ARGUMENT,
+  ARGUMENT_EXPRESSION,
+  ARRAY_FILLER,
+  ARRAY_SIZE,
+  ASSEMBLY_STRING,
+  ASSERT_EXPRESSION,
+  ASSOCIATED_STATEMENT,
+  BASE,
+  BASE_EXPRESSION,
+  BEGIN_STATEMENT,
+  BEST_DYNAMIC_CLASS_TYPE_EXPRESSION,
+  BINDING,
+  BIT_WIDTH,
+  BLOCK,
+  BODY,
+  CALCULATE_LAST_ITERATION,
+  CALLEE,
+  CAPTURED_STATEMENT,
+  CATCH_BODY,
+  CHOSEN_SUB_EXPRESSION,
+  COLLECTION,
+  COLUMN_EXPRESSION,
+  COLUMN_INDEX,
+  COMBINED_CONDITION,
+  COMBINED_DISTANCE_CONDITION,
+  COMBINED_ENSURE_UPPER_BOUND,
+  COMBINED_INITIALIZER,
+  COMBINED_LOWER_BOUND_VARIABLE,
+  COMBINED_NEXT_LOWER_BOUND,
+  COMBINED_NEXT_UPPER_BOUND,
+  COMBINED_PARALLEL_FOR_IN_DISTANCE_CONDITION,
+  COMBINED_UPPER_BOUND_VARIABLE,
+  COMBINER,
+  COMBINER_IN,
+  COMBINER_OUT,
+  COMMON,
+  COMMON_EXPRESSION,
+  COMPOUND_BODY,
+  COMPOUND_STATEMENT_BODY,
+  CONDITION,
+  CONDITION_VARIABLE_DECLARATION_STATEMENT,
+  CONFIG,
+  CONSTRAINT_EXPRESSION,
+  CONSTRUCT_EXPRESSION,
+  CONTROLLING_EXPRESSION,
+  COOKED_LITERAL,
+  DEALLOCATE,
+  DEFAULT_ARGUMENT,
+  DIMENSION_EXPRESSION,
+  DISTANCE_FUNC,
+  DISTANCE_INCREMENT,
+  ELEMENT,
+  ELSE_,
+  END_STATEMENT,
+  ENSURE_UPPER_BOUND,
+  EXCEPT_HANDLER,
+  EXCEPTION_HANDLER,
+  EXPRESSION,
+  EXPRESSION_OPERAND,
+  EXPRESSION_STATEMENT,
+  FALLTHROUGH_HANDLER,
+  FALSE_EXPRESSION,
+  FILTER_EXPRESSION,
+  FINAL_SUSPEND_STATEMENT,
+  FINALLY_BODY,
+  FINALLY_HANDLER,
+  FINALLY_STATEMENT,
+  FIRST_SWITCH_CASE,
+  FUNCTION_NAME,
+  GETTER_CXX_CONSTRUCTOR,
+  HANDLER,
+  HANDLER_BLOCK,
+  IGNORE_CASTS,
+  IGNORE_CONTAINERS,
+  IGNORE_CONVERSION_OPERATOR_SINGLE_STEP,
+  IGNORE_IMP_CASTS,
+  IGNORE_IMPLICIT,
+  IGNORE_IMPLICIT_AS_WRITTEN,
+  IGNORE_PARENTHESES,
+  IGNORE_PARENTHESIS_BASE_CASTS,
+  IGNORE_PARENTHESIS_CASTS,
+  IGNORE_PARENTHESIS_IMP_CASTS,
+  IGNORE_PARENTHESIS_L_VALUE_CASTS,
+  IGNORE_PARENTHESIS_NOOP_CASTS,
+  IGNORE_UNLESS_SPELLED_IN_SOURCE,
+  IMPLICIT_OBJECT_ARGUMENT,
+  IN_CLASS_INITIALIZER,
+  INCREMENT,
+  INDEX,
+  INITIALIZER,
+  INITIALIZER_EXPRESSION,
+  INITIALIZER_ORIGINAL,
+  INITIALIZER_PRIVATE,
+  INITIALIZER_SUSPEND_STATEMENT,
+  INNERMOST_CAPTURED_STATEMENT,
+  INSTANCE_RECEIVER,
+  IS_LAST_ITERATION_VARIABLE,
+  ITERATION_VARIABLE,
+  KEY_EXPRESSION,
+  LAST_ITERATION,
+  LENGTH,
+  LHS,
+  LOOP_STATEMENT,
+  LOOP_VARIABLE_FUNC,
+  LOOP_VARIABLE_REFERENCE,
+  LOOP_VARIABLE_STATEMENT,
+  LOWER_BOUND,
+  LOWER_BOUND_VARIABLE,
+  MAPPER_VARIABLE_REFERENCE,
+  MESSAGE,
+  NEXT_LOWER_BOUND,
+  NEXT_SWITCH_CASE,
+  NEXT_UPPER_BOUND,
+  NOEXCEPT_EXPRESSION,
+  NUM_BITS_EXPRESSION,
+  NUM_ITERATIONS,
+  OBJ_C_PROPERTY,
+  OPAQUE_VALUE,
+  OPERAND,
+  OPERATOR_COAWAIT_LOOKUP,
+  OPERATOR_DELETE_THIS_ARGUMENT,
+  ORDER,
+  ORDER_FAIL,
+  PATTERN,
+  PLACEHOLDER_TYPE_CONSTRAINT,
+  POINTER,
+  PRE_CONDITION,
+  PRE_INITIALIZERS,
+  PREV_ENSURE_UPPER_BOUND,
+  PREV_LOWER_BOUND_VARIABLE,
+  PREV_UPPER_BOUND_VARIABLE,
+  PROMISE_CALL,
+  PROMISE_DECLARATION_STATEMENT,
+  QUERIED_EXPRESSION,
+  RANGE_INITIALIZER,
+  RANGE_STATEMENT,
+  RAW_STATEMENT,
+  READY_EXPRESSION,
+  REDUCTION_REFERENCE,
+  REPLACEMENT,
+  REQUIRES_CLAUSE,
+  RESULT_DECLARATION,
+  RESULT_EXPRESSION,
+  RESUME_EXPRESSION,
+  RETURN_STATEMENT,
+  RETURN_STATEMENT_ON_ALLOC_FAILURE,
+  RETURN_VALUE,
+  RETURN_VALUE_INITIALIZER,
+  RHS,
+  ROW_EXPRESSION,
+  ROW_INDEX,
+  SCOPE,
+  SEMANTIC_FORM,
+  SETTER_CXX_ASSIGNMENT,
+  SIZE_EXPRESSION,
+  SOURCE_EXPRESSION,
+  SRC_EXPRESSION,
+  STATEMENT,
+  STATEMENT_EXPRESSION_RESULT,
+  STRIDE,
+  STRIDE_VARIABLE,
+  STRING,
+  STRIP_LABEL_LIKE_STATEMENTS,
+  STRUCTURED_BLOCK,
+  SUB_EXPRESSION,
+  SUB_EXPRESSION_AS_WRITTEN,
+  SUB_STATEMENT,
+  SUSPEND_EXPRESSION,
+  SYNCH_BODY,
+  SYNCH_EXPRESSION,
+  SYNTACTIC_FORM,
+  TARGET,
+  TASK_REDUCTION_REFERENCE_EXPRESSION,
+  TEMPORARY_EXPRESSION,
+  THEN,
+  THROW_EXPRESSION,
+  TRAILING_REQUIRES_CLAUSE,
+  TRANSFORMED_STATEMENT,
+  TRUE_EXPRESSION,
+  TRY_BLOCK,
+  TRY_BODY,
+  UNDERLYING_EXPRESSION,
+  UNINSTANTIATED_DEFAULT_ARGUMENT,
+  UPDATE_EXPRESSION,
+  UPDATER,
+  UPPER_BOUND_VARIABLE,
+  V,
+  VALUE1,
+  VALUE2,
+  WEAK,
+  X,
+};
+
+inline static const char *EnumerationName(StmtUseSelector) {
+  return "StmtUseSelector";
+}
+
+inline static constexpr unsigned NumEnumerators(StmtUseSelector) {
+  return 193;
+}
+
+const char *EnumeratorName(StmtUseSelector);
+
+enum class TypeUseSelector : unsigned short {
+  ALIASED_TYPE,
+  ALLOCATED_TYPE,
+  ARGUMENT_TYPE,
+  ARRAY_ELEMENT_TYPE_NO_TYPE_QUALIFIED,
+  AS_COMPLEX_INTEGER_TYPE,
+  AS_OBJ_C_INTERFACE_POINTER_TYPE,
+  AS_OBJ_C_INTERFACE_TYPE,
+  AS_OBJ_C_QUALIFIED_CLASS_TYPE,
+  AS_OBJ_C_QUALIFIED_ID_TYPE,
+  AS_OBJ_C_QUALIFIED_INTERFACE_TYPE,
+  AS_PLACEHOLDER_TYPE,
+  AS_STRUCTURE_TYPE,
+  AS_TYPE,
+  AS_UNION_TYPE,
+  ATOMIC_UNQUALIFIED_TYPE,
+  BASE_TYPE,
+  CALL_RESULT_TYPE,
+  CALL_RETURN_TYPE,
+  CANONICAL_TYPE,
+  CAPTURED_VLA_TYPE,
+  CAUGHT_TYPE,
+  CLASS_,
+  CLASS_RECEIVER,
+  CLASS_RECEIVER_TYPE,
+  COMPUTATION_LHS_TYPE,
+  COMPUTATION_RESULT_TYPE,
+  CONTAINED_AUTO_TYPE,
+  CONTAINED_DEDUCED_TYPE,
+  CONVERSION_TYPE,
+  DECLARED_RETURN_TYPE,
+  DEFAULT_ARGUMENT,
+  DEFAULT_ARGUMENT_INFO,
+  DESTROYED_TYPE,
+  DESUGAR,
+  DESUGARED_TYPE,
+  ELEMENT_TYPE,
+  ENCODED_TYPE,
+  EQUIVALENT_TYPE,
+  FRIEND_TYPE,
+  FUNCTION_TYPE,
+  IGNORE_PARENTHESES,
+  INJECTED_SPECIALIZATION_TYPE,
+  INJECTED_TST,
+  INNER_TYPE,
+  INTEGER_TYPE,
+  INTERFACE_TYPE,
+  LAMBDA_TYPE,
+  LOCAL_UNQUALIFIED_TYPE,
+  LOCALLY_UNQUALIFIED_SINGLE_STEP_DESUGARED_TYPE,
+  MODIFIED_TYPE,
+  NAMED_TYPE,
+  NON_L_VALUE_EXPRESSION_TYPE,
+  NON_PACK_EXPANSION_TYPE,
+  NON_REFERENCE_TYPE,
+  NULL_POINTER_TYPE,
+  OBJECT_TYPE,
+  ORIGINAL_TYPE,
+  PARAMETER_TYPE,
+  PARAMETER_TYPE_FOR_DECLARATION,
+  PATTERN,
+  POINTEE_OR_ARRAY_ELEMENT_TYPE,
+  POINTEE_TYPE,
+  POINTEE_TYPE_AS_WRITTEN,
+  PROMOTION_TYPE,
+  QUERIED_TYPE,
+  RECEIVER_TYPE,
+  REPLACED_PARAMETER,
+  REPLACEMENT_TYPE,
+  RESOLVED_TYPE,
+  RETURN_TYPE,
+  SCOPE_TYPE,
+  SIGNATURE_AS_WRITTEN,
+  SINGLE_STEP_DESUGARED_TYPE,
+  STRIP_OBJ_C_KIND_OF_TYPE,
+  STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIEDS,
+  SUPER_CLASS_TYPE,
+  SUPER_RECEIVER_TYPE,
+  SUPER_TYPE,
+  SVE_ELEMENT_TYPE,
+  THIS_OBJECT_TYPE,
+  THIS_TYPE,
+  TYPE,
+  TYPE_AS_WRITTEN,
+  TYPE_FOR_DECLARATION,
+  TYPE_OF_ARGUMENT,
+  TYPE_OPERAND,
+  TYPE_OPERAND_SOURCE_INFO,
+  UNDERLYING_TYPE,
+  UNQUALIFIED_DESUGARED_TYPE,
+  UNQUALIFIED_TYPE,
+  VALUE_TYPE,
+  WITH_CONST,
+  WITH_RESTRICT,
+  WITH_VOLATILE,
+  WITHOUT_LOCAL_FAST_QUALIFIERS,
+  WRITTEN_TYPE,
+};
+
+inline static const char *EnumerationName(TypeUseSelector) {
+  return "TypeUseSelector";
+}
+
+inline static constexpr unsigned NumEnumerators(TypeUseSelector) {
+  return 96;
+}
+
+const char *EnumeratorName(TypeUseSelector);
+
+enum class TokenUseSelector : unsigned short {
+  ACCESS_SPECIFIER_TOKEN,
+  ACCESSOR_TOKEN,
+  ALIAS_TOKEN,
+  AMP_AMP_TOKEN,
+  ASSEMBLY_TOKEN,
+  AT_CATCH_TOKEN,
+  AT_FINALLY_TOKEN,
+  AT_START_TOKEN,
+  AT_SYNCHRONIZED_TOKEN,
+  AT_TOKEN,
+  AT_TRY_TOKEN,
+  ATTRIBUTE_TOKEN,
+  BASE_TOKEN_END,
+  BASE_TYPE_TOKEN,
+  BEGIN_TOKEN,
+  BREAK_TOKEN,
+  BRIDGE_KEYWORD_TOKEN,
+  BUILTIN_TOKEN,
+  CAPTURE_DEFAULT_TOKEN,
+  CARET_TOKEN,
+  CASE_TOKEN,
+  CATCH_TOKEN,
+  CATEGORY_NAME_TOKEN,
+  COAWAIT_TOKEN,
+  COLON_COLON_TOKEN,
+  COLON_TOKEN,
+  CONTINUE_TOKEN,
+  DECLARATOR_END_TOKEN,
+  DEFAULT_ARGUMENT_TOKEN,
+  DEFAULT_TOKEN,
+  DESTROYED_TYPE_TOKEN,
+  DO_TOKEN,
+  ELLIPSIS_TOKEN,
+  ELSE_TOKEN,
+  END_OF_DEFINITION_TOKEN,
+  END_TOKEN,
+  ENUM_TOKEN,
+  EQUAL_OR_COLON_TOKEN,
+  EXCEPT_TOKEN,
+  EXPORT_TOKEN,
+  EXPRESSION_TOKEN,
+  EXTERN_TOKEN,
+  FINALLY_TOKEN,
+  FIRST_COLON_TOKEN,
+  FIRST_INNER_TOKEN,
+  FIRST_OUTER_TOKEN,
+  FOR_TOKEN,
+  FRIEND_TOKEN,
+  GENERIC_TOKEN,
+  GETTER_NAME_TOKEN,
+  GOTO_TOKEN,
+  IDENTIFIER_TOKEN,
+  IF_TOKEN,
+  INSTANCE_VARIABLE_L_BRACE_TOKEN,
+  INSTANCE_VARIABLE_R_BRACE_TOKEN,
+  ISA_MEMBER_TOKEN,
+  ITERATOR_KW_TOKEN,
+  KEYWORD_TOKEN,
+  L_ANGLE_TOKEN,
+  L_BRACE_TOKEN,
+  L_BRACKET_TOKEN,
+  L_PAREN_TOKEN,
+  LABEL_TOKEN,
+  LEAVE_TOKEN,
+  LEFT_ANGLE_TOKEN,
+  LEFT_BRACE_TOKEN,
+  LEFT_TOKEN,
+  MEMBER_TOKEN,
+  NAME_TOKEN,
+  NAMESPACE_KEY_TOKEN,
+  NAMESPACE_TOKEN,
+  OPERATION_TOKEN,
+  OPERATOR_TOKEN,
+  PACK_TOKEN,
+  PARAMETER_PACK_TOKEN,
+  POINT_OF_INSTANTIATION,
+  PROPERTY_INSTANCE_VARIABLE_DECLARATION_TOKEN,
+  PROTOCOL_ID_TOKEN,
+  QUESTION_TOKEN,
+  R_ANGLE_TOKEN,
+  R_BRACE_TOKEN,
+  R_BRACKET_TOKEN,
+  R_PAREN_TOKEN,
+  RECEIVER_TOKEN,
+  REQUIRES_KW_TOKEN,
+  RETURN_TOKEN,
+  RIGHT_ANGLE_TOKEN,
+  RIGHT_BRACE_TOKEN,
+  RIGHT_TOKEN,
+  SECOND_COLON_TOKEN,
+  SELECTOR_START_TOKEN,
+  SEMI_TOKEN,
+  SETTER_NAME_TOKEN,
+  STAR_TOKEN,
+  SUPER_CLASS_TOKEN,
+  SUPER_TOKEN,
+  SWITCH_TOKEN,
+  TARGET_CALL_TOKEN,
+  TARGET_NAME_TOKEN,
+  TEMPLATE_KEYWORD_TOKEN,
+  THROW_TOKEN,
+  TILDE_TOKEN,
+  TOKEN,
+  TOKEN_TOKEN,
+  TRY_TOKEN,
+  TYPE_SPEC_END_TOKEN,
+  TYPE_SPEC_START_TOKEN,
+  TYPENAME_TOKEN,
+  UD_SUFFIX_TOKEN,
+  USED_TOKEN,
+  USING_TOKEN,
+  VARIANCE_TOKEN,
+  WHILE_TOKEN,
+};
+
+inline static const char *EnumerationName(TokenUseSelector) {
+  return "TokenUseSelector";
+}
+
+inline static constexpr unsigned NumEnumerators(TokenUseSelector) {
+  return 113;
+}
+
+const char *EnumeratorName(TokenUseSelector);
 
 static_assert(sizeof(TemplateTypeParmType) == sizeof(Type));
 

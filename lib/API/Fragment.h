@@ -29,6 +29,14 @@ class FragmentImpl {
   //            should guard this with a mutex.
   mutable std::shared_ptr<const FileImpl> containing_file;
 
+  // For bounds checking.
+  //
+  // NOTE(pag): Initialized by derived classes;
+  unsigned num_decls{0u};
+  unsigned num_stmts{0u};
+  unsigned num_types{0u};
+  unsigned num_pseudos{0u};
+
   virtual ~FragmentImpl(void) noexcept;
 
   inline FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_)
@@ -57,21 +65,21 @@ class FragmentImpl {
   virtual std::string_view Data(void) const = 0;
 
   // Return the token associated with a specific entity ID.
-  Token TokenFor(const FragmentImpl::Ptr &, EntityId id,
-                 bool can_fail=false) const;
+  std::optional<Token> TokenFor(const FragmentImpl::Ptr &, EntityId id,
+                                bool can_fail=false) const;
 
   // Return the inclusive token range associated with two entity IDs.
   TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
                            EntityId end_id) const;
 
   // Return the declaration associated with a specific entity ID.
-  Decl DeclFor(const FragmentImpl::Ptr &, EntityId id) const;
+  std::optional<Decl> DeclFor(const FragmentImpl::Ptr &, EntityId id) const;
 
   // Return the statement associated with a specific entity ID.
-  Stmt StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
+  std::optional<Stmt> StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
 
   // Return the type associated with a specific entity ID.
-  Type TypeFor(const FragmentImpl::Ptr &, EntityId id) const;
+  std::optional<Type> TypeFor(const FragmentImpl::Ptr &, EntityId id) const;
 };
 
 // A packed fragment of code, i.e. a serialized fragment.

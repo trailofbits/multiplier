@@ -59,13 +59,15 @@ using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
 using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
 
 template <typename T>
-inline ParentDeclIteratorImpl<T> &ParentDeclIteratorImpl<T>::operator++(void) {
+inline ParentDeclIteratorImpl<T> &
+ParentDeclIteratorImpl<T>::operator++(void) & {
   impl = impl->parent_declaration();
   return *this;
 }
 
 template <typename T>
-inline ParentStmtIteratorImpl<T> &ParentStmtIteratorImpl<T>::operator++(void) {
+inline ParentStmtIteratorImpl<T> &
+ParentStmtIteratorImpl<T>::operator++(void) & {
   impl = impl->parent_statement();
   return *this;
 }
@@ -76,6 +78,7 @@ class Token {
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class Index;
   friend class TokenContext;
   friend class TokenList;
   friend class TokenListIterator;
@@ -201,7 +204,12 @@ class TokenRange {
   std::string_view data(void) const;
 
   // Return an iterator pointing at the first token in this list.
-  inline TokenListIterator begin(void) const noexcept {
+  inline TokenListIterator begin(void) && noexcept {
+    return TokenListIterator(std::move(impl), index, num_tokens);
+  }
+
+  // Return an iterator pointing at the first token in this list.
+  inline TokenListIterator begin(void) const & noexcept {
     return TokenListIterator(impl, index, num_tokens);
   }
 
@@ -309,7 +317,12 @@ class FragmentList {
   }
 
   // Return an iterator pointing at the first token in this list.
-  inline FileFragmentListIterator begin(void) const noexcept {
+  inline FileFragmentListIterator begin(void) && noexcept {
+    return FileFragmentListIterator(std::move(impl), 0, num_fragments);
+  }
+
+  // Return an iterator pointing at the first token in this list.
+  inline FileFragmentListIterator begin(void) const & noexcept {
     return FileFragmentListIterator(impl, 0, num_fragments);
   }
 
@@ -380,7 +393,8 @@ class FileList {
       : impl(std::move(impl_)) {}
 
  public:
-  FileListIterator begin(void) const;
+  FileListIterator begin(void) &&;
+  FileListIterator begin(void) const &;
 
   inline FileListIterator::EndIteratorType end(void) const {
     return {};
@@ -542,7 +556,11 @@ class TokenSubstitutionList {
  public:
   TokenSubstitutionList(void) = default;
 
-  inline TokenSubstitutionListIterator begin(void) const noexcept {
+  inline TokenSubstitutionListIterator begin(void) && noexcept {
+    return TokenSubstitutionListIterator(std::move(impl), 0, num_nodes);
+  }
+
+  inline TokenSubstitutionListIterator begin(void) const & noexcept {
     return TokenSubstitutionListIterator(impl, 0, num_nodes);
   }
 
@@ -714,7 +732,12 @@ class WeggliQueryResult {
   WeggliQueryResult(std::shared_ptr<WeggliQueryResultImpl> impl_);
 
   // Return an iterator pointing at the first token in this list.
-  inline WeggliQueryResultIterator begin(void) const noexcept {
+  inline WeggliQueryResultIterator begin(void) && noexcept {
+    return WeggliQueryResultIterator(std::move(impl), 0, num_fragments);
+  }
+
+  // Return an iterator pointing at the first token in this list.
+  inline WeggliQueryResultIterator begin(void) const & noexcept {
     return WeggliQueryResultIterator(impl, 0, num_fragments);
   }
 
@@ -842,7 +865,12 @@ class RegexQueryResult {
   RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_);
 
   // Return an iterator pointing at the first token in this list.
-  inline RegexQueryResultIterator begin(void) const noexcept {
+  inline RegexQueryResultIterator begin(void) && noexcept {
+    return RegexQueryResultIterator(std::move(impl), 0, num_fragments);
+  }
+
+  // Return an iterator pointing at the first token in this list.
+  inline RegexQueryResultIterator begin(void) const & noexcept {
     return RegexQueryResultIterator(impl, 0, num_fragments);
   }
 
@@ -887,6 +915,7 @@ class EntityProvider {
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
+  friend class UseIteratorImpl;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
 
@@ -906,11 +935,16 @@ class EntityProvider {
   virtual void VersionNumberChanged(unsigned new_version_number) = 0;
 
   // Cache a returned file list.
-  virtual FilePathList CacheFileList(FilePathList, unsigned) = 0;
+  virtual void CacheFileList(const FilePathList &, unsigned) = 0;
 
   // Cache a returned list of redeclarations.
-  virtual std::vector<RawEntityId> CacheRedeclarations(
-      std::vector<RawEntityId>, unsigned) = 0;
+  virtual void CacheRedeclarations(
+      const std::vector<RawEntityId> &, unsigned) = 0;
+
+  // Cache a returned set of uses for a given set of redeclarations.
+  virtual void CacheUses(
+      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+      unsigned) = 0;
 
  private:
 
@@ -935,6 +969,12 @@ class EntityProvider {
   // Return the redeclarations of a given declaration.
   virtual std::vector<RawEntityId> Redeclarations(
       const Ptr &, RawEntityId eid) = 0;
+
+  // Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
+  // to analyze when looking for uses.
+  virtual void FillUses(const Ptr &, RawEntityId eid,
+                        std::vector<RawEntityId> &redecl_ids_out,
+                        std::vector<FragmentId> &fragment_ids_out) = 0;
 };
 
 class NotAnEntity {};

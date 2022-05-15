@@ -17,86 +17,86 @@
 namespace indexer {
 namespace {
 
-#define MX_SERIALIZE_ENUM(cls, api_name, get, set, init, \
-                          pasta_name, type, nth_list) \
+#define MX_VISIT_ENUM(cls, api_name, get, set, init, \
+                      pasta_name, type, nth_list) \
     template <typename Reader> \
     inline static pasta::type Get_ ## cls ## _ ## pasta_name(const Reader &reader) { \
       return static_cast<pasta::type>(reader.get()); \
     }
 
-#define MX_SERIALIZE_PSEUDO_KIND(cls, get, set) \
-    inline static pasta::PseudoEntityKind Get_PseudoEntityKind( \
+#define MX_VISIT_PSEUDO_KIND(cls, get, set) \
+    inline static pasta::PseudoKind Get_PseudoKind( \
         const mx::ast::Pseudo::Reader &reader, pasta::cls *) { \
-      return static_cast<pasta::PseudoEntityKind>(reader.get()); \
+      return static_cast<pasta::PseudoKind>(reader.get()); \
     }
 
-#define MX_BEGIN_SERIALIZE_DECL(name) \
+#define MX_BEGIN_VISIT_DECL(name) \
     static void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Decl::Reader &);
 
-#define MX_BEGIN_SERIALIZE_STMT(name) \
+#define MX_BEGIN_VISIT_STMT(name) \
     static void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Stmt::Reader &);
 
-#define MX_BEGIN_SERIALIZE_TYPE(name) \
+#define MX_BEGIN_VISIT_TYPE(name) \
     static void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Type::Reader &);
 
-#define MX_BEGIN_SERIALIZE_PSEUDO(name) \
+#define MX_BEGIN_VISIT_PSEUDO(name) \
     static void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Pseudo::Reader &);
 
-#include "Visitor.inc.h"
+#include <multiplier/Visitor.inc.h>
 
-#define MX_END_SERIALIZE_DECL(name) }
-#define MX_END_SERIALIZE_STMT MX_END_SERIALIZE_DECL
-#define MX_END_SERIALIZE_TYPE MX_END_SERIALIZE_DECL
-#define MX_END_SERIALIZE_PSEUDO MX_END_SERIALIZE_DECL
+#define MX_END_VISIT_DECL(name) }
+#define MX_END_VISIT_STMT MX_END_VISIT_DECL
+#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 
-#define MX_BEGIN_SERIALIZE_DECL(name) \
+#define MX_BEGIN_VISIT_DECL(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Decl::Reader &reader) {
 
-#define MX_BEGIN_SERIALIZE_STMT(name) \
+#define MX_BEGIN_VISIT_STMT(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Stmt::Reader &reader) {
 
-#define MX_BEGIN_SERIALIZE_TYPE(name) \
+#define MX_BEGIN_VISIT_TYPE(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Type::Reader &reader) {
 
-#define MX_BEGIN_SERIALIZE_PSEUDO(name) \
+#define MX_BEGIN_VISIT_PSEUDO(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Pseudo::Reader &reader) {
 
-#define MX_SERIALIZE_BASE(name, base_name) \
+#define MX_VISIT_BASE(name, base_name) \
     FindReferences_ ## base_name (entity_ids, reader);
 
-#define MX_SERIALIZE_ENTITY(cls, api_name, get, set, init, \
-                            pasta_name, type, nth_list) \
+#define MX_VISIT_ENTITY(cls, api_name, get, set, init, \
+                        pasta_name, type, nth_list, selector) \
     if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) { \
       entity_ids.insert(reader.get()); \
     }
 
-#define MX_SERIALIZE_OPTIONAL_ENTITY MX_SERIALIZE_ENTITY
+#define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_ENTITY
 
-#define MX_SERIALIZE_ENTITY_LIST(cls, api_name, get, set, init, \
-                                 pasta_name, type, nth_list) \
-    if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) { \
-      for (auto eid : reader.get()) { \
-        entity_ids.insert(eid); \
-      } \
-    }
+//#define MX_VISIT_ENTITY_LIST(cls, api_name, get, set, init, \
+//                             pasta_name, type, nth_list) \
+//    if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) { \
+//      for (auto eid : reader.get()) { \
+//        entity_ids.insert(eid); \
+//      } \
+//    }
 
-#include "Visitor.inc.h"
+#include <multiplier/Visitor.inc.h>
 
 
 }  // namespace
@@ -163,11 +163,11 @@ void PendingFragment::FindDeclarationUses(
   pasta::TemplateArgument *tag = nullptr;
   for (mx::ast::Pseudo::Reader entity : b.getOthers().asReader()) {
 #define MX_VISIT_PSEUDO(pseudo) \
-    case pasta::PseudoEntityKind::k ## pseudo: \
+    case pasta::PseudoKind::k ## pseudo: \
       FindReferences_ ## pseudo(entity_ids, entity); \
       break;
 
-    switch (Get_PseudoEntityKind(entity, tag)) {
+    switch (Get_PseudoKind(entity, tag)) {
       PSEUDO_ENTITY_TYPES(MX_VISIT_PSEUDO)
     }
 

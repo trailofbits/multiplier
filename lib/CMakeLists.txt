@@ -70,6 +70,8 @@ set(api_headers
   "${source_include_dir}/Iterator.h"
   "${source_include_dir}/Compress.h"
   "${source_include_dir}/Types.h"
+  "${source_include_dir}/Use.h"
+  "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
 
 add_library("mx-api"
@@ -96,6 +98,8 @@ add_library("mx-api"
     "API/TokenSubstitution.cpp"
     "API/Token.cpp"
     "API/Token.h"
+    "API/Use.cpp"
+    "API/Use.h"
     "API/Weggli.cpp"
     "API/Weggli.h"
     

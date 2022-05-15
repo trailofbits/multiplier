@@ -63,48 +63,90 @@ std::variant<Decl, Stmt, Type, Token, TokenSubstitution, NotAnEntity>
 Index::entity(EntityId eid) const {
 
   VariantId vid = eid.Unpack();
+
+  // It's a reference to a declaration.
   if (std::holds_alternative<DeclarationId>(vid)) {
     DeclarationId id = std::get<DeclarationId>(vid);
     assert(id == EntityId(id));
-    if (auto frag = fragment(id.fragment_id)) {
-      Decl decl(frag->impl, id.offset);
-      assert(decl.id() == eid);
-      return decl;
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
+      if (id.offset < frag_ptr->num_decls) {
+        Decl decl(std::move(frag_ptr), id.offset);
+        if (decl.id() == eid) {
+          return decl;
+        } else {
+          assert(false);
+        }
+      }
     }
 
+  // It's a reference to a statement.
   } else if (std::holds_alternative<StatementId>(vid)) {
     StatementId id = std::get<StatementId>(vid);
     assert(id == EntityId(id));
-    if (auto frag = fragment(id.fragment_id)) {
-      Stmt stmt(frag->impl, id.offset);
-      assert(stmt.id() == eid);
-      return stmt;
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
+      if (id.offset < frag_ptr->num_stmts) {
+        Stmt stmt(std::move(frag_ptr), id.offset);
+        if (stmt.id() == eid) {
+          return stmt;
+        } else {
+          assert(false);
+        }
+      }
     }
+
+  // It's a reference to a type.
   } else if (std::holds_alternative<TypeId>(vid)) {
     TypeId id = std::get<TypeId>(vid);
     assert(id == EntityId(id));
-    if (auto frag = fragment(id.fragment_id)) {
-      Type type(frag->impl, id.offset);
-      assert(type.id() == eid);
-      return type;
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
+      if (id.offset < frag_ptr->num_types) {
+        Type type(std::move(frag_ptr), id.offset);
+        if (type.id() == eid) {
+          return type;
+        } else {
+          assert(false);
+        }
+      }
     }
 
+  // It's a reference to a fragment token.
   } else if (std::holds_alternative<FragmentTokenId>(vid)) {
     FragmentTokenId id = std::get<FragmentTokenId>(vid);
     assert(id == EntityId(id));
-    if (auto frag = fragment(id.fragment_id)) {
-      return frag->impl->TokenFor(frag->impl, eid);
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
+      auto tok_reader = frag_ptr->TokenReader(frag_ptr);
+      if (id.offset < tok_reader->NumTokens()) {
+        Token tok(std::move(tok_reader), id.offset);
+        if (tok.id() == eid) {
+          return tok;
+        } else {
+          assert(false);
+        }
+      }
     }
 
+  // It's a reference to a token substitution.
   } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
     TokenSubstitutionId id = std::get<TokenSubstitutionId>(vid);
     assert(id == EntityId(id));
-    if (auto frag = fragment(id.fragment_id)) {
-      return TokenSubstitution(frag->impl, id.offset, id.kind);
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
+      return TokenSubstitution(frag_ptr, id.offset, id.kind);
     }
 
+  // It's a reference to a file token.
   } else if (std::holds_alternative<FileTokenId>(vid)) {
     FileTokenId id = std::get<FileTokenId>(vid);
+    if (FileImpl::Ptr file_ptr = impl->FileFor(impl, id.file_id)) {
+      auto tok_reader = file_ptr->TokenReader(file_ptr);
+      if (id.offset < tok_reader->NumTokens()) {
+        Token tok(std::move(tok_reader), id.offset);
+        if (tok.id() == eid) {
+          return tok;
+        } else {
+          assert(false);
+        }
+      }
+    }
   }
 
   return NotAnEntity{};

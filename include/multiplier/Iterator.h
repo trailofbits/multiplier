@@ -7,14 +7,18 @@
 #pragma once
 
 #include <optional>
+#include <memory>
 
 #include "Types.h"
 
 namespace mx {
 
+class CXXBaseSpecifier;
 class Decl;
 class FragmentImpl;
 class Stmt;
+class TemplateArgument;
+class TemplateParameterList;
 class Token;
 class Type;
 
@@ -51,16 +55,16 @@ class DerivedEntityIterator {
   }
 
   // Return the current token pointed to by the iterator.
-  inline const Derived &operator*(void) const noexcept {
+  inline const Derived &operator*(void) const & noexcept {
     return item.value();
   }
 
-  inline const Derived *operator->(void) const noexcept {
+  inline const Derived *operator->(void) const & noexcept {
     return std::addressof(item.value());
   }
 
   // Pre-increment.
-  inline Self &operator++(void) noexcept {
+  inline Self &operator++(void) & noexcept{
     ++iter;
     Advance();
     return *this;
@@ -90,7 +94,11 @@ class DerivedEntityRange {
   inline DerivedEntityRange(Iter iter_)
       : iter(std::move(iter_)) {}
 
-  inline DerivedEntityIter begin(void) const {
+  inline DerivedEntityIter begin(void) && {
+    return std::move(iter);
+  }
+
+  inline DerivedEntityIter begin(void) const & {
     return iter;
   }
 
@@ -99,11 +107,16 @@ class DerivedEntityRange {
   }
 
   // Return the current token pointed to by the iterator.
-  inline const Derived &operator*(void) const noexcept {
+  inline Derived operator*(void) && noexcept {
+    return std::move(*iter);
+  }
+
+  // Return the current token pointed to by the iterator.
+  inline const Derived &operator*(void) const & noexcept {
     return *iter;
   }
 
-  inline const Derived *operator->(void) const noexcept {
+  inline const Derived *operator->(void) const & noexcept {
     return std::addressof(*iter);
   }
 
@@ -145,16 +158,22 @@ class DeclIterator {
   }
 
   // Return the current declaration pointed to by the iterator.
-  Decl operator*(void) const noexcept;
+  Decl operator*(void) && noexcept;
+  Decl operator*(void) const & noexcept;
 
   // Pre-increment.
-  inline DeclIterator &operator++(void) noexcept {
+  inline DeclIterator &operator++(void) & noexcept {
     ++index;
     return *this;
   }
 
   // Post-increment.
-  inline DeclIterator operator++(int) noexcept {
+  inline DeclIterator operator++(int) && noexcept {
+    return DeclIterator(std::move(impl), index + 1u, num_decls);
+  }
+
+  // Post-increment.
+  inline DeclIterator operator++(int) & noexcept {
     return DeclIterator(impl, index++, num_decls);
   }
 };
@@ -192,16 +211,22 @@ class StmtIterator {
   }
 
   // Return the current statement pointed to by the iterator.
-  Stmt operator*(void) const noexcept;
+  Stmt operator*(void) && noexcept;
+  Stmt operator*(void) const & noexcept;
 
   // Pre-increment.
-  inline StmtIterator &operator++(void) noexcept {
+  inline StmtIterator &operator++(void) & noexcept {
     ++index;
     return *this;
   }
 
   // Post-increment.
-  inline StmtIterator operator++(int) noexcept {
+  inline StmtIterator operator++(int) && noexcept {
+    return StmtIterator(std::move(impl), index + 1u, num_stmts);
+  }
+
+  // Post-increment.
+  inline StmtIterator operator++(int) & noexcept {
     return StmtIterator(impl, index++, num_stmts);
   }
 };
@@ -239,16 +264,22 @@ class TypeIterator {
   }
 
   // Return the current type pointed to by the iterator.
-  Type operator*(void) const noexcept;
+  Type operator*(void) && noexcept;
+  Type operator*(void) const & noexcept;
 
   // Pre-increment.
-  inline TypeIterator &operator++(void) noexcept {
+  inline TypeIterator &operator++(void) & noexcept {
     ++index;
     return *this;
   }
 
   // Post-increment.
-  inline TypeIterator operator++(int) noexcept {
+  inline TypeIterator operator++(int) && noexcept {
+    return TypeIterator(std::move(impl), index + 1u, num_types);
+  }
+
+  // Post-increment.
+  inline TypeIterator operator++(int) & noexcept {
     return TypeIterator(impl, index++, num_types);
   }
 };
@@ -334,17 +365,22 @@ class TokenContextIterator {
   }
 
   // Return the current token context pointed to by the iterator.
-  const TokenContext &operator*(void) const noexcept {
+  TokenContext operator*(void) && noexcept {
+    return std::move(impl.value());
+  }
+
+  // Return the current token context pointed to by the iterator.
+  const TokenContext &operator*(void) const & noexcept {
     return impl.value();
   }
 
   // Return the current token context pointed to by the iterator.
-  const TokenContext *operator->(void) const noexcept {
+  const TokenContext *operator->(void) const & noexcept {
     return std::addressof(impl.value());
   }
 
   // Pre-increment.
-  inline TokenContextIterator &operator++(void) noexcept {
+  inline TokenContextIterator &operator++(void) & noexcept {
     impl = impl->parent();
     return *this;
   }
@@ -377,17 +413,22 @@ class ParentDeclIteratorImpl {
   }
 
   // Return the current declaration pointed to by the iterator.
-  const T &operator*(void) const noexcept {
+  T operator*(void) && noexcept {
+    return std::move(impl.value());
+  }
+
+  // Return the current declaration pointed to by the iterator.
+  const T &operator*(void) const & noexcept {
     return impl.value();
   }
 
   // Return the current declaration pointed to by the iterator.
-  const T *operator->(void) const noexcept {
+  const T *operator->(void) const & noexcept {
     return std::addressof(impl.value());
   }
 
   // Pre-increment.
-  inline ParentDeclIteratorImpl<T> &operator++(void);
+  inline ParentDeclIteratorImpl<T> &operator++(void) &;
 };
 
 template <typename T>
@@ -417,17 +458,22 @@ class ParentStmtIteratorImpl {
   }
 
   // Return the current statement pointed to by the iterator.
-  const T &operator*(void) const noexcept {
+  T operator*(void) && noexcept {
+    return std::move(impl.value());
+  }
+
+  // Return the current statement pointed to by the iterator.
+  const T &operator*(void) const & noexcept {
     return impl.value();
   }
 
   // Return the current statement pointed to by the iterator.
-  const T *operator->(void) const noexcept {
+  const T *operator->(void) const & noexcept {
     return std::addressof(impl.value());
   }
 
   // Pre-increment.
-  inline ParentStmtIteratorImpl<T> &operator++(void);
+  inline ParentStmtIteratorImpl<T> &operator++(void) &;
 };
 
 }  // namespace mx

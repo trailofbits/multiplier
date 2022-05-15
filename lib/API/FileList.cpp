@@ -37,7 +37,12 @@ void FileListIterator::Advance(void) {
   }
 }
 
-FileListIterator FileList::begin(void) const {
+FileListIterator FileList::begin(void) && {
+  auto num_files = impl->files.size();
+  return FileListIterator(std::move(impl), 0, num_files);
+}
+
+FileListIterator FileList::begin(void) const & {
   return FileListIterator(impl, 0, impl->files.size());
 }
 

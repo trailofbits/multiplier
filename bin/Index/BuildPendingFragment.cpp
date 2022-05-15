@@ -31,11 +31,11 @@ class FragmentBuilder {
       : entity_ids(entity_ids_),
         fragment(fragment_) {}
 
-#define MX_BEGIN_SERIALIZE_DECL(name) void Visit ## name (const pasta::name &);
-#define MX_BEGIN_SERIALIZE_STMT MX_BEGIN_SERIALIZE_DECL
-#define MX_BEGIN_SERIALIZE_TYPE MX_BEGIN_SERIALIZE_DECL
-#define MX_BEGIN_SERIALIZE_PSEUDO MX_BEGIN_SERIALIZE_DECL
-#include "Visitor.inc.h"
+#define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
+#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
+#include <multiplier/Visitor.inc.h>
 
   void Accept(const pasta::Decl &entity);
   void Accept(const pasta::Stmt &entity);
@@ -150,30 +150,30 @@ void FragmentBuilder::MaybeVisitNext(
   }
 }
 
-#define MX_SERIALIZE_BASE(derived_type, base_type) \
+#define MX_VISIT_BASE(derived_type, base_type) \
     Visit ## base_type(entity);
 
-#define MX_SERIALIZE_ENTITY(cls, api_method, get_storage, set_storage, \
-                            init_storage, method, entity_type, \
-                            get_storage_list) \
+#define MX_VISIT_ENTITY(cls, api_method, get_storage, set_storage, \
+                        init_storage, method, entity_type, \
+                        get_storage_list, selector) \
     MaybeVisitNext(entity.method());
 
 
-#define MX_SERIALIZE_ENTITY_LIST(cls, api_method, get_storage, set_storage, \
+#define MX_VISIT_ENTITY_LIST(cls, api_method, get_storage, set_storage, \
                                  init_storage, method, entity_type, \
                                  get_storage_list) \
     for (auto sub_entity : entity.method()) { \
       MaybeVisitNext(sub_entity); \
     }
 
-#define MX_SERIALIZE_OPTIONAL_ENTITY(cls, api_method, get_storage, \
-                                     set_storage, init_storage, method, \
-                                     entity_type, get_storage_list) \
+#define MX_VISIT_OPTIONAL_ENTITY(cls, api_method, get_storage, \
+                                 set_storage, init_storage, method, \
+                                 entity_type, ...) \
     if (auto sub_entity = entity.method(); sub_entity.has_value()) { \
       MaybeVisitNext(sub_entity.value()); \
     }
 
-#define MX_SERIALIZE_OPTIONAL_ENTITY_LIST(cls, api_method, get_storage, \
+#define MX_VISIT_OPTIONAL_ENTITY_LIST(cls, api_method, get_storage, \
                                           set_storage, init_storage, method, \
                                           entity_type, get_storage_list) \
     if (auto sub_entities = entity.method(); sub_entities.has_value()) { \
@@ -182,24 +182,24 @@ void FragmentBuilder::MaybeVisitNext(
       } \
     }
 
-#define MX_SERIALIZE_PSEUDO MX_SERIALIZE_ENTITY
-#define MX_SERIALIZE_PSEUDO_LIST MX_SERIALIZE_ENTITY_LIST
-#define MX_SERIALIZE_OPTIONAL_PSEUDO MX_SERIALIZE_OPTIONAL_ENTITY
-#define MX_SERIALIZE_OPTIONAL_PSEUDO_LIST MX_SERIALIZE_OPTIONAL_ENTITY_LIST
+#define MX_VISIT_PSEUDO MX_VISIT_ENTITY
+#define MX_VISIT_PSEUDO_LIST MX_VISIT_ENTITY_LIST
+#define MX_VISIT_OPTIONAL_PSEUDO MX_VISIT_OPTIONAL_ENTITY
+#define MX_VISIT_OPTIONAL_PSEUDO_LIST MX_VISIT_OPTIONAL_ENTITY_LIST
 
-#define MX_BEGIN_SERIALIZE_DECL(name) \
+#define MX_BEGIN_VISIT_DECL(name) \
     void FragmentBuilder::Visit ## name(const pasta::name &entity) {
 
-#define MX_END_SERIALIZE_DECL(name) }
+#define MX_END_VISIT_DECL(name) }
 
-#define MX_BEGIN_SERIALIZE_STMT MX_BEGIN_SERIALIZE_DECL
-#define MX_END_SERIALIZE_STMT MX_END_SERIALIZE_DECL
-#define MX_BEGIN_SERIALIZE_TYPE MX_BEGIN_SERIALIZE_DECL
-#define MX_END_SERIALIZE_TYPE MX_END_SERIALIZE_DECL
-#define MX_BEGIN_SERIALIZE_PSEUDO MX_BEGIN_SERIALIZE_DECL
-#define MX_END_SERIALIZE_PSEUDO MX_END_SERIALIZE_DECL
+#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
+#define MX_END_VISIT_STMT MX_END_VISIT_DECL
+#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
+#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 
-#include "Visitor.inc.h"
+#include <multiplier/Visitor.inc.h>
 
 void FragmentBuilder::Accept(const pasta::Decl &entity) {
   switch (entity.Kind()) {

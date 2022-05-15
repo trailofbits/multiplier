@@ -18,7 +18,7 @@ static void DispatchSerializeDecl(EntityMapper &em,
                                   mx::ast::Decl::Builder builder,
                                   const pasta::Decl &entity) {
   switch (entity.Kind()) {
-#define MX_SERIALIZE_DECL(decl) \
+#define MX_VISIT_DECL(decl) \
     case pasta::DeclKind::k ## decl: \
       Serialize ## decl ## Decl( \
          em, \
@@ -26,9 +26,9 @@ static void DispatchSerializeDecl(EntityMapper &em,
          reinterpret_cast<const pasta::decl ## Decl &>(entity)); \
       break;
 
-    PASTA_FOR_EACH_DECL_IMPL(MX_SERIALIZE_DECL, PASTA_IGNORE_ABSTRACT)
+    PASTA_FOR_EACH_DECL_IMPL(MX_VISIT_DECL, PASTA_IGNORE_ABSTRACT)
 
-#undef MX_SERIALIZE_DECL
+#undef MX_VISIT_DECL
     default:
       assert(false);
       return;
@@ -39,7 +39,7 @@ static void DispatchSerializeStmt(EntityMapper &em,
                                   mx::ast::Stmt::Builder builder,
                                   const pasta::Stmt &entity) {
   switch (entity.Kind()) {
-#define MX_SERIALIZE_STMT(stmt) \
+#define MX_VISIT_STMT(stmt) \
     case pasta::StmtKind::k ## stmt: \
       Serialize ## stmt( \
           em, \
@@ -47,13 +47,13 @@ static void DispatchSerializeStmt(EntityMapper &em,
           reinterpret_cast<const pasta::stmt &>(entity)); \
       break;
 
-    PASTA_FOR_EACH_STMT_IMPL(MX_SERIALIZE_STMT,
-                             MX_SERIALIZE_STMT,
-                             MX_SERIALIZE_STMT,
-                             MX_SERIALIZE_STMT,
-                             MX_SERIALIZE_STMT,
+    PASTA_FOR_EACH_STMT_IMPL(MX_VISIT_STMT,
+                             MX_VISIT_STMT,
+                             MX_VISIT_STMT,
+                             MX_VISIT_STMT,
+                             MX_VISIT_STMT,
                              PASTA_IGNORE_ABSTRACT)
-#undef MX_SERIALIZE_STMT
+#undef MX_VISIT_STMT
     default:
       assert(false);
       break;
@@ -66,16 +66,16 @@ static void DispatchSerializeType(EntityMapper &em,
 
   // Second pass actually does the real serialization.
   switch (entity.Kind()) {
-#define MX_SERIALIZE_TYPE(type) \
+#define MX_VISIT_TYPE(type) \
   case pasta::TypeKind::k ## type: \
     Serialize ## type ## Type ( \
         em, builder, \
         reinterpret_cast<const pasta::type ## Type &>(entity)); \
     break;
 
-    PASTA_FOR_EACH_TYPE_IMPL(MX_SERIALIZE_TYPE,
+    PASTA_FOR_EACH_TYPE_IMPL(MX_VISIT_TYPE,
                              PASTA_IGNORE_ABSTRACT)
-#undef MX_SERIALIZE_TYPE
+#undef MX_VISIT_TYPE
     default:
       assert(false);
       break;

@@ -21,7 +21,7 @@ namespace pasta {
 // into the output.
 //
 // NOTE(pag): Keep this in sync with `bin/Index/Util.h`.
-enum class PseudoEntityKind : unsigned char {
+enum class PseudoKind : unsigned char {
   PSEUDO_ENTITY_TYPES(PSEUDO_ENTITY_TYPE_ENUMERATOR)
 };
 

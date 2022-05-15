@@ -66,6 +66,8 @@ class Server final : public mx::rpc::Multiplier::Server {
   kj::Promise<void> regexQueryFragments(RegexQueryFragmentsContext context) final;
 
   kj::Promise<void> findRedeclarations(FindRedeclarationsContext context) final;
+
+  kj::Promise<void> findUses(FindUsesContext context) final;
 };
 
 }  // namespace indexer

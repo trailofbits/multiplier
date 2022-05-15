@@ -107,12 +107,15 @@ RemoteEntityProvider::ClientConnection &RemoteEntityProvider::Connection(
   return **cc;
 }
 
-void RemoteEntityProvider::MaybeUpdateVersionNumber(
+bool RemoteEntityProvider::MaybeUpdateVersionNumber(
     const Ptr &self, unsigned new_version_number) {
   std::unique_lock<std::mutex> locker(version_number_lock);
   if (version_number < new_version_number) {
     version_number = new_version_number;
     self->VersionNumberChanged(new_version_number);
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -147,7 +150,7 @@ using FileListResults =
 
 // Get the current list of parsed files, where the minimum ID
 // in the returned list of fetched files will be `start_at`.
-FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) {
+FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) try {
   ClientConnection &cc = Connection(self);
   capnp::Request<mx::rpc::Multiplier::DownloadFileListParams,
                  mx::rpc::Multiplier::DownloadFileListResults>
@@ -169,159 +172,220 @@ FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) {
     files.try_emplace(std::move(p), file_id);
   }
 
-  return self->CacheFileList(std::move(files), resp_version_number);
+  self->CacheFileList(files, resp_version_number);
+  return files;
+
+// TODO(pag): Log something.
+} catch (...) {
+  return {};
 }
 
 // Cache a returned file list.
-FilePathList RemoteEntityProvider::CacheFileList(FilePathList files,
-                                                 unsigned) {
-  return files;
-}
+void RemoteEntityProvider::CacheFileList(const FilePathList &, unsigned) {}
 
 // Download a file by its unique ID.
-FileImpl::Ptr RemoteEntityProvider::FileFor(const Ptr &self, FileId id) {
-  try {
-    ClientConnection &cc = Connection(self);
-    capnp::Request<mx::rpc::Multiplier::DownloadFileParams,
-                   mx::rpc::Multiplier::DownloadFileResults>
-    request = cc.client.downloadFileRequest();
-    request.setId(id);
+FileImpl::Ptr RemoteEntityProvider::FileFor(const Ptr &self, FileId id) try {
+  ClientConnection &cc = Connection(self);
+  capnp::Request<mx::rpc::Multiplier::DownloadFileParams,
+                 mx::rpc::Multiplier::DownloadFileResults>
+  request = cc.client.downloadFileRequest();
+  request.setId(id);
 
-    capnp::Response<mx::rpc::Multiplier::DownloadFileResults> response =
-        request.send().wait(cc.connection.getWaitScope());
+  capnp::Response<mx::rpc::Multiplier::DownloadFileResults> response =
+      request.send().wait(cc.connection.getWaitScope());
 
-    auto resp_version_number = response.getVersionNumber();
-    MaybeUpdateVersionNumber(self, resp_version_number);
+  auto resp_version_number = response.getVersionNumber();
+  MaybeUpdateVersionNumber(self, resp_version_number);
 
-    auto ret = std::make_shared<PackedFileImpl>(id, self, kj::mv(response));
-    auto ret_ptr = ret.get();
-    return FileImpl::Ptr(std::move(ret), ret_ptr);
+  auto ret = std::make_shared<PackedFileImpl>(id, self, kj::mv(response));
+  auto ret_ptr = ret.get();
+  return FileImpl::Ptr(std::move(ret), ret_ptr);
 
-  // TODO(pag): Log something.
-  } catch (...) {
-    return {};
-  }
+// TODO(pag): Log something.
+} catch (...) {
+  return {};
 }
 
 // Download a fragment based off of an entity ID.
 FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(
-    const Ptr &self, FragmentId id) {
-  try {
-    ClientConnection &cc = Connection(self);
-    capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
-                   mx::rpc::Multiplier::DownloadFragmentResults>
-        request = cc.client.downloadFragmentRequest();
-    request.setId(id);
+    const Ptr &self, FragmentId id) try {
 
-    capnp::Response<mx::rpc::Multiplier::DownloadFragmentResults> response =
-        request.send().wait(cc.connection.getWaitScope());
+  ClientConnection &cc = Connection(self);
+  capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
+                 mx::rpc::Multiplier::DownloadFragmentResults>
+      request = cc.client.downloadFragmentRequest();
+  request.setId(id);
 
-    auto resp_version_number = response.getVersionNumber();
-    MaybeUpdateVersionNumber(self, resp_version_number);
+  capnp::Response<mx::rpc::Multiplier::DownloadFragmentResults> response =
+      request.send().wait(cc.connection.getWaitScope());
 
-    auto ret = std::make_shared<PackedFragmentImpl>(id, self, kj::mv(response));
-    auto ret_ptr = ret.get();
-    return FragmentImpl::Ptr(std::move(ret), ret_ptr);
+  auto resp_version_number = response.getVersionNumber();
+  MaybeUpdateVersionNumber(self, resp_version_number);
 
-  // TODO(pag): Log something.
-  } catch (...) {
-    return {};
-  }
+  auto ret = std::make_shared<PackedFragmentImpl>(id, self, kj::mv(response));
+  auto ret_ptr = ret.get();
+  return FragmentImpl::Ptr(std::move(ret), ret_ptr);
+
+// TODO(pag): Log something.
+} catch (...) {
+  return {};
 }
 
+// Run a Weggli query over all files.
 WeggliQueryResultImpl::Ptr RemoteEntityProvider::Query(
-    const Ptr &self, const WeggliQuery &query) {
+    const Ptr &self, const WeggliQuery &query) try {
+
   if (!query.IsValid()) {
     return {};
   }
 
-  try {
-    ClientConnection &cc = Connection(self);
-    capnp::Request<mx::rpc::Multiplier::WeggliQueryFragmentsParams,
-                   mx::rpc::Multiplier::WeggliQueryFragmentsResults>
-        request = cc.client.weggliQueryFragmentsRequest();
-    request.setQuery(kj::heapString(query.Pattern().data(),
-                                    query.Pattern().size()));
-    request.setIsCpp(query.IsCPlusPlus());
+  ClientConnection &cc = Connection(self);
+  capnp::Request<mx::rpc::Multiplier::WeggliQueryFragmentsParams,
+                 mx::rpc::Multiplier::WeggliQueryFragmentsResults>
+      request = cc.client.weggliQueryFragmentsRequest();
+  request.setQuery(kj::heapString(query.Pattern().data(),
+                                  query.Pattern().size()));
+  request.setIsCpp(query.IsCPlusPlus());
 
-    capnp::Response<mx::rpc::Multiplier::WeggliQueryFragmentsResults> response =
-        request.send().wait(cc.connection.getWaitScope());
+  capnp::Response<mx::rpc::Multiplier::WeggliQueryFragmentsResults> response =
+      request.send().wait(cc.connection.getWaitScope());
 
-    auto resp_version_number = response.getVersionNumber();
-    MaybeUpdateVersionNumber(self, resp_version_number);
+  auto resp_version_number = response.getVersionNumber();
+  MaybeUpdateVersionNumber(self, resp_version_number);
 
-    return std::make_shared<WeggliQueryResultImpl>(
-        query, std::move(self), kj::mv(response));
+  return std::make_shared<WeggliQueryResultImpl>(
+      query, std::move(self), kj::mv(response));
 
-  } catch (...) {
-    return {};
-  }
+// TODO(pag): Log something.
+} catch (...) {
+  return {};
 }
 
+// Run a regular expression query over all files.
 RegexQueryResultImpl::Ptr RemoteEntityProvider::Query(
-    const Ptr &self, const RegexQuery &query) {
+    const Ptr &self, const RegexQuery &query) try {
 
   if (!query.IsValid()) {
     return {};
   }
 
-  try {
-    ClientConnection &cc = Connection(self);
-    capnp::Request<mx::rpc::Multiplier::RegexQueryFragmentsParams,
-                   mx::rpc::Multiplier::RegexQueryFragmentsResults>
-        request = cc.client.regexQueryFragmentsRequest();
-    request.setRegex(kj::heapString(query.Pattern().data(),
-                                    query.Pattern().size()));
+  ClientConnection &cc = Connection(self);
+  capnp::Request<mx::rpc::Multiplier::RegexQueryFragmentsParams,
+                 mx::rpc::Multiplier::RegexQueryFragmentsResults>
+      request = cc.client.regexQueryFragmentsRequest();
+  request.setRegex(kj::heapString(query.Pattern().data(),
+                                  query.Pattern().size()));
 
-    capnp::Response<mx::rpc::Multiplier::RegexQueryFragmentsResults> response =
-        request.send().wait(cc.connection.getWaitScope());
+  capnp::Response<mx::rpc::Multiplier::RegexQueryFragmentsResults> response =
+      request.send().wait(cc.connection.getWaitScope());
 
-    auto resp_version_number = response.getVersionNumber();
-    MaybeUpdateVersionNumber(self, resp_version_number);
+  auto resp_version_number = response.getVersionNumber();
+  MaybeUpdateVersionNumber(self, resp_version_number);
 
-    return std::make_shared<RegexQueryResultImpl>(
-        query, std::move(self), kj::mv(response));
-  } catch (...) {
-    return {};
-  }
+  return std::make_shared<RegexQueryResultImpl>(
+      query, std::move(self), kj::mv(response));
+
+// TODO(pag): Log something.
+} catch (...) {
+  return {};
 }
 
 // Return the redeclarations of a given declaration.
 std::vector<RawEntityId> RemoteEntityProvider::Redeclarations(
-    const Ptr &self, RawEntityId eid) {
-  try {
-    ClientConnection &cc = Connection(self);
-    capnp::Request<mx::rpc::Multiplier::FindRedeclarationsParams,
-                   mx::rpc::Multiplier::FindRedeclarationsResults>
-        request = cc.client.findRedeclarationsRequest();
+    const Ptr &self, RawEntityId eid) try {
+  ClientConnection &cc = Connection(self);
+  capnp::Request<mx::rpc::Multiplier::FindRedeclarationsParams,
+                 mx::rpc::Multiplier::FindRedeclarationsResults>
+      request = cc.client.findRedeclarationsRequest();
 
-    request.setDeclId(eid);
+  request.setDeclId(eid);
 
-    capnp::Response<mx::rpc::Multiplier::FindRedeclarationsResults> response =
-        request.send().wait(cc.connection.getWaitScope());
+  capnp::Response<mx::rpc::Multiplier::FindRedeclarationsResults> response =
+      request.send().wait(cc.connection.getWaitScope());
 
-    auto resp_version_number = response.getVersionNumber();
-    MaybeUpdateVersionNumber(self, resp_version_number);
+  auto resp_version_number = response.getVersionNumber();
+  MaybeUpdateVersionNumber(self, resp_version_number);
 
-    auto redecl_ids_reader = response.getRedeclarationIds();
+  auto redecl_ids_reader = response.getRedeclarationIds();
 
-    std::vector<mx::RawEntityId> redecl_ids;
-    redecl_ids.reserve(redecl_ids_reader.size());
-    for (auto redecl_id : redecl_ids_reader) {
-      redecl_ids.push_back(redecl_id);
+  std::vector<mx::RawEntityId> redecl_ids;
+  redecl_ids.reserve(redecl_ids_reader.size());
+  for (auto redecl_id : redecl_ids_reader) {
+    redecl_ids.push_back(redecl_id);
+  }
+
+  self->CacheRedeclarations(redecl_ids, resp_version_number);
+  return redecl_ids;
+
+// TODO(pag): Log something.
+} catch (...) {
+  return {};
+}
+
+// Cache a computed set of redeclarations for a given version number.
+void RemoteEntityProvider::CacheRedeclarations(
+    const std::vector<RawEntityId> &, unsigned) {}
+
+// Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
+// to analyze when looking for uses.
+void RemoteEntityProvider::FillUses(
+    const Ptr &self, RawEntityId eid, std::vector<RawEntityId> &redecl_ids_out,
+    std::vector<FragmentId> &fragment_ids_out) try {
+
+  ClientConnection &cc = Connection(self);
+
+  auto prev_version_number = self->VersionNumber();
+  for (auto changed = true; changed; ) {
+    changed = false;
+
+    // Request the set of redeclarations for this entity. It's possible
+    redecl_ids_out = self->Redeclarations(self, eid);
+
+    capnp::Request<mx::rpc::Multiplier::FindUsesParams,
+                   mx::rpc::Multiplier::FindUsesResults>
+        request = cc.client.findUsesRequest();
+
+    auto i = 0u;
+    auto redecl_ids = request.initRedeclarationIds(
+        static_cast<unsigned>(redecl_ids_out.size()));
+    for (mx::RawEntityId eid : redecl_ids_out) {
+      redecl_ids.set(i++, eid);
     }
 
-    return self->CacheRedeclarations(std::move(redecl_ids),
-                                     resp_version_number);
-  } catch (...) {
-    return {};
+    capnp::Response<mx::rpc::Multiplier::FindUsesResults> response =
+        request.send().wait(cc.connection.getWaitScope());
+
+    // Make sure that we re-try if the version number when we requested the
+    // redeclaration IDs is now out-of-date.
+    auto resp_version_number = response.getVersionNumber();
+    if (MaybeUpdateVersionNumber(self, resp_version_number) ||
+        prev_version_number < resp_version_number) {
+      prev_version_number = resp_version_number;
+      changed = true;
+      continue;
+    }
+
+    auto fragment_ids_reader = response.getFragmentIds();
+    fragment_ids_out.clear();
+    fragment_ids_out.reserve(fragment_ids_reader.size());
+    for (auto frag_id : fragment_ids_reader) {
+      fragment_ids_out.push_back(frag_id);
+    }
+
+    self->CacheUses(redecl_ids_out, fragment_ids_out, resp_version_number);
+    return;
   }
+
+// TODO(pag): Log something.
+} catch (...) {
+  redecl_ids_out.clear();
+  fragment_ids_out.clear();
 }
 
-std::vector<RawEntityId> RemoteEntityProvider::CacheRedeclarations(
-    std::vector<RawEntityId> redecl_ids, unsigned) {
-  return redecl_ids;
-}
+// Cache a returned set of uses for a given set of redeclarations.
+void RemoteEntityProvider::CacheUses(
+    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+    unsigned) {}
 
 InvalidEntityProvider::~InvalidEntityProvider(void) noexcept {}
 
@@ -335,10 +399,7 @@ FilePathList InvalidEntityProvider::ListFiles(const Ptr &) {
   return {};
 }
 
-FilePathList InvalidEntityProvider::CacheFileList(FilePathList files,
-                                                  unsigned) {
-  return files;
-}
+void InvalidEntityProvider::CacheFileList(const FilePathList &, unsigned) {}
 
 FileImpl::Ptr InvalidEntityProvider::FileFor(const Ptr &, FileId) {
   return {};
@@ -363,20 +424,43 @@ std::vector<RawEntityId> InvalidEntityProvider::Redeclarations(
   return {};
 }
 
-std::vector<RawEntityId> InvalidEntityProvider::CacheRedeclarations(
-    std::vector<RawEntityId> redecl_ids, unsigned) {
-  return redecl_ids;
+void InvalidEntityProvider::CacheRedeclarations(
+    const std::vector<RawEntityId> &, unsigned) {}
+
+void InvalidEntityProvider::CacheUses(
+    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+    unsigned) {}
+
+void InvalidEntityProvider::FillUses(
+    const Ptr &, RawEntityId eid,
+    std::vector<RawEntityId> &redecl_ids_out,
+    std::vector<FragmentId> &fragment_ids_out) {
+  redecl_ids_out.clear();
+  fragment_ids_out.clear();
 }
 
-Decl DeclIterator::operator*(void) const noexcept {
+
+Decl DeclIterator::operator*(void) && noexcept {
+  return Decl(std::move(impl), index);
+}
+
+Decl DeclIterator::operator*(void) const & noexcept {
   return Decl(impl, index);
 }
 
-Stmt StmtIterator::operator*(void) const noexcept {
+Stmt StmtIterator::operator*(void) && noexcept {
+  return Stmt(std::move(impl), index);
+}
+
+Stmt StmtIterator::operator*(void) const & noexcept {
   return Stmt(impl, index);
 }
 
-Type TypeIterator::operator*(void) const noexcept {
+Type TypeIterator::operator*(void) && noexcept {
+  return Type(std::move(impl), index);
+}
+
+Type TypeIterator::operator*(void) const & noexcept {
   return Type(impl, index);
 }
 
@@ -452,7 +536,9 @@ std::vector<Decl> Decl::redeclarations(void) const {
   redecls.reserve(redecl_ids.size());
 
   for (mx::RawEntityId eid : redecl_ids) {
-    redecls.emplace_back(fragment->DeclFor(fragment, eid));
+    if (auto redecl = fragment->DeclFor(fragment, eid)) {
+      redecls.emplace_back(std::move(redecl.value()));
+    }
   }
 
   return redecls;

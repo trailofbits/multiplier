@@ -17,7 +17,14 @@ PackedFragmentImpl::PackedFragmentImpl(FragmentId id_,
                                        Response response)
     : FragmentImpl(id_, std::move(ep_)),
       package(response.getFragment()),
-      reader(package.Reader<rpc::Fragment>()) {}
+      reader(package.Reader<rpc::Fragment>()) {
+
+  // For bounds checking.
+  num_decls = reader.getDeclarations().size();
+  num_stmts = reader.getStatements().size();
+  num_types = reader.getStatements().size();
+  num_pseudos = reader.getStatements().size();
+}
 
 // Return the ID of the file containing the first token.
 FileId PackedFragmentImpl::FileContaingFirstToken(void) const {

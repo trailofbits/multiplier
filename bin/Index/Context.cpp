@@ -137,6 +137,11 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
   // All of the declaration kinds need to actually match.
   mx::DeclarationId did = std::get<mx::DeclarationId>(vid);
   std::vector<mx::RawEntityId> next_new_ids;
+  std::vector<mx::RawEntityId> all_ids;
+  std::vector<mx::RawEntityId> new_ids;
+  next_new_ids.reserve(16);
+  all_ids.reserve(16);
+  new_ids.reserve(16);
   next_new_ids.push_back(eid);
 
   // Expand the set of IDs via name mangling.
@@ -174,8 +179,6 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
   }
 
   size_t next_def_id_index = 0u;
-  std::vector<mx::RawEntityId> all_ids;
-  std::vector<mx::RawEntityId> new_ids;
   all_ids.reserve(next_new_ids.size());
 
   // Expand the set of declarations via fixpoint using the redeclaration

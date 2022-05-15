@@ -86,7 +86,7 @@ class RemoteEntityProvider final : public EntityProvider {
   // returns an `this`-specific, thread-local connection to be used.
   ClientConnection &Connection(const Ptr &self);
 
-  void MaybeUpdateVersionNumber(const Ptr &self, unsigned new_version_number);
+  bool MaybeUpdateVersionNumber(const Ptr &self, unsigned new_version_number);
 
  public:
   RemoteEntityProvider(std::string host, std::string port);
@@ -104,9 +104,6 @@ class RemoteEntityProvider final : public EntityProvider {
   // in the returned list of fetched files will be `start_at`.
   FilePathList ListFiles(const Ptr &) final;
 
-  // Cache a returned file list.
-  FilePathList CacheFileList(FilePathList files, unsigned) final;
-
   // Download a file by its unique ID.
   std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
 
@@ -114,16 +111,33 @@ class RemoteEntityProvider final : public EntityProvider {
   std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, FragmentId id) final;
 
+  // Run a Weggli query over all files.
   std::shared_ptr<WeggliQueryResultImpl> Query(
       const Ptr &, const WeggliQuery &query) final;
 
+  // Run a regular expression query over all files.
   std::shared_ptr<RegexQueryResultImpl> Query(
       const Ptr &, const RegexQuery &) final;
 
+  // Return the redeclarations of a given declaration.
   std::vector<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
 
-  std::vector<RawEntityId> CacheRedeclarations(
-      std::vector<RawEntityId>, unsigned) final;
+  // Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
+  // to analyze when looking for uses.
+  void FillUses(const Ptr &, RawEntityId eid,
+                std::vector<RawEntityId> &redecl_ids_out,
+                std::vector<FragmentId> &fragment_ids_out) final;
+
+  // Cache a returned file list.
+  void CacheFileList(const FilePathList &, unsigned) final;
+
+  // Cache a computed set of redeclarations for a given version number.
+  void CacheRedeclarations(const std::vector<RawEntityId> &, unsigned) final;
+
+  // Cache a returned set of uses for a given set of redeclarations.
+  void CacheUses(
+      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+      unsigned) final;
 };
 
 class InvalidEntityProvider final : public EntityProvider {
@@ -135,8 +149,6 @@ class InvalidEntityProvider final : public EntityProvider {
   void VersionNumberChanged(unsigned) final;
 
   FilePathList ListFiles(const Ptr &) final;
-
-  FilePathList CacheFileList(FilePathList files, unsigned) final;
 
   std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
 
@@ -152,8 +164,15 @@ class InvalidEntityProvider final : public EntityProvider {
 
   std::vector<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
 
-  std::vector<RawEntityId> CacheRedeclarations(
-      std::vector<RawEntityId>, unsigned);
+  void FillUses(const Ptr &, RawEntityId eid,
+                std::vector<RawEntityId> &redecl_ids_out,
+                std::vector<FragmentId> &fragment_ids_out) final;
+
+  void CacheFileList(const FilePathList &, unsigned) final;
+  void CacheRedeclarations(const std::vector<RawEntityId> &, unsigned) final;
+  void CacheUses(
+      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+      unsigned) final;
 };
 
 class FileListImpl {
