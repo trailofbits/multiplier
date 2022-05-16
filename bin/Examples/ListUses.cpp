@@ -37,8 +37,44 @@ extern "C" int main(int argc, char *argv[]) {
   auto maybe_decl = index.entity(FLAGS_entity_id);
   if (std::holds_alternative<mx::Decl>(maybe_decl)) {
     mx::Decl decl = std::get<mx::Decl>(maybe_decl);
-    for (auto use : decl.uses()) {
-      std::cerr << "Found user!!\n";
+
+    for (const mx::DeclUse &use : decl.uses()) {
+      mx::Fragment fragment = mx::Fragment::containing(use);
+      mx::File file = mx::File::containing(fragment);
+
+      std::cout
+          << file.id() << '\t'
+          << fragment.id() << '\t';
+
+      if (auto decl_user = use.as_declaration()) {
+        std::cout
+            << decl_user->id() << '\t'
+            << mx::EnumeratorName(decl_user->kind());
+
+      } else if (auto stmt_user = use.as_statement()) {
+        std::cout
+            << stmt_user->id() << '\t'
+            << mx::EnumeratorName(stmt_user->kind());
+
+      } else if (auto type_user = use.as_type()) {
+        std::cout
+            << type_user->id() << '\t'
+            << mx::EnumeratorName(type_user->kind());
+
+      } else if (auto cxx_base_spec = use.as_cxx_base_specifier()) {
+
+      } else if (auto tpl_arg = use.as_template_argument()) {
+
+      } else if (auto tpl_param_list = use.as_template_parameter_list()) {
+
+      }
+
+      std::cout << '\n';
+      for (auto selector : mx::EnumerationRange<mx::DeclUseSelector>()) {
+        if (use.has_selector(selector)) {
+          std::cout << '\t' << mx::EnumeratorName(selector) << '\n';
+        }
+      }
     }
 
   } else {

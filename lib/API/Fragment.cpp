@@ -52,6 +52,10 @@ Fragment Fragment::containing(const TokenSubstitution &entity) {
   return Fragment(entity.impl);
 }
 
+Fragment Fragment::containing(const UseBase &use) {
+  return Fragment(use.fragment);
+}
+
 // Return the ID of this fragment.
 FragmentId Fragment::id(void) const noexcept {
   return impl->fragment_id;

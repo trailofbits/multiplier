@@ -488,7 +488,7 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
     d->server_context.entity_id_use_to_fragment_id.ScanPrefix(
         eid,
-        [&fragment_ids] (mx::RawEntityId, mx::FragmentId frag_id) {
+        [&fragment_ids] (mx::RawEntityId eid, mx::FragmentId frag_id) {
           fragment_ids.push_back(frag_id);
           return true;
         });

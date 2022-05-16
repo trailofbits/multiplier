@@ -54,6 +54,11 @@ class TokenSubstitution;
 class TokenSubstitutionList;
 class TokenSubstitutionListImpl;
 
+using DeclUse = Use<DeclUseSelector>;
+using StmtUse = Use<StmtUseSelector>;
+using TypeUse = Use<TypeUseSelector>;
+using TokenUse = Use<TokenUseSelector>;
+
 using FilePathList = std::map<std::filesystem::path, FileId>;
 
 using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
@@ -616,6 +621,7 @@ class Fragment {
   static Fragment containing(const Type &);
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const TokenSubstitution &);
+  static Fragment containing(const UseBase &);
 
   // Return the ID of this fragment.
   FragmentId id(void) const noexcept;

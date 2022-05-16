@@ -24,6 +24,67 @@ class Type;
 
 class IteratorEnd {};
 
+template <typename Enum>
+class EnumeratorIterator {
+ private:
+  using IType = std::underlying_type_t<Enum>;
+  unsigned val{0};
+  static constexpr auto kMaxValue = NumEnumerators(Enum{});
+
+  inline EnumeratorIterator(unsigned val_)
+      : val(val_) {}
+
+ public:
+
+  EnumeratorIterator(void) = default;
+
+  using Self = EnumeratorIterator<Enum>;
+
+  inline bool operator!=(IteratorEnd) const {
+    return val < kMaxValue;
+  }
+
+  inline bool operator==(IteratorEnd) const {
+    return val >= kMaxValue;
+  }
+
+  inline bool operator!=(Self that) const {
+    return val != that.val;
+  }
+
+  inline bool operator==(Self that) const {
+    return val == that.val;
+  }
+
+  // Return the current token pointed to by the iterator.
+  inline Enum operator*(void) const noexcept {
+    return static_cast<Enum>(val);
+  }
+
+  // Pre-increment.
+  inline Self &operator++(void) & noexcept{
+    ++val;
+    return *this;
+  }
+
+  // Post-increment.
+  inline Self operator++(int) & noexcept{
+    return Self(val++);
+  }
+};
+
+template <typename Enum>
+class EnumerationRange {
+ public:
+  inline EnumeratorIterator<Enum> begin(void) const noexcept {
+    return EnumeratorIterator<Enum>();
+  }
+
+  inline IteratorEnd end(void) const noexcept {
+    return {};
+  }
+};
+
 template <typename Iter, typename Derived>
 class DerivedEntityIterator {
  private:

@@ -96,18 +96,15 @@ UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
 }
 
 bool UseIteratorImpl::FindNextDecl(UseIteratorBase &self) {
-  if (self.list_offset >= self.use.fragment->num_decls) {
-    return false;
-  }
+  while (self.list_offset < self.use.fragment->num_decls) {
+    self.use.offset = self.list_offset++;
+    mx::ast::Decl::Reader reader = self.use.fragment->NthDecl(self.use.offset);
+    bool found = false;
 
-  self.use.offset = self.list_offset++;
-  mx::ast::Decl::Reader reader = self.use.fragment->NthDecl(self.use.offset);
-  bool found = false;
+    self.use.selectors.reset();
 
-  self.use.selectors.reset();
-
-  for (auto eid : search_ids) {
-    switch (Get_Decl_Kind(reader)) {
+    for (auto eid : search_ids) {
+      switch (Get_Decl_Kind(reader)) {
 
 #define MX_BEGIN_VISIT_ABSTRACT_DECL(name)
 #define MX_BEGIN_VISIT_DECL(name) \
@@ -117,25 +114,27 @@ bool UseIteratorImpl::FindNextDecl(UseIteratorBase &self) {
 
 #include <multiplier/Visitor.inc.h>
 
+      }
+    }
+
+    if (found) {
+      return found;
     }
   }
 
-  return found;
+  return false;
 }
 
 bool UseIteratorImpl::FindNextStmt(UseIteratorBase &self) {
-  if (self.list_offset >= self.use.fragment->num_stmts) {
-    return false;
-  }
+  while (self.list_offset < self.use.fragment->num_stmts) {
+    self.use.offset = self.list_offset++;
+    mx::ast::Stmt::Reader reader = self.use.fragment->NthStmt(self.use.offset);
+    bool found = false;
 
-  self.use.offset = self.list_offset++;
-  mx::ast::Stmt::Reader reader = self.use.fragment->NthStmt(self.use.offset);
-  bool found = false;
+    self.use.selectors.reset();
 
-  self.use.selectors.reset();
-
-  for (auto eid : search_ids) {
-    switch (Get_Stmt_Kind(reader)) {
+    for (auto eid : search_ids) {
+      switch (Get_Stmt_Kind(reader)) {
 
 #define MX_BEGIN_VISIT_ABSTRACT_STMT(name)
 #define MX_BEGIN_VISIT_STMT(name) \
@@ -145,25 +144,25 @@ bool UseIteratorImpl::FindNextStmt(UseIteratorBase &self) {
 
 #include <multiplier/Visitor.inc.h>
 
+      }
+    }
+    if (found) {
+      return true;
     }
   }
-
-  return found;
+  return false;
 }
 
 bool UseIteratorImpl::FindNextType(UseIteratorBase &self) {
-  if (self.list_offset >= self.use.fragment->num_types) {
-    return false;
-  }
+  while (self.list_offset < self.use.fragment->num_types) {
+    self.use.offset = self.list_offset++;
+    mx::ast::Type::Reader reader = self.use.fragment->NthType(self.use.offset);
+    bool found = false;
 
-  self.use.offset = self.list_offset++;
-  mx::ast::Type::Reader reader = self.use.fragment->NthType(self.use.offset);
-  bool found = false;
+    self.use.selectors.reset();
 
-  self.use.selectors.reset();
-
-  for (auto eid : search_ids) {
-    switch (Get_Type_Kind(reader)) {
+    for (auto eid : search_ids) {
+      switch (Get_Type_Kind(reader)) {
 
 #define MX_BEGIN_VISIT_ABSTRACT_TYPE(name)
 #define MX_BEGIN_VISIT_TYPE(name) \
@@ -173,42 +172,49 @@ bool UseIteratorImpl::FindNextType(UseIteratorBase &self) {
 
 #include <multiplier/Visitor.inc.h>
 
+      }
+    }
+
+    if (found) {
+      return true;
     }
   }
 
-  return found;
+  return false;
 }
 
 bool UseIteratorImpl::FindNextPseudo(UseIteratorBase &self) {
-  if (self.list_offset >= self.use.fragment->num_pseudos) {
-    return false;
-  }
+  while (self.list_offset < self.use.fragment->num_pseudos) {
+    TemplateArgument *dummy = nullptr;
+    self.use.offset = self.list_offset++;
+    self.use.selectors.reset();
+    mx::ast::Pseudo::Reader reader =
+        self.use.fragment->NthPseudo(self.use.offset);
+    bool found = false;
 
-  TemplateArgument *dummy = nullptr;
-  self.use.offset = self.list_offset++;
-  self.use.selectors.reset();
-  mx::ast::Pseudo::Reader reader =
-      self.use.fragment->NthPseudo(self.use.offset);
-  bool found = false;
+    for (auto eid : search_ids) {
+      switch (Get_PseudoKind(reader, dummy)) {
+        case PseudoKind::CXX_BASE_SPECIFIER:
+          self.use.kind = UseKind::CXX_BASE_SPECIFIER;
+          FindUses_CXXBaseSpecifier(eid, self.use.selectors, reader, found);
+          break;
+        case PseudoKind::TEMPLATE_ARGUMENT:
+          self.use.kind = UseKind::TEMPLATE_ARGUMENT;
+          FindUses_TemplateArgument(eid, self.use.selectors, reader, found);
+          break;
+        case PseudoKind::TEMPLATE_PARAMETER_LIST:
+          self.use.kind = UseKind::TEMPLATE_PARAMETER_LIST;
+          FindUses_TemplateParameterList(eid, self.use.selectors, reader, found);
+          break;
+      }
+    }
 
-  for (auto eid : search_ids) {
-    switch (Get_PseudoKind(reader, dummy)) {
-      case PseudoKind::CXX_BASE_SPECIFIER:
-        self.use.kind = UseKind::CXX_BASE_SPECIFIER;
-        FindUses_CXXBaseSpecifier(eid, self.use.selectors, reader, found);
-        break;
-      case PseudoKind::TEMPLATE_ARGUMENT:
-        self.use.kind = UseKind::TEMPLATE_ARGUMENT;
-        FindUses_TemplateArgument(eid, self.use.selectors, reader, found);
-        break;
-      case PseudoKind::TEMPLATE_PARAMETER_LIST:
-        self.use.kind = UseKind::TEMPLATE_PARAMETER_LIST;
-        FindUses_TemplateParameterList(eid, self.use.selectors, reader, found);
-        break;
+    if (found) {
+      return true;
     }
   }
 
-  return found;
+  return false;
 }
 
 bool UseIteratorImpl::FindNext(UseIteratorBase &self) {

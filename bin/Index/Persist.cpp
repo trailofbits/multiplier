@@ -594,11 +594,11 @@ void PersistFragment(IndexingContext &context, NameMangler &mangler,
   context.PutFragmentLineCoverage(file_id, fragment_id, min_token.Line(),
                                   max_token.Line());
 
-  context.PutSerializedFragment(
-      fragment_id, CompressedMessage("fragment", message));
-
   frag.LinkDeclarations(context, em, mangler);
   frag.FindDeclarationUses(context, fragment_id, fb);
+
+  context.PutSerializedFragment(
+      fragment_id, CompressedMessage("fragment", message));
 }
 
 }  // namespace indexer

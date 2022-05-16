@@ -22,8 +22,8 @@ PackedFragmentImpl::PackedFragmentImpl(FragmentId id_,
   // For bounds checking.
   num_decls = reader.getDeclarations().size();
   num_stmts = reader.getStatements().size();
-  num_types = reader.getStatements().size();
-  num_pseudos = reader.getStatements().size();
+  num_types = reader.getTypes().size();
+  num_pseudos = reader.getOthers().size();
 }
 
 // Return the ID of the file containing the first token.
