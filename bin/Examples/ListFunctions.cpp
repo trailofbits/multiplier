@@ -16,6 +16,7 @@ DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX d
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print function names");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
+DEFINE_bool(list_variables, false, "Should we list the variables inside of functions?");
 
 static void PrintFunctionNames(mx::Fragment fragment) {
   for (mx::FunctionDecl func : mx::FunctionDecl::in(fragment)) {
@@ -25,6 +26,19 @@ static void PrintFunctionNames(mx::Fragment fragment) {
         << fragment.id() << '\t' << func.id() << '\t'
         << (func.is_definition() ? "def\t" : "decl\t")
         << func.name() << '\n';
+
+    if (FLAGS_list_variables) {
+      for (const mx::Decl &var : func.declarations_in_context()) {
+        std::cout
+            << '\t' << var.id() << '\t' << mx::EnumeratorName(var.kind());
+
+        if (auto named_decl = mx::NamedDecl::from(var)) {
+          std::cout << '\t' << named_decl->name();
+        }
+        std::cout << '\n';
+      }
+      std::cout << '\n';
+    }
   }
 }
 
