@@ -137,6 +137,15 @@ extern "C" int main(int argc, char *argv[]) {
     mx::Stmt stmt = std::get<mx::Stmt>(maybe_entity);
     PrintCallHierarchy(std::move(stmt), seen, 0u);
 
+  } else if (std::holds_alternative<mx::Token>(maybe_entity)) {
+    mx::Token token = std::get<mx::Token>(maybe_entity);
+    if (auto stmt = mx::Stmt::containing(token)) {
+      PrintCallHierarchy(stmt.value(), seen, 0u);
+
+    } else if (auto decl = mx::Decl::containing(token)) {
+      PrintCallHierarchy(decl.value(), seen, 0u);
+    }
+
   } else {
     std::cerr << "Invalid declaration id " << FLAGS_entity_id << std::endl;
     return EXIT_FAILURE;
