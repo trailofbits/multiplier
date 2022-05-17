@@ -6,6 +6,8 @@
 
 #include "Re2.h"
 
+#include <cassert>
+
 namespace mx {
 
 // NOTE(pag): `RE2::FindAndConsume` is a variadic function taking additional

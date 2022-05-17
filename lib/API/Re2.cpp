@@ -6,6 +6,8 @@
 
 #include "Re2.h"
 
+#include <cassert>
+
 #include "File.h"
 #include "Fragment.h"
 

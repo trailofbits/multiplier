@@ -6,6 +6,8 @@
 
 #include "Fragment.h"
 
+#include <cassert>
+
 #include "File.h"
 
 namespace mx {
