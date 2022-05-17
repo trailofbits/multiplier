@@ -8,6 +8,8 @@
 #include "File.h"
 #include "Fragment.h"
 
+#include <cassert>
+
 namespace mx {
 
 std::variant<Token, TokenSubstitution>

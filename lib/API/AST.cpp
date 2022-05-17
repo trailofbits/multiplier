@@ -8,6 +8,8 @@
 
 #include "Fragment.h"
 
+#include <cassert>
+
 namespace mx {
 DeclKind FromPasta(pasta::DeclKind e) {
   switch (static_cast<unsigned>(e)) {

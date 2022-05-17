@@ -6,6 +6,8 @@
 
 #include "Fragment.h"
 
+#include <cassert>
+
 namespace mx {
 
 // Return the token context associated with a token.

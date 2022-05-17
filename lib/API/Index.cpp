@@ -7,6 +7,8 @@
 #include "File.h"
 #include "Fragment.h"
 
+#include <cassert>
+
 namespace mx {
 
 Index::~Index(void) {}
