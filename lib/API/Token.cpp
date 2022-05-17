@@ -9,6 +9,8 @@
 #include "Fragment.h"
 #include "Use.h"
 
+#include <cassert>
+
 namespace mx {
 namespace {
 

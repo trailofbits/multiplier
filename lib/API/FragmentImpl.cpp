@@ -7,6 +7,8 @@
 #include "Fragment.h"
 #include "File.h"
 
+#include <cassert>
+
 namespace mx {
 
 FragmentImpl::~FragmentImpl(void) noexcept {}

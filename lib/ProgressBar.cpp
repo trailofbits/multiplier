@@ -7,6 +7,7 @@
 #include <multiplier/ProgressBar.h>
 
 #include <atomic>
+#include <cassert>
 #include <cinttypes>
 #include <cmath>
 #include <cstdio>
