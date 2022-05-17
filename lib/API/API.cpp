@@ -32,6 +32,55 @@ static std::atomic<unsigned> gNextClientIndex;
 
 }  // namespace
 
+// NOTE(pag): Keep in sync with `../bin/Index/LinkRerencesInFragment.cpp`
+//            version of the same function.
+bool MayHaveRemoteRedeclarations(const mx::Decl &decl) {
+  switch (decl.kind()) {
+    // Functions.
+    case mx::DeclKind::FUNCTION:
+    case mx::DeclKind::CXX_METHOD:
+    case mx::DeclKind::CXX_DESTRUCTOR:
+    case mx::DeclKind::CXX_CONVERSION:
+    case mx::DeclKind::CXX_CONSTRUCTOR:
+    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+      return true;
+
+    // Variables.
+    case mx::DeclKind::VAR:
+    case mx::DeclKind::PARM_VAR:
+    case mx::DeclKind::OMP_CAPTURED_EXPR:
+    case mx::DeclKind::IMPLICIT_PARAM:
+    case mx::DeclKind::DECOMPOSITION:
+    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+      if (reinterpret_cast<const VarDecl &>(decl).is_local_variable_declaration()) {
+        return false;
+      } else {
+        return true;
+      }
+
+    // Tags.
+    case mx::DeclKind::TAG:
+    case mx::DeclKind::RECORD:
+    case mx::DeclKind::CXX_RECORD:
+    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
+    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case mx::DeclKind::ENUM:
+      return true;
+
+    // Redeclarable templates.
+    case mx::DeclKind::REDECLARABLE_TEMPLATE:
+    case mx::DeclKind::FUNCTION_TEMPLATE:
+    case mx::DeclKind::CLASS_TEMPLATE:
+    case mx::DeclKind::VAR_TEMPLATE:
+    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+      return true;
+
+    default:
+      return false;
+  }
+}
+
 PackedReaderState::PackedReaderState(capnp::Data::Reader data) {
   auto begin = reinterpret_cast<const char *>(data.begin());
   std::string_view untagged_data(begin, data.size() - 1u);
@@ -339,7 +388,7 @@ void RemoteEntityProvider::FillUses(
   for (auto changed = true; changed; ) {
     changed = false;
 
-    // Request the set of redeclarations for this entity. It's possible
+    // Request the set of redeclarations for this entity.
     redecl_ids_out = self->Redeclarations(self, eid);
 
     capnp::Request<mx::rpc::Multiplier::FindUsesParams,
@@ -383,8 +432,69 @@ void RemoteEntityProvider::FillUses(
   fragment_ids_out.clear();
 }
 
+// Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
+// to analyze when looking for references.
+void RemoteEntityProvider::FillReferences(
+    const Ptr &self, RawEntityId eid, std::vector<RawEntityId> &redecl_ids_out,
+    std::vector<FragmentId> &fragment_ids_out) try {
+
+  ClientConnection &cc = Connection(self);
+
+  auto prev_version_number = self->VersionNumber();
+  for (auto changed = true; changed; ) {
+    changed = false;
+
+    // Request the set of redeclarations for this entity.
+    redecl_ids_out = self->Redeclarations(self, eid);
+
+    capnp::Request<mx::rpc::Multiplier::FindReferencesParams,
+                   mx::rpc::Multiplier::FindReferencesResults>
+        request = cc.client.findReferencesRequest();
+
+    auto i = 0u;
+    auto redecl_ids = request.initRedeclarationIds(
+        static_cast<unsigned>(redecl_ids_out.size()));
+    for (mx::RawEntityId eid : redecl_ids_out) {
+      redecl_ids.set(i++, eid);
+    }
+
+    capnp::Response<mx::rpc::Multiplier::FindReferencesResults> response =
+        request.send().wait(cc.connection.getWaitScope());
+
+    // Make sure that we re-try if the version number when we requested the
+    // redeclaration IDs is now out-of-date.
+    auto resp_version_number = response.getVersionNumber();
+    if (MaybeUpdateVersionNumber(self, resp_version_number) ||
+        prev_version_number < resp_version_number) {
+      prev_version_number = resp_version_number;
+      changed = true;
+      continue;
+    }
+
+    auto fragment_ids_reader = response.getFragmentIds();
+    fragment_ids_out.clear();
+    fragment_ids_out.reserve(fragment_ids_reader.size());
+    for (auto frag_id : fragment_ids_reader) {
+      fragment_ids_out.push_back(frag_id);
+    }
+
+    self->CacheUses(redecl_ids_out, fragment_ids_out, resp_version_number);
+    return;
+  }
+
+// TODO(pag): Log something.
+} catch (...) {
+  redecl_ids_out.clear();
+  fragment_ids_out.clear();
+}
+
 // Cache a returned set of uses for a given set of redeclarations.
 void RemoteEntityProvider::CacheUses(
+    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+    unsigned) {}
+
+// Cache a returned set of references for a given set of redeclarations.
+void RemoteEntityProvider::CacheReferences(
     const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
     unsigned) {}
 
@@ -432,6 +542,10 @@ void InvalidEntityProvider::CacheUses(
     const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
     unsigned) {}
 
+void InvalidEntityProvider::CacheReferences(
+    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+    unsigned) {}
+
 void InvalidEntityProvider::FillUses(
     const Ptr &, RawEntityId eid,
     std::vector<RawEntityId> &redecl_ids_out,
@@ -440,6 +554,13 @@ void InvalidEntityProvider::FillUses(
   fragment_ids_out.clear();
 }
 
+void InvalidEntityProvider::FillReferences(
+    const Ptr &, RawEntityId eid,
+    std::vector<RawEntityId> &redecl_ids_out,
+    std::vector<FragmentId> &fragment_ids_out) {
+  redecl_ids_out.clear();
+  fragment_ids_out.clear();
+}
 
 Decl DeclIterator::operator*(void) && noexcept {
   return Decl(std::move(impl), index);
@@ -484,48 +605,8 @@ std::optional<Decl> Decl::definition(void) const {
 }
 
 std::vector<Decl> Decl::redeclarations(void) const {
-  switch (kind()) {
-    // Functions.
-    case mx::DeclKind::FUNCTION:
-    case mx::DeclKind::CXX_METHOD:
-    case mx::DeclKind::CXX_DESTRUCTOR:
-    case mx::DeclKind::CXX_CONVERSION:
-    case mx::DeclKind::CXX_CONSTRUCTOR:
-    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
-      break;
-
-    // Variables.
-    case mx::DeclKind::VAR:
-    case mx::DeclKind::PARM_VAR:
-    case mx::DeclKind::OMP_CAPTURED_EXPR:
-    case mx::DeclKind::IMPLICIT_PARAM:
-    case mx::DeclKind::DECOMPOSITION:
-    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      if (reinterpret_cast<const VarDecl &>(*this).is_local_variable_declaration()) {
-        return redeclarations_visible_in_translation_unit();
-      }
-      break;
-
-    // Tags.
-    case mx::DeclKind::TAG:
-    case mx::DeclKind::RECORD:
-    case mx::DeclKind::CXX_RECORD:
-    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
-    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
-    case mx::DeclKind::ENUM:
-      break;
-
-    // Redeclarable templates.
-    case mx::DeclKind::REDECLARABLE_TEMPLATE:
-    case mx::DeclKind::FUNCTION_TEMPLATE:
-    case mx::DeclKind::CLASS_TEMPLATE:
-    case mx::DeclKind::VAR_TEMPLATE:
-    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
-      break;
-
-    default:
-      return redeclarations_visible_in_translation_unit();
+  if (!MayHaveRemoteRedeclarations(*this)) {
+    return redeclarations_visible_in_translation_unit();
   }
 
   auto redecl_ids = fragment->ep->Redeclarations(fragment->ep, id());
@@ -547,6 +628,10 @@ std::vector<Decl> Decl::redeclarations(void) const {
 
 UseRange<DeclUseSelector> Decl::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+}
+
+ReferenceRange Decl::references(void) const {
+  return std::make_shared<ReferenceIteratorImpl>(fragment->ep, *this);
 }
 
 DeclIterator Decl::in_internal(const Fragment &fragment) {

@@ -197,7 +197,7 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   # Download a code fragment by an `mx::FragmentId`.
   downloadFragment @4 (id: UInt64) -> (versionNumber :UInt32, fragment :Data);
 
-  # Search code fragments matches with the query
+  # Search code fragments that match with the query.
   weggliQueryFragments @5 (query :Text, isCpp :Bool) ->  (versionNumber :UInt32, fragments :List(UInt64));
  
   # Query for a regular expression match, and return the list of fragment ids
@@ -213,4 +213,9 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   # declaration, return a list of fragment IDs that contain some kind of use
   # of the declarations.
   findUses @8 (redeclarationIds :List(UInt64)) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
+  
+  # Given a list of declaration IDs that all logically represent the same
+  # declaration, return a list of statement entity ids that reference any of
+  # the declarations. This focuses on `DeclRefExpr` and `MemberExpr` references.
+  findReferences @9 (redeclarationIds :List(UInt64)) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
 }

@@ -38,7 +38,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       entity_redecls(workspace_dir),
       entity_id_to_mangled_name(workspace_dir),
       mangled_name_to_entity_id(workspace_dir),
-      entity_id_use_to_fragment_id(workspace_dir) {
+      entity_id_use_to_fragment_id(workspace_dir),
+      entity_id_reference(workspace_dir) {
 
   // Clients all default-initialize their version numbers to `0`, so we default
   // the server to `1` so that clients are always out-of-date.
@@ -366,9 +367,18 @@ void IndexingContext::LinkMangledName(const std::string &name,
 }
 
 // Link an entity to the fragment that uses the entity.
-void IndexingContext::LinkUseInFragment(mx::RawEntityId a, mx::FragmentId b) {
-  if (a != mx::kInvalidEntityId && b != mx::kInvalidEntityId) {
-    server_context.entity_id_use_to_fragment_id.Insert(a, b);
+void IndexingContext::LinkUseInFragment(mx::RawEntityId use,
+                                        mx::FragmentId user) {
+  if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
+    server_context.entity_id_use_to_fragment_id.Insert(use, user);
+  }
+}
+
+// Link a direct reference to an entity from another entity.
+void IndexingContext::LinkReferenceInFragment(mx::RawEntityId use,
+                                              mx::FragmentId user) {
+  if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
+    server_context.entity_id_reference.Insert(use, user);
   }
 }
 

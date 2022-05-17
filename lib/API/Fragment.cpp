@@ -56,6 +56,10 @@ Fragment Fragment::containing(const UseBase &use) {
   return Fragment(use.fragment);
 }
 
+Fragment Fragment::containing(const Reference &ref) {
+  return Fragment(ref.fragment);
+}
+
 // Return the ID of this fragment.
 FragmentId Fragment::id(void) const noexcept {
   return impl->fragment_id;

@@ -68,6 +68,8 @@ class Server final : public mx::rpc::Multiplier::Server {
   kj::Promise<void> findRedeclarations(FindRedeclarationsContext context) final;
 
   kj::Promise<void> findUses(FindUsesContext context) final;
+
+  kj::Promise<void> findReferences(FindReferencesContext context) final;
 };
 
 }  // namespace indexer

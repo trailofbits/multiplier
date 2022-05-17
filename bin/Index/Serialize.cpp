@@ -2689,7 +2689,7 @@ void SerializeDeclRefExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const past
   b.setVal98(e.HadMultipleCandidates());
   b.setVal99(e.HasExplicitTemplateArguments());
   b.setVal100(e.HasQualifier());
-  b.setVal101(e.HasTemplateKWAndArgumentsInfo());
+  b.setVal101(e.HasTemplateKeywordAndArgumentsInfo());
   b.setVal102(e.HasTemplateKeyword());
   b.setVal103(static_cast<unsigned char>(mx::FromPasta(e.IsNonOdrUse())));
   b.setVal104(e.RefersToEnclosingVariableOrCapture());
@@ -3691,7 +3691,7 @@ void SerializeRequiresExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   } while (false);
   auto t39 = e.RBraceToken();
   b.setVal39(es.EntityId(t39));
-  auto t40 = e.RequiresKWToken();
+  auto t40 = e.RequiresKeywordToken();
   b.setVal40(es.EntityId(t40));
   b.setVal98(e.IsSatisfied());
 }

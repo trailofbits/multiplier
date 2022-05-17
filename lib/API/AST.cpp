@@ -17917,7 +17917,7 @@ bool DeclRefExpr::has_qualifier(void) const {
   return self.getVal100();
 }
 
-bool DeclRefExpr::has_template_kw_and_arguments_info(void) const {
+bool DeclRefExpr::has_template_keyword_and_arguments_info(void) const {
   auto self = fragment->NthStmt(offset);
   return self.getVal101();
 }
@@ -22150,7 +22150,7 @@ Token RequiresExpr::r_brace_token(void) const {
   return fragment->TokenFor(fragment, self.getVal39()).value();
 }
 
-Token RequiresExpr::requires_kw_token(void) const {
+Token RequiresExpr::requires_keyword_token(void) const {
   auto self = fragment->NthStmt(offset);
   return fragment->TokenFor(fragment, self.getVal40()).value();
 }
@@ -33467,7 +33467,7 @@ const char *EnumeratorName(TokenUseSelector sel) {
     case TokenUseSelector::R_BRACKET_TOKEN: return "R_BRACKET_TOKEN";
     case TokenUseSelector::R_PAREN_TOKEN: return "R_PAREN_TOKEN";
     case TokenUseSelector::RECEIVER_TOKEN: return "RECEIVER_TOKEN";
-    case TokenUseSelector::REQUIRES_KW_TOKEN: return "REQUIRES_KW_TOKEN";
+    case TokenUseSelector::REQUIRES_KEYWORD_TOKEN: return "REQUIRES_KEYWORD_TOKEN";
     case TokenUseSelector::RETURN_TOKEN: return "RETURN_TOKEN";
     case TokenUseSelector::RIGHT_ANGLE_TOKEN: return "RIGHT_ANGLE_TOKEN";
     case TokenUseSelector::RIGHT_BRACE_TOKEN: return "RIGHT_BRACE_TOKEN";

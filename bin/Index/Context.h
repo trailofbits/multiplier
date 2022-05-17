@@ -46,6 +46,7 @@ enum : char {
   kEntityIdToMangledName,
   kMangledNameToEntityId,
   kEntityIdUseToFragmentId,
+  kEntityIdReference,
 };
 
 enum MetadataName : char {
@@ -192,6 +193,11 @@ class ServerContext {
   mx::PersistentSet<kEntityIdUseToFragmentId, mx::RawEntityId, mx::FragmentId>
       entity_id_use_to_fragment_id;
 
+  // Keeps track of references, e.g. `DeclRefExpr`, the fields accessed by
+  // `MemberExpr`, etc.
+  mx::PersistentSet<kEntityIdReference, mx::RawEntityId, mx::FragmentId>
+      entity_id_reference;
+
   void Flush(void);
 
   ~ServerContext(void);
@@ -335,7 +341,10 @@ class IndexingContext {
   void LinkMangledName(const std::string &name, mx::RawEntityId eid);
 
   // Link an entity to the fragment that uses the entity.
-  void LinkUseInFragment(mx::RawEntityId a, mx::FragmentId b);
+  void LinkUseInFragment(mx::RawEntityId use, mx::FragmentId user);
+
+  // Link a direct reference to an entity from another entity.
+  void LinkReferenceInFragment(mx::RawEntityId use, mx::FragmentId user);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out

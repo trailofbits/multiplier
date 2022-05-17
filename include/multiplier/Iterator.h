@@ -116,6 +116,11 @@ class DerivedEntityIterator {
   }
 
   // Return the current token pointed to by the iterator.
+  inline Derived operator*(void) && noexcept {
+    return std::move(item.value());
+  }
+
+  // Return the current token pointed to by the iterator.
   inline const Derived &operator*(void) const & noexcept {
     return item.value();
   }

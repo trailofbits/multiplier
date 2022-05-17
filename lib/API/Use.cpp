@@ -68,7 +68,22 @@ namespace {
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     : ep(std::move(ep_)) {
-  ep->FillUses(ep, entity.id(), search_ids, fragment_ids);
+
+  if (MayHaveRemoteRedeclarations(entity)) {
+    ep->FillUses(ep, entity.id(), search_ids, fragment_ids);
+  }
+
+  if (search_ids.empty()) {
+    for (const mx::Decl &redecl :
+             entity.redeclarations_visible_in_translation_unit()) {
+      search_ids.push_back(redecl.id());
+      fragment_ids.push_back(redecl.fragment->fragment_id);
+    }
+
+    std::sort(fragment_ids.begin(), fragment_ids.end());
+    auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+    fragment_ids.erase(it, fragment_ids.end());
+  }
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
@@ -373,6 +388,111 @@ UseBase::as_template_parameter_list(void) const {
   } else {
     return std::nullopt;
   }
+}
+
+ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
+                                             const Decl &entity)
+    : ep(std::move(ep_)) {
+
+  if (MayHaveRemoteRedeclarations(entity)) {
+    ep->FillReferences(ep, entity.id(), search_ids, fragment_ids);
+  }
+
+  if (search_ids.empty()) {
+    for (const mx::Decl &redecl :
+             entity.redeclarations_visible_in_translation_unit()) {
+      search_ids.push_back(redecl.id());
+      fragment_ids.push_back(redecl.fragment->fragment_id);
+    }
+
+    std::sort(fragment_ids.begin(), fragment_ids.end());
+    auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+    fragment_ids.erase(it, fragment_ids.end());
+  }
+}
+
+ReferenceIterator::~ReferenceIterator(void) {}
+
+void ReferenceIterator::Advance(void) {
+  if (!impl) {
+    return;
+  }
+
+  for (;;) {
+    // Initialize to the first statement of the fragment.
+    if (!user.fragment) {
+      if (fragment_offset >= impl->fragment_ids.size()) {
+        impl.reset();  // Done.
+        return;
+      }
+
+      auto frag_id = impl->fragment_ids[fragment_offset++];
+      user.fragment = impl->ep->FragmentFor(impl->ep, frag_id);
+      if (!user.fragment) {
+        continue;
+      }
+
+      if (!user.fragment->num_stmts) {
+        continue;
+      }
+
+      user.offset = 0u;
+
+    // Skip to the next statement.
+    } else {
+      ++user.offset;
+    }
+
+    // We've exhausted the statements in this fragment; skip to the next
+    // fragment.
+    if (user.offset >= user.fragment->num_stmts) {
+      user.fragment.reset();
+      user.offset = 0u;
+      continue;
+    }
+
+    Stmt stmt(std::move(user.fragment), user.offset);
+
+    if (stmt.kind() == StmtKind::DECL_REF_EXPR) {
+      const DeclRefExpr &dre = reinterpret_cast<const DeclRefExpr &>(stmt);
+      auto referenced_id = dre.declaration().id();
+      for (auto search_id : impl->search_ids) {
+        if (referenced_id == search_id) {
+          user.fragment = std::move(stmt.fragment);  // Take it back.
+          return;  // Hit!
+        }
+      }
+
+    } else if (stmt.kind() == StmtKind::MEMBER_EXPR) {
+      const MemberExpr &dre = reinterpret_cast<const MemberExpr &>(stmt);
+      auto referenced_id = dre.member_declaration().id();
+      for (auto search_id : impl->search_ids) {
+        if (referenced_id == search_id) {
+          user.fragment = std::move(stmt.fragment);  // Take it back.
+          return;  // Hit!
+        }
+      }
+
+    }
+
+    user.fragment = std::move(stmt.fragment);  // Take it back.
+  }
+}
+
+Stmt Reference::statement(void) && noexcept {
+  return Stmt(std::move(fragment), offset);
+}
+
+Stmt Reference::statement(void) const & noexcept {
+  return Stmt(fragment, offset);
+}
+
+Reference::operator Stmt(void) && noexcept {
+  return Stmt(std::move(fragment), offset);
+}
+
+Reference::operator Stmt(void) const & noexcept {
+  return Stmt(fragment, offset);
 }
 
 }  // namespace mx

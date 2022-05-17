@@ -266,6 +266,7 @@ namespace mx {
 class DeclIterator;
 class FragmentImpl;
 class FileImpl;
+class ReferenceRange;
 class StmtIterator;
 class Token;
 class TokenContext;class TokenContextIterator;
@@ -7162,6 +7163,8 @@ class TemplateParameterList {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7175,6 +7178,11 @@ class TemplateParameterList {
   unsigned offset;
 
  public:
+  TemplateParameterList(TemplateParameterList &&) noexcept = default;
+  TemplateParameterList(const TemplateParameterList &) = default;
+  TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
+  TemplateParameterList &operator=(const TemplateParameterList &) = default;
+
   inline TemplateParameterList(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
       : fragment(std::move(fragment_)),
         offset(offset_) {}
@@ -7199,6 +7207,8 @@ class TemplateArgument {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7212,6 +7222,11 @@ class TemplateArgument {
   unsigned offset;
 
  public:
+  TemplateArgument(TemplateArgument &&) noexcept = default;
+  TemplateArgument(const TemplateArgument &) = default;
+  TemplateArgument &operator=(TemplateArgument &&) noexcept = default;
+  TemplateArgument &operator=(const TemplateArgument &) = default;
+
   inline TemplateArgument(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
       : fragment(std::move(fragment_)),
         offset(offset_) {}
@@ -7235,6 +7250,8 @@ class CXXBaseSpecifier {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7248,6 +7265,11 @@ class CXXBaseSpecifier {
   unsigned offset;
 
  public:
+  CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
+  CXXBaseSpecifier(const CXXBaseSpecifier &) = default;
+  CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
+  CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
+
   inline CXXBaseSpecifier(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
       : fragment(std::move(fragment_)),
         offset(offset_) {}
@@ -7273,6 +7295,8 @@ class Type {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -7286,6 +7310,11 @@ class Type {
   unsigned offset;
 
  public:
+  Type(Type &&) noexcept = default;
+  Type(const Type &) = default;
+  Type &operator=(Type &&) noexcept = default;
+  Type &operator=(const Type &) = default;
+
   inline Type(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
       : fragment(std::move(fragment_)),
         offset(offset_) {}
@@ -9944,6 +9973,8 @@ class Stmt {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -9957,6 +9988,11 @@ class Stmt {
   unsigned offset;
 
  public:
+  Stmt(Stmt &&) noexcept = default;
+  Stmt(const Stmt &) = default;
+  Stmt &operator=(Stmt &&) noexcept = default;
+  Stmt &operator=(const Stmt &) = default;
+
   inline Stmt(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
       : fragment(std::move(fragment_)),
         offset(offset_) {}
@@ -15583,7 +15619,7 @@ class DeclRefExpr : public Expr {
   bool had_multiple_candidates(void) const;
   bool has_explicit_template_arguments(void) const;
   bool has_qualifier(void) const;
-  bool has_template_kw_and_arguments_info(void) const;
+  bool has_template_keyword_and_arguments_info(void) const;
   bool has_template_keyword(void) const;
   NonOdrUseReason is_non_odr_use(void) const;
   bool refers_to_enclosing_variable_or_capture(void) const;
@@ -20722,7 +20758,7 @@ class RequiresExpr : public Expr {
   RequiresExprBodyDecl body(void) const;
   std::vector<ParmVarDecl> local_parameters(void) const;
   Token r_brace_token(void) const;
-  Token requires_kw_token(void) const;
+  Token requires_keyword_token(void) const;
   bool is_satisfied(void) const;
 };
 
@@ -24179,6 +24215,8 @@ class Decl {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -24192,6 +24230,11 @@ class Decl {
   unsigned offset;
 
  public:
+  Decl(Decl &&) noexcept = default;
+  Decl(const Decl &) = default;
+  Decl &operator=(Decl &&) noexcept = default;
+  Decl &operator=(const Decl &) = default;
+
   inline Decl(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
       : fragment(std::move(fragment_)),
         offset(offset_) {}
@@ -24215,6 +24258,7 @@ class Decl {
   std::vector<Decl> redeclarations(void) const;
   EntityId id(void) const;
   UseRange<DeclUseSelector> uses(void) const;
+  ReferenceRange references(void) const;
 
  protected:
   static DeclIterator in_internal(const Fragment &fragment);
@@ -31069,7 +31113,7 @@ enum class TokenUseSelector : unsigned short {
   R_BRACKET_TOKEN,
   R_PAREN_TOKEN,
   RECEIVER_TOKEN,
-  REQUIRES_KW_TOKEN,
+  REQUIRES_KEYWORD_TOKEN,
   RETURN_TOKEN,
   RIGHT_ANGLE_TOKEN,
   RIGHT_BRACE_TOKEN,

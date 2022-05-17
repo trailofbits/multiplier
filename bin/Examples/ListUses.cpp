@@ -34,9 +34,9 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  auto maybe_decl = index.entity(FLAGS_entity_id);
-  if (std::holds_alternative<mx::Decl>(maybe_decl)) {
-    mx::Decl decl = std::get<mx::Decl>(maybe_decl);
+  auto maybe_entity = index.entity(FLAGS_entity_id);
+  if (std::holds_alternative<mx::Decl>(maybe_entity)) {
+    mx::Decl decl = std::get<mx::Decl>(maybe_entity);
 
     for (const mx::DeclUse &use : decl.uses()) {
       mx::Fragment fragment = mx::Fragment::containing(use);

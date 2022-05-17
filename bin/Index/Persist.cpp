@@ -595,7 +595,8 @@ void PersistFragment(IndexingContext &context, NameMangler &mangler,
                                   max_token.Line());
 
   frag.LinkDeclarations(context, em, mangler);
-  frag.FindDeclarationUses(context, fragment_id, fb);
+  frag.LinkReferences(context, em);
+  frag.FindDeclarationUses(context, fb);
 
   context.PutSerializedFragment(
       fragment_id, CompressedMessage("fragment", message));

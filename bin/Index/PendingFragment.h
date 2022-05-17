@@ -110,8 +110,13 @@ struct PendingFragment {
   // Identify all unique entity IDs used by this fragment, and map them to the
   // fragment ID in the data store.
   void FindDeclarationUses(
-      IndexingContext &context, mx::FragmentId fragment_id,
-      mx::rpc::Fragment::Builder &b);
+      IndexingContext &context, mx::rpc::Fragment::Builder &b);
+
+  // Identify all explicit references to entities.
+  //
+  // TODO(pag): Eventually make this identify the type of reference, or use
+  //            the SourceIR to do so.
+  void LinkReferences(IndexingContext &context, EntityMapper &em);
 };
 
 }  // namespace indexer

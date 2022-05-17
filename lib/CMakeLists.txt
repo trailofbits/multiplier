@@ -69,6 +69,7 @@ set(api_headers
   "${source_include_dir}/AST.h"
   "${source_include_dir}/Iterator.h"
   "${source_include_dir}/Compress.h"
+  "${source_include_dir}/Reference.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/Use.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"

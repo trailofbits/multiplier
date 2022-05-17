@@ -39,6 +39,8 @@ using TypeListReader = capnp::List<ast::Type, capnp::Kind::STRUCT>::Reader;
 using PseudoListReader = capnp::List<ast::Pseudo, capnp::Kind::STRUCT>::Reader;
 using TopLevelDeclListReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 
+bool MayHaveRemoteRedeclarations(const mx::Decl &decl);
+
 struct PackedReaderState {
  private:
   std::string storage;
@@ -128,6 +130,12 @@ class RemoteEntityProvider final : public EntityProvider {
                 std::vector<RawEntityId> &redecl_ids_out,
                 std::vector<FragmentId> &fragment_ids_out) final;
 
+  // Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
+  // to analyze when looking for references.
+  void FillReferences(const Ptr &, RawEntityId eid,
+                      std::vector<RawEntityId> &redecl_ids_out,
+                      std::vector<FragmentId> &fragment_ids_out) final;
+
   // Cache a returned file list.
   void CacheFileList(const FilePathList &, unsigned) final;
 
@@ -136,6 +144,11 @@ class RemoteEntityProvider final : public EntityProvider {
 
   // Cache a returned set of uses for a given set of redeclarations.
   void CacheUses(
+      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+      unsigned) final;
+
+  // Cache a returned set of references for a given set of redeclarations.
+  void CacheReferences(
       const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
       unsigned) final;
 };
@@ -168,9 +181,16 @@ class InvalidEntityProvider final : public EntityProvider {
                 std::vector<RawEntityId> &redecl_ids_out,
                 std::vector<FragmentId> &fragment_ids_out) final;
 
+  void FillReferences(const Ptr &, RawEntityId eid,
+                      std::vector<RawEntityId> &redecl_ids_out,
+                      std::vector<FragmentId> &fragment_ids_out) final;
+
   void CacheFileList(const FilePathList &, unsigned) final;
   void CacheRedeclarations(const std::vector<RawEntityId> &, unsigned) final;
   void CacheUses(
+      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+      unsigned) final;
+  void CacheReferences(
       const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
       unsigned) final;
 };

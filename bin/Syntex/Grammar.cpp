@@ -7,6 +7,7 @@
 #include "Grammar.h"
 
 #include <cassert>
+#include <iostream>
 
 #include <gflags/gflags.h>
 #include <multiplier/API.h>

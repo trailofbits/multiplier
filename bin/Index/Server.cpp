@@ -337,6 +337,7 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   return kj::READY_NOW;
 }
 
+// Search code fragments that match with the query.
 kj::Promise<void> Server::weggliQueryFragments(
     WeggliQueryFragmentsContext context) {
 
@@ -394,6 +395,8 @@ kj::Promise<void> Server::weggliQueryFragments(
   return kj::READY_NOW;
 }
 
+// Query for a regular expression match, and return the list of fragment ids
+// overlapping with the matches.
 kj::Promise<void> Server::regexQueryFragments(
     RegexQueryFragmentsContext context) {
   // Get params and result context
@@ -442,6 +445,9 @@ kj::Promise<void> Server::regexQueryFragments(
   return kj::READY_NOW;
 }
 
+// Expand a list of redeclarations to try to cover all redeclarations across
+// all translation units. The first redeclaration in the list should be the
+// definition.
 kj::Promise<void> Server::findRedeclarations(FindRedeclarationsContext context) {
   mx::rpc::Multiplier::FindRedeclarationsParams::Reader params =
       context.getParams();
@@ -473,6 +479,9 @@ kj::Promise<void> Server::findRedeclarations(FindRedeclarationsContext context) 
   return kj::READY_NOW;
 }
 
+// Given a list of declaration IDs that all logically represent the same
+// declaration, return a list of fragment IDs that contain some kind of use
+// of the declarations.
 kj::Promise<void> Server::findUses(FindUsesContext context) {
   mx::rpc::Multiplier::FindUsesParams::Reader params =
       context.getParams();
@@ -488,7 +497,45 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
     d->server_context.entity_id_use_to_fragment_id.ScanPrefix(
         eid,
-        [&fragment_ids] (mx::RawEntityId eid, mx::FragmentId frag_id) {
+        [&fragment_ids] (mx::RawEntityId, mx::FragmentId frag_id) {
+          fragment_ids.push_back(frag_id);
+          return true;
+        });
+  }
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
+
+  auto fib = result.initFragmentIds(static_cast<unsigned>(fragment_ids.size()));
+  auto i = 0u;
+  for (mx::FragmentId frag_id : fragment_ids) {
+    fib.set(i++, frag_id);
+  }
+
+  return kj::READY_NOW;
+}
+
+// Given a list of declaration IDs that all logically represent the same
+// declaration, return a list of statement entity ids that reference any of
+// the declarations. This focuses on `DeclRefExpr` and `MemberExpr` references.
+kj::Promise<void> Server::findReferences(FindReferencesContext context) {
+  mx::rpc::Multiplier::FindReferencesParams::Reader params =
+      context.getParams();
+
+  mx::rpc::Multiplier::FindReferencesResults::Builder result =
+      context.initResults();
+
+  result.setVersionNumber(d->server_context.version_number.load());
+
+
+  std::vector<mx::FragmentId> fragment_ids;
+  fragment_ids.reserve(16);
+
+  for (mx::RawEntityId eid : params.getRedeclarationIds()) {
+    d->server_context.entity_id_reference.ScanPrefix(
+        eid,
+        [&fragment_ids] (mx::RawEntityId, mx::FragmentId frag_id) {
           fragment_ids.push_back(frag_id);
           return true;
         });

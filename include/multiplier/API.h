@@ -6,20 +6,16 @@
 
 #pragma once
 
-#include <deque>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
 #include <map>
-#include <mutex>
-#include <iostream>
 
-#include "AST.h"  // Auto-generated.
-#include "Iterator.h"
+#include "AST.h"  // Auto-generated, brings in `Iterator.h` and `Use.h`.
+#include "Reference.h"
 #include "Types.h"
-#include "Use.h"
 
 namespace mx {
 
@@ -592,6 +588,8 @@ class Fragment {
   friend class FragmentImpl;
   friend class FragmentList;
   friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class RemoteEntityProvider;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
@@ -622,6 +620,7 @@ class Fragment {
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const TokenSubstitution &);
   static Fragment containing(const UseBase &);
+  static Fragment containing(const Reference &);
 
   // Return the ID of this fragment.
   FragmentId id(void) const noexcept;
@@ -923,6 +922,8 @@ class EntityProvider {
   friend class Index;
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
@@ -957,6 +958,11 @@ class EntityProvider {
       const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
       unsigned) = 0;
 
+  // Cache a returned set of references for a given set of redeclarations.
+  virtual void CacheReferences(
+      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
+      unsigned) = 0;
+
  private:
 
   // Get the current list of parsed files, where the minimum ID
@@ -981,11 +987,17 @@ class EntityProvider {
   virtual std::vector<RawEntityId> Redeclarations(
       const Ptr &, RawEntityId eid) = 0;
 
-  // Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
+  // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for uses.
   virtual void FillUses(const Ptr &, RawEntityId eid,
                         std::vector<RawEntityId> &redecl_ids_out,
                         std::vector<FragmentId> &fragment_ids_out) = 0;
+
+  // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
+  // to analyze when looking for references.
+  virtual void FillReferences(const Ptr &, RawEntityId eid,
+                              std::vector<RawEntityId> &redecl_ids_out,
+                              std::vector<FragmentId> &fragment_ids_out) = 0;
 };
 
 class NotAnEntity {};
