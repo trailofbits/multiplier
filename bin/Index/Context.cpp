@@ -378,6 +378,7 @@ void IndexingContext::LinkUseInFragment(mx::RawEntityId use,
 void IndexingContext::LinkReferenceInFragment(mx::RawEntityId use,
                                               mx::FragmentId user) {
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
+    LOG(ERROR) << "Reference to " << use << " in fragment " << user;
     server_context.entity_id_reference.Insert(use, user);
   }
 }

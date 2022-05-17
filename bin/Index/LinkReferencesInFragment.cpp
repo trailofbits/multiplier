@@ -69,7 +69,15 @@ void PendingFragment::LinkReferences(
     if (auto dre = pasta::DeclRefExpr::From(stmt)) {
       auto used_decl = dre->Declaration();
       if (MayHaveRemoteRedeclarations(used_decl)) {
-        context.LinkReferenceInFragment(em.EntityId(used_decl), fragment_id);
+        auto used_decl_id = em.EntityId(used_decl);
+        context.LinkReferenceInFragment(used_decl_id, fragment_id);
+        auto found_decl = dre->FoundDeclaration();
+        if (MayHaveRemoteRedeclarations(found_decl)) {
+          if (auto found_decl_id = em.EntityId(found_decl);
+              found_decl_id != used_decl_id) {
+            context.LinkReferenceInFragment(found_decl_id, fragment_id);
+          }
+        }
       }
 
     } else if (auto me = pasta::MemberExpr::From(stmt)) {

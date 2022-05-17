@@ -14,11 +14,20 @@
 
 namespace mx {
 
-class UseIteratorImpl {
+class BaseUseIteratorImpl {
  public:
   std::shared_ptr<EntityProvider> ep;
   std::vector<RawEntityId> search_ids;
   std::vector<FragmentId> fragment_ids;
+
+  inline BaseUseIteratorImpl(std::shared_ptr<EntityProvider> ep_)
+      : ep(std::move(ep_)) {}
+
+  void FillAndUniqueFragmentIds(void);
+};
+
+class UseIteratorImpl : public BaseUseIteratorImpl {
+ public:
 
   UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity);
@@ -33,11 +42,8 @@ class UseIteratorImpl {
   bool FindNext(UseIteratorBase &self);
 };
 
-class ReferenceIteratorImpl {
+class ReferenceIteratorImpl : public BaseUseIteratorImpl {
  public:
-  std::shared_ptr<EntityProvider> ep;
-  std::vector<RawEntityId> search_ids;
-  std::vector<FragmentId> fragment_ids;
 
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
 };

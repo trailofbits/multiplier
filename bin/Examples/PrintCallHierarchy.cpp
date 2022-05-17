@@ -1,147 +1,146 @@
-// // Copyright (c) 2022-present, Trail of Bits, Inc.
-// // All rights reserved.
-// //
-// // This source code is licensed in accordance with the terms specified in
-// // the LICENSE file found in the root directory of this source tree.
+// Copyright (c) 2022-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
 
-// #include <cstdlib>
-// #include <gflags/gflags.h>
-// #include <glog/logging.h>
-// #include <iostream>
-// #include <multiplier/API.h>
-// #include <sstream>
-// #include <vector>
+#include <cstdlib>
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+#include <iostream>
+#include <iomanip>
+#include <multiplier/API.h>
+#include <sstream>
+#include <vector>
 
-// DECLARE_bool(help);
-// DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-// DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
-// DEFINE_uint64(entity_id, 0, "ID of the entity to print the call hierarchy of");
+DECLARE_bool(help);
+DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
+DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+DEFINE_uint64(entity_id, 0, "ID of the entity to print the call hierarchy of");
 
-// using SeenEntityList = std::vector<mx::RawEntityId>;
+using SeenEntityList = std::vector<mx::RawEntityId>;
 
-// struct SeenEntityTracker {
-//  private:
-//   SeenEntityList &seen;
-//   const size_t size;
-//   const mx::RawEntityId eid;
-//   const bool is_new;
+struct SeenEntityTracker {
+ private:
+  SeenEntityList &seen;
+  const size_t size;
+  const mx::RawEntityId eid;
+  const size_t count;
 
-//  public:
-//   template <typename E>
-//   SeenEntityTracker(SeenEntityList &seen_, const E &entity)
-//       : seen(seen_),
-//         size(seen.size()),
-//         eid(entity.id()),
-//         is_new(std::find(seen.begin(), seen.end(), entity.id()) != seen.end()) {
-//     seen.push_back(eid);        
-//   }
+ public:
+  template <typename E>
+  SeenEntityTracker(SeenEntityList &seen_, const E &entity)
+      : seen(seen_),
+        size(seen.size()),
+        eid(entity.id()),
+        count(std::count(seen.begin(), seen.end(), entity.id())) {
+    seen.push_back(eid);        
+  }
 
-//   operator bool (void) const noexcept {
-//     return is_new;
-//   } 
+  operator bool (void) const noexcept {
+    return count <= 1u;
+  }
 
-//   ~SeenEntityTracker(void) {
-//     seen.resize(size);
-//   }
-// };
+  bool IsCycle(void) {
+    return count == 1u;
+  }
 
-// static void PrintCallHierarchy(const mx::Decl &entity, SeenEntityList &seen,
-//                                unsigned depth);
-// static void PrintCallHierarchy(const mx::Stmt &entity, SeenEntityList &seen,
-//                                unsigned depth);
+  ~SeenEntityTracker(void) {
+    seen.resize(size);
+  }
+};
 
-// void PrintCallHierarchy(const mx::Decl &entity, SeenEntityList &seen,
-//                         unsigned depth) {
-//   SeenEntityTracker enter_entity(seen, entity);
-//   if (!enter_entity) {
-//     return;
-//   }
+static void PrintCallHierarchy(mx::Decl entity, SeenEntityList &seen,
+                               unsigned depth);
+static void PrintCallHierarchy(mx::Stmt entity, SeenEntityList &seen,
+                               unsigned depth);
 
-//   for (const mx::Reference &ref : entity.references()) {
+static void Indent(std::ostream &os, unsigned depth) {
+  for (auto i = 0u; i < depth; ++i) {
+    os << "  ";
+  }
+}
 
-//   }
-// }
+void PrintCallHierarchy(mx::Decl entity, SeenEntityList &seen,
+                        unsigned depth) {
+  SeenEntityTracker enter_entity(seen, entity);
+  if (!enter_entity) {
+    return;
+  }
 
-// void PrintCallHierarchy(const mx::Stmt &entity, SeenEntityList &seen,
-//                         unsigned depth) {
-//   SeenEntityTracker enter_entity(seen, entity);
-//   if (!enter_entity) {
-//     return;
-//   }
+  Indent(std::cout, depth);
+    
+  mx::Fragment fragment = mx::Fragment::containing(entity);
+  mx::File file = mx::File::containing(fragment);
 
-//   if (auto decl = mx::Decl::containing(entity)) {
-//     PrintCallHierarchy(decl.value(), depth);
-//   }
-// }
+  if (auto named = mx::NamedDecl::from(entity)) {
+    std::cout << std::left << std::setw(16) << named->name() << '\t';
+  }
 
-// extern "C" int main(int argc, char *argv[]) {
-//   std::stringstream ss;
-//   ss
-//     << "Usage: " << argv[0]
-//     << " [--host HOST] [--port PORT] --entity_id ID\n";
+  std::cout
+      << std::left << std::setw(16) << file.id()
+      << std::left << std::setw(16) << fragment.id()
+      << std::left << std::setw(16) << entity.id()
+      << std::left << std::setw(16) << mx::EnumeratorName(entity.kind());
 
-//   google::SetUsageMessage(ss.str());
-//   google::ParseCommandLineFlags(&argc, &argv, false);
-//   google::InitGoogleLogging(argv[0]);
+  std::cout << '\n';
 
-//   if (FLAGS_help) {
-//     std::cerr << google::ProgramUsage() << std::endl;
-//     return EXIT_FAILURE;
-//   }
+  if (enter_entity.IsCycle()) {
+    return;
+  } else if (auto decl = mx::Decl::containing(entity)) {
+    PrintCallHierarchy(decl.value(), seen, depth + 1u);
+  } else {
+    for (const mx::Reference &ref : entity.references()) {
+      PrintCallHierarchy(ref, seen, depth + 1u);
+    }
+  }
+}
 
-//   mx::Index index(mx::EntityProvider::from_remote(
-//       FLAGS_host, FLAGS_port));
+void PrintCallHierarchy(mx::Stmt entity, SeenEntityList &seen,
+                        unsigned depth) {
+  SeenEntityTracker enter_entity(seen, entity);
+  if (!enter_entity) {
+    return;
+  }
 
-//   auto maybe_entity = index.entity(FLAGS_entity_id);
-//   if (std::holds_alternative<mx::Decl>(maybe_entity)) {
-//     mx::Decl decl = std::get<mx::Decl>(maybe_entity);
+  if (auto decl = mx::Decl::containing(entity)) {
+    PrintCallHierarchy(decl.value(), seen, depth);
+  }
+}
 
-//     for (const mx::DeclUse &use : decl.uses()) {
-//       mx::Fragment fragment = mx::Fragment::containing(use);
-//       mx::File file = mx::File::containing(fragment);
+extern "C" int main(int argc, char *argv[]) {
+  std::stringstream ss;
+  ss
+    << "Usage: " << argv[0]
+    << " [--host HOST] [--port PORT] --entity_id ID\n";
 
-//       std::cout
-//           << file.id() << '\t'
-//           << fragment.id() << '\t';
+  google::SetUsageMessage(ss.str());
+  google::ParseCommandLineFlags(&argc, &argv, false);
+  google::InitGoogleLogging(argv[0]);
 
-//       if (auto decl_user = use.as_declaration()) {
-//         std::cout
-//             << decl_user->id() << '\t'
-//             << mx::EnumeratorName(decl_user->kind());
+  if (FLAGS_help) {
+    std::cerr << google::ProgramUsage() << std::endl;
+    return EXIT_FAILURE;
+  }
 
-//       } else if (auto stmt_user = use.as_statement()) {
-//         std::cout
-//             << stmt_user->id() << '\t'
-//             << mx::EnumeratorName(stmt_user->kind());
+  mx::Index index(mx::EntityProvider::from_remote(
+      FLAGS_host, FLAGS_port));
 
-//       } else if (auto type_user = use.as_type()) {
-//         std::cout
-//             << type_user->id() << '\t'
-//             << mx::EnumeratorName(type_user->kind());
+  SeenEntityList seen;
 
-//       } else if (auto cxx_base_spec = use.as_cxx_base_specifier()) {
+  auto maybe_entity = index.entity(FLAGS_entity_id);
+  if (std::holds_alternative<mx::Decl>(maybe_entity)) {
+    mx::Decl decl = std::get<mx::Decl>(maybe_entity);
+    PrintCallHierarchy(std::move(decl), seen, 0u);
 
-//       } else if (auto tpl_arg = use.as_template_argument()) {
+  } else if (std::holds_alternative<mx::Stmt>(maybe_entity)) {
+    mx::Stmt stmt = std::get<mx::Stmt>(maybe_entity);
+    PrintCallHierarchy(std::move(stmt), seen, 0u);
 
-//       } else if (auto tpl_param_list = use.as_template_parameter_list()) {
+  } else {
+    std::cerr << "Invalid declaration id " << FLAGS_entity_id << std::endl;
+    return EXIT_FAILURE;
+  }
 
-//       }
-
-//       std::cout << '\n';
-//       for (auto selector : mx::EnumerationRange<mx::DeclUseSelector>()) {
-//         if (use.has_selector(selector)) {
-//           std::cout << '\t' << mx::EnumeratorName(selector) << '\n';
-//         }
-//       }
-//     }
-
-//   } else {
-//     std::cerr << "Invalid declaration id " << FLAGS_entity_id << std::endl;
-//     return EXIT_FAILURE;
-//   }
-
-//   return EXIT_SUCCESS;
-// }
-int main() {
-  return 0;
+  return EXIT_SUCCESS;
 }

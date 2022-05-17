@@ -172,6 +172,20 @@ class DerivedEntityRange {
     return !!iter;
   }
 
+  inline bool has_value(void) const {
+    return !!iter;
+  }
+
+  // Return the current token pointed to by the iterator.
+  inline Derived value(void) && noexcept {
+    return std::move(*iter);
+  }
+
+  // Return the current token pointed to by the iterator.
+  inline const Derived &value(void) const & noexcept {
+    return *iter;
+  }
+
   // Return the current token pointed to by the iterator.
   inline Derived operator*(void) && noexcept {
     return std::move(*iter);
@@ -457,8 +471,8 @@ class ParentDeclIteratorImpl {
  private:
   std::optional<T> impl;
 
-  bool operator==(const TokenContextIterator &) = delete;
-  bool operator!=(const TokenContextIterator &) = delete;
+  bool operator==(const ParentDeclIteratorImpl<T> &) = delete;
+  bool operator!=(const ParentDeclIteratorImpl<T> &) = delete;
 
  public:
   using EndIteratorType = IteratorEnd;
@@ -478,18 +492,32 @@ class ParentDeclIteratorImpl {
     return impl.has_value();
   }
 
+  inline bool has_value(void) const noexcept {
+    return impl.has_value();
+  }
+
   // Return the current declaration pointed to by the iterator.
-  T operator*(void) && noexcept {
+  inline T value(void) && noexcept {
     return std::move(impl.value());
   }
 
   // Return the current declaration pointed to by the iterator.
-  const T &operator*(void) const & noexcept {
+  inline const T &value(void) const & noexcept {
     return impl.value();
   }
 
   // Return the current declaration pointed to by the iterator.
-  const T *operator->(void) const & noexcept {
+  inline T operator*(void) && noexcept {
+    return std::move(impl.value());
+  }
+
+  // Return the current declaration pointed to by the iterator.
+  inline const T &operator*(void) const & noexcept {
+    return impl.value();
+  }
+
+  // Return the current declaration pointed to by the iterator.
+  inline const T *operator->(void) const & noexcept {
     return std::addressof(impl.value());
   }
 

@@ -66,8 +66,24 @@ namespace {
 
 }  // namespace
 
+void BaseUseIteratorImpl::FillAndUniqueFragmentIds(void) {
+
+  if (fragment_ids.empty()) {
+    for (auto eid : search_ids) {
+      auto vid = EntityId(eid).Unpack();
+      if (std::holds_alternative<DeclarationId>(vid)) {
+        fragment_ids.push_back(std::get<DeclarationId>(vid).fragment_id);
+      }
+    }
+  }
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
+}
+
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
-    : ep(std::move(ep_)) {
+    : BaseUseIteratorImpl(std::move(ep_)) {
 
   if (MayHaveRemoteRedeclarations(entity)) {
     ep->FillUses(ep, entity.id(), search_ids, fragment_ids);
@@ -79,35 +95,27 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
       search_ids.push_back(redecl.id());
       fragment_ids.push_back(redecl.fragment->fragment_id);
     }
-
-    std::sort(fragment_ids.begin(), fragment_ids.end());
-    auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
-    fragment_ids.erase(it, fragment_ids.end());
   }
+
+  FillAndUniqueFragmentIds();
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
-    : ep(std::move(ep_)),
-      search_ids(1u),
-      fragment_ids(1u) {
-  search_ids[0] = entity.id();
-  fragment_ids[0] = entity.fragment->fragment_id;
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  search_ids.push_back(entity.id());
+  fragment_ids.push_back(entity.fragment->fragment_id);
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
-    : ep(std::move(ep_)),
-      search_ids(1u),
-      fragment_ids(1u) {
-  search_ids[0] = entity.id();
-  fragment_ids[0] = entity.fragment->fragment_id;
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  search_ids.push_back(entity.id());
+  fragment_ids.push_back(entity.fragment->fragment_id);
 }
 
 UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
-    : ep(frag->ep),
-      search_ids(1u),
-      fragment_ids(1u) {
-  search_ids[0] = entity.id();
-  fragment_ids[0] = frag->fragment_id;
+    : BaseUseIteratorImpl(frag->ep) {
+  search_ids.push_back(entity.id());
+  fragment_ids.push_back(frag->fragment_id);
 }
 
 bool UseIteratorImpl::FindNextDecl(UseIteratorBase &self) {
@@ -392,7 +400,7 @@ UseBase::as_template_parameter_list(void) const {
 
 ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Decl &entity)
-    : ep(std::move(ep_)) {
+    : BaseUseIteratorImpl(std::move(ep_)) {
 
   if (MayHaveRemoteRedeclarations(entity)) {
     ep->FillReferences(ep, entity.id(), search_ids, fragment_ids);
@@ -404,11 +412,9 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
       search_ids.push_back(redecl.id());
       fragment_ids.push_back(redecl.fragment->fragment_id);
     }
-
-    std::sort(fragment_ids.begin(), fragment_ids.end());
-    auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
-    fragment_ids.erase(it, fragment_ids.end());
   }
+
+  FillAndUniqueFragmentIds();
 }
 
 ReferenceIterator::~ReferenceIterator(void) {}
@@ -432,10 +438,6 @@ void ReferenceIterator::Advance(void) {
         continue;
       }
 
-      if (!user.fragment->num_stmts) {
-        continue;
-      }
-
       user.offset = 0u;
 
     // Skip to the next statement.
@@ -454,8 +456,8 @@ void ReferenceIterator::Advance(void) {
     Stmt stmt(std::move(user.fragment), user.offset);
 
     if (stmt.kind() == StmtKind::DECL_REF_EXPR) {
-      const DeclRefExpr &dre = reinterpret_cast<const DeclRefExpr &>(stmt);
-      auto referenced_id = dre.declaration().id();
+      const DeclRefExpr &expr = reinterpret_cast<const DeclRefExpr &>(stmt);
+      RawEntityId referenced_id = expr.declaration().id();
       for (auto search_id : impl->search_ids) {
         if (referenced_id == search_id) {
           user.fragment = std::move(stmt.fragment);  // Take it back.
@@ -464,8 +466,8 @@ void ReferenceIterator::Advance(void) {
       }
 
     } else if (stmt.kind() == StmtKind::MEMBER_EXPR) {
-      const MemberExpr &dre = reinterpret_cast<const MemberExpr &>(stmt);
-      auto referenced_id = dre.member_declaration().id();
+      const MemberExpr &expr = reinterpret_cast<const MemberExpr &>(stmt);
+      RawEntityId referenced_id = expr.member_declaration().id();
       for (auto search_id : impl->search_ids) {
         if (referenced_id == search_id) {
           user.fragment = std::move(stmt.fragment);  // Take it back.

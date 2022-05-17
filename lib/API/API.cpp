@@ -478,7 +478,7 @@ void RemoteEntityProvider::FillReferences(
       fragment_ids_out.push_back(frag_id);
     }
 
-    self->CacheUses(redecl_ids_out, fragment_ids_out, resp_version_number);
+    self->CacheReferences(redecl_ids_out, fragment_ids_out, resp_version_number);
     return;
   }
 
