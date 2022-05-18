@@ -1171,6 +1171,7 @@ MX_BEGIN_VISIT_TYPE(BuiltinType)
   MX_ENTER_VISIT_BuiltinType
   MX_VISIT_BASE(BuiltinType, Type)
   MX_VISIT_ENTITY(BuiltinType, desugar, getVal305, setVal305, initVal305, Desugar, Type, NthType, TypeUseSelector::DESUGAR)
+  MX_VISIT_ENUM(BuiltinType, builtin_kind, getVal332, setVal332, initVal332, Kind, BuiltinTypeKind, NthType)
   MX_VISIT_BOOL(BuiltinType, is_floating_point, getVal307, setVal307, initVal307, IsFloatingPoint, bool, NthType)
   MX_VISIT_BOOL(BuiltinType, is_integer, getVal308, setVal308, initVal308, IsInteger, bool, NthType)
   MX_VISIT_BOOL(BuiltinType, is_signed_integer, getVal309, setVal309, initVal309, IsSignedInteger, bool, NthType)

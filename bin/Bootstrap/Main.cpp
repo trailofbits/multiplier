@@ -2054,7 +2054,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         method_name_ref.startswith("~")) {
       continue;  // E.g. `Decl::KindName()`, `operator==`.
     }
-
     std::pair<std::string, std::string> method_key{class_name, method_name};
     if (kMethodBlackList.count(method_key)) {
       continue;
@@ -2075,6 +2074,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (snake_name == "is_this_declaration_a_definition") {
       snake_name = "is_definition";
+    
+    } else if (snake_name == "kind" && class_name == "BuiltinType") {
+      snake_name = "builtin_kind";
     }
 
     if (snake_name.ends_with("_type_info")) {

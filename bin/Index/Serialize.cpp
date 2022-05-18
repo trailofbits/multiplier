@@ -1159,6 +1159,7 @@ void SerializeBuiltinType(EntityMapper &es, mx::ast::Type::Builder b, const past
   (void) e;
   SerializeType(es, b, e);
   b.setVal305(es.EntityId(e.Desugar()));
+  b.setVal332(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   b.setVal307(e.IsFloatingPoint());
   b.setVal308(e.IsInteger());
   b.setVal309(e.IsSignedInteger());

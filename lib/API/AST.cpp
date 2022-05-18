@@ -8,8 +8,6 @@
 
 #include "Fragment.h"
 
-#include <cassert>
-
 namespace mx {
 DeclKind FromPasta(pasta::DeclKind e) {
   switch (static_cast<unsigned>(e)) {
@@ -11969,6 +11967,11 @@ Type BuiltinType::desugar(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal305());
   return fragment->TypeFor(fragment, id).value();
+}
+
+BuiltinTypeKind BuiltinType::builtin_kind(void) const {
+  auto self = fragment->NthType(offset);
+  return static_cast<BuiltinTypeKind>(self.getVal332());
 }
 
 bool BuiltinType::is_floating_point(void) const {

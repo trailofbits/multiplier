@@ -9124,6 +9124,7 @@ class BuiltinType : public Type {
   }
 
   Type desugar(void) const;
+  BuiltinTypeKind builtin_kind(void) const;
   bool is_floating_point(void) const;
   bool is_integer(void) const;
   bool is_signed_integer(void) const;
