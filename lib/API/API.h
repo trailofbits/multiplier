@@ -12,6 +12,7 @@
 #include <capnp/message.h>
 #include <capnp/serialize.h>
 #include <capnp/serialize-packed.h>
+#include <deque>
 #include <kj/async.h>
 #include <kj/io.h>
 #include <multiplier/Weggli.h>
