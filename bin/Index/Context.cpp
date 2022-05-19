@@ -269,24 +269,6 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
     mx::WorkerId worker_id_, const std::string &code_hash,
     uint64_t num_tokens) {
 
-  std::string prefix;
-  prefix.reserve(32);
-  if (code_hash.size() > 32) {
-    prefix.insert(prefix.end(), &(code_hash[0]), &(code_hash[32]));
-  } else {
-    prefix = code_hash;
-  }
-
-  code_hash_to_fragment_id_maps.lock();
-  auto &cache = code_hash_to_fragment_id_maps[std::move(prefix)];
-  code_hash_to_fragment_id_maps.unlock();
-
-  std::unique_lock<std::mutex> locker(cache);
-  mx::FragmentId &code_id = cache[code_hash];
-  if (code_id != mx::kInvalidEntityId) {
-    return {code_id, false};
-  }
-
   const auto worker_id = static_cast<unsigned>(worker_id_);
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
@@ -301,7 +283,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
       maybe_id = {};
     }
 
-    code_id = server_context.code_hash_to_fragment_id.GetOrSet(
+    mx::FragmentId code_id = server_context.code_hash_to_fragment_id.GetOrSet(
         code_hash, created_id);
 
     CHECK_LT(code_id, mx::kMaxBigFragmentId);
@@ -324,7 +306,8 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
       created_id = std::move(maybe_id.value());
       maybe_id = {};
     }
-    code_id = server_context.code_hash_to_fragment_id.GetOrSet(
+
+    mx::FragmentId code_id = server_context.code_hash_to_fragment_id.GetOrSet(
         code_hash, created_id);
 
     CHECK_GE(code_id, mx::kMaxBigFragmentId);
@@ -378,7 +361,6 @@ void IndexingContext::LinkUseInFragment(mx::RawEntityId use,
 void IndexingContext::LinkReferenceInFragment(mx::RawEntityId use,
                                               mx::FragmentId user) {
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
-    LOG(ERROR) << "Reference to " << use << " in fragment " << user;
     server_context.entity_id_reference.Insert(use, user);
   }
 }

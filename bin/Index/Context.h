@@ -208,10 +208,6 @@ class ServerContext {
   std::vector<mx::RawEntityId> FindRedeclarations(mx::EntityId eid);
 };
 
-template <typename K, typename V>
-struct alignas(64) AtomicMap
-    : public std::unordered_map<K, V>, public std::mutex {};
-
 // Indexing Context counter
 class IndexingCounter {
  public:
@@ -289,16 +285,6 @@ class IndexingContext {
   //            requests a fragment, we can see if we need to fixup the
   //            canonical declarations of things.
   const unsigned version_number;
-
-  // In-memory caches that gate read/write access to
-  // `ServerContext::code_hash_to_fragment_id`, because a lot of CPU is spent
-  // there.
-  //
-  // TODO(pag): Perhaps its related to RocksDB trying to maintain ordering?
-  //            Would be nice to use a separate `rocksdb::ColumnFamily` and tell
-  //            it to optimize for point queries.
-  AtomicMap<std::string, AtomicMap<std::string, mx::FragmentId>>
-      code_hash_to_fragment_id_maps;
 
   // Worker-local next counters for IDs.
   std::vector<NextId<mx::FileId>> local_next_file_id;
