@@ -12,7 +12,7 @@
 #include "Fragment.h"
 
 #include "../Re2.h"
-
+#include <iostream>
 namespace mx {
 
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
@@ -114,6 +114,8 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
 }
 
 void RegexQueryResultIterator::Advance(void) {
+  result.reset();
+
   while (index < num_matches) {
 
     // We don't yet have any matches for `index`, so go compute them.
@@ -124,7 +126,7 @@ void RegexQueryResultIterator::Advance(void) {
       }
     }
 
-    result = impl->GetNextMatchInFragment();
+    impl->GetNextMatchInFragment().swap(result);
     if (result) {
       return;
     }
@@ -274,6 +276,6 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
 
 RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
     : impl(std::move(impl_)),
-      num_fragments(impl->fragment_ids.size()) {}
+      num_fragments(impl ? impl->fragment_ids.size() : 0u) {}
 
 }  // namespace mx

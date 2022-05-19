@@ -111,7 +111,6 @@ class WeggliQueryResultIterator {
 
   // Pre-increment.
   inline WeggliQueryResultIterator &operator++(void) noexcept {
-    ++index;
     Advance();
     return *this;
   }
@@ -248,7 +247,6 @@ class RegexQueryResultIterator {
 
   // Pre-increment.
   inline RegexQueryResultIterator &operator++(void) noexcept {
-    ++index;
     Advance();
     return *this;
   }

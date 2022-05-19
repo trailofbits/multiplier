@@ -91,6 +91,7 @@ WeggliQueryResult::WeggliQueryResult(
 // Try to advance to the next result. There can be multiple results per
 // fragment.
 void WeggliQueryResultIterator::Advance(void) {
+  result.reset();
   while (index < num_fragments) {
 
     // Reset the caches of data in the fragment, and the mapping of offsets
@@ -139,7 +140,6 @@ void WeggliQueryResultIterator::Advance(void) {
               impl->EntityContainingOffset(range.second)));
     }
 
-    result.reset();
     result.emplace(impl->frag, std::move(range.impl), range.index,
                    range.num_tokens, std::move(var_matches));
     return;
