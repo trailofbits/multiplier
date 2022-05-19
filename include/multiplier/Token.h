@@ -19,6 +19,7 @@ namespace mx {
 
 class EntityProvider;
 class File;
+class FileLocationCache;
 class Fragment;
 class FragmentImpl;
 class Index;
@@ -82,6 +83,10 @@ class Token {
   // Return the set of all uses of this token within its fragment (if it's a
   // fragment token).
   UseRange<TokenUseSelector> uses(void) const;
+
+  // Return the line and column number for this token, if any.
+  std::optional<std::pair<unsigned, unsigned>> location(
+      const FileLocationCache &) const;
 };
 
 // Forward-only iterator over a sequence of tokens.

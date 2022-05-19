@@ -12,6 +12,20 @@ namespace mx {
 
 class TokenReader;
 
+using FileLocationVector = std::vector<std::pair<unsigned, unsigned>>;
+
+class FileLocationCacheImpl {
+ public:
+  const FileLocationConfiguration config;
+  std::unordered_map<FileId, FileLocationVector> cache;
+
+  inline FileLocationCacheImpl(const FileLocationConfiguration &config_)
+      : config(config_) {}
+
+  // Add a file to the cache.
+  const FileLocationVector &Add(File file);
+};
+
 // Interface for accessing the tokens of a file.
 class FileImpl {
  public:

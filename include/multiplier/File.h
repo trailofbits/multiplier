@@ -16,13 +16,49 @@ namespace mx {
 
 class EntityProvider;
 class File;
-class FragmentList;
-class FileFragmentListIterator;
 class FileImpl;
 class FileListImpl;
+class FileLocationCache;
+class FileLocationCacheImpl;
+class FileFragmentListIterator;
 class Fragment;
 class FragmentImpl;
+class FragmentList;
 class Index;
+
+class FileLocationConfiguration {
+ public:
+  // Tab width, in terms of number of spaces.
+  unsigned tab_width{4};
+
+  // Whether or not to use tab stops. This means that tabs align to the next
+  // multiple of the tab width, and as a result, sometimes the effective width
+  // of a tab will be less than the configured width.
+  bool use_tab_stops{true};
+};
+
+// Represents a cache of files to pre-computed line/column number locations.
+class FileLocationCache {
+ private:
+  friend class Token;
+
+  std::shared_ptr<FileLocationCacheImpl> impl;
+
+ public:
+  ~FileLocationCache(void);
+
+  FileLocationCache(
+    const FileLocationConfiguration &config=FileLocationConfiguration());
+
+  // Add a file to the cache.
+  void add(const File &);
+
+  // Remove a file from the cache.
+  void remove(const File &);
+
+  // Clear the cache.
+  void clear(void);
+};
 
 // Iterate over the fragments from a file.
 class FileFragmentListIterator {
@@ -156,6 +192,8 @@ class File {
   friend class Fragment;
   friend class FragmentList;
   friend class FileListIterator;
+  friend class FileLocationCache;
+  friend class FileLocationCacheImpl;
   friend class FragmentImpl;
   friend class Index;
   friend class RemoteEntityProvider;

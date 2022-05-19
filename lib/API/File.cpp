@@ -5,9 +5,131 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "File.h"
+
+#include <cctype>
+
 #include "Fragment.h"
 
 namespace mx {
+
+FileLocationCache::~FileLocationCache(void) {}
+
+FileLocationCache::FileLocationCache(const FileLocationConfiguration &config)
+    : impl(std::make_shared<FileLocationCacheImpl>(config)) {}
+
+// Add a file to the cache.
+const FileLocationVector &FileLocationCacheImpl::Add(File file) {
+  FileLocationVector &vec = cache[file.impl->file_id];
+  if (!vec.empty()) {
+    return vec;
+  }
+
+  auto tokens = file.tokens();
+  vec.reserve(tokens.size());
+
+  auto curr_line = 1u;
+  auto curr_col = 1u;
+  const auto tab_width = config.tab_width;
+  const auto use_tab_stops = config.use_tab_stops;
+
+  for (const Token &token : tokens) {
+    vec.emplace_back(curr_line, curr_col);
+
+    auto data = token.data();
+    for (size_t i = 0u, max_i = data.size(); i < max_i; ++i) {
+      const int ch = static_cast<signed char>(data[i]);
+      if (ch == '\n') {
+        curr_col = 1u;
+        ++curr_line;
+
+      // Carriage return.
+      } else if (ch == '\r') {
+
+      } else if (ch == '\t') {
+        
+        if (use_tab_stops) {
+          if (1u < tab_width) {
+            curr_col += (tab_width + 1u);
+            curr_col = (curr_col / tab_width) * tab_width;
+
+          } else {
+            curr_col += tab_width; 
+          }
+        } else {
+          curr_col += tab_width;
+        }
+
+
+      } else if (ch == ' ') {
+        ++curr_col;
+
+      // Four byte UTF-8.
+      } else if (-1 == (ch >> 4)) {
+        ++curr_col;
+        i += 3;
+
+      // Three byte UTF-8.
+      } else if (-1 == (ch >> 3)) {
+        ++curr_col;
+        i += 2;
+
+      // Two byte UTF-8.
+      } else if (-1 == (ch >> 2)) {
+        ++curr_col;
+        i += 1;
+
+      // Maybe ascii.
+      } else {
+        if (std::isgraph(ch)) {
+          ++curr_col;
+        }
+      }
+    }
+  }
+
+  return vec;
+}
+
+// Add a file to the cache.
+void FileLocationCache::add(const File &file) {
+  impl->Add(file);
+}
+
+// Remove a file from the cache.
+void FileLocationCache::remove(const File &file) {
+  impl->cache.erase(file.impl->file_id);
+}
+
+// Clear the cache.
+void FileLocationCache::clear(void) {
+  impl->cache.clear();
+}
+
+// Return the line and column number for this token, if any.
+std::optional<std::pair<unsigned, unsigned>> Token::location(
+    const FileLocationCache &cache) const {
+
+  std::optional<Token> maybe_file_token = file_token();
+  if (!maybe_file_token) {
+    return std::nullopt;
+  }
+
+  const PackedFileImpl *file_ptr = dynamic_cast<const PackedFileImpl *>(
+      maybe_file_token->impl.get());
+  if (!file_ptr) {
+    return std::nullopt;
+  }
+
+  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token->impl),
+                                            file_ptr));
+  const FileLocationVector &vec = cache.impl->Add(std::move(file));
+
+  if (maybe_file_token->index >= vec.size()) {
+    return std::nullopt;
+  }
+
+  return vec[maybe_file_token->index];
+}
 
 FileImpl::~FileImpl(void) noexcept {}
 
