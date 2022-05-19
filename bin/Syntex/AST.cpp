@@ -6,7 +6,7 @@
 
 #include "AST.h"
 
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <ostream>
 #include <sstream>
 

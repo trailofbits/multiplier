@@ -8,7 +8,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <sstream>
 
 DECLARE_bool(help);
@@ -52,6 +52,9 @@ extern "C" int main(int argc, char *argv[]) {
             << mx::EnumeratorName(decl_user->kind());
 
       } else if (auto stmt_user = use.as_statement()) {
+        if (auto call_expr = mx::CallExpr::from(stmt_user)) {
+
+        }
         std::cout
             << stmt_user->id() << '\t'
             << mx::EnumeratorName(stmt_user->kind());

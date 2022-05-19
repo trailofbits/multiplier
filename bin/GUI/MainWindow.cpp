@@ -26,7 +26,7 @@
 #include <QPainter>
 #include <unordered_map>
 
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 
 #include "FileBrowserView.h"
 #include "FileView.h"

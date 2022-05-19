@@ -8,7 +8,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <sstream>
 
 DECLARE_bool(help);
@@ -16,7 +16,6 @@ DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX d
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print function names");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
-DEFINE_bool(unparsed, false, "Show original source code?");
 
 static void FindSwitchCases(mx::Fragment fragment) {
   for (mx::SwitchStmt sw : mx::SwitchStmt::in(fragment)) {

@@ -5,7 +5,7 @@
 #include <memory>
 #include <multiplier/Action.h>
 #include <multiplier/RPC.capnp.h>
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <multiplier/Weggli.h>
 #include <multiplier/Re2.h>
 

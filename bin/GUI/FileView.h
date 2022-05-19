@@ -8,7 +8,7 @@
 
 #include <filesystem>
 #include <memory>
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <optional>
 #include <QPaintEvent>
 #include <QRunnable>

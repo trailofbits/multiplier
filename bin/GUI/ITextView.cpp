@@ -18,8 +18,13 @@
 namespace mx::gui {
 namespace {
 
+#ifdef __APPLE__
 static constexpr float kFontWidthPadding = 1.0;
 static constexpr float kFontHeightPadding = 1.0;
+#else
+static constexpr float kFontWidthPadding = 0.0;
+static constexpr float kFontHeightPadding = 0.0;
+#endif
 
 const auto kNewLineGlyph{L'\u23CE'};
 
@@ -145,7 +150,8 @@ void ITextView::SetModel(ITextModel::Ptr model) {
 
 void ITextView::SetTheme(const TextViewTheme &theme) {
   d->context.theme = theme;
-  d->context.font_metrics = std::make_unique<QFontMetricsF>(d->context.theme.monospaced_font, this);
+  d->context.font_metrics =
+      std::make_unique<QFontMetricsF>(d->context.theme.monospaced_font, this);
 
   setFont(d->context.theme.monospaced_font);
   update();
@@ -163,7 +169,9 @@ void ITextView::SetLineNumbers(bool enabled) {
   update();
 }
 
-bool ITextView::HasSelection() const { return d->context.opt_selection.has_value(); }
+bool ITextView::HasSelection() const {
+  return d->context.opt_selection.has_value();
+}
 
 std::optional<QString> ITextView::GetSelection() const {
   if (!d->context.opt_selection.has_value()) {
@@ -174,21 +182,24 @@ std::optional<QString> ITextView::GetSelection() const {
   SanitizeSelection(selection);
 
   QString output;
-  for (auto token_id = selection.first_cursor.token_id; token_id <= selection.last_cursor.token_id;
-       ++token_id) {
+  for (auto token_id = selection.first_cursor.token_id;
+       token_id <= selection.last_cursor.token_id; ++token_id) {
 
     auto token = d->model->TokenData(token_id);
 
-    if (selection.first_cursor.token_id == token_id && selection.last_cursor.token_id == token_id) {
-      auto length =
-          static_cast<int>(selection.last_cursor.offset - selection.first_cursor.offset) + 1;
-      output += token.mid(static_cast<int>(selection.first_cursor.offset), length);
+    if (selection.first_cursor.token_id == token_id &&
+        selection.last_cursor.token_id == token_id) {
+      auto length = static_cast<int>(selection.last_cursor.offset -
+                                     selection.first_cursor.offset) + 1;
+      output += token.mid(static_cast<int>(selection.first_cursor.offset),
+                          length);
 
     } else if (selection.first_cursor.token_id == token_id) {
       output += token.mid(static_cast<int>(selection.first_cursor.offset));
 
     } else if (selection.last_cursor.token_id == token_id) {
-      output += token.mid(0, static_cast<int>(selection.last_cursor.offset) + 1);
+      output +=
+          token.mid(0, static_cast<int>(selection.last_cursor.offset) + 1);
 
     } else {
       output += token;
@@ -237,7 +248,7 @@ void ITextView::paintEvent(QPaintEvent *event) {
 
   if (!context.opt_scene) {
     GenerateScene(context, *d->model.get());
-    UpdateScrollbars();
+    assert(context.opt_scene.has_value());
   }
 
   QPainter painter(this);
@@ -246,7 +257,8 @@ void ITextView::paintEvent(QPaintEvent *event) {
 
   QPointF translation(-context.viewport.x(), -context.viewport.y());
 
-  auto font_width = context.font_metrics->horizontalAdvance(".") + kFontWidthPadding;
+  auto font_width =
+      context.font_metrics->horizontalAdvance(".") + kFontWidthPadding;
   auto font_height = context.font_metrics->height() + kFontHeightPadding;
 
   QRectF glyph_rect(0.0, 0.0, font_width, font_height);
@@ -352,7 +364,8 @@ void ITextView::paintEvent(QPaintEvent *event) {
     }
 
     auto rect = line_number.bounding_box.translated(translation);
-    painter.drawText(rect, Qt::AlignRight | Qt::TextSingleLine, line_number.str);
+    painter.drawText(rect, Qt::AlignRight | Qt::TextSingleLine,
+                     line_number.str);
 
     lowest_line_number = std::min(lowest_line_number, rect.y());
     highest_line_number = std::max(highest_line_number,
@@ -363,6 +376,8 @@ void ITextView::paintEvent(QPaintEvent *event) {
     painter.drawLine(QPointF(scene.gutter_margin, lowest_line_number),
                      QPointF(scene.gutter_margin, highest_line_number));
   }
+  
+  UpdateScrollbars();
 }
 
 void ITextView::mousePressEvent(QMouseEvent *event) {
@@ -426,8 +441,9 @@ void ITextView::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  QPointF mouse_position(static_cast<qreal>(event->x() + d->context.viewport.x()),
-                         static_cast<qreal>(event->y() + d->context.viewport.y()));
+  QPointF mouse_position(
+      static_cast<qreal>(event->x() + d->context.viewport.x()),
+      static_cast<qreal>(event->y() + d->context.viewport.y()));
 
   auto opt_cursor = CreateCursor(d->context, mouse_position);
   if (opt_cursor.has_value()) {

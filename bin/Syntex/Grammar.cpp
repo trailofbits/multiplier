@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include <gflags/gflags.h>
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <multiplier/Endian.h>
 #include <multiplier/PersistentMap.h>
 

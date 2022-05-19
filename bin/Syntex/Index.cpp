@@ -8,7 +8,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <sstream>
 #include <vector>
 

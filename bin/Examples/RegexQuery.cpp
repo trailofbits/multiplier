@@ -9,7 +9,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 #include <multiplier/Re2.h>
 #include <fstream>
 #include <sstream>

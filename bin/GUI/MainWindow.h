@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 
 namespace mx::gui {
 

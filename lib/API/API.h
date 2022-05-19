@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <multiplier/API.h>
+#include <multiplier/Index.h>
 
 #include <capnp/ez-rpc.h>
 #include <capnp/message.h>
