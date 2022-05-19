@@ -253,31 +253,80 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
 
 
 bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
-  auto args = o.getString("command");
   auto cwd = o.getString("directory");
   auto file = o.getString("file");
-  if (!args || !cwd || !file) {
+  if (!cwd || !file) {
     return false;
   }
 
   auto &commands = d->commands[cwd->str()];
-  auto args_str = args->str();
-  auto &command = commands.emplace_back(args_str);
-  if (command.vec.Size()) {
-    command.compiler_hash = std::move(args_str);
-    command.working_dir = cwd->str();
 
-    // Guess at the language.
-    if (args->contains_insensitive("++") || args->contains_insensitive(".cc") ||
-        args->contains_insensitive(".cxx") || args->contains_insensitive(".cpp") ||
-        args->contains_insensitive(".hxx") || args->contains_insensitive(".hpp")) {
-      command.lang = pasta::TargetLanguage::kCXX;
+  // E.g. from CMake, Blight.
+  if (auto commands_str = o.getString("command")) {
+
+    auto args_str = commands_str->str();
+    auto &command = commands.emplace_back(args_str);
+    if (command.vec.Size()) {
+      command.compiler_hash = std::move(args_str);
+      command.working_dir = cwd->str();
+
+      // Guess at the language.
+      if (commands_str->contains_insensitive("++") ||
+          commands_str->contains_insensitive(".cc") ||
+          commands_str->contains_insensitive(".cxx") ||
+          commands_str->contains_insensitive(".cpp") ||
+          commands_str->contains_insensitive(".hxx") ||
+          commands_str->contains_insensitive(".hpp")) {
+        command.lang = pasta::TargetLanguage::kCXX;
+      }
+
+      return true;
+
+    } else {
+      commands.pop_back();
+      return false;
     }
 
-    return true;
+  // E.g. from Bear (Build ear).
+  } else if (auto arguments_list = o.getArray("arguments");
+             arguments_list && !arguments_list->empty()) {
+
+    auto lang = pasta::TargetLanguage::kC;
+    std::stringstream ss;
+
+    std::vector<std::string> args_vec;
+    for (auto arg : *arguments_list) {
+      if (auto arg_str = arg.getAsString()) {
+        // Guess at the language.
+        if (arg_str->contains_insensitive("++") ||
+            arg_str->contains_insensitive(".cc") ||
+            arg_str->contains_insensitive(".cxx") ||
+            arg_str->contains_insensitive(".cpp") ||
+            arg_str->contains_insensitive(".hxx") ||
+            arg_str->contains_insensitive(".hpp")) {
+          lang = pasta::TargetLanguage::kCXX;
+        }
+        auto str = arg_str->str();
+        ss << ' ' << str;
+        args_vec.emplace_back(std::move(str));
+      } else {
+        return false;
+      }
+    }
+
+    auto &command = commands.emplace_back(args_vec);
+    if (command.vec.Size()) {
+      command.compiler_hash = ss.str();
+      command.working_dir = cwd->str();
+      command.lang = lang;
+      return true;
+
+    } else {
+      commands.pop_back();
+      return false;
+    }
 
   } else {
-    commands.pop_back();
     return false;
   }
 }

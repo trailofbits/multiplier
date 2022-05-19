@@ -698,7 +698,9 @@ void ITextView::CreateTokenIndex(Context &context, ITextModel &model) {
   context.token_index = std::move(token_index);
 }
 
-void ITextView::ResetScene(Context &context) { context.opt_scene = {}; }
+void ITextView::ResetScene(Context &context) {
+  context.opt_scene = {};
+}
 
 void ITextView::GenerateScene(Context &context, ITextModel &model) {
   Scene scene;
@@ -771,6 +773,7 @@ void ITextView::GenerateScene(Context &context, ITextModel &model) {
   scene.bounding_box.adjust(0.0, 0.0, font_height, font_height);
 
   context.opt_scene = std::move(scene);
+  assert(context.opt_scene.has_value());
 }
 
 std::optional<ITextView::Cursor> ITextView::CreateCursor(
@@ -779,7 +782,8 @@ std::optional<ITextView::Cursor> ITextView::CreateCursor(
     return std::nullopt;
   }
 
-  auto font_width = context.font_metrics->horizontalAdvance(".") + kFontWidthPadding;
+  auto font_width = context.font_metrics->horizontalAdvance(".") +
+                    kFontWidthPadding;
   auto font_height = context.font_metrics->height() + kFontHeightPadding;
 
   const auto &scene = context.opt_scene.value();
@@ -800,7 +804,8 @@ std::optional<ITextView::Cursor> ITextView::CreateCursor(
   }
 
   for (const auto &row : scene.row_list) {
-    for (auto entity_it = row.entity_list.begin(); entity_it != row.entity_list.end();
+    for (auto entity_it = row.entity_list.begin();
+         entity_it != row.entity_list.end();
          ++entity_it) {
 
       const auto &entity = *entity_it;
