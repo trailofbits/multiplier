@@ -19,6 +19,7 @@ namespace indexer {
 //            function.
 static bool MayHaveRemoteRedeclarations(const pasta::Decl &decl) {
   switch (mx::FromPasta(decl.Kind())) {
+    // Functions / methods.
     case mx::DeclKind::FUNCTION:
     case mx::DeclKind::CXX_METHOD:
     case mx::DeclKind::CXX_DESTRUCTOR:
@@ -56,6 +57,11 @@ static bool MayHaveRemoteRedeclarations(const pasta::Decl &decl) {
     case mx::DeclKind::CLASS_TEMPLATE:
     case mx::DeclKind::VAR_TEMPLATE:
     case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+      return true;
+
+    // Fields.
+    case mx::DeclKind::FIELD:
+    case mx::DeclKind::INDIRECT_FIELD:
       return true;
 
     default:

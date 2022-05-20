@@ -18,6 +18,7 @@
 
 namespace mx {
 
+class CachingEntityProvider;
 class EntityProvider;
 class File;
 class FragmentList;
@@ -77,7 +78,11 @@ class EntityProvider {
   // Returns an entity provider that gets entities from a UNIX domain socket.
   static Ptr from_socket(std::filesystem::path path);
 
+  // Create an in-memory caching entity provider.
+  static Ptr in_memory_cache(Ptr next);
+
  private:
+  friend class CachingEntityProvider;
   friend class Decl;
   friend class File;
   friend class FileImpl;

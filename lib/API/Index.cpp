@@ -13,9 +13,6 @@ namespace mx {
 
 Index::~Index(void) {}
 
-Index::Index(void)
-    : impl(std::make_shared<InvalidEntityProvider>()) {}
-
 FilePathList Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }

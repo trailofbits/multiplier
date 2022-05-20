@@ -85,7 +85,7 @@ void BaseUseIteratorImpl::FillAndUniqueFragmentIds(void) {
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
 
-  if (MayHaveRemoteRedeclarations(entity)) {
+  if (MayHaveRemoteUses(entity)) {
     ep->FillUses(ep, entity.id(), search_ids, fragment_ids);
   }
 
@@ -402,7 +402,7 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
 
-  if (MayHaveRemoteRedeclarations(entity)) {
+  if (MayHaveRemoteUses(entity)) {
     ep->FillReferences(ep, entity.id(), search_ids, fragment_ids);
   }
 
