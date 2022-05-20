@@ -137,8 +137,9 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(
+      mx::EntityProvider::in_memory_cache(
+          mx::EntityProvider::from_remote(FLAGS_host, FLAGS_port)));
 
   if (FLAGS_show_locations) {
     for (auto [path, id] : index.file_paths()) {

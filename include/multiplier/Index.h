@@ -137,6 +137,9 @@ class EntityProvider {
 
  private:
 
+  // Clear the cache.
+  virtual void ClearCache(void) = 0;
+
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
   virtual FilePathList ListFiles(const Ptr &) = 0;
@@ -188,6 +191,9 @@ class Index {
 
   /* implicit */ inline Index(EntityProvider::Ptr impl_)
       : impl(std::move(impl_)) {}
+
+  // Clear any internal caches.
+  void clear_caches(void) const;
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.

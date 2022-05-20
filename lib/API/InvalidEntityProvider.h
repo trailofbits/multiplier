@@ -21,6 +21,8 @@ class InvalidEntityProvider final : public EntityProvider {
  public:
   virtual ~InvalidEntityProvider(void) noexcept;
 
+  void ClearCache(void) final;
+
   unsigned VersionNumber(void) final;
 
   void VersionNumberChanged(unsigned) final;

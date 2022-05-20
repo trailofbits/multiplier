@@ -112,6 +112,8 @@ bool RemoteEntityProvider::MaybeUpdateVersionNumber(
   }
 }
 
+void RemoteEntityProvider::ClearCache(void) {}
+
 // Return the version number.
 unsigned RemoteEntityProvider::VersionNumber(void) {
   std::unique_lock<std::mutex> locker(version_number_lock);

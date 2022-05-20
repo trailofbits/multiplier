@@ -17,18 +17,26 @@
 namespace mx {
 
 class CachingEntityProvider final : public EntityProvider {
- private:
+ public:
+  // The next entity provider that we will invoke.
   const Ptr next;
 
-  std::recursive_mutex version_number_lock;
+  // Lock over the version number and all cached things.
+  std::recursive_mutex lock;
   unsigned version_number;
 
+  // Cache file list.
   FilePathList file_list;
   bool has_file_list{false};
 
+  // Cached entities. The `entities` here is a vector of opaque fragments or
+  // files, which is "stolen" by a reclaimer thread. The issue is that
+  // `entities` introduces a reference cycle.
+  std::vector<std::shared_ptr<const void>> entities;
   std::unordered_map<FragmentId, FragmentImpl::WeakPtr> fragments;
   std::unordered_map<FileId, FileImpl::WeakPtr> files;
-  
+
+  // Cached redeclarations/references/uses.
   std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
       redeclarations;
   std::unordered_map<RawEntityId, std::shared_ptr<std::vector<FragmentId>>>
@@ -38,12 +46,14 @@ class CachingEntityProvider final : public EntityProvider {
 
   void ClearCacheLocked(unsigned new_version_number);
 
- public:
   inline CachingEntityProvider(Ptr next_)
       : next(std::move(next_)),
         version_number(next->VersionNumber()) {}
 
   virtual ~CachingEntityProvider(void) noexcept;
+
+  // Clear any caches.
+  void ClearCache(void) final;
 
   unsigned VersionNumber(void) final;
 

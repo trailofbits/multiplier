@@ -58,6 +58,9 @@ class RemoteEntityProvider final : public EntityProvider {
 
   virtual ~RemoteEntityProvider(void) noexcept;
 
+  // Clear any caches.
+  void ClearCache(void) final;
+
   // Return the version number.
   unsigned VersionNumber(void) final;
 

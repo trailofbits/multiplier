@@ -10,6 +10,8 @@ namespace mx {
 
 InvalidEntityProvider::~InvalidEntityProvider(void) noexcept {}
 
+void InvalidEntityProvider::ClearCache(void) {}
+
 unsigned InvalidEntityProvider::VersionNumber(void) {
   return 0u;
 }

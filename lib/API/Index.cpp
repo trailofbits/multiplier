@@ -13,6 +13,11 @@ namespace mx {
 
 Index::~Index(void) {}
 
+// Clear any internal caches.
+void Index::clear_caches(void) const {
+  impl->ClearCache();
+}
+
 FilePathList Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }

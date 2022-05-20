@@ -5,13 +5,24 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "CachingEntityProvider.h"
-#include <iostream>
+
+#include <cassert>
+#include <chrono>
+#include <thread>
+
 namespace mx {
 
 CachingEntityProvider::~CachingEntityProvider(void) noexcept {}
 
+// Clear any caches.
+void CachingEntityProvider::ClearCache(void) {
+  std::lock_guard<std::recursive_mutex> locker(lock);
+  ClearCacheLocked(version_number);
+  next->ClearCache();
+}
+
 unsigned CachingEntityProvider::VersionNumber(void) {
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   return version_number;
 }
 
@@ -28,14 +39,14 @@ void CachingEntityProvider::ClearCacheLocked(unsigned new_version_number) {
 }
 
 void CachingEntityProvider::VersionNumberChanged(unsigned new_version_number) {
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (new_version_number > version_number) {
     ClearCacheLocked(new_version_number);
   }
 }
 
 FilePathList CachingEntityProvider::ListFiles(const Ptr &self) {
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (has_file_list) {
     return file_list;
   }
@@ -43,27 +54,15 @@ FilePathList CachingEntityProvider::ListFiles(const Ptr &self) {
   return next->ListFiles(self);
 }
 
-void CachingEntityProvider::CacheFileList(
-    const FilePathList &new_file_list, unsigned new_version_number) {
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
-  
-  if (new_version_number > version_number) {
-    ClearCacheLocked(new_version_number);
-  }
-
-  if (!has_file_list) {
-    has_file_list = true;
-    file_list = new_file_list;
-  }
-}
-
 FileImpl::Ptr CachingEntityProvider::FileFor(const Ptr &self, FileId id) {
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   auto &weak_ptr = files[id];
   if (auto ptr = weak_ptr.lock()) {
+    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
     return ptr;
   } else {
     ptr = next->FileFor(self, id);
+    entities.emplace_back(ptr, ptr.get());
     weak_ptr = ptr;
     return ptr;
   }
@@ -71,14 +70,15 @@ FileImpl::Ptr CachingEntityProvider::FileFor(const Ptr &self, FileId id) {
 
 FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
     const Ptr &self, FragmentId id) {
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
-  // auto contains = fragments.count(id);
+  std::lock_guard<std::recursive_mutex> locker(lock);
+  auto contains = fragments.count(id);
   auto &weak_ptr = fragments[id];
   if (auto ptr = weak_ptr.lock()) {
+    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
     return ptr;
   } else {
-    // std::cerr << "Missed on fragment " << id << " contains=" << contains << '\n';
     ptr = next->FragmentFor(self, id);
+    entities.emplace_back(ptr, ptr.get());
     weak_ptr = ptr;
     return ptr;
   }
@@ -97,7 +97,7 @@ RegexQueryResultImpl::Ptr CachingEntityProvider::Query(
 std::vector<RawEntityId> CachingEntityProvider::Redeclarations(
     const Ptr &self, RawEntityId eid) {
 
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (auto it = redeclarations.find(eid); it != redeclarations.end()) {
     return *(it->second);
   } else {
@@ -105,10 +105,26 @@ std::vector<RawEntityId> CachingEntityProvider::Redeclarations(
   }
 }
 
+void CachingEntityProvider::CacheFileList(
+    const FilePathList &new_file_list, unsigned new_version_number) {
+  std::lock_guard<std::recursive_mutex> locker(lock);
+  
+  if (new_version_number > version_number) {
+    ClearCacheLocked(new_version_number);
+  }
+
+  if (!has_file_list) {
+    has_file_list = true;
+    file_list = new_file_list;
+  }
+
+  next->CacheFileList(new_file_list, new_version_number);
+}
+
 void CachingEntityProvider::CacheRedeclarations(
     const std::vector<RawEntityId> &redecl_eids, unsigned new_version_number) {
 
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (new_version_number > version_number) {
     ClearCacheLocked(new_version_number);
   }
@@ -118,6 +134,8 @@ void CachingEntityProvider::CacheRedeclarations(
   for (auto eid : redecl_eids) {
     (void) redeclarations.emplace(eid, cached_redecl_eids);
   }
+
+  next->CacheRedeclarations(redecl_eids, new_version_number);
 }
 
 void CachingEntityProvider::CacheUses(
@@ -125,7 +143,7 @@ void CachingEntityProvider::CacheUses(
     const std::vector<FragmentId> &use_fragment_ids,
     unsigned new_version_number) {
 
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (new_version_number > version_number) {
     ClearCacheLocked(new_version_number);
   }
@@ -135,6 +153,8 @@ void CachingEntityProvider::CacheUses(
   for (auto eid : redecl_eids) {
     (void) uses.emplace(eid, cached_fragment_ids);
   }
+
+  next->CacheUses(redecl_eids, use_fragment_ids, new_version_number);
 }
 
 void CachingEntityProvider::CacheReferences(
@@ -142,7 +162,7 @@ void CachingEntityProvider::CacheReferences(
     const std::vector<FragmentId> &ref_fragment_ids,
     unsigned new_version_number) {
 
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (new_version_number > version_number) {
     ClearCacheLocked(new_version_number);
   }
@@ -152,6 +172,8 @@ void CachingEntityProvider::CacheReferences(
   for (auto eid : redecl_eids) {
     (void) references.emplace(eid, cached_fragment_ids);
   }
+
+  next->CacheReferences(redecl_eids, ref_fragment_ids, new_version_number);
 }
 
 void CachingEntityProvider::FillUses(
@@ -159,7 +181,7 @@ void CachingEntityProvider::FillUses(
     std::vector<RawEntityId> &redecl_ids_out,
     std::vector<FragmentId> &fragment_ids_out) {
   
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (auto redecl_it = redeclarations.find(eid);
       redecl_it != redeclarations.end()) {
     if (auto uses_it = uses.find(eid); uses_it != uses.end()) {
@@ -177,7 +199,7 @@ void CachingEntityProvider::FillReferences(
     std::vector<RawEntityId> &redecl_ids_out,
     std::vector<FragmentId> &fragment_ids_out) {
 
-  std::lock_guard<std::recursive_mutex> locker(version_number_lock);
+  std::lock_guard<std::recursive_mutex> locker(lock);
   if (auto redecl_it = redeclarations.find(eid);
       redecl_it != redeclarations.end()) {
     if (auto refs_it = references.find(eid); refs_it != uses.end()) {
@@ -192,7 +214,42 @@ void CachingEntityProvider::FillReferences(
 
 // Returns an entity provider that gets entities from a UNIX domain socket.
 EntityProvider::Ptr EntityProvider::in_memory_cache(Ptr next) {
-  return std::make_shared<CachingEntityProvider>(std::move(next));
+  auto ret = std::make_shared<CachingEntityProvider>(std::move(next));
+
+  // Run a reclaimer thread that will extend the lifetimes of entities in
+  // the cache.
+  std::thread reclaimer_thread(
+      [] (std::weak_ptr<CachingEntityProvider> weak_self) {
+        std::vector<std::shared_ptr<const void>> next_entities;
+        while (true) {
+          
+          // Clear out the prior set of entities. This might be the last thing
+          // keeping the entitiy provider alive if we're "just past the end"
+          // of the program.
+          next_entities.clear();
+
+          do {
+            // Get a strong pointer to the entity provider. If it's being used
+            // then it's also keeping itself alive with reference cycles in
+            // `entities`, which we need to steal.
+            auto self = weak_self.lock();
+            if (!self) {
+              return;
+            }
+
+            // Steal the next set of entities to cache from the entity
+            // provider.
+            std::lock_guard<std::recursive_mutex> locker(self->lock);
+            next_entities.swap(self->entities);
+          } while (false);
+
+          using namespace std::chrono_literals;
+          std::this_thread::sleep_for(1000ms);
+        }
+      },
+      ret);
+  reclaimer_thread.detach();
+  return ret;
 }
 
 }  // namespace mx
