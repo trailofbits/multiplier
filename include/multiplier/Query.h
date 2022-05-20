@@ -116,6 +116,7 @@ class WeggliQueryResultIterator {
   }
 };
 
+// NOTE(pag): The iterators from this are *NOT* restartable.
 class WeggliQueryResult {
  private:
 
@@ -127,9 +128,10 @@ class WeggliQueryResult {
   friend class WeggliQueryResultIterator;
 
   std::shared_ptr<WeggliQueryResultImpl> impl;
-  unsigned num_fragments;
+  unsigned num_fragments{0u};
 
  public:
+  WeggliQueryResult(void) = default;
   WeggliQueryResult(std::shared_ptr<WeggliQueryResultImpl> impl_);
 
   // Return an iterator pointing at the first token in this list.
@@ -252,6 +254,7 @@ class RegexQueryResultIterator {
   }
 };
 
+// NOTE(pag): The iterators from this are *NOT* restartable.
 class RegexQueryResult {
  private:
 
@@ -263,9 +266,11 @@ class RegexQueryResult {
   friend class RegexQueryResultIterator;
 
   std::shared_ptr<RegexQueryResultImpl> impl;
-  unsigned num_fragments;
+  unsigned num_fragments{0u};
 
  public:
+  RegexQueryResult(void) = default;
+
   RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_);
 
   // Return an iterator pointing at the first token in this list.

@@ -28,6 +28,7 @@ class InvalidEntityProvider;
 class ReferenceIterator;
 class ReferenceIteratorImpl;
 class RemoteEntityProvider;
+class RegexQuery;
 class RegexQueryMatch;
 class RegexQueryResult;
 class RegexQueryResultImpl;
@@ -36,6 +37,7 @@ class Stmt;
 class Token;
 class TokenSubstitutionListIterator;
 class Type;
+class WeggliQuery;
 class WeggliQueryMatch;
 class WeggliQueryResult;
 class WeggliQueryResultImpl;
@@ -150,6 +152,12 @@ class Fragment {
   inline bool operator!=(const Fragment &that) const noexcept {
     return id() != that.id();
   }
+
+  // Run a Weggli search over this fragment.
+  WeggliQueryResult query(const WeggliQuery &query) const;
+
+  // Run a regular expression search over this fragment.
+  RegexQueryResult query(const RegexQuery &query) const;
 };
 
 inline File File::containing(const FragmentList &fragment_list) {

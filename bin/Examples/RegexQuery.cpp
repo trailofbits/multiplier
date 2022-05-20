@@ -18,6 +18,7 @@ DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_string(query, "", "Query pattern to be searched");
+DEFINE_uint64(fragment_id, 0, "ID of the fragment in which to perform the search");
 
 std::string GetFileContaining(mx::Index &index, mx::FileId file_id) {
   for (auto [path, id] : index.file_paths()) {
@@ -55,7 +56,25 @@ extern "C" int main(int argc, char *argv[]) {
       FLAGS_host, FLAGS_port));
 
   mx::RegexQuery query(FLAGS_query);
-  for (const mx::RegexQueryMatch &match : index.query_fragments(query)) {
+
+  mx::RegexQueryResult results;
+
+  // Query a specific fragment.
+  if (FLAGS_fragment_id) {
+    auto fragment = index.fragment(FLAGS_fragment_id);
+    if (!fragment) {
+      std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    results = fragment->query(query);
+  
+  // Query the whole index.
+  } else {
+    results = index.query_fragments(query);
+  }
+
+  for (const mx::RegexQueryMatch &match : results) {
     mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);
     std::cout

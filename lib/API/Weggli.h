@@ -42,7 +42,11 @@ class WeggliQueryResultImpl final {
   WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
                         Response response_);
 
+  WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImpl::Ptr frag_);
+
   void GetUnparsedTokens(TokenSubstitutionList nodes);
+
+  void InitForFragment(void);
 };
 
 }  // namespace mx

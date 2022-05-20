@@ -21,6 +21,16 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(
   }
 }
 
+WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
+                                             FragmentImpl::Ptr frag_)
+    : query(query_),
+      ep(frag_->ep),
+      frag(std::move(frag_)) {
+
+  fragments.push_back(frag->fragment_id);
+  InitForFragment();
+}
+
 EntityId WeggliQueryResultImpl::EntityContainingOffset(unsigned offset) const {
   auto it = offset_to_token.upper_bound(offset);
   if (it != offset_to_token.end()) {
@@ -53,6 +63,21 @@ void WeggliQueryResultImpl::GetUnparsedTokens(TokenSubstitutionList nodes) {
       GetUnparsedTokens(sub.before());
     }
   }
+}
+
+
+void WeggliQueryResultImpl::InitForFragment(void) {
+  next_weggli_match = 0u;
+  weggli_matches.clear();
+  fragment_buffer.clear();
+  GetUnparsedTokens(Fragment(frag).substitutions());
+
+  query.ForEachMatch(
+      fragment_buffer,
+      [this] (const WeggliMatchData &match) {
+    weggli_matches.emplace_back(match);
+    return true;
+  });
 }
 
 WeggliQueryMatch::WeggliQueryMatch(
@@ -103,17 +128,7 @@ void WeggliQueryResultIterator::Advance(void) {
         continue;
       }
 
-      impl->next_weggli_match = 0u;
-      impl->weggli_matches.clear();
-      impl->fragment_buffer.clear();
-      impl->GetUnparsedTokens(Fragment(impl->frag).substitutions());
-
-      impl->query.ForEachMatch(
-          impl->fragment_buffer,
-          [impl = impl.get()] (const WeggliMatchData &match) {
-        impl->weggli_matches.emplace_back(match);
-        return true;
-      });
+      impl->InitForFragment();
     }
 
     auto match_index = impl->next_weggli_match++;

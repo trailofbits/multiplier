@@ -30,6 +30,14 @@ RegexQueryResultImpl::RegexQueryResultImpl(
   }
 }
 
+RegexQueryResultImpl::RegexQueryResultImpl(
+    const RegexQuery &query_, FragmentImpl::Ptr frag_)
+    : query(query_),
+      ep(frag_->ep) {
+  fragment_ids.push_back(frag_->fragment_id);
+  (void) InitForFragment(std::move(frag_));
+}
+
 EntityId RegexQueryResultImpl::EntityContainingOffset(unsigned offset) const {
   auto it = offset_to_index.upper_bound(offset);
   if (it != offset_to_index.end()) {
@@ -39,12 +47,8 @@ EntityId RegexQueryResultImpl::EntityContainingOffset(unsigned offset) const {
   }
 }
 
-bool RegexQueryResultImpl::InitForFragment(mx::FragmentId frag_id) {
-  frag = ep->FragmentFor(ep, frag_id);
-  if (!frag) {
-    return false;
-  }
-
+bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
+  frag = std::move(frag_);
   Fragment hl_frag(frag);
 
   matches.clear();
@@ -79,6 +83,10 @@ bool RegexQueryResultImpl::InitForFragment(mx::FragmentId frag_id) {
   assert(!offset_to_index.empty());
 
   return true;
+}
+
+bool RegexQueryResultImpl::InitForFragment(mx::FragmentId frag_id) {
+  return InitForFragment(ep->FragmentFor(ep, frag_id));
 }
 
 std::optional<RegexQueryMatch>

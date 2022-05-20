@@ -9,6 +9,8 @@
 #include <cassert>
 
 #include "File.h"
+#include "Re2.h"
+#include "Weggli.h"
 
 namespace mx {
 
@@ -48,7 +50,6 @@ std::optional<Fragment> Fragment::containing(const Token &entity) {
     return std::nullopt;
   }
 }
-
 
 Fragment Fragment::containing(const TokenSubstitution &entity) {
   return Fragment(entity.impl);
@@ -135,6 +136,17 @@ std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
     return mlir;
   }
   return std::nullopt;
+}
+
+// Run a Weggli search over this fragment.
+WeggliQueryResult Fragment::query(const WeggliQuery &query) const {
+  return WeggliQueryResult(
+      std::make_shared<WeggliQueryResultImpl>(query, impl));
+}
+
+// Run a regular expression search over this fragment.
+RegexQueryResult Fragment::query(const RegexQuery &query) const {
+  return RegexQueryResult(std::make_shared<RegexQueryResultImpl>(query, impl));
 }
 
 }  // namespace mx

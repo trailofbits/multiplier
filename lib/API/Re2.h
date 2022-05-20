@@ -55,9 +55,12 @@ class RegexQueryResultImpl final {
       const RegexQuery &re_, EntityProvider::Ptr ep_,
       Response response_);
 
+  RegexQueryResultImpl(const RegexQuery &re_, FragmentImpl::Ptr frag_);
+
   EntityId EntityContainingOffset(unsigned offset) const;
 
-  bool InitForFragment(mx::FragmentId frag_id);
+  bool InitForFragment(FragmentImpl::Ptr frag_);
+  bool InitForFragment(FragmentId frag_id);
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);
 };
