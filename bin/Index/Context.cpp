@@ -179,7 +179,6 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
       break;
   }
 
-  size_t next_def_id_index = 0u;
   all_ids.reserve(next_new_ids.size());
 
   // Expand the set of declarations via fixpoint using the redeclaration
@@ -205,13 +204,7 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
         continue;
       }
 
-      const auto def_id_index = all_ids.size();
       all_ids.push_back(new_id);
-
-      // Move definitions to be first.
-      if (new_did.is_definition && next_def_id_index < def_id_index) {
-        std::swap(all_ids[next_def_id_index++], all_ids[def_id_index]);
-      }
 
       entity_redecls.ScanPrefix(
           new_id,
@@ -221,6 +214,17 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
           });
     }
   }
+
+  // Sort the redeclaration IDs to that they are always in the same order,
+  // regardless of which one we ask for first, then partition them and move
+  // the definitions before the declarations.
+  std::sort(all_ids.begin(), all_ids.end());
+  std::partition(
+      all_ids.begin(), all_ids.end(),
+      [] (mx::RawEntityId eid) {
+        return std::get<mx::DeclarationId>(
+            mx::EntityId(eid).Unpack()).is_definition;
+      });
 
   return all_ids;
 }

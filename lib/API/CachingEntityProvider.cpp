@@ -62,8 +62,8 @@ FileImpl::Ptr CachingEntityProvider::FileFor(const Ptr &self, FileId id) {
     return ptr;
   } else {
     ptr = next->FileFor(self, id);
-    entities.emplace_back(ptr, ptr.get());
-    weak_ptr = ptr;
+    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
+    weak_ptr = ptr;  // Cache.
     return ptr;
   }
 }
@@ -78,8 +78,8 @@ FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
     return ptr;
   } else {
     ptr = next->FragmentFor(self, id);
-    entities.emplace_back(ptr, ptr.get());
-    weak_ptr = ptr;
+    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
+    weak_ptr = ptr;  // Cache.
     return ptr;
   }
 }

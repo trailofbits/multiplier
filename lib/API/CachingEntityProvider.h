@@ -29,10 +29,13 @@ class CachingEntityProvider final : public EntityProvider {
   FilePathList file_list;
   bool has_file_list{false};
 
-  // Cached entities. The `entities` here is a vector of opaque fragments or
-  // files, which is "stolen" by a reclaimer thread. The issue is that
-  // `entities` introduces a reference cycle.
+  // Cached entities. `entities` explicitly introduces a strong, non-reclaimable
+  // reference cycle. However, we have a reclaimer thread behind the scenes
+  // that periodically steals `entities`, thus extending the lifetimes of
+  // things caches in `fragments` and `files`, and also breaking the reference
+  // cycles.
   std::vector<std::shared_ptr<const void>> entities;
+
   std::unordered_map<FragmentId, FragmentImpl::WeakPtr> fragments;
   std::unordered_map<FileId, FileImpl::WeakPtr> files;
 
