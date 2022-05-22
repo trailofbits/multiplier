@@ -17,15 +17,31 @@ DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the h
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print function names");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
 DEFINE_bool(list_variables, false, "Should we list the variables inside of functions?");
+DEFINE_bool(show_locations, false, "Show the file locations of the functions?");
+
+std::unordered_map<mx::FileId, std::filesystem::path> file_paths;
+mx::FileLocationCache location_cache;
 
 static void PrintFunctionNames(mx::Fragment fragment) {
   for (mx::FunctionDecl func : mx::FunctionDecl::in(fragment)) {
+    auto file = mx::File::containing(fragment);
 
     std::cout
-        << mx::File::containing(fragment).id() << '\t'
+        << file.id() << '\t'
         << fragment.id() << '\t' << func.id() << '\t'
         << (func.is_definition() ? "def\t" : "decl\t")
-        << func.name() << '\n';
+        << func.name();
+
+    if (FLAGS_show_locations) {
+      std::cout << '\t' << file_paths[file.id()].generic_string();
+      if (auto tok = func.token()) {
+        if (auto line_col = tok.location(location_cache)) {
+          std::cout << '\t' << line_col->first << '\t' << line_col->second;
+        }
+      }
+    }
+
+    std::cout << '\n';
 
     if (FLAGS_list_variables) {
       for (const mx::Decl &var : func.declarations_in_context()) {
@@ -35,6 +51,16 @@ static void PrintFunctionNames(mx::Fragment fragment) {
         if (auto named_decl = mx::NamedDecl::from(var)) {
           std::cout << '\t' << named_decl->name();
         }
+
+        if (FLAGS_show_locations) {
+          std::cout << '\t' << file_paths[file.id()].generic_string();
+          if (auto tok = var.token()) {
+            if (auto line_col = tok.location(location_cache)) {
+              std::cout << '\t' << line_col->first << '\t' << line_col->second;
+            }
+          }
+        }
+
         std::cout << '\n';
       }
       std::cout << '\n';
@@ -57,8 +83,15 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::in_memory_cache(
+      mx::EntityProvider::from_remote(
+          FLAGS_host, FLAGS_port)));
+
+  if (FLAGS_show_locations) {
+    for (auto [path, id] : index.file_paths()) {
+      file_paths.emplace(id, std::move(path));
+    }
+  }
 
   if (FLAGS_fragment_id) {
     auto fragment = index.fragment(FLAGS_fragment_id);

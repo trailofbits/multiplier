@@ -16,6 +16,10 @@ DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX d
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print structures");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print structures");
+DEFINE_bool(show_locations, false, "Show the file locations of the structures");
+
+std::unordered_map<mx::FileId, std::filesystem::path> file_paths;
+mx::FileLocationCache location_cache;
 
 static void PrintStructures(mx::Fragment fragment) {
   for (mx::RecordDecl record : mx::RecordDecl::in(fragment)) {
@@ -23,13 +27,35 @@ static void PrintStructures(mx::Fragment fragment) {
       continue;
     }
 
+    auto file = mx::File::containing(fragment);
+
     std::cout
-        << mx::File::containing(fragment).id() << '\t'
+        << file.id() << '\t'
         << fragment.id() << '\t' << record.id() << '\t'
-        << record.name() << '\n';
+        << record.name();
+
+    if (FLAGS_show_locations) {
+      std::cout << '\t' << file_paths[file.id()].generic_string();
+      if (auto tok = record.token()) {
+        if (auto line_col = tok.location(location_cache)) {
+          std::cout << '\t' << line_col->first << '\t' << line_col->second;
+        }
+      }
+    }
+
+    std::cout << '\n';
 
     for (const mx::FieldDecl &field : record.fields()) {
-      std::cout << '\t' << field.id() << '\t' << field.name() << '\n';
+      std::cout << '\t' << field.id() << '\t' << field.name();
+      if (FLAGS_show_locations) {
+        std::cout << '\t' << file_paths[file.id()].generic_string();
+        if (auto tok = field.token()) {
+          if (auto line_col = tok.location(location_cache)) {
+            std::cout << '\t' << line_col->first << '\t' << line_col->second;
+          }
+        }
+      }
+      std::cout << '\n';
     }
 
     std::cout << '\n';
@@ -53,6 +79,12 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
+
+  if (FLAGS_show_locations) {
+    for (auto [path, id] : index.file_paths()) {
+      file_paths.emplace(id, std::move(path));
+    }
+  }
 
   if (FLAGS_fragment_id) {
     auto fragment = index.fragment(FLAGS_fragment_id);

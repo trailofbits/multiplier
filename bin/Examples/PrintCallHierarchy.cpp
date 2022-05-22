@@ -18,7 +18,7 @@ DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the call hierarchy of");
-DEFINE_bool(show_locations, false, "Show the file locations of the references");
+DEFINE_bool(show_locations, false, "Show the file locations of the entities");
 
 using SeenEntityList = std::vector<mx::RawEntityId>;
 
@@ -52,8 +52,8 @@ struct SeenEntityTracker {
   }
 };
 
-std::unordered_map<mx::FileId, std::filesystem::path> file_paths;
 SeenEntityList seen;
+std::unordered_map<mx::FileId, std::filesystem::path> file_paths;
 mx::FileLocationCache location_cache;
 
 static void PrintCallHierarchy(mx::Decl entity, unsigned depth);
@@ -77,28 +77,25 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
   mx::File file = mx::File::containing(fragment);
 
   if (auto named = mx::NamedDecl::from(entity)) {
-    std::cout << std::left << std::setw(16) << named->name() << '\t';
+    std::cout << named->name() << '\t';
   }
 
   std::cout
-      << std::left << std::setw(16) << file.id()
-      << std::left << std::setw(16) << fragment.id()
-      << std::left << std::setw(16) << entity.id()
-      << std::left << std::setw(16) << mx::EnumeratorName(entity.kind());
-
-  std::cout << '\n';
+      << file.id() << '\t'
+      << fragment.id() << '\t'
+      << entity.id() << '\t'
+      << mx::EnumeratorName(entity.kind());
 
   if (FLAGS_show_locations) {
-
-    Indent(std::cout, depth);
-    std::cout << file_paths[file.id()].generic_string();
+    std::cout << '\t' << file_paths[file.id()].generic_string();
     if (auto tok = entity.token()) {
       if (auto line_col = tok.location(location_cache)) {
-        std::cout << ':' << line_col->first << ':' << line_col->second;
+        std::cout << '\t' << line_col->first << '\t' << line_col->second;
       }
     }
-    std::cout << '\n';
   }
+
+  std::cout << '\n';
 
   if (enter_entity.IsCycle()) {
     return;
