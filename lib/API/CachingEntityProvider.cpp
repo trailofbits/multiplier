@@ -55,33 +55,46 @@ FilePathList CachingEntityProvider::ListFiles(const Ptr &self) {
 }
 
 FileImpl::Ptr CachingEntityProvider::FileFor(const Ptr &self, FileId id) {
+  
   std::lock_guard<std::recursive_mutex> locker(lock);
-  auto &weak_ptr = files[id];
-  if (auto ptr = weak_ptr.lock()) {
-    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
-    return ptr;
-  } else {
-    ptr = next->FileFor(self, id);
-    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
-    weak_ptr = ptr;  // Cache.
-    return ptr;
+  FileImpl::Ptr ptr;
+  if (auto it = files.find(id); it != files.end()) {
+    ptr = it->second.lock();
   }
+
+  // NOTE(pag): This may lead to `files` being wiped out due to a cache
+  //            invalidation.
+  if (!ptr) {
+    ptr = next->FileFor(self, id);
+    files[id] = ptr;
+  }
+
+  // Extend liftime of `ptr`.
+  entities.emplace_back(ptr, ptr.get());
+
+  return ptr;
 }
 
 FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
     const Ptr &self, FragmentId id) {
+  
   std::lock_guard<std::recursive_mutex> locker(lock);
-  auto contains = fragments.count(id);
-  auto &weak_ptr = fragments[id];
-  if (auto ptr = weak_ptr.lock()) {
-    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
-    return ptr;
-  } else {
-    ptr = next->FragmentFor(self, id);
-    entities.emplace_back(ptr, ptr.get());  // Extend its lifetime.
-    weak_ptr = ptr;  // Cache.
-    return ptr;
+  FragmentImpl::Ptr ptr;
+  if (auto it = fragments.find(id); it != fragments.end()) {
+    ptr = it->second.lock();
   }
+
+  // NOTE(pag): This may lead to `fragments` being wiped out due to a cache
+  //            invalidation.
+  if (!ptr) {
+    ptr = next->FragmentFor(self, id);
+    fragments[id] = ptr;
+  }
+
+  // Extend the liftime of `ptr`.
+  entities.emplace_back(ptr, ptr.get());
+  
+  return ptr;
 }
 
 WeggliQueryResultImpl::Ptr CachingEntityProvider::Query(
