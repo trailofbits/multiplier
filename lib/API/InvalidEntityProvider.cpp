@@ -22,7 +22,10 @@ FilePathList InvalidEntityProvider::ListFiles(const Ptr &) {
   return {};
 }
 
-void InvalidEntityProvider::CacheFileList(const FilePathList &, unsigned) {}
+std::vector<FragmentId> InvalidEntityProvider::ListFragmentsInFile(
+    const Ptr &, FileId) {
+  return {};
+}
 
 FileImpl::Ptr InvalidEntityProvider::FileFor(const Ptr &, FileId) {
   return {};
@@ -46,17 +49,6 @@ std::vector<RawEntityId> InvalidEntityProvider::Redeclarations(
     const Ptr &, RawEntityId) {
   return {};
 }
-
-void InvalidEntityProvider::CacheRedeclarations(
-    const std::vector<RawEntityId> &, unsigned) {}
-
-void InvalidEntityProvider::CacheUses(
-    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-    unsigned) {}
-
-void InvalidEntityProvider::CacheReferences(
-    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-    unsigned) {}
 
 void InvalidEntityProvider::FillUses(
     const Ptr &, RawEntityId eid,

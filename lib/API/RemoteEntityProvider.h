@@ -72,6 +72,9 @@ class RemoteEntityProvider final : public EntityProvider {
   // in the returned list of fetched files will be `start_at`.
   FilePathList ListFiles(const Ptr &) final;
 
+  // Get the current list of fragment IDs associated with a file.
+  std::vector<FragmentId> ListFragmentsInFile(const Ptr &, FileId id) final;
+
   // Download a file by its unique ID.
   std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
 
@@ -101,22 +104,6 @@ class RemoteEntityProvider final : public EntityProvider {
   void FillReferences(const Ptr &, RawEntityId eid,
                       std::vector<RawEntityId> &redecl_ids_out,
                       std::vector<FragmentId> &fragment_ids_out) final;
-
-  // Cache a returned file list.
-  void CacheFileList(const FilePathList &, unsigned) final;
-
-  // Cache a computed set of redeclarations for a given version number.
-  void CacheRedeclarations(const std::vector<RawEntityId> &, unsigned) final;
-
-  // Cache a returned set of uses for a given set of redeclarations.
-  void CacheUses(
-      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-      unsigned) final;
-
-  // Cache a returned set of references for a given set of redeclarations.
-  void CacheReferences(
-      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-      unsigned) final;
 };
 
 }  // namespace mx

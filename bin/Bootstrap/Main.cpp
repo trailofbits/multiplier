@@ -1687,6 +1687,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << " protected:\n"
         << "  friend class Decl;\n"
         << "  friend class DeclIterator;\n"
+        << "  friend class File;\n"
         << "  friend class Fragment;\n"
         << "  friend class FragmentImpl;\n"
         << "  friend class Index;\n"

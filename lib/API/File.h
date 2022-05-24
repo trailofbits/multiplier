@@ -26,6 +26,14 @@ class FileLocationCacheImpl {
   const FileLocationVector &Add(File file);
 };
 
+class FileListImpl {
+ public:
+  const EntityProvider::Ptr ep;
+  std::vector<mx::FileId> file_ids;
+
+  explicit FileListImpl(EntityProvider::Ptr ep_);
+};
+
 // Interface for accessing the tokens of a file.
 class FileImpl {
  public:
@@ -37,11 +45,6 @@ class FileImpl {
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
   const EntityProvider::Ptr ep;
-
-  // List of fragments in this file.
-  mutable std::vector<std::pair<mx::FragmentId,
-        std::weak_ptr<const FragmentImpl>>>
-      fragments;
 
   virtual ~FileImpl(void) noexcept;
 

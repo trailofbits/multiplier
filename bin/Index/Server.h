@@ -70,6 +70,9 @@ class Server final : public mx::rpc::Multiplier::Server {
   kj::Promise<void> findUses(FindUsesContext context) final;
 
   kj::Promise<void> findReferences(FindReferencesContext context) final;
+
+  // Find the list of fragment IDs associated with a specific file.
+  kj::Promise<void> findFileFragments(FindFileFragmentsContext context) final;
 };
 
 }  // namespace indexer

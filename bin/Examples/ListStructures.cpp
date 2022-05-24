@@ -46,7 +46,7 @@ static void PrintStructures(mx::Fragment fragment) {
     std::cout << '\n';
 
     for (const mx::FieldDecl &field : record.fields()) {
-      std::cout << '\t' << field.id() << '\t' << field.name();
+      std::cout << "\t\t" << field.id() << '\t' << field.name();
       if (FLAGS_show_locations) {
         std::cout << '\t' << file_paths[file.id()].generic_string();
         if (auto tok = field.token()) {
@@ -57,8 +57,6 @@ static void PrintStructures(mx::Fragment fragment) {
       }
       std::cout << '\n';
     }
-
-    std::cout << '\n';
   }
 }
 

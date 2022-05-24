@@ -49,11 +49,11 @@ class Token {
   friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
-  unsigned index;
+  unsigned offset;
 
-  inline Token(std::shared_ptr<const TokenReader> impl_, unsigned index_)
+  inline Token(std::shared_ptr<const TokenReader> impl_, unsigned offset_)
       : impl(std::move(impl_)),
-        index(index_) {}
+        offset(offset_) {}
 
  public:
   Token(void);
@@ -80,6 +80,12 @@ class Token {
   // Return the version of this token from a file, if any.
   std::optional<Token> file_token(void) const;
 
+  // Return the version of this token from a file, if any. If there isn't a
+  // one-to-one correspondence between this token and a file token, then it
+  // likely means this token exists inside of a macro expansion. If that is the
+  // case, then this will return the beginning token of the macro expansion.
+  std::optional<Token> nearest_file_token(void) const;
+
   // Return the set of all uses of this token within its fragment (if it's a
   // fragment token).
   UseRange<TokenUseSelector> uses(void) const;
@@ -87,6 +93,17 @@ class Token {
   // Return the line and column number for this token, if any.
   std::optional<std::pair<unsigned, unsigned>> location(
       const FileLocationCache &) const;
+
+  // Return the line and column number for the file token nearest to this token,
+  // if any.
+  inline std::optional<std::pair<unsigned, unsigned>> nearest_location(
+      const FileLocationCache &cache) const {
+    if (auto maybe_file_token = nearest_file_token()) {
+      return maybe_file_token->location(cache);
+    } else {
+      return std::nullopt;
+    }
+  }
 };
 
 // Forward-only iterator over a sequence of tokens.
@@ -110,31 +127,42 @@ class TokenListIterator {
   using EndIteratorType = IteratorEnd;
 
   inline bool operator==(EndIteratorType) const noexcept {
-    return impl.index >= num_tokens;
+    return impl.offset >= num_tokens;
   }
 
   inline bool operator!=(EndIteratorType) const noexcept {
-    return impl.index < num_tokens;
+    return impl.offset < num_tokens;
   }
 
   // Return the current token pointed to by the iterator.
-  inline const Token &operator*(void) const noexcept {
+  inline Token operator*(void) && noexcept {
+    return std::move(impl);
+  }
+
+  // Return the current token pointed to by the iterator.
+  inline const Token &operator*(void) const & noexcept {
     return impl;
   }
 
-  inline const Token *operator->(void) const noexcept {
+  inline const Token *operator->(void) const & noexcept {
     return &impl;
   }
 
   // Pre-increment.
-  inline TokenListIterator &operator++(void) noexcept {
-    ++impl.index;
+  inline TokenListIterator operator++(void) && noexcept {
+    auto next_offset = impl.offset + 1u;
+    return TokenListIterator(std::move(impl.impl), next_offset, num_tokens);
+  }
+
+  // Pre-increment.
+  inline TokenListIterator &operator++(void) & noexcept {
+    ++impl.offset;
     return *this;
   }
 
   // Post-increment.
   inline TokenListIterator operator++(int) noexcept {
-    return TokenListIterator(impl.impl, impl.index++, num_tokens);
+    return TokenListIterator(impl.impl, impl.offset++, num_tokens);
   }
 };
 

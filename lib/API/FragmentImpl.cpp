@@ -51,12 +51,7 @@ std::optional<Token> FragmentImpl::TokenFor(
   // It's a file token; go get the file.
   } else if (std::holds_alternative<FileTokenId>(vid)) {
     const FileTokenId tid = std::get<FileTokenId>(vid);
-    FileImpl::Ptr file;
-    if (containing_file && containing_file->file_id == tid.file_id) {
-      file = containing_file;  // Try to use the containing file if it matches.
-    } else {
-      file = ep->FileFor(ep, tid.file_id);
-    }
+    FileImpl::Ptr file = ep->FileFor(ep, tid.file_id);
 
     auto reader = file->TokenReader(file);
     if (tid.offset < reader->NumTokens()) {
@@ -123,15 +118,7 @@ TokenRange FragmentImpl::TokenRangeFor(
       return TokenRange();
     }
 
-    FileImpl::Ptr file;
-
-    // It's a token inside of the current fragment's file.
-    if (containing_file && containing_file->file_id == bfid.file_id) {
-      file = containing_file;  // Try to use the containing file if it matches.
-    } else {
-      file = ep->FileFor(ep, bfid.file_id);
-    }
-
+    auto file = ep->FileFor(ep, bfid.file_id);
     auto reader = file->TokenReader(file);
     if (auto num_tokens = reader->NumTokens(); efid.offset < num_tokens) {
       return TokenRange(std::move(reader), bfid.offset, efid.offset + 1u);

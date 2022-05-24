@@ -137,14 +137,14 @@ kj::Promise<void> Server::indexCompileCommands(
   mx::rpc::Multiplier::IndexCompileCommandsParams::Reader params =
       context.getParams();
 
-  mx::rpc::Multiplier::IndexCompileCommandsResults::Builder results =
+  mx::rpc::Multiplier::IndexCompileCommandsResults::Builder result =
       context.initResults();
 
   if (!params.hasCommands()) {
     LOG(WARNING)
         << "Got request to index with no commands";
-    context.setResults(results);
-    results.setSuccess(true);
+    context.setResults(result);
+    result.setSuccess(true);
     return kj::READY_NOW;
   }
 
@@ -159,7 +159,7 @@ kj::Promise<void> Server::indexCompileCommands(
         << "Unable to create host C compiler: "
         << maybe_cc.TakeError();
 
-    results.setSuccess(false);
+    result.setSuccess(false);
     return kj::READY_NOW;
 
   } else if (!maybe_cxx.Succeeded()) {
@@ -167,7 +167,7 @@ kj::Promise<void> Server::indexCompileCommands(
         << "Unable to create host C++ compiler: "
         << maybe_cxx.TakeError();
 
-    results.setSuccess(false);
+    result.setSuccess(false);
     return kj::READY_NOW;
   }
 
@@ -215,15 +215,15 @@ kj::Promise<void> Server::indexCompileCommands(
     }
   }
 
-  results.setSuccess(true);
+  result.setSuccess(true);
   return kj::READY_NOW;
 }
 
 // Say hello to the server.
 kj::Promise<void> Server::hello(HelloContext context) {
   unsigned version_number = d->server_context.version_number.load();
-  auto results = context.initResults();
-  results.setVersionNumber(version_number);
+  auto result = context.initResults();
+  result.setVersionNumber(version_number);
   return kj::READY_NOW;
 }
 
@@ -243,10 +243,10 @@ kj::Promise<void> Server::downloadFileList(
       });
 
   auto num_files = static_cast<unsigned>(paths.size());
-  auto results = context.initResults();
-  results.setVersionNumber(version_number);
+  auto result = context.initResults();
+  result.setVersionNumber(version_number);
 
-  auto files_builder = results.initFiles(num_files);
+  auto files_builder = result.initFiles(num_files);
   for (auto i = 0u; i < num_files; ++i) {
     const auto &path = paths[i];
     mx::rpc::FileInfo::Builder info = files_builder[i];
@@ -274,39 +274,19 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
                          kj::heapString(err.str()));
   }
 
-  // Collect the fragments associated with this file.
-  std::vector<mx::FragmentId> fragment_ids;
-  d->server_context.file_fragment_ids.ScanPrefix(
-      file_id,
-      [file_id, &fragment_ids] (mx::FileId found_file_id,
-                                mx::FragmentId fragment_id) {
-        DCHECK_EQ(file_id, found_file_id);
-        fragment_ids.push_back(fragment_id);
-        return file_id == found_file_id;
-      });
-
-
-  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
-
   // TODO(pag): This is a yolo-ducated of a guess.
   capnp::MessageSize size{
-    ((maybe_contents->size() + 7u / 8u) +
-     (num_fragments + 1u)),
+    ((maybe_contents->size() + 7u / 8u)),
     0u};
 
-  mx::rpc::Multiplier::DownloadFileResults::Builder results =
+  mx::rpc::Multiplier::DownloadFileResults::Builder result =
       context.initResults(size);
   capnp::Data::Reader contents_reader(
       reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
       maybe_contents.value().size());
 
-  results.setVersionNumber(version_number);
-  results.setFile(contents_reader);
-
-  auto fragments = results.initFragments(num_fragments);
-  for (auto i = 0u; i < num_fragments; ++i) {
-    fragments.set(i, fragment_ids[i]);
-  }
+  result.setVersionNumber(version_number);
+  result.setFile(contents_reader);
 
   return kj::READY_NOW;
 }
@@ -328,9 +308,9 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   }
 
   capnp::MessageSize size{maybe_contents->size() + 7u / 8u, 0u};
-  mx::rpc::Multiplier::DownloadFragmentResults::Builder results =
+  mx::rpc::Multiplier::DownloadFragmentResults::Builder result =
       context.initResults(size);
-  results.setFragment(kj::arrayPtr(
+  result.setFragment(kj::arrayPtr(
       reinterpret_cast<const capnp::byte *>(maybe_contents.value().data()),
       maybe_contents.value().size()));
 
@@ -345,17 +325,14 @@ kj::Promise<void> Server::weggliQueryFragments(
   mx::rpc::Multiplier::WeggliQueryFragmentsParams::Reader params =
       context.getParams();
 
-  auto results = context.initResults();
-  results.setVersionNumber(d->server_context.version_number.load());
+  auto result = context.initResults();
+  result.setVersionNumber(d->server_context.version_number.load());
 
   std::string syntax_string(params.getQuery().cStr(), params.getQuery().size());
   if (syntax_string.empty()) {
-    (void) results.initFragments(0u);
+    (void) result.initFragmentIds(0u);
     return kj::READY_NOW;
   }
-
-  LOG(INFO)
-      << "Got Weggli syntax query: " << syntax_string;
 
   auto sc = std::make_shared<SearchingContext>(d->server_context);
 
@@ -371,8 +348,9 @@ kj::Promise<void> Server::weggliQueryFragments(
   }
   executor.Wait();
 
-  // Convert the file file:line pairs into overlapping fragment IDs.
   std::set<mx::FragmentId> fragment_ids;
+
+  // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
     d->server_context.file_fragment_lines.ScanPrefix(
         prefix, [&fragment_ids] (mx::FileId, unsigned, mx::FragmentId id) {
@@ -381,12 +359,8 @@ kj::Promise<void> Server::weggliQueryFragments(
         });
   }
 
-  LOG(INFO)
-      << "Number of fragments in results "
-      << fragment_ids.size() << "\n";
-
   auto num_fragments = static_cast<unsigned>(fragment_ids.size());
-  auto fragments = results.initFragments(num_fragments);
+  auto fragments = result.initFragmentIds(num_fragments);
   auto index = 0u;
   for (auto fragment_id : fragment_ids) {
     fragments.set(index++, fragment_id);
@@ -403,12 +377,12 @@ kj::Promise<void> Server::regexQueryFragments(
   mx::rpc::Multiplier::RegexQueryFragmentsParams::Reader params =
       context.getParams();
 
-  auto results = context.initResults();
-  results.setVersionNumber(d->server_context.version_number.load());
+  auto result = context.initResults();
+  result.setVersionNumber(d->server_context.version_number.load());
 
   std::string pattern(params.getRegex().cStr(), params.getRegex().size());
   if (pattern.empty()) {
-    (void) results.initFragments(0u);
+    (void) result.initFragmentIds(0u);
     return kj::READY_NOW;
   }
 
@@ -425,8 +399,9 @@ kj::Promise<void> Server::regexQueryFragments(
   }
   executor.Wait();
 
-  // Convert the file file:line pairs into overlapping fragment IDs.
   std::set<mx::FragmentId> matches;
+
+  // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
     d->server_context.file_fragment_lines.ScanPrefix(
         prefix, [&matches] (mx::FileId, unsigned, mx::FragmentId frag_id) {
@@ -436,7 +411,7 @@ kj::Promise<void> Server::regexQueryFragments(
   }
 
   auto num_fragments = static_cast<unsigned>(matches.size());
-  auto match_builder = results.initFragments(num_fragments);
+  auto match_builder = result.initFragmentIds(num_fragments);
   auto index = 0u;
   for (mx::FragmentId frag_id : matches) {
     match_builder.set(index++, frag_id);
@@ -492,7 +467,7 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
   result.setVersionNumber(d->server_context.version_number.load());
 
   std::vector<mx::FragmentId> fragment_ids;
-  fragment_ids.reserve(16);
+  fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
     d->server_context.entity_id_use_to_fragment_id.ScanPrefix(
@@ -528,9 +503,8 @@ kj::Promise<void> Server::findReferences(FindReferencesContext context) {
 
   result.setVersionNumber(d->server_context.version_number.load());
 
-
   std::vector<mx::FragmentId> fragment_ids;
-  fragment_ids.reserve(16);
+  fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
     d->server_context.entity_id_reference.ScanPrefix(
@@ -549,6 +523,40 @@ kj::Promise<void> Server::findReferences(FindReferencesContext context) {
   auto i = 0u;
   for (mx::FragmentId frag_id : fragment_ids) {
     fib.set(i++, frag_id);
+  }
+
+  return kj::READY_NOW;
+}
+
+// Find the list of fragment IDs associated with a specific file.
+kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
+  mx::rpc::Multiplier::FindFileFragmentsParams::Reader params =
+      context.getParams();
+
+  mx::rpc::Multiplier::FindFileFragmentsResults::Builder result =
+      context.initResults();
+
+  result.setVersionNumber(d->server_context.version_number.load());
+
+  mx::FileId file_id = params.getFileId();
+
+  std::vector<mx::FragmentId> fragment_ids;
+  fragment_ids.reserve(128u);
+
+  // Collect the fragments associated with this file.
+  d->server_context.file_fragment_ids.ScanPrefix(
+      file_id,
+      [file_id, &fragment_ids] (mx::FileId found_file_id,
+                                mx::FragmentId fragment_id) {
+        DCHECK_EQ(file_id, found_file_id);
+        fragment_ids.push_back(fragment_id);
+        return file_id == found_file_id;
+      });
+
+  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
+  auto fragments = result.initFragmentIds(num_fragments);
+  for (auto i = 0u; i < num_fragments; ++i) {
+    fragments.set(i, fragment_ids[i]);
   }
 
   return kj::READY_NOW;

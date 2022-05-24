@@ -28,9 +28,10 @@ static void PrintFunctionNames(mx::Fragment fragment) {
 
     std::cout
         << file.id() << '\t'
-        << fragment.id() << '\t' << func.id() << '\t'
-        << (func.is_definition() ? "def\t" : "decl\t")
-        << func.name();
+        << fragment.id() << '\t'
+        << func.id() << '\t'
+        << func.name()
+        << (func.is_definition() ? "\tdef" : "\tdecl");
 
     if (FLAGS_show_locations) {
       std::cout << '\t' << file_paths[file.id()].generic_string();
@@ -46,7 +47,7 @@ static void PrintFunctionNames(mx::Fragment fragment) {
     if (FLAGS_list_variables) {
       for (const mx::Decl &var : func.declarations_in_context()) {
         std::cout
-            << '\t' << var.id() << '\t' << mx::EnumeratorName(var.kind());
+            << "\t\t" << var.id() << '\t' << mx::EnumeratorName(var.kind());
 
         if (auto named_decl = mx::NamedDecl::from(var)) {
           std::cout << '\t' << named_decl->name();
@@ -63,7 +64,6 @@ static void PrintFunctionNames(mx::Fragment fragment) {
 
         std::cout << '\n';
       }
-      std::cout << '\n';
     }
   }
 }

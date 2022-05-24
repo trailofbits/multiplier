@@ -192,17 +192,17 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
 
   # Download a file by a file by an `mx::FileId`. Returns the file, and a list
   # of the fragment IDs associated with this file.
-  downloadFile @3 (id :UInt64) -> (versionNumber :UInt32, file :Data, fragments :List(UInt64));
+  downloadFile @3 (id :UInt64) -> (versionNumber :UInt32, file :Data);
 
   # Download a code fragment by an `mx::FragmentId`.
   downloadFragment @4 (id: UInt64) -> (versionNumber :UInt32, fragment :Data);
 
   # Search code fragments that match with the query.
-  weggliQueryFragments @5 (query :Text, isCpp :Bool) ->  (versionNumber :UInt32, fragments :List(UInt64));
+  weggliQueryFragments @5 (query :Text, isCpp :Bool) ->  (versionNumber :UInt32, fragmentIds :List(UInt64));
  
   # Query for a regular expression match, and return the list of fragment ids
   # overlapping with the matches.
-  regexQueryFragments @6 (regex :Text) -> (versionNumber :UInt32, fragments :List(UInt64));
+  regexQueryFragments @6 (regex :Text) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
   
   # Expand a list of redeclarations to try to cover all redeclarations across
   # all translation units. The first redeclaration in the list should be the
@@ -218,4 +218,7 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   # declaration, return a list of statement entity ids that reference any of
   # the declarations. This focuses on `DeclRefExpr` and `MemberExpr` references.
   findReferences @9 (redeclarationIds :List(UInt64)) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
+
+  # Find the list of fragment IDs associated with a specific file.
+  findFileFragments @10 (fileId :UInt64) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
 }

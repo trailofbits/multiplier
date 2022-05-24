@@ -118,23 +118,6 @@ class EntityProvider {
   // caches.
   virtual void VersionNumberChanged(unsigned new_version_number) = 0;
 
-  // Cache a returned file list.
-  virtual void CacheFileList(const FilePathList &, unsigned) = 0;
-
-  // Cache a returned list of redeclarations.
-  virtual void CacheRedeclarations(
-      const std::vector<RawEntityId> &, unsigned) = 0;
-
-  // Cache a returned set of uses for a given set of redeclarations.
-  virtual void CacheUses(
-      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-      unsigned) = 0;
-
-  // Cache a returned set of references for a given set of redeclarations.
-  virtual void CacheReferences(
-      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-      unsigned) = 0;
-
  private:
 
   // Clear the cache.
@@ -143,6 +126,10 @@ class EntityProvider {
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
   virtual FilePathList ListFiles(const Ptr &) = 0;
+
+  // Download a list of fragment IDs contained in a specific file.
+  virtual std::vector<FragmentId>
+  ListFragmentsInFile(const Ptr &, FileId id) = 0;
 
   // Download a file by its unique ID.
   virtual std::shared_ptr<const FileImpl>

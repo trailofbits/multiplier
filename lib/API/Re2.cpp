@@ -22,7 +22,7 @@ RegexQueryResultImpl::RegexQueryResultImpl(
     : query(query_),
       ep(std::move(ep_)) {
 
-  auto fragment_ids_reader = response.getFragments();
+  auto fragment_ids_reader = response.getFragmentIds();
   fragment_ids.reserve(fragment_ids_reader.size());
 
   for (mx::FragmentId frag_id : fragment_ids_reader) {

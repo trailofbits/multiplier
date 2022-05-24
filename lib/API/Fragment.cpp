@@ -14,10 +14,23 @@
 
 namespace mx {
 
+// Advance to the next valid fragment.
+void FileFragmentListIterator::Advance(void) {
+  for (; index < num_fragments; ++index) {
+    frag = impl->ep->FragmentFor(impl->ep, impl->fragment_ids[index]);
+    if (frag) {
+      return;
+    }
+  }
+}
+
 // Return the list of fragments in a file.
 FragmentList Fragment::in(const File &file) {
-  return FragmentList(
-      file.impl, static_cast<unsigned>(file.impl->fragments.size()));
+  auto &ep = file.impl->ep;
+  auto list = std::make_shared<FragmentListImpl>(
+      ep, ep->ListFragmentsInFile(ep, file.id()));
+  auto num_fragments = list->fragment_ids.size();
+  return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
 }
 
 // Return the fragment containing a query match.

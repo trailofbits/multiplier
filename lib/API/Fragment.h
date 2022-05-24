@@ -12,6 +12,21 @@ namespace mx {
 
 class FileImpl;
 
+class FragmentListImpl {
+ public:
+  // Needed for us to be able to look up the file containing this fragment,
+  // or look up entities related to other fragments.
+  const EntityProvider::Ptr ep;
+
+  // List of fragment IDs.
+  std::vector<FragmentId> fragment_ids;
+
+  inline FragmentListImpl(EntityProvider::Ptr ep_,
+                          std::vector<FragmentId> fragment_ids_)
+      : ep(std::move(ep_)),
+        fragment_ids(std::move(fragment_ids_)) {}
+};
+
 class FragmentImpl {
  public:
   using Ptr = std::shared_ptr<const FragmentImpl>;
@@ -22,12 +37,6 @@ class FragmentImpl {
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
   const EntityProvider::Ptr ep;
-
-  // The containing file, if we've computed it.
-  //
-  // TODO(pag): If we start using the client with multiple threads then we
-  //            should guard this with a mutex.
-  mutable std::shared_ptr<const FileImpl> containing_file;
 
   // For bounds checking.
   //

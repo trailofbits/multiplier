@@ -153,7 +153,6 @@ FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) try {
     files.try_emplace(std::move(p), file_id);
   }
 
-  self->CacheFileList(files, resp_version_number);
   return files;
 
 // TODO(pag): Log something.
@@ -161,8 +160,33 @@ FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) try {
   return {};
 }
 
-// Cache a returned file list.
-void RemoteEntityProvider::CacheFileList(const FilePathList &, unsigned) {}
+// Get the current list of fragment IDs associated with a file.
+std::vector<FragmentId> RemoteEntityProvider::ListFragmentsInFile(
+    const Ptr &self, FileId id) try {
+  ClientConnection &cc = Connection(self);
+  capnp::Request<mx::rpc::Multiplier::FindFileFragmentsParams,
+                 mx::rpc::Multiplier::FindFileFragmentsResults>
+      request = cc.client.findFileFragmentsRequest();
+  request.setFileId(id);
+
+  capnp::Response<mx::rpc::Multiplier::FindFileFragmentsResults> response =
+      request.send().wait(cc.connection.getWaitScope());
+
+  auto resp_version_number = response.getVersionNumber();
+  MaybeUpdateVersionNumber(self, resp_version_number);
+
+  std::vector<FragmentId> fragments;
+  fragments.reserve(response.getFragmentIds().size());
+  for (FragmentId fragment_id : response.getFragmentIds()) {
+    fragments.push_back(fragment_id);
+  }
+
+  return fragments;
+
+// TODO(pag): Log something.
+} catch (...) {
+  return {};
+}
 
 // Download a file by its unique ID.
 FileImpl::Ptr RemoteEntityProvider::FileFor(const Ptr &self, FileId id) try {
@@ -295,17 +319,12 @@ std::vector<RawEntityId> RemoteEntityProvider::Redeclarations(
     redecl_ids.push_back(redecl_id);
   }
 
-  self->CacheRedeclarations(redecl_ids, resp_version_number);
   return redecl_ids;
 
 // TODO(pag): Log something.
 } catch (...) {
   return {};
 }
-
-// Cache a computed set of redeclarations for a given version number.
-void RemoteEntityProvider::CacheRedeclarations(
-    const std::vector<RawEntityId> &, unsigned) {}
 
 // Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
 // to analyze when looking for uses.
@@ -353,7 +372,6 @@ void RemoteEntityProvider::FillUses(
       fragment_ids_out.push_back(frag_id);
     }
 
-    self->CacheUses(redecl_ids_out, fragment_ids_out, resp_version_number);
     return;
   }
 
@@ -409,7 +427,6 @@ void RemoteEntityProvider::FillReferences(
       fragment_ids_out.push_back(frag_id);
     }
 
-    self->CacheReferences(redecl_ids_out, fragment_ids_out, resp_version_number);
     return;
   }
 
@@ -418,16 +435,6 @@ void RemoteEntityProvider::FillReferences(
   redecl_ids_out.clear();
   fragment_ids_out.clear();
 }
-
-// Cache a returned set of uses for a given set of redeclarations.
-void RemoteEntityProvider::CacheUses(
-    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-    unsigned) {}
-
-// Cache a returned set of references for a given set of redeclarations.
-void RemoteEntityProvider::CacheReferences(
-    const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-    unsigned) {}
 
 // Returns an entity provider that gets entities from a remote host.
 EntityProvider::Ptr EntityProvider::from_remote(

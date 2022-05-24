@@ -57,12 +57,4 @@ struct PackedReaderState {
   }
 };
 
-class FileListImpl {
- public:
-  const EntityProvider::Ptr ep;
-  std::vector<std::pair<mx::FileId, std::weak_ptr<const FileImpl>>> files;
-
-  explicit FileListImpl(EntityProvider::Ptr ep_);
-};
-
 }  // namespace mx

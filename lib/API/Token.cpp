@@ -54,7 +54,7 @@ TokenReader::Ptr InvalidTokenReader::ReaderForFile(
 
 Token::Token(void)
     : impl(kInvalidTokenReader),
-      index(0) {}
+      offset(0) {}
 
 // Return `true` if this is a valid token.
 Token::operator bool(void) const {
@@ -63,22 +63,22 @@ Token::operator bool(void) const {
 
 // Kind of this token.
 TokenKind Token::kind(void) const {
-  return impl->NthTokenKind(index);
+  return impl->NthTokenKind(offset);
 }
 
 // Return the data of this token.
 std::string_view Token::data(void) const {
-  return impl->NthTokenData(index);
+  return impl->NthTokenData(offset);
 }
 
 // Return the ID of this token.
 EntityId Token::id(void) const {
-  return impl->NthTokenId(index);
+  return impl->NthTokenId(offset);
 }
 
 // Return the version of this token from a file, if any.
 std::optional<Token> Token::file_token(void) const {
-  VariantId vid = EntityId(impl->NthFileTokenId(index)).Unpack();
+  VariantId vid = EntityId(impl->NthFileTokenId(offset)).Unpack();
   if (!std::holds_alternative<FileTokenId>(vid)) {
     return std::nullopt;
   }
@@ -90,6 +90,24 @@ std::optional<Token> Token::file_token(void) const {
   }
 
   return Token(std::move(fr), fid.offset);
+}
+
+// Return the version of this token from a file, if any. If there isn't a
+// one-to-one correspondence between this token and a file token, then it
+// likely means this token exists inside of a macro expansion. If that is the
+// case, then this will return the beginning token of the macro expansion.
+std::optional<Token> Token::nearest_file_token(void) const {
+  for (auto i = 0u; i <= offset; ++i) {
+    VariantId vid = EntityId(impl->NthFileTokenId(offset - i)).Unpack();
+    if (std::holds_alternative<FileTokenId>(vid)) {
+      FileTokenId fid = std::get<FileTokenId>(vid);
+      if (auto fr = impl->ReaderForFile(impl, fid.file_id)) {
+        return Token(std::move(fr), fid.offset);
+      }
+    }
+  }
+
+  return std::nullopt;
 }
 
 // Return the set of all uses of this token within its fragment (if it's a

@@ -14,12 +14,7 @@ PackedFileImpl::PackedFileImpl(
     FileId id_, EntityProvider::Ptr ep_, Response response)
     : FileImpl(id_, std::move(ep_)),
       package(response.getFile()),
-      reader(package.Reader<rpc::File>()) {
-
-  for (auto frag_id : response.getFragments()) {
-    fragments.emplace_back().first = frag_id;
-  }
-}
+      reader(package.Reader<rpc::File>()) {}
 
 // Return the data of the file.
 std::string_view PackedFileImpl::Data(void) const {

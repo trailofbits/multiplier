@@ -60,57 +60,6 @@ class FileLocationCache {
   void clear(void);
 };
 
-// Iterate over the fragments from a file.
-class FileFragmentListIterator {
- private:
-  friend class File;
-  friend class FragmentList;
-
-  std::shared_ptr<const FileImpl> impl;
-  std::shared_ptr<const FragmentImpl> frag;
-  unsigned index;
-  unsigned num_fragments;
-
-  bool operator==(const FileFragmentListIterator &) = delete;
-  bool operator!=(const FileFragmentListIterator &) = delete;
-
-  inline FileFragmentListIterator(std::shared_ptr<const FileImpl> impl_,
-                                  unsigned index_, unsigned num_fragments_)
-      : impl(std::move(impl_)),
-        index(index_),
-        num_fragments(num_fragments_) {
-    Advance();
-  }
-
-  void Advance(void);
-
- public:
-  using EndIteratorType = IteratorEnd;
-
-  inline Fragment operator*(void) && noexcept;
-  inline Fragment operator*(void) const & noexcept;
-
-  // Pre-increment.
-  inline FileFragmentListIterator &operator++(void) {
-    ++index;
-    Advance();
-    return *this;
-  }
-
-  // Post-increment.
-  inline FileFragmentListIterator operator++(int) {
-    return FileFragmentListIterator(impl, index++, num_fragments);
-  }
-
-  inline bool operator==(EndIteratorType) const noexcept {
-    return index >= num_fragments;
-  }
-
-  inline bool operator!=(EndIteratorType) const noexcept {
-    return index < num_fragments;
-  }
-};
-
 class FileListIterator {
  private:
   friend class FileList;
@@ -126,8 +75,18 @@ class FileListIterator {
   bool operator!=(const FileListIterator &) = delete;
 
   FileListIterator(std::shared_ptr<FileListImpl> impl_, unsigned index_,
-               unsigned num_files_)
+                   unsigned num_files_)
       : impl(std::move(impl_)),
+        index(index_),
+        num_files(num_files_) {
+    Advance();
+  }
+
+  FileListIterator(std::shared_ptr<FileListImpl> impl_, 
+                   std::shared_ptr<const FileImpl> file_,
+                   unsigned index_, unsigned num_files_)
+      : impl(std::move(impl_)),
+        file(std::move(file_)),
         index(index_),
         num_files(num_files_) {
     Advance();
@@ -148,7 +107,7 @@ class FileListIterator {
 
   // Post-increment.
   inline FileListIterator operator++(int) noexcept {
-    FileListIterator ret(impl, index, num_files);
+    FileListIterator ret(impl, file, index, num_files);
     ++index;
     Advance();
     return ret;
@@ -209,10 +168,17 @@ class File {
 
  public:
 
-  inline static File containing(const FragmentList &fragment_list);
-
   // Return the file containing a specific fragment.
   static File containing(const Fragment &fragment);
+
+  // Return the file containing the fragment containing a specific entity.
+  static File containing(const Decl &entity);
+
+  // Return the file containing the fragment containing a specific entity.
+  static File containing(const Stmt &entity);
+
+  // Return the file containing the fragment containing a specific entity.
+  static File containing(const Type &type);
 
   // Return the file containing a specific token.
   //

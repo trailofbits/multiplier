@@ -23,6 +23,7 @@ class FileFragmentListIterator;
 class Fragment;
 class FragmentImpl;
 class FragmentList;
+class FragmentListImpl;
 class Index;
 class InvalidEntityProvider;
 class ReferenceIterator;
@@ -44,16 +45,66 @@ class WeggliQueryResultImpl;
 class WeggliQueryResultIterator;
 class WeggliQueryResultIterator;
 
+// Iterate over the fragments from a file.
+class FileFragmentListIterator {
+ private:
+  friend class FragmentList;
+
+  std::shared_ptr<const FragmentListImpl> impl;
+  std::shared_ptr<const FragmentImpl> frag;
+  unsigned index{0u};
+  unsigned num_fragments{0u};
+
+  bool operator==(const FileFragmentListIterator &) = delete;
+  bool operator!=(const FileFragmentListIterator &) = delete;
+
+  inline FileFragmentListIterator(std::shared_ptr<const FragmentListImpl> impl_,
+                                  unsigned index_, unsigned num_fragments_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_fragments(num_fragments_) {
+    Advance();
+  }
+
+  void Advance(void);
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline Fragment operator*(void) && noexcept;
+  inline Fragment operator*(void) const & noexcept;
+
+  // Pre-increment.
+  inline FileFragmentListIterator &operator++(void) {
+    ++index;
+    Advance();
+    return *this;
+  }
+
+  // Post-increment.
+  inline FileFragmentListIterator operator++(int) {
+    return FileFragmentListIterator(impl, index++, num_fragments);
+  }
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_fragments;
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_fragments;
+  }
+};
+
 // List of fragments asociated with a file.
 class FragmentList {
  private:
   friend class File;
   friend class Fragment;
 
-  std::shared_ptr<const FileImpl> impl;
-  unsigned num_fragments;
+  std::shared_ptr<const FragmentListImpl> impl;
+  unsigned num_fragments{0};
 
-  inline FragmentList(std::shared_ptr<const FileImpl> impl_,
+  inline FragmentList(std::shared_ptr<const FragmentListImpl> impl_,
                       unsigned num_fragments_)
       : impl(std::move(impl_)),
         num_fragments(num_fragments_) {}
@@ -159,10 +210,6 @@ class Fragment {
   // Run a regular expression search over this fragment.
   RegexQueryResult query(const RegexQuery &query) const;
 };
-
-inline File File::containing(const FragmentList &fragment_list) {
-  return File(fragment_list.impl);
-}
 
 inline Fragment FileFragmentListIterator::operator*(void) && noexcept {
   return Fragment(std::move(frag));

@@ -124,35 +124,37 @@ std::optional<std::pair<unsigned, unsigned>> Token::location(
                                             file_ptr));
   const FileLocationVector &vec = cache.impl->Add(std::move(file));
 
-  if (maybe_file_token->index >= vec.size()) {
+  if (maybe_file_token->offset >= vec.size()) {
     return std::nullopt;
   }
 
-  return vec[maybe_file_token->index];
+  return vec[maybe_file_token->offset];
 }
 
 FileImpl::~FileImpl(void) noexcept {}
 
 // Return the file containing a specific fragment.
 File File::containing(const Fragment &fragment) {
-  auto &fp = fragment.impl->containing_file;
-  if (fp) {
-    return File(fp);
-  }
-
-  const auto frag_id = fragment.impl->fragment_id;
   const auto &ep = fragment.impl->ep;
-  fp = ep->FileFor(ep, fragment.impl->FileContaingFirstToken());
+  return File(ep->FileFor(ep, fragment.impl->FileContaingFirstToken()));
+}
 
-  // Save the file <-> fragment mapping.
-  for (auto &[file_frag_id, frag_wp] : fp->fragments) {
-    if (frag_id == file_frag_id) {
-      frag_wp = fragment.impl;
-      break;
-    }
-  }
+// Return the file containing the fragment containing a specific entity.
+File File::containing(const Decl &entity) {
+  const auto &ep = entity.fragment->ep;
+  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
+}
 
-  return fp;
+// Return the file containing the fragment containing a specific entity.
+File File::containing(const Stmt &entity) {
+  const auto &ep = entity.fragment->ep;
+  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
+}
+
+// Return the file containing the fragment containing a specific entity.
+File File::containing(const Type &entity) {
+  const auto &ep = entity.fragment->ep;
+  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
 }
 
 // Return the file containing a specific token.
@@ -188,27 +190,6 @@ TokenList File::tokens(void) const noexcept {
 // Return the contents of the file as a UTF-8 string.
 std::string_view File::data(void) const noexcept {
   return impl->Data();
-}
-
-// Advance to the next valid fragment.
-void FileFragmentListIterator::Advance(void) {
-  for (; index < num_fragments; ++index) {
-    auto &wf = impl->fragments[index].second;
-    frag = wf.lock();
-    if (frag) {
-      frag->containing_file = impl;
-      return;
-    }
-
-    frag = impl->ep->FragmentFor(impl->ep, impl->fragments[index].first);
-    if (!frag) {
-      continue;  // Failed to get the fragment, skip over it.
-    }
-
-    wf = frag;
-    frag->containing_file = impl;  // Save the file <-> fragment mapping.
-    return;
-  }
 }
 
 }  // namespace mx

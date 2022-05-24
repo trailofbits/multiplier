@@ -25,7 +25,7 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
   }
 
   FragmentReader frag_reader = frag->Fragment();
-  unsigned offset = frag_reader.getTokenContextOffsets()[tok.index];
+  unsigned offset = frag_reader.getTokenContextOffsets()[tok.offset];
   mx::rpc::TokenContext::Reader tc = frag_reader.getTokenContexts()[offset];
   std::shared_ptr<const FragmentImpl> frag_ptr(tok.impl, frag);
 

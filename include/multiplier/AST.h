@@ -7160,6 +7160,7 @@ class TemplateParameterList {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
@@ -7204,6 +7205,7 @@ class TemplateArgument {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
@@ -7247,6 +7249,7 @@ class CXXBaseSpecifier {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
@@ -7292,6 +7295,7 @@ class Type {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
@@ -9971,6 +9975,7 @@ class Stmt {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
@@ -24213,6 +24218,7 @@ class Decl {
  protected:
   friend class Decl;
   friend class DeclIterator;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;

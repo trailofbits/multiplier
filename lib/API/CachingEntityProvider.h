@@ -39,6 +39,9 @@ class CachingEntityProvider final : public EntityProvider {
   std::unordered_map<FragmentId, FragmentImpl::WeakPtr> fragments;
   std::unordered_map<FileId, FileImpl::WeakPtr> files;
 
+  // Cached list of fragments inside of files.
+  std::unordered_map<FileId, std::vector<FragmentId>> file_fragments;
+
   // Cached redeclarations/references/uses.
   std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
       redeclarations;
@@ -64,6 +67,8 @@ class CachingEntityProvider final : public EntityProvider {
 
   FilePathList ListFiles(const Ptr &) final;
 
+  std::vector<FragmentId> ListFragmentsInFile(const Ptr &, FileId id) final;
+
   std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
 
   // Download a fragment by its unique ID.
@@ -85,15 +90,6 @@ class CachingEntityProvider final : public EntityProvider {
   void FillReferences(const Ptr &, RawEntityId eid,
                       std::vector<RawEntityId> &redecl_ids_out,
                       std::vector<FragmentId> &fragment_ids_out) final;
-
-  void CacheFileList(const FilePathList &, unsigned) final;
-  void CacheRedeclarations(const std::vector<RawEntityId> &, unsigned) final;
-  void CacheUses(
-      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-      unsigned) final;
-  void CacheReferences(
-      const std::vector<RawEntityId> &, const std::vector<FragmentId> &,
-      unsigned) final;
 };
 
 }  // namespace mx
