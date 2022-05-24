@@ -95,6 +95,9 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
   // Return the token reader for another file.
   TokenReader::Ptr ReaderForFile(const TokenReader::Ptr &self,
                                  mx::FileId id) const final;
+
+  // Returns `true` if `this` is logically equivalent to `that`.
+  bool Equals(const class TokenReader *that) const final;
 };
 
 }  // namespace mx

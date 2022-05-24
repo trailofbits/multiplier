@@ -70,4 +70,20 @@ TokenReader::Ptr PackedFileImpl::ReaderForFile(const TokenReader::Ptr &self,
   }
 }
 
+// Returns `true` if `this` is logically equivalent to `that`.
+bool PackedFileImpl::Equals(const class TokenReader *that_) const {
+  if (!that_) {
+    return false;
+  } else if (this == that_) {
+    return true;
+  }
+
+  auto that = dynamic_cast<const PackedFileImpl *>(that_);
+  if (!that) {
+    return false;
+  }
+
+  return that->file_id == file_id && that->ep.get() == ep.get();
+}
+
 }  // namespace mx

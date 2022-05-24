@@ -36,6 +36,9 @@ class TokenReader {
 
   // Return the token reader for another file.
   virtual Ptr ReaderForFile(const Ptr &self, mx::FileId id) const = 0;
+
+  // Returns `true` if `this` is logically equivalent to `that`.
+  virtual bool Equals(const TokenReader *that) const = 0;
 };
 
 struct BeforeTag {};
@@ -75,6 +78,9 @@ class InvalidTokenReader final : public TokenReader {
 
   // Return the token reader for another file.
   Ptr ReaderForFile(const Ptr &self, mx::FileId id) const final;
+  
+  // Returns `true` if `this` is logically equivalent to `that`.
+  bool Equals(const TokenReader *) const final;
 };
 
 }  // namespace mx

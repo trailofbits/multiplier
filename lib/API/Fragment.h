@@ -131,6 +131,9 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   TokenReader::Ptr ReaderForFile(const TokenReader::Ptr &self,
                                  mx::FileId id) const final;
 
+  // Returns `true` if `this` is logically equivalent to `that`.
+  bool Equals(const class TokenReader *that) const final;
+
   // Return a reader for the whole fragment.
   const FragmentReader &Fragment(void) const final;
 

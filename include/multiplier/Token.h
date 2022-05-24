@@ -190,6 +190,8 @@ class TokenRange {
  public:
   TokenRange(void);
 
+  TokenRange(const Token &);
+
   // Return the number of tokens in this token list.
   inline size_t size(void) const noexcept {
     return num_tokens - index;
@@ -220,6 +222,9 @@ class TokenRange {
   // an empty token range is returned. The indices cover the tokens in the
   // exclusive range `[start_index, end_index)`.
   TokenRange slice(size_t start_index, size_t end_index) const noexcept;
+
+  // Returns the index of `that` in this range, or `std::nullopt`.
+  std::optional<unsigned> index_of(const Token &that) const noexcept;
 };
 
 // List of tokens.

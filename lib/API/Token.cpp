@@ -52,6 +52,11 @@ TokenReader::Ptr InvalidTokenReader::ReaderForFile(
   return {};
 }
 
+// Returns `true` if `this` is logically equivalent to `that`.
+bool InvalidTokenReader::Equals(const TokenReader *) const {
+  return false;
+}
+
 Token::Token(void)
     : impl(kInvalidTokenReader),
       offset(0) {}
@@ -159,6 +164,10 @@ TokenRange::TokenRange(void)
     : index(0),
       num_tokens(0) {}
 
+TokenRange::TokenRange(const Token &tok)
+    : index(tok.offset),
+      num_tokens(tok.impl ? (tok.offset + 1u) : 0u) {}
+
 // Return the token at index `index`.
 Token TokenRange::operator[](size_t relative_index) const {
   auto effective_index = (index + relative_index);
@@ -185,6 +194,42 @@ TokenRange TokenRange::slice(size_t start_index,
   } else {
     return TokenRange(impl, static_cast<unsigned>(index + start_index),
                       static_cast<unsigned>(index + end_index));
+  }
+}
+
+// Returns the index of `that` in this range, or `std::nullopt`.
+std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
+  if (!impl->Equals(that.impl.get())) {
+    return std::nullopt;
+  }
+
+  VariantId vid = EntityId(that.id()).Unpack();
+  if (std::holds_alternative<FragmentTokenId>(vid)) {
+    auto id = std::get<FragmentTokenId>(vid);
+    if (id.offset < index) {
+      return std::nullopt;
+    }
+
+    if (id.offset >= num_tokens) {
+      return std::nullopt;
+    }
+
+    return id.offset - index;
+
+  } else if (std::holds_alternative<FileTokenId>(vid)) {
+    auto id = std::get<FileTokenId>(vid);
+    if (id.offset < index) {
+      return std::nullopt;
+    }
+
+    if (id.offset >= num_tokens) {
+      return std::nullopt;
+    }
+
+    return id.offset - index;
+
+  } else {
+    return std::nullopt;
   }
 }
 

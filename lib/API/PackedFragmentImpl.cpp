@@ -85,6 +85,22 @@ TokenReader::Ptr PackedFragmentImpl::ReaderForFile(
   return ptr->TokenReader(ptr);
 }
 
+// Returns `true` if `this` is logically equivalent to `that`.
+bool PackedFragmentImpl::Equals(const class TokenReader *that_) const {
+  if (!that_) {
+    return false;
+  } else if (this == that_) {
+    return true;
+  }
+
+  auto that = dynamic_cast<const PackedFragmentImpl *>(that_);
+  if (!that) {
+    return false;
+  }
+
+  return that->fragment_id == fragment_id && that->ep.get() == ep.get();
+}
+
 // Return a reader for the whole fragment.
 const FragmentReader &PackedFragmentImpl::Fragment(void) const {
   return reader;

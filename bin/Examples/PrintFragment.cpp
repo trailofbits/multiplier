@@ -44,8 +44,10 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::in_memory_cache(
+      mx::EntityProvider::from_remote(
+          FLAGS_host, FLAGS_port)));
+
   auto fragment = index.fragment(FLAGS_fragment_id);
   if (!fragment) {
     std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;

@@ -37,6 +37,7 @@ endfunction(define_example)
 
 define_example("mx-list-files" "ListFiles.cpp")
 define_example("mx-print-file" "PrintFile.cpp")
+define_example("mx-highlight-entity" "HighlightEntity.cpp")
 define_example("mx-print-call-hierarchy" "PrintCallHierarchy.cpp")
 define_example("mx-print-call-graph" "PrintCallGraph.cpp")
 define_example("mx-list-fragments" "ListFragments.cpp")
