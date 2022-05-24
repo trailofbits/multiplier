@@ -144,11 +144,11 @@ TokenList Token::in(const File &file) {
 // Return the token list containing a particular token.
 TokenList TokenList::containing(Token tok) {
   if (tok) {
-    auto num_tokens = tok.impl->NumTokens();
-    return TokenList(std::move(tok.impl), num_tokens);
-  } else {
-    return TokenList();
+    if (auto num_tokens = tok.impl->NumTokens()) {
+      return TokenList(std::move(tok.impl), num_tokens);
+    }
   }
+  return TokenList();
 }
 
 // Return the token list containing a particular token range.
@@ -161,11 +161,13 @@ TokenList TokenList::containing(const TokenRange &range) {
 }
 
 TokenRange::TokenRange(void)
-    : index(0),
+    : impl(kInvalidTokenReader),
+      index(0),
       num_tokens(0) {}
 
 TokenRange::TokenRange(const Token &tok)
-    : index(tok.offset),
+    : impl(tok.impl),
+      index(tok.offset),
       num_tokens(tok.impl ? (tok.offset + 1u) : 0u) {}
 
 // Return the token at index `index`.
@@ -199,7 +201,7 @@ TokenRange TokenRange::slice(size_t start_index,
 
 // Returns the index of `that` in this range, or `std::nullopt`.
 std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
-  if (!impl->Equals(that.impl.get())) {
+  if (!impl || !impl->Equals(that.impl.get())) {
     return std::nullopt;
   }
 
