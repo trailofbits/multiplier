@@ -8,6 +8,8 @@
 
 #include "Token.h"
 
+#include <mutex>
+
 namespace mx {
 
 class TokenReader;
@@ -16,6 +18,7 @@ using FileLocationVector = std::vector<std::pair<unsigned, unsigned>>;
 
 class FileLocationCacheImpl {
  public:
+  std::mutex lock;
   const FileLocationConfiguration config;
   std::unordered_map<FileId, FileLocationVector> cache;
 

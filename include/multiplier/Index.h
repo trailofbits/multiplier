@@ -79,7 +79,7 @@ class EntityProvider {
   static Ptr from_socket(std::filesystem::path path);
 
   // Create an in-memory caching entity provider.
-  static Ptr in_memory_cache(Ptr next);
+  static Ptr in_memory_cache(Ptr next, unsigned timeout_s=1u);
 
  private:
   friend class CachingEntityProvider;

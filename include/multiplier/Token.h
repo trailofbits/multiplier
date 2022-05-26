@@ -192,6 +192,10 @@ class TokenRange {
 
   TokenRange(const Token &);
 
+  inline operator bool(void) const noexcept {
+    return num_tokens && (num_tokens - index);
+  }
+
   // Return the number of tokens in this token list.
   inline size_t size(void) const noexcept {
     return num_tokens - index;

@@ -209,13 +209,14 @@ void CachingEntityProvider::FillReferences(
 }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.
-EntityProvider::Ptr EntityProvider::in_memory_cache(Ptr next) {
+EntityProvider::Ptr EntityProvider::in_memory_cache(
+    Ptr next, unsigned timeout_s_) {
   auto ret = std::make_shared<CachingEntityProvider>(std::move(next));
 
   // Run a reclaimer thread that will extend the lifetimes of entities in
   // the cache.
   std::thread reclaimer_thread(
-      [] (std::weak_ptr<CachingEntityProvider> weak_self) {
+      [] (std::weak_ptr<CachingEntityProvider> weak_self, unsigned timeout_s) {
         std::vector<std::shared_ptr<const void>> next_entities;
         while (true) {
           
@@ -240,10 +241,11 @@ EntityProvider::Ptr EntityProvider::in_memory_cache(Ptr next) {
           } while (false);
 
           using namespace std::chrono_literals;
-          std::this_thread::sleep_for(1000ms);
+          std::this_thread::sleep_for(1s * timeout_s);
         }
       },
-      ret);
+      ret,
+      timeout_s_);
   reclaimer_thread.detach();
   return ret;
 }

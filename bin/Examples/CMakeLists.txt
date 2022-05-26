@@ -6,6 +6,17 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
+add_library("mx-example-index" STATIC
+  "Index.h"
+  "Index.cpp"
+)
+
+target_link_libraries("mx-example-index"
+  PUBLIC
+    "mx-api"
+    glog::glog
+    gflags::gflags
+)
 
 function(define_example exe_name source_file)
   add_executable("${exe_name}"
@@ -14,9 +25,7 @@ function(define_example exe_name source_file)
   
   target_link_libraries("${exe_name}"
     PRIVATE
-      "mx-api"
-      glog::glog
-      gflags::gflags
+      "mx-example-index"
   )
   
   add_executable("${PROJECT_NAME}::${exe_name}" ALIAS "${exe_name}")

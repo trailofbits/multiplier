@@ -174,6 +174,12 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Expr", "IsBoundMemberFunction"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsModifiableLvalue"},  // Calls `clang::Expr::ClassifyImpl`.
 
+  // Internally can call all sorts of stuff, e.g. `InitListExpr::isTransparent`.
+  {"Expr", "IsCXX11ConstantExpression"},
+  {"Expr", "EvaluateAsRValue"},
+  {"Expr", "IsEvaluatable"},
+  {"Expr", "AsBuiltinConstantDeclarationReference"},
+
   // These are methods that we just don't want, e.g. they don't provide
   // relevant info.
   {"Decl", "GlobalID"},  // Related to loading from an AST file.
@@ -1750,6 +1756,9 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("most_recent_declaration");  // Disable this.
       seen_methods->emplace("most_recent_cxx_record_declaration");  // Disable this.
       seen_methods->emplace("next_class_category_raw");  // Disable this.
+      seen_methods->emplace("begin_token");  // Disable this.
+      seen_methods->emplace("end_token");  // Disable this.
+      seen_methods->emplace("previous_declaration");  // Disable this.
 
     } else if (class_name == "Stmt") {
       include_h_os
@@ -1769,6 +1778,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
+          
+      seen_methods->emplace("begin_token");  // Disable this.
+      seen_methods->emplace("end_token");  // Disable this.
 
     } else if (class_name == "Type") {
       include_h_os

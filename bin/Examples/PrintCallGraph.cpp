@@ -4,18 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <iostream>
-#include <map>
-#include <multiplier/Index.h>
-#include <sstream>
 #include <unordered_set>
 
-DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+#include "Index.h"
+
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the call hierarchy of");
 
 static std::map<std::pair<mx::RawEntityId, mx::RawEntityId>, unsigned>
@@ -107,14 +101,7 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  if (FLAGS_help) {
-    std::cerr << google::ProgramUsage() << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  mx::Index index(
-      mx::EntityProvider::in_memory_cache(
-          mx::EntityProvider::from_remote(FLAGS_host, FLAGS_port)));
+  mx::Index index = InitExample();
 
   std::cout
       << "digraph {\n"

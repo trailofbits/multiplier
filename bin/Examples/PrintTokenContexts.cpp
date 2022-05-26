@@ -5,19 +5,13 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <cassert>
-#include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <iostream>
-#include <multiplier/Index.h>
 #include <sstream>
-#include <unordered_map>
 
-DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+#include "Index.h"
+
 DEFINE_uint64(fragment_id, 0, "ID of the fragment to print");
-
 
 static std::string TokData(mx::Token tok) {
   std::stringstream ss;
@@ -45,13 +39,8 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  if (FLAGS_help) {
-    std::cerr << google::ProgramUsage() << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index = InitExample();
+  
   auto fragment = index.fragment(FLAGS_fragment_id);
   if (!fragment) {
     std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;

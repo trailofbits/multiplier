@@ -73,6 +73,7 @@ enum class VectorTypeVectorKind : unsigned;
 enum class ASTDumpOutputFormat : unsigned;
 enum class AccessSpecifier : unsigned;
 enum class AddrSpaceMapMangling : unsigned;
+enum class AlignRequirementKind : int;
 enum class AllocatorTypeTy : unsigned;
 enum class AltivecSrcCompatKind : int;
 enum class ArgumentKind : unsigned;
@@ -98,6 +99,7 @@ enum class ConstexprSpecKind : int;
 enum class ConsumedState : unsigned;
 enum class ConventionKind : unsigned;
 enum class CoreFoundationABI : int;
+enum class DataPositionTy : unsigned long;
 enum class DefaultArgKind : unsigned;
 enum class DefaultCallingConvention : unsigned;
 enum class DevTypeTy : unsigned;
@@ -127,13 +129,16 @@ enum class GetBuiltinTypeError : unsigned;
 enum class GuardArg : unsigned;
 enum class ID : unsigned;
 enum class IdentifierInfoFlag : unsigned;
+enum class IfStatementKind : unsigned;
 enum class ImbueAttribute : int;
 enum class ImplicitReason : unsigned;
 enum class InClassInitStyle : unsigned;
 enum class InheritedDesignatedInitializersState : unsigned;
 enum class InitStorageKind : unsigned;
+enum class InlineAsmDialectKind : unsigned;
 enum class InlineVariableDefinitionKind : int;
 enum class InliningMethod : unsigned;
+enum class InteropType : unsigned;
 enum class InterruptType : unsigned;
 enum class Kinds : unsigned;
 enum class LambdaCaptureDefault : unsigned;
@@ -172,7 +177,9 @@ enum class ObjCSubstitutionContext : int;
 enum class ObjCTypeParamVariance : unsigned char;
 enum class OnOffSwitch : unsigned;
 enum class OnStackType : unsigned;
+enum class OpenMPAdjustArgsOpKind : unsigned;
 enum class OpenMPAtomicDefaultMemOrderClauseKind : unsigned;
+enum class OpenMPBindClauseKind : unsigned;
 enum class OpenMPDefaultmapClauseKind : unsigned;
 enum class OpenMPDefaultmapClauseModifier : unsigned;
 enum class OpenMPDependClauseKind : unsigned;
@@ -202,6 +209,7 @@ enum class PragmaMSPointersToMembersKind : unsigned;
 enum class PragmaMSStructKind : unsigned;
 enum class PragmaSectionFlag : unsigned;
 enum class ProfileInstrKind : unsigned;
+enum class Qualified : int;
 enum class RangeExprOffset : int;
 enum class RangeLocOffset : int;
 enum class RefQualifierKind : unsigned;
@@ -225,6 +233,7 @@ enum class StoredSpecifierKind : unsigned;
 enum class StructReturnConventionKind : unsigned;
 enum class SubExpr : unsigned;
 enum class SubStmt : unsigned;
+enum class SwiftAsyncFramePointerKind : int;
 enum class SyncScope : int;
 enum class Syntax : unsigned;
 enum class TLSModel : unsigned;
@@ -412,6 +421,7 @@ enum class AtomicExprAtomicOp : unsigned char {
   C11_ATOMIC_FETCH_AND,
   C11_ATOMIC_FETCH_OR,
   C11_ATOMIC_FETCH_XOR,
+  C11_ATOMIC_FETCH_NAND,
   C11_ATOMIC_FETCH_MAX,
   C11_ATOMIC_FETCH_MIN,
   ATOMIC_LOAD,
@@ -451,6 +461,17 @@ enum class AtomicExprAtomicOp : unsigned char {
   OPENCL_ATOMIC_FETCH_MAX,
   ATOMIC_FETCH_MIN,
   ATOMIC_FETCH_MAX,
+  HIP_ATOMIC_LOAD,
+  HIP_ATOMIC_STORE,
+  HIP_ATOMIC_COMPARE_EXCHANGE_WEAK,
+  HIP_ATOMIC_COMPARE_EXCHANGE_STRONG,
+  HIP_ATOMIC_EXCHANGE,
+  HIP_ATOMIC_FETCH_ADD,
+  HIP_ATOMIC_FETCH_AND,
+  HIP_ATOMIC_FETCH_OR,
+  HIP_ATOMIC_FETCH_XOR,
+  HIP_ATOMIC_FETCH_MIN,
+  HIP_ATOMIC_FETCH_MAX,
 };
 
 AtomicExprAtomicOp FromPasta(pasta::AtomicExprAtomicOp pasta_val);
@@ -460,7 +481,7 @@ inline static const char *EnumerationName(AtomicExprAtomicOp) {
 }
 
 inline static constexpr unsigned NumEnumerators(AtomicExprAtomicOp) {
-  return 50;
+  return 62;
 }
 
 const char *EnumeratorName(AtomicExprAtomicOp);
@@ -683,6 +704,7 @@ enum class BuiltinTypeKind : unsigned char {
   FLOAT16,
   B_FLOAT16,
   FLOAT128,
+  IBM128,
   NULL_POINTER,
   OBJ_C_ID,
   OBJ_C_CLASS,
@@ -712,7 +734,7 @@ inline static const char *EnumerationName(BuiltinTypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(BuiltinTypeKind) {
-  return 237;
+  return 238;
 }
 
 const char *EnumeratorName(BuiltinTypeKind);
@@ -1442,6 +1464,7 @@ enum class StmtKind : unsigned char {
   OMP_DISTRIBUTE_SIMD_DIRECTIVE,
   OMP_FOR_DIRECTIVE,
   OMP_FOR_SIMD_DIRECTIVE,
+  OMP_GENERIC_LOOP_DIRECTIVE,
   OMP_MASTER_TASK_LOOP_DIRECTIVE,
   OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE,
   OMP_PARALLEL_FOR_DIRECTIVE,
@@ -1465,6 +1488,7 @@ enum class StmtKind : unsigned char {
   OMP_UNROLL_DIRECTIVE,
   OMP_MASKED_DIRECTIVE,
   OMP_MASTER_DIRECTIVE,
+  OMP_META_DIRECTIVE,
   OMP_ORDERED_DIRECTIVE,
   OMP_PARALLEL_DIRECTIVE,
   OMP_PARALLEL_MASTER_DIRECTIVE,
@@ -1636,7 +1660,7 @@ inline static const char *EnumerationName(StmtKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(StmtKind) {
-  return 220;
+  return 222;
 }
 
 const char *EnumeratorName(StmtKind);
@@ -1719,6 +1743,7 @@ enum class TypeKind : unsigned char {
   VARIABLE_ARRAY,
   ATOMIC,
   ATTRIBUTED,
+  BIT_INT,
   BLOCK_POINTER,
   BUILTIN,
   COMPLEX,
@@ -1726,13 +1751,12 @@ enum class TypeKind : unsigned char {
   AUTO,
   DEDUCED_TEMPLATE_SPECIALIZATION,
   DEPENDENT_ADDRESS_SPACE,
-  DEPENDENT_EXT_INT,
+  DEPENDENT_BIT_INT,
   DEPENDENT_NAME,
   DEPENDENT_SIZED_EXT_VECTOR,
   DEPENDENT_TEMPLATE_SPECIALIZATION,
   DEPENDENT_VECTOR,
   ELABORATED,
-  EXT_INT,
   FUNCTION_NO_PROTO,
   FUNCTION_PROTO,
   INJECTED_CLASS_NAME,
@@ -1761,6 +1785,7 @@ enum class TypeKind : unsigned char {
   TYPEDEF,
   UNARY_TRANSFORM,
   UNRESOLVED_USING,
+  USING,
   VECTOR,
   EXT_VECTOR,
 };
@@ -1772,7 +1797,7 @@ inline static const char *EnumerationName(TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeKind) {
-  return 52;
+  return 53;
 }
 
 const char *EnumeratorName(TypeKind);
@@ -1945,6 +1970,25 @@ inline static constexpr unsigned NumEnumerators(AddrSpaceMapMangling) {
 
 const char *EnumeratorName(AddrSpaceMapMangling);
 
+enum class AlignRequirementKind : unsigned char {
+  NONE,
+  REQUIRED_BY_TYPEDEF,
+  REQUIRED_BY_RECORD,
+  REQUIRED_BY_ENUM,
+};
+
+AlignRequirementKind FromPasta(pasta::AlignRequirementKind pasta_val);
+
+inline static const char *EnumerationName(AlignRequirementKind) {
+  return "AlignRequirementKind";
+}
+
+inline static constexpr unsigned NumEnumerators(AlignRequirementKind) {
+  return 4;
+}
+
+const char *EnumeratorName(AlignRequirementKind);
+
 enum class AllocatorTypeTy : unsigned char {
   OMP_NULL_MEMORY_ALLOC,
   OMP_DEFAULT_MEMORY_ALLOC,
@@ -2039,6 +2083,7 @@ const char *EnumeratorName(ArrayTypeTrait);
 enum class AtomicScopeModelKind : unsigned char {
   NONE,
   OPEN_CL,
+  HIP,
 };
 
 AtomicScopeModelKind FromPasta(pasta::AtomicScopeModelKind pasta_val);
@@ -2048,7 +2093,7 @@ inline static const char *EnumerationName(AtomicScopeModelKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(AtomicScopeModelKind) {
-  return 2;
+  return 3;
 }
 
 const char *EnumeratorName(AtomicScopeModelKind);
@@ -2056,6 +2101,7 @@ const char *EnumeratorName(AtomicScopeModelKind);
 enum class AttributeKind : unsigned short {
   ADDRESS_SPACE,
   ARM_MVE_STRICT_POLYMORPHISM,
+  BTF_TYPE_TAG,
   CMSE_NS_CALL,
   NO_DEREF,
   OBJ_CGC,
@@ -2149,6 +2195,7 @@ enum class AttributeKind : unsigned short {
   ASSUMPTION,
   AVAILABILITY,
   BPF_PRESERVE_ACCESS_INDEX,
+  BTF_DECL_TAG,
   BLOCKS,
   BUILTIN,
   C11_NO_RETURN,
@@ -2192,13 +2239,16 @@ enum class AttributeKind : unsigned short {
   DLL_IMPORT_STATIC_LOCAL,
   DEPRECATED,
   DESTRUCTOR,
+  DIAGNOSE_AS_BUILTIN,
   DIAGNOSE_IF,
+  DISABLE_SANITIZER_INSTRUMENTATION,
   DISABLE_TAIL_CALLS,
   EMPTY_BASES,
   ENABLE_IF,
   ENFORCE_TCB,
   ENFORCE_TCB_LEAF,
   ENUM_EXTENSIBILITY,
+  ERROR,
   EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
   EXCLUSIVE_TRYLOCK_FUNCTION,
   EXTERNAL_SOURCE_SYMBOL,
@@ -2318,6 +2368,7 @@ enum class AttributeKind : unsigned short {
   RETURNS_NON_NULL,
   RETURNS_TWICE,
   SYCL_KERNEL,
+  SYCL_SPECIAL_CLASS,
   SCOPED_LOCKABLE,
   SECTION,
   SELECT_ANY,
@@ -2339,6 +2390,7 @@ enum class AttributeKind : unsigned short {
   SWIFT_PRIVATE,
   TLS_MODEL,
   TARGET,
+  TARGET_CLONES,
   TEST_TYPESTATE,
   TRANSPARENT_UNION,
   TRIVIAL_ABI,
@@ -2404,7 +2456,7 @@ inline static const char *EnumerationName(AttributeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(AttributeKind) {
-  return 341;
+  return 348;
 }
 
 const char *EnumeratorName(AttributeKind);
@@ -2882,6 +2934,25 @@ inline static constexpr unsigned NumEnumerators(CoreFoundationABI) {
 }
 
 const char *EnumeratorName(CoreFoundationABI);
+
+enum class DataPositionTy : unsigned char {
+  POSX,
+  POSV,
+  POSE,
+  POS_UPDATE_EXPRESSION,
+};
+
+DataPositionTy FromPasta(pasta::DataPositionTy pasta_val);
+
+inline static const char *EnumerationName(DataPositionTy) {
+  return "DataPositionTy";
+}
+
+inline static constexpr unsigned NumEnumerators(DataPositionTy) {
+  return 4;
+}
+
+const char *EnumeratorName(DataPositionTy);
 
 enum class DefaultArgKind : unsigned char {
   NONE,
@@ -3445,6 +3516,25 @@ inline static constexpr unsigned NumEnumerators(IdentifierInfoFlag) {
 
 const char *EnumeratorName(IdentifierInfoFlag);
 
+enum class IfStatementKind : unsigned char {
+  ORDINARY,
+  CONSTEXPR,
+  CONSTEVAL_NON_NEGATED,
+  CONSTEVAL_NEGATED,
+};
+
+IfStatementKind FromPasta(pasta::IfStatementKind pasta_val);
+
+inline static const char *EnumerationName(IfStatementKind) {
+  return "IfStatementKind";
+}
+
+inline static constexpr unsigned NumEnumerators(IfStatementKind) {
+  return 4;
+}
+
+const char *EnumeratorName(IfStatementKind);
+
 enum class ImbueAttribute : unsigned char {
   NONE,
   ALWAYS,
@@ -3540,6 +3630,23 @@ inline static constexpr unsigned NumEnumerators(InitStorageKind) {
 
 const char *EnumeratorName(InitStorageKind);
 
+enum class InlineAsmDialectKind : unsigned char {
+  IADATT,
+  IAD_INTEL,
+};
+
+InlineAsmDialectKind FromPasta(pasta::InlineAsmDialectKind pasta_val);
+
+inline static const char *EnumerationName(InlineAsmDialectKind) {
+  return "InlineAsmDialectKind";
+}
+
+inline static constexpr unsigned NumEnumerators(InlineAsmDialectKind) {
+  return 2;
+}
+
+const char *EnumeratorName(InlineAsmDialectKind);
+
 enum class InlineVariableDefinitionKind : unsigned char {
   NONE,
   WEAK,
@@ -3576,6 +3683,24 @@ inline static constexpr unsigned NumEnumerators(InliningMethod) {
 }
 
 const char *EnumeratorName(InliningMethod);
+
+enum class InteropType : unsigned char {
+  TARGET,
+  TARGET_SYNC,
+  TARGET_TARGET_SYNC,
+};
+
+InteropType FromPasta(pasta::InteropType pasta_val);
+
+inline static const char *EnumerationName(InteropType) {
+  return "InteropType";
+}
+
+inline static constexpr unsigned NumEnumerators(InteropType) {
+  return 3;
+}
+
+const char *EnumeratorName(InteropType);
 
 enum class InterruptType : unsigned char {
   IRQ,
@@ -3884,6 +4009,7 @@ enum class MSVCMajorVersion : unsigned char {
   MSVC20175,
   MSVC20177,
   MSVC2019,
+  MSVC20195,
   MSVC20198,
 };
 
@@ -3894,7 +4020,7 @@ inline static const char *EnumerationName(MSVCMajorVersion) {
 }
 
 inline static constexpr unsigned NumEnumerators(MSVCMajorVersion) {
-  return 9;
+  return 10;
 }
 
 const char *EnumeratorName(MSVCMajorVersion);
@@ -3983,6 +4109,7 @@ enum class MultiVersionKind : unsigned char {
   TARGET,
   CPU_SPECIFIC,
   CPU_DISPATCH,
+  TARGET_CLONES,
 };
 
 MultiVersionKind FromPasta(pasta::MultiVersionKind pasta_val);
@@ -3992,7 +4119,7 @@ inline static const char *EnumerationName(MultiVersionKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(MultiVersionKind) {
-  return 4;
+  return 5;
 }
 
 const char *EnumeratorName(MultiVersionKind);
@@ -4343,6 +4470,24 @@ inline static constexpr unsigned NumEnumerators(OnStackType) {
 
 const char *EnumeratorName(OnStackType);
 
+enum class OpenMPAdjustArgsOpKind : unsigned char {
+  ADJUSTARGS_NOTHING,
+  ADJUSTARGS_NEED_DEVICE_POINTER,
+  ADJUSTARGS_UNKNOWN,
+};
+
+OpenMPAdjustArgsOpKind FromPasta(pasta::OpenMPAdjustArgsOpKind pasta_val);
+
+inline static const char *EnumerationName(OpenMPAdjustArgsOpKind) {
+  return "OpenMPAdjustArgsOpKind";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenMPAdjustArgsOpKind) {
+  return 3;
+}
+
+const char *EnumeratorName(OpenMPAdjustArgsOpKind);
+
 enum class OpenMPAtomicDefaultMemOrderClauseKind : unsigned char {
   SEQ_CST,
   ACQ_REL,
@@ -4361,6 +4506,25 @@ inline static constexpr unsigned NumEnumerators(OpenMPAtomicDefaultMemOrderClaus
 }
 
 const char *EnumeratorName(OpenMPAtomicDefaultMemOrderClauseKind);
+
+enum class OpenMPBindClauseKind : unsigned char {
+  BIND_TEAMS,
+  BIND_PARALLEL,
+  BIND_THREAD,
+  BIND_UNKNOWN,
+};
+
+OpenMPBindClauseKind FromPasta(pasta::OpenMPBindClauseKind pasta_val);
+
+inline static const char *EnumerationName(OpenMPBindClauseKind) {
+  return "OpenMPBindClauseKind";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenMPBindClauseKind) {
+  return 4;
+}
+
+const char *EnumeratorName(OpenMPBindClauseKind);
 
 enum class OpenMPDefaultmapClauseKind : unsigned char {
   SCALAR,
@@ -4545,6 +4709,7 @@ enum class OpenMPMapModifierKind : unsigned char {
   CLOSE,
   MAPPER,
   PRESENT,
+  OMPX_HOLD,
 };
 
 OpenMPMapModifierKind FromPasta(pasta::OpenMPMapModifierKind pasta_val);
@@ -4554,7 +4719,7 @@ inline static const char *EnumerationName(OpenMPMapModifierKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(OpenMPMapModifierKind) {
-  return 5;
+  return 6;
 }
 
 const char *EnumeratorName(OpenMPMapModifierKind);
@@ -4951,6 +5116,24 @@ inline static constexpr unsigned NumEnumerators(ProfileInstrKind) {
 
 const char *EnumeratorName(ProfileInstrKind);
 
+enum class Qualified : unsigned char {
+  NONE,
+  AS_WRITTEN,
+  FULLY,
+};
+
+Qualified FromPasta(pasta::Qualified pasta_val);
+
+inline static const char *EnumerationName(Qualified) {
+  return "Qualified";
+}
+
+inline static constexpr unsigned NumEnumerators(Qualified) {
+  return 3;
+}
+
+const char *EnumeratorName(Qualified);
+
 enum class RangeExprOffset : unsigned char {
   BEGIN,
   END,
@@ -5030,6 +5213,7 @@ const char *EnumeratorName(RemarkKind);
 enum class ReservedIdentifierStatus : unsigned char {
   NOT_RESERVED,
   STARTS_WITH_UNDERSCORE_AT_GLOBAL_SCOPE,
+  STARTS_WITH_UNDERSCORE_AND_IS_EXTERN_C,
   STARTS_WITH_DOUBLE_UNDERSCORE,
   STARTS_WITH_UNDERSCORE_FOLLOWED_BY_CAPITAL_LETTER,
   CONTAINS_DOUBLE_UNDERSCORE,
@@ -5042,7 +5226,7 @@ inline static const char *EnumerationName(ReservedIdentifierStatus) {
 }
 
 inline static constexpr unsigned NumEnumerators(ReservedIdentifierStatus) {
-  return 5;
+  return 6;
 }
 
 const char *EnumeratorName(ReservedIdentifierStatus);
@@ -5469,7 +5653,31 @@ inline static constexpr unsigned NumEnumerators(SubStmt) {
 
 const char *EnumeratorName(SubStmt);
 
+enum class SwiftAsyncFramePointerKind : unsigned char {
+  AUTO,
+  ALWAYS,
+  NEVER,
+  // Skipped repeat pasta::kDefault
+};
+
+SwiftAsyncFramePointerKind FromPasta(pasta::SwiftAsyncFramePointerKind pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncFramePointerKind) {
+  return "SwiftAsyncFramePointerKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncFramePointerKind) {
+  return 3;
+}
+
+const char *EnumeratorName(SwiftAsyncFramePointerKind);
+
 enum class SyncScope : unsigned char {
+  HIP_SINGLE_THREAD,
+  HIP_WAVEFRONT,
+  HIP_WORKGROUP,
+  HIP_AGENT,
+  HIP_SYSTEM,
   OPEN_CL_WORK_GROUP,
   OPEN_CL_DEVICE,
   OPEN_CL_ALL_SVM_DEVICES,
@@ -5483,7 +5691,7 @@ inline static const char *EnumerationName(SyncScope) {
 }
 
 inline static constexpr unsigned NumEnumerators(SyncScope) {
-  return 4;
+  return 9;
 }
 
 const char *EnumeratorName(SyncScope);
@@ -5801,6 +6009,7 @@ enum class TokenKind : unsigned short {
   KEYWORD_INLINE,
   KEYWORD_INT,
   KEYWORD__EXT_INT,
+  KEYWORD__BIT_INT,
   KEYWORD_LONG,
   KEYWORD_REGISTER,
   KEYWORD_RESTRICT,
@@ -5900,6 +6109,7 @@ enum class TokenKind : unsigned short {
   KEYWORD___BUILTIN_VA_ARGUMENT,
   KEYWORD___EXTENSION__,
   KEYWORD___FLOAT128,
+  KEYWORD___IBM128,
   KEYWORD___IMAG,
   KEYWORD___INT128,
   KEYWORD___LABEL__,
@@ -6079,6 +6289,7 @@ enum class TokenKind : unsigned short {
   ANNOT_PRAGMA_REDEFINE_EXTNAME,
   ANNOT_PRAGMA_FP_CONTRACT,
   ANNOT_PRAGMA_FENV_ACCESS,
+  ANNOT_PRAGMA_FENV_ACCESS_MS,
   ANNOT_PRAGMA_FENV_ROUND,
   ANNOT_PRAGMA_FLOAT_CONTROL,
   ANNOT_PRAGMA_MS_POINTERS_TO_MEMBERS,
@@ -6159,7 +6370,7 @@ inline static const char *EnumerationName(TokenKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenKind) {
-  return 444;
+  return 447;
 }
 
 const char *EnumeratorName(TokenKind);
@@ -6250,6 +6461,7 @@ enum class TypeLocClass : unsigned char {
   VARIABLE_ARRAY,
   ATOMIC,
   ATTRIBUTED,
+  BIT_INT,
   BLOCK_POINTER,
   BUILTIN,
   COMPLEX,
@@ -6257,13 +6469,12 @@ enum class TypeLocClass : unsigned char {
   AUTO,
   DEDUCED_TEMPLATE_SPECIALIZATION,
   DEPENDENT_ADDRESS_SPACE,
-  DEPENDENT_EXT_INT,
+  DEPENDENT_BIT_INT,
   DEPENDENT_NAME,
   DEPENDENT_SIZED_EXT_VECTOR,
   DEPENDENT_TEMPLATE_SPECIALIZATION,
   DEPENDENT_VECTOR,
   ELABORATED,
-  EXT_INT,
   FUNCTION_NO_PROTO,
   FUNCTION_PROTO,
   INJECTED_CLASS_NAME,
@@ -6292,6 +6503,7 @@ enum class TypeLocClass : unsigned char {
   TYPEDEF,
   UNARY_TRANSFORM,
   UNRESOLVED_USING,
+  USING,
   VECTOR,
   EXT_VECTOR,
   QUALIFIED,
@@ -6304,7 +6516,7 @@ inline static const char *EnumerationName(TypeLocClass) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeLocClass) {
-  return 53;
+  return 54;
 }
 
 const char *EnumeratorName(TypeLocClass);
@@ -6337,7 +6549,7 @@ enum class TypeSpecifierType : unsigned char {
   CHAR32,
   INT,
   INT128,
-  EXTINT,
+  BITINT,
   HALF,
   FLOAT16,
   ACCUM,
@@ -6346,6 +6558,7 @@ enum class TypeSpecifierType : unsigned char {
   FLOAT,
   DOUBLE,
   FLOAT128,
+  IBM128,
   BOOLEAN,
   DECIMAL32,
   DECIMAL64,
@@ -6387,7 +6600,7 @@ inline static const char *EnumerationName(TypeSpecifierType) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeSpecifierType) {
-  return 50;
+  return 51;
 }
 
 const char *EnumeratorName(TypeSpecifierType);
@@ -6918,10 +7131,12 @@ class OMPInteropDirective;
 class OMPIteratorExpr;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
+class OMPLoopTransformationDirective;
 class OMPMaskedDirective;
 class OMPMasterDirective;
 class OMPMasterTaskLoopDirective;
 class OMPMasterTaskLoopSimdDirective;
+class OMPMetaDirective;
 class OMPOrderedDirective;
 class OMPParallelDirective;
 class OMPParallelForDirective;
@@ -7080,6 +7295,7 @@ class OMPDistributeParallelForSimdDirective;
 class OMPDistributeSimdDirective;
 class OMPForDirective;
 class OMPForSimdDirective;
+class OMPGenericLoopDirective;
 class ObjCBridgedCastExpr;
 class UserDefinedLiteral;
 class BuiltinBitCastExpr;
@@ -7101,12 +7317,14 @@ class TypeOfType;
 class TypedefType;
 class UnaryTransformType;
 class UnresolvedUsingType;
+class UsingType;
 class VectorType;
 class TypeWithKeyword;
 class AdjustedType;
 class ArrayType;
 class AtomicType;
 class AttributedType;
+class BitIntType;
 class BlockPointerType;
 class BuiltinType;
 class ComplexType;
@@ -7115,14 +7333,13 @@ class DecayedType;
 class DecltypeType;
 class DeducedType;
 class DependentAddressSpaceType;
-class DependentExtIntType;
+class DependentBitIntType;
 class DependentNameType;
 class DependentSizedArrayType;
 class DependentSizedExtVectorType;
 class DependentTemplateSpecializationType;
 class DependentVectorType;
 class ElaboratedType;
-class ExtIntType;
 class ExtVectorType;
 class FunctionType;
 class IncompleteArrayType;
@@ -7392,7 +7609,7 @@ class Type {
   bool has_sized_vla_type(void) const;
   bool has_unnamed_or_local_type(void) const;
   bool has_unsigned_integer_representation(void) const;
-  bool is_aggregate_type(void) const;
+  std::optional<bool> is_aggregate_type(void) const;
   bool is_align_value_t(void) const;
   bool is_any_character_type(void) const;
   bool is_any_complex_type(void) const;
@@ -7401,6 +7618,7 @@ class Type {
   bool is_array_type(void) const;
   bool is_atomic_type(void) const;
   bool is_b_float16_type(void) const;
+  bool is_bit_int_type(void) const;
   bool is_block_compatible_obj_c_pointer_type(void) const;
   bool is_block_pointer_type(void) const;
   bool is_boolean_type(void) const;
@@ -7428,7 +7646,6 @@ class Type {
   bool is_elaborated_type_specifier(void) const;
   bool is_enumeral_type(void) const;
   bool is_event_t(void) const;
-  bool is_ext_int_type(void) const;
   bool is_ext_vector_type(void) const;
   bool is_fixed_point_or_integer_type(void) const;
   bool is_fixed_point_type(void) const;
@@ -7443,6 +7660,7 @@ class Type {
   bool is_function_type(void) const;
   bool is_fundamental_type(void) const;
   bool is_half_type(void) const;
+  bool is_ibm128_type(void) const;
   bool is_image_type(void) const;
   bool is_incomplete_array_type(void) const;
   bool is_incomplete_or_object_type(void) const;
@@ -7663,7 +7881,7 @@ class TemplateTypeParmType : public Type {
   }
 
   Type desugar(void) const;
-  TemplateTypeParmDecl declaration(void) const;
+  std::optional<TemplateTypeParmDecl> declaration(void) const;
   bool is_parameter_pack(void) const;
   bool is_sugared(void) const;
 };
@@ -7699,7 +7917,7 @@ class TemplateSpecializationType : public Type {
   }
 
   Type desugar(void) const;
-  Type aliased_type(void) const;
+  std::optional<Type> aliased_type(void) const;
   bool is_current_instantiation(void) const;
   bool is_sugared(void) const;
   bool is_type_alias(void) const;
@@ -8650,7 +8868,7 @@ class FunctionProtoType : public FunctionType {
     }
   }
 
-  CanThrowResult can_throw(void) const;
+  std::optional<CanThrowResult> can_throw(void) const;
   Type desugar(void) const;
   std::vector<Type> exceptions(void) const;
   Token ellipsis_token(void) const;
@@ -8667,7 +8885,7 @@ class FunctionProtoType : public FunctionType {
   bool has_instantiation_dependent_exception_spec(void) const;
   bool has_noexcept_exception_spec(void) const;
   bool has_trailing_return(void) const;
-  bool is_nothrow(void) const;
+  std::optional<bool> is_nothrow(void) const;
   bool is_sugared(void) const;
   bool is_template_variadic(void) const;
   bool is_variadic(void) const;
@@ -8717,42 +8935,6 @@ class FunctionNoProtoType : public FunctionType {
 
   Type desugar(void) const;
   bool is_sugared(void) const;
-};
-
-using ExtIntTypeRange = DerivedEntityRange<TypeIterator, ExtIntType>;
-using ExtIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExtIntType>;
-class ExtIntType : public Type {
- private:
-  friend class FragmentImpl;
-  friend class Type;
- public:
-  inline static ExtIntTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
-  }
-
-  inline static ExtIntTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
-  }
-
-  inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::EXT_INT;
-  }
-
-  static std::optional<ExtIntType> from(const TokenContext &c);
-  static std::optional<ExtIntType> from(const Type &parent);
-
-  inline static std::optional<ExtIntType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ExtIntType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  Type desugar(void) const;
-  bool is_signed(void) const;
-  bool is_sugared(void) const;
-  bool is_unsigned(void) const;
 };
 
 using DependentVectorTypeRange = DerivedEntityRange<TypeIterator, DependentVectorType>;
@@ -8830,31 +9012,31 @@ class DependentSizedExtVectorType : public Type {
   bool is_sugared(void) const;
 };
 
-using DependentExtIntTypeRange = DerivedEntityRange<TypeIterator, DependentExtIntType>;
-using DependentExtIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentExtIntType>;
-class DependentExtIntType : public Type {
+using DependentBitIntTypeRange = DerivedEntityRange<TypeIterator, DependentBitIntType>;
+using DependentBitIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentBitIntType>;
+class DependentBitIntType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static DependentExtIntTypeRange in(const Fragment &frag) {
+  inline static DependentBitIntTypeRange in(const Fragment &frag) {
     return in_internal(frag);
   }
 
-  inline static DependentExtIntTypeContainingTokenRange containing(const Token &tok) {
+  inline static DependentBitIntTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
   inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::DEPENDENT_EXT_INT;
+    return TypeKind::DEPENDENT_BIT_INT;
   }
 
-  static std::optional<DependentExtIntType> from(const TokenContext &c);
-  static std::optional<DependentExtIntType> from(const Type &parent);
+  static std::optional<DependentBitIntType> from(const TokenContext &c);
+  static std::optional<DependentBitIntType> from(const Type &parent);
 
-  inline static std::optional<DependentExtIntType> from(const std::optional<Type> &parent) {
+  inline static std::optional<DependentBitIntType> from(const std::optional<Type> &parent) {
     if (parent) {
-      return DependentExtIntType::from(parent.value());
+      return DependentBitIntType::from(parent.value());
     } else {
       return std::nullopt;
     }
@@ -8930,7 +9112,7 @@ class DeducedType : public Type {
   }
 
   Type desugar(void) const;
-  Type resolved_type(void) const;
+  std::optional<Type> resolved_type(void) const;
   bool is_deduced(void) const;
   bool is_sugared(void) const;
 };
@@ -9021,7 +9203,7 @@ class AutoType : public DeducedType {
 
   AutoTypeKeyword keyword(void) const;
   std::vector<TemplateArgument> type_constraint_arguments(void) const;
-  ConceptDecl type_constraint_concept(void) const;
+  std::optional<ConceptDecl> type_constraint_concept(void) const;
   bool is_constrained(void) const;
   bool is_decltype_auto(void) const;
 };
@@ -9168,6 +9350,42 @@ class BlockPointerType : public Type {
 
   Type desugar(void) const;
   bool is_sugared(void) const;
+};
+
+using BitIntTypeRange = DerivedEntityRange<TypeIterator, BitIntType>;
+using BitIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, BitIntType>;
+class BitIntType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static BitIntTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BitIntTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::BIT_INT;
+  }
+
+  static std::optional<BitIntType> from(const TokenContext &c);
+  static std::optional<BitIntType> from(const Type &parent);
+
+  inline static std::optional<BitIntType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return BitIntType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Type desugar(void) const;
+  bool is_signed(void) const;
+  bool is_sugared(void) const;
+  bool is_unsigned(void) const;
 };
 
 using AttributedTypeRange = DerivedEntityRange<TypeIterator, AttributedType>;
@@ -9790,6 +10008,42 @@ class ExtVectorType : public VectorType {
 
 };
 
+using UsingTypeRange = DerivedEntityRange<TypeIterator, UsingType>;
+using UsingTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingType>;
+class UsingType : public Type {
+ private:
+  friend class FragmentImpl;
+  friend class Type;
+ public:
+  inline static UsingTypeRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UsingTypeContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::USING;
+  }
+
+  static std::optional<UsingType> from(const TokenContext &c);
+  static std::optional<UsingType> from(const Type &parent);
+
+  inline static std::optional<UsingType> from(const std::optional<Type> &parent) {
+    if (parent) {
+      return UsingType::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Type desugar(void) const;
+  UsingShadowDecl found_declaration(void) const;
+  Type underlying_type(void) const;
+  bool is_sugared(void) const;
+};
+
 using UnresolvedUsingTypeRange = DerivedEntityRange<TypeIterator, UnresolvedUsingType>;
 using UnresolvedUsingTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingType>;
 class UnresolvedUsingType : public Type {
@@ -10037,8 +10291,6 @@ class Stmt {
 
   Stmt ignore_containers(void) const;
   std::vector<Stmt> children(void) const;
-  Token begin_token(void) const;
-  Token end_token(void) const;
   TokenRange tokens(void) const;
   StmtKind kind(void) const;
   Stmt strip_label_like_statements(void) const;
@@ -11880,6 +12132,55 @@ class OMPOrderedDirective : public OMPExecutableDirective {
 
 };
 
+using OMPMetaDirectiveRange = DerivedEntityRange<StmtIterator, OMPMetaDirective>;
+using OMPMetaDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMetaDirective>;
+using OMPMetaDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPMetaDirective>;
+
+class OMPMetaDirective : public OMPExecutableDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
+ public:
+  inline static OMPMetaDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPMetaDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_META_DIRECTIVE;
+  }
+
+  static OMPMetaDirectiveContainingStmtRange containing(const Decl &decl);
+  static OMPMetaDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  static std::optional<OMPMetaDirective> from(const TokenContext &c);
+  static std::optional<OMPMetaDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPMetaDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPMetaDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPMetaDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPMetaDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPMetaDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Stmt if_statement(void) const;
+};
+
 using OMPMasterDirectiveRange = DerivedEntityRange<StmtIterator, OMPMasterDirective>;
 using OMPMasterDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMasterDirective>;
 using OMPMasterDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPMasterDirective>;
@@ -12020,13 +12321,71 @@ class OMPLoopBasedDirective : public OMPExecutableDirective {
 
 };
 
+using OMPLoopTransformationDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopTransformationDirective>;
+using OMPLoopTransformationDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPLoopTransformationDirective>;
+using OMPLoopTransformationDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPLoopTransformationDirective>;
+
+class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
+ public:
+  inline static OMPLoopTransformationDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPLoopTransformationDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  static OMPLoopTransformationDirectiveContainingStmtRange containing(const Decl &decl);
+  static OMPLoopTransformationDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  static std::optional<OMPLoopTransformationDirective> from(const TokenContext &c);
+  static std::optional<OMPLoopTransformationDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPLoopTransformationDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPLoopTransformationDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPLoopTransformationDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPLoopTransformationDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPLoopTransformationDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPLoopTransformationDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPLoopTransformationDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPLoopTransformationDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Stmt pre_initializers(void) const;
+  Stmt transformed_statement(void) const;
+};
+
 using OMPUnrollDirectiveRange = DerivedEntityRange<StmtIterator, OMPUnrollDirective>;
 using OMPUnrollDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPUnrollDirective>;
 using OMPUnrollDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPUnrollDirective>;
 
-class OMPUnrollDirective : public OMPLoopBasedDirective {
+class OMPUnrollDirective : public OMPLoopTransformationDirective {
  private:
   friend class FragmentImpl;
+  friend class OMPLoopTransformationDirective;
   friend class OMPLoopBasedDirective;
   friend class OMPExecutableDirective;
   friend class Stmt;
@@ -12047,6 +12406,16 @@ class OMPUnrollDirective : public OMPLoopBasedDirective {
   static OMPUnrollDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPUnrollDirective> from(const TokenContext &c);
+  static std::optional<OMPUnrollDirective> from(const OMPLoopTransformationDirective &parent);
+
+  inline static std::optional<OMPUnrollDirective> from(const std::optional<OMPLoopTransformationDirective> &parent) {
+    if (parent) {
+      return OMPUnrollDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPUnrollDirective> from(const OMPLoopBasedDirective &parent);
 
   inline static std::optional<OMPUnrollDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
@@ -12077,17 +12446,16 @@ class OMPUnrollDirective : public OMPLoopBasedDirective {
     }
   }
 
-  Stmt pre_initializers(void) const;
-  Stmt transformed_statement(void) const;
 };
 
 using OMPTileDirectiveRange = DerivedEntityRange<StmtIterator, OMPTileDirective>;
 using OMPTileDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTileDirective>;
 using OMPTileDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTileDirective>;
 
-class OMPTileDirective : public OMPLoopBasedDirective {
+class OMPTileDirective : public OMPLoopTransformationDirective {
  private:
   friend class FragmentImpl;
+  friend class OMPLoopTransformationDirective;
   friend class OMPLoopBasedDirective;
   friend class OMPExecutableDirective;
   friend class Stmt;
@@ -12108,6 +12476,16 @@ class OMPTileDirective : public OMPLoopBasedDirective {
   static OMPTileDirectiveContainingStmtRange containing(const Stmt &stmt);
 
   static std::optional<OMPTileDirective> from(const TokenContext &c);
+  static std::optional<OMPTileDirective> from(const OMPLoopTransformationDirective &parent);
+
+  inline static std::optional<OMPTileDirective> from(const std::optional<OMPLoopTransformationDirective> &parent) {
+    if (parent) {
+      return OMPTileDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<OMPTileDirective> from(const OMPLoopBasedDirective &parent);
 
   inline static std::optional<OMPTileDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
@@ -12138,8 +12516,6 @@ class OMPTileDirective : public OMPLoopBasedDirective {
     }
   }
 
-  Stmt pre_initializers(void) const;
-  Stmt transformed_statement(void) const;
 };
 
 using OMPLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopDirective>;
@@ -12233,6 +12609,76 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   std::vector<Expr> initializers(void) const;
   std::vector<Expr> private_counters(void) const;
   std::vector<Expr> updates(void) const;
+};
+
+using OMPGenericLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPGenericLoopDirective>;
+using OMPGenericLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPGenericLoopDirective>;
+using OMPGenericLoopDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPGenericLoopDirective>;
+
+class OMPGenericLoopDirective : public OMPLoopDirective {
+ private:
+  friend class FragmentImpl;
+  friend class OMPLoopDirective;
+  friend class OMPLoopBasedDirective;
+  friend class OMPExecutableDirective;
+  friend class Stmt;
+ public:
+  inline static OMPGenericLoopDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPGenericLoopDirectiveContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline static constexpr StmtKind static_kind(void) {
+    return StmtKind::OMP_GENERIC_LOOP_DIRECTIVE;
+  }
+
+  static OMPGenericLoopDirectiveContainingStmtRange containing(const Decl &decl);
+  static OMPGenericLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  static std::optional<OMPGenericLoopDirective> from(const TokenContext &c);
+  static std::optional<OMPGenericLoopDirective> from(const OMPLoopDirective &parent);
+
+  inline static std::optional<OMPGenericLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
+    if (parent) {
+      return OMPGenericLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPGenericLoopDirective> from(const OMPLoopBasedDirective &parent);
+
+  inline static std::optional<OMPGenericLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
+    if (parent) {
+      return OMPGenericLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPGenericLoopDirective> from(const OMPExecutableDirective &parent);
+
+  inline static std::optional<OMPGenericLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
+    if (parent) {
+      return OMPGenericLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPGenericLoopDirective> from(const Stmt &parent);
+
+  inline static std::optional<OMPGenericLoopDirective> from(const std::optional<Stmt> &parent) {
+    if (parent) {
+      return OMPGenericLoopDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
 };
 
 using OMPForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPForSimdDirective>;
@@ -14372,11 +14818,15 @@ class IfStmt : public Stmt {
   std::optional<Stmt> initializer(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
+  IfStatementKind statement_kind(void) const;
   Stmt then(void) const;
   bool has_else_storage(void) const;
   bool has_initializer_storage(void) const;
   bool has_variable_storage(void) const;
+  bool is_consteval(void) const;
   bool is_constexpr(void) const;
+  bool is_negated_consteval(void) const;
+  bool is_non_negated_consteval(void) const;
   bool is_obj_c_availability_check(void) const;
 };
 
@@ -15281,13 +15731,11 @@ class Expr : public ValueStmt {
   ExprObjectKind object_kind(void) const;
   std::optional<Decl> referenced_declaration_of_callee(void) const;
   std::optional<FieldDecl> source_bit_field(void) const;
-  Type type(void) const;
+  std::optional<Type> type(void) const;
   ExprValueKind value_kind(void) const;
   bool has_non_trivial_call(void) const;
-  std::optional<bool> is_cxx11_constant_expression(void) const;
   std::optional<bool> is_cxx98_integral_constant_expression(void) const;
   bool is_default_argument(void) const;
-  std::optional<bool> is_evaluatable(void) const;
   bool is_gl_value(void) const;
   bool is_implicit_cxx_this(void) const;
   bool is_instantiation_dependent(void) const;
@@ -18154,7 +18602,7 @@ class CXXPseudoDestructorExpr : public Expr {
   Type destroyed_type(void) const;
   Token destroyed_type_token(void) const;
   Token operator_token(void) const;
-  Type scope_type(void) const;
+  std::optional<Type> scope_type(void) const;
   Token tilde_token(void) const;
   bool has_qualifier(void) const;
   bool is_arrow(void) const;
@@ -18549,7 +18997,7 @@ class CXXDependentScopeMemberExpr : public Expr {
     }
   }
 
-  Expr base(void) const;
+  std::optional<Expr> base(void) const;
   Type base_type(void) const;
   std::optional<NamedDecl> first_qualifier_found_in_scope(void) const;
   Token l_angle_token(void) const;
@@ -21195,7 +21643,7 @@ class OverloadExpr : public Expr {
 
   Token l_angle_token(void) const;
   Token name_token(void) const;
-  CXXRecordDecl naming_class(void) const;
+  std::optional<CXXRecordDecl> naming_class(void) const;
   Token r_angle_token(void) const;
   Token template_keyword_token(void) const;
   bool has_explicit_template_arguments(void) const;
@@ -24284,9 +24732,7 @@ class Decl {
 
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
-  Token begin_token(void) const;
   std::optional<TemplateParameterList> described_template_parameters(void) const;
-  Token end_token(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
   std::optional<FunctionType> function_type(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
@@ -24300,6 +24746,7 @@ class Decl {
   bool is_function_or_function_template(void) const;
   bool is_implicit(void) const;
   bool is_in_anonymous_namespace(void) const;
+  bool is_in_export_declaration_context(void) const;
   bool is_in_local_scope_for_instantiation(void) const;
   bool is_in_std_namespace(void) const;
   bool is_invalid_declaration(void) const;
@@ -26380,15 +26827,15 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   }
 
   bool default_argument_was_inherited(void) const;
-  Expr default_argument(void) const;
+  std::optional<Expr> default_argument(void) const;
   Token default_argument_token(void) const;
-  Expr placeholder_type_constraint(void) const;
+  std::optional<unsigned> num_expansion_types(void) const;
+  std::optional<Expr> placeholder_type_constraint(void) const;
   bool has_default_argument(void) const;
   bool has_placeholder_type_constraint(void) const;
   bool is_expanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
   std::vector<Type> expansion_types(void) const;
-  std::vector<Type> expansion_type_source_infos(void) const;
 };
 
 using MSPropertyDeclRange = DerivedEntityRange<DeclIterator, MSPropertyDecl>;
@@ -26531,6 +26978,7 @@ class FunctionDecl : public DeclaratorDecl {
     }
   }
 
+  bool uses_fp_intrin(void) const;
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
   bool does_this_declaration_have_a_body(void) const;
   Type call_result_type(void) const;
@@ -26592,6 +27040,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_replaceable_global_allocation_function(void) const;
   std::optional<bool> is_reserved_global_placement_operator(void) const;
   bool is_static(void) const;
+  bool is_target_clones_multi_version(void) const;
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
   bool is_definition(void) const;
@@ -26688,8 +27137,8 @@ class CXXMethodDecl : public FunctionDecl {
   }
 
   RefQualifierKind reference_qualifier(void) const;
-  Type this_object_type(void) const;
-  Type this_type(void) const;
+  std::optional<Type> this_object_type(void) const;
+  std::optional<Type> this_type(void) const;
   bool has_inline_body(void) const;
   bool is_const(void) const;
   bool is_copy_assignment_operator(void) const;
@@ -27884,8 +28333,8 @@ class TemplateTypeParmDecl : public TypeDecl {
   }
 
   bool default_argument_was_inherited(void) const;
-  Type default_argument(void) const;
-  Type default_argument_info(void) const;
+  std::optional<Type> default_argument(void) const;
+  std::optional<Type> default_argument_info(void) const;
   Token default_argument_token(void) const;
   bool has_default_argument(void) const;
   bool has_type_constraint(void) const;
@@ -28178,6 +28627,7 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<bool> has_in_class_initializer(void) const;
   std::optional<bool> has_inherited_assignment(void) const;
   std::optional<bool> has_inherited_constructor(void) const;
+  std::optional<bool> has_initializer_method(void) const;
   std::optional<bool> has_irrelevant_destructor(void) const;
   std::optional<bool> has_known_lambda_internal_linkage(void) const;
   std::optional<bool> has_move_assignment(void) const;
@@ -28356,7 +28806,7 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   std::vector<TemplateArgument> template_arguments(void) const;
   std::vector<TemplateArgument> template_instantiation_arguments(void) const;
   Token template_keyword_token(void) const;
-  Type type_as_written(void) const;
+  std::optional<Type> type_as_written(void) const;
   bool is_class_scope_explicit_specialization(void) const;
   bool is_explicit_instantiation_or_specialization(void) const;
   bool is_explicit_specialization(void) const;
@@ -28671,7 +29121,6 @@ class TypedefNameDecl : public TypeDecl {
   }
 
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;
-  Type type(void) const;
   Type underlying_type(void) const;
   bool is_moded(void) const;
   bool is_transparent_tag(void) const;
@@ -29277,7 +29726,7 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
     }
   }
 
-  TypeAliasTemplateDecl instantiated_from_member_template(void) const;
+  std::optional<TypeAliasTemplateDecl> instantiated_from_member_template(void) const;
   TypeAliasDecl templated_declaration(void) const;
 };
 
@@ -29585,6 +30034,7 @@ class ObjCMethodDecl : public NamedDecl {
   TokenRange return_type_source_range(void) const;
   Token selector_start_token(void) const;
   ImplicitParamDecl self_declaration(void) const;
+  bool has_parameter_destroyed_in_callee(void) const;
   bool has_redeclaration(void) const;
   bool has_related_result_type(void) const;
   bool has_skipped_body(void) const;
@@ -30430,7 +30880,7 @@ class FriendDecl : public Decl {
 
   std::optional<NamedDecl> friend_declaration(void) const;
   Token friend_token(void) const;
-  Type friend_type(void) const;
+  std::optional<Type> friend_type(void) const;
   bool is_unsupported_friend(void) const;
   std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const;
 };
@@ -30795,6 +31245,7 @@ enum class StmtUseSelector : unsigned short {
   GETTER_CXX_CONSTRUCTOR,
   HANDLER,
   HANDLER_BLOCK,
+  IF_STATEMENT,
   IGNORE_CASTS,
   IGNORE_CONTAINERS,
   IGNORE_CONVERSION_OPERATOR_SINGLE_STEP,
@@ -30921,7 +31372,7 @@ inline static const char *EnumerationName(StmtUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(StmtUseSelector) {
-  return 193;
+  return 194;
 }
 
 const char *EnumeratorName(StmtUseSelector);
@@ -31050,7 +31501,6 @@ enum class TokenUseSelector : unsigned short {
   ATTRIBUTE_TOKEN,
   BASE_TOKEN_END,
   BASE_TYPE_TOKEN,
-  BEGIN_TOKEN,
   BREAK_TOKEN,
   BRIDGE_KEYWORD_TOKEN,
   BUILTIN_TOKEN,
@@ -31071,7 +31521,6 @@ enum class TokenUseSelector : unsigned short {
   ELLIPSIS_TOKEN,
   ELSE_TOKEN,
   END_OF_DEFINITION_TOKEN,
-  END_TOKEN,
   ENUM_TOKEN,
   EQUAL_OR_COLON_TOKEN,
   EXCEPT_TOKEN,
@@ -31156,7 +31605,7 @@ inline static const char *EnumerationName(TokenUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenUseSelector) {
-  return 113;
+  return 111;
 }
 
 const char *EnumeratorName(TokenUseSelector);
@@ -31215,13 +31664,11 @@ static_assert(sizeof(FunctionProtoType) == sizeof(FunctionType));
 
 static_assert(sizeof(FunctionNoProtoType) == sizeof(FunctionType));
 
-static_assert(sizeof(ExtIntType) == sizeof(Type));
-
 static_assert(sizeof(DependentVectorType) == sizeof(Type));
 
 static_assert(sizeof(DependentSizedExtVectorType) == sizeof(Type));
 
-static_assert(sizeof(DependentExtIntType) == sizeof(Type));
+static_assert(sizeof(DependentBitIntType) == sizeof(Type));
 
 static_assert(sizeof(DependentAddressSpaceType) == sizeof(Type));
 
@@ -31238,6 +31685,8 @@ static_assert(sizeof(ComplexType) == sizeof(Type));
 static_assert(sizeof(BuiltinType) == sizeof(Type));
 
 static_assert(sizeof(BlockPointerType) == sizeof(Type));
+
+static_assert(sizeof(BitIntType) == sizeof(Type));
 
 static_assert(sizeof(AttributedType) == sizeof(Type));
 
@@ -31268,6 +31717,8 @@ static_assert(sizeof(DependentNameType) == sizeof(TypeWithKeyword));
 static_assert(sizeof(VectorType) == sizeof(Type));
 
 static_assert(sizeof(ExtVectorType) == sizeof(VectorType));
+
+static_assert(sizeof(UsingType) == sizeof(Type));
 
 static_assert(sizeof(UnresolvedUsingType) == sizeof(Type));
 
@@ -31359,17 +31810,23 @@ static_assert(sizeof(OMPParallelDirective) == sizeof(OMPExecutableDirective));
 
 static_assert(sizeof(OMPOrderedDirective) == sizeof(OMPExecutableDirective));
 
+static_assert(sizeof(OMPMetaDirective) == sizeof(OMPExecutableDirective));
+
 static_assert(sizeof(OMPMasterDirective) == sizeof(OMPExecutableDirective));
 
 static_assert(sizeof(OMPMaskedDirective) == sizeof(OMPExecutableDirective));
 
 static_assert(sizeof(OMPLoopBasedDirective) == sizeof(OMPExecutableDirective));
 
-static_assert(sizeof(OMPUnrollDirective) == sizeof(OMPLoopBasedDirective));
+static_assert(sizeof(OMPLoopTransformationDirective) == sizeof(OMPLoopBasedDirective));
 
-static_assert(sizeof(OMPTileDirective) == sizeof(OMPLoopBasedDirective));
+static_assert(sizeof(OMPUnrollDirective) == sizeof(OMPLoopTransformationDirective));
+
+static_assert(sizeof(OMPTileDirective) == sizeof(OMPLoopTransformationDirective));
 
 static_assert(sizeof(OMPLoopDirective) == sizeof(OMPLoopBasedDirective));
+
+static_assert(sizeof(OMPGenericLoopDirective) == sizeof(OMPLoopDirective));
 
 static_assert(sizeof(OMPForSimdDirective) == sizeof(OMPLoopDirective));
 

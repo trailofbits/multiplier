@@ -4,16 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <iostream>
-#include <multiplier/Index.h>
 #include <sstream>
 
-DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+#include "Index.h"
+
 DEFINE_uint64(declaration_id, 0, "ID of the declaration to print the redeclarations of");
 DEFINE_bool(show_locations, false, "Show the file locations of the redeclarations");
 
@@ -27,23 +23,7 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  if (FLAGS_help) {
-    std::cerr << google::ProgramUsage() << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
-
-
-  std::unordered_map<mx::FileId, std::filesystem::path> file_paths;
-  mx::FileLocationCache location_cache;
-
-  if (FLAGS_show_locations) {
-    for (auto [path, id] : index.file_paths()) {
-      file_paths.emplace(id, std::move(path));
-    }
-  }
+  mx::Index index = InitExample(FLAGS_show_locations);
 
   auto maybe_decl = index.entity(FLAGS_declaration_id);
   if (!std::holds_alternative<mx::Decl>(maybe_decl)) {

@@ -4,21 +4,17 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <cstdlib>
 #include <filesystem>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <iostream>
-#include <multiplier/Index.h>
 #include <fstream>
 #include <sstream>
 
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
 
-DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+#include "Index.h"
+
 DEFINE_string(output_dir, "", "Path to the directory into which all output will be dumped");
 
 static llvm::json::Object UnparsedToken(mx::Token tok);
@@ -184,19 +180,13 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  if (FLAGS_help) {
-    std::cerr << google::ProgramUsage() << std::endl;
-    return EXIT_FAILURE;
-  }
+  mx::Index index = InitExample();
 
   if (FLAGS_output_dir.empty()) {
     std::cerr << "--output_dir must not be empty";
     return EXIT_FAILURE;
   }
 
-
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
   for (auto [path, id] : index.file_paths()) {
     if (auto maybe_file = index.file(id)) {
       OutputFileInfo(std::move(*maybe_file), std::move(path));

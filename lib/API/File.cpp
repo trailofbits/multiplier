@@ -19,6 +19,8 @@ FileLocationCache::FileLocationCache(const FileLocationConfiguration &config)
 
 // Add a file to the cache.
 const FileLocationVector &FileLocationCacheImpl::Add(File file) {
+  std::unique_lock<std::mutex> locker(lock);
+
   FileLocationVector &vec = cache[file.impl->file_id];
   if (!vec.empty()) {
     return vec;

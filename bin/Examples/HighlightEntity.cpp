@@ -4,64 +4,14 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <iostream>
-#include <multiplier/Index.h>
 #include <sstream>
 
-DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+#include "Index.h"
+
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
 DEFINE_bool(unparsed, false, "Show original source code?");
-
-static void HighlightToken(mx::Token token) {
-  std::cout << "\u001b[35m\033[1m" << token.data() << "\033[0m";
-}
-
-static void PrintToken(mx::Token token) {
-  std::cout << token.data(); 
-}
-
-static bool ContainsHighlightedTokens(mx::TokenSubstitutionList nodes,
-                                      const mx::TokenRange &entity_tokens) {
-  for (auto node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      if (entity_tokens.index_of(std::get<mx::Token>(node))) {
-        return true;
-      }
-    } else {
-      if (ContainsHighlightedTokens(
-              std::get<mx::TokenSubstitution>(node).after(), entity_tokens)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-static void PrintUnparsedTokens(mx::TokenSubstitutionList nodes,
-                                const mx::TokenRange &entity_tokens,
-                                bool force_highlight=false) {
-  for (auto node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      auto token = std::get<mx::Token>(node);
-      if (force_highlight || entity_tokens.index_of(token)) {
-        HighlightToken(std::move(token));
-      } else {
-        PrintToken(std::move(token));
-      }
-    } else {
-      auto sub = std::get<mx::TokenSubstitution>(node);
-      PrintUnparsedTokens(
-          sub.before(), entity_tokens,
-          (force_highlight ||
-           ContainsHighlightedTokens(sub.after(), entity_tokens)));
-    }
-  }
-}
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
@@ -73,14 +23,7 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  if (FLAGS_help) {
-    std::cerr << google::ProgramUsage() << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  mx::Index index(mx::EntityProvider::in_memory_cache(
-      mx::EntityProvider::from_remote(
-          FLAGS_host, FLAGS_port)));
+  mx::Index index = InitExample();
   
   mx::TokenRange entity_tokens;
   std::optional<mx::Fragment> fragment;
@@ -110,7 +53,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   // Print out the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
-    PrintUnparsedTokens(fragment->substitutions(), entity_tokens);
+    PrintUnparsedTokens(std::cout, fragment->substitutions(), entity_tokens);
 
   // Print out the tokens of this fragment that were actually parsed. These
   // are post-macro expansion tokens, and generally don't include whitespace
@@ -118,14 +61,14 @@ extern "C" int main(int argc, char *argv[]) {
   } else {
     for (mx::Token token : mx::Token::in(*fragment)) {
       if (entity_tokens.index_of(token)) {
-        HighlightToken(std::move(token));
+        HighlightToken(std::cout, std::move(token));
       } else {
-        PrintToken(std::move(token));
+        PrintToken(std::cout, std::move(token));
       }
       std::cout << ' ';
     }
-    std::cout << '\n';
   }
+  std::cout << '\n';
 
   return EXIT_SUCCESS;
 }
