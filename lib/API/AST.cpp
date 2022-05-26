@@ -10253,367 +10253,371 @@ bool Type::is_std_byte_type(void) const {
   return self.getVal236();
 }
 
-bool Type::is_structural_type(void) const {
+std::optional<bool> Type::is_structural_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal237();
+  if (!self.getVal238()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(self.getVal237());
+  }
 }
 
 bool Type::is_structure_or_class_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal238();
+  return self.getVal239();
 }
 
 bool Type::is_structure_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal239();
+  return self.getVal240();
 }
 
 bool Type::is_template_type_parm_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal240();
+  return self.getVal241();
 }
 
 bool Type::is_typedef_name_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal241();
+  return self.getVal242();
 }
 
 bool Type::is_undeduced_auto_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal242();
+  return self.getVal243();
 }
 
 bool Type::is_undeduced_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal243();
+  return self.getVal244();
 }
 
 bool Type::is_union_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal244();
+  return self.getVal245();
 }
 
 bool Type::is_unsaturated_fixed_point_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal245();
+  return self.getVal246();
 }
 
 bool Type::is_unscoped_enumeration_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal246();
+  return self.getVal247();
 }
 
 bool Type::is_unsigned_fixed_point_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal247();
+  return self.getVal248();
 }
 
 bool Type::is_unsigned_integer_or_enumeration_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal248();
+  return self.getVal249();
 }
 
 bool Type::is_unsigned_integer_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal249();
+  return self.getVal250();
 }
 
 bool Type::is_vlst_builtin_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal250();
+  return self.getVal251();
 }
 
 bool Type::is_variable_array_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal251();
+  return self.getVal252();
 }
 
 bool Type::is_variably_modified_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal252();
+  return self.getVal253();
 }
 
 bool Type::is_vector_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal253();
+  return self.getVal254();
 }
 
 bool Type::is_visibility_explicit(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal254();
+  return self.getVal255();
 }
 
 bool Type::is_void_pointer_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal255();
+  return self.getVal256();
 }
 
 bool Type::is_void_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal256();
+  return self.getVal257();
 }
 
 bool Type::is_wide_character_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal257();
+  return self.getVal258();
 }
 
 Type Type::ignore_parentheses(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal258());
+  EntityId id(self.getVal259());
   return fragment->TypeFor(fragment, id).value();
 }
 
 LangAS Type::address_space(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<LangAS>(self.getVal259());
+  return static_cast<LangAS>(self.getVal260());
 }
 
 Type Type::atomic_unqualified_type(void) const {
-  auto self = fragment->NthType(offset);
-  EntityId id(self.getVal260());
-  return fragment->TypeFor(fragment, id).value();
-}
-
-Type Type::canonical_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal261());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::desugared_type(void) const {
+Type Type::canonical_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal262());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::local_unqualified_type(void) const {
+Type Type::desugared_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal263());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::non_l_value_expression_type(void) const {
+Type Type::local_unqualified_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal264());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::non_pack_expansion_type(void) const {
+Type Type::non_l_value_expression_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal265());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::non_reference_type(void) const {
+Type Type::non_pack_expansion_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal266());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::single_step_desugared_type(void) const {
+Type Type::non_reference_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal267());
   return fragment->TypeFor(fragment, id).value();
 }
 
-bool Type::has_address_space(void) const {
+Type Type::single_step_desugared_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal268();
+  EntityId id(self.getVal268());
+  return fragment->TypeFor(fragment, id).value();
 }
 
-bool Type::has_local_non_fast_qualifiers(void) const {
+bool Type::has_address_space(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal269();
 }
 
-bool Type::has_local_qualifiers(void) const {
+bool Type::has_local_non_fast_qualifiers(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal270();
 }
 
-bool Type::has_non_trivial_obj_c_lifetime(void) const {
+bool Type::has_local_qualifiers(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal271();
 }
 
-bool Type::has_non_trivial_to_primitive_copy_c_union(void) const {
+bool Type::has_non_trivial_obj_c_lifetime(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal272();
 }
 
-bool Type::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
+bool Type::has_non_trivial_to_primitive_copy_c_union(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal273();
 }
 
-bool Type::has_non_trivial_to_primitive_destruct_c_union(void) const {
+bool Type::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal274();
 }
 
-bool Type::has_qualifiers(void) const {
+bool Type::has_non_trivial_to_primitive_destruct_c_union(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal275();
 }
 
-bool Type::has_strong_or_weak_obj_c_lifetime(void) const {
+bool Type::has_qualifiers(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal276();
 }
 
-bool Type::is_c_forbidden_l_value_type(void) const {
+bool Type::has_strong_or_weak_obj_c_lifetime(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal277();
 }
 
-bool Type::is_cxx11_pod_type(void) const {
+bool Type::is_c_forbidden_l_value_type(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal278();
 }
 
-bool Type::is_cxx98_pod_type(void) const {
+bool Type::is_cxx11_pod_type(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal279();
 }
 
-bool Type::is_canonical(void) const {
+bool Type::is_cxx98_pod_type(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal280();
 }
 
-bool Type::is_canonical_as_parameter(void) const {
+bool Type::is_canonical(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal281();
 }
 
-bool Type::is_const_qualified(void) const {
+bool Type::is_canonical_as_parameter(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal282();
 }
 
-bool Type::is_constant(void) const {
+bool Type::is_const_qualified(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal283();
 }
 
+bool Type::is_constant(void) const {
+  auto self = fragment->NthType(offset);
+  return self.getVal284();
+}
+
 QualTypeDestructionKind Type::is_destructed_type(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<QualTypeDestructionKind>(self.getVal284());
+  return static_cast<QualTypeDestructionKind>(self.getVal285());
 }
 
 bool Type::is_local_const_qualified(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal285();
+  return self.getVal286();
 }
 
 bool Type::is_local_restrict_qualified(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal286();
+  return self.getVal287();
 }
 
 bool Type::is_local_volatile_qualified(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal287();
+  return self.getVal288();
 }
 
 QualTypePrimitiveCopyKind Type::is_non_trivial_to_primitive_copy(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<QualTypePrimitiveCopyKind>(self.getVal288());
+  return static_cast<QualTypePrimitiveCopyKind>(self.getVal289());
 }
 
 QualTypePrimitiveDefaultInitializeKind Type::is_non_trivial_to_primitive_default_initialize(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<QualTypePrimitiveDefaultInitializeKind>(self.getVal289());
+  return static_cast<QualTypePrimitiveDefaultInitializeKind>(self.getVal290());
 }
 
 QualTypePrimitiveCopyKind Type::is_non_trivial_to_primitive_destructive_move(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<QualTypePrimitiveCopyKind>(self.getVal290());
+  return static_cast<QualTypePrimitiveCopyKind>(self.getVal291());
 }
 
 bool Type::is_non_weak_in_mrr_with_obj_c_weak(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal291();
+  return self.getVal292();
 }
 
 bool Type::is_null(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal292();
+  return self.getVal293();
 }
 
 bool Type::is_obj_cgc_strong(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal293();
+  return self.getVal294();
 }
 
 bool Type::is_obj_cgc_weak(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal294();
+  return self.getVal295();
 }
 
 bool Type::is_pod_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal295();
+  return self.getVal296();
 }
 
 bool Type::is_restrict_qualified(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal296();
+  return self.getVal297();
 }
 
 bool Type::is_trivial_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal297();
+  return self.getVal298();
 }
 
 bool Type::is_trivially_copyable_type(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal298();
+  return self.getVal299();
 }
 
 bool Type::is_volatile_qualified(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal299();
+  return self.getVal300();
 }
 
 bool Type::may_be_dynamic_class(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal300();
+  return self.getVal301();
 }
 
 bool Type::may_be_not_dynamic_class(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal301();
+  return self.getVal302();
 }
 
 Type Type::strip_obj_c_kind_of_type(void) const {
-  auto self = fragment->NthType(offset);
-  EntityId id(self.getVal302());
-  return fragment->TypeFor(fragment, id).value();
-}
-
-Type Type::with_const(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal303());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::with_restrict(void) const {
+Type Type::with_const(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal304());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::with_volatile(void) const {
+Type Type::with_restrict(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal305());
   return fragment->TypeFor(fragment, id).value();
 }
 
-Type Type::without_local_fast_qualifiers(void) const {
+Type Type::with_volatile(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal306());
+  return fragment->TypeFor(fragment, id).value();
+}
+
+Type Type::without_local_fast_qualifiers(void) const {
+  auto self = fragment->NthType(offset);
+  EntityId id(self.getVal307());
   return fragment->TypeFor(fragment, id).value();
 }
 
@@ -10631,28 +10635,28 @@ std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const Type &paren
 
 Type TemplateTypeParmType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmType::declaration(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal308());
+    EntityId id(self.getVal309());
     return TemplateTypeParmDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool TemplateTypeParmType::is_parameter_pack(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool TemplateTypeParmType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const TokenContext &c) {
@@ -10669,38 +10673,38 @@ std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const
 
 Type TemplateSpecializationType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::optional<Type> TemplateSpecializationType::aliased_type(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal308());
+    EntityId id(self.getVal309());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 bool TemplateSpecializationType::is_current_instantiation(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool TemplateSpecializationType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 bool TemplateSpecializationType::is_type_alias(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal312();
+  return self.getVal313();
 }
 
 std::vector<TemplateArgument> TemplateSpecializationType::template_arguments(void) const {
   auto self = fragment->NthType(offset);
-  auto list = self.getVal313();
+  auto list = self.getVal314();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -10724,13 +10728,13 @@ std::optional<TagType> TagType::from(const Type &parent) {
 
 TagDecl TagType::declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return TagDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 bool TagType::is_being_defined(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<RecordType> RecordType::from(const TokenContext &c) {
@@ -10751,18 +10755,18 @@ std::optional<RecordType> RecordType::from(const Type &parent) {
 
 Type RecordType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool RecordType::has_const_fields(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool RecordType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<EnumType> EnumType::from(const TokenContext &c) {
@@ -10783,13 +10787,13 @@ std::optional<EnumType> EnumType::from(const Type &parent) {
 
 Type EnumType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool EnumType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const TokenContext &c) {
@@ -10806,25 +10810,25 @@ std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const T
 
 Type SubstTemplateTypeParmType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 TemplateTypeParmType SubstTemplateTypeParmType::replaced_parameter(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return TemplateTypeParmType::from(fragment->TypeFor(fragment, id).value()).value();
 }
 
 Type SubstTemplateTypeParmType::replacement_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool SubstTemplateTypeParmType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const TokenContext &c) {
@@ -10841,19 +10845,19 @@ std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from
 
 Type SubstTemplateTypeParmPackType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 TemplateTypeParmType SubstTemplateTypeParmPackType::replaced_parameter(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return TemplateTypeParmType::from(fragment->TypeFor(fragment, id).value()).value();
 }
 
 bool SubstTemplateTypeParmPackType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<ReferenceType> ReferenceType::from(const TokenContext &c) {
@@ -10871,18 +10875,18 @@ std::optional<ReferenceType> ReferenceType::from(const Type &parent) {
 
 Type ReferenceType::pointee_type_as_written(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool ReferenceType::is_inner_reference(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 bool ReferenceType::is_spelled_as_l_value(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 std::optional<RValueReferenceType> RValueReferenceType::from(const TokenContext &c) {
@@ -10903,13 +10907,13 @@ std::optional<RValueReferenceType> RValueReferenceType::from(const Type &parent)
 
 Type RValueReferenceType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool RValueReferenceType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<LValueReferenceType> LValueReferenceType::from(const TokenContext &c) {
@@ -10930,13 +10934,13 @@ std::optional<LValueReferenceType> LValueReferenceType::from(const Type &parent)
 
 Type LValueReferenceType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool LValueReferenceType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<PointerType> PointerType::from(const TokenContext &c) {
@@ -10953,13 +10957,13 @@ std::optional<PointerType> PointerType::from(const Type &parent) {
 
 Type PointerType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool PointerType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<PipeType> PipeType::from(const TokenContext &c) {
@@ -10976,24 +10980,24 @@ std::optional<PipeType> PipeType::from(const Type &parent) {
 
 Type PipeType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type PipeType::element_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool PipeType::is_read_only(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 bool PipeType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 std::optional<ParenType> ParenType::from(const TokenContext &c) {
@@ -11010,19 +11014,19 @@ std::optional<ParenType> ParenType::from(const Type &parent) {
 
 Type ParenType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type ParenType::inner_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool ParenType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<PackExpansionType> PackExpansionType::from(const TokenContext &c) {
@@ -11039,28 +11043,28 @@ std::optional<PackExpansionType> PackExpansionType::from(const Type &parent) {
 
 Type PackExpansionType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::optional<unsigned> PackExpansionType::num_expansions(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal315());
+    return static_cast<unsigned>(self.getVal316());
   }
 }
 
 Type PackExpansionType::pattern(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool PackExpansionType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const TokenContext &c) {
@@ -11077,19 +11081,19 @@ std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const Type &parent) {
 
 Type ObjCTypeParamType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 ObjCTypeParamDecl ObjCTypeParamType::declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return ObjCTypeParamDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 bool ObjCTypeParamType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<ObjCObjectType> ObjCObjectType::from(const TokenContext &c) {
@@ -11107,47 +11111,33 @@ std::optional<ObjCObjectType> ObjCObjectType::from(const Type &parent) {
 
 Type ObjCObjectType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type ObjCObjectType::base_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 ObjCInterfaceDecl ObjCObjectType::interface(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 std::optional<Type> ObjCObjectType::super_class_type(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal316());
+    EntityId id(self.getVal317());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 std::vector<Type> ObjCObjectType::type_arguments(void) const {
-  auto self = fragment->NthType(offset);
-  auto list = self.getVal317();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto t317 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t317.value()));
-    }
-  }
-  return vec;
-}
-
-std::vector<Type> ObjCObjectType::type_arguments_as_written(void) const {
   auto self = fragment->NthType(offset);
   auto list = self.getVal318();
   std::vector<Type> vec;
@@ -11161,79 +11151,93 @@ std::vector<Type> ObjCObjectType::type_arguments_as_written(void) const {
   return vec;
 }
 
-bool ObjCObjectType::is_kind_of_type(void) const {
+std::vector<Type> ObjCObjectType::type_arguments_as_written(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  auto list = self.getVal319();
+  std::vector<Type> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto t319 = fragment->TypeFor(fragment, id)) {
+      vec.emplace_back(std::move(t319.value()));
+    }
+  }
+  return vec;
 }
 
-bool ObjCObjectType::is_kind_of_type_as_written(void) const {
+bool ObjCObjectType::is_kind_of_type(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal311();
 }
 
-bool ObjCObjectType::is_obj_c_class(void) const {
+bool ObjCObjectType::is_kind_of_type_as_written(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal312();
 }
 
-bool ObjCObjectType::is_obj_c_id(void) const {
+bool ObjCObjectType::is_obj_c_class(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal319();
+  return self.getVal313();
 }
 
-bool ObjCObjectType::is_obj_c_qualified_class(void) const {
+bool ObjCObjectType::is_obj_c_id(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal320();
 }
 
-bool ObjCObjectType::is_obj_c_qualified_id(void) const {
+bool ObjCObjectType::is_obj_c_qualified_class(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal321();
 }
 
-bool ObjCObjectType::is_obj_c_unqualified_class(void) const {
+bool ObjCObjectType::is_obj_c_qualified_id(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal322();
 }
 
-bool ObjCObjectType::is_obj_c_unqualified_id(void) const {
+bool ObjCObjectType::is_obj_c_unqualified_class(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal323();
 }
 
-bool ObjCObjectType::is_obj_c_unqualified_id_or_class(void) const {
+bool ObjCObjectType::is_obj_c_unqualified_id(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal324();
 }
 
-bool ObjCObjectType::is_specialized(void) const {
+bool ObjCObjectType::is_obj_c_unqualified_id_or_class(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal325();
 }
 
-bool ObjCObjectType::is_specialized_as_written(void) const {
+bool ObjCObjectType::is_specialized(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal326();
 }
 
-bool ObjCObjectType::is_sugared(void) const {
+bool ObjCObjectType::is_specialized_as_written(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal327();
 }
 
-bool ObjCObjectType::is_unspecialized(void) const {
+bool ObjCObjectType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal328();
 }
 
-bool ObjCObjectType::is_unspecialized_as_written(void) const {
+bool ObjCObjectType::is_unspecialized(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal329();
 }
 
+bool ObjCObjectType::is_unspecialized_as_written(void) const {
+  auto self = fragment->NthType(offset);
+  return self.getVal330();
+}
+
 Type ObjCObjectType::strip_obj_c_kind_of_type_and_qualifieds(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal330());
+  EntityId id(self.getVal331());
   return fragment->TypeFor(fragment, id).value();
 }
 
@@ -11255,7 +11259,7 @@ std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const Type &parent) {
 
 ObjCInterfaceDecl ObjCInterfaceType::declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal331());
+  EntityId id(self.getVal332());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
@@ -11273,49 +11277,35 @@ std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const Type &par
 
 Type ObjCObjectPointerType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 ObjCInterfaceDecl ObjCObjectPointerType::interface_declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 ObjCInterfaceType ObjCObjectPointerType::interface_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return ObjCInterfaceType::from(fragment->TypeFor(fragment, id).value()).value();
 }
 
 ObjCObjectType ObjCObjectPointerType::object_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal316());
+  EntityId id(self.getVal317());
   return ObjCObjectType::from(fragment->TypeFor(fragment, id).value()).value();
 }
 
 Type ObjCObjectPointerType::super_class_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal330());
+  EntityId id(self.getVal331());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::vector<Type> ObjCObjectPointerType::type_arguments(void) const {
-  auto self = fragment->NthType(offset);
-  auto list = self.getVal317();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto t317 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t317.value()));
-    }
-  }
-  return vec;
-}
-
-std::vector<Type> ObjCObjectPointerType::type_arguments_as_written(void) const {
   auto self = fragment->NthType(offset);
   auto list = self.getVal318();
   std::vector<Type> vec;
@@ -11329,50 +11319,64 @@ std::vector<Type> ObjCObjectPointerType::type_arguments_as_written(void) const {
   return vec;
 }
 
-bool ObjCObjectPointerType::is_kind_of_type(void) const {
+std::vector<Type> ObjCObjectPointerType::type_arguments_as_written(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  auto list = self.getVal319();
+  std::vector<Type> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto t319 = fragment->TypeFor(fragment, id)) {
+      vec.emplace_back(std::move(t319.value()));
+    }
+  }
+  return vec;
 }
 
-bool ObjCObjectPointerType::is_obj_c_id_or_class_type(void) const {
+bool ObjCObjectPointerType::is_kind_of_type(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal310();
 }
 
-bool ObjCObjectPointerType::is_specialized(void) const {
+bool ObjCObjectPointerType::is_obj_c_id_or_class_type(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal311();
 }
 
-bool ObjCObjectPointerType::is_specialized_as_written(void) const {
+bool ObjCObjectPointerType::is_specialized(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal312();
 }
 
-bool ObjCObjectPointerType::is_sugared(void) const {
+bool ObjCObjectPointerType::is_specialized_as_written(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal319();
+  return self.getVal313();
 }
 
-bool ObjCObjectPointerType::is_unspecialized(void) const {
+bool ObjCObjectPointerType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal320();
 }
 
-bool ObjCObjectPointerType::is_unspecialized_as_written(void) const {
+bool ObjCObjectPointerType::is_unspecialized(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal321();
 }
 
+bool ObjCObjectPointerType::is_unspecialized_as_written(void) const {
+  auto self = fragment->NthType(offset);
+  return self.getVal322();
+}
+
 std::vector<ObjCProtocolDecl> ObjCObjectPointerType::qualifieds(void) const {
   auto self = fragment->NthType(offset);
-  auto list = self.getVal332();
+  auto list = self.getVal333();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d332 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCProtocolDecl::from(d332.value())) {
+    if (auto d333 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCProtocolDecl::from(d333.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -11382,19 +11386,19 @@ std::vector<ObjCProtocolDecl> ObjCObjectPointerType::qualifieds(void) const {
 
 ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifieds(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal331());
+  EntityId id(self.getVal332());
   return ObjCObjectPointerType::from(fragment->TypeFor(fragment, id).value()).value();
 }
 
 std::vector<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const {
   auto self = fragment->NthType(offset);
-  auto list = self.getVal333();
+  auto list = self.getVal334();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d333 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCProtocolDecl::from(d333.value())) {
+    if (auto d334 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCProtocolDecl::from(d334.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -11416,35 +11420,35 @@ std::optional<MemberPointerType> MemberPointerType::from(const Type &parent) {
 
 Type MemberPointerType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type MemberPointerType::class_(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 CXXRecordDecl MemberPointerType::most_recent_cxx_record_declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return CXXRecordDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 bool MemberPointerType::is_member_data_pointer(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 bool MemberPointerType::is_member_function_pointer(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool MemberPointerType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<MatrixType> MatrixType::from(const TokenContext &c) {
@@ -11462,19 +11466,19 @@ std::optional<MatrixType> MatrixType::from(const Type &parent) {
 
 Type MatrixType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type MatrixType::element_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool MatrixType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const TokenContext &c) {
@@ -11495,18 +11499,18 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Typ
 
 Token DependentSizedMatrixType::attribute_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal314()).value();
+  return fragment->TokenFor(fragment, self.getVal315()).value();
 }
 
 Expr DependentSizedMatrixType::column_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal316());
+  EntityId id(self.getVal317());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal330());
+  EntityId id(self.getVal331());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
@@ -11540,25 +11544,25 @@ std::optional<MacroQualifiedType> MacroQualifiedType::from(const Type &parent) {
 
 Type MacroQualifiedType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type MacroQualifiedType::modified_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type MacroQualifiedType::underlying_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool MacroQualifiedType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<InjectedClassNameType> InjectedClassNameType::from(const TokenContext &c) {
@@ -11575,31 +11579,31 @@ std::optional<InjectedClassNameType> InjectedClassNameType::from(const Type &par
 
 Type InjectedClassNameType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 CXXRecordDecl InjectedClassNameType::declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return CXXRecordDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 Type InjectedClassNameType::injected_specialization_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 TemplateSpecializationType InjectedClassNameType::injected_tst(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal316());
+  EntityId id(self.getVal317());
   return TemplateSpecializationType::from(fragment->TypeFor(fragment, id).value()).value();
 }
 
 bool InjectedClassNameType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<FunctionType> FunctionType::from(const TokenContext &c) {
@@ -11617,49 +11621,49 @@ std::optional<FunctionType> FunctionType::from(const Type &parent) {
 
 CallingConv FunctionType::call_conv(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<CallingConv>(self.getVal334());
+  return static_cast<CallingConv>(self.getVal335());
 }
 
 Type FunctionType::call_result_type(void) const {
-  auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
-  return fragment->TypeFor(fragment, id).value();
-}
-
-bool FunctionType::cmse_ns_call_attribute(void) const {
-  auto self = fragment->NthType(offset);
-  return self.getVal309();
-}
-
-bool FunctionType::has_reg_parm(void) const {
-  auto self = fragment->NthType(offset);
-  return self.getVal310();
-}
-
-bool FunctionType::no_return_attribute(void) const {
-  auto self = fragment->NthType(offset);
-  return self.getVal311();
-}
-
-Type FunctionType::return_type(void) const {
   auto self = fragment->NthType(offset);
   EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
-bool FunctionType::is_const(void) const {
+bool FunctionType::cmse_ns_call_attribute(void) const {
+  auto self = fragment->NthType(offset);
+  return self.getVal310();
+}
+
+bool FunctionType::has_reg_parm(void) const {
+  auto self = fragment->NthType(offset);
+  return self.getVal311();
+}
+
+bool FunctionType::no_return_attribute(void) const {
   auto self = fragment->NthType(offset);
   return self.getVal312();
 }
 
+Type FunctionType::return_type(void) const {
+  auto self = fragment->NthType(offset);
+  EntityId id(self.getVal309());
+  return fragment->TypeFor(fragment, id).value();
+}
+
+bool FunctionType::is_const(void) const {
+  auto self = fragment->NthType(offset);
+  return self.getVal313();
+}
+
 bool FunctionType::is_restrict(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal319();
+  return self.getVal320();
 }
 
 bool FunctionType::is_volatile(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal320();
+  return self.getVal321();
 }
 
 std::optional<FunctionProtoType> FunctionProtoType::from(const TokenContext &c) {
@@ -11680,74 +11684,20 @@ std::optional<FunctionProtoType> FunctionProtoType::from(const Type &parent) {
 
 std::optional<CanThrowResult> FunctionProtoType::can_throw(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal321()) {
+  if (!self.getVal322()) {
     return std::nullopt;
   } else {
-    return static_cast<CanThrowResult>(self.getVal335());
+    return static_cast<CanThrowResult>(self.getVal336());
   }
 }
 
 Type FunctionProtoType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::vector<Type> FunctionProtoType::exceptions(void) const {
-  auto self = fragment->NthType(offset);
-  auto list = self.getVal317();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto t317 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t317.value()));
-    }
-  }
-  return vec;
-}
-
-Token FunctionProtoType::ellipsis_token(void) const {
-  auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal316()).value();
-}
-
-std::optional<FunctionDecl> FunctionProtoType::exception_spec_declaration(void) const {
-  auto self = fragment->NthType(offset);
-  if (!self.getVal322()) {
-    return std::nullopt;
-  } else {
-    EntityId id(self.getVal330());
-    return FunctionDecl::from(fragment->DeclFor(fragment, id));
-  }
-}
-
-std::optional<FunctionDecl> FunctionProtoType::exception_spec_template(void) const {
-  auto self = fragment->NthType(offset);
-  if (!self.getVal323()) {
-    return std::nullopt;
-  } else {
-    EntityId id(self.getVal331());
-    return FunctionDecl::from(fragment->DeclFor(fragment, id));
-  }
-}
-
-ExceptionSpecificationType FunctionProtoType::exception_spec_type(void) const {
-  auto self = fragment->NthType(offset);
-  return static_cast<ExceptionSpecificationType>(self.getVal336());
-}
-
-std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
-  auto self = fragment->NthType(offset);
-  if (!self.getVal324()) {
-    return std::nullopt;
-  } else {
-    EntityId id(self.getVal337());
-    return Expr::from(fragment->StmtFor(fragment, id));
-  }
-}
-
-std::vector<Type> FunctionProtoType::parameter_types(void) const {
   auto self = fragment->NthType(offset);
   auto list = self.getVal318();
   std::vector<Type> vec;
@@ -11761,79 +11711,133 @@ std::vector<Type> FunctionProtoType::parameter_types(void) const {
   return vec;
 }
 
+Token FunctionProtoType::ellipsis_token(void) const {
+  auto self = fragment->NthType(offset);
+  return fragment->TokenFor(fragment, self.getVal317()).value();
+}
+
+std::optional<FunctionDecl> FunctionProtoType::exception_spec_declaration(void) const {
+  auto self = fragment->NthType(offset);
+  if (!self.getVal323()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal331());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<FunctionDecl> FunctionProtoType::exception_spec_template(void) const {
+  auto self = fragment->NthType(offset);
+  if (!self.getVal324()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal332());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+ExceptionSpecificationType FunctionProtoType::exception_spec_type(void) const {
+  auto self = fragment->NthType(offset);
+  return static_cast<ExceptionSpecificationType>(self.getVal337());
+}
+
+std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
+  auto self = fragment->NthType(offset);
+  if (!self.getVal325()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal338());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
+}
+
+std::vector<Type> FunctionProtoType::parameter_types(void) const {
+  auto self = fragment->NthType(offset);
+  auto list = self.getVal319();
+  std::vector<Type> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto t319 = fragment->TypeFor(fragment, id)) {
+      vec.emplace_back(std::move(t319.value()));
+    }
+  }
+  return vec;
+}
+
 RefQualifierKind FunctionProtoType::reference_qualifier(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<RefQualifierKind>(self.getVal338());
+  return static_cast<RefQualifierKind>(self.getVal339());
 }
 
 bool FunctionProtoType::has_dependent_exception_spec(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal325();
+  return self.getVal326();
 }
 
 bool FunctionProtoType::has_dynamic_exception_spec(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal326();
+  return self.getVal327();
 }
 
 bool FunctionProtoType::has_exception_spec(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal327();
+  return self.getVal328();
 }
 
 bool FunctionProtoType::has_ext_parameter_infos(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal328();
+  return self.getVal329();
 }
 
 bool FunctionProtoType::has_instantiation_dependent_exception_spec(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal329();
+  return self.getVal330();
 }
 
 bool FunctionProtoType::has_noexcept_exception_spec(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal339();
+  return self.getVal340();
 }
 
 bool FunctionProtoType::has_trailing_return(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal340();
+  return self.getVal341();
 }
 
 std::optional<bool> FunctionProtoType::is_nothrow(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal342()) {
+  if (!self.getVal343()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal341());
+    return static_cast<bool>(self.getVal342());
   }
 }
 
 bool FunctionProtoType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal343();
+  return self.getVal344();
 }
 
 bool FunctionProtoType::is_template_variadic(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal344();
+  return self.getVal345();
 }
 
 bool FunctionProtoType::is_variadic(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal345();
+  return self.getVal346();
 }
 
 std::vector<Type> FunctionProtoType::exception_types(void) const {
   auto self = fragment->NthType(offset);
-  auto list = self.getVal332();
+  auto list = self.getVal333();
   std::vector<Type> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t332 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t332.value()));
+    if (auto t333 = fragment->TypeFor(fragment, id)) {
+      vec.emplace_back(std::move(t333.value()));
     }
   }
   return vec;
@@ -11857,13 +11861,13 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const Type &parent)
 
 Type FunctionNoProtoType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool FunctionNoProtoType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal321();
+  return self.getVal322();
 }
 
 std::optional<DependentVectorType> DependentVectorType::from(const TokenContext &c) {
@@ -11880,35 +11884,35 @@ std::optional<DependentVectorType> DependentVectorType::from(const Type &parent)
 
 Type DependentVectorType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Token DependentVectorType::attribute_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal308()).value();
+  return fragment->TokenFor(fragment, self.getVal309()).value();
 }
 
 Type DependentVectorType::element_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Expr DependentVectorType::size_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal316());
+  EntityId id(self.getVal317());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 VectorTypeVectorKind DependentVectorType::vector_kind(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<VectorTypeVectorKind>(self.getVal334());
+  return static_cast<VectorTypeVectorKind>(self.getVal335());
 }
 
 bool DependentVectorType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(const TokenContext &c) {
@@ -11925,30 +11929,30 @@ std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(con
 
 Type DependentSizedExtVectorType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Token DependentSizedExtVectorType::attribute_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal308()).value();
+  return fragment->TokenFor(fragment, self.getVal309()).value();
 }
 
 Type DependentSizedExtVectorType::element_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Expr DependentSizedExtVectorType::size_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal316());
+  EntityId id(self.getVal317());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 bool DependentSizedExtVectorType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<DependentBitIntType> DependentBitIntType::from(const TokenContext &c) {
@@ -11965,29 +11969,29 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const Type &parent)
 
 Type DependentBitIntType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Expr DependentBitIntType::num_bits_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 bool DependentBitIntType::is_signed(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 bool DependentBitIntType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool DependentBitIntType::is_unsigned(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const TokenContext &c) {
@@ -12004,24 +12008,24 @@ std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const T
 
 Type DependentAddressSpaceType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Expr DependentAddressSpaceType::addr_space_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 Token DependentAddressSpaceType::attribute_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal314()).value();
+  return fragment->TokenFor(fragment, self.getVal315()).value();
 }
 
 bool DependentAddressSpaceType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<DeducedType> DeducedType::from(const TokenContext &c) {
@@ -12039,28 +12043,28 @@ std::optional<DeducedType> DeducedType::from(const Type &parent) {
 
 Type DeducedType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::optional<Type> DeducedType::resolved_type(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal308());
+    EntityId id(self.getVal309());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 bool DeducedType::is_deduced(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool DeducedType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const TokenContext &c) {
@@ -12097,12 +12101,12 @@ std::optional<AutoType> AutoType::from(const Type &parent) {
 
 AutoTypeKeyword AutoType::keyword(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<AutoTypeKeyword>(self.getVal334());
+  return static_cast<AutoTypeKeyword>(self.getVal335());
 }
 
 std::vector<TemplateArgument> AutoType::type_constraint_arguments(void) const {
   auto self = fragment->NthType(offset);
-  auto list = self.getVal313();
+  auto list = self.getVal314();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -12113,22 +12117,22 @@ vec.emplace_back(fragment, v);
 
 std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal312()) {
+  if (!self.getVal313()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal314());
+    EntityId id(self.getVal315());
     return ConceptDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool AutoType::is_constrained(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal319();
+  return self.getVal320();
 }
 
 bool AutoType::is_decltype_auto(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal320();
+  return self.getVal321();
 }
 
 std::optional<DecltypeType> DecltypeType::from(const TokenContext &c) {
@@ -12145,25 +12149,25 @@ std::optional<DecltypeType> DecltypeType::from(const Type &parent) {
 
 Type DecltypeType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Expr DecltypeType::underlying_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 Type DecltypeType::underlying_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool DecltypeType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<ComplexType> ComplexType::from(const TokenContext &c) {
@@ -12180,19 +12184,19 @@ std::optional<ComplexType> ComplexType::from(const Type &parent) {
 
 Type ComplexType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type ComplexType::element_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool ComplexType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<BuiltinType> BuiltinType::from(const TokenContext &c) {
@@ -12209,38 +12213,38 @@ std::optional<BuiltinType> BuiltinType::from(const Type &parent) {
 
 Type BuiltinType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<BuiltinTypeKind>(self.getVal334());
+  return static_cast<BuiltinTypeKind>(self.getVal335());
 }
 
 bool BuiltinType::is_floating_point(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 bool BuiltinType::is_integer(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool BuiltinType::is_signed_integer(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 bool BuiltinType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal312();
+  return self.getVal313();
 }
 
 bool BuiltinType::is_unsigned_integer(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal319();
+  return self.getVal320();
 }
 
 std::optional<BlockPointerType> BlockPointerType::from(const TokenContext &c) {
@@ -12257,13 +12261,13 @@ std::optional<BlockPointerType> BlockPointerType::from(const Type &parent) {
 
 Type BlockPointerType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool BlockPointerType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<BitIntType> BitIntType::from(const TokenContext &c) {
@@ -12280,23 +12284,23 @@ std::optional<BitIntType> BitIntType::from(const Type &parent) {
 
 Type BitIntType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool BitIntType::is_signed(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 bool BitIntType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool BitIntType::is_unsigned(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 std::optional<AttributedType> AttributedType::from(const TokenContext &c) {
@@ -12313,54 +12317,54 @@ std::optional<AttributedType> AttributedType::from(const Type &parent) {
 
 Type AttributedType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 AttributeKind AttributedType::attribute_kind(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<AttributeKind>(self.getVal346());
+  return static_cast<AttributeKind>(self.getVal347());
 }
 
 Type AttributedType::equivalent_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::optional<NullabilityKind> AttributedType::immediate_nullability(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    return static_cast<NullabilityKind>(self.getVal334());
+    return static_cast<NullabilityKind>(self.getVal335());
   }
 }
 
 Type AttributedType::modified_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool AttributedType::is_calling_conv(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 bool AttributedType::is_ms_type_spec(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal311();
+  return self.getVal312();
 }
 
 bool AttributedType::is_qualifier(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal312();
+  return self.getVal313();
 }
 
 bool AttributedType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal319();
+  return self.getVal320();
 }
 
 std::optional<AtomicType> AtomicType::from(const TokenContext &c) {
@@ -12377,19 +12381,19 @@ std::optional<AtomicType> AtomicType::from(const Type &parent) {
 
 Type AtomicType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type AtomicType::value_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool AtomicType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<ArrayType> ArrayType::from(const TokenContext &c) {
@@ -12409,13 +12413,13 @@ std::optional<ArrayType> ArrayType::from(const Type &parent) {
 
 Type ArrayType::element_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 ArrayTypeArraySizeModifier ArrayType::size_modifier(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<ArrayTypeArraySizeModifier>(self.getVal334());
+  return static_cast<ArrayTypeArraySizeModifier>(self.getVal335());
 }
 
 std::optional<VariableArrayType> VariableArrayType::from(const TokenContext &c) {
@@ -12436,34 +12440,34 @@ std::optional<VariableArrayType> VariableArrayType::from(const Type &parent) {
 
 Type VariableArrayType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 TokenRange VariableArrayType::brackets_range(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenRangeFor(fragment, self.getVal314(), self.getVal316());
+  return fragment->TokenRangeFor(fragment, self.getVal315(), self.getVal317());
 }
 
 Token VariableArrayType::l_bracket_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal330()).value();
+  return fragment->TokenFor(fragment, self.getVal331()).value();
 }
 
 Token VariableArrayType::r_bracket_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal331()).value();
+  return fragment->TokenFor(fragment, self.getVal332()).value();
 }
 
 Expr VariableArrayType::size_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal337());
+  EntityId id(self.getVal338());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 bool VariableArrayType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<IncompleteArrayType> IncompleteArrayType::from(const TokenContext &c) {
@@ -12484,13 +12488,13 @@ std::optional<IncompleteArrayType> IncompleteArrayType::from(const Type &parent)
 
 Type IncompleteArrayType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool IncompleteArrayType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const TokenContext &c) {
@@ -12511,34 +12515,34 @@ std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const Type 
 
 Type DependentSizedArrayType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 TokenRange DependentSizedArrayType::brackets_range(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenRangeFor(fragment, self.getVal314(), self.getVal316());
+  return fragment->TokenRangeFor(fragment, self.getVal315(), self.getVal317());
 }
 
 Token DependentSizedArrayType::l_bracket_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal330()).value();
+  return fragment->TokenFor(fragment, self.getVal331()).value();
 }
 
 Token DependentSizedArrayType::r_bracket_token(void) const {
   auto self = fragment->NthType(offset);
-  return fragment->TokenFor(fragment, self.getVal331()).value();
+  return fragment->TokenFor(fragment, self.getVal332()).value();
 }
 
 Expr DependentSizedArrayType::size_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal337());
+  EntityId id(self.getVal338());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 bool DependentSizedArrayType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<ConstantArrayType> ConstantArrayType::from(const TokenContext &c) {
@@ -12559,23 +12563,23 @@ std::optional<ConstantArrayType> ConstantArrayType::from(const Type &parent) {
 
 Type ConstantArrayType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::optional<Expr> ConstantArrayType::size_expression(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal314());
+    EntityId id(self.getVal315());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 bool ConstantArrayType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 std::optional<AdjustedType> AdjustedType::from(const TokenContext &c) {
@@ -12593,25 +12597,25 @@ std::optional<AdjustedType> AdjustedType::from(const Type &parent) {
 
 Type AdjustedType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type AdjustedType::resolved_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type AdjustedType::original_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool AdjustedType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<DecayedType> DecayedType::from(const TokenContext &c) {
@@ -12646,7 +12650,7 @@ std::optional<TypeWithKeyword> TypeWithKeyword::from(const Type &parent) {
 
 ElaboratedTypeKeyword TypeWithKeyword::keyword(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<ElaboratedTypeKeyword>(self.getVal334());
+  return static_cast<ElaboratedTypeKeyword>(self.getVal335());
 }
 
 std::optional<ElaboratedType> ElaboratedType::from(const TokenContext &c) {
@@ -12667,29 +12671,29 @@ std::optional<ElaboratedType> ElaboratedType::from(const Type &parent) {
 
 Type ElaboratedType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type ElaboratedType::named_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
   auto self = fragment->NthType(offset);
-  if (!self.getVal309()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    EntityId id(self.getVal314());
+    EntityId id(self.getVal315());
     return TagDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool ElaboratedType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal310();
+  return self.getVal311();
 }
 
 std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::from(const TokenContext &c) {
@@ -12710,18 +12714,18 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
 
 Type DependentTemplateSpecializationType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool DependentTemplateSpecializationType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::vector<TemplateArgument> DependentTemplateSpecializationType::template_arguments(void) const {
   auto self = fragment->NthType(offset);
-  auto list = self.getVal313();
+  auto list = self.getVal314();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -12748,13 +12752,13 @@ std::optional<DependentNameType> DependentNameType::from(const Type &parent) {
 
 Type DependentNameType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool DependentNameType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<VectorType> VectorType::from(const TokenContext &c) {
@@ -12772,24 +12776,24 @@ std::optional<VectorType> VectorType::from(const Type &parent) {
 
 Type VectorType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type VectorType::element_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 VectorTypeVectorKind VectorType::vector_kind(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<VectorTypeVectorKind>(self.getVal334());
+  return static_cast<VectorTypeVectorKind>(self.getVal335());
 }
 
 bool VectorType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<ExtVectorType> ExtVectorType::from(const TokenContext &c) {
@@ -12822,25 +12826,25 @@ std::optional<UsingType> UsingType::from(const Type &parent) {
 
 Type UsingType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 UsingShadowDecl UsingType::found_declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return UsingShadowDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 Type UsingType::underlying_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool UsingType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const TokenContext &c) {
@@ -12857,19 +12861,19 @@ std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const Type &parent)
 
 Type UnresolvedUsingType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 UnresolvedUsingTypenameDecl UnresolvedUsingType::declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return UnresolvedUsingTypenameDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 bool UnresolvedUsingType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<UnaryTransformType> UnaryTransformType::from(const TokenContext &c) {
@@ -12886,30 +12890,30 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const Type &parent) {
 
 Type UnaryTransformType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type UnaryTransformType::base_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 UnaryTransformTypeUTTKind UnaryTransformType::utt_kind(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<UnaryTransformTypeUTTKind>(self.getVal334());
+  return static_cast<UnaryTransformTypeUTTKind>(self.getVal335());
 }
 
 Type UnaryTransformType::underlying_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal314());
+  EntityId id(self.getVal315());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool UnaryTransformType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<TypedefType> TypedefType::from(const TokenContext &c) {
@@ -12926,19 +12930,19 @@ std::optional<TypedefType> TypedefType::from(const Type &parent) {
 
 Type TypedefType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 TypedefNameDecl TypedefType::declaration(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return TypedefNameDecl::from(fragment->DeclFor(fragment, id).value()).value();
 }
 
 bool TypedefType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<TypeOfType> TypeOfType::from(const TokenContext &c) {
@@ -12955,19 +12959,19 @@ std::optional<TypeOfType> TypeOfType::from(const Type &parent) {
 
 Type TypeOfType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Type TypeOfType::underlying_type(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return fragment->TypeFor(fragment, id).value();
 }
 
 bool TypeOfType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<TypeOfExprType> TypeOfExprType::from(const TokenContext &c) {
@@ -12984,19 +12988,19 @@ std::optional<TypeOfExprType> TypeOfExprType::from(const Type &parent) {
 
 Type TypeOfExprType::desugar(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal307());
+  EntityId id(self.getVal308());
   return fragment->TypeFor(fragment, id).value();
 }
 
 Expr TypeOfExprType::underlying_expression(void) const {
   auto self = fragment->NthType(offset);
-  EntityId id(self.getVal308());
+  EntityId id(self.getVal309());
   return Expr::from(fragment->StmtFor(fragment, id).value()).value();
 }
 
 bool TypeOfExprType::is_sugared(void) const {
   auto self = fragment->NthType(offset);
-  return self.getVal309();
+  return self.getVal310();
 }
 
 std::optional<Decl> Stmt::parent_declaration(void) const {

@@ -7778,7 +7778,7 @@ class Type {
   bool is_specifier_type(void) const;
   std::optional<bool> is_standard_layout_type(void) const;
   bool is_std_byte_type(void) const;
-  bool is_structural_type(void) const;
+  std::optional<bool> is_structural_type(void) const;
   bool is_structure_or_class_type(void) const;
   bool is_structure_type(void) const;
   bool is_template_type_parm_type(void) const;

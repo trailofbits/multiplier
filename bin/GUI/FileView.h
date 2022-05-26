@@ -56,31 +56,4 @@ class FileView final : public QTabWidget {
   void OnDownloadedFile(std::optional<File> file);
 };
 
-//class SourceCodeView final : public ITextView {
-//  Q_OBJECT
-//  Q_INTERFACES(irene::gui::ITextView)
-//
-// private:
-//  using ITextView::SetModel;
-//
-// public:
-//  virtual ~SourceCodeView(void);
-//
-//  SourceCodeView(QWidget *parent=nullptr);
-//
-//  template <typename T>
-//  inline void SetModel(std::shared_ptr<T> model) {
-//    if constexpr (std::is_same_v<T, ITextModel>) {
-//      this->ITextView::SetModel(std::move(model));
-//      return;
-//    } else if constexpr (std::is_convertible_v<T *, ITextModel *>) {
-//      auto model_ptr = model.get();
-//      std::shared_ptr<T> model_alias(std::move(model), model_ptr);
-//      this->ITextView::SetModel(std::move(model_alias));
-//    } else {
-//      throw std::runtime_error("Bad type to `SetModel`.");
-//    }
-//  }
-//};
-
 }  // namespace mx::gui

@@ -243,9 +243,11 @@ void MainWindow::OnFileConnectAction(void) {
   d->connection_state = ConnectionState::kConnecting;
   UpdateUI();
 
-  d->index = EntityProvider::from_remote(
-      connect_settings->host.toStdString(),
-      connect_settings->port.toStdString());
+  d->index = EntityProvider::in_memory_cache(
+      EntityProvider::from_remote(
+          connect_settings->host.toStdString(),
+          connect_settings->port.toStdString()),
+      10u * 60u  /* 10 minutes */);
 
   d->file_list_view->DownloadFileListInBackground(d->index);
 }

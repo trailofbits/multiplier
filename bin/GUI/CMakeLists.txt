@@ -19,10 +19,6 @@ add_executable("${exe_name}"
   FileView.h
   FileView.cpp
   
-  ITextModel.h
-  ITextView.cpp
-  ITextView.h
-
   MainWindow.h
   MainWindow.cpp
 

@@ -11,7 +11,10 @@
 
 #include <filesystem>
 #include <map>
+#include <multiplier/Types.h>
+#include <set>
 #include <unordered_map>
+#include <utility>
 
 #include "FileBrowserView.h"
 #include "MainWindow.h"
@@ -81,30 +84,55 @@ void FileBrowserView::InitializeWidgets(void) {
 void FileBrowserView::OnDownloadedFileList(FilePathList files) {
   QTreeWidgetItem *root_item = nullptr;
 
-  // Build up the items.
-  std::map<std::filesystem::path, QTreeWidgetItem *> item_map;
-  for (const auto &[path_, file_id] : files) {
-    std::filesystem::path path = path_.lexically_normal();
+  std::set<std::filesystem::path> has_files;
+  for (const auto &[path, file_id] : files) {
     auto base = path.root_path();
-    QTreeWidgetItem *last = nullptr;
-    for (std::filesystem::path part : path) {
-      base /= part;
-      auto &item = item_map[base.generic_string()];
-      if (!item) {
-        item = new QTreeWidgetItem();
-        item->setText(0, QString::fromStdString(part.generic_string()));
-        if (last) {
-          last->addChild(item);
-        } else if (!root_item) {
-          root_item = item;
-        }
-      }
-      last = item;
+    for (std::filesystem::path part : path.parent_path()) {
+      base /= part;  // A bit redundant, but follow the same process throughout.
     }
-    d->file_infos.emplace(last, std::make_pair(std::move(path), file_id));
+    has_files.emplace(std::move(base));
   }
 
-  d->source_file_tree->addTopLevelItem(root_item);
+  // Group the paths into folders that have at least one file in them. This is
+  // so that we don't have to see crazy deep folder trees all the time.
+  std::map<std::filesystem::path, FilePathList> sub_lists;
+  for (auto [path, file_id] : files) {
+    auto base = path.root_path();
+    for (std::filesystem::path part : path.parent_path()) {
+      base /= part;
+      if (has_files.count(base)) {
+        sub_lists[base].emplace(std::move(path), file_id);
+        break;
+      }
+    }
+  }
+
+  // Build up the items.
+  for (const auto &[parent_path, sub_list] : sub_lists) {
+    QTreeWidgetItem *root_item = new QTreeWidgetItem;
+    root_item->setText(0, QString::fromStdString(parent_path.generic_string()));
+    d->source_file_tree->addTopLevelItem(root_item);
+
+
+    std::map<std::filesystem::path, QTreeWidgetItem *> item_map;
+
+    for (const auto &[path, file_id] : sub_list) {
+      std::filesystem::path base;
+      QTreeWidgetItem *last = root_item;
+      for (std::filesystem::path part : path.lexically_relative(parent_path)) {
+        base /= part;
+        auto &item = item_map[base.generic_string()];
+        if (!item) {
+          item = new QTreeWidgetItem();
+          item->setText(0, QString::fromStdString(part.generic_string()));
+          last->addChild(item);
+        }
+        last = item;
+      }
+      d->file_infos.emplace(last, std::make_pair(std::move(path), file_id));
+    }
+  }
+
   d->source_file_tree->expandAll();
   d->source_file_tree->sortItems(0, Qt::AscendingOrder);
 
