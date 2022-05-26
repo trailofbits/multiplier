@@ -149,7 +149,7 @@ std::optional<Decl> FragmentImpl::DeclFor(
     // It's a token inside of another fragment, go get the other fragment.
     } else {
       auto frag = ep->FragmentFor(ep, decl_id.fragment_id);
-      if (decl_id.offset < frag->num_decls) {
+      if (frag && decl_id.offset < frag->num_decls) {
         Decl decl(std::move(frag), decl_id.offset);
         if (decl.id() == eid) {
           return decl;
@@ -183,7 +183,7 @@ std::optional<Stmt> FragmentImpl::StmtFor(
     // It's a token inside of another fragment, go get the other fragment.
     } else {
       auto frag = ep->FragmentFor(ep, stmt_id.fragment_id);
-      if (stmt_id.offset < frag->num_stmts) {
+      if (frag && stmt_id.offset < frag->num_stmts) {
         Stmt stmt(std::move(frag), stmt_id.offset);
         if (stmt.id() == eid) {
           return stmt;
@@ -221,7 +221,7 @@ std::optional<Type> FragmentImpl::TypeFor(
     // It's a token inside of another fragment, go get the other fragment.
     } else {
       auto frag = ep->FragmentFor(ep, type_id.fragment_id);
-      if (type_id.offset < frag->num_types) {
+      if (frag && type_id.offset < frag->num_types) {
         Type type(std::move(frag), type_id.offset);
         if (type.id() == eid) {
           return type;
