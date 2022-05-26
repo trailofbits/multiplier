@@ -303,6 +303,7 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
       d->server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
   if (!maybe_contents) {
     err << "Invalid fragment id " << fragment_id << "; missing data";
+    LOG(ERROR) << err.str();
     return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
                          kj::heapString(err.str()));
   }
