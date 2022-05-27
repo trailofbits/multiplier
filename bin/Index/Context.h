@@ -22,6 +22,8 @@
 #include <iostream>
 #include <set>
 
+#include "Database.h"
+
 namespace mx {
 class Executor;
 class ProgressBar;
@@ -293,6 +295,8 @@ class IndexingContext {
 
   std::unique_ptr<CodeGenerator> codegen;
 
+  std::vector<std::unique_ptr<Database>> database;
+
   explicit IndexingContext(ServerContext &server_context_,
                            const mx::Executor &exe_);
 
@@ -337,6 +341,12 @@ class IndexingContext {
   // which fragments overlap which lines.
   void PutFragmentLineCoverage(mx::FileId file_id, mx::FragmentId fragment_id,
                                unsigned start_line, unsigned end_line);
+
+  // Prepare database
+  void PrepareDatabase(mx::WorkerId id);
+
+  // Commit database
+  void CommitDatabase(mx::WorkerId id);
 };
 
 class SearchingContext {

@@ -12,6 +12,7 @@
 #include "Pseudo.h"
 
 namespace pasta {
+class AST;
 class Decl;
 class FileToken;
 class Token;
@@ -23,6 +24,8 @@ namespace indexer {
 
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl);
+
+std::string DeclToString(const pasta::AST &ast, const pasta::Decl &decl);
 
 // Return the name of a declaration with a leading `prefix`, or nothing.
 std::string PrefixedName(const pasta::Decl &decl, const char *prefix=" ");

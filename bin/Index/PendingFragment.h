@@ -21,6 +21,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Context.h"
+
 namespace indexer {
 
 using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
@@ -117,6 +119,10 @@ struct PendingFragment {
   // TODO(pag): Eventually make this identify the type of reference, or use
   //            the SourceIR to do so.
   void LinkReferences(IndexingContext &context, EntityMapper &em);
+
+  // Store serialized declaration fragments symbol to the persistent store
+  void PersistDeclarationSymbols(IndexingContext &context, EntityMapper &em,
+                                 pasta::AST &ast, mx::WorkerId worker_id);
 };
 
 }  // namespace indexer
