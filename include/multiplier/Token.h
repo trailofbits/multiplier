@@ -192,6 +192,12 @@ class TokenRange {
 
   TokenRange(const Token &);
 
+  TokenRange(const TokenRange &) = default;
+  TokenRange(TokenRange &&) noexcept = default;
+
+  TokenRange &operator=(const TokenRange &) = default;
+  TokenRange &operator=(TokenRange &&) noexcept = default;
+
   inline operator bool(void) const noexcept {
     return num_tokens && (num_tokens - index);
   }
@@ -218,7 +224,11 @@ class TokenRange {
     return TokenListIterator(impl, index, num_tokens);
   }
 
-  inline TokenListIterator::EndIteratorType end(void) const noexcept {
+  inline TokenListIterator::EndIteratorType end(void) && noexcept {
+    return {};
+  }
+
+  inline TokenListIterator::EndIteratorType end(void) const & noexcept {
     return {};
   }
 
@@ -247,13 +257,18 @@ class TokenList : public TokenRange {
  public:
   TokenList(void) = default;
 
+  TokenList(const TokenList &) = default;
+  TokenList(TokenList &&) noexcept = default;
+
+  TokenList &operator=(const TokenList &) = default;
+  TokenList &operator=(TokenList &&) noexcept = default;
+
   // Return the token list containing a particular token.
   static TokenList containing(Token tok);
 
   // Return the token list containing a particular token range.
   static TokenList containing(const TokenRange &range);
 };
-
 
 // A token substitution gives access to the before and after tokens of a
 // substitution. There can be one-or-more `before` tokens (e.g. function-like

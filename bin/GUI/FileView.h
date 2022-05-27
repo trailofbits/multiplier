@@ -12,6 +12,7 @@
 #include <optional>
 #include <QPaintEvent>
 #include <QRunnable>
+#include <QTextBrowser>
 #include <QTabWidget>
 
 namespace mx::gui {
@@ -31,7 +32,8 @@ class DownloadFileThread final : public QObject, public QRunnable {
         file_id(file_id_) {}
 
  signals:
-  void DownloadedFile(std::optional<File> file);
+  void DownloadedFile(bool failed);
+  void RenderedFile(QString html);
 };
 
 class FileView final : public QTabWidget {
@@ -53,7 +55,8 @@ class FileView final : public QTabWidget {
   void InitializeWidgets(void);
 
  private slots:
-  void OnDownloadedFile(std::optional<File> file);
+  void OnDownloadedFile(bool failed);
+  void OnRenderedFile(QString html);
 };
 
 }  // namespace mx::gui

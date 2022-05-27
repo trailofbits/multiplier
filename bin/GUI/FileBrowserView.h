@@ -51,6 +51,7 @@ class FileBrowserView final : public QWidget {
  private slots:
   void OnDownloadedFileList(FilePathList files);
   void OnTreeWidgetItemActivated(QTreeWidgetItem *item, int);
+  void OnFilterFileView(const QString &filter);
 
  signals:
   void SourceFileDoubleClicked(std::filesystem::path, mx::FileId file_id);

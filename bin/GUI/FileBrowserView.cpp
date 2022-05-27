@@ -4,7 +4,10 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <QHBoxLayout>
 #include <QHeaderView>
+#include <QLabel>
+#include <QLineEdit>
 #include <QThreadPool>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -23,6 +26,7 @@ namespace mx::gui {
 
 struct FileBrowserView::PrivateData final {
   QVBoxLayout *layout{nullptr};
+  QLineEdit *filter_box{nullptr};
   QTreeWidget *source_file_tree{nullptr};
   std::unordered_map<
       QTreeWidgetItem *,
@@ -45,6 +49,15 @@ FileBrowserView::FileBrowserView(MainWindow *mw, QWidget *parent)
 
   d->layout = new QVBoxLayout;
   d->layout->setContentsMargins(0, 0, 0, 0);
+
+  auto filter_area = new QWidget;
+  auto filter_layout = new QHBoxLayout;
+  filter_area->setLayout(filter_layout);
+
+  d->filter_box = new QLineEdit;
+  filter_layout->addWidget(new QLabel(tr("Filter:")));
+  filter_layout->addWidget(d->filter_box);
+  d->layout->addWidget(filter_area);
 
   d->source_file_tree = new QTreeWidget;
   d->layout->addWidget(d->source_file_tree);
@@ -77,8 +90,26 @@ void FileBrowserView::InitializeWidgets(void) {
   d->source_file_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
   d->source_file_tree->header()->setStretchLastSection(false);
 
-  connect(d->source_file_tree, &QTreeWidget::itemActivated, this,
-          &FileBrowserView::OnTreeWidgetItemActivated);
+  connect(d->source_file_tree, &QTreeWidget::itemActivated,
+          this, &FileBrowserView::OnTreeWidgetItemActivated);
+
+  connect(d->filter_box, &QLineEdit::textChanged,
+          this, &FileBrowserView::OnFilterFileView);
+}
+
+void FileBrowserView::OnFilterFileView(const QString &text) {
+  if (!text.size()) {
+    for (auto &[item, path_id] : d->file_infos) {
+      item->setHidden(false);
+    }
+  } else {
+    for (auto &[item, path_id] : d->file_infos) {
+      QString path = QString::fromStdString(path_id.first.generic_string());
+      item->setHidden(!path.contains(text));
+    }
+  }
+
+  update();
 }
 
 void FileBrowserView::OnDownloadedFileList(FilePathList files) {
@@ -110,22 +141,32 @@ void FileBrowserView::OnDownloadedFileList(FilePathList files) {
   // Build up the items.
   for (const auto &[parent_path, sub_list] : sub_lists) {
     QTreeWidgetItem *root_item = new QTreeWidgetItem;
-    root_item->setText(0, QString::fromStdString(parent_path.generic_string()));
+    QString sub_path = QString::fromStdString(parent_path.generic_string());
+    root_item->setText(0, sub_path);
     d->source_file_tree->addTopLevelItem(root_item);
 
+#ifndef QT_NO_TOOLTIP
+    root_item->setToolTip(0, sub_path);
+#endif
 
     std::map<std::filesystem::path, QTreeWidgetItem *> item_map;
 
     for (const auto &[path, file_id] : sub_list) {
       std::filesystem::path base;
+      std::filesystem::path full_base = path;
       QTreeWidgetItem *last = root_item;
       for (std::filesystem::path part : path.lexically_relative(parent_path)) {
         base /= part;
+        full_base /= part;
         auto &item = item_map[base.generic_string()];
         if (!item) {
           item = new QTreeWidgetItem();
           item->setText(0, QString::fromStdString(part.generic_string()));
           last->addChild(item);
+
+#ifndef QT_NO_TOOLTIP
+          item->setToolTip(0, QString::fromStdString(full_base.generic_string()));
+#endif
         }
         last = item;
       }

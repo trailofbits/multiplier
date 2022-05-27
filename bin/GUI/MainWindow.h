@@ -51,6 +51,7 @@ class MainWindow final : public QMainWindow {
   void OnFileExitAction(void);
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
+  void OnCloseFileViewTab(int index);
 };
 
 }  // namespace mx::gui

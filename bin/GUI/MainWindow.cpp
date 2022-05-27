@@ -140,6 +140,7 @@ void MainWindow::InitializeWidgets(void) {
   addDockWidget(Qt::LeftDockWidgetArea, d->file_list_dock);
 
   d->central_widget->setTabsClosable(true);
+  d->central_widget->setMovable(true);
   d->central_widget->setDocumentMode(true);
   d->central_widget->setUsesScrollButtons(true);
   setCentralWidget(d->central_widget);
@@ -149,6 +150,9 @@ void MainWindow::InitializeWidgets(void) {
     setTitleBarColor(winId(), palette().color(QPalette::Window), false);
   }
 #endif
+
+  connect(d->central_widget, &QTabWidget::tabCloseRequested,
+          this, &MainWindow::OnCloseFileViewTab);
 }
 
 void MainWindow::InitializeMenus(void) {
@@ -223,6 +227,10 @@ void MainWindow::OnConnectionStateChange(ConnectionState state) {
   UpdateUI();
 }
 
+void MainWindow::OnCloseFileViewTab(int index) {
+  d->central_widget->removeTab(index);
+}
+
 void MainWindow::OnConnected(void) {
   d->connection_state = ConnectionState::kConnected;
   UpdateUI();
@@ -230,8 +238,18 @@ void MainWindow::OnConnected(void) {
 
 void MainWindow::OnSourceFileDoubleClicked(
     std::filesystem::path path, mx::FileId file_id) {
-  d->central_widget->addTab(
-      new FileView(d->index, path, file_id), path.c_str());
+
+  QTabWidget *file_view = new FileView(d->index, path, file_id);
+  int tab_index = d->central_widget->addTab(
+      file_view,
+      QString("%1 (%2)").arg(path.filename().c_str()).arg(file_id));
+
+#ifndef QT_NO_TOOLTIP
+  d->central_widget->setTabToolTip(
+      tab_index, QString::fromStdString(path.generic_string()));
+#endif
+
+  d->central_widget->setCurrentIndex(tab_index);
 }
 
 void MainWindow::OnFileConnectAction(void) {
