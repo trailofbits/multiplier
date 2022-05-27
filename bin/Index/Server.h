@@ -73,6 +73,8 @@ class Server final : public mx::rpc::Multiplier::Server {
 
   // Find the list of fragment IDs associated with a specific file.
   kj::Promise<void> findFileFragments(FindFileFragmentsContext context) final;
+
+  kj::Promise<void> findSymbols(FindSymbolsContext context) final;
 };
 
 }  // namespace indexer

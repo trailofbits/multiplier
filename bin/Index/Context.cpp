@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "Codegen.h"
+#include "Database.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 
@@ -51,6 +52,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       MetadataName::kNextSmallCodeId, mx::kMaxBigFragmentId));
   next_big_fragment_id.store(meta_to_value.GetOrSet(
       MetadataName::kNextBigCodeId, mx::kMinEntityIdIncrement));
+
+  connection = std::make_unique<Database>(Database::Name(workspace_dir));
 }
 
 ServerContext::~ServerContext(void) {
@@ -94,6 +97,12 @@ IndexingContext::IndexingContext(ServerContext &server_context_,
 
   // Save the updated version number.
   server_context.Flush();
+
+  // Initialize database instance for each worker
+  for (auto i = 0U; i < num_workers; ++i) {
+    databases.emplace_back(new Database(
+        Database::Name(server_context_.workspace_dir)));
+  }
 }
 
 IndexingContext::~IndexingContext(void) {

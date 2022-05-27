@@ -30,6 +30,8 @@ enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
+class Database;
+
 enum : char {
   kMetaNameToId,
   kFileIdToPath,
@@ -192,6 +194,8 @@ class ServerContext {
   mx::PersistentSet<kEntityIdReference, mx::RawEntityId, mx::FragmentId>
       entity_id_reference;
 
+  std::unique_ptr<Database> connection;
+
   void Flush(void);
 
   ~ServerContext(void);
@@ -286,6 +290,8 @@ class IndexingContext {
   std::vector<NextId<mx::FragmentId>> local_next_big_fragment_id;
 
   std::unique_ptr<CodeGenerator> codegen;
+
+  std::vector<std::unique_ptr<Database>> databases;
 
   explicit IndexingContext(ServerContext &server_context_,
                            const mx::Executor &exe_);

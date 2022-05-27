@@ -6,13 +6,16 @@
 
 #include "Util.h"
 
+#include <clang/AST/ASTContext.h>
 #include <clang/AST/Attr.h>
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
 #include <clang/AST/DeclObjC.h>
 #include <clang/AST/DeclTemplate.h>
+#include <clang/AST/PrettyPrinter.h>
 
 #include <multiplier/AST.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Printer.h>
@@ -29,6 +32,20 @@ std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
   auto sep = "";
   for (auto ptok : pasta::PrintedTokenRange::Create(decl)) {
+    ss << sep << ptok.Data();
+    sep = " ";
+  }
+  return ss.str();
+}
+
+std::string DeclToString(const pasta::AST &ast, const pasta::Decl &decl) {
+  std::stringstream ss;
+  clang::ASTContext &context = ast.UnderlyingAST();
+  clang::PrintingPolicy Policy = context.getPrintingPolicy();
+  Policy.TerseOutput = true;
+  auto sep = "";
+  for (auto ptok : pasta::PrintedTokenRange::Create(
+      context, Policy, const_cast<clang::Decl*>(decl.RawDecl()))) {
     ss << sep << ptok.Data();
     sep = " ";
   }

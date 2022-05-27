@@ -66,6 +66,11 @@ void InvalidEntityProvider::FillReferences(
   fragment_ids_out.clear();
 }
 
+void InvalidEntityProvider::FindSymbol(
+    const Ptr &, std::string name, SymbolList &ids_out) {
+  ids_out.clear();
+}
+
 Index::Index(void)
     : impl(std::make_shared<InvalidEntityProvider>()) {}
 

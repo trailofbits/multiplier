@@ -237,6 +237,7 @@ add_library("mx-util"
     "WorkerPool.cpp"
     "Weggli.cpp"
     "Re2.cpp"
+    "SQLiteStore.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -265,6 +266,7 @@ target_link_libraries("mx-util"
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
     RocksDB::rocksdb
+    SQLite3
     ZLIB::ZLIB
   PUBLIC
     glog::glog

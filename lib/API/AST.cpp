@@ -2753,7 +2753,7 @@ AttributeKind FromPasta(pasta::AttributeKind e) {
     case 171: return AttributeKind::LOCK_RETURNED;
     case 172: return AttributeKind::LOCKS_EXCLUDED;
     case 173: return AttributeKind::M68_KINTERRUPT;
-    case 174: return AttributeKind::MIG_SERVER_ROUTINE;
+    case 174: return AttributeKind::MIG_SERVER_ROUTINE__;
     case 175: return AttributeKind::MS_ALLOCATOR;
     case 176: return AttributeKind::MS_INHERITANCE;
     case 177: return AttributeKind::MS_NO_V_TABLE;
@@ -3107,7 +3107,7 @@ const char *EnumeratorName(AttributeKind e) {
     case AttributeKind::LOCK_RETURNED: return "LOCK_RETURNED";
     case AttributeKind::LOCKS_EXCLUDED: return "LOCKS_EXCLUDED";
     case AttributeKind::M68_KINTERRUPT: return "M68_KINTERRUPT";
-    case AttributeKind::MIG_SERVER_ROUTINE: return "MIG_SERVER_ROUTINE";
+    case AttributeKind::MIG_SERVER_ROUTINE__: return "MIG_SERVER_ROUTINE__";
     case AttributeKind::MS_ALLOCATOR: return "MS_ALLOCATOR";
     case AttributeKind::MS_INHERITANCE: return "MS_INHERITANCE";
     case AttributeKind::MS_NO_V_TABLE: return "MS_NO_V_TABLE";

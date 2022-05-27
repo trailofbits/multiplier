@@ -676,9 +676,12 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
     } else if (enum_name == "SanitizerOrdinal" && val_name == "kNull") {
       val_name = "Null_";
+    } else if (enum_name == "AttributeKind" && val_name == "kMIGServerRoutine") {
+      val_name = "kMIGServerRoutine_";
     }
 
     std::string_view val_name_view = val_name;
+
     if (val_name_view[0] == 'k') {
       val_name_view = val_name_view.substr(1);
     }

@@ -16,6 +16,8 @@ add_executable("${exe_name}"
   "Codegen.h"
   "Context.cpp"
   "Context.h"
+  "Database.cpp"
+  "Database.h"
   "EntityMapper.cpp"
   "EntityMapper.h"
   "FindUsesInFragment.cpp"
@@ -33,6 +35,7 @@ add_executable("${exe_name}"
   "PendingFragment.h"
   "Persist.cpp"
   "Persist.h"
+  "PersistDeclarationInFragments.cpp"
   "PrintTokenGraph.cpp"
   "PrintTokenGraph.h"
   "Pseudo.h"
@@ -58,6 +61,7 @@ target_link_libraries("${exe_name}"
   PRIVATE
     ${MX_BEGIN_FORCE_LOAD_GROUP}
     "mx-util"
+    "concurrentqueue"
     ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
     ${MX_END_FORCE_LOAD_GROUP}
 )
