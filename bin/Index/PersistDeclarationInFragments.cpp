@@ -10,6 +10,7 @@
 #include <pasta/AST/Stmt.h>
 
 #include "Context.h"
+#include "Database.h"
 #include "EntityMapper.h"
 #include "PendingFragment.h"
 #include "Util.h"

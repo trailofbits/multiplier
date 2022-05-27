@@ -22,8 +22,6 @@
 #include <iostream>
 #include <set>
 
-#include "Database.h"
-
 namespace mx {
 class Executor;
 class ProgressBar;
@@ -31,6 +29,8 @@ enum WorkerId : unsigned;
 enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
+
+class Database;
 
 enum : char {
   kMetaNameToId,

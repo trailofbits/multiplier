@@ -34,13 +34,17 @@ class Database {
   Database(const Database &) = delete;
   Database &operator=(const Database &) = delete;
 
-  void StoreEntities(uint64_t entity_id, std::string data);
+  // Store the entity ids and symbol name in sqlite table
+  void StoreEntities(uint64_t entity_id, std::string &data);
 
+  // Prepare statement to bind values to and commit
   void Prepare();
 
   void Commit();
 
-  void CreateVirtualTable(void);
+  // Create indexed table that will enable text based seaching
+  // on entity table
+  void CreateIndexedTable(void);
 
  private:
   std::unique_ptr<DatabaseImpl> impl;

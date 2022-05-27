@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "Codegen.h"
+#include "Database.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 
@@ -116,7 +117,7 @@ IndexingContext::~IndexingContext(void) {
   // index based searching.
   for (auto i = 0U; i < num_workers; ++i) {
     if (auto db = database[i].get()) {
-      db->CreateVirtualTable();
+      db->CreateIndexedTable();
     }
   }
 
