@@ -194,7 +194,6 @@ class Connection {
   std::unique_ptr<sqlite3, Deleter> db;
   std::string dbFilename;
   std::vector<Statement*> stmts;
-  char *last_error_message;
 };
 
 }

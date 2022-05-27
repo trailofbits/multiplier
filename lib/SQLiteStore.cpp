@@ -145,8 +145,7 @@ void Statement::bind(const size_t i, const std::string &value) {
 
 Connection::Connection(const std::string &db_name,
                        const int busyTimeouts)
-                      : dbFilename(db_name),
-                        last_error_message(nullptr)
+                      : dbFilename(db_name)
 {
   sqlite3* db_handle;
   const int ret = sqlite3_open(db_name.c_str(), &db_handle);
@@ -216,8 +215,8 @@ void Connection::SetBusyTimeout(const int32_t timeout) {
 
 void Connection::Execute(const std::string& query) {
   if (sqlite3_exec(GetHandler(), query.c_str(),
-                   nullptr, nullptr, &last_error_message)) {
-    throw error(last_error_message);
+                   nullptr, nullptr, nullptr)) {
+    throw error("Failed to execute query string");
   }
 }
 
