@@ -31,6 +31,7 @@
 #include "FileBrowserView.h"
 #include "FileView.h"
 #include "OpenConnectionDialog.h"
+#include "ReferenceHierarchyView.h"
 
 namespace mx::gui {
 
@@ -59,6 +60,9 @@ struct MainWindow::PrivateData final {
   // File list. This shows files included in the build.
   FileBrowserView *file_list_view{nullptr};
   QDockWidget *file_list_dock{nullptr};
+
+  ReferenceHierarchyView *references_view{nullptr};
+  QDockWidget *references_dock{nullptr};
 
   mx::Index index;
 
@@ -137,7 +141,12 @@ void MainWindow::InitializeWidgets(void) {
   d->file_list_dock = new QDockWidget(d->file_list_view->windowTitle());
   d->file_list_dock->setWidget(d->file_list_view);
 
+  d->references_view = new ReferenceHierarchyView;
+  d->references_dock = new QDockWidget(d->references_view->windowTitle());
+  d->references_dock->setWidget(d->references_view);
+
   addDockWidget(Qt::LeftDockWidgetArea, d->file_list_dock);
+  addDockWidget(Qt::LeftDockWidgetArea, d->references_dock);
 
   d->central_widget->setTabsClosable(true);
   d->central_widget->setMovable(true);
@@ -192,12 +201,15 @@ void MainWindow::UpdateWidgets(void) {
     case ConnectionState::kNotConnected:
     case ConnectionState::kConnecting:
       d->file_list_view->Clear();
+      d->references_view->Clear();
       d->file_list_dock->hide();
+      d->references_dock->hide();
       d->central_widget->clear();
       break;
 
     case ConnectionState::kConnected:
       d->file_list_dock->show();
+      d->references_dock->show();
       break;
   }
 }
@@ -239,7 +251,7 @@ void MainWindow::OnConnected(void) {
 void MainWindow::OnSourceFileDoubleClicked(
     std::filesystem::path path, mx::FileId file_id) {
 
-  QTabWidget *file_view = new FileView(d->index, path, file_id);
+  FileView *file_view = new FileView(d->index, path, file_id);
   int tab_index = d->central_widget->addTab(
       file_view,
       QString("%1 (%2)").arg(path.filename().c_str()).arg(file_id));
@@ -250,6 +262,9 @@ void MainWindow::OnSourceFileDoubleClicked(
 #endif
 
   d->central_widget->setCurrentIndex(tab_index);
+
+  connect(file_view, &FileView::FragmentTokensClicked,
+          this, &MainWindow::OnFragmentTokensClicked);
 }
 
 void MainWindow::OnFileConnectAction(void) {
@@ -268,16 +283,25 @@ void MainWindow::OnFileConnectAction(void) {
       10u * 60u  /* 10 minutes */);
 
   d->file_list_view->DownloadFileListInBackground(d->index);
+  d->references_view->SetIndex(d->index);
 }
 
 void MainWindow::OnFileDisconnectAction(void) {
   d->connection_state = ConnectionState::kNotConnected;
   d->index = mx::Index();
+  d->references_view->SetIndex(d->index);
   UpdateUI();
 }
 
 void MainWindow::OnFileExitAction(void) { close(); }
 
 void MainWindow::OnHelpAboutAction(void) {}
+
+void MainWindow::OnFragmentTokensClicked(std::vector<RawEntityId> ids) {
+  d->references_view->Clear();
+  for (auto id : ids) {
+    d->references_view->AddRoot(id);
+  }
+}
 
 }  // namespace mx::gui

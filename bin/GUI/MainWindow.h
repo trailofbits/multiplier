@@ -52,6 +52,7 @@ class MainWindow final : public QMainWindow {
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
   void OnCloseFileViewTab(int index);
+  void OnFragmentTokensClicked(std::vector<RawEntityId> ids);
 };
 
 }  // namespace mx::gui

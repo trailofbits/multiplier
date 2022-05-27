@@ -47,24 +47,6 @@ FileBrowserView::FileBrowserView(MainWindow *mw, QWidget *parent)
   connect(this, &FileBrowserView::SourceFileDoubleClicked,
           mw, &MainWindow::OnSourceFileDoubleClicked);
 
-  d->layout = new QVBoxLayout;
-  d->layout->setContentsMargins(0, 0, 0, 0);
-
-  auto filter_area = new QWidget;
-  auto filter_layout = new QHBoxLayout;
-  filter_area->setLayout(filter_layout);
-
-  d->filter_box = new QLineEdit;
-  filter_layout->addWidget(new QLabel(tr("Filter:")));
-  filter_layout->addWidget(d->filter_box);
-  d->layout->addWidget(filter_area);
-
-  d->source_file_tree = new QTreeWidget;
-  d->layout->addWidget(d->source_file_tree);
-
-  setWindowTitle(tr("File Browser"));
-  setLayout(d->layout);
-
   InitializeWidgets();
 }
 
@@ -84,6 +66,24 @@ void FileBrowserView::DownloadFileListInBackground(Index index) {
 }
 
 void FileBrowserView::InitializeWidgets(void) {
+  d->layout = new QVBoxLayout;
+  d->layout->setContentsMargins(0, 0, 0, 0);
+
+  auto filter_area = new QWidget;
+  auto filter_layout = new QHBoxLayout;
+  filter_area->setLayout(filter_layout);
+
+  d->filter_box = new QLineEdit;
+  filter_layout->addWidget(new QLabel(tr("Filter:")));
+  filter_layout->addWidget(d->filter_box);
+  d->layout->addWidget(filter_area);
+
+  d->source_file_tree = new QTreeWidget;
+  d->layout->addWidget(d->source_file_tree);
+
+  setWindowTitle(tr("File Browser"));
+  setLayout(d->layout);
+
   d->source_file_tree->setHeaderHidden(true);
   d->source_file_tree->setColumnCount(1);
   d->source_file_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);

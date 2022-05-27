@@ -106,6 +106,10 @@ class ReferenceRange {
 
  public:
   ReferenceRange(void) = default;
+  ReferenceRange(const ReferenceRange &) = default;
+  ReferenceRange(ReferenceRange &&) noexcept = default;
+  ReferenceRange &operator=(const ReferenceRange &) = default;
+  ReferenceRange &operator=(ReferenceRange &&) noexcept = default;
 
   inline ReferenceIterator begin(void) && noexcept {
     return ReferenceIterator(std::move(impl));

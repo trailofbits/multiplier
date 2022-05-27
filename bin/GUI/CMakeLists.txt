@@ -13,19 +13,22 @@ find_package(${MX_QT} COMPONENTS Core Widgets REQUIRED)
 set(exe_name "multiplier")
 add_executable("${exe_name}"
 
-  FileBrowserView.h
   FileBrowserView.cpp
+  FileBrowserView.h
 
-  FileView.h
   FileView.cpp
-  
-  MainWindow.h
-  MainWindow.cpp
-
-  OpenConnectionDialog.h
-  OpenConnectionDialog.cpp
+  FileView.h
 
   Main.cpp
+  
+  MainWindow.cpp
+  MainWindow.h
+
+  OpenConnectionDialog.cpp
+  OpenConnectionDialog.h
+
+  ReferenceHierarchyView.cpp
+  ReferenceHierarchyView.h
 )
 
 target_link_libraries("${exe_name}" PRIVATE

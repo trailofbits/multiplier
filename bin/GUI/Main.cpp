@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
     initializeTheme();
   }
 
+  qRegisterMetaType<mx::RawEntityId>("RawEntityId");
   qRegisterMetaType<mx::FilePathList>("FilePathList");
   qRegisterMetaType<mx::Token>("Token");
   qRegisterMetaType<mx::TokenRange>("TokenRange");
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType<std::optional<mx::Type>>("std::optional<Type>");
   qRegisterMetaType<std::optional<mx::Token>>("std::optional<Token>");
   qRegisterMetaType<std::vector<mx::Fragment>>("std::vector<Fragment>");
+  qRegisterMetaType<std::vector<mx::RawEntityId>>("std::vector<RawEntityId>");
 
   mx::gui::MainWindow main_window;
   main_window.show();

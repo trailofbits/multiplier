@@ -24,7 +24,8 @@ class DownloadFileThread final : public QObject, public QRunnable {
  private:
   const Index index;
   const FileId file_id;
-  void run(void);
+
+  void run(void) final;
 
  public:
   virtual ~DownloadFileThread(void);
@@ -59,6 +60,9 @@ class FileView final : public QTabWidget {
   void OnDownloadedFile(bool failed);
   void OnRenderedFile(QString html);
   void OnClickToken(const QUrl &url);
+
+ signals:
+  void FragmentTokensClicked(std::vector<RawEntityId> ids);
 };
 
 }  // namespace mx::gui

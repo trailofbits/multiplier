@@ -324,8 +324,22 @@ void FileView::paintEvent(QPaintEvent *event) {
 }
 
 void FileView::OnClickToken(const QUrl &url) {
+  std::vector<RawEntityId> token_ids;
   for (QString tok_id_str : url.toString().split('/')) {
-    std::cerr << "Token id: " << tok_id_str.toStdString() << '\n';
+    bool ok = true;
+    RawEntityId id = tok_id_str.toULongLong(&ok);
+    if (!ok) {
+      continue;
+    }
+
+    VariantId vid = EntityId(id).Unpack();
+    if (std::holds_alternative<FragmentTokenId>(vid)) {
+      token_ids.emplace_back(id);
+    }
+  }
+
+  if (!token_ids.empty()) {
+    emit FragmentTokensClicked(std::move(token_ids));
   }
 }
 
