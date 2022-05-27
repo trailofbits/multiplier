@@ -39,6 +39,7 @@ a, a:hover, a:visited, a:active {
 td.number {
   text-align: right;
   padding-right: 10px;
+  color: rgba(%1, %2, %3, 0.5);
 }
 td.code {
   color: rgb(%1, %2, %3);
@@ -52,8 +53,6 @@ static const QString table_begin(R"(
 <td class="code">)");
 
 static const QString table_end("</td></tr></table>");
-
-static const QString anchor_format("%1%2");
 
 static const QString token_link("<a href=\"%1\">%2</a>");
 
@@ -127,14 +126,15 @@ void DownloadFileThread::run(void) {
       fragment_tokens.erase(file_tok_id);  // Garbage collect.
     }
 
-    auto sep = "#";
     ids_os.clear();
     if (auto fragment_tokens_it = open_matches.find(file_tok_id);
         fragment_tokens_it != open_matches.end()) {
 
       for (Token parsed_tok : fragment_tokens_it->second) {
-        ids_os.append(anchor_format.arg(sep).arg(parsed_tok.id()));
-        sep = "_";
+        if (ids_os.size()) {
+          ids_os.append('/');
+        }
+        ids_os.append(QString::number(parsed_tok.id()));
       }
 
       open_matches.erase(file_tok_id);  // Garbage collect.
@@ -265,7 +265,12 @@ void FileView::OnRenderedFile(QString html) {
   content->setCurrentFont(font);
   content->setFont(font);
   content->setAcceptRichText(true);
+  content->setOpenLinks(false);
+  content->setOpenExternalLinks(false);
   content->setHtml(html);
+
+  connect(content, &QTextBrowser::anchorClicked,
+          this, &FileView::OnClickToken);
 
   d->splitter->addWidget(content);
   d->state = FileViewState::kRendered;
@@ -316,6 +321,12 @@ void FileView::paintEvent(QPaintEvent *event) {
   painter.drawText(message_rect, kTextFlags, message);
 
   event->accept();
+}
+
+void FileView::OnClickToken(const QUrl &url) {
+  for (QString tok_id_str : url.toString().split('/')) {
+    std::cerr << "Token id: " << tok_id_str.toStdString() << '\n';
+  }
 }
 
 }  // namespace mx::gui

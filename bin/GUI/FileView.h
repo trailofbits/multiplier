@@ -14,6 +14,7 @@
 #include <QRunnable>
 #include <QTextBrowser>
 #include <QTabWidget>
+#include <QUrl>
 
 namespace mx::gui {
 
@@ -57,6 +58,7 @@ class FileView final : public QTabWidget {
  private slots:
   void OnDownloadedFile(bool failed);
   void OnRenderedFile(QString html);
+  void OnClickToken(const QUrl &url);
 };
 
 }  // namespace mx::gui
