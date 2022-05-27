@@ -7,6 +7,7 @@
 #include "ReferenceHierarchyView.h"
 
 #include <QHeaderView>
+#include <QSplitter>
 #include <QThreadPool>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -137,6 +138,7 @@ struct ReferenceHierarchyView::PrivateData {
   Index index;
   QTreeWidgetItem *counter{nullptr};
   QVBoxLayout *layout{nullptr};
+  QSplitter *splitter{nullptr};
   QTreeWidget *reference_tree{nullptr};
 
   std::unordered_map<QTreeWidgetItem *, std::pair<RawEntityId, bool>>
@@ -153,13 +155,23 @@ ReferenceHierarchyView::ReferenceHierarchyView(QWidget *parent)
 
 void ReferenceHierarchyView::InitializeWidgets(void) {
   d->layout = new QVBoxLayout;
+  d->splitter = new QSplitter(Qt::Horizontal);
+
   d->layout->setContentsMargins(0, 0, 0, 0);
+  d->layout->addWidget(d->splitter);
 
   d->reference_tree = new QTreeWidget;
   d->layout->addWidget(d->reference_tree);
 
   setWindowTitle(tr("Reference Hierarchy"));
   setLayout(d->layout);
+
+  QList<int> splitter_sizes;
+  splitter_sizes.push_back(d->splitter->width() / 2);
+  splitter_sizes.push_back(splitter_sizes.back());
+  d->splitter->setSizes(splitter_sizes);
+
+  d->splitter->addWidget(d->reference_tree);
 
   d->reference_tree->setHeaderHidden(true);
   d->reference_tree->setColumnCount(1);
@@ -241,6 +253,8 @@ void ReferenceHierarchyView::OnUsersOfFirstLevel(
   root_id.second = true;  // Mark as prevously expanded.
 
   OnUsersOfLevel(root_item, use_id, std::move(users));
+
+  root_item->setExpanded(true);
 }
 
 void ReferenceHierarchyView::OnUsersOfLevel(

@@ -11,6 +11,7 @@
 #include <pasta/AST/Stmt.h>
 #include <unordered_set>
 
+#include "EntityMapper.h"
 #include "Visitor.h"
 
 namespace indexer {
@@ -34,85 +35,80 @@ struct SaveRestoreEntityId {
 
 class ParentTrackerVisitor : public EntityVisitor {
  public:
-  EntityIdMap &entity_ids;
+  EntityMapper &em;
   PendingFragment &fragment;
 
   mx::RawEntityId parent_decl_id{mx::kInvalidEntityId};
   mx::RawEntityId parent_stmt_id{mx::kInvalidEntityId};
 
-  std::unordered_set<const void *> seen;
+  std::unordered_set<const void *> not_yet_seen;
 
   virtual ~ParentTrackerVisitor(void) = default;
 
-  ParentTrackerVisitor(EntityIdMap &entity_ids_, PendingFragment &fragment_)
-      : entity_ids(entity_ids_),
+  ParentTrackerVisitor(EntityMapper &em_, PendingFragment &fragment_)
+      : em(em_),
         fragment(fragment_) {}
 
-  void Accept(const pasta::Decl &decl) final {
-    if (parent_decl_id != mx::kInvalidEntityId) {
-      fragment.parent_decl_ids.emplace(decl.RawDecl(), parent_decl_id);
-    }
-
-    if (parent_stmt_id != mx::kInvalidEntityId) {
-      fragment.parent_stmt_ids.emplace(decl.RawDecl(), parent_stmt_id);
-    }
-
-    auto it = entity_ids.find(decl.RawDecl());
-    if (it == entity_ids.end()) {
+  void Accept(const pasta::Decl &entity) final {
+    mx::RawEntityId rid = em.EntityId(entity);
+    mx::VariantId vid = mx::EntityId(rid).Unpack();
+    if (!std::holds_alternative<mx::DeclarationId>(vid)) {
       return;
     }
 
-    const mx::EntityId ent_id = it->second;
-
-    mx::VariantId unpacked_id = ent_id.Unpack();
-    CHECK(std::holds_alternative<mx::DeclarationId>(unpacked_id));
-    mx::DeclarationId decl_id = std::get<mx::DeclarationId>(unpacked_id);
+    mx::DeclarationId eid = std::get<mx::DeclarationId>(vid);
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (decl_id.fragment_id != fragment.fragment_id) {
+    if (eid.fragment_id != fragment.fragment_id) {
       return;
     }
 
-    SaveRestoreEntityId save_parent_decl(parent_decl_id, ent_id);
-    this->EntityVisitor::Accept(decl);
+    if (parent_decl_id != mx::kInvalidEntityId) {
+      fragment.parent_decl_ids.emplace(entity.RawDecl(), parent_decl_id);
+    }
+
+    if (parent_stmt_id != mx::kInvalidEntityId) {
+      fragment.parent_stmt_ids.emplace(entity.RawDecl(), parent_stmt_id);
+    }
+
+    SaveRestoreEntityId save_parent_decl(parent_decl_id, rid);
+    this->EntityVisitor::Accept(entity);
   }
 
-  void Accept(const pasta::Stmt &stmt) final {
-    if (parent_decl_id != mx::kInvalidEntityId) {
-      fragment.parent_decl_ids.emplace(stmt.RawStmt(), parent_decl_id);
-    }
-
-    if (parent_stmt_id != mx::kInvalidEntityId) {
-      fragment.parent_stmt_ids.emplace(stmt.RawStmt(), parent_stmt_id);
-    }
-
-    auto it = entity_ids.find(stmt.RawStmt());
-    if (it == entity_ids.end()) {
+  void Accept(const pasta::Stmt &entity) final {
+    mx::RawEntityId rid = em.EntityId(entity);
+    mx::VariantId vid = mx::EntityId(rid).Unpack();
+    if (!std::holds_alternative<mx::StatementId>(vid)) {
       return;
     }
 
-    const mx::EntityId ent_id = it->second;
-    mx::VariantId unpacked_id = ent_id.Unpack();
-    CHECK(std::holds_alternative<mx::StatementId>(unpacked_id));
-    mx::StatementId stmt_id = std::get<mx::StatementId>(unpacked_id);
+    mx::StatementId eid = std::get<mx::StatementId>(vid);
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (stmt_id.fragment_id != fragment.fragment_id) {
+    if (eid.fragment_id != fragment.fragment_id) {
       return;
     }
 
-    SaveRestoreEntityId save_parent_stmt(parent_stmt_id, ent_id);
-    this->EntityVisitor::Accept(stmt);
+    if (parent_decl_id != mx::kInvalidEntityId) {
+      fragment.parent_decl_ids.emplace(entity.RawStmt(), parent_decl_id);
+    }
+
+    if (parent_stmt_id != mx::kInvalidEntityId) {
+      fragment.parent_stmt_ids.emplace(entity.RawStmt(), parent_stmt_id);
+    }
+
+    SaveRestoreEntityId save_parent_stmt(parent_stmt_id, rid);
+    this->EntityVisitor::Accept(entity);
   }
 
   bool Enter(const pasta::Decl &entity) final {
-    return seen.insert(entity.RawDecl()).second;
+    return not_yet_seen.erase(entity.RawDecl());
   }
 
   bool Enter(const pasta::Stmt &entity) final {
-    return seen.insert(entity.RawStmt()).second;
+    return not_yet_seen.erase(entity.RawStmt());
   }
 };
 
@@ -120,17 +116,31 @@ class ParentTrackerVisitor : public EntityVisitor {
 
 // Maps the child-to-parent relationships in the fragment, storing the
 // relationships in `parent_decls` and `parent_stmts`.
-void PendingFragment::LabelParents(EntityIdMap &entity_ids) {
-  ParentTrackerVisitor vis(entity_ids, *this);
+void PendingFragment::LabelParents(EntityMapper &em) {
+  ParentTrackerVisitor vis(em, *this);
+  for (const pasta::Decl &decl : decls_to_serialize) {
+    vis.not_yet_seen.emplace(decl.RawDecl());
+  }
+
+  for (const pasta::Stmt &stmt : stmts_to_serialize) {
+    vis.not_yet_seen.emplace(stmt.RawStmt());
+  }
+
   for (const pasta::Decl &decl : decls) {
     vis.Accept(decl);
   }
 
-  // Do a second pass through to handle any implicit declarations that were
-  // internalized into this fragment.
   for (const pasta::Decl &decl : decls_to_serialize) {
-    vis.Accept(decl);
+    if (vis.not_yet_seen.count(decl.RawDecl())) {
+      vis.Accept(decl);   
+    }
   }
+
+#ifndef NDEBUG
+  for (const pasta::Stmt &stmt : stmts_to_serialize) {
+    assert(!vis.not_yet_seen.count(stmt.RawStmt()));
+  }
+#endif
 }
 
 }  // namespace indexer

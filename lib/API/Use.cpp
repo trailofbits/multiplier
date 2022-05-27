@@ -454,27 +454,46 @@ void ReferenceIterator::Advance(void) {
     }
 
     Stmt stmt(std::move(user.fragment), user.offset);
-
-    if (stmt.kind() == StmtKind::DECL_REF_EXPR) {
-      const DeclRefExpr &expr = reinterpret_cast<const DeclRefExpr &>(stmt);
-      RawEntityId referenced_id = expr.declaration().id();
-      for (auto search_id : impl->search_ids) {
-        if (referenced_id == search_id) {
-          user.fragment = std::move(stmt.fragment);  // Take it back.
-          return;  // Hit!
+    switch (stmt.kind()) {
+      case StmtKind::DECL_REF_EXPR: {
+        const DeclRefExpr &expr = reinterpret_cast<const DeclRefExpr &>(stmt);
+        RawEntityId referenced_id = expr.declaration().id();
+        for (auto search_id : impl->search_ids) {
+          if (referenced_id == search_id) {
+            user.fragment = std::move(stmt.fragment);  // Take it back.
+            return;  // Hit!
+          }
         }
+        break;
       }
 
-    } else if (stmt.kind() == StmtKind::MEMBER_EXPR) {
-      const MemberExpr &expr = reinterpret_cast<const MemberExpr &>(stmt);
-      RawEntityId referenced_id = expr.member_declaration().id();
-      for (auto search_id : impl->search_ids) {
-        if (referenced_id == search_id) {
-          user.fragment = std::move(stmt.fragment);  // Take it back.
-          return;  // Hit!
+      case StmtKind::MEMBER_EXPR: {
+        const MemberExpr &expr = reinterpret_cast<const MemberExpr &>(stmt);
+        RawEntityId referenced_id = expr.member_declaration().id();
+        for (auto search_id : impl->search_ids) {
+          if (referenced_id == search_id) {
+            user.fragment = std::move(stmt.fragment);  // Take it back.
+            return;  // Hit!
+          }
         }
+        break;
       }
 
+      case StmtKind::CXX_CONSTRUCT_EXPR: {
+        const CXXConstructExpr &expr =
+            reinterpret_cast<const CXXConstructExpr &>(stmt);
+        RawEntityId referenced_id = expr.constructor().id();
+        for (auto search_id : impl->search_ids) {
+          if (referenced_id == search_id) {
+            user.fragment = std::move(stmt.fragment);  // Take it back.
+            return;  // Hit!
+          }
+        }
+        break;
+      }
+
+      default:
+        break;
     }
 
     user.fragment = std::move(stmt.fragment);  // Take it back.

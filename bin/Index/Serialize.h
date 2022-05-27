@@ -658,6 +658,7 @@ enum class APValueKind : unsigned;
 enum class VectorLibrary : unsigned;
 enum class Visibility : unsigned;
 enum class VisibilityType : unsigned;
+enum class DeclCategory : unsigned;
 enum class PathKind : signed char;
 enum class FileType : signed char;
 enum class CompilerName : unsigned;

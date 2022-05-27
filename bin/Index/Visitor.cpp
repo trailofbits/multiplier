@@ -306,6 +306,35 @@ void EntityVisitor::VisitLambdaExpr(const pasta::LambdaExpr &stmt) {
   }
 }
 
+void EntityVisitor::VisitInitListExpr(const pasta::InitListExpr &stmt) {
+  if (EnterStmt(stmt)) {
+    if (auto sf = stmt.SyntacticForm()) {
+      Accept(sf.value());
+    }
+    if (auto filler = stmt.ArrayFiller()) {
+      Accept(filler.value());
+    }
+  }
+}
+
+void EntityVisitor::VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) {
+  if (EnterStmt(stmt)) {
+    Accept(stmt.AssemblyString());
+    for (auto input : stmt.InputConstraintLiterals()) {
+      Accept(input);
+    }
+    for (auto output : stmt.OutputConstraintLiterals()) {
+      Accept(output);
+    }
+    for (auto clobber : stmt.ClobberStringLiterals()) {
+      Accept(clobber);
+    }
+    for (auto label : stmt.LabelExpressions()) {
+      Accept(label);
+    }
+  }
+}
+
 bool EntityVisitor::EnterDecl(const pasta::Decl &decl) {
   if (Enter(decl)) {
     if (auto ls = decl.DescribedTemplateParameters()) {

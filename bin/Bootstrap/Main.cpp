@@ -1738,7 +1738,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  EntityId id(void) const;\n"
           << "  UseRange<DeclUseSelector> uses(void) const;\n"
           << "  ReferenceRange references(void) const;\n\n"
-//          << "  DeclReferenceRange references(void) const;\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -2145,8 +2144,12 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "Token " << class_name << "::" << api_name
             << "(void) const {\n"
             << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
-            << "  return fragment->TokenFor(fragment, self." << getter_name
-            << "()).value();\n"
+            << "  if (auto tok = fragment->TokenFor(fragment, self."
+            << getter_name << "())) {\n"
+            << "    return tok.value();\n"
+            << "  } else {\n"
+            << "    return Token();\n"
+            << "  }\n"
             << "}\n\n";
 
         serialize_cpp_os

@@ -263,6 +263,7 @@ enum class APValueKind : unsigned;
 enum class VectorLibrary : unsigned;
 enum class Visibility : unsigned;
 enum class VisibilityType : unsigned;
+enum class DeclCategory : unsigned;
 enum class PathKind : signed char;
 enum class FileType : signed char;
 enum class CompilerName : unsigned;
@@ -6854,6 +6855,42 @@ inline static constexpr unsigned NumEnumerators(VisibilityType) {
 }
 
 const char *EnumeratorName(VisibilityType);
+
+enum class DeclCategory : unsigned char {
+  UNKNOWN,
+  LOCAL_VARIABLE,
+  GLOBAL_VARIABLE,
+  PARAMETER_VARIABLE,
+  FUNCTION,
+  INSTANCE_METHOD,
+  INSTANCE_MEMBER,
+  CLASS_METHOD,
+  CLASS_MEMBER,
+  THIS,
+  CLASS,
+  STRUCTURE,
+  UNION,
+  INTERFACE,
+  ENUMERATION,
+  ENUMERATOR,
+  NAMESPACE,
+  TYPE_ALIAS,
+  TEMPLATE_TYPE_PARAMETER,
+  TEMPLATE_VALUE_PARAMETER,
+  LABEL,
+};
+
+DeclCategory FromPasta(pasta::DeclCategory pasta_val);
+
+inline static const char *EnumerationName(DeclCategory) {
+  return "DeclCategory";
+}
+
+inline static constexpr unsigned NumEnumerators(DeclCategory) {
+  return 21;
+}
+
+const char *EnumeratorName(DeclCategory);
 
 enum class PathKind : unsigned char {
   UNIX,
@@ -24763,6 +24800,7 @@ class Decl {
   bool is_weak_imported(void) const;
   std::vector<Decl> redeclarations_visible_in_translation_unit(void) const;
   DeclKind kind(void) const;
+  DeclCategory category(void) const;
   Token token(void) const;
   TokenRange tokens(void) const;
 };
@@ -30023,7 +30061,6 @@ class ObjCMethodDecl : public NamedDecl {
 
   bool defined_in_ns_object(void) const;
   ObjCPropertyDecl find_property_declaration(void) const;
-  ObjCCategoryDecl category(void) const;
   ObjCInterfaceDecl class_interface(void) const;
   ImplicitParamDecl command_declaration(void) const;
   Token declarator_end_token(void) const;
@@ -31061,7 +31098,6 @@ enum class DeclUseSelector : unsigned short {
   CAPTURED_DECLARATION,
   CAPTURED_RECORD_DECLARATION,
   CATCH_PARAMETER_DECLARATION,
-  CATEGORY,
   CATEGORY_DECLARATION,
   CLASS_INTERFACE,
   CLASS_RECEIVER,
@@ -31165,7 +31201,7 @@ inline static const char *EnumerationName(DeclUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclUseSelector) {
-  return 116;
+  return 115;
 }
 
 const char *EnumeratorName(DeclUseSelector);

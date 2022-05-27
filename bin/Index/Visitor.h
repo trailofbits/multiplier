@@ -65,6 +65,8 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitClassTemplateSpecializationDecl(const pasta::ClassTemplateSpecializationDecl &decl) final;
   void VisitDeclaratorDecl(const pasta::DeclaratorDecl &decl) final;
   void VisitLambdaExpr(const pasta::LambdaExpr &stmt) final;
+  void VisitInitListExpr(const pasta::InitListExpr &stmt) final;
+  void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
 

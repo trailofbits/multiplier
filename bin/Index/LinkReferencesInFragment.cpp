@@ -91,6 +91,12 @@ void PendingFragment::LinkReferences(
       if (MayHaveRemoteRedeclarations(used_decl)) {
         context.LinkReferenceInFragment(em.EntityId(used_decl), fragment_id);
       }
+    
+    } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
+      auto used_decl = ce->Constructor();
+      if (MayHaveRemoteRedeclarations(used_decl)) {
+        context.LinkReferenceInFragment(em.EntityId(used_decl), fragment_id);
+      }  
     }
   }
 }

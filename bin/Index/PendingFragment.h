@@ -97,7 +97,7 @@ struct PendingFragment {
              const pasta::TokenRange &tokens);
 
   // Label the parent entity ids.
-  void LabelParents(EntityIdMap &entity_ids);
+  void LabelParents(EntityMapper &em);
 
   // Serialize the built-out fragments.
   void Serialize(EntityMapper &em, mx::rpc::Fragment::Builder &b);

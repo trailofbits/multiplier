@@ -519,11 +519,12 @@ void PersistFragment(IndexingContext &context, NameMangler &mangler,
   // and build lists of the entities to serialize.
   frag.Build(entity_ids, file_ids, tokens);
 
+  EntityMapper em(entity_ids, file_ids, frag);
+
   // Figure out parentage/inheritance between the entities.
-  frag.LabelParents(entity_ids);
+  frag.LabelParents(em);
 
   // Serialize all discovered entities.
-  EntityMapper em(entity_ids, file_ids, frag);
   frag.Serialize(em, fb);
 
   const mx::FragmentId fragment_id = frag.fragment_id;

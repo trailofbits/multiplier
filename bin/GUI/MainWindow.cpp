@@ -15,7 +15,9 @@
 #include <glog/logging.h>
 
 #include <QAction>
+#include <QApplication>
 #include <QCloseEvent>
+#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QMdiArea>
@@ -24,6 +26,8 @@
 #include <QMessageBox>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QRect>
+
 #include <unordered_map>
 
 #include <multiplier/Index.h>
@@ -146,7 +150,7 @@ void MainWindow::InitializeWidgets(void) {
   d->references_dock->setWidget(d->references_view);
 
   addDockWidget(Qt::LeftDockWidgetArea, d->file_list_dock);
-  addDockWidget(Qt::LeftDockWidgetArea, d->references_dock);
+  addDockWidget(Qt::BottomDockWidgetArea, d->references_dock);
 
   d->central_widget->setTabsClosable(true);
   d->central_widget->setMovable(true);
@@ -222,7 +226,9 @@ void MainWindow::UpdateUI(void) {
 
 void MainWindow::InitializeUI(void) {
   setWindowTitle("Multiplier");
-  resize(1280, 720);
+  QRect rect = QApplication::desktop()->screenGeometry();
+
+  resize(rect.width(), rect.height());
 
   InitializeWidgets();
   InitializeMenus();
