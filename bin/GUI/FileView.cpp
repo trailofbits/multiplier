@@ -30,6 +30,10 @@ enum class FileViewState {
 };
 
 static const QString peters_theme(R"(
+.sc_area {
+  font-size: 18px;
+}
+
 .sc_code_line {
   background-color: rgb(20,20,20);
   color: rgb(224,0,1);  /* Highlight what isn't colored */
@@ -41,6 +45,10 @@ static const QString peters_theme(R"(
   color: rgb(108,131,139);
   text-align: right;
   padding-right: 10px;
+}
+
+.sc_disabled {
+  color: rgb(114,114,114);
 }
 
 .sc_comment {
@@ -79,7 +87,27 @@ static const QString peters_theme(R"(
   font-weight: bold;
 }
 
-.sc_enumeration {
+.sc_class {
+  color: rgb(0,177,110);
+  font-weight: bold;
+}
+
+.sc_struct {
+  color: rgb(0,177,110);
+  font-weight: bold;
+}
+
+.sc_union {
+  color: rgb(0,177,110);
+  font-weight: bold;
+}
+
+.sc_interface {
+  color: rgb(0,177,110);
+  font-weight: bold;
+}
+
+.sc_enum {
   color: rgb(175,144,65);
   font-style: italic;
 }
@@ -144,6 +172,11 @@ static const QString peters_theme(R"(
   color: rgb(202,120,29);
 }
 
+.sc_template_parameter_value {
+  color: rgb(174,144,65);
+  font-style: italic;
+}
+
 .sc_punctuation {
   color: rgb(93,93,93);
 }
@@ -158,7 +191,7 @@ a, a:hover, a:visited, a:active {
 </style>
 )");
 static const QString table_begin(R"(
-<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="sc_area">
 <tr>
 <td class="sc_number_line" id="line1">1</td>
 <td class="sc_code_line" width="100%">)");
@@ -175,20 +208,44 @@ static const QString new_line(R"(
 static const QString space("&nbsp;");
 static const QString tab("&nbsp;&nbsp;&nbsp;&nbsp;");
 
+namespace sc {
 static const QString none;
+static const QString disabled = "sc_disabled";
 static const QString comment = "sc_comment";
 static const QString literal = "sc_literal";
 static const QString punctuation = "sc_punctuation";
+static const QString type_builtin = "sc_type_builtin";
 static const QString keyword = "sc_keyword";
 static const QString pp_keyword = "sc_pp_keyword";
 static const QString objc_keyword = "sc_objc_keyword";
+static const QString macro = "sc_macro";
+static const QString local_variable = "sc_local_variable";
+static const QString global_variable = "sc_global_variable";
+static const QString parameter_variable = "sc_parameter_variable";
+static const QString function = "sc_function";
+static const QString instance_method = "sc_instance_method";
+static const QString instance_member = "sc_instance_member";
+static const QString class_method = "sc_instance_method";
+static const QString class_member = "sc_instance_member";
+static const QString class_ = "sc_class";
+static const QString struct_ = "sc_struct";
+static const QString union_ = "sc_union";
+static const QString interface_ = "sc_interface";
+static const QString enum_ = "sc_enum";
+static const QString enumerator = "sc_enumerator";
+static const QString namespace_ = "sc_namespace";
+static const QString type_alias = "sc_type_alias";
+static const QString template_parameter_type = "sc_template_parameter_type";
+static const QString template_parameter_value = "sc_template_parameter_value";
+static const QString label = "sc_label";
+}  // namespace sc
 
 static const QString *BaselineTokenClass(TokenKind kind) {
   switch (kind) {
     default:
       return nullptr;
     case TokenKind::COMMENT:
-      return &comment;
+      return &sc::comment;
     case TokenKind::NUMERIC_CONSTANT:
     case TokenKind::CHARACTER_CONSTANT:
     case TokenKind::WIDE_CHARACTER_CONSTANT:
@@ -201,7 +258,7 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::UTF8_STRING_LITERAL:
     case TokenKind::UTF16_STRING_LITERAL:
     case TokenKind::UTF32_STRING_LITERAL:
-      return &literal;
+      return &sc::literal;
     case TokenKind::L_SQUARE:
     case TokenKind::R_SQUARE:
     case TokenKind::L_PARENTHESIS:
@@ -259,48 +316,70 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::LESS_LESS_LESS:
     case TokenKind::GREATER_GREATER_GREATER:
     case TokenKind::CARETCARET:
-      return &punctuation;
+      return &sc::punctuation;
+    case TokenKind::KEYWORD_DOUBLE:
+    case TokenKind::KEYWORD_LONG:
+    case TokenKind::KEYWORD_FLOAT:
+    case TokenKind::KEYWORD_CHARACTER:
+    case TokenKind::KEYWORD_SHORT:
+    case TokenKind::KEYWORD_SIGNED:
+    case TokenKind::KEYWORD_UNSIGNED:
+    case TokenKind::KEYWORD__BOOLEAN:
+    case TokenKind::KEYWORD_BOOLEAN:
+    case TokenKind::KEYWORD_WCHAR_T:
+    case TokenKind::KEYWORD_CHAR16_T:
+    case TokenKind::KEYWORD_CHAR32_T:
+    case TokenKind::KEYWORD_CHAR8_T:
+    case TokenKind::KEYWORD__FLOAT16:
+    case TokenKind::KEYWORD__DECIMAL32:
+    case TokenKind::KEYWORD__DECIMAL64:
+    case TokenKind::KEYWORD__DECIMAL128:
+    case TokenKind::KEYWORD_INT:
+    case TokenKind::KEYWORD_VOID:
+    case TokenKind::KEYWORD___FLOAT128:
+    case TokenKind::KEYWORD___INT128:
+    case TokenKind::KEYWORD___BOOLEAN:
+    case TokenKind::KEYWORD___BF16:
+    case TokenKind::KEYWORD_HALF:
+    case TokenKind::KEYWORD___PTR64:
+    case TokenKind::KEYWORD___PTR32:
+    case TokenKind::KEYWORD___SPTR:
+    case TokenKind::KEYWORD___UPTR:
+    case TokenKind::KEYWORD___W64:
+    case TokenKind::KEYWORD___INT64:
+      return &sc::type_builtin;
+
+    case TokenKind::KEYWORD__EXT_INT:
+    case TokenKind::KEYWORD__BIT_INT:
+    case TokenKind::KEYWORD__COMPLEX:
     case TokenKind::KEYWORD_AUTO:
     case TokenKind::KEYWORD_BREAK:
     case TokenKind::KEYWORD_CASE:
-    case TokenKind::KEYWORD_CHARACTER:
     case TokenKind::KEYWORD_CONST:
     case TokenKind::KEYWORD_CONTINUE:
     case TokenKind::KEYWORD_DEFAULT:
     case TokenKind::KEYWORD_DO:
-    case TokenKind::KEYWORD_DOUBLE:
     case TokenKind::KEYWORD_ELSE:
     case TokenKind::KEYWORD_ENUM:
     case TokenKind::KEYWORD_EXTERN:
-    case TokenKind::KEYWORD_FLOAT:
     case TokenKind::KEYWORD_FOR:
     case TokenKind::KEYWORD_GOTO:
     case TokenKind::KEYWORD_IF:
     case TokenKind::KEYWORD_INLINE:
-    case TokenKind::KEYWORD_INT:
-    case TokenKind::KEYWORD__EXT_INT:
-    case TokenKind::KEYWORD__BIT_INT:
-    case TokenKind::KEYWORD_LONG:
     case TokenKind::KEYWORD_REGISTER:
     case TokenKind::KEYWORD_RESTRICT:
     case TokenKind::KEYWORD_RETURN:
-    case TokenKind::KEYWORD_SHORT:
-    case TokenKind::KEYWORD_SIGNED:
     case TokenKind::KEYWORD_SIZEOF:
     case TokenKind::KEYWORD_STATIC:
     case TokenKind::KEYWORD_STRUCT:
     case TokenKind::KEYWORD_SWITCH:
     case TokenKind::KEYWORD_TYPEDEF:
     case TokenKind::KEYWORD_UNION:
-    case TokenKind::KEYWORD_UNSIGNED:
-    case TokenKind::KEYWORD_VOID:
     case TokenKind::KEYWORD_VOLATILE:
     case TokenKind::KEYWORD_WHILE:
     case TokenKind::KEYWORD__ALIGNAS:
     case TokenKind::KEYWORD__ALIGNOF:
     case TokenKind::KEYWORD__ATOMIC:
-    case TokenKind::KEYWORD__BOOLEAN:
-    case TokenKind::KEYWORD__COMPLEX:
     case TokenKind::KEYWORD__GENERIC:
     case TokenKind::KEYWORD__IMAGINARY:
     case TokenKind::KEYWORD__NORETURN:
@@ -310,7 +389,6 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::KEYWORD___OBJC_YES:
     case TokenKind::KEYWORD___OBJC_NO:
     case TokenKind::KEYWORD_ASSEMBLY:
-    case TokenKind::KEYWORD_BOOLEAN:
     case TokenKind::KEYWORD_CATCH:
     case TokenKind::KEYWORD_CLASS:
     case TokenKind::KEYWORD_CONST_CAST:
@@ -338,11 +416,8 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::KEYWORD_TYPEID:
     case TokenKind::KEYWORD_USING:
     case TokenKind::KEYWORD_VIRTUAL:
-    case TokenKind::KEYWORD_WCHAR_T:
     case TokenKind::KEYWORD_ALIGNAS:
     case TokenKind::KEYWORD_ALIGNOF:
-    case TokenKind::KEYWORD_CHAR16_T:
-    case TokenKind::KEYWORD_CHAR32_T:
     case TokenKind::KEYWORD_CONSTEXPR:
     case TokenKind::KEYWORD_DECLTYPE:
     case TokenKind::KEYWORD_NOEXCEPT:
@@ -358,14 +433,9 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::KEYWORD_IMPORT:
     case TokenKind::KEYWORD_CONSTEVAL:
     case TokenKind::KEYWORD_CONSTINIT:
-    case TokenKind::KEYWORD_CHAR8_T:
-    case TokenKind::KEYWORD__FLOAT16:
     case TokenKind::KEYWORD__ACCUM:
     case TokenKind::KEYWORD__FRACT:
     case TokenKind::KEYWORD__SAT:
-    case TokenKind::KEYWORD__DECIMAL32:
-    case TokenKind::KEYWORD__DECIMAL64:
-    case TokenKind::KEYWORD__DECIMAL128:
     case TokenKind::KEYWORD___NULL:
     case TokenKind::KEYWORD___ALIGNOF:
     case TokenKind::KEYWORD___ATTRIBUTE:
@@ -378,10 +448,8 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::KEYWORD___BUILTIN_TYPES_COMPATIBLE_P:
     case TokenKind::KEYWORD___BUILTIN_VA_ARGUMENT:
     case TokenKind::KEYWORD___EXTENSION__:
-    case TokenKind::KEYWORD___FLOAT128:
     case TokenKind::KEYWORD___IBM128:
     case TokenKind::KEYWORD___IMAG:
-    case TokenKind::KEYWORD___INT128:
     case TokenKind::KEYWORD___LABEL__:
     case TokenKind::KEYWORD___REAL:
     case TokenKind::KEYWORD___THREAD:
@@ -502,9 +570,6 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::KEYWORD___PASCAL:
     case TokenKind::KEYWORD___VECTOR:
     case TokenKind::KEYWORD___PIXEL:
-    case TokenKind::KEYWORD___BOOLEAN:
-    case TokenKind::KEYWORD___BF16:
-    case TokenKind::KEYWORD_HALF:
     case TokenKind::KEYWORD___BRIDGE:
     case TokenKind::KEYWORD___BRIDGE_TRANSFER:
     case TokenKind::KEYWORD___BRIDGE_RETAINED:
@@ -516,16 +581,10 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::KEYWORD__NULLABLE:
     case TokenKind::KEYWORD__NULLABLE_RESULT:
     case TokenKind::KEYWORD__NULL_UNSPECIFIED:
-    case TokenKind::KEYWORD___PTR64:
-    case TokenKind::KEYWORD___PTR32:
-    case TokenKind::KEYWORD___SPTR:
-    case TokenKind::KEYWORD___UPTR:
-    case TokenKind::KEYWORD___W64:
     case TokenKind::KEYWORD___UUIDOF:
     case TokenKind::KEYWORD___TRY:
     case TokenKind::KEYWORD___FINALLY:
     case TokenKind::KEYWORD___LEAVE:
-    case TokenKind::KEYWORD___INT64:
     case TokenKind::KEYWORD___IF_EXISTS:
     case TokenKind::KEYWORD___IF_NOT_EXISTS:
     case TokenKind::KEYWORD___SINGLE_INHERITANCE:
@@ -537,7 +596,7 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::KEYWORD___BUILTIN_AVAILABLE:
     case TokenKind::KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME:
     case TokenKind::KEYWORD___UNKNOWN_ANYTYPE:
-      return &keyword;
+      return &sc::keyword;
     case TokenKind::PP_IF:
     case TokenKind::PP_IFDEF:
     case TokenKind::PP_IFNDEF:
@@ -563,7 +622,7 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::PP_UNASSERT:
     case TokenKind::PP___PUBLIC_MACRO:
     case TokenKind::PP___PRIVATE_MACRO:
-      return &pp_keyword;
+      return &sc::pp_keyword;
     case TokenKind::OBJC_AT_CLASS:
     case TokenKind::OBJC_AT_COMPATIBILITY_ALIAS:
     case TokenKind::OBJC_AT_DEFINITIONS:
@@ -590,36 +649,166 @@ static const QString *BaselineTokenClass(TokenKind kind) {
     case TokenKind::OBJC_AT_DYNAMIC:
     case TokenKind::OBJC_AT_IMPORT:
     case TokenKind::OBJC_AT_AVAILABLE:
-      return &objc_keyword;
+      return &sc::objc_keyword;
+    case TokenKind::BEGIN_OF_MACRO_EXPANSION_MARKER:
+      return &sc::macro;
   }
+}
+
+static const QString *DeclCategoryToSyntaxColor(DeclCategory category) {
+  switch (category) {
+    case DeclCategory::UNKNOWN:
+      break;
+    case DeclCategory::LOCAL_VARIABLE:
+      return &sc::local_variable;
+    case DeclCategory::GLOBAL_VARIABLE:
+      return &sc::global_variable;
+    case DeclCategory::PARAMETER_VARIABLE:
+      return &sc::parameter_variable;
+    case DeclCategory::FUNCTION:
+      return &sc::function;
+    case DeclCategory::INSTANCE_METHOD:
+      return &sc::instance_method;
+    case DeclCategory::INSTANCE_MEMBER:
+      return &sc::instance_member;
+    case DeclCategory::CLASS_METHOD:
+      return &sc::class_method;
+    case DeclCategory::CLASS_MEMBER:
+      return &sc::class_member;
+    case DeclCategory::THIS:
+      return &sc::parameter_variable;
+    case DeclCategory::CLASS:
+      return &sc::class_;
+    case DeclCategory::STRUCTURE:
+      return &sc::struct_;
+    case DeclCategory::UNION:
+      return &sc::union_;
+    case DeclCategory::INTERFACE:
+      return &sc::interface_;
+    case DeclCategory::ENUMERATION:
+      return &sc::enum_;
+    case DeclCategory::ENUMERATOR:
+      return &sc::enumerator;
+    case DeclCategory::NAMESPACE:
+      return &sc::namespace_;
+    case DeclCategory::TYPE_ALIAS:
+      return &sc::type_alias;
+    case DeclCategory::TEMPLATE_TYPE_PARAMETER:
+      return &sc::template_parameter_type;
+    case DeclCategory::TEMPLATE_VALUE_PARAMETER:
+      return &sc::template_parameter_value;
+    case DeclCategory::LABEL:
+      return &sc::label;
+  }
+  return nullptr;
+}
+
+static const QString *VisitStmt(const Stmt &stmt, const Token &frag_token) {
+  if (auto dre = DeclRefExpr::from(stmt)) {
+    if (auto named_decl = NamedDecl::from(dre->declaration())) {
+      if (named_decl->name() == frag_token.data() &&
+          dre->expression_token().id() == frag_token.id()) {
+        return DeclCategoryToSyntaxColor(named_decl->category());
+      }
+    }
+  } else if (auto me = MemberExpr::from(stmt)) {
+    auto member_decl = me->member_declaration();
+    if (member_decl.name() == frag_token.data() &&
+        me->member_token().id() == frag_token.id()) {
+      return DeclCategoryToSyntaxColor(member_decl.category());
+    } else {
+      return VisitStmt(me->base(), frag_token);
+    }
+  } else if (auto ce = CXXConstructExpr::from(stmt)) {
+    auto constructor_decl = ce->constructor();
+    if (constructor_decl.name() == frag_token.data() &&
+        ce->token().id() == frag_token.id()) {
+      return DeclCategoryToSyntaxColor(constructor_decl.category());
+    }
+  }
+  return nullptr;
+}
+
+static const QString *VisitType(const Type &type, const Token &frag_token) {
+  if (auto typedef_type = TypedefType::from(type)) {
+    auto typedef_decl = typedef_type->declaration();
+    if (typedef_decl.name() == frag_token.data()) {
+      return DeclCategoryToSyntaxColor(typedef_decl.category());
+    }
+
+  } else if (auto tag_type = TagType::from(type)) {
+    auto tag_decl = tag_type->declaration();
+    if (tag_decl.name() == frag_token.data()) {
+      return DeclCategoryToSyntaxColor(tag_decl.category());
+    }
+
+  } else if (auto unqual_type = type.unqualified_type();
+             unqual_type.id() != type.id()) {
+    return VisitType(unqual_type, frag_token);
+  }
+  return nullptr;
+}
+
+static const QString *FragmentTokenClass(const Token &frag_token) {
+  const QString *backup_sc = nullptr;
+
+  for (auto context = TokenContext::of(frag_token); context;
+       context = context->parent()) {
+    if (auto stmt = context->as_statement()) {
+      if (auto sc = VisitStmt(stmt.value(), frag_token)) {
+        return sc;
+      } else {
+        return backup_sc;
+      }
+    }
+
+    if (backup_sc) {
+      continue;
+    }
+
+    if (auto decl = context->as_declaration()) {
+      if (auto named_decl = NamedDecl::from(decl);
+          named_decl && named_decl->name() == frag_token.data()) {
+        backup_sc = DeclCategoryToSyntaxColor(decl->category());
+      }
+    } else if (auto type = context->as_type()) {
+      backup_sc = VisitType(type.value(), frag_token);
+    }
+  }
+
+  return backup_sc;
 }
 
 const QString &TokenClass(const Token &file_token,
                           const std::vector<Token> &frag_tokens) {
-  const QString *sc = nullptr;
 
-  auto tok_kind = file_token.kind();
-  sc = BaselineTokenClass(tok_kind);
+  const auto tok_kind = file_token.kind();
 
-  // Fragments generally have better information on the token kinds, e.g.
-  // ientifiers are mapped to keywords.
+  // Fragments generally have better information on the identifiers.
+  if (tok_kind == TokenKind::IDENTIFIER) {
+    for (const Token &frag_token : frag_tokens) {
+      if (auto sc = FragmentTokenClass(frag_token)) {
+        return *sc;
+      }
+    }
+  }
+
   for (const Token &frag_token : frag_tokens) {
-    if (sc) {
-      break;
-    }
-    sc = BaselineTokenClass(frag_token.kind());
-  }
-
-  // Reasonable default.
-  if (!sc) {
-    if (TokenKind::IDENTIFIER == tok_kind) {
-      sc = &keyword;
-    } else {
-      sc = &none;
+    if (auto sc = BaselineTokenClass(frag_token.kind())) {
+      return *sc;
     }
   }
 
-  return *sc;
+  if (auto sc = BaselineTokenClass(tok_kind)) {
+    return *sc;
+  }
+
+  // If it's a token in a fragment, then treat as null.
+  if (!frag_tokens.empty()) {
+    return sc::none;
+  }
+
+  return sc::disabled;
 }
 
 }  // namespace
