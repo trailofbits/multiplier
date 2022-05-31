@@ -492,6 +492,18 @@ void ReferenceIterator::Advance(void) {
         break;
       }
 
+      case StmtKind::GOTO_STMT: {
+        const GotoStmt &expr = reinterpret_cast<const GotoStmt &>(stmt); 
+        RawEntityId referenced_id = expr.label().id();
+        for (auto search_id : impl->search_ids) {
+          if (referenced_id == search_id) {
+            user.fragment = std::move(stmt.fragment);  // Take it back.
+            return;  // Hit!
+          }
+        }
+        break;
+      }
+
       default:
         break;
     }

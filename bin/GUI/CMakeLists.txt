@@ -12,6 +12,12 @@ find_package(${MX_QT} COMPONENTS Core Widgets REQUIRED)
 
 set(exe_name "multiplier")
 add_executable("${exe_name}"
+  
+  CodeTheme.cpp
+  CodeTheme.h
+  
+  CodeView.cpp
+  CodeView.h
 
   FileBrowserView.cpp
   FileBrowserView.h
@@ -29,6 +35,9 @@ add_executable("${exe_name}"
 
   ReferenceHierarchyView.cpp
   ReferenceHierarchyView.h
+  
+  Util.cpp
+  Util.h
 )
 
 target_link_libraries("${exe_name}" PRIVATE

@@ -269,8 +269,8 @@ void MainWindow::OnSourceFileDoubleClicked(
 
   d->central_widget->setCurrentIndex(tab_index);
 
-  connect(file_view, &FileView::FragmentTokensClicked,
-          this, &MainWindow::OnFragmentTokensClicked);
+  connect(file_view, &FileView::DeclarationsClicked,
+          this, &MainWindow::OnDeclarationsClicked);
 }
 
 void MainWindow::OnFileConnectAction(void) {
@@ -303,7 +303,7 @@ void MainWindow::OnFileExitAction(void) { close(); }
 
 void MainWindow::OnHelpAboutAction(void) {}
 
-void MainWindow::OnFragmentTokensClicked(std::vector<RawEntityId> ids) {
+void MainWindow::OnDeclarationsClicked(std::vector<RawEntityId> ids) {
   d->references_view->Clear();
   for (auto id : ids) {
     d->references_view->AddRoot(id);

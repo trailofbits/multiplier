@@ -12,6 +12,7 @@
 #include <QApplication>
 #include <QMetaType>
 
+#include "CodeView.h"
 #include "MainWindow.h"
 
 namespace {
@@ -33,6 +34,7 @@ int main(int argc, char *argv[]) {
     initializeTheme();
   }
 
+  qRegisterMetaType<mx::gui::CodePtr>("CodePtr");
   qRegisterMetaType<mx::RawEntityId>("RawEntityId");
   qRegisterMetaType<mx::FilePathList>("FilePathList");
   qRegisterMetaType<mx::Token>("Token");
