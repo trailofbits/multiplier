@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <filesystem>
+#include <map>
 #include <unordered_map>
 
 #include "CodeView.h"
@@ -77,6 +79,11 @@ void InitReferenceHierarchyThread::run(void) {
   for (Reference ref : root_decl.references()) {
     Stmt stmt = ref.statement();
     if (auto decl = DeclContaining(stmt)) {
+
+      // Populate the cache in this background thread to not block the main
+      // thread.
+      (void) decl->token().nearest_location(line_cache);
+
       users.emplace_back(decl.value(),
                          stmt.tokens().file_tokens().strip_whitespace());
     }
@@ -99,6 +106,11 @@ void ExpandReferenceHierarchyThread::run(void) {
   for (Reference ref : std::get<Decl>(entity).references()) {
     Stmt stmt = ref.statement();
     if (auto decl = DeclContaining(stmt)) {
+
+      // Populate the cache in this background thread to not block the main
+      // thread.
+      (void) decl->token().nearest_location(line_cache);
+
       users.emplace_back(decl.value(), stmt.tokens().file_tokens());
     }
   }
@@ -118,6 +130,7 @@ struct ReferenceHierarchyView::PrivateData {
   HighlightRangeTheme theme;
   CodeView *code{nullptr};
   QTreeWidgetItem *active_item{nullptr};
+  FileLocationCache line_cache;
 
   struct ItemInfo {
     const Decl decl;
@@ -129,6 +142,7 @@ struct ReferenceHierarchyView::PrivateData {
   };
 
   std::unordered_map<QTreeWidgetItem *, ItemInfo> item_to_info;
+  std::unordered_map<FileId, QString> file_id_to_path;
 
   inline PrivateData(const CodeTheme &theme_)
       : theme(theme_) {}
@@ -187,7 +201,12 @@ void ReferenceHierarchyView::Clear(void) {
 }
 
 void ReferenceHierarchyView::SetIndex(Index index) {
+  d->file_id_to_path.clear();
   d->index = std::move(index);
+  for (auto &[path, index] : d->index.file_paths()) {
+    d->file_id_to_path.emplace(
+        index, QString::fromStdString(path.generic_string()));
+  }
   Clear();
 }
 
@@ -197,7 +216,7 @@ void ReferenceHierarchyView::AddRoot(RawEntityId root_id) {
   d->reference_tree->addTopLevelItem(root_item);
 
   auto expander = new InitReferenceHierarchyThread(
-      d->index, root_id, root_item);
+      d->index, root_id, d->line_cache, root_item);
 
   expander->setAutoDelete(true);
 
@@ -225,7 +244,7 @@ void ReferenceHierarchyView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
   it->second.has_been_expanded = true;
 
   auto expander = new ExpandReferenceHierarchyThread(
-      d->index, it->second.decl.id(), item);
+      d->index, it->second.decl.id(), d->line_cache, item);
 
   expander->setAutoDelete(true);
 
@@ -233,6 +252,28 @@ void ReferenceHierarchyView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
           this, &ReferenceHierarchyView::OnUsersOfLevel);
 
   QThreadPool::globalInstance()->start(expander);
+}
+
+QString ReferenceHierarchyView::RowName(
+    const Decl &decl, const Token &use) const {
+  QString decl_name;
+  if (auto nd = NamedDecl::from(decl)) {
+    if (auto name_data = nd->name(); !name_data.empty()) {
+      decl_name = QString::fromUtf8(name_data.data(),
+                                    static_cast<int>(name_data.size()));
+    } else {
+      decl_name = QString("%1(%2)").arg(EnumeratorName(decl.category()))
+                                   .arg(decl.id());
+    }
+  } else {
+    decl_name = QString("%1(%2)").arg(EnumeratorName(decl.category()))
+                                 .arg(decl.id());
+  }
+  if (auto loc = use.nearest_location(d->line_cache)) {
+    decl_name.append(QString(":%1:%2").arg(loc->first)
+                                                .arg(loc->second));
+  }
+  return decl_name;
 }
 
 void ReferenceHierarchyView::OnUsersOfFirstLevel(
@@ -244,7 +285,7 @@ void ReferenceHierarchyView::OnUsersOfFirstLevel(
     return;
   }
 
-  root_item->setText(0, QString::number(root_decl->id()));
+  root_item->setText(0, RowName(root_decl.value(), root_decl->token()));
   d->item_to_info.clear();
 
   auto &item = d->item_to_info.emplace(
@@ -280,10 +321,15 @@ void ReferenceHierarchyView::OnUsersOfLevel(
     return;
   }
 
-  for (auto &[decl, tokens] : users) {
+
+  auto add_user = [=] (QTreeWidgetItem *parent, Decl decl, TokenRange tokens) {
     QTreeWidgetItem *user_item = new QTreeWidgetItem;
-    user_item->setText(0, QString::number(decl.id()));
-    parent_item->addChild(user_item);
+    if (tokens) {
+      user_item->setText(0, RowName(decl, tokens[0]));
+    } else {
+      user_item->setText(0, RowName(decl, decl.token()));
+    }
+    parent->addChild(user_item);
 
     PrivateData::ItemInfo &child_id =
         d->item_to_info.emplace(user_item, std::move(decl)).first->second;
@@ -295,6 +341,33 @@ void ReferenceHierarchyView::OnUsersOfLevel(
 
     user_item->addChild(download_item);
     user_item->setExpanded(false);
+  };
+
+  std::map<QString, QTreeWidgetItem *> file_users;
+  UserLocations other_users;
+  for (auto &[decl, tokens] : users) {
+    if (std::optional<File> file = File::containing(decl)) {
+      if (auto id_it = d->file_id_to_path.find(file->id());
+          id_it != d->file_id_to_path.end()) {
+
+        QTreeWidgetItem *&file_parent = file_users[id_it->second];
+        if (!file_parent) {
+          file_parent = new QTreeWidgetItem;
+          file_parent->setText(0, id_it->second);
+        }
+
+        add_user(file_parent, std::move(decl), std::move(tokens));
+        continue;
+      }
+    }
+
+    add_user(parent_item, std::move(decl), std::move(tokens));
+    other_users.emplace_back(std::move(decl), std::move(tokens));
+  }
+
+  for (const auto &[path, file_item] : file_users) {
+    parent_item->addChild(file_item);
+    file_item->setExpanded(true);
   }
 
   parent_item->setExpanded(true);
@@ -303,9 +376,20 @@ void ReferenceHierarchyView::OnUsersOfLevel(
 }
 
 void ReferenceHierarchyView::OnItemSelectionChanged(void) {
+
   for (auto item : d->reference_tree->selectedItems()) {
-    OnItemPressed(item, 0);
-    return;
+    auto id_it = d->item_to_info.find(item);
+    if (id_it == d->item_to_info.end()) {
+      if (item->childCount()) {
+        d->reference_tree->clearSelection();
+        d->reference_tree->setItemSelected(item, false);
+        d->reference_tree->setItemSelected(item->child(0), true);
+        return;
+      }
+    } else {
+      OnItemPressed(item, 0);
+      return;
+    }
   }
 }
 

@@ -28,6 +28,7 @@ class InitReferenceHierarchyThread final : public QObject, public QRunnable {
  private:
   Index index;
   const RawEntityId id;
+  FileLocationCache &line_cache;
   QTreeWidgetItem * const item_parent;
 
   void run(void) Q_DECL_FINAL;
@@ -35,9 +36,11 @@ class InitReferenceHierarchyThread final : public QObject, public QRunnable {
  public:
   virtual ~InitReferenceHierarchyThread(void);
   inline explicit InitReferenceHierarchyThread(Index index_, RawEntityId id_,
+                                               FileLocationCache &line_cache_,
                                                QTreeWidgetItem *parent_)
       : index(std::move(index_)),
         id(id_),
+        line_cache(line_cache_),
         item_parent(parent_) {}
 
  signals:
@@ -52,6 +55,7 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
  private:
   Index index;
   const RawEntityId id;
+  FileLocationCache &line_cache;
   QTreeWidgetItem * const item_parent;
 
   void run(void) Q_DECL_FINAL;
@@ -59,9 +63,11 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
  public:
   virtual ~ExpandReferenceHierarchyThread(void);
   inline explicit ExpandReferenceHierarchyThread(Index index_, RawEntityId id_,
+                                                 FileLocationCache &line_cache_,
                                                  QTreeWidgetItem *parent_)
       : index(std::move(index_)),
         id(id_),
+        line_cache(line_cache_),
         item_parent(parent_) {}
 
  signals:
@@ -75,6 +81,7 @@ class ReferenceHierarchyView final : public QWidget {
   std::unique_ptr<PrivateData> d;
 
   void InitializeWidgets(void);
+  QString RowName(const Decl &decl, const Token &use) const;
 
  public:
   virtual ~ReferenceHierarchyView(void);
