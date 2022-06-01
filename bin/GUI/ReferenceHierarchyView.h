@@ -15,7 +15,36 @@
 
 #include <vector>
 
+#include "CodeTheme.h"
+
 namespace mx::gui {
+
+using UserLocation = std::pair<Decl, TokenRange>;
+using UserLocations = std::vector<UserLocation>;
+
+class InitReferenceHierarchyThread final : public QObject, public QRunnable {
+  Q_OBJECT
+
+ private:
+  Index index;
+  const RawEntityId id;
+  QTreeWidgetItem * const item_parent;
+
+  void run(void) Q_DECL_FINAL;
+
+ public:
+  virtual ~InitReferenceHierarchyThread(void);
+  inline explicit InitReferenceHierarchyThread(Index index_, RawEntityId id_,
+                                               QTreeWidgetItem *parent_)
+      : index(std::move(index_)),
+        id(id_),
+        item_parent(parent_) {}
+
+ signals:
+  void UsersOfRoot(QTreeWidgetItem *item_parent, std::optional<Decl> root_decl,
+                   UserLocations users);
+};
+
 
 class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
   Q_OBJECT
@@ -25,7 +54,7 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
   const RawEntityId id;
   QTreeWidgetItem * const item_parent;
 
-  void run(void) final;
+  void run(void) Q_DECL_FINAL;
 
  public:
   virtual ~ExpandReferenceHierarchyThread(void);
@@ -36,8 +65,7 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
         item_parent(parent_) {}
 
  signals:
-  void UsersOfLevel(QTreeWidgetItem *item_parent, RawEntityId use_id,
-                    std::vector<RawEntityId> users);
+  void UsersOfLevel(QTreeWidgetItem *item_parent, UserLocations users);
 };
 
 class ReferenceHierarchyView final : public QWidget {
@@ -51,7 +79,8 @@ class ReferenceHierarchyView final : public QWidget {
  public:
   virtual ~ReferenceHierarchyView(void);
 
-  ReferenceHierarchyView(QWidget *parent = nullptr);
+  ReferenceHierarchyView(const CodeTheme &theme_=CodeTheme::DefaultTheme(),
+                         QWidget *parent = nullptr);
 
   void Clear(void);
   void SetIndex(Index index);
@@ -59,10 +88,12 @@ class ReferenceHierarchyView final : public QWidget {
 
  private slots:
   void OnTreeWidgetItemExpanded(QTreeWidgetItem *item);
-  void OnUsersOfFirstLevel(QTreeWidgetItem *parent, RawEntityId use_id,
-                           std::vector<RawEntityId> users);
-  void OnUsersOfLevel(QTreeWidgetItem *parent, RawEntityId use_id,
-                      std::vector<RawEntityId> users);
+  void OnUsersOfFirstLevel(QTreeWidgetItem *parent,
+                           std::optional<Decl> root_decl,
+                           UserLocations users);
+  void OnUsersOfLevel(QTreeWidgetItem *parent, UserLocations users);
+  void OnItemPressed(QTreeWidgetItem *item, int column);
+  void OnItemSelectionChanged(void);
 };
 
 }  // namespace mx::gui

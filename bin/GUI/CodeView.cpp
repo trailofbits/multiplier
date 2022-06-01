@@ -7,6 +7,7 @@
 #include "CodeView.h"
 
 #include <QApplication>
+#include <QBrush>
 #include <QColor>
 #include <QFont>
 #include <QFontMetrics>
@@ -22,7 +23,8 @@
 #include <optional>
 #include <unordered_map>
 #include <vector>
-#include <set>
+
+#include <multiplier/Index.h>
 
 #include "CodeTheme.h"
 #include "Util.h"
@@ -40,12 +42,27 @@ enum class CodeViewState {
 
 }  // namespace
 
+class Code {
+ public:
+  QString data;
+  std::vector<int> start_of_token;
+  std::vector<bool> italic;
+  std::vector<bool> bold;
+  std::vector<bool> underline;
+  std::vector<const QBrush *> foreground;
+  std::vector<const QBrush *> background;
+  std::vector<unsigned> declaration_ids_begin;
+  std::vector<RawEntityId> declaration_ids;
+  std::vector<RawEntityId> file_token_ids;
+};
+
 struct CodeView::PrivateData {
   const CodeViewKind kind;
   CodeViewState state{CodeViewState::kInitialized};
   FileLocationCache line_number_cache;
   std::unique_ptr<Code> code;
   const CodeTheme &theme;
+  RawEntityId scroll_target_eid{kInvalidEntityId};
 
   inline PrivateData(CodeViewKind kind_, const CodeTheme &theme_)
       : kind(kind_),
@@ -80,23 +97,23 @@ DownloadCodeThread::DownloadCodeThread(PrivateData *d_)
 DownloadCodeThread::~DownloadCodeThread(void) {}
 
 DownloadCodeThread *DownloadCodeThread::CreateFileDownloader(
-    Index index_, const CodeTheme &theme_, FileId file_id_) {
-  auto d = new PrivateData(std::move(index_), theme_);
+    const Index &index_, const CodeTheme &theme_, FileId file_id_) {
+  auto d = new PrivateData(index_, theme_);
   d->file_id.emplace(file_id_);
   return new DownloadCodeThread(d);
 }
 
 DownloadCodeThread *DownloadCodeThread::CreateFragmentDownloader(
-    Index index_, const CodeTheme &theme_, FragmentId frag_id_) {
-  auto d = new PrivateData(std::move(index_), theme_);
+    const Index &index_, const CodeTheme &theme_, FragmentId frag_id_) {
+  auto d = new PrivateData(index_, theme_);
   d->fragment_id.emplace(frag_id_);
   return new DownloadCodeThread(d);
 }
 
 DownloadCodeThread *DownloadCodeThread::CreateTokenRangeDownloader(
-    Index index_, const CodeTheme &theme_, RawEntityId begin_tok_id,
+    const Index &index_, const CodeTheme &theme_, RawEntityId begin_tok_id,
     RawEntityId end_tok_id) {
-  auto d = new PrivateData(std::move(index_), theme_);
+  auto d = new PrivateData(index_, theme_);
   d->token_range.emplace(begin_tok_id, end_tok_id);
   return new DownloadCodeThread(d);
 }
@@ -217,22 +234,30 @@ void DownloadCodeThread::run(void) {
     return;
   }
 
-  CodePtr code(new Code);
+  auto code = new Code;
+
+  d->theme.BeginTokens();
 
   code->data.reserve(static_cast<int>(d->file_tokens.data().size()));
   code->bold.reserve(num_file_tokens);
   code->italic.reserve(num_file_tokens);
   code->underline.reserve(num_file_tokens);
   code->foreground.reserve(num_file_tokens);
+  code->background.reserve(num_file_tokens);
   code->start_of_token.reserve(num_file_tokens + 1u);
-  code->fragment_token_ids_begin.reserve(num_file_tokens + 1u);
   code->declaration_ids_begin.reserve(num_file_tokens + 1u);
+  code->file_token_ids.reserve(num_file_tokens);
 
   std::map<RawEntityId, std::vector<Token>> file_to_frag_toks;
   std::vector<Decl> tok_decls;
 
+  RawEntityId last_file_tok_id = kInvalidEntityId;
   for (Token file_tok : d->file_tokens) {
     RawEntityId file_tok_id = file_tok.id();
+
+    // Sortedness needed for `CodeView::ScrollToToken`.
+    assert(last_file_tok_id < file_tok_id);
+    last_file_tok_id = file_tok_id;
 
     // This token corresponds to the beginning of a fragment. We might have a
     // one-to-many mapping of file tokens to fragment tokens. So when we come
@@ -287,8 +312,9 @@ void DownloadCodeThread::run(void) {
       continue;
     }
 
-    code->fragment_token_ids_begin.push_back(
-        static_cast<unsigned>(code->fragment_token_ids.size()));
+
+    code->file_token_ids.push_back(file_tok_id);
+
     code->declaration_ids_begin.push_back(
         static_cast<unsigned>(code->declaration_ids.size()));
 
@@ -304,7 +330,6 @@ void DownloadCodeThread::run(void) {
     if (auto frag_tok_it = file_to_frag_toks.find(file_tok_id);
         frag_tok_it != file_to_frag_toks.end()) {
       for (const Token &frag_tok : frag_tok_it->second) {
-        code->fragment_token_ids.push_back(frag_tok.id());
         if (auto related_decl = DeclForToken(frag_tok)) {
           tok_decls.emplace_back(related_decl.value());
 
@@ -329,7 +354,10 @@ void DownloadCodeThread::run(void) {
 
     CodeTokenKind kind = CodeTokenKind::kUnknown;
 
-    if (category == DeclCategory::UNKNOWN) {
+    if (is_whitespace) {
+      kind = CodeTokenKind::kWhitespace;
+
+    } else if (category == DeclCategory::UNKNOWN) {
       kind = static_cast<CodeTokenKind>(file_tok_class);
 
     } else {
@@ -343,7 +371,9 @@ void DownloadCodeThread::run(void) {
     code->bold.push_back(b);
     code->italic.push_back(i);
     code->underline.push_back(u);
-    code->foreground.push_back(&(d->theme.ForegroundColor(
+    code->foreground.push_back(&(d->theme.TokenForegroundColor(
+        file_tok, tok_decls, kind)));
+    code->background.push_back(&(d->theme.TokenBackgroundColor(
         file_tok, tok_decls, kind)));
 
     // We might have found multiple declarations associated with this token, but
@@ -366,11 +396,10 @@ void DownloadCodeThread::run(void) {
   }
 
   code->start_of_token.push_back(code->data.size());
-
-  code->fragment_token_ids_begin.push_back(
-      static_cast<unsigned>(code->fragment_token_ids.size()));
   code->declaration_ids_begin.push_back(
       static_cast<unsigned>(code->declaration_ids.size()));
+
+  d->theme.EndTokens();
 
   // We've now rendered the HTML.
   emit RenderCode(std::move(code));
@@ -384,12 +413,63 @@ CodeView::CodeView(CodeViewKind kind, const CodeTheme &theme_, QWidget *parent)
   InitializeWidgets();
 }
 
-void CodeView::SetFile(Index index, FileId file_id) {
+void CodeView::ScrollToToken(const TokenRange &range) {
+  if (range) {
+    ScrollToToken(range[0].id());
+  } else {
+    ScrollToToken(kInvalidEntityId);
+  }
+}
+
+void CodeView::ScrollToToken(const Token &tok) {
+  if (tok) {
+    ScrollToToken(tok.id());
+  } else {
+    ScrollToToken(kInvalidEntityId);
+  }
+}
+
+void CodeView::ScrollToToken(RawEntityId file_tok_id) {
+  if (d->state == CodeViewState::kRendered) {
+    if (file_tok_id == kInvalidEntityId) {
+      return;
+    }
+
+    auto begin_it = d->code->file_token_ids.begin();
+    auto end_it = d->code->file_token_ids.end();
+    auto it = std::lower_bound(begin_it, end_it, file_tok_id);
+    if (it == end_it || *it != file_tok_id) {
+      return;
+    }
+
+    auto tok_index = static_cast<unsigned>((it - begin_it));
+    if (tok_index >= d->code->start_of_token.size()) {
+      return;
+    }
+
+    QTextCursor loc = textCursor();
+    loc.setPosition(d->code->start_of_token[tok_index],
+                    QTextCursor::MoveMode::MoveAnchor);
+    moveCursor(QTextCursor::MoveOperation::End);
+    setTextCursor(loc);
+    ensureCursorVisible();
+    centerCursor();
+
+  } else {
+    d->scroll_target_eid = file_tok_id;
+  }
+}
+
+void CodeView::SetFile(const File &file) {
+  SetFile(Index::containing(file), file.id());
+}
+
+void CodeView::SetFile(const Index &index, FileId file_id) {
   d->state = CodeViewState::kDownloading;
-  d->code.reset();
+  d->scroll_target_eid = kInvalidEntityId;
 
   auto downloader = DownloadCodeThread::CreateFileDownloader(
-      std::move(index), d->theme, file_id);
+      index, d->theme, file_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -401,12 +481,16 @@ void CodeView::SetFile(Index index, FileId file_id) {
   update();
 }
 
-void CodeView::SetFragment(Index index, FragmentId fragment_id) {
+void CodeView::SetFragment(const Fragment &fragment) {
+  SetFragment(Index::containing(fragment), fragment.id());
+}
+
+void CodeView::SetFragment(const Index &index, FragmentId fragment_id) {
   d->state = CodeViewState::kDownloading;
-  d->code.reset();
+  d->scroll_target_eid = kInvalidEntityId;
 
   auto downloader = DownloadCodeThread::CreateFragmentDownloader(
-      std::move(index), d->theme, fragment_id);
+      index, d->theme, fragment_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -418,13 +502,13 @@ void CodeView::SetFragment(Index index, FragmentId fragment_id) {
   update();
 }
 
-void CodeView::SetTokenRange(Index index, RawEntityId begin_tok_id,
+void CodeView::SetTokenRange(const Index &index, RawEntityId begin_tok_id,
                              RawEntityId end_tok_id) {
   d->state = CodeViewState::kDownloading;
-  d->code.reset();
+  d->scroll_target_eid = kInvalidEntityId;
 
   auto downloader = DownloadCodeThread::CreateTokenRangeDownloader(
-      std::move(index), d->theme, begin_tok_id, end_tok_id);
+      index, d->theme, begin_tok_id, end_tok_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -446,7 +530,7 @@ void CodeView::InitializeWidgets(void) {
   setLineWrapMode(d->theme.LineWrap() ?
                   QPlainTextEdit::LineWrapMode::WidgetWidth :
                   QPlainTextEdit::LineWrapMode::NoWrap);
-  setTabStopDistance(d->theme.NumSpacesInTable() *
+  setTabStopDistance(d->theme.NumSpacesInTab() *
                                 fm.width(QChar::Space));
 
   auto p = palette();
@@ -462,11 +546,11 @@ void CodeView::OnDownloadFailed(void) {
   update();
 }
 
-void CodeView::OnRenderCode(CodePtr code) {
+void CodeView::OnRenderCode(void *code_) {
   d->state = CodeViewState::kRendering;
   update();
 
-  d->code.reset(code);
+  d->code.reset(reinterpret_cast<Code *>(code_));
   setPlainText(d->code->data);
 
   QTextCharFormat format;
@@ -474,17 +558,19 @@ void CodeView::OnRenderCode(CodePtr code) {
   auto num_tokens = d->code->foreground.size();
   const auto &start_of_token = d->code->start_of_token;
   const auto &foreground_color = d->code->foreground;
+  const auto &background_color = d->code->background;
   const auto &is_bold = d->code->bold;
   const auto &is_italic = d->code->italic;
   const auto &is_underlined = d->code->underline;
 
-  auto cursor = textCursor();
+  QTextCursor cursor = textCursor();
 
   cursor.beginEditBlock();
   for (auto i = 0u; i < num_tokens; ++i) {
     cursor.setPosition(start_of_token[i], QTextCursor::MoveMode::MoveAnchor);
     cursor.setPosition(start_of_token[i + 1], QTextCursor::MoveMode::KeepAnchor);
     format.setForeground(*(foreground_color[i]));
+    format.setBackground(*(background_color[i]));
     format.setFontItalic(is_italic[i]);
     format.setFontWeight(is_bold[i] ? QFont::DemiBold : QFont::Normal);
     format.setFontUnderline(is_underlined[i]);
@@ -493,49 +579,73 @@ void CodeView::OnRenderCode(CodePtr code) {
   cursor.endEditBlock();
 
   d->state = CodeViewState::kRendered;
+  ScrollToToken(d->scroll_target_eid);
   update();
 }
 
-void CodeView::mousePressEvent(QMouseEvent *event) {
+std::optional<unsigned> CodeView::TokenIndexForPosition(
+    const QPoint &pos) const {
+
   if (d->state != CodeViewState::kRendered) {
-    this->QPlainTextEdit::mousePressEvent(event);
-    return;
+    return std::nullopt;
   }
 
-  QTextCursor cursor = cursorForPosition(event->pos());
+  QTextCursor cursor = cursorForPosition(pos);
   if (cursor.isNull()) {
-    this->QPlainTextEdit::mousePressEvent(event);
-    return;
+    return std::nullopt;
   }
 
   const auto position = cursor.position();
   if (0 > position || position >= d->code->start_of_token.back()) {
-    this->QPlainTextEdit::mousePressEvent(event);
-    return;
+    return std::nullopt;
   }
 
   auto begin_it = d->code->start_of_token.begin();
   auto end_it = d->code->start_of_token.end();
   auto it = std::lower_bound(begin_it, end_it, position);
   if (it == begin_it || it == end_it) {
-    this->QPlainTextEdit::mousePressEvent(event);
-    return;
+    return std::nullopt;
   }
 
-  auto index = static_cast<unsigned>((it - begin_it) - 1);
-  auto decls_begin_index = d->code->declaration_ids_begin[index];
-  auto decls_end_index = d->code->declaration_ids_begin[index + 1u];
+  return static_cast<unsigned>((it - begin_it) - 1);
+}
 
-  if (auto num_decls = decls_end_index - decls_begin_index) {
-    std::vector<RawEntityId> decl_ids;
-    decl_ids.reserve(num_decls);
-    for (auto i = decls_begin_index; i < decls_end_index; ++i) {
-      decl_ids.push_back(d->code->declaration_ids[i]);
+std::vector<RawEntityId> CodeView::DeclsForPosition(const QPoint &pos) const {
+  std::vector<RawEntityId> decl_ids;
+  if (auto index = TokenIndexForPosition(pos)) {
+    auto decls_begin_index = d->code->declaration_ids_begin[*index];
+    auto decls_end_index = d->code->declaration_ids_begin[*index + 1u];
+
+    if (auto num_decls = decls_end_index - decls_begin_index) {
+      decl_ids.reserve(num_decls);
+      for (auto i = decls_begin_index; i < decls_end_index; ++i) {
+        decl_ids.push_back(d->code->declaration_ids[i]);
+      }
     }
-    emit DeclarationsClicked(std::move(decl_ids));
+  }
+  return decl_ids;
+}
+
+void CodeView::mousePressEvent(QMouseEvent *event) {
+  if (event->button() == Qt::MouseButton::LeftButton) {
+    auto decl_ids = DeclsForPosition(event->pos());
+    if (!decl_ids.empty()) {
+      emit DeclarationsClicked(std::move(decl_ids));
+    }
   }
 
   this->QPlainTextEdit::mousePressEvent(event);
+}
+
+
+void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
+  if (event->button() == Qt::MouseButton::LeftButton) {
+    auto decl_ids = DeclsForPosition(event->pos());
+    if (!decl_ids.empty()) {
+      emit DeclarationsDoubleClicked(std::move(decl_ids));
+    }
+  }
+  this->QPlainTextEdit::mouseDoubleClickEvent(event);
 }
 
 void CodeView::paintEvent(QPaintEvent *event) {

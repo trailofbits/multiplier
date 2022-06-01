@@ -6,6 +6,7 @@
 
 #include "ReferenceHierarchyView.h"
 
+#include <QBrush>
 #include <QHeaderView>
 #include <QSplitter>
 #include <QThreadPool>
@@ -17,139 +18,128 @@
 #include <cstdint>
 #include <unordered_map>
 
+#include "CodeView.h"
+#include "Util.h"
+
+#include <iostream>
+
 namespace mx::gui {
 namespace {
 
-static RawEntityId CanonicalId(Decl decl) {
-  for (auto redecl : decl.redeclarations()) {
-    return redecl.id();
-  }
-  return decl.id();
-}
+template <typename T>
+static std::optional<Decl> DeclContaining(const T &thing) {
+  if (auto func = FunctionDecl::containing(thing)) {
+    return func.value();
 
-using FragmentOffset = std::pair<FragmentId, uint32_t>;
+  } else if (auto field = FieldDecl::containing(thing)) {
+    return field.value();
 
-static FragmentOffset GetFragmentOffset(RawEntityId id) {
-  VariantId vid = EntityId(id).Unpack();
-  if (std::holds_alternative<DeclarationId>(vid)) {
-    auto eid = std::get<DeclarationId>(vid);
-    return {eid.fragment_id, eid.offset};
+  } else if (auto var = VarDecl::containing(thing)) {
+    if (var->is_local_variable_declaration()) {
+      return DeclContaining<Decl>(var.value());
 
-  } else if (std::holds_alternative<StatementId>(vid)) {
-    auto eid = std::get<StatementId>(vid);
-    return {eid.fragment_id, eid.offset};
-
-  } else if (std::holds_alternative<TypeId>(vid)) {
-    auto eid = std::get<TypeId>(vid);
-    return {eid.fragment_id, eid.offset};
-
-  } else if (std::holds_alternative<FragmentTokenId>(vid)) {
-    auto eid = std::get<FragmentTokenId>(vid);
-    return {eid.fragment_id, eid.offset};
-
-  } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
-    auto eid = std::get<TokenSubstitutionId>(vid);
-    return {eid.fragment_id, eid.offset};
-
+    } else {
+      return var.value();
+    }
   } else {
-    return {0ul, 0u};
+    return std::nullopt;
   }
+};
+
+static bool UserLocationSort(const UserLocation &a, const UserLocation &b) {
+  if (!a.second && !b.second) {
+    return false;
+  } else if (!a.second && b.second) {
+    return false;
+  } else if (a.second && !b.second) {
+    return false;
+  }
+
+  return std::less<EntityBaseOffsetPair>{}(GetFileOffset(a.second[0].id()),
+                                           GetFileOffset(b.second[0].id()));
 }
 
 }  // namespace
 
+InitReferenceHierarchyThread::~InitReferenceHierarchyThread(void) {}
 ExpandReferenceHierarchyThread::~ExpandReferenceHierarchyThread(void) {}
 
-void ExpandReferenceHierarchyThread::run(void) {
-  std::vector<RawEntityId> users;
+void InitReferenceHierarchyThread::run(void) {
 
   auto entity = index.entity(id);
+  if (!std::holds_alternative<Decl>(entity)) {
+    return;
+  }
 
-  if (std::holds_alternative<Decl>(entity)) {
-    auto found = false;
-    auto decl = std::get<Decl>(entity);
-    for (Reference ref : decl.references()) {
-      users.push_back(ref.statement().id());
-      found = true;
-    }
+  UserLocations users;
 
-    if (!found) {
-      if (auto containing_stmt = Stmt::containing(decl)) {
-        users.push_back(containing_stmt->id());
-
-      } else if (auto containing_decl = Decl::containing(decl)) {
-        users.push_back(CanonicalId(std::move(containing_decl.value())));
-      }
-    }
-
-  } else if (std::holds_alternative<Stmt>(entity)) {
-    auto stmt = std::get<Stmt>(entity);
-    if (auto containing_decl = Decl::containing(stmt)) {
-      users.push_back(CanonicalId(std::move(containing_decl.value())));
-
-    } else if (auto containing_stmt = Stmt::containing(stmt)) {
-      users.push_back(containing_stmt->id());
-    }
-
-  } else if (std::holds_alternative<Token>(entity)) {
-    auto tok = std::get<Token>(entity);
-    if (auto containing_decl = Decl::containing(tok)) {
-      users.push_back(CanonicalId(std::move(containing_decl.value())));
-
-    } else if (auto containing_stmt = Stmt::containing(tok)) {
-      users.push_back(containing_stmt->id());
-    }
-
-  } else if (std::holds_alternative<Type>(entity)) {
-    auto type = std::get<Type>(entity);
-    if (auto typedef_type = TypedefType::from(type)) {
-      users.push_back(CanonicalId(typedef_type->declaration()));
-
-    } else if (auto tag_decl = type.as_tag_declaration()) {
-      users.push_back(CanonicalId(std::move(tag_decl.value())));
-
-    } else if (auto deduced_type = DeducedType::from(type)) {
-      if (auto deduced_typedef = TypedefType::from(deduced_type.value())) {
-        users.push_back(CanonicalId(deduced_typedef->declaration()));
-
-      } else if (auto deduced_tag_decl = deduced_type->as_tag_declaration()) {
-        users.push_back(CanonicalId(std::move(deduced_tag_decl.value())));
-      }
+  const Decl &root_decl = std::get<Decl>(entity);
+  for (Reference ref : root_decl.references()) {
+    Stmt stmt = ref.statement();
+    if (auto decl = DeclContaining(stmt)) {
+      users.emplace_back(decl.value(),
+                         stmt.tokens().file_tokens().strip_whitespace());
     }
   }
 
-  // Keep only unique ones.
-  std::sort(users.begin(), users.end());
-  auto it = std::unique(users.begin(), users.end());
-  users.erase(it, users.end());
+  // Group them by file; they are already grouped by fragment.
+  std::stable_sort(users.begin(), users.end(), UserLocationSort);
 
-  // Group them by fragment.
-  std::stable_sort(
-      users.begin(), users.end(), [] (RawEntityId a, RawEntityId b) {
-        return std::less<FragmentOffset>{}(GetFragmentOffset(a),
-                                           GetFragmentOffset(b));
-      });
+  emit UsersOfRoot(item_parent, root_decl, std::move(users));
+}
 
-  emit UsersOfLevel(item_parent, id, std::move(users));
+void ExpandReferenceHierarchyThread::run(void) {
+  auto entity = index.entity(id);
+  if (!std::holds_alternative<Decl>(entity)) {
+    return;
+  }
+
+  UserLocations users;
+
+  for (Reference ref : std::get<Decl>(entity).references()) {
+    Stmt stmt = ref.statement();
+    if (auto decl = DeclContaining(stmt)) {
+      users.emplace_back(decl.value(), stmt.tokens().file_tokens());
+    }
+  }
+
+  // Group them by file; they are already grouped by fragment.
+  std::stable_sort(users.begin(), users.end(), UserLocationSort);
+
+  emit UsersOfLevel(item_parent, std::move(users));
 }
 
 struct ReferenceHierarchyView::PrivateData {
  public:
   Index index;
-  QTreeWidgetItem *counter{nullptr};
   QVBoxLayout *layout{nullptr};
   QSplitter *splitter{nullptr};
   QTreeWidget *reference_tree{nullptr};
+  HighlightRangeTheme theme;
+  CodeView *code{nullptr};
+  QTreeWidgetItem *active_item{nullptr};
 
-  std::unordered_map<QTreeWidgetItem *, std::pair<RawEntityId, bool>>
-      item_to_id;
+  struct ItemInfo {
+    const Decl decl;
+    TokenRange tokens;  // For scrolling and highlighting.
+    bool has_been_expanded{false};
+
+    inline explicit ItemInfo(Decl decl_)
+        : decl(std::move(decl_)) {}
+  };
+
+  std::unordered_map<QTreeWidgetItem *, ItemInfo> item_to_info;
+
+  inline PrivateData(const CodeTheme &theme_)
+      : theme(theme_) {}
 };
 
 ReferenceHierarchyView::~ReferenceHierarchyView(void) {}
 
-ReferenceHierarchyView::ReferenceHierarchyView(QWidget *parent)
+ReferenceHierarchyView::ReferenceHierarchyView(const CodeTheme &theme_,
+                                               QWidget *parent)
     : QWidget(parent),
-      d(new PrivateData) {
+      d(new PrivateData(theme_)) {
   InitializeWidgets();
 }
 
@@ -181,12 +171,18 @@ void ReferenceHierarchyView::InitializeWidgets(void) {
 
   connect(d->reference_tree, &QTreeWidget::itemExpanded,
           this, &ReferenceHierarchyView::OnTreeWidgetItemExpanded);
+
+  connect(d->reference_tree, &QTreeWidget::itemPressed,
+          this, &ReferenceHierarchyView::OnItemPressed);
+
+  connect(d->reference_tree, &QTreeWidget::itemSelectionChanged,
+          this, &ReferenceHierarchyView::OnItemSelectionChanged);
 }
 
 void ReferenceHierarchyView::Clear(void) {
-  d->item_to_id.clear();
-  d->counter = &(d->counter[1]);
+  d->item_to_info.clear();
   d->reference_tree->clear();
+  d->active_item = nullptr;
   update();
 }
 
@@ -196,12 +192,16 @@ void ReferenceHierarchyView::SetIndex(Index index) {
 }
 
 void ReferenceHierarchyView::AddRoot(RawEntityId root_id) {
-  auto expander = new ExpandReferenceHierarchyThread(
-      d->index, root_id, d->counter);
+  QTreeWidgetItem *root_item = new QTreeWidgetItem;
+  root_item->setText(0, tr("Downloading entity %1 references...").arg(root_id));
+  d->reference_tree->addTopLevelItem(root_item);
+
+  auto expander = new InitReferenceHierarchyThread(
+      d->index, root_id, root_item);
 
   expander->setAutoDelete(true);
 
-  connect(expander, &ExpandReferenceHierarchyThread::UsersOfLevel,
+  connect(expander, &InitReferenceHierarchyThread::UsersOfRoot,
           this, &ReferenceHierarchyView::OnUsersOfFirstLevel);
 
   QThreadPool::globalInstance()->start(expander);
@@ -211,20 +211,21 @@ void ReferenceHierarchyView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
 
   item->setExpanded(true);
 
-  auto it = d->item_to_id.find(item);
-  if (it == d->item_to_id.end()) {
+  auto it = d->item_to_info.find(item);
+  if (it == d->item_to_info.end()) {
     return;  // Weird.
   }
 
-  if (it->second.second) {
+  if (it->second.has_been_expanded) {
     item->setExpanded(true);
     return;  // Already attempted to expand.
   }
 
-  it->second.second = true;  // Mark as having previously been expanded.
+  // Mark as having previously been expanded.
+  it->second.has_been_expanded = true;
 
   auto expander = new ExpandReferenceHierarchyThread(
-      d->index, it->second.first, item);
+      d->index, it->second.decl.id(), item);
 
   expander->setAutoDelete(true);
 
@@ -235,36 +236,38 @@ void ReferenceHierarchyView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
 }
 
 void ReferenceHierarchyView::OnUsersOfFirstLevel(
-    QTreeWidgetItem *counter, RawEntityId use_id,
-    std::vector<RawEntityId> users) {
+    QTreeWidgetItem *root_item, std::optional<Decl> root_decl,
+    UserLocations users) {
 
   // Something else was requested before the background thread returned.
-  if (counter != d->counter) {
+  if (0 < d->reference_tree->indexOfTopLevelItem(root_item)) {
     return;
   }
 
-  QTreeWidgetItem *root_item = new QTreeWidgetItem;
-  root_item->setText(0, QString::number(use_id));
-  d->reference_tree->addTopLevelItem(root_item);
+  root_item->setText(0, QString::number(root_decl->id()));
+  d->item_to_info.clear();
 
-  // Record the ID of this item, and mark it as expanded.
-  auto &root_id = d->item_to_id[root_item];
-  root_id.first = use_id;
-  root_id.second = true;  // Mark as prevously expanded.
+  auto &item = d->item_to_info.emplace(
+      root_item, std::move(root_decl.value())).first->second;
 
-  OnUsersOfLevel(root_item, use_id, std::move(users));
+  if (auto ft = item.decl.token().nearest_file_token()) {
+    item.tokens = ft.value();
+  }
 
-  root_item->setExpanded(true);
+  OnUsersOfLevel(root_item, std::move(users));
+  OnItemPressed(root_item, 0);
 }
 
 void ReferenceHierarchyView::OnUsersOfLevel(
-    QTreeWidgetItem *parent_item, RawEntityId use_id,
-    std::vector<RawEntityId> users) {
+    QTreeWidgetItem *parent_item, UserLocations users) {
 
   // Something else was requested before the background thread returned.
-  if (d->item_to_id.find(parent_item) == d->item_to_id.end()) {
+  auto id_it = d->item_to_info.find(parent_item);
+  if (id_it == d->item_to_info.end()) {
     return;
   }
+
+  id_it->second.has_been_expanded = true;
 
   // Remove the `Downloading...` item.
   while (parent_item->childCount()) {
@@ -277,14 +280,15 @@ void ReferenceHierarchyView::OnUsersOfLevel(
     return;
   }
 
-  for (auto user_id : users) {
+  for (auto &[decl, tokens] : users) {
     QTreeWidgetItem *user_item = new QTreeWidgetItem;
-    user_item->setText(0, QString::number(user_id));
+    user_item->setText(0, QString::number(decl.id()));
     parent_item->addChild(user_item);
 
-    auto &child_id = d->item_to_id[user_item];
-    child_id.first = user_id;
-    child_id.second = false;  // Mark as not yet expanded.
+    PrivateData::ItemInfo &child_id =
+        d->item_to_info.emplace(user_item, std::move(decl)).first->second;
+    child_id.tokens = std::move(tokens);
+    child_id.has_been_expanded = false;
 
     QTreeWidgetItem *download_item = new QTreeWidgetItem;
     download_item->setText(0, tr("Downloading..."));
@@ -292,7 +296,48 @@ void ReferenceHierarchyView::OnUsersOfLevel(
     user_item->addChild(download_item);
     user_item->setExpanded(false);
   }
+
+  parent_item->setExpanded(true);
+
   update();
+}
+
+void ReferenceHierarchyView::OnItemSelectionChanged(void) {
+  for (auto item : d->reference_tree->selectedItems()) {
+    OnItemPressed(item, 0);
+    return;
+  }
+}
+
+void ReferenceHierarchyView::OnItemPressed(
+    QTreeWidgetItem *item, int column) {
+  auto id_it = d->item_to_info.find(item);
+  if (id_it == d->item_to_info.end()) {
+    return;
+  }
+
+  if (item == d->active_item) {
+    return;
+  }
+
+  d->active_item = item;
+
+  if (!d->code) {
+    d->code = new CodeView(CodeViewKind::kMultiLine, d->theme);
+    d->splitter->addWidget(d->code);
+  }
+
+  const PrivateData::ItemInfo &info = id_it->second;
+
+  auto [fragment_id, offset] = GetFragmentOffset(info.decl.id());
+  if (fragment_id != kInvalidEntityId) {
+    d->theme.SetRangeToHighlight(info.tokens);
+    d->code->show();
+    d->code->SetFragment(d->index, fragment_id);
+    d->code->ScrollToToken(info.tokens);
+  } else {
+    d->code->hide();
+  }
 }
 
 }  // namespace mx::gui

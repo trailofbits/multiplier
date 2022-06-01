@@ -9,11 +9,20 @@
 #include <QColor>
 
 #include <multiplier/AST.h>
+#include <multiplier/Index.h>
 #include <multiplier/Token.h>
-
+#include <mutex>
+#include <unordered_map>
 
 namespace mx::gui {
 namespace {
+
+static QColor InvertColor(const QColor &color) {
+  auto red = 1.0f - color.redF();
+  auto green = 1.0f - color.greenF();
+  auto blue = 1.0f - color.blueF();
+  return QColor::fromRgbF(red, green, blue);
+}
 
 class PetersTheme final : public CodeTheme {
  public:
@@ -21,7 +30,11 @@ class PetersTheme final : public CodeTheme {
 
   virtual ~PetersTheme(void) = default;
 
-  int NumSpacesInTable(void) const final {
+  // Prepare this theme for use. This may be called multiple times.
+  void BeginTokens(void) const final {}
+  void EndTokens(void) const final {}
+
+  int NumSpacesInTab(void) const final {
     return 2;
   }
 
@@ -29,7 +42,13 @@ class PetersTheme final : public CodeTheme {
     return false;
   }
 
-  const QBrush &ForegroundColor(
+  const QBrush &TokenBackgroundColor(
+      const Token &, const std::vector<Decl> &, CodeTokenKind) const final {
+    static const QBrush kColor(BackgroundColor());
+    return kColor;
+  }
+
+  const QBrush &TokenForegroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
       CodeTokenKind kind) const final {
 
@@ -93,11 +112,13 @@ class PetersTheme final : public CodeTheme {
         static const QBrush kUseOfDeclColor(QColor::fromRgb(168, 82, 226));
         auto use_color = &kUseOfDeclColor;
         for (const Decl &decl : related_decls) {
-          if (auto file_tok = decl.token().file_token();
-              file_tok && file_tok->id() == tok.id()) {
-            return kDefColor;
-          } else if (decl.definition()) {
-            use_color = &kUseOfDefColor;
+          for (const Decl &redecl : decl.redeclarations()) {
+            if (auto file_tok = redecl.token().file_token();
+                file_tok && file_tok->id() == tok.id()) {
+              return kDefColor;
+            } else if (redecl.is_definition()) {
+              use_color = &kUseOfDefColor;
+            }
           }
         }
         return *use_color;
@@ -162,6 +183,10 @@ class PetersTheme final : public CodeTheme {
         static const QBrush kColor(QColor::fromRgb(149, 149, 149));
         return kColor;
       }
+      case CodeTokenKind::kWhitespace: {
+        static const QBrush kColor;
+        return kColor;
+      }
     }
   }
 
@@ -217,6 +242,126 @@ CodeTheme::~CodeTheme(void) {}
 const CodeTheme &CodeTheme::DefaultTheme(void) {
   static const PetersTheme kTheme;
   return kTheme;
+}
+
+ProxyCodeTheme::~ProxyCodeTheme(void) {}
+
+// Prepare this theme for use. This may be called multiple times.
+void ProxyCodeTheme::BeginTokens(void) const {
+  next.BeginTokens();
+}
+
+void ProxyCodeTheme::EndTokens(void) const {
+  next.EndTokens();
+}
+
+// The code font to be used, including its size.
+const QFont &ProxyCodeTheme::Font(void) const {
+  return next.Font();
+}
+
+// Number of spaces in a tab.
+int ProxyCodeTheme::NumSpacesInTab(void) const {
+  return next.NumSpacesInTab();
+}
+
+// Whether or not to wrap lines.
+bool ProxyCodeTheme::LineWrap(void) const {
+  return next.LineWrap();
+}
+
+// Background color of the code area.
+QColor ProxyCodeTheme::BackgroundColor(void) const {
+  return next.BackgroundColor();
+}
+
+// Background color for a specific token.
+const QBrush &ProxyCodeTheme::TokenBackgroundColor(
+    const Token &tok, const std::vector<Decl> &related_decls,
+    CodeTokenKind kind) const {
+  return next.TokenBackgroundColor(tok, related_decls, kind);
+}
+
+// Text color of a specific token.
+const QBrush &ProxyCodeTheme::TokenForegroundColor(
+    const Token &tok, const std::vector<Decl> &related_decls,
+    CodeTokenKind kind) const {
+  return next.TokenForegroundColor(tok, related_decls, kind);
+}
+
+// Format (bold, italic, underline) for a specific token.
+TokenFormat ProxyCodeTheme::Format(
+    const Token &tok, const std::vector<Decl> &related_decls,
+    CodeTokenKind kind) const {
+  return next.Format(tok, related_decls, kind);
+}
+
+struct HighlightRangeTheme::PrivateData {
+  std::mutex lock;
+  TokenRange tokens;
+  std::unordered_map<const QBrush *, QBrush> inverted_colors;
+  const QBrush inverted_background;
+
+  inline PrivateData(QColor bg_color)
+      : inverted_background(InvertColor(bg_color)) {}
+};
+
+HighlightRangeTheme::HighlightRangeTheme(const CodeTheme &next_)
+    : ProxyCodeTheme(next_),
+      d(new PrivateData(next_.BackgroundColor())) {}
+
+HighlightRangeTheme::~HighlightRangeTheme(void) {}
+
+// Set the entity to be highlighted.
+void HighlightRangeTheme::SetRangeToHighlight(const TokenRange &range) {
+  std::unique_lock<std::mutex> locker(d->lock);
+  d->tokens = range;
+}
+
+void HighlightRangeTheme::BeginTokens(void) const {
+  this->ProxyCodeTheme::BeginTokens();
+  d->lock.lock();
+  d->inverted_colors.clear();
+  d->tokens = d->tokens.file_tokens();
+}
+
+void HighlightRangeTheme::EndTokens(void) const {
+  d->lock.unlock();
+  this->ProxyCodeTheme::EndTokens();
+}
+
+// Background color for a specific token.
+const QBrush &HighlightRangeTheme::TokenBackgroundColor(
+    const Token &tok, const std::vector<Decl> &related_decls,
+    CodeTokenKind kind) const {
+
+  const QBrush &brush = this->ProxyCodeTheme::TokenBackgroundColor(
+      tok, related_decls, kind);
+
+  // If it's one of the tokens in our range, then invert its background color.
+  if (d->tokens.index_of(tok)) {
+    QBrush brush_inv(InvertColor(brush.color()), brush.style());
+    return d->inverted_colors.emplace(&brush, brush_inv).first->second;
+  } else {
+    return brush;
+  }
+}
+
+// Foreground color for a specific token.
+const QBrush &HighlightRangeTheme::TokenForegroundColor(
+    const Token &tok, const std::vector<Decl> &related_decls,
+    CodeTokenKind kind) const {
+  const QBrush &brush = this->ProxyCodeTheme::TokenForegroundColor(
+      tok, related_decls, kind);
+
+  // If it's one of the tokens in our range, then invert its background color.
+  if (d->tokens.index_of(tok)) {
+    if (brush.color().isValid()) {
+      QBrush brush_inv(InvertColor(brush.color()), brush.style());
+      return d->inverted_colors.emplace(&brush, brush_inv).first->second;
+    }
+  }
+  return brush;
 }
 
 }  // namespace mx::gui

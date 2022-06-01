@@ -7,8 +7,8 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Index.h>
-#include <QBrush>
+#include <multiplier/Types.h>
+#include <optional>
 #include <QPaintEvent>
 #include <QPlainTextEdit>
 #include <QRunnable>
@@ -16,24 +16,13 @@
 
 #include "CodeTheme.h"
 
-namespace mx::gui {
-
-// Structured code, ready for rendering.
-struct Code {
-  QString data;
-  std::vector<int> start_of_token;
-  std::vector<bool> italic;
-  std::vector<bool> bold;
-  std::vector<bool> underline;
-  std::vector<const QBrush *> foreground;
-  std::vector<unsigned> fragment_token_ids_begin;
-  std::vector<unsigned> declaration_ids_begin;
-
-  std::vector<RawEntityId> fragment_token_ids;
-  std::vector<RawEntityId> declaration_ids;
-};
-
-using CodePtr = Code *;
+namespace mx {
+class File;
+class Fragment;
+class Index;
+class Token;
+class TokenRange;
+namespace gui {
 
 // Thread that goes and downloads and structures the relevant code in the
 // background.
@@ -44,7 +33,7 @@ class DownloadCodeThread final : public QObject, public QRunnable {
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
-  void run(void) final;
+  void run(void) Q_DECL_FINAL;
 
   DownloadCodeThread(PrivateData *d_);
 
@@ -52,18 +41,18 @@ class DownloadCodeThread final : public QObject, public QRunnable {
   virtual ~DownloadCodeThread(void);
 
   static DownloadCodeThread *CreateFileDownloader(
-      Index index_, const CodeTheme &theme_, FileId file_id_);
+      const Index &index_, const CodeTheme &theme_, FileId file_id_);
 
   static DownloadCodeThread *CreateFragmentDownloader(
-      Index index_, const CodeTheme &theme_, FragmentId frag_id_);
+      const Index &index_, const CodeTheme &theme_, FragmentId frag_id_);
 
   static DownloadCodeThread *CreateTokenRangeDownloader(
-      Index index_, const CodeTheme &theme_, RawEntityId begin_tok_id,
+      const Index &index_, const CodeTheme &theme_, RawEntityId begin_tok_id,
       RawEntityId end_tok_id);
 
  signals:
   void DownloadFailed(void);
-  void RenderCode(CodePtr code);
+  void RenderCode(void *code);
 };
 
 enum class CodeViewKind {
@@ -82,40 +71,43 @@ class CodeView final : public QPlainTextEdit {
 
  public:
   virtual ~CodeView(void);
-  CodeView(CodeViewKind kind_,
+  CodeView(CodeViewKind kind_=CodeViewKind::kMultiLine,
            const CodeTheme &theme_=CodeTheme::DefaultTheme(),
            QWidget *parent = nullptr);
 
 //  // Should line numbers be shown?
 //  void SetLineNumbersEnabled(bool);
-//
-//  // Should we render this as a mutli-line code view, or a single-line code
-//  // view? Turning multi-line off disables line numbers.
-//  void SetMultiLine(bool);
+
+  void ScrollToToken(const TokenRange &tok);
+  void ScrollToToken(const Token &tok);
+  void ScrollToToken(RawEntityId file_tok_id);
 
   // Change the underlying data of this view.
-  void SetFile(Index index, FileId file_id);
-  void SetFragment(Index index, FragmentId fragment_id);
-  void SetTokenRange(Index index, RawEntityId begin_tok_id,
+  void SetFile(const File &file);
+  void SetFile(const Index &index, FileId file_id);
+  void SetFragment(const Fragment &fragment);
+  void SetFragment(const Index &index, FragmentId fragment_id);
+  void SetTokenRange(const Index &index, RawEntityId begin_tok_id,
                      RawEntityId end_tok_id);
 
  protected:
-  void paintEvent(QPaintEvent *event) final;
-  void mousePressEvent(QMouseEvent *event) final;
+  void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
+  void mousePressEvent(QMouseEvent *event) Q_DECL_FINAL;
+  void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_FINAL;
 
  private:
   void InitializeWidgets(void);
+  std::optional<unsigned> TokenIndexForPosition(const QPoint &pos) const;
+  std::vector<RawEntityId> DeclsForPosition(const QPoint &pos) const;
 
  private slots:
   void OnDownloadFailed(void);
-  void OnRenderCode(CodePtr code);
-
-//  void OnBlockCountChanged(int new_block_count);
-//  void OnHighlightCurrentLine(void);
-//  void updateLineNumberArea(const QRect &rect, int dy);
+  void OnRenderCode(void *code);
 
  signals:
   void DeclarationsClicked(std::vector<RawEntityId> ids);
+  void DeclarationsDoubleClicked(std::vector<RawEntityId> ids);
 };
 
-}  // namespace mx::gui
+}  // namespace gui
+}  // namespace mx

@@ -25,9 +25,8 @@ class MainWindow final : public QMainWindow {
   MainWindow &operator=(const MainWindow &) = delete;
 
  protected:
-  void paintEvent(QPaintEvent *event) override;
-
-  virtual void closeEvent(QCloseEvent *event) override;
+  void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
+  void closeEvent(QCloseEvent *event) Q_DECL_FINAL;
 
  private:
   struct PrivateData;

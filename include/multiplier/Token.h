@@ -239,6 +239,12 @@ class TokenRange {
 
   // Returns the index of `that` in this range, or `std::nullopt`.
   std::optional<unsigned> index_of(const Token &that) const noexcept;
+
+  // Convert this token range into a file token range.
+  TokenRange file_tokens(void) const noexcept;
+
+  // Strip leading and trailing whitespace.
+  TokenRange strip_whitespace(void) const noexcept;
 };
 
 // List of tokens.

@@ -45,6 +45,7 @@ class FragmentImpl {
   unsigned num_stmts{0u};
   unsigned num_types{0u};
   unsigned num_pseudos{0u};
+  unsigned num_tokens{0u};
 
   virtual ~FragmentImpl(void) noexcept;
 

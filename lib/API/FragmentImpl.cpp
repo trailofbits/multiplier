@@ -92,17 +92,19 @@ TokenRange FragmentImpl::TokenRangeFor(
 
     // It's a token inside of the current fragment.
     if (bfid.fragment_id == fragment_id) {
-      auto reader = this->TokenReader(self);
-      if (auto num_tokens = reader->NumTokens(); efid.offset < num_tokens) {
-        return TokenRange(std::move(reader), bfid.offset, efid.offset + 1u);
+      if (efid.offset < num_tokens) {
+        return TokenRange(this->TokenReader(self),
+                          bfid.offset, efid.offset + 1u);
       }
 
     // It's a token inside of another fragment, go get the other fragment.
     } else {
       auto other_frag = ep->FragmentFor(ep, bfid.fragment_id);
-      auto reader = other_frag->TokenReader(other_frag);
-      if (auto num_tokens = reader->NumTokens(); efid.offset < num_tokens) {
-        return TokenRange(std::move(reader), bfid.offset, efid.offset + 1u);
+      auto other_reader = other_frag->TokenReader(other_frag);
+      if (auto other_num_tokens = other_reader->NumTokens();
+          efid.offset < other_num_tokens) {
+        return TokenRange(std::move(other_reader), bfid.offset,
+                          efid.offset + 1u);
       }
     }
 
@@ -119,9 +121,10 @@ TokenRange FragmentImpl::TokenRangeFor(
     }
 
     auto file = ep->FileFor(ep, bfid.file_id);
-    auto reader = file->TokenReader(file);
-    if (auto num_tokens = reader->NumTokens(); efid.offset < num_tokens) {
-      return TokenRange(std::move(reader), bfid.offset, efid.offset + 1u);
+    auto file_reader = file->TokenReader(file);
+    if (auto file_num_tokens = file_reader->NumTokens();
+        efid.offset < file_num_tokens) {
+      return TokenRange(std::move(file_reader), bfid.offset, efid.offset + 1u);
     }
   }
 

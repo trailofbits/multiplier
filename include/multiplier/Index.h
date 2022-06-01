@@ -179,6 +179,9 @@ class Index {
   /* implicit */ inline Index(EntityProvider::Ptr impl_)
       : impl(std::move(impl_)) {}
 
+  static Index containing(const Fragment &fragment);
+  static Index containing(const File &file);
+
   // Clear any internal caches.
   void clear_caches(void) const;
 

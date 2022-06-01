@@ -14,6 +14,7 @@
 
 #include "CodeView.h"
 #include "MainWindow.h"
+#include "ReferenceHierarchyView.h"
 
 namespace {
 
@@ -34,7 +35,11 @@ int main(int argc, char *argv[]) {
     initializeTheme();
   }
 
-  qRegisterMetaType<mx::gui::CodePtr>("CodePtr");
+  qRegisterMetaType<std::optional<mx::Decl>>("std::optional<Decl>");
+  qRegisterMetaType<std::optional<mx::Stmt>>("std::optional<Stmt>");
+  qRegisterMetaType<std::optional<mx::Type>>("std::optional<Type>");
+  qRegisterMetaType<std::optional<mx::Token>>("std::optional<Token>");
+  qRegisterMetaType<mx::gui::UserLocations>("UserLocations");
   qRegisterMetaType<mx::RawEntityId>("RawEntityId");
   qRegisterMetaType<mx::FilePathList>("FilePathList");
   qRegisterMetaType<mx::Token>("Token");

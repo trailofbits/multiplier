@@ -22,7 +22,7 @@ class DownloadFileListThread final : public QObject, public QRunnable {
 
  private:
   const Index index;
-  void run(void);
+  void run(void) Q_DECL_FINAL;
 
  public:
   inline explicit DownloadFileListThread(Index index_)
