@@ -9,14 +9,14 @@ the directory where everything goes.
 
 Download the [latest release of cxx-common](https://github.com/lifting-bits/cxx-common/releases)
 for LLVM 13 for your OS/architecture. Extract the downloaded archive. For example,
-if you downloaded `vcpkg_macos-11_llvm-13_xcode-13.0_amd64.tar.xz` then after extracting
-you will have a directory `vcpkg_macos-11_llvm-13_xcode-13.0_amd64` containing two
+if you downloaded `vcpkg_macos-11_llvm-14_xcode-13.0_amd64.tar.xz` then after extracting
+you will have a directory `vcpkg_macos-11_llvm-14_xcode-13.0_amd64` containing two
 subdirectories, `scripts` and `installed`. Rename the extracted directory to
 `vcpkg-install` and set `VCPKG_ROOT` to be the path to the `vcpkg-install` directory.
 
 ```shell
 RELEASE_VERSION=v0.2.1
-RELEASE_NAME=vcpkg_macos-11_llvm-13_xcode-13.0_amd64
+RELEASE_NAME=vcpkg_macos-11_llvm-14_xcode-13.0_amd64
 VCPKG_ROOT="${WORKSPACE_DIR}/vcpkg-install"
 VCPKG_TARGET_TRIPLET=x64-osx-rel
 
@@ -165,6 +165,7 @@ cd "${WORKSPACE_DIR}/build/multiplier"
 cmake \
   -DCMAKE_BUILD_TYPE=Release \
   "-DCMAKE_INSTALL_PREFIX=${WORKSPACE_DIR}/install" \
+  "-Dpasta_ROOT=${WORKSPACE_DIR}/install" \
   "-DVCPKG_ROOT=${VCPKG_ROOT}" \
   "-DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}" \
   "-DCMAKE_C_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang" \
