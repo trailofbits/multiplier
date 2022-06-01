@@ -6,6 +6,7 @@
 
 #include "ReferenceHierarchyView.h"
 
+#include <QApplication>
 #include <QBrush>
 #include <QHeaderView>
 #include <QSplitter>
@@ -84,8 +85,7 @@ void InitReferenceHierarchyThread::run(void) {
       // thread.
       (void) decl->token().nearest_location(line_cache);
 
-      users.emplace_back(decl.value(),
-                         stmt.tokens().file_tokens().strip_whitespace());
+      users.emplace_back(decl.value(), stmt.tokens());
     }
   }
 
@@ -111,7 +111,7 @@ void ExpandReferenceHierarchyThread::run(void) {
       // thread.
       (void) decl->token().nearest_location(line_cache);
 
-      users.emplace_back(decl.value(), stmt.tokens().file_tokens());
+      users.emplace_back(decl.value(), stmt.tokens());
     }
   }
 
@@ -130,7 +130,12 @@ struct ReferenceHierarchyView::PrivateData {
   HighlightRangeTheme theme;
   CodeView *code{nullptr};
   QTreeWidgetItem *active_item{nullptr};
+  std::vector<RawEntityId> root_ids;
   FileLocationCache line_cache;
+  bool show_file_paths{true};
+  bool show_line_column_numbers{true};
+  bool show_code_preview{true};
+  bool show_context_breadcrumbs{true};
 
   struct ItemInfo {
     const Decl decl;
@@ -177,8 +182,11 @@ void ReferenceHierarchyView::InitializeWidgets(void) {
 
   d->splitter->addWidget(d->reference_tree);
 
+  d->reference_tree->header()->setStretchLastSection(true);
+  d->reference_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  d->reference_tree->setSelectionMode(
+      QAbstractItemView::SelectionMode::SingleSelection);
   d->reference_tree->setHeaderHidden(true);
-  d->reference_tree->setColumnCount(1);
   d->reference_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   d->reference_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
   d->reference_tree->header()->setStretchLastSection(false);
@@ -193,10 +201,21 @@ void ReferenceHierarchyView::InitializeWidgets(void) {
           this, &ReferenceHierarchyView::OnItemSelectionChanged);
 }
 
+void ReferenceHierarchyView::SetRoots(
+    const std::vector<RawEntityId> &new_root_ids) {
+  if (d->root_ids != new_root_ids) {
+    Clear();
+    for (RawEntityId root_id : new_root_ids) {
+      AddRoot(root_id);
+    }
+  }
+}
+
 void ReferenceHierarchyView::Clear(void) {
   d->item_to_info.clear();
   d->reference_tree->clear();
   d->active_item = nullptr;
+  d->root_ids.clear();
   update();
 }
 
@@ -210,10 +229,36 @@ void ReferenceHierarchyView::SetIndex(Index index) {
   Clear();
 }
 
+// Should we group references by file path? Defaults to `true`.
+void ReferenceHierarchyView::SetGroupByFilePath(bool show) {
+  d->show_file_paths = show;
+}
+
+// Should we show line and column numbers? Defaults to `true`.
+void ReferenceHierarchyView::SetShowLineColumnNumbers(bool show) {
+  d->show_line_column_numbers = show;
+}
+
+// Should we show a preview of the code associated with the reference?
+// Defaults to `true`.
+void ReferenceHierarchyView::SetShowCodePreview(bool show) {
+  d->show_code_preview = show;
+  if (d->code) {
+    d->code->hide();
+  }
+}
+
+// Should we show token context breadcrumbs? These can be useful for a quick
+// diagnosis of the context of a use? Defaults to `true`.
+void ReferenceHierarchyView::SetShowContextBreadcrumbs(bool show) {
+  d->show_context_breadcrumbs = show;
+}
+
 void ReferenceHierarchyView::AddRoot(RawEntityId root_id) {
   QTreeWidgetItem *root_item = new QTreeWidgetItem;
   root_item->setText(0, tr("Downloading entity %1 references...").arg(root_id));
   d->reference_tree->addTopLevelItem(root_item);
+  d->root_ids.push_back(root_id);
 
   auto expander = new InitReferenceHierarchyThread(
       d->index, root_id, d->line_cache, root_item);
@@ -254,26 +299,140 @@ void ReferenceHierarchyView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
   QThreadPool::globalInstance()->start(expander);
 }
 
-QString ReferenceHierarchyView::RowName(
-    const Decl &decl, const Token &use) const {
-  QString decl_name;
+template <typename T>
+QString NameOf(T enumerator) {
+  std::string_view ret = EnumeratorName(enumerator);
+  if (ret.ends_with("_EXPR") || ret.ends_with("_STMT") ||
+      ret.ends_with("_DECL") || ret.ends_with("_TYPE")) {
+    ret = ret.substr(0u, ret.size() - 5u);
+  } else if (ret.ends_with("_OPERATOR")) {
+    ret = ret.substr(0u, ret.size() - 9u);
+  } else if (ret.ends_with("_DIRECTIVE")) {
+    ret = ret.substr(0u, ret.size() - 10u);
+  }
+  return QString::fromUtf8(ret.data(), static_cast<int>(ret.size()));
+}
+
+QString ReferenceHierarchyView::FormatBreadcrumbs(const Token &use) const {
+  QString breadcrumbs;
+  static const QString kBreadCrumb("%1%2");
+  const char *sep = "";
+  const char * const next_sep = " → ";
+  auto i = -1;
+  for (auto context = TokenContext::of(use);
+       context; context = context->parent()) {
+    ++i;
+
+    if (auto cdecl = context->as_declaration()) {
+      breadcrumbs.append(kBreadCrumb.arg(sep).arg(NameOf(cdecl->kind())));
+      sep = next_sep;
+
+    } else if (auto cstmt = context->as_statement()) {
+      switch (cstmt->kind()) {
+        case StmtKind::DECL_REF_EXPR:
+        case StmtKind::COMPOUND_STMT:
+        case StmtKind::PAREN_EXPR:
+          break;
+        case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR: {
+          auto &expr = reinterpret_cast<const UnaryExprOrTypeTraitExpr &>(
+              cstmt.value());
+          breadcrumbs.append(
+              kBreadCrumb.arg(sep).arg(NameOf(expr.expression_or_trait_kind())));
+          sep = next_sep;
+          continue;
+        }
+
+        case StmtKind::IMPLICIT_CAST_EXPR: {
+          auto &cast = reinterpret_cast<const ImplicitCastExpr &>(cstmt.value());
+          auto ck = cast.cast_kind();
+          if (ck != CastKind::L_VALUE_TO_R_VALUE && ck != CastKind::BIT_CAST &&
+              ck != CastKind::FUNCTION_TO_POINTER_DECAY) {
+            breadcrumbs.append(kBreadCrumb.arg(sep).arg(NameOf(ck)));
+            sep = next_sep;
+          }
+          break;
+        }
+
+        case StmtKind::UNARY_OPERATOR: {
+          auto &op = reinterpret_cast<const UnaryOperator &>(cstmt.value());
+          breadcrumbs.append(
+              kBreadCrumb.arg(sep).arg(NameOf(op.opcode())));
+          sep = next_sep;
+          continue;
+        }
+
+        case StmtKind::BINARY_OPERATOR: {
+          auto &op = reinterpret_cast<const BinaryOperator &>(cstmt.value());
+          breadcrumbs.append(
+              kBreadCrumb.arg(sep).arg(NameOf(op.opcode())));
+          sep = next_sep;
+          continue;
+        }
+
+        case StmtKind::MEMBER_EXPR:
+          if (!i) {
+            continue;
+          }
+          [[clang::fallthrough]];
+
+        default: {
+          breadcrumbs.append(
+              kBreadCrumb.arg(sep).arg(NameOf(cstmt->kind())));
+          sep = next_sep;
+          break;
+        }
+      }
+
+    } else if (auto ctype = context->as_type()) {
+      breadcrumbs.append(
+          kBreadCrumb.arg(sep).arg(NameOf(ctype->kind())));
+      sep = next_sep;
+    }
+  }
+  return breadcrumbs;
+}
+
+void ReferenceHierarchyView::FillRow(
+    QTreeWidgetItem *item, const Decl &decl, const Token &use) const {
+
   if (auto nd = NamedDecl::from(decl)) {
     if (auto name_data = nd->name(); !name_data.empty()) {
-      decl_name = QString::fromUtf8(name_data.data(),
-                                    static_cast<int>(name_data.size()));
+      item->setText(0, QString::fromUtf8(name_data.data(),
+                                         static_cast<int>(name_data.size())));
     } else {
-      decl_name = QString("%1(%2)").arg(EnumeratorName(decl.category()))
-                                   .arg(decl.id());
+      item->setText(0, QString("%1(%2)").arg(EnumeratorName(decl.category()))
+                                        .arg(decl.id()));
     }
   } else {
-    decl_name = QString("%1(%2)").arg(EnumeratorName(decl.category()))
-                                 .arg(decl.id());
+    item->setText(0, QString("%1(%2)").arg(EnumeratorName(decl.category()))
+                                      .arg(decl.id()));
   }
-  if (auto loc = use.nearest_location(d->line_cache)) {
-    decl_name.append(QString(":%1:%2").arg(loc->first)
-                                                .arg(loc->second));
+
+  auto index = 1;
+
+  auto color = qApp->palette().text().color();
+  color = QColor::fromRgbF(
+      color.redF(), color.greenF(), color.blueF(), color.alphaF() * 0.75);
+
+  // Show the line and column numbers.
+  if (d->show_line_column_numbers) {
+    if (auto loc = use.nearest_location(d->line_cache)) {
+//      item->setFont(index, afont)
+      item->setText(index, QString("%1:%2").arg(loc->first).arg(loc->second));
+      ++index;
+    }
   }
-  return decl_name;
+
+  // Show the context breadcrumbs.
+  if (d->show_context_breadcrumbs) {
+    item->setTextColor(index, color);
+    item->setText(index, FormatBreadcrumbs(use));
+    ++index;
+  }
+
+  if (index > d->reference_tree->columnCount()) {
+    d->reference_tree->setColumnCount(index);
+  }
 }
 
 void ReferenceHierarchyView::OnUsersOfFirstLevel(
@@ -285,7 +444,7 @@ void ReferenceHierarchyView::OnUsersOfFirstLevel(
     return;
   }
 
-  root_item->setText(0, RowName(root_decl.value(), root_decl->token()));
+  FillRow(root_item, root_decl.value(), root_decl->token());
   d->item_to_info.clear();
 
   auto &item = d->item_to_info.emplace(
@@ -321,13 +480,12 @@ void ReferenceHierarchyView::OnUsersOfLevel(
     return;
   }
 
-
   auto add_user = [=] (QTreeWidgetItem *parent, Decl decl, TokenRange tokens) {
     QTreeWidgetItem *user_item = new QTreeWidgetItem;
     if (tokens) {
-      user_item->setText(0, RowName(decl, tokens[0]));
+      FillRow(user_item, decl, tokens[0]);
     } else {
-      user_item->setText(0, RowName(decl, decl.token()));
+      FillRow(user_item, decl, decl.token());
     }
     parent->addChild(user_item);
 
@@ -344,25 +502,36 @@ void ReferenceHierarchyView::OnUsersOfLevel(
   };
 
   std::map<QString, QTreeWidgetItem *> file_users;
-  UserLocations other_users;
   for (auto &[decl, tokens] : users) {
-    if (std::optional<File> file = File::containing(decl)) {
-      if (auto id_it = d->file_id_to_path.find(file->id());
-          id_it != d->file_id_to_path.end()) {
 
-        QTreeWidgetItem *&file_parent = file_users[id_it->second];
-        if (!file_parent) {
-          file_parent = new QTreeWidgetItem;
-          file_parent->setText(0, id_it->second);
+    // If we should group by file paths, then do the grouping here, building up
+    // the intermediate file path items.
+    if (d->show_file_paths) {
+      if (std::optional<File> file = File::containing(decl)) {
+        if (auto id_it = d->file_id_to_path.find(file->id());
+            id_it != d->file_id_to_path.end()) {
+
+          QTreeWidgetItem *&file_parent = file_users[id_it->second];
+          if (!file_parent) {
+            file_parent = new QTreeWidgetItem;
+            file_parent->setText(0, id_it->second);
+
+            // Make the text only partially visible.
+            auto color = qApp->palette().text().color();
+            file_parent->setTextColor(0, QColor::fromRgbF(
+                color.redF(), color.greenF(), color.blueF(),
+                color.alphaF() * 0.75));
+          }
+
+          add_user(file_parent, std::move(decl), std::move(tokens));
+          continue;
         }
-
-        add_user(file_parent, std::move(decl), std::move(tokens));
-        continue;
       }
     }
 
+    // If we're not grouping by file paths, or if we have no associatd file
+    // path, then show this here.
     add_user(parent_item, std::move(decl), std::move(tokens));
-    other_users.emplace_back(std::move(decl), std::move(tokens));
   }
 
   for (const auto &[path, file_item] : file_users) {
@@ -380,6 +549,11 @@ void ReferenceHierarchyView::OnItemSelectionChanged(void) {
   for (auto item : d->reference_tree->selectedItems()) {
     auto id_it = d->item_to_info.find(item);
     if (id_it == d->item_to_info.end()) {
+
+      // If we've done something like selected a file path, then try to deselect
+      // it, and then select the child (if any), triggering us to open the
+      // child. This is convenient when using up/down arrows through the
+      // reference list.
       if (item->childCount()) {
         d->reference_tree->clearSelection();
         d->reference_tree->setItemSelected(item, false);
@@ -406,7 +580,7 @@ void ReferenceHierarchyView::OnItemPressed(
 
   d->active_item = item;
 
-  if (!d->code) {
+  if (d->show_code_preview && !d->code) {
     d->code = new CodeView(CodeViewKind::kMultiLine, d->theme);
     d->splitter->addWidget(d->code);
   }
@@ -415,11 +589,14 @@ void ReferenceHierarchyView::OnItemPressed(
 
   auto [fragment_id, offset] = GetFragmentOffset(info.decl.id());
   if (fragment_id != kInvalidEntityId) {
-    d->theme.SetRangeToHighlight(info.tokens);
-    d->code->show();
-    d->code->SetFragment(d->index, fragment_id);
-    d->code->ScrollToToken(info.tokens);
-  } else {
+    if (d->show_code_preview && d->code) {
+      TokenRange tokens = info.tokens.file_tokens().strip_whitespace();
+      d->code->show();
+      d->theme.SetRangeToHighlight(tokens);
+      d->code->SetFragment(d->index, fragment_id);
+      d->code->ScrollToToken(tokens);
+    }
+  } else if (d->code) {
     d->code->hide();
   }
 }

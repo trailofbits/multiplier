@@ -517,16 +517,16 @@ std::optional<Decl> DeclForToken(const Token &token) {
 
     if (auto stmt = context->as_statement()) {
       if (auto decl = VisitStmt(stmt.value(), token)) {
-        return decl;
+        return CanonicalDecl(decl.value());
       }
     } else if (auto type = context->as_type()) {
       if (auto decl = VisitType(type.value(), token)) {
-        return decl;
+        return CanonicalDecl(decl.value());
       }
     } else if (auto decl = context->as_declaration()) {
       if (auto named_decl = NamedDecl::from(decl);
           named_decl && named_decl->name() == token.data()) {
-        return decl;
+        return CanonicalDecl(decl.value());
       }
     }
   }
@@ -534,7 +534,7 @@ std::optional<Decl> DeclForToken(const Token &token) {
 #ifndef NDEBUG
   if (ClassifyToken(token) == TokenClass::kIdentifier) {
     if (std::optional<Fragment> frag = Fragment::containing(token)) {
-      std::cerr << "Missing decl for '" << token.data() << ": " << token.id() << "':\n";
+      std::cerr << "Missing decl for '" << token.data() << "': " << token.id() << ":\n";
       if (auto file = File::containing(token)) {
         std::cerr << "\tFile ID: " << file->id() << '\n';
       }

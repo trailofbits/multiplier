@@ -304,10 +304,7 @@ void MainWindow::OnFileExitAction(void) { close(); }
 void MainWindow::OnHelpAboutAction(void) {}
 
 void MainWindow::OnDeclarationsClicked(std::vector<RawEntityId> ids) {
-  d->references_view->Clear();
-  for (auto id : ids) {
-    d->references_view->AddRoot(id);
-  }
+  d->references_view->SetRoots(ids);
 }
 
 }  // namespace mx::gui

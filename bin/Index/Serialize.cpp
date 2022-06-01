@@ -2833,6 +2833,7 @@ void SerializeChooseExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
 
 void SerializeCharacterLiteral(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CharacterLiteral &e) {
   SerializeExpr(es, b, e);
+  b.setVal98(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   auto t36 = e.Token();
   b.setVal36(es.EntityId(t36));
 }
@@ -3597,6 +3598,7 @@ void SerializeUnaryExprOrTypeTraitExpr(EntityMapper &es, mx::ast::Stmt::Builder 
     b.setVal37(mx::kInvalidEntityId);
     b.setVal94(false);
   }
+  b.setVal98(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   auto t38 = e.OperatorToken();
   b.setVal38(es.EntityId(t38));
   auto t39 = e.RParenToken();
@@ -3666,6 +3668,7 @@ void SerializeStringLiteral(EntityMapper &es, mx::ast::Stmt::Builder b, const pa
   auto v64 = e.Bytes();
   std::string s64(v64.data(), v64.size());
   b.setVal64(s64);
+  b.setVal98(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   auto v69 = e.String();
   if (v69) {
     if (v69->empty()) {

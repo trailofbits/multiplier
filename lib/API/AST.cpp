@@ -19084,6 +19084,11 @@ std::optional<CharacterLiteral> CharacterLiteral::from(const Stmt &parent) {
   }
 }
 
+CharacterLiteralCharacterKind CharacterLiteral::character_kind(void) const {
+  auto self = fragment->NthStmt(offset);
+  return static_cast<CharacterLiteralCharacterKind>(self.getVal98());
+}
+
 Token CharacterLiteral::token(void) const {
   auto self = fragment->NthStmt(offset);
   if (auto tok = fragment->TokenFor(fragment, self.getVal36())) {
@@ -22519,6 +22524,11 @@ std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
   }
 }
 
+UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::expression_or_trait_kind(void) const {
+  auto self = fragment->NthStmt(offset);
+  return static_cast<UnaryExprOrTypeTrait>(self.getVal98());
+}
+
 Token UnaryExprOrTypeTraitExpr::operator_token(void) const {
   auto self = fragment->NthStmt(offset);
   if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
@@ -22785,6 +22795,11 @@ std::string_view StringLiteral::bytes(void) const {
   auto self = fragment->NthStmt(offset);
   capnp::Text::Reader data = self.getVal64();
   return std::string_view(data.cStr(), data.size());
+}
+
+StringLiteralStringKind StringLiteral::string_kind(void) const {
+  auto self = fragment->NthStmt(offset);
+  return static_cast<StringLiteralStringKind>(self.getVal98());
 }
 
 std::optional<std::string_view> StringLiteral::string(void) const {

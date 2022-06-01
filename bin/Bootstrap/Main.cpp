@@ -2087,8 +2087,21 @@ MethodListPtr CodeGenerator::RunOnClass(
     } else if (snake_name == "is_this_declaration_a_definition") {
       snake_name = "is_definition";
     
-    } else if (snake_name == "kind" && class_name == "BuiltinType") {
-      snake_name = "builtin_kind";
+    } else if (snake_name == "kind") {
+      if (class_name == "BuiltinType") {
+        snake_name = "builtin_kind";
+      } else if (class_name == "UnaryExprOrTypeTraitExpr") {
+        snake_name = "expression_or_trait_kind";
+      } else if (class_name == "CharacterLiteral") {
+        snake_name = "character_kind";
+      } else if (class_name == "StringLiteral") {
+        snake_name = "string_kind";
+      }
+    
+    } else if (snake_name == "kind_name") {
+      if (class_name == "TagDecl") {
+        snake_name = "tag_kind_name";
+      }
     }
 
     if (snake_name.ends_with("_type_info")) {

@@ -81,7 +81,8 @@ class ReferenceHierarchyView final : public QWidget {
   std::unique_ptr<PrivateData> d;
 
   void InitializeWidgets(void);
-  QString RowName(const Decl &decl, const Token &use) const;
+  void FillRow(QTreeWidgetItem *item, const Decl &decl, const Token &use) const;
+  QString FormatBreadcrumbs(const Token &use) const;
 
  public:
   virtual ~ReferenceHierarchyView(void);
@@ -92,6 +93,21 @@ class ReferenceHierarchyView final : public QWidget {
   void Clear(void);
   void SetIndex(Index index);
   void AddRoot(RawEntityId id);
+  void SetRoots(const std::vector<RawEntityId> &new_root_ids);
+
+  // Should we group references by file path? Defaults to `true`.
+  void SetGroupByFilePath(bool);
+
+  // Should we show line and column numbers? Defaults to `true`.
+  void SetShowLineColumnNumbers(bool);
+
+  // Should we show a preview of the code associated with the reference?
+  // Defaults to `true`.
+  void SetShowCodePreview(bool);
+
+  // Should we show token context breadcrumbs? These can be useful for a quick
+  // diagnosis of the context of a use? Defaults to `true`.
+  void SetShowContextBreadcrumbs(bool);
 
  private slots:
   void OnTreeWidgetItemExpanded(QTreeWidgetItem *item);
