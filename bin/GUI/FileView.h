@@ -25,13 +25,14 @@ class FileView final : public QTabWidget {
  public:
   virtual ~FileView(void);
   FileView(Index index_, std::filesystem::path file_path,
-           FileId file_id, QWidget *parent = nullptr);
+           FileId file_id, const CodeTheme &theme_=CodeTheme::DefaultTheme(),
+           QWidget *parent = nullptr);
 
  private slots:
-  void OnDeclarationsClicked(std::vector<RawEntityId> ids);
+  void OnDeclarationsClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
 
  signals:
-  void DeclarationsClicked(std::vector<RawEntityId> ids);
+  void DeclarationsClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
 };
 
 }  // namespace mx::gui

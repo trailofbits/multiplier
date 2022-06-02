@@ -35,7 +35,7 @@
 #include "FileBrowserView.h"
 #include "FileView.h"
 #include "OpenConnectionDialog.h"
-#include "ReferenceHierarchyView.h"
+#include "ReferenceBrowserView.h"
 
 namespace mx::gui {
 
@@ -65,7 +65,7 @@ struct MainWindow::PrivateData final {
   FileBrowserView *file_list_view{nullptr};
   QDockWidget *file_list_dock{nullptr};
 
-  ReferenceHierarchyView *references_view{nullptr};
+  ReferenceBrowserView *references_view{nullptr};
   QDockWidget *references_dock{nullptr};
 
   mx::Index index;
@@ -145,7 +145,7 @@ void MainWindow::InitializeWidgets(void) {
   d->file_list_dock = new QDockWidget(d->file_list_view->windowTitle());
   d->file_list_dock->setWidget(d->file_list_view);
 
-  d->references_view = new ReferenceHierarchyView;
+  d->references_view = new ReferenceBrowserView;
   d->references_dock = new QDockWidget(d->references_view->windowTitle());
   d->references_dock->setWidget(d->references_view);
 
@@ -303,8 +303,20 @@ void MainWindow::OnFileExitAction(void) { close(); }
 
 void MainWindow::OnHelpAboutAction(void) {}
 
-void MainWindow::OnDeclarationsClicked(std::vector<RawEntityId> ids) {
-  d->references_view->SetRoots(ids);
+void MainWindow::OnDeclarationsClicked(std::vector<RawEntityId> ids,
+                                       Qt::MouseButton button) {
+  // Per Josh Hofing:
+  //
+  //    You spend a lot of time clicking stuff to go deeper and deeper while
+  //    auditing, so that should be as easy as possible.
+  //
+  //    There's a finite number of times that I'll be able to click in my life
+  //    before I get arthritis, so I don't want to halve it.
+  if (false && button == Qt::MouseButton::LeftButton) {
+
+  } else if (button == Qt::MouseButton::LeftButton) {
+    d->references_view->SetRoots(ids);
+  }
 }
 
 }  // namespace mx::gui

@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "ReferenceHierarchyView.h"
+#include "ReferenceBrowserView.h"
 
 #include <QApplication>
 #include <QBrush>
@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <map>
+#include <multiplier/Index.h>
 #include <unordered_map>
 
 #include "CodeView.h"
@@ -64,12 +65,53 @@ static bool UserLocationSort(const UserLocation &a, const UserLocation &b) {
 
 }  // namespace
 
+struct InitReferenceHierarchyThread::PrivateData {
+  Index index;
+  const RawEntityId id;
+  FileLocationCache &line_cache;
+  QTreeWidgetItem * const item_parent;
+
+  explicit PrivateData(const Index &index_, RawEntityId id_,
+                       FileLocationCache &line_cache_,
+                       QTreeWidgetItem *parent_)
+      : index(index_),
+        id(id_),
+        line_cache(line_cache_),
+        item_parent(parent_) {}
+};
+
+struct ExpandReferenceHierarchyThread::PrivateData {
+  Index index;
+  const RawEntityId id;
+  FileLocationCache &line_cache;
+  QTreeWidgetItem * const item_parent;
+
+  explicit PrivateData(const Index &index_, RawEntityId id_,
+                       FileLocationCache &line_cache_,
+                       QTreeWidgetItem *parent_)
+      : index(index_),
+        id(id_),
+        line_cache(line_cache_),
+        item_parent(parent_) {}
+};
+
 InitReferenceHierarchyThread::~InitReferenceHierarchyThread(void) {}
+
+InitReferenceHierarchyThread::InitReferenceHierarchyThread(
+    const Index &index_, RawEntityId id_, FileLocationCache &line_cache_,
+    QTreeWidgetItem *parent_)
+    : d(new PrivateData(index_, id_, line_cache_, parent_)) {}
+
 ExpandReferenceHierarchyThread::~ExpandReferenceHierarchyThread(void) {}
+
+ExpandReferenceHierarchyThread::ExpandReferenceHierarchyThread(
+    const Index &index_, RawEntityId id_, FileLocationCache &line_cache_,
+    QTreeWidgetItem *parent_)
+    : d(new PrivateData(index_, id_, line_cache_, parent_)) {}
 
 void InitReferenceHierarchyThread::run(void) {
 
-  auto entity = index.entity(id);
+  auto entity = d->index.entity(d->id);
   if (!std::holds_alternative<Decl>(entity)) {
     return;
   }
@@ -83,7 +125,7 @@ void InitReferenceHierarchyThread::run(void) {
 
       // Populate the cache in this background thread to not block the main
       // thread.
-      (void) decl->token().nearest_location(line_cache);
+      (void) decl->token().nearest_location(d->line_cache);
 
       users.emplace_back(decl.value(), stmt.tokens());
     }
@@ -92,11 +134,11 @@ void InitReferenceHierarchyThread::run(void) {
   // Group them by file; they are already grouped by fragment.
   std::stable_sort(users.begin(), users.end(), UserLocationSort);
 
-  emit UsersOfRoot(item_parent, root_decl, std::move(users));
+  emit UsersOfRoot(d->item_parent, root_decl, std::move(users));
 }
 
 void ExpandReferenceHierarchyThread::run(void) {
-  auto entity = index.entity(id);
+  auto entity = d->index.entity(d->id);
   if (!std::holds_alternative<Decl>(entity)) {
     return;
   }
@@ -109,7 +151,7 @@ void ExpandReferenceHierarchyThread::run(void) {
 
       // Populate the cache in this background thread to not block the main
       // thread.
-      (void) decl->token().nearest_location(line_cache);
+      (void) decl->token().nearest_location(d->line_cache);
 
       users.emplace_back(decl.value(), stmt.tokens());
     }
@@ -118,10 +160,10 @@ void ExpandReferenceHierarchyThread::run(void) {
   // Group them by file; they are already grouped by fragment.
   std::stable_sort(users.begin(), users.end(), UserLocationSort);
 
-  emit UsersOfLevel(item_parent, std::move(users));
+  emit UsersOfLevel(d->item_parent, std::move(users));
 }
 
-struct ReferenceHierarchyView::PrivateData {
+struct ReferenceBrowserView::PrivateData {
  public:
   Index index;
   QVBoxLayout *layout{nullptr};
@@ -153,16 +195,16 @@ struct ReferenceHierarchyView::PrivateData {
       : theme(theme_) {}
 };
 
-ReferenceHierarchyView::~ReferenceHierarchyView(void) {}
+ReferenceBrowserView::~ReferenceBrowserView(void) {}
 
-ReferenceHierarchyView::ReferenceHierarchyView(const CodeTheme &theme_,
+ReferenceBrowserView::ReferenceBrowserView(const CodeTheme &theme_,
                                                QWidget *parent)
     : QWidget(parent),
       d(new PrivateData(theme_)) {
   InitializeWidgets();
 }
 
-void ReferenceHierarchyView::InitializeWidgets(void) {
+void ReferenceBrowserView::InitializeWidgets(void) {
   d->layout = new QVBoxLayout;
   d->splitter = new QSplitter(Qt::Horizontal);
 
@@ -172,36 +214,51 @@ void ReferenceHierarchyView::InitializeWidgets(void) {
   d->reference_tree = new QTreeWidget;
   d->layout->addWidget(d->reference_tree);
 
-  setWindowTitle(tr("Reference Hierarchy"));
+  setWindowTitle(tr("Reference Browser"));
   setLayout(d->layout);
 
   QList<int> splitter_sizes;
   splitter_sizes.push_back(d->splitter->width() / 2);
   splitter_sizes.push_back(splitter_sizes.back());
   d->splitter->setSizes(splitter_sizes);
-
   d->splitter->addWidget(d->reference_tree);
 
+  // We'll potentially have a bunch of columns depending on the configuration,
+  // so make sure they span to use all available space.
   d->reference_tree->header()->setStretchLastSection(true);
-  d->reference_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  d->reference_tree->header()->setSectionResizeMode(
+      QHeaderView::ResizeToContents);
+
+  // Disallow multiple selection. If we have grouping by file enabled, then when
+  // a user clicks on a file name, we instead jump down to the first entry
+  // grouped under that file. This is to make using the up/down arrows easier.
   d->reference_tree->setSelectionMode(
       QAbstractItemView::SelectionMode::SingleSelection);
+
+  // Hide the header.
   d->reference_tree->setHeaderHidden(true);
-  d->reference_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-  d->reference_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-  d->reference_tree->header()->setStretchLastSection(false);
+
+  // When a user clicks on a cell, we don't want Qt to randomly scroll to the
+  // beginning of a cell. That can be jarring.
+  d->reference_tree->setAutoScroll(false);
+
+  // Smooth scrolling.
+  d->reference_tree->setHorizontalScrollMode(
+      QAbstractItemView::ScrollPerPixel);
+  d->reference_tree->setVerticalScrollMode(
+      QAbstractItemView::ScrollPerPixel);
 
   connect(d->reference_tree, &QTreeWidget::itemExpanded,
-          this, &ReferenceHierarchyView::OnTreeWidgetItemExpanded);
+          this, &ReferenceBrowserView::OnTreeWidgetItemExpanded);
 
   connect(d->reference_tree, &QTreeWidget::itemPressed,
-          this, &ReferenceHierarchyView::OnItemPressed);
+          this, &ReferenceBrowserView::OnItemPressed);
 
   connect(d->reference_tree, &QTreeWidget::itemSelectionChanged,
-          this, &ReferenceHierarchyView::OnItemSelectionChanged);
+          this, &ReferenceBrowserView::OnItemSelectionChanged);
 }
 
-void ReferenceHierarchyView::SetRoots(
+void ReferenceBrowserView::SetRoots(
     const std::vector<RawEntityId> &new_root_ids) {
   if (d->root_ids != new_root_ids) {
     Clear();
@@ -211,15 +268,18 @@ void ReferenceHierarchyView::SetRoots(
   }
 }
 
-void ReferenceHierarchyView::Clear(void) {
+void ReferenceBrowserView::Clear(void) {
   d->item_to_info.clear();
   d->reference_tree->clear();
   d->active_item = nullptr;
   d->root_ids.clear();
+  if (d->code) {
+    d->code->hide();
+  }
   update();
 }
 
-void ReferenceHierarchyView::SetIndex(Index index) {
+void ReferenceBrowserView::SetIndex(const Index &index) {
   d->file_id_to_path.clear();
   d->index = std::move(index);
   for (auto &[path, index] : d->index.file_paths()) {
@@ -230,18 +290,18 @@ void ReferenceHierarchyView::SetIndex(Index index) {
 }
 
 // Should we group references by file path? Defaults to `true`.
-void ReferenceHierarchyView::SetGroupByFilePath(bool show) {
+void ReferenceBrowserView::SetGroupByFilePath(bool show) {
   d->show_file_paths = show;
 }
 
 // Should we show line and column numbers? Defaults to `true`.
-void ReferenceHierarchyView::SetShowLineColumnNumbers(bool show) {
+void ReferenceBrowserView::SetShowLineColumnNumbers(bool show) {
   d->show_line_column_numbers = show;
 }
 
 // Should we show a preview of the code associated with the reference?
 // Defaults to `true`.
-void ReferenceHierarchyView::SetShowCodePreview(bool show) {
+void ReferenceBrowserView::SetShowCodePreview(bool show) {
   d->show_code_preview = show;
   if (d->code) {
     d->code->hide();
@@ -250,11 +310,11 @@ void ReferenceHierarchyView::SetShowCodePreview(bool show) {
 
 // Should we show token context breadcrumbs? These can be useful for a quick
 // diagnosis of the context of a use? Defaults to `true`.
-void ReferenceHierarchyView::SetShowContextBreadcrumbs(bool show) {
+void ReferenceBrowserView::SetShowContextBreadcrumbs(bool show) {
   d->show_context_breadcrumbs = show;
 }
 
-void ReferenceHierarchyView::AddRoot(RawEntityId root_id) {
+void ReferenceBrowserView::AddRoot(RawEntityId root_id) {
   QTreeWidgetItem *root_item = new QTreeWidgetItem;
   root_item->setText(0, tr("Downloading entity %1 references...").arg(root_id));
   d->reference_tree->addTopLevelItem(root_item);
@@ -266,12 +326,12 @@ void ReferenceHierarchyView::AddRoot(RawEntityId root_id) {
   expander->setAutoDelete(true);
 
   connect(expander, &InitReferenceHierarchyThread::UsersOfRoot,
-          this, &ReferenceHierarchyView::OnUsersOfFirstLevel);
+          this, &ReferenceBrowserView::OnUsersOfFirstLevel);
 
   QThreadPool::globalInstance()->start(expander);
 }
 
-void ReferenceHierarchyView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
+void ReferenceBrowserView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
 
   item->setExpanded(true);
 
@@ -294,7 +354,7 @@ void ReferenceHierarchyView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
   expander->setAutoDelete(true);
 
   connect(expander, &ExpandReferenceHierarchyThread::UsersOfLevel,
-          this, &ReferenceHierarchyView::OnUsersOfLevel);
+          this, &ReferenceBrowserView::OnUsersOfLevel);
 
   QThreadPool::globalInstance()->start(expander);
 }
@@ -313,19 +373,40 @@ QString NameOf(T enumerator) {
   return QString::fromUtf8(ret.data(), static_cast<int>(ret.size()));
 }
 
-QString ReferenceHierarchyView::FormatBreadcrumbs(const Token &use) const {
+QString ReferenceBrowserView::FormatBreadcrumbs(const Token &use) const {
   QString breadcrumbs;
-  static const QString kBreadCrumb("%1%2");
+  static const QString kBreadCrumb("%1%2%3");
   const char *sep = "";
   const char * const next_sep = " → ";
+  int repetitions = 0;
+  const char *reps[] = {"", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
   auto i = -1;
+
+  auto add_name = [&] (QString name) {
+    if (breadcrumbs.endsWith(name)) {
+      ++repetitions;
+
+    } else if (repetitions < 9) {
+      breadcrumbs.append(kBreadCrumb.arg(reps[repetitions]).arg(sep).arg(name));
+      repetitions = 0;
+
+    } else {
+      breadcrumbs.append(kBreadCrumb.arg("⁺").arg(sep).arg(name));
+      repetitions = 0;
+    }
+
+    sep = next_sep;
+  };
+
   for (auto context = TokenContext::of(use);
        context; context = context->parent()) {
     ++i;
 
     if (auto cdecl = context->as_declaration()) {
-      breadcrumbs.append(kBreadCrumb.arg(sep).arg(NameOf(cdecl->kind())));
-      sep = next_sep;
+      add_name(NameOf(cdecl->kind()));
+
+    } else if (auto ctype = context->as_type()) {
+      add_name(NameOf(ctype->kind()));
 
     } else if (auto cstmt = context->as_statement()) {
       switch (cstmt->kind()) {
@@ -336,9 +417,7 @@ QString ReferenceHierarchyView::FormatBreadcrumbs(const Token &use) const {
         case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR: {
           auto &expr = reinterpret_cast<const UnaryExprOrTypeTraitExpr &>(
               cstmt.value());
-          breadcrumbs.append(
-              kBreadCrumb.arg(sep).arg(NameOf(expr.expression_or_trait_kind())));
-          sep = next_sep;
+          add_name(NameOf(expr.expression_or_trait_kind()));
           continue;
         }
 
@@ -346,26 +425,22 @@ QString ReferenceHierarchyView::FormatBreadcrumbs(const Token &use) const {
           auto &cast = reinterpret_cast<const ImplicitCastExpr &>(cstmt.value());
           auto ck = cast.cast_kind();
           if (ck != CastKind::L_VALUE_TO_R_VALUE && ck != CastKind::BIT_CAST &&
-              ck != CastKind::FUNCTION_TO_POINTER_DECAY) {
-            breadcrumbs.append(kBreadCrumb.arg(sep).arg(NameOf(ck)));
-            sep = next_sep;
+              ck != CastKind::FUNCTION_TO_POINTER_DECAY &&
+              ck != CastKind::ARRAY_TO_POINTER_DECAY) {
+            add_name(NameOf(ck));
           }
           break;
         }
 
         case StmtKind::UNARY_OPERATOR: {
           auto &op = reinterpret_cast<const UnaryOperator &>(cstmt.value());
-          breadcrumbs.append(
-              kBreadCrumb.arg(sep).arg(NameOf(op.opcode())));
-          sep = next_sep;
+          add_name(NameOf(op.opcode()));
           continue;
         }
 
         case StmtKind::BINARY_OPERATOR: {
           auto &op = reinterpret_cast<const BinaryOperator &>(cstmt.value());
-          breadcrumbs.append(
-              kBreadCrumb.arg(sep).arg(NameOf(op.opcode())));
-          sep = next_sep;
+          add_name(NameOf(op.opcode()));
           continue;
         }
 
@@ -376,23 +451,16 @@ QString ReferenceHierarchyView::FormatBreadcrumbs(const Token &use) const {
           [[clang::fallthrough]];
 
         default: {
-          breadcrumbs.append(
-              kBreadCrumb.arg(sep).arg(NameOf(cstmt->kind())));
-          sep = next_sep;
+          add_name(NameOf(cstmt->kind()));
           break;
         }
       }
-
-    } else if (auto ctype = context->as_type()) {
-      breadcrumbs.append(
-          kBreadCrumb.arg(sep).arg(NameOf(ctype->kind())));
-      sep = next_sep;
     }
   }
   return breadcrumbs;
 }
 
-void ReferenceHierarchyView::FillRow(
+void ReferenceBrowserView::FillRow(
     QTreeWidgetItem *item, const Decl &decl, const Token &use) const {
 
   if (auto nd = NamedDecl::from(decl)) {
@@ -435,7 +503,7 @@ void ReferenceHierarchyView::FillRow(
   }
 }
 
-void ReferenceHierarchyView::OnUsersOfFirstLevel(
+void ReferenceBrowserView::OnUsersOfFirstLevel(
     QTreeWidgetItem *root_item, std::optional<Decl> root_decl,
     UserLocations users) {
 
@@ -458,7 +526,7 @@ void ReferenceHierarchyView::OnUsersOfFirstLevel(
   OnItemPressed(root_item, 0);
 }
 
-void ReferenceHierarchyView::OnUsersOfLevel(
+void ReferenceBrowserView::OnUsersOfLevel(
     QTreeWidgetItem *parent_item, UserLocations users) {
 
   // Something else was requested before the background thread returned.
@@ -544,7 +612,7 @@ void ReferenceHierarchyView::OnUsersOfLevel(
   update();
 }
 
-void ReferenceHierarchyView::OnItemSelectionChanged(void) {
+void ReferenceBrowserView::OnItemSelectionChanged(void) {
 
   for (auto item : d->reference_tree->selectedItems()) {
     auto id_it = d->item_to_info.find(item);
@@ -567,7 +635,7 @@ void ReferenceHierarchyView::OnItemSelectionChanged(void) {
   }
 }
 
-void ReferenceHierarchyView::OnItemPressed(
+void ReferenceBrowserView::OnItemPressed(
     QTreeWidgetItem *item, int column) {
   auto id_it = d->item_to_info.find(item);
   if (id_it == d->item_to_info.end()) {
@@ -581,7 +649,7 @@ void ReferenceHierarchyView::OnItemPressed(
   d->active_item = item;
 
   if (d->show_code_preview && !d->code) {
-    d->code = new CodeView(CodeViewKind::kMultiLine, d->theme);
+    d->code = new CodeView(d->theme);
     d->splitter->addWidget(d->code);
   }
 

@@ -57,16 +57,14 @@ class Code {
 };
 
 struct CodeView::PrivateData {
-  const CodeViewKind kind;
   CodeViewState state{CodeViewState::kInitialized};
   FileLocationCache line_number_cache;
   std::unique_ptr<Code> code;
   const CodeTheme &theme;
   RawEntityId scroll_target_eid{kInvalidEntityId};
 
-  inline PrivateData(CodeViewKind kind_, const CodeTheme &theme_)
-      : kind(kind_),
-        theme(theme_) {}
+  inline PrivateData(const CodeTheme &theme_)
+      : theme(theme_) {}
 };
 
 struct DownloadCodeThread::PrivateData {
@@ -407,9 +405,9 @@ void DownloadCodeThread::run(void) {
 
 CodeView::~CodeView(void) {}
 
-CodeView::CodeView(CodeViewKind kind, const CodeTheme &theme_, QWidget *parent)
+CodeView::CodeView(const CodeTheme &theme_, QWidget *parent)
     : QPlainTextEdit(parent),
-      d(std::make_unique<PrivateData>(kind, theme_)) {
+      d(std::make_unique<PrivateData>(theme_)) {
   InitializeWidgets();
 }
 
@@ -627,23 +625,17 @@ std::vector<RawEntityId> CodeView::DeclsForPosition(const QPoint &pos) const {
 }
 
 void CodeView::mousePressEvent(QMouseEvent *event) {
-  if (event->button() == Qt::MouseButton::LeftButton) {
-    auto decl_ids = DeclsForPosition(event->pos());
-    if (!decl_ids.empty()) {
-      emit DeclarationsClicked(std::move(decl_ids));
-    }
+  auto decl_ids = DeclsForPosition(event->pos());
+  if (!decl_ids.empty()) {
+    emit DeclarationsClicked(std::move(decl_ids), event->button());
   }
-
   this->QPlainTextEdit::mousePressEvent(event);
 }
 
-
 void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
-  if (event->button() == Qt::MouseButton::LeftButton) {
-    auto decl_ids = DeclsForPosition(event->pos());
-    if (!decl_ids.empty()) {
-      emit DeclarationsDoubleClicked(std::move(decl_ids));
-    }
+  auto decl_ids = DeclsForPosition(event->pos());
+  if (!decl_ids.empty()) {
+    emit DeclarationsDoubleClicked(std::move(decl_ids), event->button());
   }
   this->QPlainTextEdit::mouseDoubleClickEvent(event);
 }
@@ -666,14 +658,6 @@ void CodeView::paintEvent(QPaintEvent *event) {
     case CodeViewState::kFailed:
       message = tr("Failed");
       break;
-  }
-
-  // If this is an inline code thing, then use the placeholder text as a way
-  // of showing the status.
-  if (CodeViewKind::kInLine == d->kind) {
-    setPlaceholderText(message);
-    this->QPlainTextEdit::paintEvent(event);
-    return;
   }
 
   static const auto kTextFlags = Qt::AlignCenter | Qt::TextSingleLine;

@@ -14,7 +14,7 @@
 
 #include "CodeView.h"
 #include "MainWindow.h"
-#include "ReferenceHierarchyView.h"
+#include "ReferenceBrowserView.h"
 
 namespace {
 

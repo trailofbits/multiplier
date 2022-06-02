@@ -16,6 +16,9 @@ add_executable("${exe_name}"
   CodeTheme.cpp
   CodeTheme.h
   
+  CodeBrowserView.cpp
+  CodeBrowserView.h
+  
   CodeView.cpp
   CodeView.h
 
@@ -33,8 +36,8 @@ add_executable("${exe_name}"
   OpenConnectionDialog.cpp
   OpenConnectionDialog.h
 
-  ReferenceHierarchyView.cpp
-  ReferenceHierarchyView.h
+  ReferenceBrowserView.cpp
+  ReferenceBrowserView.h
   
   Util.cpp
   Util.h

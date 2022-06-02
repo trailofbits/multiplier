@@ -51,7 +51,7 @@ class MainWindow final : public QMainWindow {
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
   void OnCloseFileViewTab(int index);
-  void OnDeclarationsClicked(std::vector<RawEntityId> ids);
+  void OnDeclarationsClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
 };
 
 }  // namespace mx::gui

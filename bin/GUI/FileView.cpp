@@ -29,7 +29,7 @@ struct FileView::PrivateData {
 FileView::~FileView(void) {}
 
 FileView::FileView(Index index, std::filesystem::path file_path,
-                   FileId file_id, QWidget *parent)
+                   FileId file_id, const CodeTheme &theme, QWidget *parent)
     : QTabWidget(parent),
       d(std::make_unique<PrivateData>()) {
 
@@ -41,8 +41,6 @@ FileView::FileView(Index index, std::filesystem::path file_path,
   setTabPosition(TabPosition::North);
   setWindowTitle(file_path.c_str());
 
-  d->content = new CodeView(CodeViewKind::kMultiLine);
-
   d->splitter = new QSplitter(Qt::Horizontal);
   d->layout = new QVBoxLayout;
   d->layout->setContentsMargins(0, 0, 0, 0);
@@ -53,6 +51,7 @@ FileView::FileView(Index index, std::filesystem::path file_path,
   splitter_sizes.push_back(splitter_sizes.back());
   d->splitter->setSizes(splitter_sizes);
 
+  d->content = new CodeView(theme);
   d->splitter->addWidget(d->content);
   d->content->SetFile(std::move(index), file_id);
 
@@ -60,8 +59,9 @@ FileView::FileView(Index index, std::filesystem::path file_path,
           this, &FileView::OnDeclarationsClicked);
 }
 
-void FileView::OnDeclarationsClicked(std::vector<RawEntityId> ids) {
-  emit DeclarationsClicked(std::move(ids));
+void FileView::OnDeclarationsClicked(std::vector<RawEntityId> ids,
+                                     Qt::MouseButton button) {
+  emit DeclarationsClicked(std::move(ids), button);
 }
 
 }  // namespace mx::gui
