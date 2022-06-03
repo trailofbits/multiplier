@@ -14,38 +14,41 @@
 
 #include <filesystem>
 #include <map>
-#include <multiplier/Types.h>
 #include <set>
 #include <unordered_map>
 #include <utility>
 
+#include "Configuration.h"
 #include "FileBrowserView.h"
-#include "MainWindow.h"
+#include "Multiplier.h"
 
 namespace mx::gui {
 
 struct FileBrowserView::PrivateData final {
+  FileBrowserConfiguration &config;
+
   QVBoxLayout *layout{nullptr};
   QLineEdit *filter_box{nullptr};
+
   QTreeWidget *source_file_tree{nullptr};
+
   std::unordered_map<
       QTreeWidgetItem *,
       std::pair<std::filesystem::path, mx::FileId>> file_infos;
+
+  inline PrivateData(FileBrowserConfiguration &config_)
+      : config(config_) {}
 };
 
 void DownloadFileListThread::run(void) {
   emit DownloadedFileList(index.file_paths());
 }
 
-FileBrowserView::FileBrowserView(MainWindow *mw, QWidget *parent)
+FileBrowserView::FileBrowserView(FileBrowserConfiguration &config_,
+                                 QWidget *parent)
     : QWidget(parent),
-      d(new PrivateData) {
+      d(new PrivateData(config_)) {
 
-  connect(this, &FileBrowserView::Connected,
-          mw, &MainWindow::OnConnected);
-
-  connect(this, &FileBrowserView::SourceFileDoubleClicked,
-          mw, &MainWindow::OnSourceFileDoubleClicked);
 
   InitializeWidgets();
 }
@@ -56,7 +59,7 @@ void FileBrowserView::Clear(void) {
   d->source_file_tree->clear();
 }
 
-void FileBrowserView::DownloadFileListInBackground(Index index) {
+void FileBrowserView::DownloadFileListInBackground(const Index &index) {
   auto downloader = new DownloadFileListThread(std::move(index));
   downloader->setAutoDelete(true);
 
@@ -69,6 +72,7 @@ void FileBrowserView::InitializeWidgets(void) {
   d->layout = new QVBoxLayout;
   d->layout->setContentsMargins(0, 0, 0, 0);
 
+  // Create a filter widget area so that we can filter down on specific files.
   auto filter_area = new QWidget;
   auto filter_layout = new QHBoxLayout;
   filter_area->setLayout(filter_layout);
@@ -78,6 +82,7 @@ void FileBrowserView::InitializeWidgets(void) {
   filter_layout->addWidget(d->filter_box);
   d->layout->addWidget(filter_area);
 
+  // Below the filter put the source tree.
   d->source_file_tree = new QTreeWidget;
   d->layout->addWidget(d->source_file_tree);
 

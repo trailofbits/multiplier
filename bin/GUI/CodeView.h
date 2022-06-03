@@ -14,7 +14,7 @@
 #include <QRunnable>
 #include <vector>
 
-#include "CodeTheme.h"
+#include "Event.h"
 
 namespace mx {
 class File;
@@ -23,6 +23,8 @@ class Index;
 class Token;
 class TokenRange;
 namespace gui {
+
+class CodeTheme;
 
 // A view for code. Code views have baked-in themes once initialized. Themes
 // have access to rich data only available during render-time, such as whether
@@ -35,8 +37,7 @@ class CodeView final : public QPlainTextEdit {
 
  public:
   virtual ~CodeView(void);
-  CodeView(const CodeTheme &theme_=CodeTheme::DefaultTheme(),
-           QWidget *parent = nullptr);
+  CodeView(const CodeTheme &theme_, QWidget *parent = nullptr);
 
   void ScrollToToken(const TokenRange &tok);
   void ScrollToToken(const Token &tok);
@@ -52,6 +53,7 @@ class CodeView final : public QPlainTextEdit {
 
  protected:
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
+  bool event(QEvent *event) Q_DECL_FINAL;
   void mousePressEvent(QMouseEvent *event) Q_DECL_FINAL;
   void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_FINAL;
 
@@ -65,8 +67,7 @@ class CodeView final : public QPlainTextEdit {
   void OnRenderCode(void *code);
 
  signals:
-  void DeclarationsClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
-  void DeclarationsDoubleClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
+  MX_DECLARE_DECLARATION_SIGNALS
 };
 
 // Thread that goes and downloads and structures the relevant code in the

@@ -4,25 +4,40 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <filesystem>
+#include <memory>
+#include <multiplier/Types.h>
 #include <QMainWindow>
 
-#include <memory>
+#include "Event.h"
 
-#include <multiplier/Index.h>
+namespace mx {
+class Index;
+namespace gui {
 
-namespace mx::gui {
-
+class CodeTheme;
+struct Configuration;
 enum class ConnectionState : int;
 
-class MainWindow final : public QMainWindow {
+class Multiplier final : public QMainWindow {
   Q_OBJECT
 
- public:
-  MainWindow(void);
-  virtual ~MainWindow(void) override;
+  Multiplier(void) = delete;
+  Multiplier(const Multiplier &) = delete;
+  Multiplier &operator=(const Multiplier &) = delete;
 
-  MainWindow(const MainWindow &) = delete;
-  MainWindow &operator=(const MainWindow &) = delete;
+ public:
+  explicit Multiplier(struct Configuration &config);
+  virtual ~Multiplier(void);
+
+  // Return the current configuration.
+  ::mx::gui::Configuration &Configuration(void) const;
+
+  // Return the current connected index.
+  const ::mx::Index &Index(void) const;
+
+  // Return the current code theme.
+  const ::mx::gui::CodeTheme &CodeTheme(void) const;
 
  protected:
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
@@ -51,7 +66,10 @@ class MainWindow final : public QMainWindow {
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
   void OnCloseFileViewTab(int index);
-  void OnDeclarationsClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
+
+ public slots:
+  void OnActOnDeclarations(Action action, std::vector<RawEntityId> ids);
 };
 
-}  // namespace mx::gui
+}  // namespace gui
+}  // namespace mx

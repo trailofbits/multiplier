@@ -13,9 +13,14 @@
 #include <memory>
 #include <multiplier/Index.h>
 
-namespace mx::gui {
+namespace mx {
 
-class MainWindow;
+class Index;
+
+namespace gui {
+
+class Multiplier;
+struct FileBrowserConfiguration;
 
 // Shows a tree of files that were indexed. The tree is slightly compressed
 // by accumulating together directories that don't contain any indexed source
@@ -24,10 +29,10 @@ class FileBrowserView final : public QWidget {
   Q_OBJECT
 
  public:
-  FileBrowserView(MainWindow *mw, QWidget *parent=nullptr);
+  FileBrowserView(FileBrowserConfiguration &config_, QWidget *parent=nullptr);
   virtual ~FileBrowserView(void);
 
-  void DownloadFileListInBackground(Index index);
+  void DownloadFileListInBackground(const Index &index);
   void Clear(void);
 
  private:
@@ -62,4 +67,5 @@ class DownloadFileListThread final : public QObject, public QRunnable {
   void DownloadedFileList(FilePathList list);
 };
 
-}  // namespace mx::gui
+}  // namespace gui
+}  // namespace mx

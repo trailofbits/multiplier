@@ -23,6 +23,7 @@
 #include <unordered_map>
 
 #include "CodeView.h"
+#include "Configuration.h"
 #include "Util.h"
 
 #include <iostream>
@@ -258,8 +259,7 @@ void ReferenceBrowserView::InitializeWidgets(void) {
           this, &ReferenceBrowserView::OnItemSelectionChanged);
 }
 
-void ReferenceBrowserView::SetRoots(
-    const std::vector<RawEntityId> &new_root_ids) {
+void ReferenceBrowserView::SetRoots(std::vector<RawEntityId> new_root_ids) {
   if (d->root_ids != new_root_ids) {
     Clear();
     for (RawEntityId root_id : new_root_ids) {
@@ -463,6 +463,11 @@ QString ReferenceBrowserView::FormatBreadcrumbs(const Token &use) const {
 void ReferenceBrowserView::FillRow(
     QTreeWidgetItem *item, const Decl &decl, const Token &use) const {
 
+  // Format the declaration column. If we have a name then use it, otherwise
+  // use the stringized enumerator name for the declaration kind, coupled with
+  // the entity ID.
+  //
+  // TODO(pag): Eventually use symbol names in here.
   if (auto nd = NamedDecl::from(decl)) {
     if (auto name_data = nd->name(); !name_data.empty()) {
       item->setText(0, QString::fromUtf8(name_data.data(),
@@ -485,19 +490,25 @@ void ReferenceBrowserView::FillRow(
   // Show the line and column numbers.
   if (d->show_line_column_numbers) {
     if (auto loc = use.nearest_location(d->line_cache)) {
-//      item->setFont(index, afont)
-      item->setText(index, QString("%1:%2").arg(loc->first).arg(loc->second));
+      item->setTextColor(index, color);
+      item->setText(index, QString::number(loc->first));  // Line.
+      ++index;
+
+      item->setTextColor(index, color);
+      item->setText(index, QString::number(loc->second));  // Column.
       ++index;
     }
   }
 
-  // Show the context breadcrumbs.
+  // Show the context breadcrumbs. This is a chain of stringized enumerators
+  // derived from the token contexts.
   if (d->show_context_breadcrumbs) {
     item->setTextColor(index, color);
     item->setText(index, FormatBreadcrumbs(use));
     ++index;
   }
 
+  // Make sure we're shoring the right number of columns.
   if (index > d->reference_tree->columnCount()) {
     d->reference_tree->setColumnCount(index);
   }

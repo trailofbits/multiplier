@@ -8,13 +8,18 @@
 
 #include <filesystem>
 #include <memory>
-#include <multiplier/Index.h>
+#include <multiplier/Types.h>
 #include <optional>
 #include <QTabWidget>
+#include <vector>
 
-#include "CodeView.h"
+#include "Event.h"
 
-namespace mx::gui {
+namespace mx {
+class Index;
+namespace gui {
+
+class Multiplier;
 
 class FileView final : public QTabWidget {
   Q_OBJECT
@@ -24,15 +29,18 @@ class FileView final : public QTabWidget {
 
  public:
   virtual ~FileView(void);
-  FileView(Index index_, std::filesystem::path file_path,
-           FileId file_id, const CodeTheme &theme_=CodeTheme::DefaultTheme(),
+
+  FileView(Multiplier &multiplier,
+           std::filesystem::path file_path,
+           FileId file_id,
            QWidget *parent = nullptr);
 
  private slots:
-  void OnDeclarationsClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
+  MX_DECLARE_DECLARATION_SLOTS
 
  signals:
-  void DeclarationsClicked(std::vector<RawEntityId> ids, Qt::MouseButton);
+  MX_DECLARE_DECLARATION_SIGNALS
 };
 
-}  // namespace mx::gui
+}  // namespace gui
+}  // namespace mx

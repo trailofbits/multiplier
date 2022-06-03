@@ -11,6 +11,7 @@
 #include <QColor>
 #include <QFont>
 #include <QFontMetrics>
+#include <QHelpEvent>
 #include <QPainter>
 #include <QPlainTextEdit>
 #include <QPlainTextDocumentLayout>
@@ -27,6 +28,7 @@
 #include <multiplier/Index.h>
 
 #include "CodeTheme.h"
+#include "Event.h"
 #include "Util.h"
 
 namespace mx::gui {
@@ -624,10 +626,26 @@ std::vector<RawEntityId> CodeView::DeclsForPosition(const QPoint &pos) const {
   return decl_ids;
 }
 
+bool CodeView::event(QEvent *event) {
+  if (event->type() == QEvent::HoverEnter) {
+    QHoverEvent *hover_event = static_cast<QHoverEvent *>(event);
+
+    if (auto decl_ids = DeclsForPosition(hover_event->pos()); !decl_ids.empty()) {
+      emit DeclarationEvent({hover_event->modifiers(), {}  /* No buttons */,
+                             EventKind::kHover},
+                            std::move(decl_ids));
+      return true;
+    }
+  }
+  return this->QPlainTextEdit::event(event);
+}
+
 void CodeView::mousePressEvent(QMouseEvent *event) {
   auto decl_ids = DeclsForPosition(event->pos());
   if (!decl_ids.empty()) {
-    emit DeclarationsClicked(std::move(decl_ids), event->button());
+    emit DeclarationEvent({event->modifiers(), event->buttons(),
+                           EventKind::kClick},
+                          std::move(decl_ids));
   }
   this->QPlainTextEdit::mousePressEvent(event);
 }
@@ -635,7 +653,9 @@ void CodeView::mousePressEvent(QMouseEvent *event) {
 void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
   auto decl_ids = DeclsForPosition(event->pos());
   if (!decl_ids.empty()) {
-    emit DeclarationsDoubleClicked(std::move(decl_ids), event->button());
+    emit DeclarationEvent({event->modifiers(), event->buttons(),
+                           EventKind::kDoubleClick},
+                          std::move(decl_ids));
   }
   this->QPlainTextEdit::mouseDoubleClickEvent(event);
 }

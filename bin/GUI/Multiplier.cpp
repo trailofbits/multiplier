@@ -6,7 +6,7 @@
   the LICENSE file found in the root directory of this source tree.
 */
 
-#include "MainWindow.h"
+#include "Multiplier.h"
 
 #ifdef __APPLE__
 #include "MacOSUtils.h"
@@ -32,6 +32,8 @@
 
 #include <multiplier/Index.h>
 
+#include "Configuration.h"
+#include "CodeTheme.h"
 #include "FileBrowserView.h"
 #include "FileView.h"
 #include "OpenConnectionDialog.h"
@@ -55,7 +57,9 @@ struct MainMindowMenus final {
 
 }  // namespace
 
-struct MainWindow::PrivateData final {
+struct Multiplier::PrivateData final {
+  struct Configuration &config;
+
   MainMindowMenus menus;
 
   // The central widget is a bunch of tabs.
@@ -74,12 +78,32 @@ struct MainWindow::PrivateData final {
 
   ConnectionState connection_state{ConnectionState::kNotConnected};
 
-  inline PrivateData(void) {}
+  inline PrivateData(::mx::gui::Configuration &config_)
+      : config(config_) {}
 };
 
-MainWindow::~MainWindow(void) {}
+Multiplier::~Multiplier(void) {}
 
-void MainWindow::paintEvent(QPaintEvent *event) {
+// Return the current configuration.
+::mx::gui::Configuration &Multiplier::Configuration(void) const {
+  return d->config;
+}
+
+// Return the current connected index.
+const ::mx::Index &Multiplier::Index(void) const {
+  return d->index;
+}
+
+// Return the current code theme.
+const ::mx::gui::CodeTheme &Multiplier::CodeTheme(void) const {
+  if (d->config.theme) {
+    return *(d->config.theme);
+  } else {
+    return CodeTheme::DefaultTheme();
+  }
+}
+
+void Multiplier::paintEvent(QPaintEvent *event) {
   QString message;
   if (d->connection_state == ConnectionState::kConnected) {
     this->QWidget::paintEvent(event);
@@ -116,7 +140,7 @@ void MainWindow::paintEvent(QPaintEvent *event) {
   event->accept();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void Multiplier::closeEvent(QCloseEvent *event) {
   if (d->connection_state != ConnectionState::kNotConnected) {
     auto answer = QMessageBox::question(
         this, tr("Question"), tr("Are you sure you want to exit the program?"),
@@ -132,16 +156,17 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   event->accept();
 }
 
-MainWindow::MainWindow(void)
-    : QMainWindow(nullptr), d(new PrivateData) {
+Multiplier::Multiplier(struct Configuration &config_)
+    : QMainWindow(nullptr),
+      d(new PrivateData(config_)) {
   InitializeUI();
   UpdateUI();
 }
 
-void MainWindow::InitializeWidgets(void) {
+void Multiplier::InitializeWidgets(void) {
   d->central_widget = new QTabWidget;
 
-  d->file_list_view = new FileBrowserView(this);
+  d->file_list_view = new FileBrowserView(d->config.file_browser);
   d->file_list_dock = new QDockWidget(d->file_list_view->windowTitle());
   d->file_list_dock->setWidget(d->file_list_view);
 
@@ -164,26 +189,33 @@ void MainWindow::InitializeWidgets(void) {
   }
 #endif
 
+
+  connect(d->file_list_view, &FileBrowserView::Connected,
+          this, &Multiplier::OnConnected);
+
+  connect(d->file_list_view, &FileBrowserView::SourceFileDoubleClicked,
+          this, &Multiplier::OnSourceFileDoubleClicked);
+
   connect(d->central_widget, &QTabWidget::tabCloseRequested,
-          this, &MainWindow::OnCloseFileViewTab);
+          this, &Multiplier::OnCloseFileViewTab);
 }
 
-void MainWindow::InitializeMenus(void) {
+void Multiplier::InitializeMenus(void) {
   //
   // File menu
   //
 
   d->menus.file_connect_action = new QAction(tr("&Connect"));
   connect(d->menus.file_connect_action, &QAction::triggered, this,
-          &MainWindow::OnFileConnectAction);
+          &Multiplier::OnFileConnectAction);
 
   d->menus.file_disconnect_action = new QAction(tr("&Disconnect"));
   connect(d->menus.file_disconnect_action, &QAction::triggered, this,
-          &MainWindow::OnFileDisconnectAction);
+          &Multiplier::OnFileDisconnectAction);
 
   d->menus.file_exit_action = new QAction(tr("&Exit"));
   connect(d->menus.file_exit_action, &QAction::triggered, this,
-          &MainWindow::OnFileExitAction);
+          &Multiplier::OnFileExitAction);
 
   d->menus.file_menu = menuBar()->addMenu(tr("File"));
   d->menus.file_menu->addAction(d->menus.file_connect_action);
@@ -192,7 +224,7 @@ void MainWindow::InitializeMenus(void) {
   d->menus.file_menu->addAction(d->menus.file_exit_action);
 }
 
-void MainWindow::UpdateMenus(void) {
+void Multiplier::UpdateMenus(void) {
   d->menus.file_connect_action->setEnabled(d->connection_state ==
                                            ConnectionState::kNotConnected);
 
@@ -200,7 +232,7 @@ void MainWindow::UpdateMenus(void) {
                                               ConnectionState::kConnected);
 }
 
-void MainWindow::UpdateWidgets(void) {
+void Multiplier::UpdateWidgets(void) {
   switch (d->connection_state) {
     case ConnectionState::kNotConnected:
     case ConnectionState::kConnecting:
@@ -218,13 +250,13 @@ void MainWindow::UpdateWidgets(void) {
   }
 }
 
-void MainWindow::UpdateUI(void) {
+void Multiplier::UpdateUI(void) {
   UpdateMenus();
   UpdateWidgets();
   update();
 }
 
-void MainWindow::InitializeUI(void) {
+void Multiplier::InitializeUI(void) {
   setWindowTitle("Multiplier");
   QRect rect = QApplication::desktop()->screenGeometry();
 
@@ -234,7 +266,7 @@ void MainWindow::InitializeUI(void) {
   InitializeMenus();
 }
 
-void MainWindow::OnConnectionStateChange(ConnectionState state) {
+void Multiplier::OnConnectionStateChange(ConnectionState state) {
   if (ConnectionState::kConnected == state) {
     d->connection_state = ConnectionState::kConnected;
   } else if (ConnectionState::kNotConnected == state) {
@@ -245,19 +277,19 @@ void MainWindow::OnConnectionStateChange(ConnectionState state) {
   UpdateUI();
 }
 
-void MainWindow::OnCloseFileViewTab(int index) {
+void Multiplier::OnCloseFileViewTab(int index) {
   d->central_widget->removeTab(index);
 }
 
-void MainWindow::OnConnected(void) {
+void Multiplier::OnConnected(void) {
   d->connection_state = ConnectionState::kConnected;
   UpdateUI();
 }
 
-void MainWindow::OnSourceFileDoubleClicked(
+void Multiplier::OnSourceFileDoubleClicked(
     std::filesystem::path path, mx::FileId file_id) {
 
-  FileView *file_view = new FileView(d->index, path, file_id);
+  FileView *file_view = new FileView(*this, path, file_id);
   int tab_index = d->central_widget->addTab(
       file_view,
       QString("%1 (%2)").arg(path.filename().c_str()).arg(file_id));
@@ -269,11 +301,11 @@ void MainWindow::OnSourceFileDoubleClicked(
 
   d->central_widget->setCurrentIndex(tab_index);
 
-  connect(file_view, &FileView::DeclarationsClicked,
-          this, &MainWindow::OnDeclarationsClicked);
+  connect(file_view, &FileView::ActOnDeclarations,
+          this, &Multiplier::OnActOnDeclarations);
 }
 
-void MainWindow::OnFileConnectAction(void) {
+void Multiplier::OnFileConnectAction(void) {
   auto connect_settings = OpenConnectionDialog::Run();
   if (!connect_settings.has_value()) {
     return;
@@ -292,19 +324,19 @@ void MainWindow::OnFileConnectAction(void) {
   d->references_view->SetIndex(d->index);
 }
 
-void MainWindow::OnFileDisconnectAction(void) {
+void Multiplier::OnFileDisconnectAction(void) {
   d->connection_state = ConnectionState::kNotConnected;
   d->index = mx::Index();
   d->references_view->SetIndex(d->index);
   UpdateUI();
 }
 
-void MainWindow::OnFileExitAction(void) { close(); }
+void Multiplier::OnFileExitAction(void) { close(); }
 
-void MainWindow::OnHelpAboutAction(void) {}
+void Multiplier::OnHelpAboutAction(void) {}
 
-void MainWindow::OnDeclarationsClicked(std::vector<RawEntityId> ids,
-                                       Qt::MouseButton button) {
+void Multiplier::OnActOnDeclarations(
+    Action action, std::vector<RawEntityId> ids) {
   // Per Josh Hofing:
   //
   //    You spend a lot of time clicking stuff to go deeper and deeper while
@@ -312,10 +344,14 @@ void MainWindow::OnDeclarationsClicked(std::vector<RawEntityId> ids,
   //
   //    There's a finite number of times that I'll be able to click in my life
   //    before I get arthritis, so I don't want to halve it.
-  if (false && button == Qt::MouseButton::LeftButton) {
-
-  } else if (button == Qt::MouseButton::LeftButton) {
-    d->references_view->SetRoots(ids);
+  switch (action) {
+    case Action::kDoNothing: return;
+    case Action::kPropagate: return;
+    case Action::kOpenCodeBrowser:
+      break;
+    case Action::kOpenReferenceBrowser:
+      d->references_view->SetRoots(std::move(ids));
+      return;
   }
 }
 

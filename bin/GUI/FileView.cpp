@@ -13,25 +13,32 @@
 #include <QString>
 #include <QThreadPool>
 #include <QVBoxLayout>
-#include <iostream>
-#include <map>
-#include <vector>
-#include <set>
+
+#include <multiplier/Index.h>
+
+#include "CodeView.h"
+#include "Configuration.h"
+#include "Multiplier.h"
 
 namespace mx::gui {
 
 struct FileView::PrivateData {
+  FileConfiguration &config;
   QVBoxLayout *layout{nullptr};
   QSplitter *splitter{nullptr};
-  CodeView *content;
+  CodeView *content{nullptr};
+
+  inline PrivateData(FileConfiguration &config_)
+      : config(config_) {}
 };
 
 FileView::~FileView(void) {}
 
-FileView::FileView(Index index, std::filesystem::path file_path,
-                   FileId file_id, const CodeTheme &theme, QWidget *parent)
+FileView::FileView(Multiplier &multiplier,
+                   std::filesystem::path file_path,
+                   FileId file_id, QWidget *parent)
     : QTabWidget(parent),
-      d(std::make_unique<PrivateData>()) {
+      d(std::make_unique<PrivateData>(multiplier.Configuration().file)) {
 
   QList<int> splitter_sizes;
 
@@ -51,17 +58,14 @@ FileView::FileView(Index index, std::filesystem::path file_path,
   splitter_sizes.push_back(splitter_sizes.back());
   d->splitter->setSizes(splitter_sizes);
 
-  d->content = new CodeView(theme);
+  d->content = new CodeView(multiplier.CodeTheme());
   d->splitter->addWidget(d->content);
-  d->content->SetFile(std::move(index), file_id);
+  d->content->SetFile(multiplier.Index(), file_id);
 
-  connect(d->content, &CodeView::DeclarationsClicked,
-          this, &FileView::OnDeclarationsClicked);
+  MX_CONNECT_CHILD_ACTIONS(d->config, FileView, CodeView)
+  MX_ROUTE_ACTIONS(d->config, FileView, multiplier)
 }
 
-void FileView::OnDeclarationsClicked(std::vector<RawEntityId> ids,
-                                     Qt::MouseButton button) {
-  emit DeclarationsClicked(std::move(ids), button);
-}
+MX_DEFINE_DECLARATION_SLOTS(FileView, d->config)
 
 }  // namespace mx::gui

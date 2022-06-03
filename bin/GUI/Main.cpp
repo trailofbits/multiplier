@@ -13,16 +13,11 @@
 #include <QMetaType>
 
 #include "CodeView.h"
-#include "MainWindow.h"
+#include "Configuration.h"
+#include "Multiplier.h"
 #include "ReferenceBrowserView.h"
 
 namespace {
-
-void initializeTheme(void) {
-#ifdef __APPLE__
-  qApp->setStyle("Fusion");
-#endif
-}
 
 } // namespace
 
@@ -31,10 +26,24 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   QApplication application(argc, argv);
 
+  mx::gui::Configuration config;
+
   if (getenv("MX_NO_CUSTOM_THEME") == nullptr) {
-    initializeTheme();
+    qApp->setStyle(config.style);
   }
 
+  config.file.declaration_actions.emplace_back(
+      mx::gui::Event{{}, Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kClick},
+      mx::gui::Action::kOpenReferenceBrowser);
+
+
+  config.file.declaration_actions.emplace_back(
+      mx::gui::Event{{}, Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kDoubleClick},
+      mx::gui::Action::kOpenReferenceBrowser);
+
+  qRegisterMetaType<mx::gui::Event>("Event");
   qRegisterMetaType<std::optional<mx::Decl>>("std::optional<Decl>");
   qRegisterMetaType<std::optional<mx::Stmt>>("std::optional<Stmt>");
   qRegisterMetaType<std::optional<mx::Type>>("std::optional<Type>");
@@ -54,7 +63,7 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType<std::vector<mx::Fragment>>("std::vector<Fragment>");
   qRegisterMetaType<std::vector<mx::RawEntityId>>("std::vector<RawEntityId>");
 
-  mx::gui::MainWindow main_window;
+  mx::gui::Multiplier main_window(config);
   main_window.show();
 
   return application.exec();

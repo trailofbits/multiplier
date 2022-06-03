@@ -21,6 +21,11 @@ add_executable("${exe_name}"
   
   CodeView.cpp
   CodeView.h
+  
+  Configuration.cpp
+  Configuration.h
+  
+  Event.h
 
   FileBrowserView.cpp
   FileBrowserView.h
@@ -30,8 +35,8 @@ add_executable("${exe_name}"
 
   Main.cpp
   
-  MainWindow.cpp
-  MainWindow.h
+  Multiplier.cpp
+  Multiplier.h
 
   OpenConnectionDialog.cpp
   OpenConnectionDialog.h

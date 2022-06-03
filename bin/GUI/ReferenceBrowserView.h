@@ -49,7 +49,7 @@ class ReferenceBrowserView final : public QWidget {
   void Clear(void);
   void SetIndex(const Index &index);
   void AddRoot(RawEntityId id);
-  void SetRoots(const std::vector<RawEntityId> &new_root_ids);
+  void SetRoots(std::vector<RawEntityId> new_root_ids);
 
   // Should we group references by file path? Defaults to `true`.
   void SetGroupByFilePath(bool);
@@ -109,8 +109,8 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
  public:
   virtual ~ExpandReferenceHierarchyThread(void);
   explicit ExpandReferenceHierarchyThread(const Index &index_, RawEntityId id_,
-                                        FileLocationCache &line_cache_,
-                                        QTreeWidgetItem *parent_);
+                                          FileLocationCache &line_cache_,
+                                          QTreeWidgetItem *parent_);
 
  signals:
   void UsersOfLevel(QTreeWidgetItem *item_parent, UserLocations users);
