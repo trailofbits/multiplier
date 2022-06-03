@@ -557,7 +557,7 @@ void CodeView::InitializeWidgets(void) {
   setReadOnly(true);
   setOverwriteMode(false);
   setMouseTracking(true);  // Enable `mouseMoveEvent`.
-  setTextInteractionFlags(Qt::NoTextInteraction);
+  setTextInteractionFlags(Qt::TextSelectableByMouse);
   viewport()->setCursor(Qt::ArrowCursor);
   setFont(d->theme.Font());
 

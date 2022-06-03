@@ -22,9 +22,7 @@ enum class Action : int {
   kPropagate,
   kOpenCodeBrowser,
   kOpenReferenceBrowser,
-  kAddToHistoryAsChild,
-  kAddToHistoryAsSibling,
-  kAddToHistoryAsRoot,
+  kAddToHistory,
 };
 
 struct Event {
@@ -55,10 +53,10 @@ using EventAction = std::pair<Event, Action>;
         switch (action) { \
           case Action::kDoNothing: break; \
           case Action::kPropagate: \
-            emit DeclarationEvent(event, std::move(ids)); \
+            emit DeclarationEvent(event, ids); \
             break; \
           default: \
-            emit ActOnDeclarations(action, std::move(ids)); \
+            emit ActOnDeclarations(action, ids); \
             break; \
         } \
       } \

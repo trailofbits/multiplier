@@ -65,6 +65,8 @@ class Multiplier final : public QMainWindow {
   void OnFileExitAction(void);
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
+  void OnMoveReferenceBrowser(Qt::DockWidgetArea area);
+  void OnHistoryDeclarationClicked(RawEntityId eid);
 
  public slots:
   void OnActOnDeclarations(Action action, std::vector<RawEntityId> ids);

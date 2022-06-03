@@ -92,7 +92,13 @@ struct ReferenceBrowserConfiguration {
   // by their relative locations within their containing files. This option
   // affects whether or not those file paths appear as entries in the references
   // tree.
-  bool group_under_containing_file{true};
+  bool group_under_containing_file{false};
+
+  // Should the full file path be shown?
+  bool show_file_path{false};
+
+  // Should the file name be shown?
+  bool show_file_name{true};
 
   // Should line and column numbers show up as additional cells in the reference
   // tree.

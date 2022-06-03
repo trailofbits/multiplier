@@ -219,7 +219,7 @@ struct ReferenceBrowserView::PrivateData {
   };
 
   std::unordered_map<QTreeWidgetItem *, ItemInfo> item_to_info;
-  std::unordered_map<FileId, QString> file_id_to_path;
+  std::unordered_map<FileId, std::filesystem::path> file_id_to_path;
 
   inline PrivateData(Multiplier &multiplier_)
       : multiplier(multiplier_),
@@ -238,7 +238,7 @@ ReferenceBrowserView::ReferenceBrowserView(Multiplier &multiplier,
 
 void ReferenceBrowserView::InitializeWidgets(void) {
   d->layout = new QVBoxLayout;
-  d->splitter = new QSplitter(Qt::Horizontal);
+  d->splitter = new QSplitter(Qt::Vertical);
 
   d->layout->setContentsMargins(0, 0, 0, 0);
   d->layout->addWidget(d->splitter);
@@ -270,7 +270,7 @@ void ReferenceBrowserView::InitializeWidgets(void) {
   // Hide the header.
   d->reference_tree->setHeaderHidden(true);
 
-  // When a user clicks on a cell, we don't want Qt to randomly scroll to the
+  // When a user clicks on a cell, we don't want to randomly scroll to the
   // beginning of a cell. That can be jarring.
   d->reference_tree->setAutoScroll(false);
 
@@ -299,6 +299,14 @@ void ReferenceBrowserView::SetRoots(std::vector<RawEntityId> new_root_ids) {
   }
 }
 
+void ReferenceBrowserView::SetCodePreviewHorizontal(void) {
+  d->splitter->setOrientation(Qt::Orientation::Horizontal);
+}
+
+void ReferenceBrowserView::SetCodePreviewVertical(void) {
+  d->splitter->setOrientation(Qt::Orientation::Vertical);
+}
+
 void ReferenceBrowserView::Clear(void) {
   d->item_to_info.clear();
   d->reference_tree->clear();
@@ -315,8 +323,7 @@ void ReferenceBrowserView::Clear(void) {
 void ReferenceBrowserView::OnDownloadedFileList(FilePathList files) {
   Clear();
   for (auto &[path, index] : files) {
-    d->file_id_to_path.emplace(
-        index, QString::fromStdString(path.generic_string()));
+    d->file_id_to_path.emplace(index, std::move(path));
   }
 }
 
@@ -478,18 +485,7 @@ void ReferenceBrowserView::FillRow(
   // the entity ID.
   //
   // TODO(pag): Eventually use symbol names in here.
-  if (auto nd = NamedDecl::from(decl)) {
-    if (auto name_data = nd->name(); !name_data.empty()) {
-      item->setText(0, QString::fromUtf8(name_data.data(),
-                                         static_cast<int>(name_data.size())));
-    } else {
-      item->setText(0, QString("%1(%2)").arg(EnumeratorName(decl.category()))
-                                        .arg(decl.id()));
-    }
-  } else {
-    item->setText(0, QString("%1(%2)").arg(EnumeratorName(decl.category()))
-                                      .arg(decl.id()));
-  }
+  item->setText(0, DeclName(decl));
 
   auto index = 1;
 
@@ -498,8 +494,38 @@ void ReferenceBrowserView::FillRow(
       color.redF(), color.greenF(), color.blueF(), color.alphaF() * 0.75);
 
   // Show the line and column numbers.
-  if (config.show_line_numbers || config.show_column_numbers) {
+  if (config.show_line_numbers || config.show_column_numbers ||
+      config.show_file_path || config.show_file_name) {
     if (auto loc = use.nearest_location(d->line_cache)) {
+      auto file = File::containing(use);
+      FileId file_id = file ? file->id() : kInvalidEntityId;
+
+      if (config.show_file_path) {
+        if (auto fp_it = d->file_id_to_path.find(file_id);
+            fp_it != d->file_id_to_path.end()) {
+          item->setTextColor(index, color);
+          item->setTextAlignment(index, Qt::AlignRight);
+          item->setText(
+              index, QString::fromStdString(fp_it->second.generic_string()));
+        } else {
+          item->setText(index, "");
+        }
+        ++index;
+      }
+
+      if (config.show_file_name) {
+        if (auto fp_it = d->file_id_to_path.find(file_id);
+            fp_it != d->file_id_to_path.end()) {
+          item->setTextColor(index, color);
+          item->setTextAlignment(index, Qt::AlignRight);
+          item->setText(
+              index, QString::fromStdString(fp_it->second.filename().string()));
+        } else {
+          item->setText(index, "");
+        }
+        ++index;
+      }
+
       if (config.show_line_numbers) {
         item->setTextColor(index, color);
         item->setText(index, QString::number(loc->first));  // Line.
@@ -604,7 +630,7 @@ void ReferenceBrowserView::OnUsersOfLevel(
   ReferenceBrowserConfiguration &config =
       d->multiplier.Configuration().reference_browser;
 
-  std::map<QString, QTreeWidgetItem *> file_users;
+  std::map<std::filesystem::path, QTreeWidgetItem *> file_users;
   for (auto &[decl, tokens] : users) {
 
     // If we should group by file paths, then do the grouping here, building up
@@ -617,7 +643,8 @@ void ReferenceBrowserView::OnUsersOfLevel(
           QTreeWidgetItem *&file_parent = file_users[id_it->second];
           if (!file_parent) {
             file_parent = new QTreeWidgetItem;
-            file_parent->setText(0, id_it->second);
+            file_parent->setText(
+                0, QString::fromStdString(id_it->second.generic_string()));
 
             // Make the text only partially visible.
             auto color = qApp->palette().text().color();

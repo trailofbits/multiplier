@@ -8,6 +8,7 @@
 
 #include <multiplier/Types.h>
 #include <optional>
+#include <QString>
 #include <utility>
 
 namespace mx {
@@ -55,6 +56,13 @@ RawEntityId CanonicalId(const Decl &decl);
 // Return the "canonical" version of a declaration. This tries to get us the
 // definition when possible.
 Decl CanonicalDecl(const Decl &decl);
+
+// Return some kind of name for a declaration.
+QString DeclName(const Decl &decl);
+
+// Return the entity ID of the nearest file token associated with this
+// declaration.
+RawEntityId DeclFileLocation(const Decl &decl);
 
 }  // namespace gui
 }  // namespace mx

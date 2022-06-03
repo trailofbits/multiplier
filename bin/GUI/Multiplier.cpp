@@ -32,6 +32,7 @@
 #include "CodeTheme.h"
 #include "FileBrowserView.h"
 #include "FileView.h"
+#include "HistoryBrowserView.h"
 #include "OpenConnectionDialog.h"
 #include "ReferenceBrowserView.h"
 
@@ -58,15 +59,16 @@ struct Multiplier::PrivateData final {
 
   MainMindowMenus menus;
 
-  // The central widget is a code browser, which tracks open files.
   CodeBrowserView *code_browser_view{nullptr};
 
-  // File list. This shows files included in the build.
   FileBrowserView *file_browser_view{nullptr};
   QDockWidget *file_browser_dock{nullptr};
 
   ReferenceBrowserView *reference_browser_view{nullptr};
   QDockWidget *reference_browser_dock{nullptr};
+
+  HistoryBrowserView *history_browser_view{nullptr};
+  QDockWidget *history_browser_dock{nullptr};
 
   mx::Index index;
 
@@ -159,6 +161,7 @@ Multiplier::Multiplier(struct Configuration &config_)
 
 void Multiplier::InitializeWidgets(void) {
   d->code_browser_view = new CodeBrowserView(*this);
+
   d->file_browser_view = new FileBrowserView(d->config.file_browser);
   d->file_browser_dock = new QDockWidget(d->file_browser_view->windowTitle());
   d->file_browser_dock->setWidget(d->file_browser_view);
@@ -167,8 +170,20 @@ void Multiplier::InitializeWidgets(void) {
   d->reference_browser_dock = new QDockWidget(d->reference_browser_view->windowTitle());
   d->reference_browser_dock->setWidget(d->reference_browser_view);
 
+  d->history_browser_view = new HistoryBrowserView(*this);
+  d->history_browser_dock = new QDockWidget(d->history_browser_view->windowTitle());
+  d->history_browser_dock->setWidget(d->history_browser_view);
+
+  setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::East);
+  setTabPosition(Qt::BottomDockWidgetArea, QTabWidget::North);
+
   addDockWidget(Qt::LeftDockWidgetArea, d->file_browser_dock);
-  addDockWidget(Qt::BottomDockWidgetArea, d->reference_browser_dock);
+  addDockWidget(Qt::LeftDockWidgetArea, d->history_browser_dock);
+  addDockWidget(Qt::LeftDockWidgetArea, d->reference_browser_dock);
+  tabifyDockWidget(d->file_browser_dock, d->history_browser_dock);
+  tabifyDockWidget(d->history_browser_dock, d->reference_browser_dock);
+
+
   setCentralWidget(d->code_browser_view);
 
 #ifdef __APPLE__
@@ -182,6 +197,12 @@ void Multiplier::InitializeWidgets(void) {
 
   connect(d->file_browser_view, &FileBrowserView::SourceFileDoubleClicked,
           this, &Multiplier::OnSourceFileDoubleClicked);
+
+  connect(d->reference_browser_dock, &QDockWidget::dockLocationChanged,
+          this, &Multiplier::OnMoveReferenceBrowser);
+
+  connect(d->history_browser_view, &HistoryBrowserView::HistoryDeclarationClicked,
+          this, &Multiplier::OnHistoryDeclarationClicked);
 }
 
 void Multiplier::InitializeMenus(void) {
@@ -221,14 +242,17 @@ void Multiplier::UpdateWidgets(void) {
     case ConnectionState::kNotConnected:
     case ConnectionState::kConnecting:
       d->file_browser_view->Clear();
+      d->history_browser_view->Clear();
       d->reference_browser_view->Clear();
       d->code_browser_view->Clear();
       d->file_browser_dock->hide();
+      d->history_browser_dock->hide();
       d->reference_browser_dock->hide();
       break;
 
     case ConnectionState::kConnected:
       d->file_browser_dock->show();
+      d->history_browser_dock->show();
       d->reference_browser_dock->show();
       break;
   }
@@ -259,6 +283,25 @@ void Multiplier::OnConnectionStateChange(ConnectionState state) {
     assert(false);
   }
   UpdateUI();
+}
+
+void Multiplier::OnMoveReferenceBrowser(Qt::DockWidgetArea area) {
+  UpdateUI();
+  switch (area) {
+    case Qt::DockWidgetArea::LeftDockWidgetArea:
+    case Qt::DockWidgetArea::RightDockWidgetArea:
+      d->reference_browser_view->SetCodePreviewVertical();
+      break;
+    default:
+      d->reference_browser_view->SetCodePreviewHorizontal();
+      break;
+  }
+}
+
+void Multiplier::OnHistoryDeclarationClicked(RawEntityId eid) {
+  std::vector<RawEntityId> ids;
+  ids.push_back(eid);
+  d->code_browser_view->OpenDeclarations(std::move(ids));
 }
 
 void Multiplier::OnConnected(void) {
@@ -314,13 +357,7 @@ void Multiplier::OnHelpAboutAction(void) {}
 
 void Multiplier::OnActOnDeclarations(
     Action action, std::vector<RawEntityId> ids) {
-  // Per Josh Hofing:
-  //
-  //    You spend a lot of time clicking stuff to go deeper and deeper while
-  //    auditing, so that should be as easy as possible.
-  //
-  //    There's a finite number of times that I'll be able to click in my life
-  //    before I get arthritis, so I don't want to halve it.
+
   switch (action) {
     case Action::kDoNothing: return;
     case Action::kPropagate: return;
@@ -328,12 +365,16 @@ void Multiplier::OnActOnDeclarations(
       d->code_browser_view->OpenDeclarations(std::move(ids));
       break;
     case Action::kOpenReferenceBrowser:
-      d->reference_browser_view->SetRoots(std::move(ids));
+      if (d->reference_browser_dock->isEnabled()) {
+        d->reference_browser_view->SetRoots(std::move(ids));
+        if (d->reference_browser_dock->visibleRegion().isEmpty()) {
+          d->reference_browser_dock->raise();
+        }
+      }
       return;
-    case Action::kAddToHistoryAsChild:
-    case Action::kAddToHistoryAsSibling:
-    case Action::kAddToHistoryAsRoot:
-      break;
+    case Action::kAddToHistory:
+      d->history_browser_view->AddDeclarations(std::move(ids));
+      return;
   }
 }
 

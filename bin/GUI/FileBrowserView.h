@@ -31,17 +31,16 @@ struct FileBrowserConfiguration;
 class FileBrowserView final : public QWidget {
   Q_OBJECT
 
+  struct PrivateData;
+  std::unique_ptr<PrivateData> d;
+
+  void InitializeWidgets(void);
+
  public:
   FileBrowserView(FileBrowserConfiguration &config_, QWidget *parent=nullptr);
   virtual ~FileBrowserView(void);
 
   void Clear(void);
-
- private:
-  struct PrivateData;
-  std::unique_ptr<PrivateData> d;
-
-  void InitializeWidgets(void);
 
  public slots:
   void OnDownloadedFileList(FilePathList files);

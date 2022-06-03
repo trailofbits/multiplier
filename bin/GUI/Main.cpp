@@ -33,20 +33,26 @@ int main(int argc, char *argv[]) {
     qApp->setStyle(config.style);
   }
 
-  // Click to open something in the file view.
+  // Per Josh Hofing:
+  //
+  //    You spend a lot of time clicking stuff to go deeper and deeper while
+  //    auditing, so that should be as easy as possible.
+  //
+  //    There's a finite number of times that I'll be able to click in my life
+  //    before I get arthritis, so I don't want to halve it.
+
+  // Click to open something in the file view, as well as add it to history.
   config.file.declaration_actions.emplace_back(
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
       mx::gui::Action::kOpenCodeBrowser);
 
-  // If we click on something in file view, then add it as a child to our
-  // history view.
   config.file.declaration_actions.emplace_back(
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
-      mx::gui::Action::kAddToHistoryAsChild);
+      mx::gui::Action::kAddToHistory);
 
   // Ctrl-click / Cmd-click to open something in the references view.
   config.file.declaration_actions.emplace_back(
@@ -63,13 +69,19 @@ int main(int argc, char *argv[]) {
                      mx::gui::EventKind::kClick},
       mx::gui::Action::kOpenReferenceBrowser);
 
-  // Double click in the code preview of a reference browser opens in
-  // the code browser.
+  // Single click in the code preview of a reference browser opens in
+  // the code browser, as well as adds to history.
   config.reference_browser.code_preview.declaration_actions.emplace_back(
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
       mx::gui::Action::kOpenCodeBrowser);
+
+  config.reference_browser.code_preview.declaration_actions.emplace_back(
+      mx::gui::Event{{},
+                     Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kClick},
+      mx::gui::Action::kAddToHistory);
 
   qRegisterMetaType<uint8_t>("uint8_t");
   qRegisterMetaType<uint16_t>("uint16_t");

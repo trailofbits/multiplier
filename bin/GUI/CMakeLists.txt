@@ -32,6 +32,9 @@ add_executable("${exe_name}"
 
   FileView.cpp
   FileView.h
+  
+  HistoryBrowserView.cpp
+  HistoryBrowserView.h
 
   Main.cpp
   

@@ -633,4 +633,27 @@ RawEntityId CanonicalId(const Decl &decl) {
   return CanonicalDecl(decl).id();
 }
 
+// Return some kind of name for a declaration.
+QString DeclName(const Decl &decl) {
+  if (auto nd = NamedDecl::from(decl)) {
+    if (auto name_data = nd->name(); !name_data.empty()) {
+      return QString::fromUtf8(name_data.data(),
+                               static_cast<int>(name_data.size()));
+    }
+  }
+  return QString("%1(%2)").arg(EnumeratorName(decl.category())).arg(decl.id());
+}
+
+// Return the entity ID of the nearest file token associated with this
+// declaration.
+RawEntityId DeclFileLocation(const Decl &decl) {
+  for (const Token &token : decl.tokens()) {
+    if (auto file_tok = token.nearest_file_token()) {
+      return file_tok->id();
+    }
+  }
+
+  return Fragment::containing(decl).file_tokens().begin()->id();
+}
+
 }  // namespace mx::gui

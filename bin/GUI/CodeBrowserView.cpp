@@ -17,6 +17,7 @@
 #include "CodeView.h"
 #include "FileView.h"
 #include "Multiplier.h"
+#include "Util.h"
 
 namespace mx::gui {
 
@@ -61,17 +62,7 @@ void LocateDeclarationsThread::run(void) {
   }
 
   for (const auto &[file_id, decl] : decl_in_file) {
-    RawEntityId nearest_file_tok =
-        Fragment::containing(decl).file_tokens().begin()->id();
-
-    for (const Token &token : decl.tokens()) {
-      if (auto file_tok = token.nearest_file_token()) {
-        nearest_file_tok = file_tok->id();
-        break;
-      }
-    }
-
-    emit OpenDeclarationInFile(file_id, nearest_file_tok);
+    emit OpenDeclarationInFile(file_id, DeclFileLocation(decl));
   }
 }
 
@@ -168,8 +159,7 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
     d->view_to_file_id.emplace(file_view, file_id);
 
     tab_index = d->content->addTab(
-        file_view,
-        QString("%1 (%2)").arg(path.filename().c_str()).arg(file_id));
+        file_view, QString("%1").arg(path.filename().c_str()));
 
 #ifndef QT_NO_TOOLTIP
     d->content->setTabToolTip(

@@ -51,6 +51,8 @@ class ReferenceBrowserView final : public QWidget {
   void Clear(void);
   void AddRoot(RawEntityId id);
   void SetRoots(std::vector<RawEntityId> new_root_ids);
+  void SetCodePreviewHorizontal(void);
+  void SetCodePreviewVertical(void);
 
  public slots:
   void OnDownloadedFileList(FilePathList files);
