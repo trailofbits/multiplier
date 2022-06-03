@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QThreadPool>
 #include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QVBoxLayout>
 
 #include <filesystem>
@@ -34,7 +35,7 @@ struct FileBrowserView::PrivateData final {
 
   std::unordered_map<
       QTreeWidgetItem *,
-      std::pair<std::filesystem::path, mx::FileId>> file_infos;
+      std::pair<std::filesystem::path, FileId>> file_infos;
 
   inline PrivateData(FileBrowserConfiguration &config_)
       : config(config_) {}
@@ -49,7 +50,6 @@ FileBrowserView::FileBrowserView(FileBrowserConfiguration &config_,
     : QWidget(parent),
       d(new PrivateData(config_)) {
 
-
   InitializeWidgets();
 }
 
@@ -57,15 +57,6 @@ FileBrowserView::~FileBrowserView(void) {}
 
 void FileBrowserView::Clear(void) {
   d->source_file_tree->clear();
-}
-
-void FileBrowserView::DownloadFileListInBackground(const Index &index) {
-  auto downloader = new DownloadFileListThread(std::move(index));
-  downloader->setAutoDelete(true);
-
-  connect(downloader, &DownloadFileListThread::DownloadedFileList,
-          this, &FileBrowserView::OnDownloadedFileList);
-  QThreadPool::globalInstance()->start(downloader);
 }
 
 void FileBrowserView::InitializeWidgets(void) {

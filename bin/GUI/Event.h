@@ -11,17 +11,20 @@
 
 namespace mx::gui {
 
-enum class Action : int {
-  kDoNothing,
-  kPropagate,
-  kOpenCodeBrowser,
-  kOpenReferenceBrowser
-};
-
 enum class EventKind : int {
   kClick,
   kDoubleClick,
   kHover,
+};
+
+enum class Action : int {
+  kDoNothing,
+  kPropagate,
+  kOpenCodeBrowser,
+  kOpenReferenceBrowser,
+  kAddToHistoryAsChild,
+  kAddToHistoryAsSibling,
+  kAddToHistoryAsRoot,
 };
 
 struct Event {
@@ -50,20 +53,20 @@ using EventAction = std::pair<Event, Action>;
           continue; \
         } \
         switch (action) { \
-          case Action::kDoNothing: return; \
+          case Action::kDoNothing: break; \
           case Action::kPropagate: \
             emit DeclarationEvent(event, std::move(ids)); \
-            return; \
+            break; \
           default: \
             emit ActOnDeclarations(action, std::move(ids)); \
-            return; \
+            break; \
         } \
       } \
     }
 
-#define MX_CONNECT_CHILD_ACTIONS(config, this_cls, that_cls) \
+#define MX_CONNECT_CHILD_ACTIONS(config, this_cls, that_cls_ptr, that_cls) \
     if (!config.declaration_actions.empty()) { \
-      connect(d->content, &that_cls::DeclarationEvent, \
+      connect(that_cls_ptr, &that_cls::DeclarationEvent, \
               this, &this_cls::OnDeclarationEvent); \
     }
 

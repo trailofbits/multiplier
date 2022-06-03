@@ -7,11 +7,14 @@
 #pragma once
 
 #include <QRunnable>
-#include <QTreeWidgetItem>
 #include <QWidget>
 
 #include <memory>
 #include <multiplier/Index.h>
+
+QT_BEGIN_NAMESPACE
+class QTreeWidgetItem;
+QT_END_NAMESPACE
 
 namespace mx {
 
@@ -32,7 +35,6 @@ class FileBrowserView final : public QWidget {
   FileBrowserView(FileBrowserConfiguration &config_, QWidget *parent=nullptr);
   virtual ~FileBrowserView(void);
 
-  void DownloadFileListInBackground(const Index &index);
   void Clear(void);
 
  private:
@@ -41,13 +43,15 @@ class FileBrowserView final : public QWidget {
 
   void InitializeWidgets(void);
 
- private slots:
+ public slots:
   void OnDownloadedFileList(FilePathList files);
+
+ private slots:
   void OnTreeWidgetItemActivated(QTreeWidgetItem *item, int);
   void OnFilterFileView(const QString &filter);
 
  signals:
-  void SourceFileDoubleClicked(std::filesystem::path, mx::FileId file_id);
+  void SourceFileDoubleClicked(std::filesystem::path, FileId file_id);
   void Connected(void);
 };
 

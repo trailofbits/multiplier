@@ -11,21 +11,24 @@
 #include <QColor>
 #include <QFont>
 #include <QFontMetrics>
-#include <QHelpEvent>
+#include <QMouseEvent>
 #include <QPainter>
+#include <QPaintEvent>
 #include <QPlainTextEdit>
 #include <QPlainTextDocumentLayout>
 #include <QString>
 #include <QStringRef>
 #include <QTextDocument>
 #include <QThreadPool>
+
+#include <atomic>
+#include <cassert>
 #include <iostream>
 #include <map>
+#include <multiplier/Index.h>
 #include <optional>
 #include <unordered_map>
 #include <vector>
-
-#include <multiplier/Index.h>
 
 #include "CodeTheme.h"
 #include "Event.h"
@@ -59,11 +62,22 @@ class Code {
 };
 
 struct CodeView::PrivateData {
+
+  // Current rendering state for the code view.
   CodeViewState state{CodeViewState::kInitialized};
-  FileLocationCache line_number_cache;
+
+  // Used to track re-entrancy issues, e.g. if in the process of rendering one
+  // code, we've started to try to render another code.
+  std::atomic<uint64_t> counter;
+
+  // Thread-safe cache for figuring out line/column numbers.
   std::unique_ptr<Code> code;
   const CodeTheme &theme;
+
+  // The entity id of a file token that we'll target for scrolling.
   RawEntityId scroll_target_eid{kInvalidEntityId};
+
+  unsigned last_mouse_move_index{~0u};
 
   inline PrivateData(const CodeTheme &theme_)
       : theme(theme_) {}
@@ -72,6 +86,7 @@ struct CodeView::PrivateData {
 struct DownloadCodeThread::PrivateData {
   const Index index;
   const CodeTheme &theme;
+  const uint64_t counter;
 
   std::optional<FileId> file_id;
   std::optional<FragmentId> fragment_id;
@@ -80,9 +95,11 @@ struct DownloadCodeThread::PrivateData {
   std::map<RawEntityId, std::vector<TokenList>> fragment_tokens;
   TokenRange file_tokens;
 
-  inline explicit PrivateData(Index index_, const CodeTheme &theme_)
+  inline explicit PrivateData(Index index_, const CodeTheme &theme_,
+                              uint64_t counter_)
       : index(std::move(index_)),
-        theme(theme_) {}
+        theme(theme_),
+        counter(counter_) {}
 
   bool DownloadFileTokens(void);
   bool DownloadFragmentTokens(void);
@@ -97,23 +114,26 @@ DownloadCodeThread::DownloadCodeThread(PrivateData *d_)
 DownloadCodeThread::~DownloadCodeThread(void) {}
 
 DownloadCodeThread *DownloadCodeThread::CreateFileDownloader(
-    const Index &index_, const CodeTheme &theme_, FileId file_id_) {
-  auto d = new PrivateData(index_, theme_);
+    const Index &index_, const CodeTheme &theme_, uint64_t counter_,
+    FileId file_id_) {
+  auto d = new PrivateData(index_, theme_, counter_);
   d->file_id.emplace(file_id_);
   return new DownloadCodeThread(d);
 }
 
 DownloadCodeThread *DownloadCodeThread::CreateFragmentDownloader(
-    const Index &index_, const CodeTheme &theme_, FragmentId frag_id_) {
-  auto d = new PrivateData(index_, theme_);
+    const Index &index_, const CodeTheme &theme_, uint64_t counter_,
+    FragmentId frag_id_) {
+  auto d = new PrivateData(index_, theme_, counter_);
   d->fragment_id.emplace(frag_id_);
   return new DownloadCodeThread(d);
 }
 
 DownloadCodeThread *DownloadCodeThread::CreateTokenRangeDownloader(
-    const Index &index_, const CodeTheme &theme_, RawEntityId begin_tok_id,
-    RawEntityId end_tok_id) {
-  auto d = new PrivateData(index_, theme_);
+    const Index &index_, const CodeTheme &theme_, uint64_t counter_,
+    RawEntityId begin_tok_id, RawEntityId end_tok_id) {
+
+  auto d = new PrivateData(index_, theme_, counter_);
   d->token_range.emplace(begin_tok_id, end_tok_id);
   return new DownloadCodeThread(d);
 }
@@ -402,7 +422,7 @@ void DownloadCodeThread::run(void) {
   d->theme.EndTokens();
 
   // We've now rendered the HTML.
-  emit RenderCode(std::move(code));
+  emit RenderCode(std::move(code), d->counter);
 }
 
 CodeView::~CodeView(void) {}
@@ -467,9 +487,10 @@ void CodeView::SetFile(const File &file) {
 void CodeView::SetFile(const Index &index, FileId file_id) {
   d->state = CodeViewState::kDownloading;
   d->scroll_target_eid = kInvalidEntityId;
+  auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
 
   auto downloader = DownloadCodeThread::CreateFileDownloader(
-      index, d->theme, file_id);
+      index, d->theme, prev_counter + 1u, file_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -488,9 +509,10 @@ void CodeView::SetFragment(const Fragment &fragment) {
 void CodeView::SetFragment(const Index &index, FragmentId fragment_id) {
   d->state = CodeViewState::kDownloading;
   d->scroll_target_eid = kInvalidEntityId;
+  auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
 
   auto downloader = DownloadCodeThread::CreateFragmentDownloader(
-      index, d->theme, fragment_id);
+      index, d->theme, prev_counter + 1u, fragment_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -506,9 +528,10 @@ void CodeView::SetTokenRange(const Index &index, RawEntityId begin_tok_id,
                              RawEntityId end_tok_id) {
   d->state = CodeViewState::kDownloading;
   d->scroll_target_eid = kInvalidEntityId;
+  auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
 
   auto downloader = DownloadCodeThread::CreateTokenRangeDownloader(
-      index, d->theme, begin_tok_id, end_tok_id);
+      index, d->theme, prev_counter + 1u, begin_tok_id, end_tok_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -520,10 +543,22 @@ void CodeView::SetTokenRange(const Index &index, RawEntityId begin_tok_id,
   update();
 }
 
+void CodeView::Clear(void) {
+  d->counter.fetch_add(1u);
+  d->state = CodeViewState::kInitialized;
+  d->code.reset();
+  d->last_mouse_move_index = ~0u;
+  d->scroll_target_eid = kInvalidEntityId;
+  this->QPlainTextEdit::clear();
+}
+
 void CodeView::InitializeWidgets(void) {
 
   setReadOnly(true);
   setOverwriteMode(false);
+  setMouseTracking(true);  // Enable `mouseMoveEvent`.
+  setTextInteractionFlags(Qt::NoTextInteraction);
+  viewport()->setCursor(Qt::ArrowCursor);
   setFont(d->theme.Font());
 
   QFontMetrics fm(font());
@@ -546,11 +581,22 @@ void CodeView::OnDownloadFailed(void) {
   update();
 }
 
-void CodeView::OnRenderCode(void *code_) {
-  d->state = CodeViewState::kRendering;
-  update();
+void CodeView::OnRenderCode(void *code_, uint64_t counter) {
+  std::unique_ptr<Code> code(reinterpret_cast<Code *>(code_));
+  if (d->counter.load() != counter) {
+    return;
+  }
 
-  d->code.reset(reinterpret_cast<Code *>(code_));
+  d->state = CodeViewState::kRendering;
+  d->last_mouse_move_index = ~0u;
+
+  // An event may have asked for a new rendering; check re-entrancy.
+  update();
+  if (d->counter.load() != counter) {
+    return;
+  }
+
+  d->code.swap(code);
   setPlainText(d->code->data);
 
   QTextCharFormat format;
@@ -580,6 +626,8 @@ void CodeView::OnRenderCode(void *code_) {
 
   d->state = CodeViewState::kRendered;
   ScrollToToken(d->scroll_target_eid);
+
+  assert(d->counter.load() == counter);
   update();
 }
 
@@ -610,52 +658,56 @@ std::optional<unsigned> CodeView::TokenIndexForPosition(
   return static_cast<unsigned>((it - begin_it) - 1);
 }
 
-std::vector<RawEntityId> CodeView::DeclsForPosition(const QPoint &pos) const {
+std::vector<RawEntityId> CodeView::DeclsForToken(unsigned index) const {
   std::vector<RawEntityId> decl_ids;
-  if (auto index = TokenIndexForPosition(pos)) {
-    auto decls_begin_index = d->code->declaration_ids_begin[*index];
-    auto decls_end_index = d->code->declaration_ids_begin[*index + 1u];
-
-    if (auto num_decls = decls_end_index - decls_begin_index) {
-      decl_ids.reserve(num_decls);
-      for (auto i = decls_begin_index; i < decls_end_index; ++i) {
-        decl_ids.push_back(d->code->declaration_ids[i]);
-      }
+  auto decls_begin_index = d->code->declaration_ids_begin[index];
+  auto decls_end_index = d->code->declaration_ids_begin[index + 1u];
+  if (auto num_decls = decls_end_index - decls_begin_index) {
+    decl_ids.reserve(num_decls);
+    for (auto i = decls_begin_index; i < decls_end_index; ++i) {
+      decl_ids.push_back(d->code->declaration_ids[i]);
     }
   }
   return decl_ids;
 }
 
-bool CodeView::event(QEvent *event) {
-  if (event->type() == QEvent::HoverEnter) {
-    QHoverEvent *hover_event = static_cast<QHoverEvent *>(event);
+void CodeView::mouseMoveEvent(QMouseEvent *event) {
+  if (auto index = TokenIndexForPosition(event->pos())) {
+    if (index.value() != d->last_mouse_move_index) {
+      d->last_mouse_move_index = index.value();
 
-    if (auto decl_ids = DeclsForPosition(hover_event->pos()); !decl_ids.empty()) {
-      emit DeclarationEvent({hover_event->modifiers(), {}  /* No buttons */,
-                             EventKind::kHover},
-                            std::move(decl_ids));
-      return true;
+      auto decl_ids = DeclsForToken(d->last_mouse_move_index);
+      if (!decl_ids.empty()) {
+        emit DeclarationEvent({event->modifiers(), event->buttons(),
+                               EventKind::kHover},
+                              std::move(decl_ids));
+      }
     }
+  } else {
+    d->last_mouse_move_index = ~0u;
   }
-  return this->QPlainTextEdit::event(event);
+
+  this->QPlainTextEdit::mouseMoveEvent(event);
 }
 
 void CodeView::mousePressEvent(QMouseEvent *event) {
-  auto decl_ids = DeclsForPosition(event->pos());
-  if (!decl_ids.empty()) {
-    emit DeclarationEvent({event->modifiers(), event->buttons(),
-                           EventKind::kClick},
-                          std::move(decl_ids));
+  if (auto index = TokenIndexForPosition(event->pos())) {
+    if (auto decl_ids = DeclsForToken(index.value()); !decl_ids.empty()) {
+      emit DeclarationEvent({event->modifiers(), event->buttons(),
+                             EventKind::kClick},
+                            std::move(decl_ids));
+    }
   }
   this->QPlainTextEdit::mousePressEvent(event);
 }
 
 void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
-  auto decl_ids = DeclsForPosition(event->pos());
-  if (!decl_ids.empty()) {
-    emit DeclarationEvent({event->modifiers(), event->buttons(),
-                           EventKind::kDoubleClick},
-                          std::move(decl_ids));
+  if (auto index = TokenIndexForPosition(event->pos())) {
+    if (auto decl_ids = DeclsForToken(index.value()); !decl_ids.empty()) {
+      emit DeclarationEvent({event->modifiers(), event->buttons(),
+                             EventKind::kDoubleClick},
+                            std::move(decl_ids));
+    }
   }
   this->QPlainTextEdit::mouseDoubleClickEvent(event);
 }

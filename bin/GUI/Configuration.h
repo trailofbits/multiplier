@@ -60,6 +60,8 @@ struct ReferenceBrowserCodeConfiguration {
 //
 //    MEMBER > RETURN > IF > FUNCTION
 struct ReferenceBrowserBreadcrumbsConfiguration {
+
+  // Should the breadcrumbs be shown at all?
   bool visible{true};
 
   // Should the entries be run-length encoded? If so, then instead of seeing

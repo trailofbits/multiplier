@@ -4,6 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <cstdint>
 #include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -32,17 +33,48 @@ int main(int argc, char *argv[]) {
     qApp->setStyle(config.style);
   }
 
+  // Click to open something in the file view.
   config.file.declaration_actions.emplace_back(
-      mx::gui::Event{{}, Qt::MouseButton::LeftButton,
+      mx::gui::Event{{},
+                     Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kClick},
+      mx::gui::Action::kOpenCodeBrowser);
+
+  // If we click on something in file view, then add it as a child to our
+  // history view.
+  config.file.declaration_actions.emplace_back(
+      mx::gui::Event{{},
+                     Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kClick},
+      mx::gui::Action::kAddToHistoryAsChild);
+
+  // Ctrl-click / Cmd-click to open something in the references view.
+  config.file.declaration_actions.emplace_back(
+      mx::gui::Event{Qt::KeyboardModifier::ControlModifier,
+                     Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
       mx::gui::Action::kOpenReferenceBrowser);
 
-
-  config.file.declaration_actions.emplace_back(
-      mx::gui::Event{{}, Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kDoubleClick},
+  // Ctrl-click / Cmd-click to open something from the reference view in the
+  // references view.
+  config.reference_browser.code_preview.declaration_actions.emplace_back(
+      mx::gui::Event{Qt::KeyboardModifier::ControlModifier,
+                     Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kClick},
       mx::gui::Action::kOpenReferenceBrowser);
 
+  // Double click in the code preview of a reference browser opens in
+  // the code browser.
+  config.reference_browser.code_preview.declaration_actions.emplace_back(
+      mx::gui::Event{{},
+                     Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kClick},
+      mx::gui::Action::kOpenCodeBrowser);
+
+  qRegisterMetaType<uint8_t>("uint8_t");
+  qRegisterMetaType<uint16_t>("uint16_t");
+  qRegisterMetaType<uint32_t>("uint32_t");
+  qRegisterMetaType<uint64_t>("uint64_t");
   qRegisterMetaType<mx::gui::Event>("Event");
   qRegisterMetaType<std::optional<mx::Decl>>("std::optional<Decl>");
   qRegisterMetaType<std::optional<mx::Stmt>>("std::optional<Stmt>");
@@ -50,6 +82,9 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType<std::optional<mx::Token>>("std::optional<Token>");
   qRegisterMetaType<mx::gui::UserLocations>("UserLocations");
   qRegisterMetaType<mx::RawEntityId>("RawEntityId");
+  qRegisterMetaType<mx::FileId>("FileId");
+  qRegisterMetaType<mx::FragmentId>("FragmentId");
+  qRegisterMetaType<mx::EntityId>("EntityId");
   qRegisterMetaType<mx::FilePathList>("FilePathList");
   qRegisterMetaType<mx::Token>("Token");
   qRegisterMetaType<mx::TokenRange>("TokenRange");

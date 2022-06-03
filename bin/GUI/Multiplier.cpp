@@ -12,27 +12,23 @@
 #include "MacOSUtils.h"
 #endif
 
-#include <glog/logging.h>
-
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopWidget>
 #include <QDockWidget>
 #include <QFileDialog>
-#include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QRect>
-
-#include <unordered_map>
+#include <QThreadPool>
 
 #include <multiplier/Index.h>
 
 #include "Configuration.h"
+#include "CodeBrowserView.h"
 #include "CodeTheme.h"
 #include "FileBrowserView.h"
 #include "FileView.h"
@@ -62,19 +58,17 @@ struct Multiplier::PrivateData final {
 
   MainMindowMenus menus;
 
-  // The central widget is a bunch of tabs.
-  QTabWidget *central_widget{nullptr};
+  // The central widget is a code browser, which tracks open files.
+  CodeBrowserView *code_browser_view{nullptr};
 
   // File list. This shows files included in the build.
-  FileBrowserView *file_list_view{nullptr};
-  QDockWidget *file_list_dock{nullptr};
+  FileBrowserView *file_browser_view{nullptr};
+  QDockWidget *file_browser_dock{nullptr};
 
-  ReferenceBrowserView *references_view{nullptr};
-  QDockWidget *references_dock{nullptr};
+  ReferenceBrowserView *reference_browser_view{nullptr};
+  QDockWidget *reference_browser_dock{nullptr};
 
   mx::Index index;
-
-  std::unordered_map<FileId, FileView *> file_views;
 
   ConnectionState connection_state{ConnectionState::kNotConnected};
 
@@ -164,24 +158,18 @@ Multiplier::Multiplier(struct Configuration &config_)
 }
 
 void Multiplier::InitializeWidgets(void) {
-  d->central_widget = new QTabWidget;
+  d->code_browser_view = new CodeBrowserView(*this);
+  d->file_browser_view = new FileBrowserView(d->config.file_browser);
+  d->file_browser_dock = new QDockWidget(d->file_browser_view->windowTitle());
+  d->file_browser_dock->setWidget(d->file_browser_view);
 
-  d->file_list_view = new FileBrowserView(d->config.file_browser);
-  d->file_list_dock = new QDockWidget(d->file_list_view->windowTitle());
-  d->file_list_dock->setWidget(d->file_list_view);
+  d->reference_browser_view = new ReferenceBrowserView(*this);
+  d->reference_browser_dock = new QDockWidget(d->reference_browser_view->windowTitle());
+  d->reference_browser_dock->setWidget(d->reference_browser_view);
 
-  d->references_view = new ReferenceBrowserView;
-  d->references_dock = new QDockWidget(d->references_view->windowTitle());
-  d->references_dock->setWidget(d->references_view);
-
-  addDockWidget(Qt::LeftDockWidgetArea, d->file_list_dock);
-  addDockWidget(Qt::BottomDockWidgetArea, d->references_dock);
-
-  d->central_widget->setTabsClosable(true);
-  d->central_widget->setMovable(true);
-  d->central_widget->setDocumentMode(true);
-  d->central_widget->setUsesScrollButtons(true);
-  setCentralWidget(d->central_widget);
+  addDockWidget(Qt::LeftDockWidgetArea, d->file_browser_dock);
+  addDockWidget(Qt::BottomDockWidgetArea, d->reference_browser_dock);
+  setCentralWidget(d->code_browser_view);
 
 #ifdef __APPLE__
   if (getenv("MX_NO_CUSTOM_THEME") == nullptr) {
@@ -189,15 +177,11 @@ void Multiplier::InitializeWidgets(void) {
   }
 #endif
 
-
-  connect(d->file_list_view, &FileBrowserView::Connected,
+  connect(d->file_browser_view, &FileBrowserView::Connected,
           this, &Multiplier::OnConnected);
 
-  connect(d->file_list_view, &FileBrowserView::SourceFileDoubleClicked,
+  connect(d->file_browser_view, &FileBrowserView::SourceFileDoubleClicked,
           this, &Multiplier::OnSourceFileDoubleClicked);
-
-  connect(d->central_widget, &QTabWidget::tabCloseRequested,
-          this, &Multiplier::OnCloseFileViewTab);
 }
 
 void Multiplier::InitializeMenus(void) {
@@ -236,16 +220,16 @@ void Multiplier::UpdateWidgets(void) {
   switch (d->connection_state) {
     case ConnectionState::kNotConnected:
     case ConnectionState::kConnecting:
-      d->file_list_view->Clear();
-      d->references_view->Clear();
-      d->file_list_dock->hide();
-      d->references_dock->hide();
-      d->central_widget->clear();
+      d->file_browser_view->Clear();
+      d->reference_browser_view->Clear();
+      d->code_browser_view->Clear();
+      d->file_browser_dock->hide();
+      d->reference_browser_dock->hide();
       break;
 
     case ConnectionState::kConnected:
-      d->file_list_dock->show();
-      d->references_dock->show();
+      d->file_browser_dock->show();
+      d->reference_browser_dock->show();
       break;
   }
 }
@@ -277,32 +261,14 @@ void Multiplier::OnConnectionStateChange(ConnectionState state) {
   UpdateUI();
 }
 
-void Multiplier::OnCloseFileViewTab(int index) {
-  d->central_widget->removeTab(index);
-}
-
 void Multiplier::OnConnected(void) {
   d->connection_state = ConnectionState::kConnected;
   UpdateUI();
 }
 
 void Multiplier::OnSourceFileDoubleClicked(
-    std::filesystem::path path, mx::FileId file_id) {
-
-  FileView *file_view = new FileView(*this, path, file_id);
-  int tab_index = d->central_widget->addTab(
-      file_view,
-      QString("%1 (%2)").arg(path.filename().c_str()).arg(file_id));
-
-#ifndef QT_NO_TOOLTIP
-  d->central_widget->setTabToolTip(
-      tab_index, QString::fromStdString(path.generic_string()));
-#endif
-
-  d->central_widget->setCurrentIndex(tab_index);
-
-  connect(file_view, &FileView::ActOnDeclarations,
-          this, &Multiplier::OnActOnDeclarations);
+    std::filesystem::path path, FileId file_id) {
+  d->code_browser_view->OpenFile(std::move(path), file_id);
 }
 
 void Multiplier::OnFileConnectAction(void) {
@@ -320,14 +286,25 @@ void Multiplier::OnFileConnectAction(void) {
           connect_settings->port.toStdString()),
       10u * 60u  /* 10 minutes */);
 
-  d->file_list_view->DownloadFileListInBackground(d->index);
-  d->references_view->SetIndex(d->index);
+  auto downloader = new DownloadFileListThread(Index());
+  downloader->setAutoDelete(true);
+
+  connect(downloader, &DownloadFileListThread::DownloadedFileList,
+          d->file_browser_view, &FileBrowserView::OnDownloadedFileList);
+
+  connect(downloader, &DownloadFileListThread::DownloadedFileList,
+          d->reference_browser_view, &ReferenceBrowserView::OnDownloadedFileList);
+
+  connect(downloader, &DownloadFileListThread::DownloadedFileList,
+          d->code_browser_view, &CodeBrowserView::OnDownloadedFileList);
+
+  QThreadPool::globalInstance()->start(downloader);
 }
 
 void Multiplier::OnFileDisconnectAction(void) {
   d->connection_state = ConnectionState::kNotConnected;
   d->index = mx::Index();
-  d->references_view->SetIndex(d->index);
+  d->reference_browser_view->Clear();
   UpdateUI();
 }
 
@@ -348,10 +325,15 @@ void Multiplier::OnActOnDeclarations(
     case Action::kDoNothing: return;
     case Action::kPropagate: return;
     case Action::kOpenCodeBrowser:
+      d->code_browser_view->OpenDeclarations(std::move(ids));
       break;
     case Action::kOpenReferenceBrowser:
-      d->references_view->SetRoots(std::move(ids));
+      d->reference_browser_view->SetRoots(std::move(ids));
       return;
+    case Action::kAddToHistoryAsChild:
+    case Action::kAddToHistoryAsSibling:
+    case Action::kAddToHistoryAsRoot:
+      break;
   }
 }
 

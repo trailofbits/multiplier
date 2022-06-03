@@ -57,7 +57,7 @@ class Multiplier final : public QMainWindow {
 
  public slots:
   void OnConnected(void);
-  void OnSourceFileDoubleClicked(std::filesystem::path, mx::FileId file_id);
+  void OnSourceFileDoubleClicked(std::filesystem::path, FileId file_id);
 
  private slots:
   void OnFileConnectAction(void);
@@ -65,7 +65,6 @@ class Multiplier final : public QMainWindow {
   void OnFileExitAction(void);
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
-  void OnCloseFileViewTab(int index);
 
  public slots:
   void OnActOnDeclarations(Action action, std::vector<RawEntityId> ids);

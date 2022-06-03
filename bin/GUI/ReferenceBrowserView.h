@@ -10,12 +10,12 @@
 #include <QTreeWidgetItem>
 #include <QWidget>
 
-#include <multiplier/Types.h>
+#include <multiplier/Index.h>
 
 #include <optional>
 #include <vector>
 
-#include "CodeTheme.h"
+#include "Event.h"
 
 namespace mx {
 class Decl;
@@ -23,6 +23,9 @@ class FileLocationCache;
 class Index;
 class Token;
 namespace gui {
+
+class Multiplier;
+class CodeTheme;
 
 using UserLocation = std::pair<Decl, TokenRange>;
 using UserLocations = std::vector<UserLocation>;
@@ -38,41 +41,34 @@ class ReferenceBrowserView final : public QWidget {
 
   void InitializeWidgets(void);
   void FillRow(QTreeWidgetItem *item, const Decl &decl, const Token &use) const;
-  QString FormatBreadcrumbs(const Token &use) const;
+  QString FormatBreadcrumbs(const Token &use, bool run_length_encode) const;
 
  public:
   virtual ~ReferenceBrowserView(void);
 
-  ReferenceBrowserView(const CodeTheme &theme_=CodeTheme::DefaultTheme(),
-                       QWidget *parent = nullptr);
+  ReferenceBrowserView(Multiplier &multiplier, QWidget *parent = nullptr);
 
   void Clear(void);
-  void SetIndex(const Index &index);
   void AddRoot(RawEntityId id);
   void SetRoots(std::vector<RawEntityId> new_root_ids);
 
-  // Should we group references by file path? Defaults to `true`.
-  void SetGroupByFilePath(bool);
-
-  // Should we show line and column numbers? Defaults to `true`.
-  void SetShowLineColumnNumbers(bool);
-
-  // Should we show a preview of the code associated with the reference?
-  // Defaults to `true`.
-  void SetShowCodePreview(bool);
-
-  // Should we show token context breadcrumbs? These can be useful for a quick
-  // diagnosis of the context of a use? Defaults to `true`.
-  void SetShowContextBreadcrumbs(bool);
+ public slots:
+  void OnDownloadedFileList(FilePathList files);
 
  private slots:
+  MX_DECLARE_DECLARATION_SLOTS
+
   void OnTreeWidgetItemExpanded(QTreeWidgetItem *item);
-  void OnUsersOfFirstLevel(QTreeWidgetItem *parent,
+  void OnUsersOfFirstLevel(QTreeWidgetItem *parent, uint64_t counter,
                            std::optional<Decl> root_decl,
                            UserLocations users);
-  void OnUsersOfLevel(QTreeWidgetItem *parent, UserLocations users);
+  void OnUsersOfLevel(QTreeWidgetItem *parent, uint64_t counter,
+                      UserLocations users);
   void OnItemPressed(QTreeWidgetItem *item, int column);
   void OnItemSelectionChanged(void);
+
+ signals:
+  MX_DECLARE_DECLARATION_SIGNALS
 };
 
 // A background thread that downloads the first level of references for one
@@ -88,12 +84,13 @@ class InitReferenceHierarchyThread final : public QObject, public QRunnable {
  public:
   virtual ~InitReferenceHierarchyThread(void);
   explicit InitReferenceHierarchyThread(const Index &index_, RawEntityId id_,
-                                        FileLocationCache &line_cache_,
-                                        QTreeWidgetItem *parent_);
+                                        const FileLocationCache &line_cache_,
+                                        QTreeWidgetItem *parent_,
+                                        uint64_t counter);
 
  signals:
-  void UsersOfRoot(QTreeWidgetItem *item_parent, std::optional<Decl> root_decl,
-                   UserLocations users);
+  void UsersOfRoot(QTreeWidgetItem *item_parent, uint64_t counter,
+                   std::optional<Decl> root_decl, UserLocations users);
 };
 
 // A background thread that downloads the Nth level of references for one
@@ -109,11 +106,13 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
  public:
   virtual ~ExpandReferenceHierarchyThread(void);
   explicit ExpandReferenceHierarchyThread(const Index &index_, RawEntityId id_,
-                                          FileLocationCache &line_cache_,
-                                          QTreeWidgetItem *parent_);
+                                          const FileLocationCache &line_cache_,
+                                          QTreeWidgetItem *parent_,
+                                          uint64_t counter);
 
  signals:
-  void UsersOfLevel(QTreeWidgetItem *item_parent, UserLocations users);
+  void UsersOfLevel(QTreeWidgetItem *item_parent, uint64_t counter,
+                    UserLocations users);
 };
 
 }  // namespace gui

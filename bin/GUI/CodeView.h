@@ -9,13 +9,16 @@
 #include <memory>
 #include <multiplier/Types.h>
 #include <optional>
-#include <QPaintEvent>
 #include <QPlainTextEdit>
 #include <QRunnable>
 #include <vector>
 
 #include "Event.h"
 
+QT_BEGIN_NAMESPACE
+class QMouseEvent;
+class QPaintEvent;
+QT_END_NAMESPACE
 namespace mx {
 class File;
 class Fragment;
@@ -51,20 +54,22 @@ class CodeView final : public QPlainTextEdit {
   void SetTokenRange(const Index &index, RawEntityId begin_tok_id,
                      RawEntityId end_tok_id);
 
+  void Clear(void);
+
  protected:
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
-  bool event(QEvent *event) Q_DECL_FINAL;
+  void mouseMoveEvent(QMouseEvent *event) Q_DECL_FINAL;
   void mousePressEvent(QMouseEvent *event) Q_DECL_FINAL;
   void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_FINAL;
 
  private:
   void InitializeWidgets(void);
   std::optional<unsigned> TokenIndexForPosition(const QPoint &pos) const;
-  std::vector<RawEntityId> DeclsForPosition(const QPoint &pos) const;
+  std::vector<RawEntityId> DeclsForToken(unsigned index) const;
 
  private slots:
   void OnDownloadFailed(void);
-  void OnRenderCode(void *code);
+  void OnRenderCode(void *code, uint64_t counter);
 
  signals:
   MX_DECLARE_DECLARATION_SIGNALS
@@ -87,18 +92,20 @@ class DownloadCodeThread final : public QObject, public QRunnable {
   virtual ~DownloadCodeThread(void);
 
   static DownloadCodeThread *CreateFileDownloader(
-      const Index &index_, const CodeTheme &theme_, FileId file_id_);
+      const Index &index_, const CodeTheme &theme_, uint64_t counter,
+      FileId file_id_);
 
   static DownloadCodeThread *CreateFragmentDownloader(
-      const Index &index_, const CodeTheme &theme_, FragmentId frag_id_);
+      const Index &index_, const CodeTheme &theme_, uint64_t counter,
+      FragmentId frag_id_);
 
   static DownloadCodeThread *CreateTokenRangeDownloader(
-      const Index &index_, const CodeTheme &theme_, RawEntityId begin_tok_id,
-      RawEntityId end_tok_id);
+      const Index &index_, const CodeTheme &theme_, uint64_t counter,
+      RawEntityId begin_tok_id, RawEntityId end_tok_id);
 
  signals:
   void DownloadFailed(void);
-  void RenderCode(void *code);
+  void RenderCode(void *code, uint64_t counter);
 };
 
 }  // namespace gui

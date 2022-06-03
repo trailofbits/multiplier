@@ -35,6 +35,8 @@ class FileView final : public QTabWidget {
            FileId file_id,
            QWidget *parent = nullptr);
 
+  void ScrollToToken(RawEntityId eid) const;
+
  private slots:
   MX_DECLARE_DECLARATION_SLOTS
 
