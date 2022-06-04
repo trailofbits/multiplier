@@ -520,6 +520,10 @@ void ReferenceBrowserView::FillRow(
           item->setTextAlignment(index, Qt::AlignRight);
           item->setText(
               index, QString::fromStdString(fp_it->second.filename().string()));
+#ifndef QT_NO_TOOLTIP
+          item->setToolTip(
+              index, QString::fromStdString(fp_it->second.generic_string()));
+#endif
         } else {
           item->setText(index, "");
         }
@@ -529,12 +533,18 @@ void ReferenceBrowserView::FillRow(
       if (config.show_line_numbers) {
         item->setTextColor(index, color);
         item->setText(index, QString::number(loc->first));  // Line.
+#ifndef QT_NO_TOOLTIP
+        item->setToolTip(index, tr("Line %1").arg(loc->first));
+#endif
         ++index;
       }
 
       if (config.show_column_numbers) {
         item->setTextColor(index, color);
         item->setText(index, QString::number(loc->second));  // Column.
+#ifndef QT_NO_TOOLTIP
+        item->setToolTip(index, tr("Column %1").arg(loc->second));
+#endif
         ++index;
       }
     }
