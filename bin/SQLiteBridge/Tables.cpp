@@ -24,21 +24,20 @@ enum class ConstraintType { None, EntityId, FragmentId };
 
 // FIXME(frabert): May the Lispers have mercy on my soul
 
-static mx::Fragment
-FragmentContaining(std::variant<mx::Decl, mx::Stmt, mx::Type, mx::Token,
-                                mx::TokenSubstitution, mx::NotAnEntity> &var) {
-  if (std::holds_alternative<mx::Decl>(var)) {
-    return mx::Fragment::containing(std::get<mx::Decl>(var));
-  } else if (std::holds_alternative<mx::Stmt>(var)) {
-    return mx::Fragment::containing(std::get<mx::Stmt>(var));
-  } else if (std::holds_alternative<mx::Type>(var)) {
-    return mx::Fragment::containing(std::get<mx::Type>(var));
-  } else if (std::holds_alternative<mx::Token>(var)) {
-    auto frag{mx::Fragment::containing(std::get<mx::Token>(var))};
-    assert(frag.has_value());
-    return *frag;
-  } else if (std::holds_alternative<mx::TokenSubstitution>(var)) {
-    return mx::Fragment::containing(std::get<mx::TokenSubstitution>(var));
+static std::optional<mx::FragmentId> FragmentContaining(mx::EntityId id) {
+  auto var{id.Unpack()};
+  if (std::holds_alternative<mx::DeclarationId>(var)) {
+    return std::get<mx::DeclarationId>(var).fragment_id;
+  } else if (std::holds_alternative<mx::StatementId>(var)) {
+    return std::get<mx::StatementId>(var).fragment_id;
+  } else if (std::holds_alternative<mx::TypeId>(var)) {
+    return std::get<mx::TypeId>(var).fragment_id;
+  } else if (std::holds_alternative<mx::FragmentTokenId>(var)) {
+    return std::get<mx::FragmentTokenId>(var).fragment_id;
+  } else if (std::holds_alternative<mx::FileTokenId>(var)) {
+    return std::nullopt;
+  } else if (std::holds_alternative<mx::TokenSubstitutionId>(var)) {
+    return std::get<mx::TokenSubstitutionId>(var).fragment_id;
   } else {
     assert(false);
   }
@@ -130,7 +129,7 @@ template <> struct FromEntityId<mx::TemplateArgument> {
 /* Schema definitions */
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \
   constexpr const char *NAME##Table_schema =                                   \
-      "CREATE TABLE vtab(id INTEGER NOT NULL, fragment_id INTEGER NOT NULL, "
+      "CREATE TABLE vtab(id INTEGER NOT NULL, fragment_id INTEGER, "
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
@@ -293,9 +292,12 @@ template <> struct FromEntityId<mx::TemplateArgument> {
       sqlite3_result_int64(ctx, *cur);                                         \
       return SQLITE_OK;                                                        \
     case NAME##Table_fragment_id: {                                            \
-      auto entity{index.entity(*cur)};                                         \
-      auto fragment{FragmentContaining(entity)};                               \
-      sqlite3_result_int64(ctx, fragment.id());                                \
+      auto fragment{FragmentContaining(*cur)};                                 \
+      if (fragment) {                                                          \
+        sqlite3_result_int64(ctx, *fragment);                                  \
+      } else {                                                                 \
+        sqlite3_result_null(ctx);                                              \
+      }                                                                        \
       return SQLITE_OK;                                                        \
     }
 
