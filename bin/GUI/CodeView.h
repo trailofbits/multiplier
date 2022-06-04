@@ -71,6 +71,7 @@ class CodeView final : public QPlainTextEdit {
 
  private slots:
   void OnDownloadFailed(void);
+  void OnHighlightLine(void);
   void OnRenderCode(void *code, uint64_t counter);
 
  signals:

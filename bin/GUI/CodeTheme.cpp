@@ -233,6 +233,10 @@ class PetersTheme final : public CodeTheme {
   QColor BackgroundColor(void) const final {
     return QColor::fromRgb(20, 20, 20);
   }
+
+  QColor SelectedLineBackgroundColor(void) const final {
+    return QColor::fromRgb(0, 0, 0);
+  }
 };
 
 }  // namespace
@@ -273,6 +277,11 @@ bool ProxyCodeTheme::LineWrap(void) const {
 // Background color of the code area.
 QColor ProxyCodeTheme::BackgroundColor(void) const {
   return next.BackgroundColor();
+}
+
+// The color to use as a highlight for the line containing the cursor.
+QColor ProxyCodeTheme::SelectedLineBackgroundColor(void) const {
+  return next.SelectedLineBackgroundColor();
 }
 
 // Background color for a specific token.

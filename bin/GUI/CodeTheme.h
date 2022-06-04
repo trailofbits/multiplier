@@ -96,6 +96,9 @@ class CodeTheme {
   // Background color of the code area.
   virtual QColor BackgroundColor(void) const = 0;
 
+  // The color to use as a highlight for the line containing the cursor.
+  virtual QColor SelectedLineBackgroundColor(void) const = 0;
+
   // Background color for a specific token.
   //
   // NOTE(pag): The lifetime of the returned `QBrush` references must match or
@@ -145,6 +148,9 @@ class ProxyCodeTheme : public CodeTheme {
 
   // Background color of the code area.
   QColor BackgroundColor(void) const override;
+
+  // The color to use as a highlight for the line containing the cursor.
+  QColor SelectedLineBackgroundColor(void) const override;
 
   // Background color for a specific token.
   const QBrush &TokenBackgroundColor(

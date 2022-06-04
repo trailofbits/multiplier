@@ -473,6 +473,8 @@ void CodeView::ScrollToToken(RawEntityId file_tok_id) {
       return;
     }
 
+    OnHighlightLine();
+
     int desired_position = d->code->start_of_token[tok_index];
 
     // Figure out if we can avoid scrolling due to the text being (probably)
@@ -590,13 +592,15 @@ void CodeView::InitializeWidgets(void) {
   setLineWrapMode(d->theme.LineWrap() ?
                   QPlainTextEdit::LineWrapMode::WidgetWidth :
                   QPlainTextEdit::LineWrapMode::NoWrap);
-  setTabStopDistance(d->theme.NumSpacesInTab() *
-                                fm.width(QChar::Space));
+  setTabStopDistance(d->theme.NumSpacesInTab() * fm.width(QChar::Space));
 
   auto p = palette();
   p.setColor(QPalette::All, QPalette::Base, d->theme.BackgroundColor());
   setPalette(p);
   setBackgroundVisible(false);
+
+  connect(this, &CodeView::cursorPositionChanged,
+          this, &CodeView::OnHighlightLine);
 
   update();
 }
@@ -604,6 +608,22 @@ void CodeView::InitializeWidgets(void) {
 void CodeView::OnDownloadFailed(void) {
   d->state = CodeViewState::kFailed;
   update();
+}
+
+void CodeView::OnHighlightLine(void) {
+  if (d->state != CodeViewState::kRendered) {
+    return;
+  }
+
+  QList<QTextEdit::ExtraSelection> extra_selections;
+  QTextEdit::ExtraSelection selection;
+
+  selection.format.setBackground(d->theme.SelectedLineBackgroundColor());
+  selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+  selection.cursor = textCursor();
+  selection.cursor.clearSelection();
+  extra_selections.append(selection);
+  setExtraSelections(extra_selections);
 }
 
 void CodeView::OnRenderCode(void *code_, uint64_t counter) {
