@@ -21,8 +21,6 @@
 #include "Multiplier.h"
 #include "Util.h"
 
-#include <iostream>
-
 namespace mx::gui {
 namespace {
 
@@ -137,6 +135,11 @@ void HistoryBrowserView::InitializeWidgets(void) {
 // Add the declarations to the history view.
 void HistoryBrowserView::AddDeclarations(std::vector<RawEntityId> ids) const {
 
+//  d->filter_box->clear();
+//  for (auto &[item, eid] : d->item_to_decl) {
+//    item->setHidden(false);
+//  }
+
   // Double check its sanity.
   if (d->current_root) {
     auto root_it = d->item_to_decl.find(d->current_root);
@@ -169,6 +172,7 @@ void HistoryBrowserView::AddDeclarations(std::vector<RawEntityId> ids) const {
 }
 
 void HistoryBrowserView::Clear(void) {
+  d->filter_box->clear();
   d->history_tree->clear();
   d->current_root = nullptr;
   d->item_to_decl.clear();
@@ -183,13 +187,11 @@ void HistoryBrowserView::OnTreeWidgetItemClicked(
 }
 
 void HistoryBrowserView::mouseDoubleClickEvent(QMouseEvent *event) {
-  std::cerr << "a\n";
   this->QWidget::mouseDoubleClickEvent(event);
 }
 
 void HistoryBrowserView::OnTreeWidgetItemDoubleClicked(
     QTreeWidgetItem *item, int) {
-  std::cerr << "b\n";
   auto decl_it = d->item_to_decl.find(item);
   if (decl_it == d->item_to_decl.end()) {
     return;
@@ -198,11 +200,33 @@ void HistoryBrowserView::OnTreeWidgetItemDoubleClicked(
   d->current_root = item;
 }
 
-void HistoryBrowserView::OnFilterHistoryView(const QString &filter) {
+void HistoryBrowserView::OnFilterHistoryView(const QString &text) {
+  if (!text.size()) {
+    for (auto &[item, eid] : d->item_to_decl) {
+      item->setHidden(false);
+    }
+  } else {
+    for (auto &[item, eid] : d->item_to_decl) {
+      item->setHidden(true);
+    }
 
+    for (auto &[item, eid] : d->item_to_decl) {
+      if (item->text(0).contains(text)) {
+
+        // Show all of the parents leading to a visible item.
+        for (auto parent = item->parent(); parent; parent = parent->parent()) {
+          parent->setHidden(false);
+        }
+        item->setHidden(false);
+      }
+    }
+  }
+
+  update();
 }
 
 void HistoryBrowserView::OnClearButton(void) {
+  d->filter_box->clear();
   d->history_tree->clear();
   d->item_to_decl.clear();
   d->current_root = nullptr;
