@@ -647,6 +647,24 @@ QString DeclName(const Decl &decl) {
 // Return the entity ID of the nearest file token associated with this
 // declaration.
 RawEntityId DeclFileLocation(const Decl &decl) {
+
+  // Structs and enums and such can often be defined inside of a typedef so we
+  // want to go to the beginning of them.
+  if (TypeDecl::from(decl)) {
+    goto skip_name_match;
+  }
+
+  if (auto nd = NamedDecl::from(decl)) {
+    if (auto tok = nd->token()) {
+      if (tok.data() == nd->name()) {
+        if (auto file_tok = tok.nearest_file_token()) {
+          return file_tok->id();
+        }
+      }
+    }
+  }
+
+skip_name_match:
   for (const Token &token : decl.tokens()) {
     if (auto file_tok = token.nearest_file_token()) {
       return file_tok->id();

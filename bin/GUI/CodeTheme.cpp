@@ -309,15 +309,17 @@ struct HighlightRangeTheme::PrivateData {
   std::mutex lock;
   TokenRange tokens;
   std::unordered_map<const QBrush *, QBrush> inverted_colors;
-  const QBrush inverted_background;
+  const QColor background;
+  const QColor inverted_foreground;
 
   inline PrivateData(QColor bg_color)
-      : inverted_background(InvertColor(bg_color)) {}
+      : background(bg_color),
+        inverted_foreground(InvertColor(bg_color)) {}
 };
 
 HighlightRangeTheme::HighlightRangeTheme(const CodeTheme &next_)
     : ProxyCodeTheme(next_),
-      d(new PrivateData(next_.BackgroundColor())) {}
+      d(new PrivateData(next_.SelectedLineBackgroundColor())) {}
 
 HighlightRangeTheme::~HighlightRangeTheme(void) {}
 
@@ -349,7 +351,7 @@ const QBrush &HighlightRangeTheme::TokenBackgroundColor(
 
   // If it's one of the tokens in our range, then invert its background color.
   if (d->tokens.index_of(tok)) {
-    QBrush brush_inv(InvertColor(brush.color()), brush.style());
+    QBrush brush_inv(d->background, brush.style());
     return d->inverted_colors.emplace(&brush, brush_inv).first->second;
   } else {
     return brush;
@@ -366,7 +368,7 @@ const QBrush &HighlightRangeTheme::TokenForegroundColor(
   // If it's one of the tokens in our range, then invert its background color.
   if (d->tokens.index_of(tok)) {
     if (brush.color().isValid()) {
-      QBrush brush_inv(InvertColor(brush.color()), brush.style());
+      QBrush brush_inv(d->inverted_foreground, brush.style());
       return d->inverted_colors.emplace(&brush, brush_inv).first->second;
     }
   }
