@@ -57,6 +57,7 @@ class CodeView final : public QPlainTextEdit {
   void Clear(void);
 
  protected:
+  void scrollContentsBy(int dx, int dy) Q_DECL_FINAL;
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
   void mouseMoveEvent(QMouseEvent *event) Q_DECL_FINAL;
   void mousePressEvent(QMouseEvent *event) Q_DECL_FINAL;
@@ -64,7 +65,8 @@ class CodeView final : public QPlainTextEdit {
 
  private:
   void InitializeWidgets(void);
-  std::optional<unsigned> TokenIndexForPosition(const QPoint &pos) const;
+  std::optional<std::pair<unsigned, int>>
+  TokenIndexForPosition(const QPoint &pos) const;
   std::vector<RawEntityId> DeclsForToken(unsigned index) const;
 
  private slots:

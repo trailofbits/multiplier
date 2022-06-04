@@ -79,6 +79,13 @@ struct CodeView::PrivateData {
 
   unsigned last_mouse_move_index{~0u};
 
+  // Keep track of the last clicked block number. If we click to go somewhere
+  // in our own file, and where we're going is on the same line or a nearby
+  // line, then we don't want to have to scroll, as that can be jarring.
+  int last_block{-1};
+
+  std::vector<RawEntityId> last_entity_ids;
+
   inline PrivateData(const CodeTheme &theme_)
       : theme(theme_) {}
 };
@@ -332,7 +339,6 @@ void DownloadCodeThread::run(void) {
       continue;
     }
 
-
     code->file_token_ids.push_back(file_tok_id);
 
     code->declaration_ids_begin.push_back(
@@ -467,9 +473,26 @@ void CodeView::ScrollToToken(RawEntityId file_tok_id) {
       return;
     }
 
+    int desired_position = d->code->start_of_token[tok_index];
+
+    // Figure out if we can avoid scrolling due to the text being (probably)
+    // visible. If we have a `last_block`, then we clicked on something in here,
+    // so it must have been visible.
+    if (d->last_block != -1) {
+      d->last_block = -1;
+
+      int start_pos = cursorForPosition(QPoint(0, 0)).position();
+      QPoint bottom_right(viewport()->width() - 1, viewport()->height() - 1);
+      int end_pos = cursorForPosition(bottom_right).position();
+      if (start_pos < desired_position && desired_position < end_pos) {
+        return;
+      }
+    }
+
     QTextCursor loc = textCursor();
-    loc.setPosition(d->code->start_of_token[tok_index],
+    loc.setPosition(desired_position,
                     QTextCursor::MoveMode::MoveAnchor);
+
     moveCursor(QTextCursor::MoveOperation::End);
     setTextCursor(loc);
     ensureCursorVisible();
@@ -548,6 +571,8 @@ void CodeView::Clear(void) {
   d->state = CodeViewState::kInitialized;
   d->code.reset();
   d->last_mouse_move_index = ~0u;
+  d->last_block = -1;
+  d->last_entity_ids.clear();
   d->scroll_target_eid = kInvalidEntityId;
   this->QPlainTextEdit::clear();
 }
@@ -589,6 +614,8 @@ void CodeView::OnRenderCode(void *code_, uint64_t counter) {
 
   d->state = CodeViewState::kRendering;
   d->last_mouse_move_index = ~0u;
+  d->last_block = ~0u;
+  d->last_entity_ids.clear();
 
   // An event may have asked for a new rendering; check re-entrancy.
   update();
@@ -631,7 +658,7 @@ void CodeView::OnRenderCode(void *code_, uint64_t counter) {
   update();
 }
 
-std::optional<unsigned> CodeView::TokenIndexForPosition(
+std::optional<std::pair<unsigned, int>> CodeView::TokenIndexForPosition(
     const QPoint &pos) const {
 
   if (d->state != CodeViewState::kRendered) {
@@ -655,7 +682,8 @@ std::optional<unsigned> CodeView::TokenIndexForPosition(
     return std::nullopt;
   }
 
-  return static_cast<unsigned>((it - begin_it) - 1);
+  return std::make_pair<unsigned, int>(
+      static_cast<unsigned>((it - begin_it) - 1), cursor.blockNumber());
 }
 
 std::vector<RawEntityId> CodeView::DeclsForToken(unsigned index) const {
@@ -672,44 +700,62 @@ std::vector<RawEntityId> CodeView::DeclsForToken(unsigned index) const {
 }
 
 void CodeView::mouseMoveEvent(QMouseEvent *event) {
-  if (auto index = TokenIndexForPosition(event->pos())) {
-    if (index.value() != d->last_mouse_move_index) {
-      d->last_mouse_move_index = index.value();
-
-      auto decl_ids = DeclsForToken(d->last_mouse_move_index);
-      if (!decl_ids.empty()) {
+  if (auto pos = TokenIndexForPosition(event->pos())) {
+    auto [index, block] = pos.value();
+    if (index != d->last_mouse_move_index) {
+      d->last_mouse_move_index = index;
+      d->last_block = block;
+      d->last_entity_ids = DeclsForToken(index);
+      if (!d->last_entity_ids.empty()) {
         emit DeclarationEvent({event->modifiers(), event->buttons(),
-                               EventKind::kHover},
-                              std::move(decl_ids));
+                               EventKind::kHover}, d->last_entity_ids);
       }
     }
   } else {
     d->last_mouse_move_index = ~0u;
+    d->last_block = -1;
+    d->last_entity_ids.clear();
   }
 
   this->QPlainTextEdit::mouseMoveEvent(event);
 }
 
 void CodeView::mousePressEvent(QMouseEvent *event) {
-  if (auto index = TokenIndexForPosition(event->pos())) {
-    if (auto decl_ids = DeclsForToken(index.value()); !decl_ids.empty()) {
+  if (auto pos = TokenIndexForPosition(event->pos())) {
+    auto [index, block] = pos.value();
+    d->last_block = block;
+    d->last_entity_ids = DeclsForToken(index);
+    if (!d->last_entity_ids.empty()) {
       emit DeclarationEvent({event->modifiers(), event->buttons(),
-                             EventKind::kClick},
-                            std::move(decl_ids));
+                             EventKind::kClick}, d->last_entity_ids);
     }
+  } else {
+    d->last_block = -1;
+    d->last_entity_ids.clear();
   }
   this->QPlainTextEdit::mousePressEvent(event);
 }
 
 void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
-  if (auto index = TokenIndexForPosition(event->pos())) {
-    if (auto decl_ids = DeclsForToken(index.value()); !decl_ids.empty()) {
+  if (auto pos = TokenIndexForPosition(event->pos())) {
+    auto [index, block] = pos.value();
+    d->last_block = block;
+    d->last_entity_ids = DeclsForToken(index);
+    if (!d->last_entity_ids.empty()) {
       emit DeclarationEvent({event->modifiers(), event->buttons(),
-                             EventKind::kDoubleClick},
-                            std::move(decl_ids));
+                             EventKind::kDoubleClick}, d->last_entity_ids);
     }
+  } else {
+    d->last_block = -1;
+    d->last_entity_ids.clear();
   }
   this->QPlainTextEdit::mouseDoubleClickEvent(event);
+}
+
+void CodeView::scrollContentsBy(int dx, int dy) {
+  d->last_block = -1;
+  d->last_entity_ids.clear();
+  this->QPlainTextEdit::scrollContentsBy(dx, dy);
 }
 
 void CodeView::paintEvent(QPaintEvent *event) {
@@ -748,12 +794,13 @@ void CodeView::paintEvent(QPaintEvent *event) {
 
   message_rect.moveTo(message_x_pos, message_y_pos);
 
-  QPainter painter(this);
-  painter.fillRect(event_rec, palette().color(QPalette::Window));
+  QPainter painter(viewport());
+  painter.fillRect(event_rec, d->theme.BackgroundColor());
 
   painter.setFont(message_font);
   painter.setPen(QPen(palette().color(QPalette::WindowText)));
   painter.drawText(message_rect, kTextFlags, message);
+  painter.end();
 
   event->accept();
 }

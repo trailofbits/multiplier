@@ -372,8 +372,17 @@ void Multiplier::OnActOnDeclarations(
         }
       }
       return;
-    case Action::kAddToHistory:
-      d->history_browser_view->AddDeclarations(std::move(ids));
+    case Action::kAddToHistoryAsChild:
+      d->history_browser_view->AddChildDeclarations(std::move(ids));
+      return;
+    case Action::kAddToHistoryAsSibling:
+      d->history_browser_view->AddSiblingDeclarations(std::move(ids));
+      return;
+    case Action::kAddToHistoryUnderRoot:
+      d->history_browser_view->AddDeclarationsUnderRoot(std::move(ids));
+      return;
+    case Action::kAddToHistoryAsRoots:
+      d->history_browser_view->AddDeclarationsUnderRoot(std::move(ids));
       return;
   }
 }

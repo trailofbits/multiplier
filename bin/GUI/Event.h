@@ -22,7 +22,10 @@ enum class Action : int {
   kPropagate,
   kOpenCodeBrowser,
   kOpenReferenceBrowser,
-  kAddToHistory,
+  kAddToHistoryAsChild,
+  kAddToHistoryAsSibling,
+  kAddToHistoryUnderRoot,
+  kAddToHistoryAsRoots,
 };
 
 struct Event {

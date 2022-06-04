@@ -44,8 +44,17 @@ class HistoryBrowserView final : public QWidget {
 
   void Clear(void);
 
-  // Add the declarations to the history view.
-  void AddDeclarations(std::vector<RawEntityId> ids) const;
+  // Add the declarations to the history as children of the last added item.
+  void AddChildDeclarations(std::vector<RawEntityId> ids) const;
+
+  // Add the declarations to the history as siblings of the last added item.
+  void AddSiblingDeclarations(std::vector<RawEntityId> ids) const;
+
+  // Add the declarations to the history view as top-level items.
+  void AddRootDeclarations(std::vector<RawEntityId> ids) const;
+
+  // Add the declarations to the history nested under the current selected root.
+  void AddDeclarationsUnderRoot(std::vector<RawEntityId> ids) const;
 
  private slots:
 

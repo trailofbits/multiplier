@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
-      mx::gui::Action::kAddToHistory);
+      mx::gui::Action::kAddToHistoryUnderRoot);
 
   // Ctrl-click / Cmd-click to open something in the references view.
   config.file.declaration_actions.emplace_back(
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
-      mx::gui::Action::kAddToHistory);
+      mx::gui::Action::kAddToHistoryUnderRoot);
 
   qRegisterMetaType<uint8_t>("uint8_t");
   qRegisterMetaType<uint16_t>("uint16_t");

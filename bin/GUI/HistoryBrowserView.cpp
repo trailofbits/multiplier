@@ -46,6 +46,7 @@ struct HistoryBrowserView::PrivateData {
   QTreeWidget *history_tree{nullptr};
 
   QTreeWidgetItem *current_root{nullptr};
+  QTreeWidgetItem *last_added{nullptr};
 
   QPushButton *clear_button{nullptr};
   QPushButton *root_button{nullptr};
@@ -113,7 +114,7 @@ void HistoryBrowserView::InitializeWidgets(void) {
 
   d->history_tree->setAutoScroll(true);
 
-  connect(d->history_tree, &QTreeWidget::itemClicked,
+  connect(d->history_tree, &QTreeWidget::itemPressed,
           this, &HistoryBrowserView::OnTreeWidgetItemClicked);
 
   connect(d->history_tree, &QTreeWidget::itemDoubleClicked,
@@ -132,13 +133,9 @@ void HistoryBrowserView::InitializeWidgets(void) {
           this, &HistoryBrowserView::OnRootButton);
 }
 
-// Add the declarations to the history view.
-void HistoryBrowserView::AddDeclarations(std::vector<RawEntityId> ids) const {
-
-//  d->filter_box->clear();
-//  for (auto &[item, eid] : d->item_to_decl) {
-//    item->setHidden(false);
-//  }
+// Add the declarations to the history nested under the current selected root.
+void HistoryBrowserView::AddDeclarationsUnderRoot(
+    std::vector<RawEntityId> ids) const {
 
   // Double check its sanity.
   if (d->current_root) {
@@ -168,13 +165,50 @@ void HistoryBrowserView::AddDeclarations(std::vector<RawEntityId> ids) const {
     }
 
     d->history_tree->scrollToItem(item);
+
+    d->last_added = item;
   }
+}
+
+// Add the declarations to the history as siblings of the last added item.
+void HistoryBrowserView::AddSiblingDeclarations(
+    std::vector<RawEntityId> ids) const {
+
+  auto prev_root = d->current_root;
+  if (d->last_added) {
+    d->current_root = d->last_added->parent();
+  } else {
+    d->current_root = nullptr;
+  }
+
+  AddDeclarationsUnderRoot(std::move(ids));
+  d->current_root = prev_root;
+}
+
+// Add the declarations to the history as children of the last added item.
+void HistoryBrowserView::AddChildDeclarations(
+    std::vector<RawEntityId> ids) const {
+
+  auto prev_root = d->current_root;
+  d->current_root = d->last_added;
+  AddDeclarationsUnderRoot(std::move(ids));
+  d->current_root = prev_root;
+}
+
+// Add the declarations to the history view as top-level items.
+void HistoryBrowserView::AddRootDeclarations(
+    std::vector<RawEntityId> ids) const {
+  auto prev_root = d->current_root;
+  d->current_root = nullptr;
+  AddDeclarationsUnderRoot(std::move(ids));
+  d->current_root = prev_root;
 }
 
 void HistoryBrowserView::Clear(void) {
   d->filter_box->clear();
   d->history_tree->clear();
   d->current_root = nullptr;
+  d->last_added = nullptr;
   d->item_to_decl.clear();
 }
 
@@ -230,6 +264,7 @@ void HistoryBrowserView::OnClearButton(void) {
   d->history_tree->clear();
   d->item_to_decl.clear();
   d->current_root = nullptr;
+  d->last_added = nullptr;
 }
 
 void HistoryBrowserView::OnRootButton(void) {

@@ -26,6 +26,14 @@ struct FileConfiguration {
   std::vector<EventAction> declaration_actions;
 };
 
+// The configuration for the history browser.
+struct HistoryBrowserConfiguration {
+
+  // If one or more declarations are hovered/clicked, then we evaluate these
+  // bindings are trigger the relevant actions.
+  std::vector<EventAction> declaration_actions;
+};
+
 // Configuration for the file browser, which presents a tree view of all files
 // indexed by Multiplier.
 struct FileBrowserConfiguration {
@@ -114,6 +122,7 @@ struct Configuration {
 
   const CodeTheme *theme;
 
+  HistoryBrowserConfiguration history_browser;
   ReferenceBrowserConfiguration reference_browser;
   FileBrowserConfiguration file_browser;
   FileConfiguration file;
