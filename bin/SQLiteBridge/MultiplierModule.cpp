@@ -33,6 +33,8 @@ ResultType MultiplierModule::Create(sqlite3 *db,
     vtab = std::make_unique<FileTable>(ep);
   } else if (table == "Fragment") {
     vtab = std::make_unique<FragmentTable>(ep);
+  } else if (table == "Reference") {
+    vtab = std::make_unique<ReferenceTable>(ep);
   }
 
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \

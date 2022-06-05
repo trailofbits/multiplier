@@ -35,6 +35,19 @@ public:
   virtual mx::Result<std::unique_ptr<VirtualTableCursor>, int> Open() override;
 };
 
+class ReferenceTable : public VirtualTable {
+private:
+  mx::EntityProvider::Ptr ep;
+  mx::Index index;
+
+public:
+  ReferenceTable(mx::EntityProvider::Ptr ep);
+  virtual ~ReferenceTable() = default;
+  virtual std::optional<std::string> Init(sqlite3 *db) override;
+  virtual int BestIndex(sqlite3_index_info *info) override;
+  virtual mx::Result<std::unique_ptr<VirtualTableCursor>, int> Open() override;
+};
+
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \
   class NAME##Table : public VirtualTable {                                    \
   private:                                                                     \

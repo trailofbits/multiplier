@@ -11,6 +11,7 @@ add_library("sqlitebridge" SHARED
   "FragmentTable.cpp"
   "Module.cpp"
   "MultiplierModule.cpp"
+  "ReferenceTable.cpp"
   "SQLiteBridge.cpp"
   "Tables.cpp"
 )

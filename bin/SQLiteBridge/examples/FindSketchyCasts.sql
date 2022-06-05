@@ -1,8 +1,10 @@
 
 CREATE VIRTUAL TABLE File              USING multiplier(File, localhost, 50051);
 CREATE VIRTUAL TABLE Fragment          USING multiplier(Fragment, localhost, 50051);
+CREATE VIRTUAL TABLE Reference         USING multiplier(Reference, localhost, 50051);
 CREATE VIRTUAL TABLE Decl              USING multiplier(Decl, localhost, 50051);
 CREATE VIRTUAL TABLE Expr              USING multiplier(Expr, localhost, 50051);
+CREATE VIRTUAL TABLE Stmt              USING multiplier(Expr, localhost, 50051);
 CREATE VIRTUAL TABLE CallExpr          USING multiplier(CallExpr, localhost, 50051);
 CREATE VIRTUAL TABLE ImplicitCastExpr  USING multiplier(ImplicitCastExpr, localhost, 50051);
 CREATE VIRTUAL TABLE CastExpr          USING multiplier(CastExpr, localhost, 50051);
@@ -26,3 +28,10 @@ WHERE cast_expr.cast_kind_name = "IntegralCast"
     AND NOT implicit_cast.is_part_of_explicit_cast
     AND (source_type.builtin_kind = 176 OR source_type.builtin_kind = 175)
     AND dest_type.builtin_kind = 182;
+
+SELECT Stmt.*
+FROM File, Fragment, Decl, Reference, Stmt
+WHERE Fragment.file_id = File.id
+AND Decl.fragment_id = Fragment.id
+AND Reference.use_id = Decl.id
+AND Stmt.id = Reference.user_id;
