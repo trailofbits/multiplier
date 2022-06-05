@@ -336,7 +336,7 @@ template <> struct FromEntityId<mx::TemplateArgument> {
     auto entity{helper.get(index, *cur)};                                      \
     assert(entity.has_value());                                                \
     auto view{entity->NAME()};                                                 \
-    sqlite3_result_text(ctx, view.data(), view.size(), SQLITE_TRANSIENT);      \
+    sqlite3_result_text(ctx, view.data(), view.size(), SQLITE_STATIC);         \
     return SQLITE_OK;                                                          \
   }
 #define MX_VISIT_OPTIONAL_BOOL(TABLE, NAME, ...)                               \
@@ -374,8 +374,7 @@ template <> struct FromEntityId<mx::TemplateArgument> {
     assert(entity.has_value());                                                \
     auto value{entity->NAME()};                                                \
     if (value) {                                                               \
-      sqlite3_result_text(ctx, value->data(), value->size(),                   \
-                          SQLITE_TRANSIENT);                                   \
+      sqlite3_result_text(ctx, value->data(), value->size(), SQLITE_STATIC);   \
     } else {                                                                   \
       sqlite3_result_null(ctx);                                                \
     }                                                                          \
