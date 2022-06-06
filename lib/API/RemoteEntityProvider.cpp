@@ -150,7 +150,7 @@ FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) try {
     capnp::Text::Reader path = entry.getPath();
     assert(0u < path.size());
     std::filesystem::path p(path.cStr());
-    files.try_emplace(std::move(p), file_id);
+    files.emplace(std::move(p), file_id);
   }
 
   return files;

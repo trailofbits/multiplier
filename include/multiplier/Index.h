@@ -7,10 +7,10 @@
 #pragma once
 
 #include <memory>
+#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <map>
 
 #include "AST.h"  // Auto-generated, brings in `Iterator.h` and `Use.h`.
 #include "Fragment.h"
@@ -49,7 +49,7 @@ using TypeUse = Use<TypeUseSelector>;
 using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
 using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
 
-using FilePathList = std::map<std::filesystem::path, FileId>;
+using FilePathList = std::set<std::pair<std::filesystem::path, FileId>>;
 
 template <typename T>
 inline ParentDeclIteratorImpl<T> &

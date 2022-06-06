@@ -12,6 +12,7 @@ namespace mx {
 
 FileListImpl::FileListImpl(EntityProvider::Ptr ep_)
     : ep(std::move(ep_)) {
+
   auto file_paths = ep->ListFiles(ep);
   file_ids.reserve(file_paths.size());
   for (const auto &[path, file_id] : file_paths) {

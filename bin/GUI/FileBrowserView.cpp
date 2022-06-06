@@ -112,7 +112,8 @@ void FileBrowserView::OnDownloadedFileList(FilePathList files) {
   QTreeWidgetItem *root_item = nullptr;
 
   std::set<std::filesystem::path> has_files;
-  for (const auto &[path, file_id] : files) {
+  for (const auto &[path_, file_id] : files) {
+    const std::filesystem::path &path = path_;
     auto base = path.root_path();
     for (std::filesystem::path part : path.parent_path()) {
       base /= part;  // A bit redundant, but follow the same process throughout.
@@ -123,7 +124,8 @@ void FileBrowserView::OnDownloadedFileList(FilePathList files) {
   // Group the paths into folders that have at least one file in them. This is
   // so that we don't have to see crazy deep folder trees all the time.
   std::map<std::filesystem::path, FilePathList> sub_lists;
-  for (auto [path, file_id] : files) {
+  for (const auto &[path_, file_id] : files) {
+    std::filesystem::path path = path_;
     auto base = path.root_path();
     for (std::filesystem::path part : path.parent_path()) {
       base /= part;
@@ -135,7 +137,9 @@ void FileBrowserView::OnDownloadedFileList(FilePathList files) {
   }
 
   // Build up the items.
-  for (const auto &[parent_path, sub_list] : sub_lists) {
+  for (const auto &[parent_path_, sub_list] : sub_lists) {
+    const std::filesystem::path &parent_path = parent_path_;
+
     QTreeWidgetItem *root_item = new QTreeWidgetItem;
     QString sub_path = QString::fromStdString(parent_path.generic_string());
     root_item->setText(0, sub_path);
@@ -147,26 +151,29 @@ void FileBrowserView::OnDownloadedFileList(FilePathList files) {
 
     std::map<std::filesystem::path, QTreeWidgetItem *> item_map;
 
-    for (const auto &[path, file_id] : sub_list) {
+    for (const auto &[path_, file_id] : sub_list) {
+      std::filesystem::path path = path_;
       std::filesystem::path base;
       std::filesystem::path full_base = path;
       QTreeWidgetItem *last = root_item;
       for (std::filesystem::path part : path.lexically_relative(parent_path)) {
         base /= part;
         full_base /= part;
-        auto &item = item_map[base.generic_string()];
-        if (!item) {
-          item = new QTreeWidgetItem();
-          item->setText(0, QString::fromStdString(part.generic_string()));
-          last->addChild(item);
+        auto item = new QTreeWidgetItem();
+        item->setText(0, QString::fromStdString(part.generic_string()));
+        last->addChild(item);
 
 #ifndef QT_NO_TOOLTIP
-          item->setToolTip(0, QString::fromStdString(full_base.generic_string()));
+        item->setToolTip(0, QString::fromStdString(full_base.generic_string()));
 #endif
-        }
         last = item;
       }
+
       d->file_infos.emplace(last, std::make_pair(std::move(path), file_id));
+
+#ifndef QT_NO_TOOLTIP
+      last->setToolTip(0, tr("%1 (File id %2)").arg(last->toolTip(0)).arg(file_id));
+#endif
     }
   }
 
