@@ -159,16 +159,20 @@ void FileBrowserView::OnDownloadedFileList(FilePathList files) {
       for (std::filesystem::path part : path.lexically_relative(parent_path)) {
         base /= part;
         full_base /= part;
-        auto item = new QTreeWidgetItem();
-        item->setText(0, QString::fromStdString(part.generic_string()));
-        last->addChild(item);
+        auto &item = item_map[base];
+        if (!item) {
+          item = new QTreeWidgetItem();
+          item->setText(0, QString::fromStdString(part.generic_string()));
+          last->addChild(item);
 
 #ifndef QT_NO_TOOLTIP
-        item->setToolTip(0, QString::fromStdString(full_base.generic_string()));
+          item->setToolTip(0, QString::fromStdString(full_base.generic_string()));
 #endif
+        }
         last = item;
       }
 
+      item_map.erase(base);
       d->file_infos.emplace(last, std::make_pair(std::move(path), file_id));
 
 #ifndef QT_NO_TOOLTIP
