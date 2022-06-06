@@ -43,37 +43,10 @@ ResultType MultiplierModule::Create(sqlite3 *db,
   }
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
-#define MX_VISIT_BOOL_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, NAME,    \
-                           ...)                                                \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_INT_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, NAME,     \
-                          ...)                                                 \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_ENUM_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, NAME,    \
-                           ...)                                                \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_TEXT_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, NAME,    \
-                           ...)                                                \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_ENTITY_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, NAME,  \
-                             ...)                                              \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_OPTIONAL_BOOL_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, \
-                                    NAME, ...)                                 \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_OPTIONAL_INT_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3,  \
-                                   NAME, ...)                                  \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_OPTIONAL_ENUM_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, \
-                                    NAME, ...)                                 \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_OPTIONAL_TEXT_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, \
-                                    NAME, ...)                                 \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
-#define MX_VISIT_OPTIONAL_ENTITY_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2,        \
-                                      IGNORE3, NAME, ...)                      \
-  MX_BEGIN_VISIT_DECL(TABLE##NAME)
 #include <multiplier/Visitor.inc.h>
+  else {
+    vtab = GetListTable(ep, table);
+  }
 
   if (!vtab) {
     return ResultType("Unknown Multiplier table: " + table);

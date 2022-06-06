@@ -17,15 +17,13 @@ SELECT call_expr.id, cast_expr.cast_kind_name, source_type.builtin_kind AS sourc
 JOIN Fragment AS fragment ON File.id = fragment.file_id
 JOIN CallExpr AS call_expr ON call_expr.fragment_id = fragment.id
 JOIN CallExprArguments AS argument ON argument.parent_id = call_expr.id
-JOIN CastExpr AS cast_expr ON cast_expr.id = argument.value
-JOIN ImplicitCastExpr AS implicit_cast ON implicit_cast.id = cast_expr.id
+JOIN ImplicitCastExpr AS cast_expr ON cast_expr.id = argument.value
 JOIN Expr AS sub_expr ON sub_expr.id = cast_expr.sub_expression
 JOIN Type AS sub_type ON sub_type.id = sub_expr.type
-JOIN Expr AS cast_expr_down ON cast_expr_down.id = cast_expr.id
 JOIN BuiltinType AS source_type ON source_type.id = sub_type.canonical_type
-JOIN BuiltinType AS dest_type ON dest_type.id = cast_expr_down.type
+JOIN BuiltinType AS dest_type ON dest_type.id = cast_expr.type
 WHERE cast_expr.cast_kind_name = "IntegralCast"
-    AND NOT implicit_cast.is_part_of_explicit_cast
+    AND NOT cast_expr.is_part_of_explicit_cast
     AND (source_type.builtin_kind = 176 OR source_type.builtin_kind = 175)
     AND dest_type.builtin_kind = 182;
 

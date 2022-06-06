@@ -8,6 +8,7 @@
 SQLITE_EXTENSION_INIT3
 
 #include <cassert>
+#include <functional>
 #include <multiplier/File.h>
 #include <multiplier/Iterator.h>
 #include <multiplier/Types.h>
@@ -108,6 +109,12 @@ template <> struct FromEntityId<mx::TemplateArgument> {
   }
 };
 
+template <> struct FromEntityId<mx::CXXBaseSpecifier> {
+  std::optional<mx::CXXBaseSpecifier> get(mx::Index &index, mx::EntityId id) {
+    return std::nullopt;
+  }
+};
+
 // Macros _and_ template metaprogramming? Yes please
 #define MX_VISIT_BASE(TYPE, BASE)                                              \
   template <> struct FromEntityId<mx::TYPE> {                                  \
@@ -126,57 +133,153 @@ template <> struct FromEntityId<mx::TemplateArgument> {
 #include "ExtraDecls.inc.h"
 #include <multiplier/Visitor.inc.h>
 
+enum class FieldType { Integer, Text };
+
+using FieldGetter = void(mx::Index index, mx::EntityId id,
+                         sqlite3_context *ctx);
+
+struct FieldDescriptor {
+  std::string name;
+  FieldType type;
+  bool nullable;
+  FieldGetter *getter;
+
+  FieldDescriptor(std::string name, FieldType type, bool nullable,
+                  FieldGetter *getter)
+      : name(name), type(type), nullable(nullable), getter(getter) {}
+};
+
 /* Schema definitions */
-#define MX_BEGIN_VISIT_DECL(NAME)                                              \
-  constexpr const char *NAME##Table_schema =                                   \
-      "CREATE TABLE vtab(id INTEGER NOT NULL, fragment_id INTEGER, "
+#define MX_BEGIN_VISIT_DECL(NAME) static std::vector<FieldDescriptor> NAME##Table_fields({
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
-#define MX_VISIT_BOOL(IGNORE, NAME, ...) "" #NAME " INTEGER NOT NULL, "
+#define MX_VISIT_BOOL(TYPE, NAME, ...)                                         \
+  FieldDescriptor(#NAME, FieldType::Integer, false,                            \
+                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
+                    FromEntityId<mx::TYPE> helper;                             \
+                    auto entity{helper.get(index, id)};                        \
+                    assert(entity.has_value());                                \
+                    sqlite3_result_int64(                                      \
+                        ctx, static_cast<std::int64_t>(entity->NAME()));       \
+                  }),
 #define MX_VISIT_INT MX_VISIT_BOOL
 #define MX_VISIT_ENUM MX_VISIT_BOOL
-#define MX_VISIT_ENTITY MX_VISIT_BOOL
-#define MX_VISIT_TEXT(IGNORE, NAME, ...) "" #NAME " TEXT NOT NULL, "
-#define MX_VISIT_OPTIONAL_BOOL(IGNORE, NAME, ...) "" #NAME " INTEGER, "
+#define MX_VISIT_ENTITY(TYPE, NAME, ...)                                       \
+  FieldDescriptor(#NAME, FieldType::Integer, false,                            \
+                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
+                    FromEntityId<mx::TYPE> helper;                             \
+                    auto entity{helper.get(index, id)};                        \
+                    assert(entity.has_value());                                \
+                    sqlite3_result_int64(                                      \
+                        ctx, static_cast<std::int64_t>(entity->NAME().id()));  \
+                  }),
+#define MX_VISIT_TEXT(TYPE, NAME, ...)                                         \
+  FieldDescriptor(#NAME, FieldType::Text, false,                               \
+                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
+                    FromEntityId<mx::TYPE> helper;                             \
+                    auto entity{helper.get(index, id)};                        \
+                    assert(entity.has_value());                                \
+                    auto str{entity->NAME()};                                  \
+                    sqlite3_result_text(ctx, str.data(), str.size(),           \
+                                        SQLITE_STATIC);                        \
+                  }),
+#define MX_VISIT_OPTIONAL_BOOL(TYPE, NAME, ...)                                \
+  FieldDescriptor(#NAME, FieldType::Integer, true,                             \
+                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
+                    FromEntityId<mx::TYPE> helper;                             \
+                    auto entity{helper.get(index, id)};                        \
+                    assert(entity.has_value());                                \
+                    auto val{entity->NAME()};                                  \
+                    if (val) {                                                 \
+                      sqlite3_result_int64(ctx,                                \
+                                           static_cast<std::int64_t>(*val));   \
+                    } else {                                                   \
+                      sqlite3_result_null(ctx);                                \
+                    }                                                          \
+                  }),
 #define MX_VISIT_OPTIONAL_INT MX_VISIT_OPTIONAL_BOOL
 #define MX_VISIT_OPTIONAL_ENUM MX_VISIT_OPTIONAL_BOOL
-#define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_OPTIONAL_BOOL
-#define MX_VISIT_OPTIONAL_TEXT(IGNORE, NAME, ...) "" #NAME " TEXT, "
-
-#define MX_END_VISIT_DECL(NAME) "PRIMARY KEY(id))";
+#define MX_VISIT_OPTIONAL_ENTITY(TYPE, NAME, ...)                              \
+  FieldDescriptor(#NAME, FieldType::Integer, true,                             \
+                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
+                    FromEntityId<mx::TYPE> helper;                             \
+                    auto entity{helper.get(index, id)};                        \
+                    assert(entity.has_value());                                \
+                    auto val{entity->NAME()};                                  \
+                    if (val) {                                                 \
+                      sqlite3_result_int64(                                    \
+                          ctx, static_cast<std::int64_t>(val->id()));          \
+                    } else {                                                   \
+                      sqlite3_result_null(ctx);                                \
+                    }                                                          \
+                  }),
+#define MX_VISIT_OPTIONAL_TEXT(TYPE, NAME, ...)                                \
+  FieldDescriptor(#NAME, FieldType::Text, true,                                \
+                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
+                    FromEntityId<mx::TYPE> helper;                             \
+                    auto entity{helper.get(index, id)};                        \
+                    assert(entity.has_value());                                \
+                    auto val{entity->NAME()};                                  \
+                    if (val) {                                                 \
+                      sqlite3_result_text(ctx, val->data(), val->size(),       \
+                                          SQLITE_STATIC);                      \
+                    } else {                                                   \
+                      sqlite3_result_null(ctx);                                \
+                    }                                                          \
+                  }),
+#define MX_END_VISIT_DECL(NAME)                                                \
+  });
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
-/* Column numbers */
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \
-  enum NAME##Table_columns {                                                   \
-    NAME##Table_id, NAME##Table_fragment_id,
+  static std::vector<FieldDescriptor> Get##NAME##TableSchema() {               \
+    std::vector<FieldDescriptor> fields;                                       \
+    auto out_it{std::back_inserter(fields)};
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
-#define MX_VISIT_BOOL(TABLE, NAME, ...) TABLE##Table_##NAME,
-#define MX_VISIT_INT MX_VISIT_BOOL
-#define MX_VISIT_ENUM MX_VISIT_BOOL
-#define MX_VISIT_TEXT MX_VISIT_BOOL
-#define MX_VISIT_ENTITY MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_BOOL MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_INT MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_ENUM MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_TEXT MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_BOOL
+#define MX_VISIT_BASE(NAME, BASE)                                              \
+  std::copy(BASE##TableSchema.begin(), BASE##TableSchema.end(), out_it);
 
 #define MX_END_VISIT_DECL(NAME)                                                \
+  std::copy(NAME##Table_fields.begin(), NAME##Table_fields.end(), out_it);     \
+  return fields;                                                               \
   }                                                                            \
-  ;
+  static std::vector<FieldDescriptor> NAME##TableSchema =                      \
+      Get##NAME##TableSchema();
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
+
+static std::string
+GetCreateTableStatement(const std::vector<FieldDescriptor> &fields) {
+  std::string schema{
+      "CREATE TABLE vtab(id INTEGER NOT NULL, fragment_id INTEGER, "};
+  for (auto desc : fields) {
+    schema += desc.name + ' ';
+    switch (desc.type) {
+    case FieldType::Integer:
+      schema += "INTEGER";
+      break;
+    case FieldType::Text:
+      schema += "TEXT";
+      break;
+    }
+    if (desc.nullable) {
+      schema += " NOT NULL";
+    }
+    schema += ", ";
+  }
+  schema += "PRIMARY KEY(id))";
+  return schema;
+}
 
 /* Class definitions */
 #define TABLE_CTOR(NAME)                                                       \
@@ -184,7 +287,8 @@ template <> struct FromEntityId<mx::TemplateArgument> {
 
 #define TABLE_INIT(NAME)                                                       \
   std::optional<std::string> NAME##Table::Init(sqlite3 *db) {                  \
-    int err = sqlite3_declare_vtab(db, NAME##Table_schema);                    \
+    auto statement{GetCreateTableStatement(NAME##TableSchema)};                \
+    int err = sqlite3_declare_vtab(db, statement.c_str());                     \
     if (err != SQLITE_OK) {                                                    \
       return sqlite3_errmsg(db);                                               \
     }                                                                          \
@@ -288,10 +392,17 @@ template <> struct FromEntityId<mx::TemplateArgument> {
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \
   int NAME##Cursor::Column(sqlite3_context *ctx, int idxCol) {                 \
     switch (idxCol) {                                                          \
-    case NAME##Table_id:                                                       \
+    default: {                                                                 \
+      if (idxCol - 2 >= NAME##TableSchema.size()) {                            \
+        return SQLITE_ERROR;                                                   \
+      }                                                                        \
+      NAME##TableSchema[idxCol - 2].getter(index, *cur, ctx);                  \
+      return SQLITE_OK;                                                        \
+    }                                                                          \
+    case 0:                                                                    \
       sqlite3_result_int64(ctx, *cur);                                         \
       return SQLITE_OK;                                                        \
-    case NAME##Table_fragment_id: {                                            \
+    case 1: {                                                                  \
       auto fragment{FragmentContaining(*cur)};                                 \
       if (fragment) {                                                          \
         sqlite3_result_int64(ctx, *fragment);                                  \
@@ -299,433 +410,338 @@ template <> struct FromEntityId<mx::TemplateArgument> {
         sqlite3_result_null(ctx);                                              \
       }                                                                        \
       return SQLITE_OK;                                                        \
-    }
+    }                                                                          \
+    }                                                                          \
+  }
 
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
-#define MX_BEGIN_VISIT_PSEUDO(NAME)                                            \
-  template <typename IgnoreMePlease,                                           \
-            template <typename> typename FromEntityId>                         \
-  struct NAME##_IGNORE_ME {                                                    \
-    int test(IgnoreMePlease index, int i, sqlite3_context *ctx, int *cur) {    \
-      switch (i) {                                                             \
-      default:                                                                 \
-        return SQLITE_ERROR;
+#include <multiplier/Visitor.inc.h>
 
-#define MX_VISIT_BOOL(TABLE, NAME, ...)                                        \
-  case TABLE##Table_##NAME: {                                                  \
-    FromEntityId<mx::TABLE> helper;                                            \
-    auto entity{helper.get(index, *cur)};                                      \
-    assert(entity.has_value());                                                \
-    sqlite3_result_int64(ctx, static_cast<std::int64_t>(entity->NAME()));      \
-    return SQLITE_OK;                                                          \
-  }
-#define MX_VISIT_INT MX_VISIT_BOOL
-#define MX_VISIT_ENUM MX_VISIT_BOOL
-#define MX_VISIT_ENTITY(TABLE, NAME, ...)                                      \
-  case TABLE##Table_##NAME: {                                                  \
-    FromEntityId<mx::TABLE> helper;                                            \
-    auto entity{helper.get(index, *cur)};                                      \
-    assert(entity.has_value());                                                \
-    sqlite3_result_int64(ctx, static_cast<std::int64_t>(entity->NAME().id())); \
-    return SQLITE_OK;                                                          \
-  }
-#define MX_VISIT_TEXT(TABLE, NAME, ...)                                        \
-  case TABLE##Table_##NAME: {                                                  \
-    FromEntityId<mx::TABLE> helper;                                            \
-    auto entity{helper.get(index, *cur)};                                      \
-    assert(entity.has_value());                                                \
-    auto view{entity->NAME()};                                                 \
-    sqlite3_result_text(ctx, view.data(), view.size(), SQLITE_STATIC);         \
-    return SQLITE_OK;                                                          \
-  }
-#define MX_VISIT_OPTIONAL_BOOL(TABLE, NAME, ...)                               \
-  case TABLE##Table_##NAME: {                                                  \
-    FromEntityId<mx::TABLE> helper;                                            \
-    auto entity{helper.get(index, *cur)};                                      \
-    assert(entity.has_value());                                                \
-    auto value{entity->NAME()};                                                \
-    if (value) {                                                               \
-      sqlite3_result_int64(ctx, static_cast<std::int64_t>(*value));            \
-    } else {                                                                   \
-      sqlite3_result_null(ctx);                                                \
-    }                                                                          \
-    return SQLITE_OK;                                                          \
-  }
-#define MX_VISIT_OPTIONAL_INT MX_VISIT_OPTIONAL_BOOL
-#define MX_VISIT_OPTIONAL_ENUM MX_VISIT_OPTIONAL_BOOL
-#define MX_VISIT_OPTIONAL_ENTITY(TABLE, NAME, ...)                             \
-  case TABLE##Table_##NAME: {                                                  \
-    FromEntityId<mx::TABLE> helper;                                            \
-    auto entity{helper.get(index, *cur)};                                      \
-    assert(entity.has_value());                                                \
-    auto value{entity->NAME()};                                                \
-    if (value) {                                                               \
-      sqlite3_result_int64(ctx, static_cast<std::int64_t>(value->id()));       \
-    } else {                                                                   \
-      sqlite3_result_null(ctx);                                                \
-    }                                                                          \
-    return SQLITE_OK;                                                          \
-  }
-#define MX_VISIT_OPTIONAL_TEXT(TABLE, NAME, ...)                               \
-  case TABLE##Table_##NAME: {                                                  \
-    FromEntityId<mx::TABLE> helper;                                            \
-    auto entity{helper.get(index, *cur)};                                      \
-    assert(entity.has_value());                                                \
-    auto value{entity->NAME()};                                                \
-    if (value) {                                                               \
-      sqlite3_result_text(ctx, value->data(), value->size(), SQLITE_STATIC);   \
-    } else {                                                                   \
-      sqlite3_result_null(ctx);                                                \
-    }                                                                          \
-    return SQLITE_OK;                                                          \
-  }
+using ListGen = void(mx::Index index, std::int64_t id,
+                     std::vector<std::int64_t> &int_results,
+                     std::vector<std::string_view> &text_results);
 
-#define MX_END_VISIT_DECL(NAME)                                                \
-  default:                                                                     \
-    return SQLITE_ERROR;                                                       \
-    }                                                                          \
+class IntegerListCursor : public VirtualTableCursor {
+private:
+  mx::Index index;
+  mx::EntityId id;
+  ListGen *gen;
+  std::vector<std::int64_t> values;
+  std::size_t cur;
+
+public:
+  IntegerListCursor(mx::EntityProvider::Ptr ep, ListGen *gen)
+      : index(ep), gen(gen) {}
+  virtual ~IntegerListCursor() = default;
+  virtual int Filter(int idxNum, const char *idxStr,
+                     const std::vector<sqlite3_value *> &args) override {
+    values.clear();
+    if (idxNum) {
+      id = sqlite3_value_int64(args[0]);
+      std::vector<std::string_view> tmp;
+      gen(index, id, values, tmp);
     }
-#define MX_END_VISIT_STMT MX_END_VISIT_DECL
-#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
-#define MX_END_VISIT_PSEUDO(NAME)                                              \
-  }                                                                            \
-  }                                                                            \
-  }                                                                            \
-  ;
-#include <multiplier/Visitor.inc.h>
+    cur = 0;
+    return SQLITE_OK;
+  }
+  virtual int Next() override {
+    ++cur;
+    return SQLITE_OK;
+  }
+  virtual int Eof() override { return cur == values.size(); }
+  virtual int Column(sqlite3_context *ctx, int idxCol) override {
+    switch (idxCol) {
+    default:
+      return SQLITE_ERROR;
+    case 0:
+      sqlite3_result_int64(ctx, static_cast<std::int64_t>(id));
+      return SQLITE_OK;
+    case 1:
+      sqlite3_result_int64(ctx, static_cast<std::int64_t>(cur));
+      return SQLITE_OK;
+    case 2:
+      sqlite3_result_int64(ctx, static_cast<std::int64_t>(values[cur]));
+      return SQLITE_OK;
+    }
+  }
+  virtual mx::Result<std::int64_t, int> RowId() override { return 0; }
+};
 
-/* Schema definitions for lists */
-#define MX_VISIT_BOOL_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, NAME,    \
-                           ...)                                                \
-  constexpr const char *TABLE##NAME##Table_schema =                            \
-      "CREATE TABLE vtab(parent_id INTEGER NOT NULL, pos INTEGER NOT NULL, "   \
-      "value INTEGER NOT NULL, PRIMARY KEY(parent_id, pos)) WITHOUT ROWID";
-#define MX_VISIT_INT_LIST MX_VISIT_BOOL_LIST
-#define MX_VISIT_ENUM_LIST MX_VISIT_BOOL_LIST
-#define MX_VISIT_TEXT_LIST(TABLE, IGNORE0, IGNORE1, IGNORE2, IGNORE3, NAME,    \
-                           ...)                                                \
-  constexpr const char *TABLE##NAME##Table_schema =                            \
-      "CREATE TABLE vtab(parent_id INTEGER NOT NULL, pos INTEGER NOT NULL, "   \
-      "value TEXT NOT NULL, PRIMARY KEY(parent_id, pos)) WITHOUT ROWID";
-#define MX_VISIT_ENTITY_LIST MX_VISIT_BOOL_LIST
-#define MX_VISIT_OPTIONAL_BOOL_LIST MX_VISIT_BOOL_LIST
-#define MX_VISIT_OPTIONAL_INT_LIST MX_VISIT_BOOL_LIST
-#define MX_VISIT_OPTIONAL_ENUM_LIST MX_VISIT_BOOL_LIST
-#define MX_VISIT_OPTIONAL_TEXT_LIST MX_VISIT_TEXT_LIST
-#define MX_VISIT_OPTIONAL_ENTITY_LIST MX_VISIT_BOOL_LIST
-#include <multiplier/Visitor.inc.h>
+class TextListCursor : public VirtualTableCursor {
+private:
+  mx::Index index;
+  mx::EntityId id;
+  ListGen *gen;
+  std::vector<std::string_view> values;
+  std::size_t cur;
 
-/* Class definitions */
-#define LIST_CTOR(TABLE, NAME)                                                 \
-  TABLE##NAME##Table::TABLE##NAME##Table(mx::EntityProvider::Ptr ep)           \
-      : ep(ep), index(ep) {}
+public:
+  TextListCursor(mx::EntityProvider::Ptr ep, ListGen *gen)
+      : index(ep), gen(gen) {}
+  virtual ~TextListCursor() = default;
+  virtual int Filter(int idxNum, const char *idxStr,
+                     const std::vector<sqlite3_value *> &args) override {
+    values.clear();
+    if (idxNum) {
+      id = sqlite3_value_int64(args[0]);
+      std::vector<std::int64_t> tmp;
+      gen(index, id, tmp, values);
+    }
+    cur = 0;
+    return SQLITE_OK;
+  }
+  virtual int Next() override {
+    ++cur;
+    return SQLITE_OK;
+  }
+  virtual int Eof() override { return cur == values.size(); }
+  virtual int Column(sqlite3_context *ctx, int idxCol) override {
+    switch (idxCol) {
+    default:
+      return SQLITE_ERROR;
+    case 0:
+      sqlite3_result_int64(ctx, static_cast<std::int64_t>(id));
+      return SQLITE_OK;
+    case 1:
+      sqlite3_result_int64(ctx, static_cast<std::int64_t>(cur));
+      return SQLITE_OK;
+    case 2:
+      sqlite3_result_text(ctx, values[cur].data(), values[cur].size(),
+                          SQLITE_STATIC);
+      return SQLITE_OK;
+    }
+  }
+  virtual mx::Result<std::int64_t, int> RowId() override { return 0; }
+};
 
-#define LIST_INIT(TABLE, NAME)                                                 \
-  std::optional<std::string> TABLE##NAME##Table::Init(sqlite3 *db) {           \
-    int err = sqlite3_declare_vtab(db, TABLE##NAME##Table_schema);             \
-    if (err != SQLITE_OK) {                                                    \
-      return sqlite3_errmsg(db);                                               \
-    }                                                                          \
-    return std::nullopt;                                                       \
+class ListTable : public VirtualTable {
+private:
+  mx::EntityProvider::Ptr ep;
+  mx::Index index;
+  FieldType type;
+  ListGen *gen;
+
+public:
+  ListTable(mx::EntityProvider::Ptr ep, FieldType type, ListGen *gen)
+      : ep(ep), type(type), gen(gen) {}
+  virtual ~ListTable() = default;
+
+  virtual std::optional<std::string> Init(sqlite3 *db) override {
+    int err;
+    switch (type) {
+    case FieldType::Integer:
+      err = sqlite3_declare_vtab(
+          db, "CREATE TABLE vtab(parent_id INTEGER NOT NULL, pos INTEGER "
+              "NOT NULL, value INTEGER NOT NULL, PRIMARY KEY(parent_id, pos)) "
+              "WITHOUT ROWID");
+      break;
+    case FieldType::Text:
+      err = sqlite3_declare_vtab(
+          db, "CREATE TABLE vtab(parent_id INTEGER NOT NULL, pos INTEGER "
+              "NOT NULL, value TEXT NOT NULL, PRIMARY KEY(parent_id, pos)) "
+              "WITHOUT ROWID");
+      break;
+    }
+    if (err != SQLITE_OK) {
+      return sqlite3_errmsg(db);
+    }
+    return std::nullopt;
   }
 
-#define LIST_OPEN(TABLE, NAME)                                                 \
-  mx::Result<std::unique_ptr<VirtualTableCursor>, int>                         \
-      TABLE##NAME##Table::Open() {                                             \
-    auto cursor{std::make_unique<TABLE##NAME##Cursor>(ep)};                    \
-    return mx::Result<std::unique_ptr<VirtualTableCursor>, int>(               \
-        std::move(cursor));                                                    \
+  virtual int BestIndex(sqlite3_index_info *info) override {
+    for (int i = 0; i < info->nConstraint; i++) {
+      auto constraint = info->aConstraint[i];
+      if (constraint.usable && constraint.iColumn == 0 &&
+          constraint.op == SQLITE_INDEX_CONSTRAINT_EQ) {
+        info->aConstraintUsage[i].argvIndex = 1;
+        info->estimatedCost = 1;
+        info->idxNum = 1;
+        return SQLITE_OK;
+      }
+    }
+    return SQLITE_OK;
   }
 
-#define LIST_BESTINDEX(TABLE, NAME)                                            \
-  int TABLE##NAME##Table::BestIndex(sqlite3_index_info *info) {                \
-    for (int i = 0; i < info->nConstraint; i++) {                              \
-      auto constraint = info->aConstraint[i];                                  \
-      if (constraint.usable && constraint.iColumn == 0 &&                      \
-          constraint.op == SQLITE_INDEX_CONSTRAINT_EQ) {                       \
-        info->aConstraintUsage[i].argvIndex = 1;                               \
-        info->estimatedCost = 1;                                               \
-        info->idxNum = 1;                                                      \
-        return SQLITE_OK;                                                      \
-      }                                                                        \
-    }                                                                          \
-    return SQLITE_OK;                                                          \
+  virtual mx::Result<std::unique_ptr<VirtualTableCursor>, int> Open() override {
+    std::unique_ptr<VirtualTableCursor> cursor;
+    if (type == FieldType::Integer) {
+      cursor = std::make_unique<IntegerListCursor>(ep, gen);
+    } else {
+      cursor = std::make_unique<TextListCursor>(ep, gen);
+    }
+    return mx::Result<std::unique_ptr<VirtualTableCursor>, int>(
+        std::move(cursor));
   }
+};
 
-#define LIST_CURSOR_BOOL(TABLE, NAME, LOWERCASE)                               \
-  class TABLE##NAME##Cursor : public VirtualTableCursor {                      \
-  private:                                                                     \
-    mx::Index index;                                                           \
-    mx::EntityId id;                                                           \
-    std::vector<std::int64_t> values;                                          \
-    std::size_t cur;                                                           \
-                                                                               \
-  public:                                                                      \
-    TABLE##NAME##Cursor(mx::EntityProvider::Ptr ep) : index(ep) {}             \
-    virtual ~TABLE##NAME##Cursor() = default;                                  \
-    virtual int Filter(int idxNum, const char *idxStr,                         \
-                       const std::vector<sqlite3_value *> &args) override;     \
-    virtual int Next() override {                                              \
-      ++cur;                                                                   \
-      return SQLITE_OK;                                                        \
-    }                                                                          \
-    virtual int Eof() override { return cur == values.size(); }                \
-    virtual int Column(sqlite3_context *ctx, int idxCol) override {            \
-      switch (idxCol) {                                                        \
-      default:                                                                 \
-        return SQLITE_ERROR;                                                   \
-      case 0:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(id));              \
-        return SQLITE_OK;                                                      \
-      case 1:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(cur));             \
-        return SQLITE_OK;                                                      \
-      case 2:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(values[cur]));     \
-        return SQLITE_OK;                                                      \
-      }                                                                        \
-    }                                                                          \
-    virtual mx::Result<std::int64_t, int> RowId() override { return 0; }       \
-  };
+struct ListDescriptor {
+  std::string name;
+  ListGen *gen;
+  FieldType type;
+  ListDescriptor(std::string name, FieldType type, ListGen *gen)
+      : name(name), type(type), gen(gen) {}
+};
 
-#define LIST_CURSOR_TEXT(TABLE, NAME, LOWERCASE)                               \
-  class TABLE##NAME##Cursor : public VirtualTableCursor {                      \
-  private:                                                                     \
-    mx::Index index;                                                           \
-    mx::EntityId id;                                                           \
-    std::vector<std::string_view> values;                                      \
-    std::size_t cur;                                                           \
-                                                                               \
-  public:                                                                      \
-    TABLE##NAME##Cursor(mx::EntityProvider::Ptr ep) : index(ep) {}             \
-    virtual ~TABLE##NAME##Cursor() = default;                                  \
-    virtual int Filter(int idxNum, const char *idxStr,                         \
-                       const std::vector<sqlite3_value *> &args) override;     \
-    virtual int Next() override {                                              \
-      ++cur;                                                                   \
-      return SQLITE_OK;                                                        \
-    }                                                                          \
-    virtual int Eof() override { return cur == values.size(); }                \
-    virtual int Column(sqlite3_context *ctx, int idxCol) override {            \
-      switch (idxCol) {                                                        \
-      default:                                                                 \
-        return SQLITE_ERROR;                                                   \
-      case 0:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(id));              \
-        return SQLITE_OK;                                                      \
-      case 1:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(cur));             \
-        return SQLITE_OK;                                                      \
-      case 2:                                                                  \
-        sqlite3_result_text(ctx, values[cur].data(), values[cur].size(),       \
-                            SQLITE_TRANSIENT);                                 \
-        return SQLITE_OK;                                                      \
-      }                                                                        \
-    }                                                                          \
-    virtual mx::Result<std::int64_t, int> RowId() override { return 0; }       \
-  };
-
-#define LIST_CURSOR_ENTITY(TABLE, NAME, LOWERCASE)                             \
-  class TABLE##NAME##Cursor : public VirtualTableCursor {                      \
-  private:                                                                     \
-    mx::Index index;                                                           \
-    mx::EntityId id;                                                           \
-    std::vector<std::int64_t> values;                                          \
-    std::size_t cur;                                                           \
-                                                                               \
-  public:                                                                      \
-    TABLE##NAME##Cursor(mx::EntityProvider::Ptr ep) : index(ep) {}             \
-    virtual ~TABLE##NAME##Cursor() = default;                                  \
-    virtual int Filter(int idxNum, const char *idxStr,                         \
-                       const std::vector<sqlite3_value *> &args) override;     \
-    virtual int Next() override {                                              \
-      ++cur;                                                                   \
-      return SQLITE_OK;                                                        \
-    }                                                                          \
-    virtual int Eof() override { return cur == values.size(); }                \
-    virtual int Column(sqlite3_context *ctx, int idxCol) override {            \
-      switch (idxCol) {                                                        \
-      default:                                                                 \
-        return SQLITE_ERROR;                                                   \
-      case 0:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(id));              \
-        return SQLITE_OK;                                                      \
-      case 1:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(cur));             \
-        return SQLITE_OK;                                                      \
-      case 2:                                                                  \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(values[cur]));     \
-        return SQLITE_OK;                                                      \
-      }                                                                        \
-    }                                                                          \
-    virtual mx::Result<std::int64_t, int> RowId() override { return 0; }       \
-  };
-
-#define LIST_FILTER_BOOL(TABLE, NAME, LOWERCASE)                               \
-  int TABLE##NAME##Cursor::Filter(int idxNum, const char *idxStr,              \
-                                  const std::vector<sqlite3_value *> &args) {  \
-    values.clear();                                                            \
-    if (idxNum) {                                                              \
-      id = sqlite3_value_int64(args[0]);                                       \
-      FromEntityId<mx::TABLE> helper;                                          \
-      auto entity{helper.get(index, id)};                                      \
-      if (entity) {                                                            \
-        for (auto value : entity->LOWERCASE()) {                               \
-          values.push_back(static_cast<std::int64_t>(value));                  \
-        }                                                                      \
-      }                                                                        \
-    }                                                                          \
-    cur = 0;                                                                   \
-    return SQLITE_OK;                                                          \
-  }
-
-#define LIST_FILTER_TEXT(TABLE, NAME, LOWERCASE)                               \
-  int TABLE##NAME##Cursor::Filter(int idxNum, const char *idxStr,              \
-                                  const std::vector<sqlite3_value *> &args) {  \
-    values.clear();                                                            \
-    if (idxNum) {                                                              \
-      id = sqlite3_value_int64(args[0]);                                       \
-      FromEntityId<mx::TABLE> helper;                                          \
-      auto entity{helper.get(index, id)};                                      \
-      if (entity) {                                                            \
-        values = entity->LOWERCASE();                                          \
-      }                                                                        \
-    }                                                                          \
-    cur = 0;                                                                   \
-    return SQLITE_OK;                                                          \
-  }
-
-#define LIST_FILTER_ENTITY(TABLE, NAME, LOWERCASE)                             \
-  int TABLE##NAME##Cursor::Filter(int idxNum, const char *idxStr,              \
-                                  const std::vector<sqlite3_value *> &args) {  \
-    values.clear();                                                            \
-    if (idxNum) {                                                              \
-      id = sqlite3_value_int64(args[0]);                                       \
-      FromEntityId<mx::TABLE> helper;                                          \
-      auto entity{helper.get(index, id)};                                      \
-      if (entity) {                                                            \
-        for (auto value : entity->LOWERCASE()) {                               \
-          values.push_back(static_cast<std::int64_t>(value.id()));             \
-        }                                                                      \
-      }                                                                        \
-    }                                                                          \
-    cur = 0;                                                                   \
-    return SQLITE_OK;                                                          \
-  }
-
-#define LIST_FILTER_OPTIONAL_BOOL(TABLE, NAME, LOWERCASE)                      \
-  int TABLE##NAME##Cursor::Filter(int idxNum, const char *idxStr,              \
-                                  const std::vector<sqlite3_value *> &args) {  \
-    values.clear();                                                            \
-    if (idxNum) {                                                              \
-      id = sqlite3_value_int64(args[0]);                                       \
-      FromEntityId<mx::TABLE> helper;                                          \
-      auto entity{helper.get(index, id)};                                      \
-      if (entity) {                                                            \
-        auto coll = entity->LOWERCASE();                                       \
-        if (coll) {                                                            \
-          for (auto value : *coll) {                                           \
-            values.push_back(static_cast<std::int64_t>(value));                \
-          }                                                                    \
-        }                                                                      \
-      }                                                                        \
-    }                                                                          \
-    cur = 0;                                                                   \
-    return SQLITE_OK;                                                          \
-  }
-
-#define LIST_FILTER_OPTIONAL_TEXT(TABLE, NAME, LOWERCASE)                      \
-  int TABLE##NAME##Cursor::Filter(int idxNum, const char *idxStr,              \
-                                  const std::vector<sqlite3_value *> &args) {  \
-    values.clear();                                                            \
-    if (idxNum) {                                                              \
-      id = sqlite3_value_int64(args[0]);                                       \
-      FromEntityId<mx::TABLE> helper;                                          \
-      auto entity{helper.get(index, id)};                                      \
-      if (entity) {                                                            \
-        auto coll = entity->LOWERCASE();                                       \
-        if (coll) {                                                            \
-          values = *coll;                                                      \
-        }                                                                      \
-      }                                                                        \
-    }                                                                          \
-    cur = 0;                                                                   \
-    return SQLITE_OK;                                                          \
-  }
-
-#define LIST_FILTER_OPTIONAL_ENTITY(TABLE, NAME, LOWERCASE)                    \
-  int TABLE##NAME##Cursor::Filter(int idxNum, const char *idxStr,              \
-                                  const std::vector<sqlite3_value *> &args) {  \
-    values.clear();                                                            \
-    if (idxNum) {                                                              \
-      id = sqlite3_value_int64(args[0]);                                       \
-      FromEntityId<mx::TABLE> helper;                                          \
-      auto entity{helper.get(index, id)};                                      \
-      if (entity) {                                                            \
-        auto coll = entity->LOWERCASE();                                       \
-        if (coll) {                                                            \
-          for (auto value : *coll) {                                           \
-            values.push_back(static_cast<std::int64_t>(value.id()));           \
-          }                                                                    \
-        }                                                                      \
-      }                                                                        \
-    }                                                                          \
-    cur = 0;                                                                   \
-    return SQLITE_OK;                                                          \
-  }
+#define MX_BEGIN_VISIT_DECL(NAME) static std::vector<ListDescriptor> NAME##Table_lists({
+#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
 #define MX_VISIT_BOOL_LIST(TABLE, LOWERCASE, IGNORE1, IGNORE2, IGNORE3, NAME,  \
                            ...)                                                \
-  LIST_CURSOR_BOOL(TABLE, NAME, LOWERCASE)                                     \
-  LIST_FILTER_BOOL(TABLE, NAME, LOWERCASE)                                     \
-  LIST_CTOR(TABLE, NAME)                                                       \
-  LIST_INIT(TABLE, NAME)                                                       \
-  LIST_OPEN(TABLE, NAME)                                                       \
-  LIST_BESTINDEX(TABLE, NAME)
+  ListDescriptor(#NAME, FieldType::Integer,                                    \
+                 [](mx::Index index, std::int64_t id,                          \
+                    std::vector<std::int64_t> &result,                         \
+                    std::vector<std::string_view> &tmp) {                      \
+                   FromEntityId<mx::TABLE> helper;                             \
+                   auto entity{helper.get(index, id)};                         \
+                   if (!entity) {                                              \
+                     return;                                                   \
+                   }                                                           \
+                   auto coll = entity->LOWERCASE();                            \
+                   for (auto value : coll) {                                   \
+                     result.push_back(static_cast<std::int64_t>(value));       \
+                   }                                                           \
+                 }),
 #define MX_VISIT_INT_LIST MX_VISIT_BOOL_LIST
 #define MX_VISIT_ENUM_LIST MX_VISIT_BOOL_LIST
 #define MX_VISIT_TEXT_LIST(TABLE, LOWERCASE, IGNORE1, IGNORE2, IGNORE3, NAME,  \
                            ...)                                                \
-  LIST_CURSOR_TEXT(TABLE, NAME, LOWERCASE)                                     \
-  LIST_FILTER_TEXT(TABLE, NAME, LOWERCASE)                                     \
-  LIST_CTOR(TABLE, NAME)                                                       \
-  LIST_INIT(TABLE, NAME)                                                       \
-  LIST_OPEN(TABLE, NAME)                                                       \
-  LIST_BESTINDEX(TABLE, NAME)
+  ListDescriptor(#NAME, FieldType::Text,                                       \
+                 [](mx::Index index, std::int64_t id,                          \
+                    std::vector<std::int64_t> &tmp,                            \
+                    std::vector<std::string_view> &result) {                   \
+                   FromEntityId<mx::TABLE> helper;                             \
+                   auto entity{helper.get(index, id)};                         \
+                   if (!entity) {                                              \
+                     return;                                                   \
+                   }                                                           \
+                   auto coll = entity->LOWERCASE();                            \
+                   for (auto value : coll) {                                   \
+                     result.push_back(value);                                  \
+                   }                                                           \
+                 }),
 #define MX_VISIT_ENTITY_LIST(TABLE, LOWERCASE, IGNORE1, IGNORE2, IGNORE3,      \
                              NAME, ...)                                        \
-  LIST_CURSOR_ENTITY(TABLE, NAME, LOWERCASE)                                   \
-  LIST_FILTER_ENTITY(TABLE, NAME, LOWERCASE)                                   \
-  LIST_CTOR(TABLE, NAME)                                                       \
-  LIST_INIT(TABLE, NAME)                                                       \
-  LIST_OPEN(TABLE, NAME)                                                       \
-  LIST_BESTINDEX(TABLE, NAME)
+  ListDescriptor(#NAME, FieldType::Integer,                                    \
+                 [](mx::Index index, std::int64_t id,                          \
+                    std::vector<std::int64_t> &result,                         \
+                    std::vector<std::string_view> &tmp) {                      \
+                   FromEntityId<mx::TABLE> helper;                             \
+                   auto entity{helper.get(index, id)};                         \
+                   if (!entity) {                                              \
+                     return;                                                   \
+                   }                                                           \
+                   auto coll = entity->LOWERCASE();                            \
+                   for (auto value : coll) {                                   \
+                     result.push_back(static_cast<std::int64_t>(value.id()));  \
+                   }                                                           \
+                 }),
+
 #define MX_VISIT_OPTIONAL_BOOL_LIST(TABLE, LOWERCASE, IGNORE1, IGNORE2,        \
                                     IGNORE3, NAME, ...)                        \
-  LIST_CURSOR_BOOL(TABLE, NAME, LOWERCASE)                                     \
-  LIST_FILTER_OPTIONAL_BOOL(TABLE, NAME, LOWERCASE)                            \
-  LIST_CTOR(TABLE, NAME)                                                       \
-  LIST_INIT(TABLE, NAME)                                                       \
-  LIST_OPEN(TABLE, NAME)                                                       \
-  LIST_BESTINDEX(TABLE, NAME)
-#define MX_VISIT_OPTIONAL_INT_LIST MX_VISIT_OPTIONAL_BOOL_LIST
-#define MX_VISIT_OPTIONAL_ENUM_LIST MX_VISIT_OPTIONAL_BOOL_LIST
+  ListDescriptor(#NAME, FieldType::Integer,                                    \
+                 [](mx::Index index, std::int64_t id,                          \
+                    std::vector<std::int64_t> &result,                         \
+                    std::vector<std::string_view> &tmp) {                      \
+                   FromEntityId<mx::TABLE> helper;                             \
+                   auto entity{helper.get(index, id)};                         \
+                   if (!entity) {                                              \
+                     return;                                                   \
+                   }                                                           \
+                   auto coll = entity->LOWERCASE();                            \
+                   if (!coll) {                                                \
+                     return;                                                   \
+                   }                                                           \
+                   for (auto value : *coll) {                                  \
+                     result.push_back(static_cast<std::int64_t>(value));       \
+                   }                                                           \
+                 }),
+#define MX_VISIT_OPTIONAL_INT_LIST MX_VISIT_BOOL_LIST
+#define MX_VISIT_OPTIONAL_ENUM_LIST MX_VISIT_BOOL_LIST
 #define MX_VISIT_OPTIONAL_TEXT_LIST(TABLE, LOWERCASE, IGNORE1, IGNORE2,        \
                                     IGNORE3, NAME, ...)                        \
-  LIST_CURSOR_TEXT(TABLE, NAME, LOWERCASE)                                     \
-  LIST_FILTER_OPTIONAL_TEXT(TABLE, NAME, LOWERCASE)                            \
-  LIST_CTOR(TABLE, NAME)                                                       \
-  LIST_INIT(TABLE, NAME)                                                       \
-  LIST_OPEN(TABLE, NAME)                                                       \
-  LIST_BESTINDEX(TABLE, NAME)
+  ListDescriptor(#NAME, FieldType::Text,                                       \
+                 [](mx::Index index, std::int64_t id,                          \
+                    std::vector<std::int64_t> &tmp,                            \
+                    std::vector<std::string_view> &result) {                   \
+                   FromEntityId<mx::TABLE> helper;                             \
+                   auto entity{helper.get(index, id)};                         \
+                   if (!entity) {                                              \
+                     return;                                                   \
+                   }                                                           \
+                   auto coll = entity->LOWERCASE();                            \
+                   if (!coll) {                                                \
+                     return;                                                   \
+                   }                                                           \
+                   for (auto value : *coll) {                                  \
+                     result.push_back(value);                                  \
+                   }                                                           \
+                 }),
 #define MX_VISIT_OPTIONAL_ENTITY_LIST(TABLE, LOWERCASE, IGNORE1, IGNORE2,      \
                                       IGNORE3, NAME, ...)                      \
-  LIST_CURSOR_BOOL(TABLE, NAME, LOWERCASE)                                     \
-  LIST_FILTER_OPTIONAL_ENTITY(TABLE, NAME, LOWERCASE)                          \
-  LIST_CTOR(TABLE, NAME)                                                       \
-  LIST_INIT(TABLE, NAME)                                                       \
-  LIST_OPEN(TABLE, NAME)                                                       \
-  LIST_BESTINDEX(TABLE, NAME)
+  ListDescriptor(#NAME, FieldType::Integer,                                    \
+                 [](mx::Index index, std::int64_t id,                          \
+                    std::vector<std::int64_t> &result,                         \
+                    std::vector<std::string_view> &tmp) {                      \
+                   FromEntityId<mx::TABLE> helper;                             \
+                   auto entity{helper.get(index, id)};                         \
+                   if (!entity) {                                              \
+                     return;                                                   \
+                   }                                                           \
+                   auto coll = entity->LOWERCASE();                            \
+                   if (!coll) {                                                \
+                     return;                                                   \
+                   }                                                           \
+                   for (auto value : *coll) {                                  \
+                     result.push_back(static_cast<std::int64_t>(value.id()));  \
+                   }                                                           \
+                 }),
+
+#define MX_END_VISIT_DECL(NAME)                                                \
+  });
+#define MX_END_VISIT_STMT MX_END_VISIT_DECL
+#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
+
+#define MX_BEGIN_VISIT_DECL(NAME)                                              \
+  static std::vector<ListDescriptor> Get##NAME##TableLists() {                 \
+    std::vector<ListDescriptor> fields;                                        \
+    auto out_it{std::back_inserter(fields)};
+#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
+
+#define MX_VISIT_BASE(NAME, BASE)                                              \
+  std::copy(BASE##TableLists.begin(), BASE##TableLists.end(), out_it);
+
+#define MX_END_VISIT_DECL(NAME)                                                \
+  std::copy(NAME##Table_lists.begin(), NAME##Table_lists.end(), out_it);       \
+  return fields;                                                               \
+  }                                                                            \
+  static std::vector<ListDescriptor> NAME##TableLists = Get##NAME##TableLists();
+#define MX_END_VISIT_STMT MX_END_VISIT_DECL
+#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
+#include <multiplier/Visitor.inc.h>
+
+std::unique_ptr<VirtualTable> GetListTable(mx::EntityProvider::Ptr ep,
+                                           const std::string &name) {
+  std::string s;
+#define MX_BEGIN_VISIT_DECL(NAME)                                              \
+  s = #NAME;                                                                   \
+  for (auto &list : NAME##TableLists) {                                        \
+    if (name == s + list.name) {                                               \
+      return std::make_unique<ListTable>(ep, list.type, list.gen);             \
+    }                                                                          \
+  }
+#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
+#include <multiplier/Visitor.inc.h>
+  return nullptr;
+}
+
 } // namespace sqlite_bridge
