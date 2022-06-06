@@ -1679,7 +1679,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
           << "  auto self = fragment->" << nth_entity_reader << "(offset);\n"
-          << "  if (auto id = self." << cd_getter_name << "(); "
+          << "  if (auto id = self." << cs_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
           << "    return fragment->StmtFor(fragment, id);\n"
           << "  } else {\n"

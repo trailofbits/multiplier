@@ -28,13 +28,11 @@ DEFINE_bool(show_locations, false, "Show the locations of users?");
 // This was motivated by the PHP vulnerability described here, and is an
 // attempt to identify more instances of the vulnerable code pattern:
 // https://pwning.systems/posts/php_filter_var_shenanigans/
-static void CheckCallForImplicitCast(const mx::CallExpr call_expr, bool show_locations) {
+static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
   for (auto argument : call_expr.arguments()) {
     if (auto cast_expr = mx::ImplicitCastExpr::from(argument)) {
-      if (cast_expr->is_part_of_explicit_cast()) {
-        continue;
-      }
-      if (cast_expr->cast_kind() != mx::CastKind::INTEGRAL_CAST) {
+      if (cast_expr->is_part_of_explicit_cast() ||
+          cast_expr->cast_kind() != mx::CastKind::INTEGRAL_CAST) {
         continue;
       }
       auto source_type = cast_expr->sub_expression().type()->canonical_type();
@@ -42,19 +40,23 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr, bool show_loc
 
       auto source_builtin = mx::BuiltinType::from(source_type);
       auto dest_builtin = mx::BuiltinType::from(dest_type);
-      if (!source_builtin || !dest_builtin) { continue; }
+      if (!source_builtin || !dest_builtin) {
+        continue;
+      }
 
       auto source_type_kind = source_builtin->builtin_kind();
       auto dest_type_kind = dest_builtin->builtin_kind();
 
-      /* TODO: generalize the sketchy casts we care about. */
-      if (source_type_kind != mx::BuiltinTypeKind::U_LONG
-          || dest_type_kind != mx::BuiltinTypeKind::INT) { continue; }
+      // TODO(wunused): generalize the sketchy casts we care about.
+      if (source_type_kind != mx::BuiltinTypeKind::U_LONG ||
+          dest_type_kind != mx::BuiltinTypeKind::INT) {
+        continue;
+      }
 
       mx::Fragment fragment = mx::Fragment::containing(call_expr);
       mx::File file = mx::File::containing(fragment);
 
-      if (show_locations) {
+      if (FLAGS_show_locations) {
         auto file = mx::File::containing(mx::Fragment::containing(call_expr));
         std::cout << file_paths[file.id()].generic_string();
         if (auto tok = call_expr.tokens()[0]) {
@@ -75,7 +77,7 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr, bool show_loc
           << cast_expr->tokens().data()
           << std::endl;
 
-      if (show_locations) {
+      if (FLAGS_show_locations) {
         std::cout << std::endl;
         if (auto toks = call_expr.tokens()) {
           RenderFragment(std::cout, fragment, toks, "\t", true);
@@ -86,9 +88,9 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr, bool show_loc
   }
 }
 
-static void FindSketchyUsesOfFragment(const mx::Fragment fragment, bool show_locations) {
+static void FindSketchyUsesOfFragment(const mx::Fragment fragment) {
   for (mx::CallExpr call_expr : mx::CallExpr::in(fragment)) {
-    CheckCallForImplicitCast(call_expr, show_locations);
+    CheckCallForImplicitCast(call_expr);
   }
 }
 
@@ -114,8 +116,8 @@ extern "C" int main(int argc, char *argv[]) {
     mx::Decl decl = std::get<mx::Decl>(maybe_entity);
     for (const mx::Reference ref : decl.references()) {
       const mx::Stmt ref_stmt = ref.statement();
-      for (const mx::CallExpr &call_expr : mx::CallExpr::containing(ref_stmt.tokens()[0])) {
-        CheckCallForImplicitCast(call_expr, FLAGS_show_locations);
+      for (const mx::CallExpr &call_expr : mx::CallExpr::containing(ref_stmt)) {
+        CheckCallForImplicitCast(call_expr);
       }
     }
 
@@ -125,7 +127,7 @@ extern "C" int main(int argc, char *argv[]) {
       std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
       return EXIT_FAILURE;
     }
-    FindSketchyUsesOfFragment(std::move(*fragment), FLAGS_show_locations);
+    FindSketchyUsesOfFragment(std::move(*fragment));
 
   } else if (FLAGS_file_id) {
     auto file = index.file(FLAGS_file_id);
@@ -134,13 +136,13 @@ extern "C" int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
     for (mx::Fragment fragment : mx::Fragment::in(*file)) {
-      FindSketchyUsesOfFragment(std::move(fragment), FLAGS_show_locations);
+      FindSketchyUsesOfFragment(std::move(fragment));
     }
 
   } else {
     for (mx::File file : mx::File::in(index)) {
       for (mx::Fragment fragment : mx::Fragment::in(file)) {
-        FindSketchyUsesOfFragment(std::move(fragment), FLAGS_show_locations);
+        FindSketchyUsesOfFragment(std::move(fragment));
       }
     }
   }

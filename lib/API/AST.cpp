@@ -13120,7 +13120,7 @@ std::optional<Decl> Stmt::parent_declaration(void) const {
 
 std::optional<Stmt> Stmt::parent_statement(void) const {
   auto self = fragment->NthStmt(offset);
-  if (auto id = self.getVal0(); id != kInvalidEntityId) {
+  if (auto id = self.getVal1(); id != kInvalidEntityId) {
     return fragment->StmtFor(fragment, id);
   } else {
     return std::nullopt;
@@ -26555,7 +26555,7 @@ std::optional<Decl> Decl::parent_declaration(void) const {
 
 std::optional<Stmt> Decl::parent_statement(void) const {
   auto self = fragment->NthDecl(offset);
-  if (auto id = self.getVal0(); id != kInvalidEntityId) {
+  if (auto id = self.getVal1(); id != kInvalidEntityId) {
     return fragment->StmtFor(fragment, id);
   } else {
     return std::nullopt;
