@@ -634,6 +634,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   }
 
   include_h_os << "enum class " << enum_name << " : " << types.first << " {\n";
+  serialize_inc_os << "MX_BEGIN_ENUM_CLASS(" << enum_name << ", " << types.first << ")\n";
 
   // Generate a `switch` to convert from PASTA, as PASTA's version of enums
   // have the same initializer values as Clang does, but in Multiplier, we use
@@ -707,6 +708,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
         << "    case " << enum_name << "::" << enum_case << ": return \""
         << enum_case << "\";\n";
 
+    serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
     ++i;
   }
 
@@ -736,6 +738,8 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       name_cases_ss
           << "    case " << enum_name << "::" << enum_case << ": return \""
           << enum_case << "\";\n";
+
+      serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
       ++i;
     }
 
@@ -758,6 +762,8 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       name_cases_ss
           << "    case " << enum_name << "::" << enum_case << ": return \""
           << enum_case << "\";\n";
+
+      serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
       ++i;
     }
 
@@ -781,6 +787,8 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       name_cases_ss
           << "    case " << enum_name << "::" << enum_case << ": return \""
           << enum_case << "\";\n";
+
+      serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
       ++i;
     }
   }
@@ -808,6 +816,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "}\n\n"
       << "const char *EnumeratorName(" << enum_name << ");\n\n";
 
+  serialize_inc_os << "MX_END_ENUM_CLASS(" << enum_name << ")\n\n";
 
   enum_names.insert(std::move(enum_name));
 }
@@ -2744,6 +2753,15 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#ifndef MX_VISIT_PSEUDO_KIND\n"
       << "#  define MX_VISIT_PSEUDO_KIND(...)\n"
       << "#endif\n"
+      << "#ifndef MX_BEGIN_ENUM_CLASS\n"
+      << "#  define MX_BEGIN_ENUM_CLASS(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_ENUM_CLASS_ENTRY\n"
+      << "#  define MX_ENUM_CLASS_ENTRY(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_END_ENUM_CLASS\n"
+      << "#  define MX_END_ENUM_CLASS(...)\n"
+      << "#endif\n"
       << "\n";
 
   serialize_h_os
@@ -3020,7 +3038,10 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#undef MX_END_VISIT_DECL\n"
       << "#undef MX_END_VISIT_STMT\n"
       << "#undef MX_END_VISIT_TYPE\n"
-      << "#undef MX_END_VISIT_PSEUDO\n";
+      << "#undef MX_END_VISIT_PSEUDO\n"
+      << "#undef MX_BEGIN_ENUM_CLASS\n"
+      << "#undef MX_ENUM_CLASS_ENTRY\n"
+      << "#undef MX_END_ENUM_CLASS\n";
 
   RunOnUseSet(decl_use_ids, "DeclUseSelector");
   RunOnUseSet(stmt_use_ids, "StmtUseSelector");
