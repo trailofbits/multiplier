@@ -26,6 +26,11 @@ macro(DownloadSQLite3)
     PRIVATE
       "-DSQLITE_ENABLE_FTS5"
       "-DSQLITE_ENABLE_RTREE")
+  set_target_properties(SQLite3
+    PROPERTIES
+      C_VISIBILITY_PRESET   default
+      CXX_VISIBILITY_PRESET default
+  )
   add_library(SQLite::SQLite3 ALIAS SQLite3)
 
   set(SQLite3_VERSION "3.38.5")

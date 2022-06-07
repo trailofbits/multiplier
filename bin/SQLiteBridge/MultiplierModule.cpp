@@ -35,6 +35,10 @@ ResultType MultiplierModule::Create(sqlite3 *db,
     vtab = std::make_unique<FragmentTable>(ep);
   } else if (table == "Reference") {
     vtab = std::make_unique<ReferenceTable>(ep);
+  } else if (table == "RegexQuery") {
+    vtab = std::make_unique<QueryTable>(ep, QueryType::Regex);
+  } else if (table == "WeggliQuery") {
+    vtab = std::make_unique<QueryTable>(ep, QueryType::Weggli);
   }
 
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \

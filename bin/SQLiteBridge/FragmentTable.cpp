@@ -66,7 +66,7 @@ class FragmentCursor : public VirtualTableCursor {
 private:
   mx::Index index;
   std::vector<mx::FragmentId> fragments;
-  typename std::vector<mx::FragmentId>::iterator cur;
+  decltype(fragments)::iterator cur;
 
 public:
   FragmentCursor(mx::EntityProvider::Ptr ep) : index(ep) {}

@@ -5,14 +5,11 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <sqlite3ext.h>
-#include <variant>
 SQLITE_EXTENSION_INIT3
 
 #include <cassert>
-#include <multiplier/File.h>
-#include <multiplier/Types.h>
-#include <multiplier/Use.h>
 #include <optional>
+#include <variant>
 
 #include "Tables.h"
 #include "VirtualTableCursor.h"
@@ -57,7 +54,7 @@ private:
   mx::Index index;
   mx::EntityId use;
   std::vector<mx::Reference> references;
-  decltype(references.begin()) cur;
+  decltype(references)::iterator cur;
 
 public:
   ReferenceCursor(mx::EntityProvider::Ptr ep) : index(ep) {}

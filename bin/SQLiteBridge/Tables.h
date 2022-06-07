@@ -48,6 +48,22 @@ public:
   virtual mx::Result<std::unique_ptr<VirtualTableCursor>, int> Open() override;
 };
 
+enum class QueryType { Regex, Weggli };
+
+class QueryTable : public VirtualTable {
+private:
+  mx::EntityProvider::Ptr ep;
+  mx::Index index;
+  QueryType type;
+
+public:
+  QueryTable(mx::EntityProvider::Ptr ep, QueryType type);
+  virtual ~QueryTable() = default;
+  virtual std::optional<std::string> Init(sqlite3 *db) override;
+  virtual int BestIndex(sqlite3_index_info *info) override;
+  virtual mx::Result<std::unique_ptr<VirtualTableCursor>, int> Open() override;
+};
+
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \
   class NAME##Table : public VirtualTable {                                    \
   private:                                                                     \
