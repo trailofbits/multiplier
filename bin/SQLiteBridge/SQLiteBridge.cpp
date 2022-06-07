@@ -8,6 +8,8 @@
 SQLITE_EXTENSION_INIT1
 
 #include "MultiplierModule.h"
+#include <cassert>
+#include <multiplier/AST.h>
 
 #ifdef _WIN32
 #define EXPORT extern "C" __declspec(dllexport)
@@ -19,6 +21,27 @@ EXPORT int sqlite3_sqlitebridge_init(sqlite3 *db, char **pzErrMsg,
                                      const sqlite3_api_routines *pApi) {
   int rc = SQLITE_OK;
   SQLITE_EXTENSION_INIT2(pApi);
+
+#define MX_BEGIN_ENUM_CLASS(NAME, ...)                                         \
+  rc = sqlite3_create_function(db, #NAME, 1,                                   \
+  SQLITE_UTF8 | SQLITE_DETERMINISTIC, nullptr,                                 \
+  [](sqlite3_context* ctx, int argc, sqlite3_value** argv) {                   \
+    assert(argc == 1);                                                         \
+    std::string input{reinterpret_cast<const char*>(sqlite3_value_text(argv[0]))};
+
+#define MX_ENUM_CLASS_ENTRY(NAME, ENTRY, ...)                                  \
+  if (input == #ENTRY) {                                                       \
+    sqlite3_result_int64(ctx, static_cast<std::int64_t>(mx::NAME::ENTRY));     \
+  } else
+
+#define MX_END_ENUM_CLASS(NAME)                                                \
+  { sqlite3_result_null(ctx); }                                                \
+  }, nullptr, nullptr);                                                        \
+  if (rc != SQLITE_OK) {                                                       \
+    return rc;                                                                 \
+  }
+#undef EXPORT
+#include <multiplier/Visitor.inc.h>
 
   return (new sqlite_bridge::MultiplierModule())->Register(db, "multiplier");
 }
