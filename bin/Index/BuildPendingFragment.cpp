@@ -153,30 +153,26 @@ void FragmentBuilder::MaybeVisitNext(
 #define MX_VISIT_BASE(derived_type, base_type) \
     Visit ## base_type(entity);
 
-#define MX_VISIT_ENTITY(cls, api_method, get_storage, set_storage, \
-                        init_storage, method, entity_type, \
+#define MX_VISIT_ENTITY(cls, api_method, storage, apply, method, entity_type, \
                         get_storage_list, selector) \
-    MaybeVisitNext(entity.method());
+    MaybeVisitNext(apply(entity, method));
 
 
-#define MX_VISIT_ENTITY_LIST(cls, api_method, get_storage, set_storage, \
-                                 init_storage, method, entity_type, \
-                                 get_storage_list) \
-    for (auto sub_entity : entity.method()) { \
+#define MX_VISIT_ENTITY_LIST(cls, api_method, storage, apply, method, \
+                             entity_type, get_storage_list) \
+    for (auto sub_entity : apply(entity, method)) { \
       MaybeVisitNext(sub_entity); \
     }
 
-#define MX_VISIT_OPTIONAL_ENTITY(cls, api_method, get_storage, \
-                                 set_storage, init_storage, method, \
+#define MX_VISIT_OPTIONAL_ENTITY(cls, api_method, storage, apply, method, \
                                  entity_type, ...) \
-    if (auto sub_entity = entity.method(); sub_entity.has_value()) { \
+    if (auto sub_entity = apply(entity, method); sub_entity.has_value()) { \
       MaybeVisitNext(sub_entity.value()); \
     }
 
-#define MX_VISIT_OPTIONAL_ENTITY_LIST(cls, api_method, get_storage, \
-                                          set_storage, init_storage, method, \
-                                          entity_type, get_storage_list) \
-    if (auto sub_entities = entity.method(); sub_entities.has_value()) { \
+#define MX_VISIT_OPTIONAL_ENTITY_LIST(cls, api_method, storage, apply, method, \
+                                      entity_type, get_storage_list) \
+    if (auto sub_entities = apply(entity, method); sub_entities.has_value()) { \
       for (const auto &sub_entity : sub_entities.value()) { \
         MaybeVisitNext(sub_entity); \
       } \

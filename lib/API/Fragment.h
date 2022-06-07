@@ -83,13 +83,16 @@ class FragmentImpl {
                            EntityId end_id) const;
 
   // Return the declaration associated with a specific entity ID.
-  std::optional<Decl> DeclFor(const FragmentImpl::Ptr &, EntityId id) const;
+  std::optional<Decl> DeclFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
 
   // Return the statement associated with a specific entity ID.
-  std::optional<Stmt> StmtFor(const FragmentImpl::Ptr &, EntityId id) const;
+  std::optional<Stmt> StmtFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
 
   // Return the type associated with a specific entity ID.
-  std::optional<Type> TypeFor(const FragmentImpl::Ptr &, EntityId id) const;
+  std::optional<Type> TypeFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
 };
 
 // A packed fragment of code, i.e. a serialized fragment.

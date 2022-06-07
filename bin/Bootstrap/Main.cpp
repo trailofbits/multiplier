@@ -1141,9 +1141,9 @@ void CodeGenerator::RunOnOptional(
 
   serialize_inc_os
       << "  " << serializer << "(" << class_name << ", " << api_name
-      << ", " << getter_name << ", " << setter_name << ", "
-      << init_name << ", " << method_name << ", " << element_name.value()
-      << ", " << nth_entity_reader << selector.str() << ")\n";
+      << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+      << element_name.value() << ", " << nth_entity_reader << selector.str()
+      << ")\n";
 }
 
 void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
@@ -1398,8 +1398,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
 
   serialize_inc_os
         << "  " << serializer[optional] << "(" << class_name << ", " << api_name
-        << ", " << getter_name << ", " << setter_name << ", "
-        << init_name << ", " << method_name << ", " << element_name.value()
+        << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", " << element_name.value()
         << ", " << nth_entity_reader << ")\n";
 }
 
@@ -1569,8 +1568,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     serialize_inc_os
         << "MX_BEGIN_VISIT_PSEUDO(" << class_name << ")\n"
         << "  MX_ENTER_VISIT_" << class_name << "\n"
-        << "  MX_VISIT_PSEUDO_KIND(" << class_name << ", " << pk_getter_name
-        << ", " << pk_setter_name << ")\n";
+        << "  MX_VISIT_PSEUDO_KIND(" << class_name << ", " << pk << ")\n";
 
     end_serializer = "MX_END_VISIT_PSEUDO";
 
@@ -1638,24 +1636,22 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_inc_os
           << "  MX_VISIT_DECL_LINK(" << class_name
-          << ", parent_declaration, " << cd_getter_name
-          << ", " << cd_setter_name << ", " << cd_init_name << ")\n"
+          << ", parent_declaration, " << cd << ")\n"
           << "  MX_VISIT_STMT_LINK(" << class_name << ", parent_statement, "
-          << cs_getter_name << ", " << cs_setter_name << ", " << cs_init_name
-          << ")\n";
+          << cs << ")\n";
 
       serialize_cpp_os
           << "  b." << cd_setter_name << "(es.ParentDeclId(e));\n"
           << "  b." << cs_setter_name << "(es.ParentStmtId(e));\n";
 
+      // `Decl::is_definition`.
       if (class_name == "Decl") {
         const auto def = storage.AddMethod("Bool");
         auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
 
         serialize_inc_os
-            << "  MX_VISIT_BOOL(Decl, is_definition, " << def_getter_name
-            << ", " << def_setter_name << ", " << def_init_name
-            << ", IsThisDeclarationADefinition, bool, NthDecl)\n";
+            << "  MX_VISIT_BOOL(Decl, is_definition, " << def
+            << ", MX_APPLY_METHOD, IsThisDeclarationADefinition, bool, NthDecl)\n";
 
         lib_cpp_os
             << "bool Decl::is_definition(void) const {\n"
@@ -1772,11 +1768,37 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n"
+          << "  std::optional<Decl> referenced_declaration(void) const;\n"
           << "  EntityId id(void) const;\n"
           << "  UseRange<StmtUseSelector> uses(void) const;\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
+
+      // `Stmt::referenced_declaration`.
+      const auto ref = storage.AddMethod("UInt64");
+      auto [ref_getter_name, ref_setter_name, ref_init_name] = NamesFor(ref);
+      decl_use_ids["referenced_declaration"].SetId(cls, ref);
+      serialize_inc_os
+          << "  MX_VISIT_OPTIONAL_ENTITY(Stmt, referenced_declaration, " << ref
+          << ", MX_APPLY_FUNC, ReferencedDecl, Decl, NthStmt, "
+          << "DeclUseSelector::REFERENCED_DECLARATION)\n";
+
+      lib_cpp_os
+          << "std::optional<Decl> Stmt::referenced_declaration(void) const {\n"
+          << "  auto self = fragment->NthStmt(offset);\n"
+          << "  if (auto id = self." << ref_getter_name << "(); id != kInvalidEntityId) {\n"
+          << "    return fragment->DeclFor(fragment, id);\n"
+          << "  } else {\n"
+          << "    return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n";
+
+      serialize_cpp_os
+          << "  if (auto r" << ref << " = ReferencedDecl(e)) {\n"
+          << "    b." << ref_setter_name << "(es.EntityId(r" << ref
+          << ".value()));\n"
+          << "  }\n";  
           
       seen_methods->emplace("begin_token");  // Disable this.
       seen_methods->emplace("end_token");  // Disable this.
@@ -2145,8 +2167,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << record_name << ", "
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name
+            << ", " << record_name << ", "
             << nth_entity_reader << ", TokenUseSelector::"
             << SnakeCaseToEnumCase(snake_name) << ")\n";
 
@@ -2207,9 +2229,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_TEXT(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << record_name << ", "
-            << nth_entity_reader << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << record_name << ", " << nth_entity_reader << ")\n";
 
         include_h_os
             << "  std::string_view " << api_name << "(void) const;\n";
@@ -2237,9 +2258,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_TEXT(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << record_name << ", "
-            << nth_entity_reader << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << record_name << ", " << nth_entity_reader << ")\n";
 
         include_h_os
             << "  std::string_view " << api_name << "(void) const;\n";
@@ -2286,9 +2306,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_PATH(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << record_name << ", "
-            << nth_entity_reader << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << record_name << ", " << nth_entity_reader << ")\n";
 
         include_h_os
             << "  std::filesystem::path " << api_name << "(void) const;\n";
@@ -2350,40 +2369,40 @@ MethodListPtr CodeGenerator::RunOnClass(
           decl_use_ids[api_name].SetId(cls, i);
           selector = "DeclUseSelector";
           lib_cpp_os
-              << "  return fragment->DeclFor(fragment, id).value();\n";
+              << "  return fragment->DeclFor(fragment, id, false).value();\n";
 
         } else if (record_name == "Stmt") {
           stmt_use_ids[api_name].SetId(cls, i);
           selector = "StmtUseSelector";
           lib_cpp_os
-              << "  return fragment->StmtFor(fragment, id).value();\n";
+              << "  return fragment->StmtFor(fragment, id, false).value();\n";
 
         } else if (record_name == "Type") {
           type_use_ids[api_name].SetId(cls, i);
           selector = "TypeUseSelector";
           lib_cpp_os
-              << "  return fragment->TypeFor(fragment, id).value();\n";
+              << "  return fragment->TypeFor(fragment, id, false).value();\n";
 
         } else if (gDeclNames.count(record_name)) {
           decl_use_ids[api_name].SetId(cls, i);
           selector = "DeclUseSelector";
           lib_cpp_os
               << "  return " << record_name
-              << "::from(fragment->DeclFor(fragment, id).value()).value();\n";
+              << "::from(fragment->DeclFor(fragment, id, false).value()).value();\n";
 
         } else if (gStmtNames.count(record_name)) {
           stmt_use_ids[api_name].SetId(cls, i);
           selector = "StmtUseSelector";
           lib_cpp_os
               << "  return " << record_name
-              << "::from(fragment->StmtFor(fragment, id).value()).value();\n";
+              << "::from(fragment->StmtFor(fragment, id, false).value()).value();\n";
 
         } else if (gTypeNames.count(record_name)) {
           type_use_ids[api_name].SetId(cls, i);
           selector = "TypeUseSelector";
           lib_cpp_os
               << "  return " << record_name
-              << "::from(fragment->TypeFor(fragment, id).value()).value();\n";
+              << "::from(fragment->TypeFor(fragment, id, false).value()).value();\n";
 
         } else {
           std::cerr << "??? record " << record_name << '\n';
@@ -2392,10 +2411,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << record_name << ", "
-            << nth_entity_reader << ", " << selector << "::"
-            << SnakeCaseToEnumCase(api_name) << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << record_name << ", " << nth_entity_reader << ", " << selector
+            << "::" << SnakeCaseToEnumCase(api_name) << ")\n";
 
         lib_cpp_os
             << "}\n\n";
@@ -2407,9 +2425,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_PSEUDO(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << record_name << ", "
-            << nth_entity_reader << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << record_name << ", " << nth_entity_reader << ")\n";
 
         include_h_os
             << "  " << record_name << " " << api_name
@@ -2453,9 +2470,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_ENUM(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << enum_name << ", "
-            << nth_entity_reader << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << enum_name << ", " << nth_entity_reader << ")\n";
 
         include_h_os
             << "  " << enum_name << " " << api_name
@@ -2496,15 +2512,13 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_BOOL(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << cxx_int_type << ", "
-            << nth_entity_reader << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << cxx_int_type << ", " << nth_entity_reader << ")\n";
       } else {
         serialize_inc_os
             << "  MX_VISIT_INT(" << class_name << ", " << api_name
-            << ", " << getter_name << ", " << setter_name << ", "
-            << init_name << ", " << method_name << ", " << cxx_int_type << ", "
-            << nth_entity_reader << ")\n";
+            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << cxx_int_type << ", " << nth_entity_reader << ")\n";
       }
 
       include_h_os
@@ -2538,8 +2552,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_inc_os
           << "  MX_VISIT_DECL_CONTEXT(" << class_name << ", " << api_name
-          << ", " << getter_name << ", " << setter_name << ", "
-          << init_name << ", AlreadyLoadedDeclarations, Decl, "
+          << ", " << i << ", MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, "
           << nth_entity_reader << ")\n";
 
       include_h_os
@@ -2625,6 +2638,12 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
+      << "#ifndef MX_APPLY_METHOD\n"
+      << "#  define MX_APPLY_METHOD(obj, meth) obj.meth()\n"
+      << "#endif\n"
+      << "#ifndef MX_APPLY_FUNC\n"
+      << "#  define MX_APPLY_FUNC(obj, meth) meth(obj)\n"
+      << "#endif\n"
       << "#ifndef MX_VISIT_BOOL\n"
       << "#  define MX_VISIT_BOOL(...)\n"
       << "#endif\n"
@@ -2991,6 +3010,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   serialize_inc_os
       << late_serialize_inc_os.str()
+      << "#undef MX_APPLY_METHOD\n"
+      << "#undef MX_APPLY_FUNC\n"
       << "#undef MX_VISIT_BOOL\n"
       << "#undef MX_VISIT_INT\n"
       << "#undef MX_VISIT_ENUM\n"

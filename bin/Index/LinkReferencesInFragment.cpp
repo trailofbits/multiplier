@@ -12,8 +12,10 @@
 #include "Context.h"
 #include "EntityMapper.h"
 #include "PendingFragment.h"
+#include "Util.h"
 
 namespace indexer {
+namespace {
 
 // NOTE(pag): Keep in sync with `../lib/API/API.cpp` version of the same
 //            function.
@@ -64,39 +66,33 @@ static bool MayHaveRemoteRedeclarations(const pasta::Decl &decl) {
     case mx::DeclKind::INDIRECT_FIELD:
       return true;
 
+    // Types.
+    case mx::DeclKind::TYPE_ALIAS:
+    // case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+    case mx::DeclKind::TYPE:
+    case mx::DeclKind::TYPEDEF:
+    case mx::DeclKind::TYPEDEF_NAME:
+      return true;
+
     default:
       return false;
   }
 }
 
+}  // namespace
+
 void PendingFragment::LinkReferences(
     IndexingContext &context, EntityMapper &em) {
   for (const pasta::Stmt &stmt : stmts_to_serialize) {
-    if (auto dre = pasta::DeclRefExpr::From(stmt)) {
-      auto used_decl = dre->Declaration();
+    if (stmt.Kind() == pasta::StmtKind::kImplicitCastExpr) {
+      continue;
+    }
+    if (auto ref_decl = ReferencedDecl(stmt)) {
+      auto used_decl = std::move(ref_decl.value());
       if (MayHaveRemoteRedeclarations(used_decl)) {
         auto used_decl_id = em.EntityId(used_decl);
         context.LinkReferenceInFragment(used_decl_id, fragment_id);
-        auto found_decl = dre->FoundDeclaration();
-        if (MayHaveRemoteRedeclarations(found_decl)) {
-          if (auto found_decl_id = em.EntityId(found_decl);
-              found_decl_id != used_decl_id) {
-            context.LinkReferenceInFragment(found_decl_id, fragment_id);
-          }
-        }
       }
-
-    } else if (auto me = pasta::MemberExpr::From(stmt)) {
-      auto used_decl = me->MemberDeclaration();
-      if (MayHaveRemoteRedeclarations(used_decl)) {
-        context.LinkReferenceInFragment(em.EntityId(used_decl), fragment_id);
-      }
-    
-    } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
-      auto used_decl = ce->Constructor();
-      if (MayHaveRemoteRedeclarations(used_decl)) {
-        context.LinkReferenceInFragment(em.EntityId(used_decl), fragment_id);
-      }  
     }
   }
 }

@@ -409,9 +409,7 @@ NameMangler::NameMangler(const pasta::AST &ast)
                                              ast.MainFile().Path())) {}
 
 const std::string &NameMangler::Mangle(const pasta::Decl &decl) {
-  auto &ret = impl->GetMangledName(decl.RawDecl());
-  LOG(ERROR) << ret;
-  return ret;
+  return impl->GetMangledName(decl.RawDecl());
 }
 
 // This is not a very good API, but basically says that the mangled name

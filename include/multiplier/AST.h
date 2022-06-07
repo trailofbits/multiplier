@@ -10308,6 +10308,7 @@ class Stmt {
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
+  std::optional<Decl> referenced_declaration(void) const;
   EntityId id(void) const;
   UseRange<StmtUseSelector> uses(void) const;
 
@@ -31181,6 +31182,7 @@ enum class DeclUseSelector : unsigned short {
   PROTOCOL,
   RECEIVER_INTERFACE,
   RECORD_DECLARATION,
+  REFERENCED_DECLARATION,
   REFERENCED_DECLARATION_OF_CALLEE,
   SELF_DECLARATION,
   SETTER_METHOD_DECLARATION,
@@ -31204,7 +31206,7 @@ inline static const char *EnumerationName(DeclUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclUseSelector) {
-  return 115;
+  return 116;
 }
 
 const char *EnumeratorName(DeclUseSelector);

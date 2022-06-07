@@ -133,7 +133,7 @@ TokenRange FragmentImpl::TokenRangeFor(
 
 // Return the declaration associated with a specific entity ID.
 std::optional<Decl> FragmentImpl::DeclFor(
-    const FragmentImpl::Ptr &self, EntityId eid) const {
+    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
   VariantId vid = eid.Unpack();
 
   if (std::holds_alternative<DeclarationId>(vid)) {
@@ -162,12 +162,18 @@ std::optional<Decl> FragmentImpl::DeclFor(
       }
     }
   }
+
+  if (!can_fail) {
+    // TODO(pag): Check version number, do back-off to wait for indexer to
+    //            finish. 
+  }
+
   return std::nullopt;
 }
 
 // Return the statement associated with a specific entity ID.
 std::optional<Stmt> FragmentImpl::StmtFor(
-    const FragmentImpl::Ptr &self, EntityId eid) const {
+    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
   VariantId vid = eid.Unpack();
 
   if (std::holds_alternative<StatementId>(vid)) {
@@ -197,13 +203,18 @@ std::optional<Stmt> FragmentImpl::StmtFor(
     }
   }
 
+  if (!can_fail) {
+    // TODO(pag): Check version number, do back-off to wait for indexer to
+    //            finish. 
+  }
+
   return std::nullopt;
 }
 
 
 // Return the type associated with a specific entity ID.
 std::optional<Type> FragmentImpl::TypeFor(
-    const FragmentImpl::Ptr &self, EntityId eid) const {
+    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
   VariantId vid = eid.Unpack();
 
   // It's a fragment token.
@@ -234,6 +245,12 @@ std::optional<Type> FragmentImpl::TypeFor(
       }
     }
   }
+
+  if (!can_fail) {
+    // TODO(pag): Check version number, do back-off to wait for indexer to
+    //            finish. 
+  }
+
   return std::nullopt;
 }
 
