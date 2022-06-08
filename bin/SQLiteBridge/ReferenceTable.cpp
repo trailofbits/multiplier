@@ -46,7 +46,7 @@ int ReferenceTable::BestIndex(sqlite3_index_info *info) {
       return SQLITE_OK;
     }
   }
-  return SQLITE_OK;
+  return SQLITE_CONSTRAINT;
 }
 
 class ReferenceCursor : public VirtualTableCursor {
