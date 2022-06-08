@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -15,7 +16,9 @@ namespace pasta {
 class AST;
 class Decl;
 class FileToken;
+class Stmt;
 class Token;
+class Type;
 }  // namespace pasta
 namespace mx {
 enum class TokenKind : unsigned short;
@@ -44,5 +47,11 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
+
+// Try to find the `Decl` referenced by a particular `type`.
+std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type);
+
+// Try to find the `Decl` referenced by a particular `stmt`.
+std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt);
 
 }  // namespace indexer

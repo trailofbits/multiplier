@@ -10308,6 +10308,7 @@ class Stmt {
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
+  std::optional<Decl> referenced_declaration(void) const;
   EntityId id(void) const;
   UseRange<StmtUseSelector> uses(void) const;
 
@@ -16629,6 +16630,7 @@ class CharacterLiteral : public Expr {
     }
   }
 
+  CharacterLiteralCharacterKind character_kind(void) const;
   Token token(void) const;
 };
 
@@ -20552,6 +20554,7 @@ class UnaryExprOrTypeTraitExpr : public Expr {
 
   std::optional<Expr> argument_expression(void) const;
   std::optional<Type> argument_type(void) const;
+  UnaryExprOrTypeTrait expression_or_trait_kind(void) const;
   Token operator_token(void) const;
   Token r_paren_token(void) const;
   Type type_of_argument(void) const;
@@ -20864,6 +20867,7 @@ class StringLiteral : public Expr {
   std::optional<bool> contains_non_ascii(void) const;
   std::optional<bool> contains_non_ascii_or_null(void) const;
   std::string_view bytes(void) const;
+  StringLiteralStringKind string_kind(void) const;
   std::optional<std::string_view> string(void) const;
   bool is_ascii(void) const;
   bool is_pascal(void) const;
@@ -31178,6 +31182,7 @@ enum class DeclUseSelector : unsigned short {
   PROTOCOL,
   RECEIVER_INTERFACE,
   RECORD_DECLARATION,
+  REFERENCED_DECLARATION,
   REFERENCED_DECLARATION_OF_CALLEE,
   SELF_DECLARATION,
   SETTER_METHOD_DECLARATION,
@@ -31201,7 +31206,7 @@ inline static const char *EnumerationName(DeclUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclUseSelector) {
-  return 115;
+  return 116;
 }
 
 const char *EnumeratorName(DeclUseSelector);

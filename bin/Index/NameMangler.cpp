@@ -14,6 +14,7 @@
 #include <clang/AST/DeclObjC.h>
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/Mangle.h>
+#include <clang/AST/ODRHash.h>
 #include <clang/AST/PrettyPrinter.h>
 
 #include <clang/Frontend/ASTUnit.h>
@@ -59,13 +60,13 @@ clang::FunctionDecl *WalkUpToFunction(const clang::Decl *decl) {
 
 // Convenience class for easily mangling named decls into `std::string`s.
 class NameManglerImpl {
- private:
-  const std::string tu;
+ public:
+  const uint64_t tu;
   std::string mangled_name;
   llvm::raw_string_ostream mangled_name_os;
   std::unique_ptr<clang::MangleContext> mangle_context;
+  bool is_precise{false};
 
- public:
   explicit NameManglerImpl(clang::ASTContext &ast_context_,
                            std::filesystem::path tu_);
 
@@ -87,7 +88,7 @@ class NameManglerImpl {
 
 NameManglerImpl::NameManglerImpl(clang::ASTContext &ast_context_,
                                  std::filesystem::path tu_)
-    : tu(tu_.generic_string()),
+    : tu(std::hash<std::string>{}(tu_.generic_string())),
       mangled_name_os(mangled_name),
       mangle_context(ast_context_.createMangleContext()) {
 
@@ -121,13 +122,19 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   // Static functions, including inline static functions in headers,
   // should be uniqued.
   if (!decl->isExternallyVisible()) {
+ 
     auto func_def = decl->getDefinition();
     if (!func_def) {
       func_def = decl;
+      is_precise = false;
+
+    // TODO(pag): Ideally want this to be the file containing the declaration.
+    } else {
+      mangled_name_os << " tu:" << tu;
     }
-    std::stringstream ss;
-    ss << std::hex << const_cast<clang::FunctionDecl *>(func_def)->getODRHash();
-    mangled_name_os << " (odr " << ss.str() << ")";
+
+    auto hash = const_cast<clang::FunctionDecl *>(func_def)->getODRHash();
+    mangled_name_os << " odr:" << hash;
     mangled_name_os.flush();
 
   // Projects with multiple `main` functions should have each of them
@@ -156,10 +163,10 @@ const std::string &NameManglerImpl::GetMangledNameRec(
     const auto name = decl->getName();
     if (name.empty()) {
       mangled_name_os
-          << " (field " << decl->getFieldIndex() << ")";
+          << " field:" << decl->getFieldIndex();
     } else {
       mangled_name_os
-          << " (field " << name << ")";
+          << " field:" << name;
     }
     mangled_name_os.flush();
   }
@@ -173,17 +180,22 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   auto func_decl = clang::dyn_cast<clang::FunctionDecl>(parent_decl);
   if (!GetMangledNameRec(func_decl).empty()) {
     switch (decl->getParameterKind()) {
-      case clang::ImplicitParamDecl::ObjCSelf:mangled_name_os << " (implicit self)";
+      case clang::ImplicitParamDecl::ObjCSelf:
+        mangled_name_os << " implicit:self";
         break;
-      case clang::ImplicitParamDecl::ObjCCmd:mangled_name_os << " (implicit _cmd)";
+      case clang::ImplicitParamDecl::ObjCCmd:
+        mangled_name_os << " implicit:_cmd";
         break;
-      case clang::ImplicitParamDecl::CXXThis:mangled_name_os << " (implicit this)";
+      case clang::ImplicitParamDecl::CXXThis:
+        mangled_name_os << " implicit:this";
         break;
-      case clang::ImplicitParamDecl::CXXVTT:mangled_name_os << " (implicit vtt)";
+      case clang::ImplicitParamDecl::CXXVTT:
+        mangled_name_os << " implicit:vtt";
         break;
 
       case clang::ImplicitParamDecl::CapturedContext:
-      case clang::ImplicitParamDecl::Other:mangled_name_os << " (implicit ?)";
+      case clang::ImplicitParamDecl::Other:
+        mangled_name_os << " implicit:other";
         break;
     }
     mangled_name_os.flush();
@@ -197,7 +209,7 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   auto func_decl = clang::dyn_cast<clang::FunctionDecl>(parent_decl);
   if (!GetMangledNameRec(func_decl).empty()) {
     mangled_name_os
-        << " (param " << decl->getFunctionScopeIndex() << ")";
+        << " param:" << decl->getFunctionScopeIndex();
     mangled_name_os.flush();
   }
   return mangled_name;
@@ -218,7 +230,7 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   } else {
     if (auto func_decl = WalkUpToFunction(decl)) {
       if (!GetMangledNameRec(func_decl).empty()) {
-        mangled_name_os << " (var " << decl->getName() << ")";
+        mangled_name_os << " var:" << decl->getName();
         mangled_name_os.flush();
       }
 
@@ -307,7 +319,10 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
 // XREF(pag): `getMangledNameImpl` in `clang/lib/CodeGen/CodeGenModule.cpp`.
 const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
   mangled_name.clear();
+  is_precise = true;
+
   if (!decl) {
+    is_precise = false;
     return mangled_name;
 
   // Mangle functions with an `__attribute__((alias("...")))` to use the
@@ -338,7 +353,7 @@ const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
 
     if (!GetMangledNameRec(var_decl).empty() &&
         !var_decl->isExternallyVisible()) {
-      mangled_name_os << " (" << tu << ")";
+      mangled_name_os << " tu:" << tu;
       mangled_name_os.flush();
     }
 
@@ -375,12 +390,14 @@ const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
   } else if (clang::isa<clang::TypedefNameDecl>(decl) ||
              clang::isa<clang::UsingDirectiveDecl>(decl) ||
              clang::isa<clang::UsingPackDecl>(decl)) {
+    is_precise = false;
     return mangled_name;  // No mangled name.
 
   } else if (auto named_decl = clang::dyn_cast<clang::NamedDecl>(decl)) {
     return GetMangledNameImpl(named_decl);
 
   } else {
+    is_precise = false;
     return mangled_name;  // No mangled name.
   }
 }
@@ -393,6 +410,12 @@ NameMangler::NameMangler(const pasta::AST &ast)
 
 const std::string &NameMangler::Mangle(const pasta::Decl &decl) {
   return impl->GetMangledName(decl.RawDecl());
+}
+
+// This is not a very good API, but basically says that the mangled name
+// can probably be trusted.
+bool NameMangler::MangledNameIsPrecise(void) const {
+  return impl->is_precise;
 }
 
 }  // namespace indexer

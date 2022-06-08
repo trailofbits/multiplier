@@ -34,7 +34,8 @@ class TokenReader {
   // is the file token associated with the file token, if any.
   virtual EntityId NthFileTokenId(unsigned token_index) const = 0;
 
-  // Return the token reader for another file.
+  // Return the token reader for another file. Returns a null reader on
+  // failure.
   virtual Ptr ReaderForFile(const Ptr &self, mx::FileId id) const = 0;
 
   // Returns `true` if `this` is logically equivalent to `that`.

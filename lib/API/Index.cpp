@@ -13,6 +13,14 @@ namespace mx {
 
 Index::~Index(void) {}
 
+Index Index::containing(const Fragment &fragment) {
+  return Index(fragment.impl->ep);
+}
+
+Index Index::containing(const File &file) {
+  return Index(file.impl->ep);
+}
+
 // Clear any internal caches.
 void Index::clear_caches(void) const {
   impl->ClearCache();

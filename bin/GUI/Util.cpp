@@ -497,6 +497,9 @@ static std::optional<Decl> VisitType(const Type &type, const Token &token) {
       return tag_decl;
     }
 
+  } else if (auto deduced_type = DeducedType::from(type)) {
+    return VisitType(deduced_type.value(), token);
+
   } else if (auto unqual_type = type.unqualified_type();
              unqual_type.id() != type.id()) {
     return VisitType(unqual_type, token);
@@ -514,16 +517,16 @@ std::optional<Decl> DeclForToken(const Token &token) {
 
     if (auto stmt = context->as_statement()) {
       if (auto decl = VisitStmt(stmt.value(), token)) {
-        return decl;
+        return CanonicalDecl(decl.value());
       }
     } else if (auto type = context->as_type()) {
       if (auto decl = VisitType(type.value(), token)) {
-        return decl;
+        return CanonicalDecl(decl.value());
       }
     } else if (auto decl = context->as_declaration()) {
       if (auto named_decl = NamedDecl::from(decl);
           named_decl && named_decl->name() == token.data()) {
-        return decl;
+        return CanonicalDecl(decl.value());
       }
     }
   }
@@ -531,7 +534,10 @@ std::optional<Decl> DeclForToken(const Token &token) {
 #ifndef NDEBUG
   if (ClassifyToken(token) == TokenClass::kIdentifier) {
     if (std::optional<Fragment> frag = Fragment::containing(token)) {
-      std::cerr << "Missing decl for '" << token.data() << "':\n";
+      std::cerr << "Missing decl for '" << token.data() << "': " << token.id() << ":\n";
+      if (auto file = File::containing(token)) {
+        std::cerr << "\tFile ID: " << file->id() << '\n';
+      }
       std::cerr << "\tContext:";
       for (auto context = TokenContext::of(token); context;
            context = context->parent()) {
@@ -568,6 +574,104 @@ std::optional<Decl> DeclForToken(const Token &token) {
 #endif
 
   return std::nullopt;
+}
+
+// Returns a pair of `(fragment_id, offset)` or `(kInvalidEntityId, 0)` for a
+// given raw entity id.
+EntityBaseOffsetPair GetFragmentOffset(RawEntityId id) {
+  VariantId vid = EntityId(id).Unpack();
+  if (std::holds_alternative<DeclarationId>(vid)) {
+    auto eid = std::get<DeclarationId>(vid);
+    return {eid.fragment_id, eid.offset};
+
+  } else if (std::holds_alternative<StatementId>(vid)) {
+    auto eid = std::get<StatementId>(vid);
+    return {eid.fragment_id, eid.offset};
+
+  } else if (std::holds_alternative<TypeId>(vid)) {
+    auto eid = std::get<TypeId>(vid);
+    return {eid.fragment_id, eid.offset};
+
+  } else if (std::holds_alternative<FragmentTokenId>(vid)) {
+    auto eid = std::get<FragmentTokenId>(vid);
+    return {eid.fragment_id, eid.offset};
+
+  } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
+    auto eid = std::get<TokenSubstitutionId>(vid);
+    return {eid.fragment_id, eid.offset};
+
+  } else {
+    return {kInvalidEntityId, 0u};
+  }
+}
+
+// Returns a pair of `(file_id, offset)` or `(kInvalidEntityId, 0)` for a
+// given raw entity id.
+EntityBaseOffsetPair GetFileOffset(RawEntityId id) {
+  VariantId vid = EntityId(id).Unpack();
+  if (std::holds_alternative<FileTokenId>(vid)) {
+    auto eid = std::get<FileTokenId>(vid);
+    return {eid.file_id, eid.offset};
+
+  } else {
+    return {kInvalidEntityId, 0u};
+  }
+}
+
+// Return the "canonical" version of a declaration. This tries to get us the
+// definition when possible.
+Decl CanonicalDecl(const Decl &decl) {
+  for (const Decl &redecl : decl.redeclarations()) {
+    return redecl;
+  }
+  return decl;
+}
+
+// Return the "canonical" ID of a declaration. This tries to get us the
+// definition when possible.
+RawEntityId CanonicalId(const Decl &decl) {
+  return CanonicalDecl(decl).id();
+}
+
+// Return some kind of name for a declaration.
+QString DeclName(const Decl &decl) {
+  if (auto nd = NamedDecl::from(decl)) {
+    if (auto name_data = nd->name(); !name_data.empty()) {
+      return QString::fromUtf8(name_data.data(),
+                               static_cast<int>(name_data.size()));
+    }
+  }
+  return QString("%1(%2)").arg(EnumeratorName(decl.category())).arg(decl.id());
+}
+
+// Return the entity ID of the nearest file token associated with this
+// declaration.
+RawEntityId DeclFileLocation(const Decl &decl) {
+
+  // Structs and enums and such can often be defined inside of a typedef so we
+  // want to go to the beginning of them.
+  if (TypeDecl::from(decl)) {
+    goto skip_name_match;
+  }
+
+  if (auto nd = NamedDecl::from(decl)) {
+    if (auto tok = nd->token()) {
+      if (tok.data() == nd->name()) {
+        if (auto file_tok = tok.nearest_file_token()) {
+          return file_tok->id();
+        }
+      }
+    }
+  }
+
+skip_name_match:
+  for (const Token &token : decl.tokens()) {
+    if (auto file_tok = token.nearest_file_token()) {
+      return file_tok->id();
+    }
+  }
+
+  return Fragment::containing(decl).file_tokens().begin()->id();
 }
 
 }  // namespace mx::gui

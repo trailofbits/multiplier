@@ -6,6 +6,7 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <map>
 #include <unordered_set>
 
 #include "Index.h"

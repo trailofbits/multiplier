@@ -14,7 +14,8 @@ PackedFileImpl::PackedFileImpl(
     FileId id_, EntityProvider::Ptr ep_, Response response)
     : FileImpl(id_, std::move(ep_)),
       package(response.getFile()),
-      reader(package.Reader<rpc::File>()) {}
+      reader(package.Reader<rpc::File>()),
+      num_tokens(reader.getTokenKinds().size()) {}
 
 // Return the data of the file.
 std::string_view PackedFileImpl::Data(void) const {
@@ -30,29 +31,41 @@ TokenReader::Ptr PackedFileImpl::TokenReader(
 
 // Return the number of tokens in the file.
 unsigned PackedFileImpl::NumTokens(void) const {
-  return reader.getTokenKinds().size();
+  return num_tokens;
 }
 
 // Return the kind of the Nth token.
-TokenKind PackedFileImpl::NthTokenKind(unsigned index) const {
-  return static_cast<TokenKind>(reader.getTokenKinds()[index]);
+TokenKind PackedFileImpl::NthTokenKind(unsigned token_index) const {
+  if (token_index < num_tokens) {
+    return static_cast<TokenKind>(reader.getTokenKinds()[token_index]);
+  } else {
+    return TokenKind::UNKNOWN;
+  }
 }
 
 // Return the data of the Nth token.
-std::string_view PackedFileImpl::NthTokenData(unsigned index) const {
-  auto tor = reader.getTokenOffsets();
-  auto bo = tor[index];
-  auto eo = tor[index + 1u];
-  return std::string_view(&(reader.getData().cStr()[bo]), eo - bo);
+std::string_view PackedFileImpl::NthTokenData(unsigned token_index) const {
+  if (token_index < num_tokens) {
+    auto tor = reader.getTokenOffsets();
+    auto bo = tor[token_index];
+    auto eo = tor[token_index + 1u];
+    return std::string_view(&(reader.getData().cStr()[bo]), eo - bo);
+  } else {
+    return {};
+  }
 }
 
 // Return the id of the Nth token.
-EntityId PackedFileImpl::NthTokenId(unsigned index) const {
-  FileTokenId id;
-  id.file_id = this->file_id;
-  id.kind = NthTokenKind(index);
-  id.offset = index;
-  return id;
+EntityId PackedFileImpl::NthTokenId(unsigned token_index) const {
+  if (token_index < num_tokens) {
+    FileTokenId id;
+    id.file_id = this->file_id;
+    id.kind = static_cast<TokenKind>(reader.getTokenKinds()[token_index]);
+    id.offset = token_index;
+    return id;
+  } else {
+    return kInvalidEntityId;
+  }
 }
 
 EntityId PackedFileImpl::NthFileTokenId(unsigned token_index) const {
@@ -64,9 +77,10 @@ TokenReader::Ptr PackedFileImpl::ReaderForFile(const TokenReader::Ptr &self,
                                                mx::FileId fid) const {
   if (fid == file_id) {
     return self;
-  } else {
-    FileImpl::Ptr ptr = ep->FileFor(ep, fid);
+  } else if (FileImpl::Ptr ptr = ep->FileFor(ep, fid)) {
     return ptr->TokenReader(ptr);
+  } else {
+    return {};
   }
 }
 

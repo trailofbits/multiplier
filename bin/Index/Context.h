@@ -40,7 +40,6 @@ enum : char {
   kFileIdToFragmentId,
   kFileIdAndLineNumberToFragmentId,
   kFileHashToFileId,
-  kFilePathToFileId,
   kFragmentHashToFragmentId,
   kFragmentIdToSerializedFragment,
   kFragmentIdToVersionNumber,
@@ -153,11 +152,6 @@ class ServerContext {
   // Maps a hash of a file's contents to an ID for that file.
   mx::PersistentMap<kFileHashToFileId, std::string, mx::FileId>
       file_hash_to_file_id;
-
-  // Maps an absolute path to a file's ID. Multiple files may map to the same
-  // ID if their contents are identical.
-  mx::PersistentMap<kFilePathToFileId, std::string, mx::FileId>
-      file_path_to_file_id;
 
   // Maps an aggregate key of the form
   //

@@ -22,15 +22,15 @@ function(define_example exe_name source_file)
   add_executable("${exe_name}"
     "${source_file}"
   )
-  
+
   target_link_libraries("${exe_name}"
     PRIVATE
       "mx-example-index"
   )
-  
+
   add_executable("${PROJECT_NAME}::${exe_name}" ALIAS "${exe_name}")
   set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
-  
+
   if(MX_ENABLE_INSTALL)
     install(
       TARGETS
@@ -52,6 +52,7 @@ define_example("mx-print-call-graph" "PrintCallGraph.cpp")
 define_example("mx-list-fragments" "ListFragments.cpp")
 define_example("mx-print-fragment" "PrintFragment.cpp")
 define_example("mx-list-functions" "ListFunctions.cpp")
+define_example("mx-list-variables" "ListVariables.cpp")
 define_example("mx-list-redeclarations" "ListRedeclarations.cpp")
 define_example("mx-list-structures" "ListStructures.cpp")
 define_example("mx-list-uses" "ListUses.cpp")
@@ -61,6 +62,7 @@ define_example("mx-find-switch-cases" "FindSwitchCases.cpp")
 define_example("mx-print-sourceir" "PrintSourceIR.cpp")
 define_example("mx-weggli-query" "WeggliQuery.cpp")
 define_example("mx-regex-query" "RegexQuery.cpp")
+define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
 
 target_link_libraries("mx-dump-json"
   PRIVATE

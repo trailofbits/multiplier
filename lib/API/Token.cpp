@@ -255,4 +255,106 @@ std::string_view TokenRange::data(void) const {
   return std::string_view(data_begin.data(), size);
 }
 
+// Convert this token range into a file token range.
+TokenRange TokenRange::file_tokens(void) const noexcept {
+  TokenRange ret;
+  if (!impl || impl.get() == kInvalidTokenReader.get() || !num_tokens) {
+    return ret;
+  }
+
+  // It's already a file token range.
+  if (dynamic_cast<const PackedFileImpl *>(impl.get())) {
+    return *this;
+  }
+
+  FileId file_id = kInvalidEntityId;
+
+  // Find the nearest file token for the first token.
+  for (auto i = 0u; i <= index; ++i) {
+    VariantId vid = EntityId(impl->NthFileTokenId(index - i)).Unpack();
+    if (std::holds_alternative<FileTokenId>(vid)) {
+      FileTokenId fid = std::get<FileTokenId>(vid);
+      if (auto fr = impl->ReaderForFile(impl, fid.file_id)) {
+        ret.impl = std::move(fr);
+        ret.index = fid.offset;
+        file_id = fid.file_id;
+        break;
+      }
+    }
+  }
+
+  if (file_id == kInvalidEntityId) {
+    return ret;
+  }
+
+  // Hope for an exact match with the last token in the range.
+  if (auto last_fid = impl->NthFileTokenId(num_tokens - 1u);
+      last_fid != kInvalidEntityId) {
+    VariantId vid = EntityId(last_fid).Unpack();
+    if (std::holds_alternative<FileTokenId>(vid)) {
+      FileTokenId fid = std::get<FileTokenId>(vid);
+      if (fid.file_id == file_id) {
+        ret.num_tokens = fid.offset + 1u;
+        return ret;
+      }
+    }
+  }
+
+  // Try to find the file token for one-past-the-end of this token range, then
+  // we'll take the file token from before that. Failing that, we'll need to
+  // match up on the exact token, then mark the num tokens as that token's
+  // offset plus one.
+  auto offset_shift = 0u;
+  for (auto i = 0u; i <= num_tokens; ++i) {
+    VariantId vid = EntityId(impl->NthFileTokenId(num_tokens - i)).Unpack();
+    if (std::holds_alternative<FileTokenId>(vid)) {
+      FileTokenId fid = std::get<FileTokenId>(vid);
+      if (fid.file_id == file_id) {
+        ret.num_tokens = fid.offset + offset_shift;
+        return ret;
+      }
+    }
+    offset_shift = 1u;
+  }
+
+  // Worst case, the range of the only token :-/
+  ret.num_tokens = ret.index + 1u;
+  return ret;
+}
+
+// Strip leading and trailing whitespace.
+TokenRange TokenRange::strip_whitespace(void) const noexcept {
+  TokenRange ret(*this);
+  for (; ret.index < ret.num_tokens; ++ret.index) {
+    const TokenKind kind = impl->NthTokenKind(ret.index);
+    if (kind == TokenKind::WHITESPACE) {
+      continue;
+    } else if (kind == TokenKind::UNKNOWN &&
+               impl->NthTokenData(ret.index).empty()) {
+      continue;
+    } else {
+      break;
+    }
+  }
+
+  for (; ret.num_tokens > ret.index; --ret.num_tokens) {
+    const TokenKind kind = impl->NthTokenKind(ret.num_tokens - 1u);
+    if (kind == TokenKind::WHITESPACE) {
+      continue;
+    } else if (kind == TokenKind::UNKNOWN &&
+               impl->NthTokenData(ret.num_tokens - 1u).empty()) {
+      continue;
+    } else {
+      break;
+    }
+  }
+
+  if (ret.num_tokens <= ret.index) {
+    ret.num_tokens = 0;
+    ret.index = 0;
+  }
+
+  return ret;
+}
+
 }  // namespace mx

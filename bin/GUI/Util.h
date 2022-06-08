@@ -6,7 +6,10 @@
 
 #pragma once
 
+#include <multiplier/Types.h>
 #include <optional>
+#include <QString>
+#include <utility>
 
 namespace mx {
 class Decl;
@@ -35,6 +38,31 @@ TokenClass ClassifyToken(const Token &token);
 
 // Try to determine the declarations associated with this token.
 std::optional<Decl> DeclForToken(const Token &token);
+
+using EntityBaseOffsetPair = std::pair<RawEntityId, uint32_t>;
+
+// Returns a pair of `(fragment_id, offset)` or `(kInvalidEntityId, 0)` for a
+// given raw entity id.
+EntityBaseOffsetPair GetFragmentOffset(RawEntityId id);
+
+// Returns a pair of `(file_id, offset)` or `(kInvalidEntityId, 0)` for a
+// given raw entity id.
+EntityBaseOffsetPair GetFileOffset(RawEntityId id);
+
+// Return the "canonical" ID of a declaration. This tries to get us the
+// definition when possible.
+RawEntityId CanonicalId(const Decl &decl);
+
+// Return the "canonical" version of a declaration. This tries to get us the
+// definition when possible.
+Decl CanonicalDecl(const Decl &decl);
+
+// Return some kind of name for a declaration.
+QString DeclName(const Decl &decl);
+
+// Return the entity ID of the nearest file token associated with this
+// declaration.
+RawEntityId DeclFileLocation(const Decl &decl);
 
 }  // namespace gui
 }  // namespace mx

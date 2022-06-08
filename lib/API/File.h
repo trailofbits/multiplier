@@ -70,6 +70,7 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
 
   PackedReaderState package;
   const rpc::File::Reader reader;
+  const unsigned num_tokens;
 
   virtual ~PackedFileImpl(void) noexcept;
 

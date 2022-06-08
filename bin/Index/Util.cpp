@@ -19,7 +19,9 @@
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Printer.h>
+#include <pasta/AST/Stmt.h>
 #include <pasta/AST/Token.h>
+#include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
 #include <sstream>
 
@@ -313,6 +315,85 @@ bool IsDefinition(const pasta::Decl &decl_) {
   } else {
     return false;
   }
+}
+
+// Try to find the `Decl` referenced by a particular `type`.
+std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type_) {
+  auto type = type_;
+  for (const void *prev_raw = nullptr; prev_raw != type.RawType();
+       prev_raw = type.RawType()) {
+    type = type.IgnoreParentheses().LocalUnqualifiedType();
+    if (auto nt = type.PointeeOrArrayElementType()) {
+      type = std::move(nt.value());
+    }
+  }
+
+  if (auto tdt = pasta::TypedefType::From(type)) {
+    return tdt->Declaration();
+
+  } else if (auto ttt = pasta::TagType::From(type)) {
+    return ttt->Declaration();
+
+  } else if (auto tut = pasta::UsingType::From(type)) {
+    if (auto ret = ReferencedDecl(tut->UnderlyingType())) {
+      return ret;
+    } else {
+      return tut->FoundDeclaration();
+    }
+  
+  } else if (auto dtt = pasta::DecltypeType::From(type)) {
+    return ReferencedDecl(dtt->UnderlyingType());  
+  
+  } else if (auto ddt = pasta::DeducedType::From(type)) {
+    if (auto rt = ddt->ResolvedType()) {
+      return ReferencedDecl(std::move(rt.value()));
+    }
+  }
+
+  return std::nullopt;
+}
+
+// Try to identify the declaration referenced by a statement.
+std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
+  // E.g. `a` or `a()` where `a` is a `Decl`.
+  if (auto dre = pasta::DeclRefExpr::From(stmt)) {
+    return dre->Declaration();
+
+  // `foo->bar`, mark `bar` as being referenced. `foo` will be handled as
+  // a `DeclRefExpr`.
+  } else if (auto me = pasta::MemberExpr::From(stmt)) {
+    return me->MemberDeclaration();
+  
+  // If we have `a = X()` for class name `X`, then mark the constructor as
+  // used in this fragment.
+  } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
+    return ce->Constructor();
+  
+  // If we have `new T`, then mark `T` as being referenced in this fragment.
+  } else if (auto cxx_new = pasta::CXXNewExpr::From(stmt)) {
+    if (auto used_decl = ReferencedDecl(cxx_new->AllocatedType())) {
+      return used_decl.value();
+    }
+  
+  // If we have `(T *) b` then mark `T` as being referenced in this fragment.
+  } else if (auto cast = pasta::CastExpr::From(stmt)) {
+    if (auto casted_type = cast->Type()) {
+      if (auto used_decl = ReferencedDecl(casted_type.value())) {
+        return used_decl.value();
+      }   
+    }
+  
+  // If we have `sizeof(T)` or `alignof(T)` or something like these then
+  // mark `T` as being referenced in this fragment.
+  } else if (auto unary = pasta::UnaryExprOrTypeTraitExpr::From(stmt)) {
+    if (auto arg_type = unary->ArgumentType()) {
+      if (auto used_decl = ReferencedDecl(arg_type.value())) {
+        return used_decl.value();
+      }
+    }
+  }
+
+  return std::nullopt;
 }
 
 }  // namespace indexer

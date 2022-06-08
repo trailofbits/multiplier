@@ -17,17 +17,17 @@
 namespace indexer {
 namespace {
 
-#define MX_VISIT_ENUM(cls, api_name, get, set, init, \
+#define MX_VISIT_ENUM(cls, api_name, storage, apply, \
                       pasta_name, type, nth_list) \
     template <typename Reader> \
     inline static pasta::type Get_ ## cls ## _ ## pasta_name(const Reader &reader) { \
-      return static_cast<pasta::type>(reader.get()); \
+      return static_cast<pasta::type>(reader.getVal ## storage()); \
     }
 
-#define MX_VISIT_PSEUDO_KIND(cls, get, set) \
+#define MX_VISIT_PSEUDO_KIND(cls, storage) \
     inline static pasta::PseudoKind Get_PseudoKind( \
         const mx::ast::Pseudo::Reader &reader, pasta::cls *) { \
-      return static_cast<pasta::PseudoKind>(reader.get()); \
+      return static_cast<pasta::PseudoKind>(reader.getVal ## storage()); \
     }
 
 #define MX_BEGIN_VISIT_DECL(name) \
@@ -80,15 +80,15 @@ namespace {
 #define MX_VISIT_BASE(name, base_name) \
     FindReferences_ ## base_name (entity_ids, reader);
 
-#define MX_VISIT_ENTITY(cls, api_name, get, set, init, \
+#define MX_VISIT_ENTITY(cls, api_name, storage, apply, \
                         pasta_name, type, nth_list, selector) \
     if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) { \
-      entity_ids.insert(reader.get()); \
+      entity_ids.insert(reader.getVal ## storage()); \
     }
 
 #define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_ENTITY
 
-//#define MX_VISIT_ENTITY_LIST(cls, api_name, get, set, init, \
+//#define MX_VISIT_ENTITY_LIST(cls, api_name, storage, apply, \
 //                             pasta_name, type, nth_list) \
 //    if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) { \
 //      for (auto eid : reader.get()) { \

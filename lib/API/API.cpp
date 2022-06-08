@@ -124,6 +124,14 @@ bool MayHaveRemoteUses(const mx::Decl &decl) {
     case mx::DeclKind::INDIRECT_FIELD:
       return true;
 
+    // Types.
+    case mx::DeclKind::TYPE_ALIAS:
+    // case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
+    case mx::DeclKind::TYPE:
+    case mx::DeclKind::TYPEDEF:
+    case mx::DeclKind::TYPEDEF_NAME:
+      return true;
+
     default:
       return false;
   }

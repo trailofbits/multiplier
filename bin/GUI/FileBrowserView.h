@@ -7,22 +7,60 @@
 #pragma once
 
 #include <QRunnable>
-#include <QTreeWidgetItem>
 #include <QWidget>
 
 #include <memory>
 #include <multiplier/Index.h>
 
-namespace mx::gui {
+QT_BEGIN_NAMESPACE
+class QTreeWidgetItem;
+QT_END_NAMESPACE
 
-class MainWindow;
+namespace mx {
 
+class Index;
+
+namespace gui {
+
+class Multiplier;
+struct FileBrowserConfiguration;
+
+// Shows a tree of files that were indexed. The tree is slightly compressed
+// by accumulating together directories that don't contain any indexed source
+// files.
+class FileBrowserView final : public QWidget {
+  Q_OBJECT
+
+  struct PrivateData;
+  std::unique_ptr<PrivateData> d;
+
+  void InitializeWidgets(void);
+
+ public:
+  FileBrowserView(FileBrowserConfiguration &config_, QWidget *parent=nullptr);
+  virtual ~FileBrowserView(void);
+
+  void Clear(void);
+
+ public slots:
+  void OnDownloadedFileList(FilePathList files);
+
+ private slots:
+  void OnTreeWidgetItemActivated(QTreeWidgetItem *item, int);
+  void OnFilterFileView(const QString &filter);
+
+ signals:
+  void SourceFileDoubleClicked(std::filesystem::path, FileId file_id);
+  void Connected(void);
+};
+
+// Downloads the file list in the background.
 class DownloadFileListThread final : public QObject, public QRunnable {
   Q_OBJECT
 
  private:
   const Index index;
-  void run(void);
+  void run(void) Q_DECL_FINAL;
 
  public:
   inline explicit DownloadFileListThread(Index index_)
@@ -32,30 +70,5 @@ class DownloadFileListThread final : public QObject, public QRunnable {
   void DownloadedFileList(FilePathList list);
 };
 
-class FileBrowserView final : public QWidget {
-  Q_OBJECT
-
- public:
-  FileBrowserView(MainWindow *mw, QWidget *parent=nullptr);
-  virtual ~FileBrowserView(void);
-
-  void DownloadFileListInBackground(Index index);
-  void Clear(void);
-
- private:
-  struct PrivateData;
-  std::unique_ptr<PrivateData> d;
-
-  void InitializeWidgets(void);
-
- private slots:
-  void OnDownloadedFileList(FilePathList files);
-  void OnTreeWidgetItemActivated(QTreeWidgetItem *item, int);
-  void OnFilterFileView(const QString &filter);
-
- signals:
-  void SourceFileDoubleClicked(std::filesystem::path, mx::FileId file_id);
-  void Connected(void);
-};
-
-}  // namespace mx::gui
+}  // namespace gui
+}  // namespace mx

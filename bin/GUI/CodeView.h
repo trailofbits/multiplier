@@ -7,69 +7,27 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Index.h>
-#include <QBrush>
-#include <QPaintEvent>
+#include <multiplier/Types.h>
+#include <optional>
 #include <QPlainTextEdit>
 #include <QRunnable>
 #include <vector>
 
-#include "CodeTheme.h"
+#include "Event.h"
 
-namespace mx::gui {
+QT_BEGIN_NAMESPACE
+class QMouseEvent;
+class QPaintEvent;
+QT_END_NAMESPACE
+namespace mx {
+class File;
+class Fragment;
+class Index;
+class Token;
+class TokenRange;
+namespace gui {
 
-// Structured code, ready for rendering.
-struct Code {
-  QString data;
-  std::vector<int> start_of_token;
-  std::vector<bool> italic;
-  std::vector<bool> bold;
-  std::vector<bool> underline;
-  std::vector<const QBrush *> foreground;
-  std::vector<unsigned> fragment_token_ids_begin;
-  std::vector<unsigned> declaration_ids_begin;
-
-  std::vector<RawEntityId> fragment_token_ids;
-  std::vector<RawEntityId> declaration_ids;
-};
-
-using CodePtr = Code *;
-
-// Thread that goes and downloads and structures the relevant code in the
-// background.
-class DownloadCodeThread final : public QObject, public QRunnable {
-  Q_OBJECT
-
- private:
-  struct PrivateData;
-  std::unique_ptr<PrivateData> d;
-
-  void run(void) final;
-
-  DownloadCodeThread(PrivateData *d_);
-
- public:
-  virtual ~DownloadCodeThread(void);
-
-  static DownloadCodeThread *CreateFileDownloader(
-      Index index_, const CodeTheme &theme_, FileId file_id_);
-
-  static DownloadCodeThread *CreateFragmentDownloader(
-      Index index_, const CodeTheme &theme_, FragmentId frag_id_);
-
-  static DownloadCodeThread *CreateTokenRangeDownloader(
-      Index index_, const CodeTheme &theme_, RawEntityId begin_tok_id,
-      RawEntityId end_tok_id);
-
- signals:
-  void DownloadFailed(void);
-  void RenderCode(CodePtr code);
-};
-
-enum class CodeViewKind {
-  kInLine,
-  kMultiLine
-};
+class CodeTheme;
 
 // A view for code. Code views have baked-in themes once initialized. Themes
 // have access to rich data only available during render-time, such as whether
@@ -82,40 +40,76 @@ class CodeView final : public QPlainTextEdit {
 
  public:
   virtual ~CodeView(void);
-  CodeView(CodeViewKind kind_,
-           const CodeTheme &theme_=CodeTheme::DefaultTheme(),
-           QWidget *parent = nullptr);
+  CodeView(const CodeTheme &theme_, QWidget *parent = nullptr);
 
-//  // Should line numbers be shown?
-//  void SetLineNumbersEnabled(bool);
-//
-//  // Should we render this as a mutli-line code view, or a single-line code
-//  // view? Turning multi-line off disables line numbers.
-//  void SetMultiLine(bool);
+  void ScrollToToken(const TokenRange &tok);
+  void ScrollToToken(const Token &tok);
+  void ScrollToToken(RawEntityId file_tok_id);
 
   // Change the underlying data of this view.
-  void SetFile(Index index, FileId file_id);
-  void SetFragment(Index index, FragmentId fragment_id);
-  void SetTokenRange(Index index, RawEntityId begin_tok_id,
+  void SetFile(const File &file);
+  void SetFile(const Index &index, FileId file_id);
+  void SetFragment(const Fragment &fragment);
+  void SetFragment(const Index &index, FragmentId fragment_id);
+  void SetTokenRange(const Index &index, RawEntityId begin_tok_id,
                      RawEntityId end_tok_id);
 
+  void Clear(void);
+
  protected:
-  void paintEvent(QPaintEvent *event) final;
-  void mousePressEvent(QMouseEvent *event) final;
+  void scrollContentsBy(int dx, int dy) Q_DECL_FINAL;
+  void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
+  void mouseMoveEvent(QMouseEvent *event) Q_DECL_FINAL;
+  void mousePressEvent(QMouseEvent *event) Q_DECL_FINAL;
+  void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_FINAL;
 
  private:
   void InitializeWidgets(void);
+  std::optional<std::pair<unsigned, int>>
+  TokenIndexForPosition(const QPoint &pos) const;
+  std::vector<RawEntityId> DeclsForToken(unsigned index) const;
 
  private slots:
   void OnDownloadFailed(void);
-  void OnRenderCode(CodePtr code);
-
-//  void OnBlockCountChanged(int new_block_count);
-//  void OnHighlightCurrentLine(void);
-//  void updateLineNumberArea(const QRect &rect, int dy);
+  void OnHighlightLine(void);
+  void OnRenderCode(void *code, uint64_t counter);
 
  signals:
-  void DeclarationsClicked(std::vector<RawEntityId> ids);
+  MX_DECLARE_DECLARATION_SIGNALS
 };
 
-}  // namespace mx::gui
+// Thread that goes and downloads and structures the relevant code in the
+// background.
+class DownloadCodeThread final : public QObject, public QRunnable {
+  Q_OBJECT
+
+ private:
+  struct PrivateData;
+  std::unique_ptr<PrivateData> d;
+
+  void run(void) Q_DECL_FINAL;
+
+  DownloadCodeThread(PrivateData *d_);
+
+ public:
+  virtual ~DownloadCodeThread(void);
+
+  static DownloadCodeThread *CreateFileDownloader(
+      const Index &index_, const CodeTheme &theme_, uint64_t counter,
+      FileId file_id_);
+
+  static DownloadCodeThread *CreateFragmentDownloader(
+      const Index &index_, const CodeTheme &theme_, uint64_t counter,
+      FragmentId frag_id_);
+
+  static DownloadCodeThread *CreateTokenRangeDownloader(
+      const Index &index_, const CodeTheme &theme_, uint64_t counter,
+      RawEntityId begin_tok_id, RawEntityId end_tok_id);
+
+ signals:
+  void DownloadFailed(void);
+  void RenderCode(void *code, uint64_t counter);
+};
+
+}  // namespace gui
+}  // namespace mx

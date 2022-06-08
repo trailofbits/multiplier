@@ -31,6 +31,10 @@ class NameMangler {
   //
   // NOTE(pag): The same string reference is returned upon each call.
   const std::string &Mangle(const pasta::Decl &decl);
+
+  // This is not a very good API, but basically says that the mangled name
+  // can probably be trusted.
+  bool MangledNameIsPrecise(void) const;
 };
 
 }  // namespace indexer

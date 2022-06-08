@@ -13,17 +13,17 @@
 namespace mx {
 namespace {
 
-#define MX_VISIT_ENUM(cls, api_name, get_val, set_val, init_val, \
+#define MX_VISIT_ENUM(cls, api_name, storage, apply, \
                       pasta_name, type, nth_list) \
     template <typename Reader> \
     inline static type Get_ ## cls ## _ ## pasta_name(const Reader &reader) { \
-      return static_cast<type>(reader.get_val()); \
+      return static_cast<type>(reader.getVal ## storage()); \
     }
 
-#define MX_VISIT_PSEUDO_KIND(cls, get_val, set_val) \
+#define MX_VISIT_PSEUDO_KIND(cls, storage) \
     inline static PseudoKind Get_PseudoKind( \
         const mx::ast::Pseudo::Reader &reader, cls *) { \
-      return static_cast<PseudoKind>(reader.get_val()); \
+      return static_cast<PseudoKind>(reader.getVal ## storage()); \
     }
 
 #define DECLARE_FIND_READER_USES(reader_kind, name) \
@@ -46,9 +46,9 @@ namespace {
 #define MX_VISIT_BASE(name, base_name) \
     FindUses_ ## base_name(eid, selectors, reader, found);
 
-#define MX_VISIT_ENTITY(cls, api_name, get_val, set_val, init_val, \
+#define MX_VISIT_ENTITY(cls, api_name, storage, apply, \
                         pasta_name, type, nth_list, selector) \
-    if (eid == reader.get_val()) { \
+    if (eid == reader.getVal ## storage()) { \
       found = true; \
       selectors.set(static_cast<unsigned>(selector)); \
     }
@@ -455,55 +455,32 @@ void ReferenceIterator::Advance(void) {
 
     Stmt stmt(std::move(user.fragment), user.offset);
     switch (stmt.kind()) {
-      case StmtKind::DECL_REF_EXPR: {
-        const DeclRefExpr &expr = reinterpret_cast<const DeclRefExpr &>(stmt);
-        RawEntityId referenced_id = expr.declaration().id();
-        for (auto search_id : impl->search_ids) {
-          if (referenced_id == search_id) {
-            user.fragment = std::move(stmt.fragment);  // Take it back.
-            return;  // Hit!
+      case StmtKind::DECL_REF_EXPR:
+      case StmtKind::MEMBER_EXPR:
+      case StmtKind::CXX_CONSTRUCT_EXPR:
+      case StmtKind::CXX_NEW_EXPR:
+      case StmtKind::GOTO_STMT:
+      case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
+      case StmtKind::BUILTIN_BIT_CAST_EXPR:
+      case StmtKind::C_STYLE_CAST_EXPR:
+      case StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+      case StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+      case StmtKind::CXX_CONST_CAST_EXPR:
+      case StmtKind::CXX_DYNAMIC_CAST_EXPR:
+      case StmtKind::CXX_REINTERPRET_CAST_EXPR:
+      case StmtKind::CXX_STATIC_CAST_EXPR:
+      case StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+      //case StmtKind::IMPLICIT_CAST_EXPR:
+        if (auto ref_decl = stmt.referenced_declaration()) {
+          RawEntityId referenced_id = ref_decl->id();
+          for (auto search_id : impl->search_ids) {
+            if (referenced_id == search_id) {
+              user.fragment = std::move(stmt.fragment);  // Take it back.
+              return;  // Hit!
+            }
           }
         }
         break;
-      }
-
-      case StmtKind::MEMBER_EXPR: {
-        const MemberExpr &expr = reinterpret_cast<const MemberExpr &>(stmt);
-        RawEntityId referenced_id = expr.member_declaration().id();
-        for (auto search_id : impl->search_ids) {
-          if (referenced_id == search_id) {
-            user.fragment = std::move(stmt.fragment);  // Take it back.
-            return;  // Hit!
-          }
-        }
-        break;
-      }
-
-      case StmtKind::CXX_CONSTRUCT_EXPR: {
-        const CXXConstructExpr &expr =
-            reinterpret_cast<const CXXConstructExpr &>(stmt);
-        RawEntityId referenced_id = expr.constructor().id();
-        for (auto search_id : impl->search_ids) {
-          if (referenced_id == search_id) {
-            user.fragment = std::move(stmt.fragment);  // Take it back.
-            return;  // Hit!
-          }
-        }
-        break;
-      }
-
-      case StmtKind::GOTO_STMT: {
-        const GotoStmt &expr = reinterpret_cast<const GotoStmt &>(stmt); 
-        RawEntityId referenced_id = expr.label().id();
-        for (auto search_id : impl->search_ids) {
-          if (referenced_id == search_id) {
-            user.fragment = std::move(stmt.fragment);  // Take it back.
-            return;  // Hit!
-          }
-        }
-        break;
-      }
-
       default:
         break;
     }
