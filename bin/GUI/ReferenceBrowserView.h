@@ -42,7 +42,6 @@ class ReferenceBrowserView final : public QWidget {
 
   void InitializeWidgets(void);
   void FillRow(QTreeWidgetItem *item, const Decl &decl, const Token &use) const;
-  QString FormatBreadcrumbs(const Token &use, bool run_length_encode) const;
 
  public:
   virtual ~ReferenceBrowserView(void);

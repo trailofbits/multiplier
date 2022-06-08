@@ -64,5 +64,8 @@ QString DeclName(const Decl &decl);
 // declaration.
 RawEntityId DeclFileLocation(const Decl &decl);
 
+// Create a breadcrumbs string of the token contexts.
+QString TokenBreadCrumbs(const Token &ent, bool run_length_encode=true);
+
 }  // namespace gui
 }  // namespace mx

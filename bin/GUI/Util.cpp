@@ -674,4 +674,134 @@ skip_name_match:
   return Fragment::containing(decl).file_tokens().begin()->id();
 }
 
+namespace {
+
+static const QString kBreadCrumb("%1%2%3");
+static const QString kReps[] = {"", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
+static const QString kTooManyReps("⁺");
+static const QString kNextSep(" → ");
+
+struct BreadCrumbs {
+
+  QString sep;
+  QString breadcrumbs;
+
+  int repetitions{0};
+  const bool run_length_encode;
+
+  BreadCrumbs(bool run_length_encode_)
+      : run_length_encode(run_length_encode_) {}
+
+  QString Release(void) {
+    repetitions = 0;
+    return std::move(breadcrumbs);
+  }
+
+  template <typename T>
+  void AddEnum(T enumerator) {
+    std::string_view ret = EnumeratorName(enumerator);
+    if (ret.ends_with("_EXPR") || ret.ends_with("_STMT") ||
+        ret.ends_with("_DECL") || ret.ends_with("_TYPE")) {
+      AddStringView(ret.substr(0u, ret.size() - 5u));
+    } else if (ret.ends_with("_OPERATOR")) {
+      AddStringView(ret.substr(0u, ret.size() - 9u));
+    } else if (ret.ends_with("_DIRECTIVE")) {
+      AddStringView(ret.substr(0u, ret.size() - 10u));
+    } else {
+      AddStringView(ret);
+    }
+  }
+
+  void AddStringView(std::string_view ret) {
+    AddString(QString::fromUtf8(ret.data(), static_cast<int>(ret.size())));
+  }
+
+  void AddString(QString name) {
+    if (run_length_encode && breadcrumbs.endsWith(name)) {
+      ++repetitions;
+
+    } else if (repetitions < 9) {
+      breadcrumbs.append(kBreadCrumb.arg(kReps[repetitions]).arg(sep).arg(name));
+      repetitions = 0;
+
+    } else {
+      breadcrumbs.append(kBreadCrumb.arg(kTooManyReps).arg(sep).arg(name));
+      repetitions = 0;
+    }
+
+    sep = kNextSep;
+  }
+};
+
+}  // namespace
+
+// Create a breadcrumbs string of the token contexts.
+QString TokenBreadCrumbs(const Token &ent, bool run_length_encode) {
+  auto i = -1;
+
+  BreadCrumbs crumbs(run_length_encode);
+
+  for (auto context = TokenContext::of(ent);
+       context; context = context->parent()) {
+    ++i;
+
+    if (auto cdecl = context->as_declaration()) {
+      crumbs.AddEnum(cdecl->kind());
+
+    } else if (auto ctype = context->as_type()) {
+      crumbs.AddEnum(ctype->kind());
+
+    } else if (auto cstmt = context->as_statement()) {
+      switch (cstmt->kind()) {
+        case StmtKind::DECL_REF_EXPR:
+        case StmtKind::COMPOUND_STMT:
+        case StmtKind::PAREN_EXPR:
+          break;
+        case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR: {
+          auto &expr = reinterpret_cast<const UnaryExprOrTypeTraitExpr &>(
+              cstmt.value());
+          crumbs.AddEnum(expr.expression_or_trait_kind());
+          continue;
+        }
+
+        case StmtKind::IMPLICIT_CAST_EXPR: {
+          auto &cast = reinterpret_cast<const ImplicitCastExpr &>(cstmt.value());
+          auto ck = cast.cast_kind();
+          if (ck != CastKind::L_VALUE_TO_R_VALUE && ck != CastKind::BIT_CAST &&
+              ck != CastKind::FUNCTION_TO_POINTER_DECAY &&
+              ck != CastKind::ARRAY_TO_POINTER_DECAY) {
+            crumbs.AddEnum(ck);
+          }
+          break;
+        }
+
+        case StmtKind::UNARY_OPERATOR: {
+          auto &op = reinterpret_cast<const UnaryOperator &>(cstmt.value());
+          crumbs.AddEnum(op.opcode());
+          continue;
+        }
+
+        case StmtKind::BINARY_OPERATOR: {
+          auto &op = reinterpret_cast<const BinaryOperator &>(cstmt.value());
+          crumbs.AddEnum(op.opcode());
+          continue;
+        }
+
+        case StmtKind::MEMBER_EXPR:
+          // If we're asking for the use of a field, then every use will start
+          // with `MEMBER_EXPR`.
+          if (!i) {
+            continue;
+          }
+          [[clang::fallthrough]];
+
+        default:
+          crumbs.AddEnum(cstmt->kind());
+          break;
+      }
+    }
+  }
+  return crumbs.Release();
+}
+
 }  // namespace mx::gui

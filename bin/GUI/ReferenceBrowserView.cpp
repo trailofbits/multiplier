@@ -267,6 +267,17 @@ ReferenceBrowserView::ReferenceBrowserView(Multiplier &multiplier,
   InitializeWidgets();
 }
 
+enum : int {
+  kEntityColumnIndex,
+  kPathColumnIndex,
+  kFileColumnIndex,
+  kLineColumnIndex,
+  kColumnColumnIndex,
+  kContextColumnIndex,
+
+  kNumColumns
+};
+
 void ReferenceBrowserView::InitializeWidgets(void) {
   d->layout = new QVBoxLayout;
   d->splitter = new QSplitter(Qt::Vertical);
@@ -276,6 +287,29 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   d->reference_tree = new QTreeWidget;
   d->layout->addWidget(d->reference_tree);
+
+  // Add the column headers.
+  QHeaderView *header = d->reference_tree->header();
+  QTreeWidgetItem *header_item = d->reference_tree->headerItem();
+  d->reference_tree->setColumnCount(kNumColumns);
+  header_item->setText(kEntityColumnIndex, tr("Entity"));
+  header_item->setText(kPathColumnIndex, tr("Path"));
+  header_item->setText(kFileColumnIndex, tr("File"));
+  header_item->setText(kLineColumnIndex, tr("Line"));
+  header_item->setText(kColumnColumnIndex, tr("Column"));
+  header_item->setText(kContextColumnIndex, tr("Context"));
+
+  // Customize visibility of columns.
+  ReferenceBrowserConfiguration &config =
+      d->multiplier.Configuration().reference_browser;
+  d->reference_tree->setColumnHidden(kPathColumnIndex, !config.show_file_path);
+  d->reference_tree->setColumnHidden(kFileColumnIndex, !config.show_file_name);
+  d->reference_tree->setColumnHidden(kLineColumnIndex,
+                                     !config.show_line_numbers);
+  d->reference_tree->setColumnHidden(kColumnColumnIndex,
+                                     !config.show_column_numbers);
+  d->reference_tree->setColumnHidden(kContextColumnIndex,
+                                     !config.breadcrumbs.visible);
 
   setWindowTitle(tr("Reference Browser"));
   setLayout(d->layout);
@@ -288,9 +322,14 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   // We'll potentially have a bunch of columns depending on the configuration,
   // so make sure they span to use all available space.
-  d->reference_tree->header()->setStretchLastSection(true);
-  d->reference_tree->header()->setSectionResizeMode(
+  header->setStretchLastSection(true);
+  header->setSectionResizeMode(
       QHeaderView::ResizeToContents);
+
+  // Enable sorting. We want to be able to sort by context (breadcrumbs) so that
+  // it's easy to pick out when a given thing is used differently among many
+  // common uses, e.g. every use but one is inside two nested `if` statements.
+  d->reference_tree->setSortingEnabled(true);
 
   // Disallow multiple selection. If we have grouping by file enabled, then when
   // a user clicks on a file name, we instead jump down to the first entry
@@ -403,108 +442,6 @@ void ReferenceBrowserView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
   QThreadPool::globalInstance()->start(expander);
 }
 
-template <typename T>
-static QString NameOf(T enumerator) {
-  std::string_view ret = EnumeratorName(enumerator);
-  if (ret.ends_with("_EXPR") || ret.ends_with("_STMT") ||
-      ret.ends_with("_DECL") || ret.ends_with("_TYPE")) {
-    ret = ret.substr(0u, ret.size() - 5u);
-  } else if (ret.ends_with("_OPERATOR")) {
-    ret = ret.substr(0u, ret.size() - 9u);
-  } else if (ret.ends_with("_DIRECTIVE")) {
-    ret = ret.substr(0u, ret.size() - 10u);
-  }
-  return QString::fromUtf8(ret.data(), static_cast<int>(ret.size()));
-}
-
-QString ReferenceBrowserView::FormatBreadcrumbs(
-    const Token &use, bool run_length_encode) const {
-  QString breadcrumbs;
-  static const QString kBreadCrumb("%1%2%3");
-  const char *sep = "";
-  const char * const next_sep = " → ";
-  int repetitions = 0;
-  const char *reps[] = {"", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
-  auto i = -1;
-
-  auto add_name = [&] (QString name) {
-    if (run_length_encode && breadcrumbs.endsWith(name)) {
-      ++repetitions;
-
-    } else if (repetitions < 9) {
-      breadcrumbs.append(kBreadCrumb.arg(reps[repetitions]).arg(sep).arg(name));
-      repetitions = 0;
-
-    } else {
-      breadcrumbs.append(kBreadCrumb.arg("⁺").arg(sep).arg(name));
-      repetitions = 0;
-    }
-
-    sep = next_sep;
-  };
-
-  for (auto context = TokenContext::of(use);
-       context; context = context->parent()) {
-    ++i;
-
-    if (auto cdecl = context->as_declaration()) {
-      add_name(NameOf(cdecl->kind()));
-
-    } else if (auto ctype = context->as_type()) {
-      add_name(NameOf(ctype->kind()));
-
-    } else if (auto cstmt = context->as_statement()) {
-      switch (cstmt->kind()) {
-        case StmtKind::DECL_REF_EXPR:
-        case StmtKind::COMPOUND_STMT:
-        case StmtKind::PAREN_EXPR:
-          break;
-        case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR: {
-          auto &expr = reinterpret_cast<const UnaryExprOrTypeTraitExpr &>(
-              cstmt.value());
-          add_name(NameOf(expr.expression_or_trait_kind()));
-          continue;
-        }
-
-        case StmtKind::IMPLICIT_CAST_EXPR: {
-          auto &cast = reinterpret_cast<const ImplicitCastExpr &>(cstmt.value());
-          auto ck = cast.cast_kind();
-          if (ck != CastKind::L_VALUE_TO_R_VALUE && ck != CastKind::BIT_CAST &&
-              ck != CastKind::FUNCTION_TO_POINTER_DECAY &&
-              ck != CastKind::ARRAY_TO_POINTER_DECAY) {
-            add_name(NameOf(ck));
-          }
-          break;
-        }
-
-        case StmtKind::UNARY_OPERATOR: {
-          auto &op = reinterpret_cast<const UnaryOperator &>(cstmt.value());
-          add_name(NameOf(op.opcode()));
-          continue;
-        }
-
-        case StmtKind::BINARY_OPERATOR: {
-          auto &op = reinterpret_cast<const BinaryOperator &>(cstmt.value());
-          add_name(NameOf(op.opcode()));
-          continue;
-        }
-
-        case StmtKind::MEMBER_EXPR:
-          if (!i) {
-            continue;
-          }
-          [[clang::fallthrough]];
-
-        default: {
-          add_name(NameOf(cstmt->kind()));
-          break;
-        }
-      }
-    }
-  }
-  return breadcrumbs;
-}
-
 void ReferenceBrowserView::FillRow(
     QTreeWidgetItem *item, const Decl &decl, const Token &use) const {
 
@@ -518,82 +455,55 @@ void ReferenceBrowserView::FillRow(
   // TODO(pag): Eventually use symbol names in here.
   item->setText(0, DeclName(decl));
 
-  auto index = 1;
-
   auto color = qApp->palette().text().color();
   color = QColor::fromRgbF(
       color.redF(), color.greenF(), color.blueF(), color.alphaF() * 0.75);
 
   // Show the line and column numbers.
-  if (config.show_line_numbers || config.show_column_numbers ||
-      config.show_file_path || config.show_file_name) {
-    if (auto loc = use.nearest_location(d->line_cache)) {
-      auto file = File::containing(use);
-      FileId file_id = file ? file->id() : kInvalidEntityId;
+  if (auto loc = use.nearest_location(d->line_cache)) {
+    auto file = File::containing(use);
+    FileId file_id = file ? file->id() : kInvalidEntityId;
 
-      if (config.show_file_path) {
-        if (auto fp_it = d->file_id_to_path.find(file_id);
-            fp_it != d->file_id_to_path.end()) {
-          item->setTextColor(index, color);
-          item->setTextAlignment(index, Qt::AlignRight);
-          item->setText(
-              index, QString::fromStdString(fp_it->second.generic_string()));
-        } else {
-          item->setText(index, "");
-        }
-        ++index;
-      }
+    if (auto fp_it = d->file_id_to_path.find(file_id);
+        fp_it != d->file_id_to_path.end()) {
+      item->setTextColor(kPathColumnIndex, color);
+      item->setTextAlignment(kPathColumnIndex, Qt::AlignRight);
+      item->setText(
+          kPathColumnIndex,
+          QString::fromStdString(fp_it->second.generic_string()));
 
-      if (config.show_file_name) {
-        if (auto fp_it = d->file_id_to_path.find(file_id);
-            fp_it != d->file_id_to_path.end()) {
-          item->setTextColor(index, color);
-          item->setTextAlignment(index, Qt::AlignRight);
-          item->setText(
-              index, QString::fromStdString(fp_it->second.filename().string()));
+      item->setTextColor(kFileColumnIndex, color);
+      item->setTextAlignment(kFileColumnIndex, Qt::AlignRight);
+      item->setText(
+          kFileColumnIndex,
+          QString::fromStdString(fp_it->second.filename().string()));
+
 #ifndef QT_NO_TOOLTIP
-          item->setToolTip(
-              index, QString::fromStdString(fp_it->second.generic_string()));
+      item->setToolTip(
+          kFileColumnIndex,
+          QString::fromStdString(fp_it->second.generic_string()));
 #endif
-        } else {
-          item->setText(index, "");
-        }
-        ++index;
-      }
-
-      if (config.show_line_numbers) {
-        item->setTextColor(index, color);
-        item->setText(index, QString::number(loc->first));  // Line.
-#ifndef QT_NO_TOOLTIP
-        item->setToolTip(index, tr("Line %1").arg(loc->first));
-#endif
-        ++index;
-      }
-
-      if (config.show_column_numbers) {
-        item->setTextColor(index, color);
-        item->setText(index, QString::number(loc->second));  // Column.
-#ifndef QT_NO_TOOLTIP
-        item->setToolTip(index, tr("Column %1").arg(loc->second));
-#endif
-        ++index;
-      }
     }
+
+    item->setTextColor(kLineColumnIndex, color);
+    item->setText(kLineColumnIndex, QString::number(loc->first));  // Line.
+#ifndef QT_NO_TOOLTIP
+    item->setToolTip(kLineColumnIndex, tr("Line %1").arg(loc->first));
+#endif
+
+    item->setTextColor(kColumnColumnIndex, color);
+    item->setText(kColumnColumnIndex, QString::number(loc->second));  // Column.
+#ifndef QT_NO_TOOLTIP
+    item->setToolTip(kColumnColumnIndex, tr("Column %1").arg(loc->second));
+#endif
   }
 
   // Show the context breadcrumbs. This is a chain of stringized enumerators
   // derived from the token contexts.
-  if (config.breadcrumbs.visible) {
-    item->setTextColor(index, color);
-    item->setText(
-        index, FormatBreadcrumbs(use, config.breadcrumbs.run_length_encode));
-    ++index;
-  }
-
-  // Make sure we're shoring the right number of columns.
-  if (index > d->reference_tree->columnCount()) {
-    d->reference_tree->setColumnCount(index);
-  }
+  item->setTextColor(kContextColumnIndex, color);
+  item->setText(
+      kContextColumnIndex,
+      TokenBreadCrumbs(use, config.breadcrumbs.run_length_encode));
 }
 
 void ReferenceBrowserView::OnUsersOfFirstLevel(
