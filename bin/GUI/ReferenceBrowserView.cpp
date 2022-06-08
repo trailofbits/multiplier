@@ -120,6 +120,8 @@ ExpandReferenceHierarchyThread::ExpandReferenceHierarchyThread(
     QTreeWidgetItem *parent_, uint64_t counter_)
     : d(new PrivateData(index_, id_, line_cache_, parent_, counter_)) {}
 
+static constexpr size_t kEmitBatchSize = 32;
+
 void InitReferenceHierarchyThread::run(void) {
 
   auto entity = d->index.entity(d->id);
@@ -128,24 +130,37 @@ void InitReferenceHierarchyThread::run(void) {
   }
 
   UserLocations users;
+  FragmentId last_fragment_id = kInvalidEntityId;
 
   const Decl &root_decl = std::get<Decl>(entity);
   for (Reference ref : root_decl.references()) {
     Stmt stmt = ref.statement();
     if (auto decl = DeclContaining(stmt)) {
 
+      // Send them off one batch at a time. Ideally, send them so that we don't
+      // split across fragments.
+      Fragment frag = Fragment::containing(decl.value());
+      if (users.size() >= kEmitBatchSize && frag.id() != last_fragment_id) {
+
+        // Group them by file; they are already grouped by fragment.
+        std::stable_sort(users.begin(), users.end(), UserLocationSort);
+        emit UsersOfRoot(d->item_parent, d->counter, root_decl,
+                         std::make_shared<UserLocations>(std::move(users)));
+      }
+
       // Populate the cache in this background thread to not block the main
       // thread.
       (void) decl->token().nearest_location(d->line_cache);
 
       users.emplace_back(decl.value(), stmt.tokens());
+      last_fragment_id = frag.id();
     }
   }
 
   // Group them by file; they are already grouped by fragment.
   std::stable_sort(users.begin(), users.end(), UserLocationSort);
-
-  emit UsersOfRoot(d->item_parent, d->counter, root_decl, std::move(users));
+  emit UsersOfRoot(d->item_parent, d->counter, root_decl,
+                   std::make_shared<UserLocations>(std::move(users)));
 }
 
 void ExpandReferenceHierarchyThread::run(void) {
@@ -155,23 +170,36 @@ void ExpandReferenceHierarchyThread::run(void) {
   }
 
   UserLocations users;
+  FragmentId last_fragment_id = kInvalidEntityId;
 
   for (Reference ref : std::get<Decl>(entity).references()) {
     Stmt stmt = ref.statement();
     if (auto decl = DeclContaining(stmt)) {
+
+      // Send them off one batch at a time. Ideally, send them so that we don't
+      // split across fragments.
+      Fragment frag = Fragment::containing(decl.value());
+      if (users.size() >= kEmitBatchSize && frag.id() != last_fragment_id) {
+
+        // Group them by file; they are already grouped by fragment.
+        std::stable_sort(users.begin(), users.end(), UserLocationSort);
+        emit UsersOfLevel(d->item_parent, d->counter,
+                          std::make_shared<UserLocations>(std::move(users)));
+      }
 
       // Populate the cache in this background thread to not block the main
       // thread.
       (void) decl->token().nearest_location(d->line_cache);
 
       users.emplace_back(decl.value(), stmt.tokens());
+      last_fragment_id = frag.id();
     }
   }
 
   // Group them by file; they are already grouped by fragment.
   std::stable_sort(users.begin(), users.end(), UserLocationSort);
-
-  emit UsersOfLevel(d->item_parent, d->counter, std::move(users));
+  emit UsersOfLevel(d->item_parent, d->counter,
+                    std::make_shared<UserLocations>(std::move(users)));
 }
 
 struct ReferenceBrowserView::PrivateData {
@@ -213,6 +241,9 @@ struct ReferenceBrowserView::PrivateData {
     // `false` to `true`, then we know to remove the dummy downloading item and
     // leave the item empty or populate with the discovered references.
     bool has_been_expanded{false};
+
+    // Is this the first expansion?
+    bool is_first_expansion{true};
 
     inline explicit ItemInfo(Decl decl_)
         : decl(std::move(decl_)) {}
@@ -268,7 +299,7 @@ void ReferenceBrowserView::InitializeWidgets(void) {
       QAbstractItemView::SelectionMode::SingleSelection);
 
   // Hide the header.
-  d->reference_tree->setHeaderHidden(true);
+  d->reference_tree->setHeaderHidden(false);
 
   // When a user clicks on a cell, we don't want to randomly scroll to the
   // beginning of a cell. That can be jarring.
@@ -567,7 +598,7 @@ void ReferenceBrowserView::FillRow(
 
 void ReferenceBrowserView::OnUsersOfFirstLevel(
     QTreeWidgetItem *root_item, uint64_t counter, std::optional<Decl> root_decl,
-    UserLocations users) {
+    UserLocationsPtr users) {
 
   // Something else was requested before the background thread returned.
   if (counter != d->counter.load() ||
@@ -575,22 +606,33 @@ void ReferenceBrowserView::OnUsersOfFirstLevel(
     return;
   }
 
-  FillRow(root_item, root_decl.value(), root_decl->token());
-  d->item_to_info.clear();
+  // This is the first batch of results for this root.
+  auto id_it = d->item_to_info.find(root_item);
+  auto is_first = false;
+  if (id_it == d->item_to_info.end()) {
 
-  auto &item = d->item_to_info.emplace(
-      root_item, std::move(root_decl.value())).first->second;
+    FillRow(root_item, root_decl.value(), root_decl->token());
+    d->item_to_info.clear();
 
-  if (auto ft = item.decl.token().nearest_file_token()) {
-    item.tokens = ft.value();
+    auto &item = d->item_to_info.emplace(
+        root_item, std::move(root_decl.value())).first->second;
+
+    if (auto ft = item.decl.token().nearest_file_token()) {
+      item.tokens = ft.value();
+    }
+
+    is_first = true;
   }
 
   OnUsersOfLevel(root_item, counter, std::move(users));
-  OnItemPressed(root_item, 0);
+
+  if (is_first) {
+    OnItemPressed(root_item, 0);
+  }
 }
 
 void ReferenceBrowserView::OnUsersOfLevel(
-    QTreeWidgetItem *parent_item, uint64_t counter, UserLocations users) {
+    QTreeWidgetItem *parent_item, uint64_t counter, UserLocationsPtr users) {
 
   // Something else was requested before the background thread returned.
   if (counter != d->counter.load()) {
@@ -603,15 +645,17 @@ void ReferenceBrowserView::OnUsersOfLevel(
     return;
   }
 
-  id_it->second.has_been_expanded = true;
-
   // Remove the `Downloading...` item.
-  while (parent_item->childCount()) {
-    parent_item->removeChild(parent_item->child(0));
+  id_it->second.has_been_expanded = true;
+  if (id_it->second.is_first_expansion) {
+    id_it->second.is_first_expansion = false;
+    while (parent_item->childCount()) {
+      parent_item->removeChild(parent_item->child(0));
+    }
   }
 
   // Nothing to show.
-  if (users.empty()) {
+  if (users->empty()) {
     update();
     return;
   }
@@ -640,43 +684,8 @@ void ReferenceBrowserView::OnUsersOfLevel(
   ReferenceBrowserConfiguration &config =
       d->multiplier.Configuration().reference_browser;
 
-  std::map<std::filesystem::path, QTreeWidgetItem *> file_users;
-  for (auto &[decl, tokens] : users) {
-
-    // If we should group by file paths, then do the grouping here, building up
-    // the intermediate file path items.
-    if (config.group_under_containing_file) {
-      if (std::optional<File> file = File::containing(decl)) {
-        if (auto id_it = d->file_id_to_path.find(file->id());
-            id_it != d->file_id_to_path.end()) {
-
-          QTreeWidgetItem *&file_parent = file_users[id_it->second];
-          if (!file_parent) {
-            file_parent = new QTreeWidgetItem;
-            file_parent->setText(
-                0, QString::fromStdString(id_it->second.generic_string()));
-
-            // Make the text only partially visible.
-            auto color = qApp->palette().text().color();
-            file_parent->setTextColor(0, QColor::fromRgbF(
-                color.redF(), color.greenF(), color.blueF(),
-                color.alphaF() * 0.75));
-          }
-
-          add_user(file_parent, std::move(decl), std::move(tokens));
-          continue;
-        }
-      }
-    }
-
-    // If we're not grouping by file paths, or if we have no associatd file
-    // path, then show this here.
+  for (auto &[decl, tokens] : *users) {
     add_user(parent_item, std::move(decl), std::move(tokens));
-  }
-
-  for (const auto &[path, file_item] : file_users) {
-    parent_item->addChild(file_item);
-    file_item->setExpanded(true);
   }
 
   parent_item->setExpanded(true);

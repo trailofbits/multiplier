@@ -81,26 +81,6 @@ struct ReferenceBrowserBreadcrumbsConfiguration {
 // Configuration for the reference browser, which presents a tree view of
 // the references / call hierarchy of a particular entity.
 struct ReferenceBrowserConfiguration {
-  // Should entries in the reference tree be grouped under a containing file?
-  // If `true`, then what is shown is something like:
-  //
-  //    +- /path/to/file1
-  //    |  +- ref1
-  //    |  `- ref2
-  //    `- /path/to/file2
-  //       `- ref3
-  //
-  // If `false`, then what is shown is something like:
-  //
-  //    +- ref1
-  //    +- ref2
-  //    `- ref3
-  //
-  // In all cases, the references are still logically grouped and ordered
-  // by their relative locations within their containing files. This option
-  // affects whether or not those file paths appear as entries in the references
-  // tree.
-  bool group_under_containing_file{false};
 
   // Should the full file path be shown?
   bool show_file_path{false};

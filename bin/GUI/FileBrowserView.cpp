@@ -94,14 +94,26 @@ void FileBrowserView::InitializeWidgets(void) {
 }
 
 void FileBrowserView::OnFilterFileView(const QString &text) {
+
+  auto set_visible = +[] (QTreeWidgetItem *item, bool visible) {
+    for (auto parent = item; parent; parent = parent->parent()) {
+      parent->setHidden(!visible);
+    }
+  };
+
   if (!text.size()) {
     for (auto &[item, path_id] : d->file_infos) {
-      item->setHidden(false);
+      set_visible(item, true);
     }
   } else {
     for (auto &[item, path_id] : d->file_infos) {
+      set_visible(item, false);
+    }
+    for (auto &[item, path_id] : d->file_infos) {
       QString path = QString::fromStdString(path_id.first.generic_string());
-      item->setHidden(!path.contains(text));
+      if (path.contains(text)) {
+        set_visible(item, true);
+      }
     }
   }
 

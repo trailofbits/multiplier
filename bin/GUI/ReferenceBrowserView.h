@@ -29,6 +29,7 @@ class CodeTheme;
 
 using UserLocation = std::pair<Decl, TokenRange>;
 using UserLocations = std::vector<UserLocation>;
+using UserLocationsPtr = std::shared_ptr<std::vector<UserLocation>>;
 
 // Implements the reference browser view. This view presents a tree of users
 // of some entity. At the N+1th level, you see the users of items at the Nth
@@ -63,9 +64,9 @@ class ReferenceBrowserView final : public QWidget {
   void OnTreeWidgetItemExpanded(QTreeWidgetItem *item);
   void OnUsersOfFirstLevel(QTreeWidgetItem *parent, uint64_t counter,
                            std::optional<Decl> root_decl,
-                           UserLocations users);
+                           UserLocationsPtr users);
   void OnUsersOfLevel(QTreeWidgetItem *parent, uint64_t counter,
-                      UserLocations users);
+                      UserLocationsPtr users);
   void OnItemPressed(QTreeWidgetItem *item, int column);
   void OnItemSelectionChanged(void);
 
@@ -92,7 +93,7 @@ class InitReferenceHierarchyThread final : public QObject, public QRunnable {
 
  signals:
   void UsersOfRoot(QTreeWidgetItem *item_parent, uint64_t counter,
-                   std::optional<Decl> root_decl, UserLocations users);
+                   std::optional<Decl> root_decl, UserLocationsPtr users);
 };
 
 // A background thread that downloads the Nth level of references for one
@@ -114,7 +115,7 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
 
  signals:
   void UsersOfLevel(QTreeWidgetItem *item_parent, uint64_t counter,
-                    UserLocations users);
+                    UserLocationsPtr users);
 };
 
 }  // namespace gui

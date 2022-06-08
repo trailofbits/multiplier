@@ -92,6 +92,7 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType<std::optional<mx::Stmt>>("std::optional<Stmt>");
   qRegisterMetaType<std::optional<mx::Type>>("std::optional<Type>");
   qRegisterMetaType<std::optional<mx::Token>>("std::optional<Token>");
+  qRegisterMetaType<mx::gui::UserLocationsPtr>("UserLocationsPtr");
   qRegisterMetaType<mx::gui::UserLocations>("UserLocations");
   qRegisterMetaType<mx::RawEntityId>("RawEntityId");
   qRegisterMetaType<mx::FileId>("FileId");
