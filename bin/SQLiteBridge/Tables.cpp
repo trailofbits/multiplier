@@ -7,13 +7,17 @@
 #include <sqlite3ext.h>
 SQLITE_EXTENSION_INIT3
 
+#include <algorithm>
+#include <array>
 #include <cassert>
+#include <cstring>
 #include <functional>
 #include <multiplier/File.h>
 #include <multiplier/Iterator.h>
 #include <multiplier/Types.h>
 #include <multiplier/Use.h>
 #include <optional>
+#include <type_traits>
 #include <variant>
 
 #include "Tables.h"
@@ -21,7 +25,11 @@ SQLITE_EXTENSION_INIT3
 
 namespace sqlite_bridge {
 
-enum class ConstraintType { None, EntityId, FragmentId };
+enum ConstraintType {
+  EntityId = 1 << 0,
+  FragmentId = 1 << 1,
+  Containing = 1 << 2
+};
 
 // FIXME(frabert): May the Lispers have mercy on my soul
 
@@ -131,6 +139,173 @@ template <> struct FromEntityId<mx::CXXBaseSpecifier> {
     return mx::TYPE::from(base);                                               \
   }
 #include "ExtraDecls.inc.h"
+#include <multiplier/Visitor.inc.h>
+
+template <typename T> constexpr bool has_containing = false;
+template <> constexpr bool has_containing<mx::Decl> = true;
+template <> constexpr bool has_containing<mx::Stmt> = true;
+template <> constexpr bool has_containing<mx::Type> = true;
+
+#define MX_VISIT_BASE(NAME, BASE, ...)                                         \
+  template <>                                                                  \
+  static constexpr bool has_containing<mx::NAME> = has_containing<mx::BASE>;
+#include <multiplier/Visitor.inc.h>
+
+using PredType = bool(mx::Index index, mx::EntityId ancestor_eid,
+                      mx::EntityId descendant_eid);
+
+static bool FalsePredicate(mx::Index index, mx::EntityId ancestor_eid,
+                           mx::EntityId descendant_eid) {
+  return false;
+}
+
+template <typename T, typename Enable = void> struct ContainingPredicate {
+  static bool Predicate(mx::Index index, mx::EntityId ancestor_eid,
+                        mx::EntityId descendant_eid) {
+    return false;
+  }
+};
+
+template <typename T>
+struct ContainingPredicate<T,
+                           std::enable_if_t<std::is_base_of_v<mx::Decl, T> ||
+                                            std::is_base_of_v<mx::Stmt, T>>> {
+  static bool Predicate(mx::Index index, mx::EntityId ancestor_eid,
+                        mx::EntityId descendant_eid) {
+    auto ancestor_vid{ancestor_eid.Unpack()};
+    auto descendant_vid{ancestor_eid.Unpack()};
+
+    if (std::holds_alternative<mx::InvalidId>(ancestor_vid) ||
+        std::holds_alternative<mx::InvalidId>(descendant_vid)) {
+      return false;
+    }
+
+    auto ancestor_frag{FragmentContaining(ancestor_eid)};
+    auto descendant_frag{FragmentContaining(descendant_eid)};
+    if (!ancestor_frag || !descendant_frag ||
+        *ancestor_frag != *descendant_frag) {
+      return false;
+    }
+
+    FromEntityId<T> helper;
+    auto ancestor{helper.get(index, ancestor_eid)};
+    if (!ancestor) {
+      return false;
+    }
+
+    auto descendant{index.entity(descendant_eid)};
+    if (std::holds_alternative<mx::Decl>(descendant)) {
+      auto descendant_decl{std::get<mx::Decl>(descendant)};
+      for (auto parent : T::containing(descendant_decl)) {
+        if (parent.id() == ancestor_eid) {
+          return true;
+        }
+      }
+    } else if (std::holds_alternative<mx::Stmt>(descendant)) {
+      auto descendant_stmt{std::get<mx::Stmt>(descendant)};
+      for (auto parent : T::containing(descendant_stmt)) {
+        if (parent.id() == ancestor_eid) {
+          return true;
+        }
+      }
+    } else if (std::holds_alternative<mx::Token>(descendant)) {
+      auto descendant_tok{std::get<mx::Token>(descendant)};
+      for (auto parent : T::containing(descendant_tok)) {
+        if (parent.id() == ancestor_eid) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+};
+
+template <typename T>
+struct ContainingPredicate<T,
+                           std::enable_if_t<std::is_base_of_v<mx::Type, T>>> {
+  static bool Predicate(mx::Index index, mx::EntityId ancestor_eid,
+                        mx::EntityId descendant_eid) {
+    auto ancestor_vid{ancestor_eid.Unpack()};
+    auto descendant_vid{ancestor_eid.Unpack()};
+
+    if (std::holds_alternative<mx::InvalidId>(ancestor_vid) ||
+        std::holds_alternative<mx::InvalidId>(descendant_vid)) {
+      return false;
+    }
+
+    auto ancestor_frag{FragmentContaining(ancestor_eid)};
+    auto descendant_frag{FragmentContaining(descendant_eid)};
+    if (!ancestor_frag || !descendant_frag ||
+        *ancestor_frag != *descendant_frag) {
+      return false;
+    }
+
+    FromEntityId<mx::Type> helper;
+    auto ancestor{helper.get(index, ancestor_eid)};
+    if (!ancestor) {
+      return false;
+    }
+
+    auto descendant{index.entity(descendant_eid)};
+    if (std::holds_alternative<mx::Token>(descendant)) {
+      auto descendant_tok{std::get<mx::Token>(descendant)};
+      for (auto parent : mx::Type::containing(descendant_tok)) {
+        if (parent.id() == ancestor_eid) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+};
+
+#define MX_BEGIN_VISIT_DECL(NAME)                                              \
+  static std::vector<PredType*> NAME##ColumnContaining_partial({
+#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
+#define MX_VISIT_BOOL(...) &FalsePredicate,
+#define MX_VISIT_INT MX_VISIT_BOOL
+#define MX_VISIT_ENUM MX_VISIT_BOOL
+#define MX_VISIT_TEXT MX_VISIT_BOOL
+#define MX_VISIT_OPTIONAL_BOOL MX_VISIT_BOOL
+#define MX_VISIT_OPTIONAL_INT MX_VISIT_BOOL
+#define MX_VISIT_OPTIONAL_TEXT MX_VISIT_BOOL
+#define MX_VISIT_ENTITY(TABLE, LOWERCASE, GET, SET, INIT, UPPERCASE, TYPE,     \
+                        ...)                                                   \
+  &ContainingPredicate<mx::TYPE>::Predicate,
+#define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_ENTITY
+#define MX_END_VISIT_DECL(NAME)                                                \
+  });
+#define MX_END_VISIT_STMT MX_END_VISIT_DECL
+#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
+#include <multiplier/Visitor.inc.h>
+
+#define MX_BEGIN_VISIT_DECL(NAME)                                              \
+  static std::vector<PredType *> Get##NAME##ColumnContaining() {               \
+    std::vector<PredType *> fields;                                            \
+    auto out_it{std::back_inserter(fields)};
+#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
+
+#define MX_VISIT_BASE(NAME, BASE)                                              \
+  std::copy(BASE##ColumnContaining.begin(), BASE##ColumnContaining.end(),      \
+            out_it);
+
+#define MX_END_VISIT_DECL(NAME)                                                \
+  std::copy(NAME##ColumnContaining_partial.begin(),                            \
+            NAME##ColumnContaining_partial.end(), out_it);                     \
+  return fields;                                                               \
+  }                                                                            \
+  static std::vector<PredType *> NAME##ColumnContaining =                      \
+      Get##NAME##ColumnContaining();
+#define MX_END_VISIT_STMT MX_END_VISIT_DECL
+#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
 enum class FieldType { Integer, Text };
@@ -260,8 +435,8 @@ struct FieldDescriptor {
 
 static std::string
 GetCreateTableStatement(const std::vector<FieldDescriptor> &fields) {
-  std::string schema{
-      "CREATE TABLE vtab(id INTEGER NOT NULL, fragment_id INTEGER, "};
+  std::string schema{"CREATE TABLE vtab(id INTEGER NOT "
+                     "NULL, fragment_id INTEGER, "};
   for (auto desc : fields) {
     schema += desc.name + ' ';
     switch (desc.type) {
@@ -302,28 +477,96 @@ GetCreateTableStatement(const std::vector<FieldDescriptor> &fields) {
         std::move(cursor));                                                    \
   }
 
+enum FunctionConstraints { CONTAINING_OP = SQLITE_INDEX_CONSTRAINT_FUNCTION };
+
+static constexpr size_t MaxNumContaining = 128;
+using ConstraintData = std::array<int, MaxNumContaining>;
+static_assert(std::is_trivial_v<ConstraintData>);
+
+static int BestIndex(sqlite3_index_info *info) {
+  int argvIndex{0};
+  ConstraintData data;
+  data.fill(-1);
+
+  // Search for index id constraint
+  for (int i = 0; i < info->nConstraint; i++) {
+    auto constraint = info->aConstraint[i];
+    if (!constraint.usable) {
+      continue;
+    }
+    if (constraint.iColumn == 0 &&
+        constraint.op == SQLITE_INDEX_CONSTRAINT_EQ) {
+      info->aConstraintUsage[i].argvIndex = ++argvIndex;
+      info->aConstraintUsage[i].omit = 1;
+      info->idxNum |= EntityId;
+      break;
+    }
+  }
+
+  // Search for fragment id constraint
+  for (int i = 0; i < info->nConstraint; i++) {
+    auto constraint = info->aConstraint[i];
+    if (!constraint.usable) {
+      continue;
+    }
+    if (constraint.iColumn == 1 &&
+        constraint.op == SQLITE_INDEX_CONSTRAINT_EQ) {
+      info->aConstraintUsage[i].argvIndex = ++argvIndex;
+      info->aConstraintUsage[i].omit = 1;
+      info->idxNum |= FragmentId;
+      break;
+    }
+  }
+
+  size_t constraint_i{0};
+  // Search for fragment id constraints
+  for (int i = 0; i < info->nConstraint; i++) {
+    auto constraint = info->aConstraint[i];
+    if (!constraint.usable && constraint.op == CONTAINING_OP) {
+      return SQLITE_CONSTRAINT;
+    }
+    if (constraint.op == CONTAINING_OP) {
+      if (i >= MaxNumContaining) {
+        return SQLITE_ERROR;
+      }
+      info->aConstraintUsage[i].argvIndex = ++argvIndex;
+      info->aConstraintUsage[i].omit = 1;
+      info->idxNum |= Containing;
+      data[constraint_i++] = constraint.iColumn;
+    }
+  }
+
+  info->idxStr = static_cast<char *>(sqlite3_malloc(sizeof(data)));
+  std::memcpy(info->idxStr, data.data(), sizeof(data));
+  info->needToFreeIdxStr = 1;
+
+  return SQLITE_OK;
+}
+
 #define TABLE_BESTINDEX(NAME)                                                  \
   int NAME##Table::BestIndex(sqlite3_index_info *info) {                       \
-    for (int i = 0; i < info->nConstraint; i++) {                              \
-      auto constraint = info->aConstraint[i];                                  \
-      if (constraint.usable && constraint.iColumn == 0 &&                      \
-          constraint.op == SQLITE_INDEX_CONSTRAINT_EQ) {                       \
-        info->aConstraintUsage[i].argvIndex = 1;                               \
-        info->estimatedCost = 1;                                               \
-        info->idxNum = static_cast<int>(ConstraintType::EntityId);             \
-        return SQLITE_OK;                                                      \
-      }                                                                        \
-                                                                               \
-      if (constraint.usable && constraint.iColumn == 1 &&                      \
-          constraint.op == SQLITE_INDEX_CONSTRAINT_EQ) {                       \
-        info->aConstraintUsage[i].argvIndex = 1;                               \
-        info->estimatedCost = 1;                                               \
-        info->idxNum = static_cast<int>(ConstraintType::FragmentId);           \
-        return SQLITE_OK;                                                      \
-      }                                                                        \
-    }                                                                          \
-                                                                               \
-    return SQLITE_OK;                                                          \
+    return ::sqlite_bridge::BestIndex(info);                                   \
+  }
+
+static int FindFunction(int nArg, const std::string &name,
+                        void (**pxFunc)(sqlite3_context *, int,
+                                        sqlite3_value **),
+                        void **ppArg) {
+  if (nArg == 2 && name == "containing") {
+    *pxFunc = [](sqlite3_context *ctx, int, sqlite3_value **) {
+      sqlite3_result_int(ctx, 0);
+    };
+    return CONTAINING_OP;
+  }
+  return 0;
+}
+
+#define TABLE_FINDFUNCTION(NAME)                                               \
+  int NAME##Table::FindFunction(                                               \
+      int nArg, const std::string &name,                                       \
+      void (**pxFunc)(sqlite3_context *, int, sqlite3_value **),               \
+      void **ppArg) {                                                          \
+    return ::sqlite_bridge::FindFunction(nArg, name, pxFunc, ppArg);           \
   }
 
 #define TABLE_CURSOR(NAME)                                                     \
@@ -339,26 +582,66 @@ GetCreateTableStatement(const std::vector<FieldDescriptor> &fields) {
     virtual int Filter(int idxNum, const char *idxStr,                         \
                        const std::vector<sqlite3_value *> &args) override {    \
       entities.clear();                                                        \
-      auto constraint{static_cast<ConstraintType>(idxNum)};                    \
-      if (constraint == ConstraintType::EntityId) {                            \
+      ConstraintData data;                                                     \
+      std::memcpy(data.data(), idxStr, sizeof(data));                          \
+      int argIndex{0};                                                         \
+      if ((idxNum & EntityId) == EntityId) {                                   \
         FromEntityId<mx::NAME> helper;                                         \
-        auto entity{helper.get(index, sqlite3_value_int64(args[0]))};          \
+        auto entity{helper.get(index, sqlite3_value_int64(args[argIndex++]))}; \
         if (entity) {                                                          \
           entities.push_back(entity->id());                                    \
         }                                                                      \
-      } else if (constraint == ConstraintType::FragmentId) {                   \
-        auto fragment{index.fragment(sqlite3_value_int64(args[0]))};           \
+      }                                                                        \
+      if ((idxNum & FragmentId) == FragmentId) {                               \
+        auto frag_id{sqlite3_value_int64(args[argIndex++])};                   \
+        auto fragment{index.fragment(frag_id)};                                \
         if (fragment) {                                                        \
-          for (auto entity : mx::NAME::in(*fragment)) {                        \
-            entities.push_back(entity.id());                                   \
+          if ((idxNum & EntityId) == EntityId) {                               \
+            std::remove_if(entities.begin(), entities.end(),                   \
+                           [&](mx::EntityId id) {                              \
+                             auto frag{FragmentContaining(id)};                \
+                             if (!frag) {                                      \
+                               return true;                                    \
+                             }                                                 \
+                             return frag_id != *frag;                          \
+                           });                                                 \
+          } else {                                                             \
+            for (auto entity : mx::NAME::in(*fragment)) {                      \
+              entities.push_back(entity.id());                                 \
+            }                                                                  \
           }                                                                    \
+        } else {                                                               \
+          entities.clear();                                                    \
         }                                                                      \
-      } else {                                                                 \
+      }                                                                        \
+      if (!((idxNum & EntityId) == EntityId ||                                 \
+            (idxNum & FragmentId) == FragmentId)) {                            \
         for (auto file : mx::File::in(index)) {                                \
           for (auto fragment : mx::Fragment::in(file)) {                       \
             for (auto entity : mx::NAME::in(fragment)) {                       \
               entities.push_back(entity.id());                                 \
             }                                                                  \
+          }                                                                    \
+        }                                                                      \
+      }                                                                        \
+      if ((idxNum & Containing) == Containing) {                               \
+        for (size_t i = 0; i < MaxNumContaining && data[i] >= 0; ++i) {        \
+          auto col{data[i]};                                                   \
+          auto descendant_id{sqlite3_value_int64(args[argIndex++])};           \
+          if (col == 0) {                                                      \
+            std::remove_if(                                                    \
+                entities.begin(), entities.end(), [&](mx::EntityId id) {       \
+                  return !(ContainingPredicate<mx::NAME>::Predicate(           \
+                      index, id, descendant_id));                              \
+                });                                                            \
+          } else if (col == 1) {                                               \
+            entities.clear();                                                  \
+          } else {                                                             \
+            std::remove_if(entities.begin(), entities.end(),                   \
+                           [&](mx::EntityId id) {                              \
+                             return !(NAME##ColumnContaining[col - 2](         \
+                                 index, id, descendant_id));                   \
+                           });                                                 \
           }                                                                    \
         }                                                                      \
       }                                                                        \
@@ -381,7 +664,8 @@ GetCreateTableStatement(const std::vector<FieldDescriptor> &fields) {
   TABLE_CTOR(NAME)                                                             \
   TABLE_INIT(NAME)                                                             \
   TABLE_OPEN(NAME)                                                             \
-  TABLE_BESTINDEX(NAME)
+  TABLE_BESTINDEX(NAME)                                                        \
+  TABLE_FINDFUNCTION(NAME)
 
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
@@ -531,16 +815,21 @@ public:
     int err;
     switch (type) {
     case FieldType::Integer:
-      err = sqlite3_declare_vtab(
-          db, "CREATE TABLE vtab(parent_id INTEGER NOT NULL, pos INTEGER "
-              "NOT NULL, value INTEGER NOT NULL, PRIMARY KEY(parent_id, pos)) "
-              "WITHOUT ROWID");
+      err = sqlite3_declare_vtab(db, "CREATE TABLE vtab(parent_id "
+                                     "INTEGER "
+                                     "NOT NULL, pos INTEGER "
+                                     "NOT NULL, value INTEGER NOT "
+                                     "NULL, "
+                                     "PRIMARY KEY(parent_id, pos)) "
+                                     "WITHOUT ROWID");
       break;
     case FieldType::Text:
-      err = sqlite3_declare_vtab(
-          db, "CREATE TABLE vtab(parent_id INTEGER NOT NULL, pos INTEGER "
-              "NOT NULL, value TEXT NOT NULL, PRIMARY KEY(parent_id, pos)) "
-              "WITHOUT ROWID");
+      err = sqlite3_declare_vtab(db, "CREATE TABLE vtab(parent_id "
+                                     "INTEGER "
+                                     "NOT NULL, pos INTEGER "
+                                     "NOT NULL, value TEXT NOT NULL, "
+                                     "PRIMARY KEY(parent_id, pos)) "
+                                     "WITHOUT ROWID");
       break;
     }
     if (err != SQLITE_OK) {
@@ -560,7 +849,7 @@ public:
         return SQLITE_OK;
       }
     }
-    return SQLITE_OK;
+    return SQLITE_CONSTRAINT;
   }
 
   virtual mx::Result<std::unique_ptr<VirtualTableCursor>, int> Open() override {

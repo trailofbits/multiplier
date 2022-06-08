@@ -43,5 +43,15 @@ EXPORT int sqlite3_sqlitebridge_init(sqlite3 *db, char **pzErrMsg,
 #undef EXPORT
 #include <multiplier/Visitor.inc.h>
 
+  rc = sqlite3_create_function(
+      db, "containing", 2, SQLITE_UTF8 | SQLITE_DETERMINISTIC, nullptr,
+      [](sqlite3_context *ctx, int argc, sqlite3_value **argv) {
+        sqlite3_result_int(ctx, 0);
+      },
+      nullptr, nullptr);
+  if (rc != SQLITE_OK) {
+    return rc;
+  }
+
   return (new sqlite_bridge::MultiplierModule())->Register(db, "multiplier");
 }

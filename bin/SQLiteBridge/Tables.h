@@ -77,6 +77,10 @@ public:
     virtual int BestIndex(sqlite3_index_info *info) override;                  \
     virtual mx::Result<std::unique_ptr<VirtualTableCursor>, int>               \
     Open() override;                                                           \
+    virtual int FindFunction(int nArg, const std::string &name,                \
+                             void (**pxFunc)(sqlite3_context *, int,           \
+                                             sqlite3_value **),                \
+                             void **ppArg) override;                           \
   };
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
