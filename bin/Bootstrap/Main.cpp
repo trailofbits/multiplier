@@ -551,6 +551,7 @@ class CodeGenerator {
   std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
   std::ofstream serialize_inc_os;  // `include/multiplier/Visitor.inc.h`
   std::stringstream late_serialize_inc_os;
+  std::ofstream docs_md_os; // `docs/sqlite.md`
 
   // Keep track of where the decl/stmt/type kind is stored.
   unsigned decl_kind_id{0u};
@@ -635,6 +636,9 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
   include_h_os << "enum class " << enum_name << " : " << types.first << " {\n";
   serialize_inc_os << "MX_BEGIN_ENUM_CLASS(" << enum_name << ", " << types.first << ")\n";
+  docs_md_os
+      << "<details><summary><a name=\"" << enum_name << "\"></a>" << enum_name << "</summary>\n\n"
+      << "Available enumerations:\n\n";
 
   // Generate a `switch` to convert from PASTA, as PASTA's version of enums
   // have the same initializer values as Clang does, but in Multiplier, we use
@@ -709,6 +713,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
         << enum_case << "\";\n";
 
     serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
+    docs_md_os << "* `" << enum_case << "`\n";
     ++i;
   }
 
@@ -740,6 +745,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
           << enum_case << "\";\n";
 
       serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
+      docs_md_os << "* `" << enum_case << "`\n";
       ++i;
     }
 
@@ -764,6 +770,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
           << enum_case << "\";\n";
 
       serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
+      docs_md_os << "* `" << enum_case << "`\n";
       ++i;
     }
 
@@ -789,6 +796,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
           << enum_case << "\";\n";
 
       serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
+      docs_md_os << "* `" << enum_case << "`\n";
       ++i;
     }
   }
@@ -817,6 +825,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "const char *EnumeratorName(" << enum_name << ");\n\n";
 
   serialize_inc_os << "MX_END_ENUM_CLASS(" << enum_name << ")\n\n";
+  docs_md_os << "\n</details>\n\n";
 
   enum_names.insert(std::move(enum_name));
 }
@@ -981,6 +990,9 @@ void CodeGenerator::RunOnOptional(
         << "    return " << cxx_element_name
         << "(data.cStr(), data.size());\n";
 
+    docs_md_os
+      << "| `" << api_name << "` | `TEXT` | :x: | |\n";
+
   // String views need to be converted to `std::string` because Cap'n
   // Proto requires `:Text` fields to be `NUL`-terminated.
   } else if (*element_name == "string_view" ||
@@ -1007,6 +1019,9 @@ void CodeGenerator::RunOnOptional(
         << "();\n"
         << "    return " << cxx_element_name
         << "(data.cStr(), data.size());\n";
+
+    docs_md_os
+      << "| `" << api_name << "` | `TEXT` | :x: | |\n";
 
   // Filesystem paths.
   } else if (*element_name == "path") {
@@ -1101,6 +1116,9 @@ void CodeGenerator::RunOnOptional(
 
     selector << "::" << SnakeCaseToEnumCase(api_name);
 
+    docs_md_os
+      << "| `" << api_name << "` | `INTEGER` | :x: | [`" << *element_name << "`](#" << *element_name << ") |\n";
+
   // Pseudo-entities.
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
 
@@ -1142,6 +1160,12 @@ void CodeGenerator::RunOnOptional(
     lib_cpp_os
         << "    return static_cast<" << cxx_element_name
         << ">(self." << getter_name << "());\n";
+
+    if(is_enum || is_bool) {
+      docs_md_os << "| `" << api_name << "` | `INTEGER` | :x: | |\n";
+    } else {
+      docs_md_os << "| `" << api_name << "` | `INTEGER` | :x: | [`"<< element_name.value() << "`](#" << element_name.value() << ") |\n";
+    }
   }
 
   lib_cpp_os
@@ -1502,6 +1526,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthDecl";
 
+    docs_md_os
+        << "<details><summary><a name=\"" << class_name << "\"></a>" << class_name << "</summary>\n\n"
+        << "| Name | Type | `NOT NULL` | References |\n"
+        << "| --- | --- | --- | --- |\n";
   } else if (is_stmt) {
     include_h_os
         << "using " << class_name
@@ -1533,6 +1561,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthStmt";
 
+    docs_md_os
+        << "<details><summary><a name=\"" << class_name << "\"></a>" << class_name << "</summary>\n\n"
+        << "| Name | Type | `NOT NULL` | References |\n"
+        << "| --- | --- | --- | --- |\n";
   } else if (is_type) {
     include_h_os
         << "using " << class_name
@@ -1564,6 +1596,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthType";
 
+    docs_md_os
+        << "<details><summary><a name=\"" << class_name << "\"></a>" << class_name << "</summary>\n\n"
+        << "| Name | Type | `NOT NULL` | References |\n"
+        << "| --- | --- | --- | --- |\n";
   } else {
     auto pk = storage.AddMethod("UInt8");  // pseudo kind.
     auto [pk_getter_name, pk_setter_name, pk_init_name] = NamesFor(pk);
@@ -1582,6 +1618,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     end_serializer = "MX_END_VISIT_PSEUDO";
 
     nth_entity_reader = "NthPseudo";
+
+    docs_md_os << "<!-- ";
   }
 
   include_h_os
@@ -1670,6 +1708,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_cpp_os
             << "  b." << def_setter_name << "(IsDefinition(e));\n";
+
+        docs_md_os
+          << "| `is_definition` | `INTEGER` | :heavy_check_mark: | |\n";
       }
 
       lib_cpp_os
@@ -1808,7 +1849,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    b." << ref_setter_name << "(es.EntityId(r" << ref
           << ".value()));\n"
           << "  }\n";  
-          
+
+      docs_md_os
+        << "| `referenced_declaration` | `INTEGER` | :x: | [`Decl`](#Decl) |\n";
       seen_methods->emplace("begin_token");  // Disable this.
       seen_methods->emplace("end_token");  // Disable this.
 
@@ -2201,6 +2244,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 //            << "  LOG_IF(ERROR, !t" << i << ") << \"" << class_name << "::"
 //            << method_name << " returns invalid token\";\n"
             << "  b." << setter_name << "(es.EntityId(t" << i << "));\n";
+            
+        docs_md_os
+          << "| `" << api_name << "` | `INTEGER` | :heavy_check_mark: | |\n";
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
@@ -2255,6 +2301,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_cpp_os
             << "  b." << setter_name << "(e." << method_name << "());\n";
+            
+        docs_md_os
+          << "| `" << api_name << "` | `TEXT` | :heavy_check_mark: | |\n";
 
       // Handle `std::string_view`. Cap'n Proto requires that `:Text` fields
       // are `NUL`-terminated, so we convert the string view into a
@@ -2286,7 +2335,9 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  auto v" << i << " = e." << method_name << "();\n"
             << "  std::string s" << i << "(v" << i << ".data(), v"
             << i << ".size());\n  b." << setter_name << "(s" << i << ");\n";
-
+            
+        docs_md_os
+          << "| `" << api_name << "` | `TEXT` | :heavy_check_mark: | |\n";
       // In pasta.
       } else if (record_name == "ArgumentVector") {
         std::cerr << "!!! ArgumentVector\n";
@@ -2426,6 +2477,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         lib_cpp_os
             << "}\n\n";
+            
+        docs_md_os
+          << "| `" << api_name << "` | `INTEGER` | :heavy_check_mark: | [`" << record_name << "`](#" << record_name << ") |\n";
 
       // E.g. `TemplateParameterList`.
       } else if (gNotReferenceTypesRelatedToEntities.count(record_name)) {
@@ -2498,6 +2552,9 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  b." << setter_name
             << "(static_cast<" << types.first << ">(mx::FromPasta(e."
             << method_name << "())));\n";
+            
+        docs_md_os
+          << "| `" << api_name << "` | `INTEGER` | :heavy_check_mark: | [`" << enum_name << "`](#" << enum_name << ") |\n";
 
         // Keep track of where the decl/stmt/type kind is stored.
         if (api_name == "kind") {
@@ -2543,6 +2600,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_cpp_os
           << "  b." << setter_name << "(e." << method_name << "());\n";
+
+      docs_md_os
+        << "| `" << api_name << "` | `INTEGER` | :heavy_check_mark: | |\n";
     }
   }
 
@@ -2607,6 +2667,17 @@ MethodListPtr CodeGenerator::RunOnClass(
   late_serialize_inc_os
       << "#undef MX_ENTER_VISIT_" << class_name << "\n"
       << "#undef MX_EXIT_VISIT_" << class_name << "\n";
+
+  if(end_serializer != std::string("MX_END_VISIT_PSEUDO")) { 
+    if (cls->base) {
+      auto base_name{cls->base->record.Name()};
+      docs_md_os
+          << "\nThis table also includes all of the fields contained in [`" << base_name << "`](#" << base_name << ").\n\n";
+    }
+    docs_md_os << "\n</details>\n\n";
+  } else {
+    docs_md_os << " -->\n\n";
+  }
 
   return seen_methods;
 }
@@ -2847,6 +2918,13 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Use.h\"\n\n"
       << "namespace pasta {\n";
 
+  docs_md_os
+      << "# SQLite bindings for Multiplier\n"
+      << "\n"
+      << "This document has been automatically generated and "
+      << "provides a reference to the Multiplier API as exposes by the SQLite extension module.\n"
+      << "\n";
+
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {
     serialize_h_os << "class " << record.Name() << ";\n";
@@ -2898,6 +2976,11 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     }
   }
 
+  docs_md_os
+      << "## Enum functions\n\n"
+      << "These functions allow users to refer to the numeric value of enum "
+      << "constants using their name. For example, `BuiltinTypeKind(\"U_LONG\")` "
+      << "is equivalent to accessing `BuiltinTypeKind::U_LONG` in C++.\n\n";
   for (const pasta::EnumDecl &tag : enums) {
     if (auto itype = CxxIntType(tag.IntegerType())) {
       RunOnEnum(tag);
@@ -2959,6 +3042,12 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   lib_cpp_os
       << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n";
 
+  docs_md_os
+      << "## Class tables\n\n"
+      << "Every class exposed by the Multiplier API has a corresponding table "
+      << "for use with SQL queries.\n\n"
+      << "In addition to the fields listed in each entry's summary, "
+      << "every table also has `id` and `fragment_id` fields\n\n";
   while (!work_list.empty()) {
     auto [cls, parent_methods] = work_list.back();
     work_list.pop_back();
@@ -3215,14 +3304,15 @@ CodeGenerator::CodeGenerator(char *argv[])
       include_h_os(argv[5], std::ios::trunc | std::ios::out),
       serialize_h_os(argv[6], std::ios::trunc | std::ios::out),
       serialize_cpp_os(argv[7], std::ios::trunc | std::ios::out),
-      serialize_inc_os(argv[8], std::ios::trunc | std::ios::out) {}
+      serialize_inc_os(argv[8], std::ios::trunc | std::ios::out),
+      docs_md_os(argv[9], std::ios::trunc | std::ios::out) {}
 
 int main(int argc, char *argv[]) {
-  if (9 != argc) {
+  if (10 != argc) {
     std::cerr
         << "Usage: " << argv[0]
         << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_AST_CAPNP LIB_AST_CPP"
-        << " INCLUDE_AST_H SERIALIZE_H SERIALIZE_CPP VISITOR_INC USE_INC"
+        << " INCLUDE_AST_H SERIALIZE_H SERIALIZE_CPP VISITOR_INC USE_INC DOCS_MD"
         << std::endl;
     return EXIT_FAILURE;
   }

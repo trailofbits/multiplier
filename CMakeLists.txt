@@ -116,6 +116,7 @@ set(MX_BOOTSTRAP_INCLUDE_AST_H "${PROJECT_SOURCE_DIR}/include/multiplier/AST.h")
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_H "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.h")
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_CPP "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.cpp")
 set(MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H "${PROJECT_SOURCE_DIR}/include/multiplier/Visitor.inc.h")
+set(MX_BOOTSTRAP_SQLITE_DOCS_MD "${PROJECT_SOURCE_DIR}/docs/sqlite.md")
 
 if(MX_ENABLE_BOOTSTRAP)
   add_subdirectory("bin/Bootstrap")
