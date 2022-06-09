@@ -261,67 +261,40 @@ struct ContainingPredicate<T,
   }
 };
 
-#define MX_BEGIN_VISIT_DECL(NAME)                                              \
-  static std::vector<PredType*> NAME##ColumnContaining_partial({
-#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
-#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
-#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
-#define MX_VISIT_BOOL(...) &FalsePredicate,
-#define MX_VISIT_INT MX_VISIT_BOOL
-#define MX_VISIT_ENUM MX_VISIT_BOOL
-#define MX_VISIT_TEXT MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_BOOL MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_INT MX_VISIT_BOOL
-#define MX_VISIT_OPTIONAL_TEXT MX_VISIT_BOOL
-#define MX_VISIT_ENTITY(TABLE, LOWERCASE, GET, SET, INIT, UPPERCASE, TYPE,     \
-                        ...)                                                   \
-  &ContainingPredicate<mx::TYPE>::Predicate,
-#define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_ENTITY
-#define MX_END_VISIT_DECL(NAME)                                                \
-  });
-#define MX_END_VISIT_STMT MX_END_VISIT_DECL
-#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
-#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
-#include <multiplier/Visitor.inc.h>
-
-#define MX_BEGIN_VISIT_DECL(NAME)                                              \
-  static std::vector<PredType *> Get##NAME##ColumnContaining() {               \
-    std::vector<PredType *> fields;                                            \
-    auto out_it{std::back_inserter(fields)};
-#define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
-#define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
-#define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
-
-#define MX_VISIT_BASE(NAME, BASE)                                              \
-  std::copy(BASE##ColumnContaining.begin(), BASE##ColumnContaining.end(),      \
-            out_it);
-
-#define MX_END_VISIT_DECL(NAME)                                                \
-  std::copy(NAME##ColumnContaining_partial.begin(),                            \
-            NAME##ColumnContaining_partial.end(), out_it);                     \
-  return fields;                                                               \
-  }                                                                            \
-  static std::vector<PredType *> NAME##ColumnContaining =                      \
-      Get##NAME##ColumnContaining();
-#define MX_END_VISIT_STMT MX_END_VISIT_DECL
-#define MX_END_VISIT_TYPE MX_END_VISIT_DECL
-#define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
-#include <multiplier/Visitor.inc.h>
-
 enum class FieldType { Integer, Text };
 
-using FieldGetter = void(mx::Index index, mx::EntityId id,
-                         sqlite3_context *ctx);
+using SQLiteFieldGetter = void(mx::Index index, mx::EntityId id,
+                               sqlite3_context *ctx);
+using EntityFieldGetter = std::optional<mx::EntityId>(mx::Index,
+                                                      mx::EntityId id);
 
 struct FieldDescriptor {
+  // Name of the field
   std::string name;
+
+  // SQL type of the field
   FieldType type;
+
+  // Whether it is nullable or not
   bool nullable;
-  FieldGetter *getter;
+
+  // Sets the result of a SQL function to the value of the field
+  SQLiteFieldGetter *sqliteGetter;
+
+  // Returns the entity id of the field, if the field _is_ an entity. Otherwise,
+  // nullopt.
+  EntityFieldGetter *entityGetter;
+
+  // The predicate function to use when evaluating the `containing` function on
+  // this field
+  PredType *containingPredicate;
 
   FieldDescriptor(std::string name, FieldType type, bool nullable,
-                  FieldGetter *getter)
-      : name(name), type(type), nullable(nullable), getter(getter) {}
+                  SQLiteFieldGetter *sqliteGetter,
+                  EntityFieldGetter *entityGetter,
+                  PredType *containingPredicate)
+      : name(name), type(type), nullable(nullable), sqliteGetter(sqliteGetter),
+        entityGetter(entityGetter), containingPredicate(containingPredicate) {}
 };
 
 /* Schema definitions */
@@ -331,79 +304,107 @@ struct FieldDescriptor {
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
 #define MX_VISIT_BOOL(TYPE, NAME, ...)                                         \
-  FieldDescriptor(#NAME, FieldType::Integer, false,                            \
-                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
-                    FromEntityId<mx::TYPE> helper;                             \
-                    auto entity{helper.get(index, id)};                        \
-                    assert(entity.has_value());                                \
-                    sqlite3_result_int64(                                      \
-                        ctx, static_cast<std::int64_t>(entity->NAME()));       \
-                  }),
+  FieldDescriptor(                                                             \
+      #NAME, FieldType::Integer, false,                                        \
+      [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) {             \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        sqlite3_result_int64(ctx, static_cast<std::int64_t>(entity->NAME()));  \
+      },                                                                       \
+      [](mx::Index index, mx::EntityId id) { return std::nullopt; },           \
+      &FalsePredicate),
 #define MX_VISIT_INT MX_VISIT_BOOL
 #define MX_VISIT_ENUM MX_VISIT_BOOL
 #define MX_VISIT_ENTITY(TYPE, NAME, ...)                                       \
-  FieldDescriptor(#NAME, FieldType::Integer, false,                            \
-                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
-                    FromEntityId<mx::TYPE> helper;                             \
-                    auto entity{helper.get(index, id)};                        \
-                    assert(entity.has_value());                                \
-                    sqlite3_result_int64(                                      \
-                        ctx, static_cast<std::int64_t>(entity->NAME().id()));  \
-                  }),
+  FieldDescriptor(                                                             \
+      #NAME, FieldType::Integer, false,                                        \
+      [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) {             \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        sqlite3_result_int64(ctx,                                              \
+                             static_cast<std::int64_t>(entity->NAME().id()));  \
+      },                                                                       \
+      [](mx::Index index, mx::EntityId id) {                                   \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        return entity->NAME().id();                                            \
+      },                                                                       \
+      &ContainingPredicate<mx::TYPE>::Predicate),
 #define MX_VISIT_TEXT(TYPE, NAME, ...)                                         \
-  FieldDescriptor(#NAME, FieldType::Text, false,                               \
-                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
-                    FromEntityId<mx::TYPE> helper;                             \
-                    auto entity{helper.get(index, id)};                        \
-                    assert(entity.has_value());                                \
-                    auto str{entity->NAME()};                                  \
-                    sqlite3_result_text(ctx, str.data(), str.size(),           \
-                                        SQLITE_STATIC);                        \
-                  }),
+  FieldDescriptor(                                                             \
+      #NAME, FieldType::Text, false,                                           \
+      [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) {             \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        auto str{entity->NAME()};                                              \
+        sqlite3_result_text(ctx, str.data(), str.size(), SQLITE_STATIC);       \
+      },                                                                       \
+      [](mx::Index index, mx::EntityId id) { return std::nullopt; },           \
+      &FalsePredicate),
 #define MX_VISIT_OPTIONAL_BOOL(TYPE, NAME, ...)                                \
-  FieldDescriptor(#NAME, FieldType::Integer, true,                             \
-                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
-                    FromEntityId<mx::TYPE> helper;                             \
-                    auto entity{helper.get(index, id)};                        \
-                    assert(entity.has_value());                                \
-                    auto val{entity->NAME()};                                  \
-                    if (val) {                                                 \
-                      sqlite3_result_int64(ctx,                                \
-                                           static_cast<std::int64_t>(*val));   \
-                    } else {                                                   \
-                      sqlite3_result_null(ctx);                                \
-                    }                                                          \
-                  }),
+  FieldDescriptor(                                                             \
+      #NAME, FieldType::Integer, true,                                         \
+      [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) {             \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        auto val{entity->NAME()};                                              \
+        if (val) {                                                             \
+          sqlite3_result_int64(ctx, static_cast<std::int64_t>(*val));          \
+        } else {                                                               \
+          sqlite3_result_null(ctx);                                            \
+        }                                                                      \
+      },                                                                       \
+      [](mx::Index index, mx::EntityId id) { return std::nullopt; },           \
+      &FalsePredicate),
 #define MX_VISIT_OPTIONAL_INT MX_VISIT_OPTIONAL_BOOL
 #define MX_VISIT_OPTIONAL_ENUM MX_VISIT_OPTIONAL_BOOL
 #define MX_VISIT_OPTIONAL_ENTITY(TYPE, NAME, ...)                              \
-  FieldDescriptor(#NAME, FieldType::Integer, true,                             \
-                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
-                    FromEntityId<mx::TYPE> helper;                             \
-                    auto entity{helper.get(index, id)};                        \
-                    assert(entity.has_value());                                \
-                    auto val{entity->NAME()};                                  \
-                    if (val) {                                                 \
-                      sqlite3_result_int64(                                    \
-                          ctx, static_cast<std::int64_t>(val->id()));          \
-                    } else {                                                   \
-                      sqlite3_result_null(ctx);                                \
-                    }                                                          \
-                  }),
+  FieldDescriptor(                                                             \
+      #NAME, FieldType::Integer, true,                                         \
+      [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) {             \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        auto val{entity->NAME()};                                              \
+        if (val) {                                                             \
+          sqlite3_result_int64(ctx, static_cast<std::int64_t>(val->id()));     \
+        } else {                                                               \
+          sqlite3_result_null(ctx);                                            \
+        }                                                                      \
+      },                                                                       \
+      [](mx::Index index, mx::EntityId id) {                                   \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        auto sub{entity->NAME()};                                              \
+        if (sub) {                                                             \
+          return sub->id();                                                    \
+        } else {                                                               \
+          return std::nullopt;                                                 \
+        }                                                                      \
+      },                                                                       \
+      &ContainingPredicate<mx::TYPE>::Predicate),
 #define MX_VISIT_OPTIONAL_TEXT(TYPE, NAME, ...)                                \
-  FieldDescriptor(#NAME, FieldType::Text, true,                                \
-                  [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) { \
-                    FromEntityId<mx::TYPE> helper;                             \
-                    auto entity{helper.get(index, id)};                        \
-                    assert(entity.has_value());                                \
-                    auto val{entity->NAME()};                                  \
-                    if (val) {                                                 \
-                      sqlite3_result_text(ctx, val->data(), val->size(),       \
-                                          SQLITE_STATIC);                      \
-                    } else {                                                   \
-                      sqlite3_result_null(ctx);                                \
-                    }                                                          \
-                  }),
+  FieldDescriptor(                                                             \
+      #NAME, FieldType::Text, true,                                            \
+      [](mx::Index index, mx::EntityId id, sqlite3_context *ctx) {             \
+        FromEntityId<mx::TYPE> helper;                                         \
+        auto entity{helper.get(index, id)};                                    \
+        assert(entity.has_value());                                            \
+        auto val{entity->NAME()};                                              \
+        if (val) {                                                             \
+          sqlite3_result_text(ctx, val->data(), val->size(), SQLITE_STATIC);   \
+        } else {                                                               \
+          sqlite3_result_null(ctx);                                            \
+        }                                                                      \
+      },                                                                       \
+      [](mx::Index index, mx::EntityId id) { return std::nullopt; },           \
+      &FalsePredicate),
 #define MX_END_VISIT_DECL(NAME)                                                \
   });
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
@@ -569,6 +570,81 @@ static int FindFunction(int nArg, const std::string &name,
     return ::sqlite_bridge::FindFunction(nArg, name, pxFunc, ppArg);           \
   }
 
+template <typename T>
+static int Filter(int idxNum, const char *idxStr,
+                  const std::vector<sqlite3_value *> &args,
+                  std::vector<mx::EntityId> &entities,
+                  const std::vector<FieldDescriptor> &fields) override {
+  entities.clear();
+  ConstraintData data;
+  std::memcpy(data.data(), idxStr, sizeof(data));
+  int argIndex{0};
+  bool generatedEntities{false};
+  if ((idxNum & EntityId) == EntityId) {
+    FromEntityId<T> helper;
+    auto entity{helper.get(index, sqlite3_value_int64(args[argIndex++]))};
+    if (entity) {
+      entities.push_back(entity->id());
+    }
+    generatedEntities = true;
+  }
+  if ((idxNum & FragmentId) == FragmentId) {
+    auto frag_id{sqlite3_value_int64(args[argIndex++])};
+    auto fragment{index.fragment(frag_id)};
+    if (fragment) {
+      if (generatedEntities) {
+        std::remove_if(entities.begin(), entities.end(), [&](mx::EntityId id) {
+          auto frag{FragmentContaining(id)};
+          if (!frag) {
+            return true;
+          }
+          return frag_id != *frag;
+        });
+      } else {
+        for (auto entity : T::in(*fragment)) {
+          entities.push_back(entity.id());
+        }
+        generatedEntities = true;
+      }
+    } else {
+      entities.clear();
+      generatedEntities = true;
+    }
+  }
+  if (!generatedEntities) {
+    for (auto file : mx::File::in(index)) {
+      for (auto fragment : mx::Fragment::in(file)) {
+        for (auto entity : T::in(fragment)) {
+          entities.push_back(entity.id());
+        }
+      }
+    }
+  }
+  if ((idxNum & Containing) == Containing) {
+    for (size_t i = 0; i < MaxNumContaining && data[i] >= 0; ++i) {
+      auto col{data[i]};
+      auto descendant_id{sqlite3_value_int64(args[argIndex++])};
+      if (col == 0) {
+        std::remove_if(entities.begin(), entities.end(), [&](mx::EntityId id) {
+          return !(ContainingPredicate<T>::Predicate(index, id, descendant_id));
+        });
+      } else if (col == 1) {
+        entities.clear();
+      } else {
+        std::remove_if(entities.begin(), entities.end(), [&](mx::EntityId id) {
+          auto field{fields[col - 2]};
+          auto value{field.entityGetter(index, id)};
+          if (value) {
+            return !(field.containingPredicate(index, *value, descendant_id));
+          } else {
+            return false;
+          }
+        });
+      }
+    }
+  }
+}
+
 #define TABLE_CURSOR(NAME)                                                     \
   class NAME##Cursor : public VirtualTableCursor {                             \
   private:                                                                     \
@@ -581,70 +657,8 @@ static int FindFunction(int nArg, const std::string &name,
     virtual ~NAME##Cursor() = default;                                         \
     virtual int Filter(int idxNum, const char *idxStr,                         \
                        const std::vector<sqlite3_value *> &args) override {    \
-      entities.clear();                                                        \
-      ConstraintData data;                                                     \
-      std::memcpy(data.data(), idxStr, sizeof(data));                          \
-      int argIndex{0};                                                         \
-      if ((idxNum & EntityId) == EntityId) {                                   \
-        FromEntityId<mx::NAME> helper;                                         \
-        auto entity{helper.get(index, sqlite3_value_int64(args[argIndex++]))}; \
-        if (entity) {                                                          \
-          entities.push_back(entity->id());                                    \
-        }                                                                      \
-      }                                                                        \
-      if ((idxNum & FragmentId) == FragmentId) {                               \
-        auto frag_id{sqlite3_value_int64(args[argIndex++])};                   \
-        auto fragment{index.fragment(frag_id)};                                \
-        if (fragment) {                                                        \
-          if ((idxNum & EntityId) == EntityId) {                               \
-            std::remove_if(entities.begin(), entities.end(),                   \
-                           [&](mx::EntityId id) {                              \
-                             auto frag{FragmentContaining(id)};                \
-                             if (!frag) {                                      \
-                               return true;                                    \
-                             }                                                 \
-                             return frag_id != *frag;                          \
-                           });                                                 \
-          } else {                                                             \
-            for (auto entity : mx::NAME::in(*fragment)) {                      \
-              entities.push_back(entity.id());                                 \
-            }                                                                  \
-          }                                                                    \
-        } else {                                                               \
-          entities.clear();                                                    \
-        }                                                                      \
-      }                                                                        \
-      if (!((idxNum & EntityId) == EntityId ||                                 \
-            (idxNum & FragmentId) == FragmentId)) {                            \
-        for (auto file : mx::File::in(index)) {                                \
-          for (auto fragment : mx::Fragment::in(file)) {                       \
-            for (auto entity : mx::NAME::in(fragment)) {                       \
-              entities.push_back(entity.id());                                 \
-            }                                                                  \
-          }                                                                    \
-        }                                                                      \
-      }                                                                        \
-      if ((idxNum & Containing) == Containing) {                               \
-        for (size_t i = 0; i < MaxNumContaining && data[i] >= 0; ++i) {        \
-          auto col{data[i]};                                                   \
-          auto descendant_id{sqlite3_value_int64(args[argIndex++])};           \
-          if (col == 0) {                                                      \
-            std::remove_if(                                                    \
-                entities.begin(), entities.end(), [&](mx::EntityId id) {       \
-                  return !(ContainingPredicate<mx::NAME>::Predicate(           \
-                      index, id, descendant_id));                              \
-                });                                                            \
-          } else if (col == 1) {                                               \
-            entities.clear();                                                  \
-          } else {                                                             \
-            std::remove_if(entities.begin(), entities.end(),                   \
-                           [&](mx::EntityId id) {                              \
-                             return !(NAME##ColumnContaining[col - 2](         \
-                                 index, id, descendant_id));                   \
-                           });                                                 \
-          }                                                                    \
-        }                                                                      \
-      }                                                                        \
+      ::sqlite_bridge::Filter<mx::NAME>(idxNum, idxStr, args, entities,        \
+                                        NAME##TableSchema);                    \
       cur = entities.begin();                                                  \
       return SQLITE_OK;                                                        \
     }                                                                          \
@@ -680,7 +694,7 @@ static int FindFunction(int nArg, const std::string &name,
       if (idxCol - 2 >= NAME##TableSchema.size()) {                            \
         return SQLITE_ERROR;                                                   \
       }                                                                        \
-      NAME##TableSchema[idxCol - 2].getter(index, *cur, ctx);                  \
+      NAME##TableSchema[idxCol - 2].sqliteGetter(index, *cur, ctx);            \
       return SQLITE_OK;                                                        \
     }                                                                          \
     case 0:                                                                    \
