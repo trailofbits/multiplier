@@ -3229,9 +3229,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   docs_md_os
       << "\n\n## List tables\n\n"
-      << "These tables represent one-to-many relations between objects. For examples, the arguments "
-      << "passed to a `CallExpr` will be represented as rows in the `CallExprArguments` table, "
-      << "which will contain a row for each argument.\n\n"
+      << "These tables represent one-to-many relations between objects. For example, the arguments "
+      << "passed to a `CallExpr` will be represented using the `CallExprArguments` table, which "
+      << "will contain a row for each argument.\n\n"
       << "Each table consists of three fields:\n\n"
       << "* `parent_id`: id of the object this list belongs to.\n"
       << "* `pos`: position in the list of this row.\n"

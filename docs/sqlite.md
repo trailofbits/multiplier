@@ -10763,7 +10763,7 @@ This table also includes all of the fields contained in [`Decl`](#Decl).
 
 ## List tables
 
-These tables represent one-to-many relations between objects. For examples, the arguments passed to a `CallExpr` will be represented as rows in the `CallExprArguments` table, which will contain a row for each argument.
+These tables represent one-to-many relations between objects. For example, the arguments passed to a `CallExpr` will be represented using the `CallExprArguments` table, which will contain a row for each argument.
 
 Each table consists of three fields:
 
