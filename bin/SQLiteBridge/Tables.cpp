@@ -351,124 +351,145 @@ struct FieldDescriptor {
 };
 
 /* Schema definitions */
+#define MX_VISIT_BOOL(TYPE, NAME, ...)                                         \
+  static void TYPE##SQliteGet##NAME(mx::Index &index, mx::EntityId id,         \
+                                    sqlite3_context *ctx) {                    \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    sqlite3_result_int64(ctx, static_cast<std::int64_t>(entity->NAME()));      \
+  }                                                                            \
+  static std::optional<mx::EntityId> TYPE##Get##NAME##EntityId(                \
+      mx::Index &index, mx::EntityId id) {                                     \
+    return std::nullopt;                                                       \
+  }
+#define MX_VISIT_INT MX_VISIT_BOOL
+#define MX_VISIT_ENUM MX_VISIT_BOOL
+#define MX_VISIT_ENTITY(TYPE, NAME, IGNORE0, IGNORE1, IGNORE2, ENTITY_TYPE,    \
+                        ...)                                                   \
+  static void TYPE##SQliteGet##NAME(mx::Index &index, mx::EntityId id,         \
+                                    sqlite3_context *ctx) {                    \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    sqlite3_result_int64(ctx, static_cast<std::int64_t>(entity->NAME().id())); \
+  }                                                                            \
+  static std::optional<mx::EntityId> TYPE##Get##NAME##EntityId(                \
+      mx::Index &index, mx::EntityId id) {                                     \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    return entity->NAME().id();                                                \
+  }
+#define MX_VISIT_TEXT(TYPE, NAME, ...)                                         \
+  static void TYPE##SQliteGet##NAME(mx::Index &index, mx::EntityId id,         \
+                                    sqlite3_context *ctx) {                    \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    auto str{entity->NAME()};                                                  \
+    sqlite3_result_text(ctx, str.data(), str.size(), SQLITE_TRANSIENT);        \
+  }                                                                            \
+  static std::optional<mx::EntityId> TYPE##Get##NAME##EntityId(                \
+      mx::Index &index, mx::EntityId id) {                                     \
+    return std::nullopt;                                                       \
+  }
+#define MX_VISIT_OPTIONAL_BOOL(TYPE, NAME, ...)                                \
+  static void TYPE##SQliteGet##NAME(mx::Index &index, mx::EntityId id,         \
+                                    sqlite3_context *ctx) {                    \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    auto val{entity->NAME()};                                                  \
+    if (val) {                                                                 \
+      sqlite3_result_int64(ctx, static_cast<std::int64_t>(*val));              \
+    } else {                                                                   \
+      sqlite3_result_null(ctx);                                                \
+    }                                                                          \
+  }                                                                            \
+  static std::optional<mx::EntityId> TYPE##Get##NAME##EntityId(                \
+      mx::Index &index, mx::EntityId id) {                                     \
+    return std::nullopt;                                                       \
+  }
+#define MX_VISIT_OPTIONAL_INT MX_VISIT_OPTIONAL_BOOL
+#define MX_VISIT_OPTIONAL_ENUM MX_VISIT_OPTIONAL_BOOL
+#define MX_VISIT_OPTIONAL_ENTITY(TYPE, NAME, IGNORE0, IGNORE1, IGNORE2,        \
+                                 ENTITY_TYPE, ...)                             \
+  static void TYPE##SQliteGet##NAME(mx::Index &index, mx::EntityId id,         \
+                                    sqlite3_context *ctx) {                    \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    auto val{entity->NAME()};                                                  \
+    if (val) {                                                                 \
+      sqlite3_result_int64(ctx, static_cast<std::int64_t>(val->id()));         \
+    } else {                                                                   \
+      sqlite3_result_null(ctx);                                                \
+    }                                                                          \
+  }                                                                            \
+  static std::optional<mx::EntityId> TYPE##Get##NAME##EntityId(                \
+      mx::Index &index, mx::EntityId id) {                                     \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    auto sub{entity->NAME()};                                                  \
+    if (sub) {                                                                 \
+      return sub->id();                                                        \
+    } else {                                                                   \
+      return std::nullopt;                                                     \
+    }                                                                          \
+  }
+#define MX_VISIT_OPTIONAL_TEXT(TYPE, NAME, ...)                                \
+  static void TYPE##SQliteGet##NAME(mx::Index &index, mx::EntityId id,         \
+                                    sqlite3_context *ctx) {                    \
+    FromEntityId<mx::TYPE> helper;                                             \
+    auto entity{helper.get(index, id)};                                        \
+    assert(entity.has_value());                                                \
+    auto val{entity->NAME()};                                                  \
+    if (val) {                                                                 \
+      sqlite3_result_text(ctx, val->data(), val->size(), SQLITE_TRANSIENT);    \
+    } else {                                                                   \
+      sqlite3_result_null(ctx);                                                \
+    }                                                                          \
+  }                                                                            \
+  static std::optional<mx::EntityId> TYPE##Get##NAME##EntityId(                \
+      mx::Index &index, mx::EntityId id) {                                     \
+    return std::nullopt;                                                       \
+  }
+
+#include <multiplier/Visitor.inc.h>
+
 #define MX_BEGIN_VISIT_DECL(NAME) static std::vector<FieldDescriptor> NAME##Table_fields({
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
 #define MX_VISIT_BOOL(TYPE, NAME, ...)                                         \
-  FieldDescriptor(                                                             \
-      #NAME, FieldType::Integer, false,                                        \
-      [](mx::Index &index, mx::EntityId id, sqlite3_context *ctx) {            \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        sqlite3_result_int64(ctx, static_cast<std::int64_t>(entity->NAME()));  \
-      },                                                                       \
-      [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
-        return std::nullopt;                                                   \
-      },                                                                       \
-      &FalsePredicate),
+  FieldDescriptor(#NAME, FieldType::Integer, false, &TYPE##SQliteGet##NAME,    \
+                  &TYPE##Get##NAME##EntityId, &FalsePredicate),
 #define MX_VISIT_INT MX_VISIT_BOOL
 #define MX_VISIT_ENUM MX_VISIT_BOOL
 #define MX_VISIT_ENTITY(TYPE, NAME, IGNORE0, IGNORE1, IGNORE2, ENTITY_TYPE,    \
                         ...)                                                   \
-  FieldDescriptor(                                                             \
-      #NAME, FieldType::Integer, false,                                        \
-      [](mx::Index &index, mx::EntityId id, sqlite3_context *ctx) {            \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        sqlite3_result_int64(ctx,                                              \
-                             static_cast<std::int64_t>(entity->NAME().id()));  \
-      },                                                                       \
-      [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        return entity->NAME().id();                                            \
-      },                                                                       \
-      &ContainingPredicate<mx::ENTITY_TYPE>::Predicate),
+  FieldDescriptor(#NAME, FieldType::Integer, false, &TYPE##SQliteGet##NAME,    \
+                  &TYPE##Get##NAME##EntityId,                                  \
+                  &ContainingPredicate<mx::ENTITY_TYPE>::Predicate),
 #define MX_VISIT_TEXT(TYPE, NAME, ...)                                         \
-  FieldDescriptor(                                                             \
-      #NAME, FieldType::Text, false,                                           \
-      [](mx::Index &index, mx::EntityId id, sqlite3_context *ctx) {            \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        auto str{entity->NAME()};                                              \
-        sqlite3_result_text(ctx, str.data(), str.size(), SQLITE_TRANSIENT);    \
-      },                                                                       \
-      [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
-        return std::nullopt;                                                   \
-      },                                                                       \
-      &FalsePredicate),
+  FieldDescriptor(#NAME, FieldType::Text, false, &TYPE##SQliteGet##NAME,       \
+                  &TYPE##Get##NAME##EntityId, &FalsePredicate),
 #define MX_VISIT_OPTIONAL_BOOL(TYPE, NAME, ...)                                \
-  FieldDescriptor(                                                             \
-      #NAME, FieldType::Integer, true,                                         \
-      [](mx::Index &index, mx::EntityId id, sqlite3_context *ctx) {            \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        auto val{entity->NAME()};                                              \
-        if (val) {                                                             \
-          sqlite3_result_int64(ctx, static_cast<std::int64_t>(*val));          \
-        } else {                                                               \
-          sqlite3_result_null(ctx);                                            \
-        }                                                                      \
-      },                                                                       \
-      [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
-        return std::nullopt;                                                   \
-      },                                                                       \
-      &FalsePredicate),
+  FieldDescriptor(#NAME, FieldType::Integer, true, &TYPE##SQliteGet##NAME,     \
+                  &TYPE##Get##NAME##EntityId, &FalsePredicate),
 #define MX_VISIT_OPTIONAL_INT MX_VISIT_OPTIONAL_BOOL
 #define MX_VISIT_OPTIONAL_ENUM MX_VISIT_OPTIONAL_BOOL
 #define MX_VISIT_OPTIONAL_ENTITY(TYPE, NAME, IGNORE0, IGNORE1, IGNORE2,        \
                                  ENTITY_TYPE, ...)                             \
-  FieldDescriptor(                                                             \
-      #NAME, FieldType::Integer, true,                                         \
-      [](mx::Index &index, mx::EntityId id, sqlite3_context *ctx) {            \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        auto val{entity->NAME()};                                              \
-        if (val) {                                                             \
-          sqlite3_result_int64(ctx, static_cast<std::int64_t>(val->id()));     \
-        } else {                                                               \
-          sqlite3_result_null(ctx);                                            \
-        }                                                                      \
-      },                                                                       \
-      [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        auto sub{entity->NAME()};                                              \
-        if (sub) {                                                             \
-          return sub->id();                                                    \
-        } else {                                                               \
-          return std::nullopt;                                                 \
-        }                                                                      \
-      },                                                                       \
-      &ContainingPredicate<mx::TYPE>::Predicate),
+  FieldDescriptor(#NAME, FieldType::Integer, true, &TYPE##SQliteGet##NAME,     \
+                  &TYPE##Get##NAME##EntityId,                                  \
+                  &ContainingPredicate<mx::TYPE>::Predicate),
 #define MX_VISIT_OPTIONAL_TEXT(TYPE, NAME, ...)                                \
-  FieldDescriptor(                                                             \
-      #NAME, FieldType::Text, true,                                            \
-      [](mx::Index &index, mx::EntityId id, sqlite3_context *ctx) {            \
-        FromEntityId<mx::TYPE> helper;                                         \
-        auto entity{helper.get(index, id)};                                    \
-        assert(entity.has_value());                                            \
-        auto val{entity->NAME()};                                              \
-        if (val) {                                                             \
-          sqlite3_result_text(ctx, val->data(), val->size(),                   \
-                              SQLITE_TRANSIENT);                               \
-        } else {                                                               \
-          sqlite3_result_null(ctx);                                            \
-        }                                                                      \
-      },                                                                       \
-      [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
-        return std::nullopt;                                                   \
-      },                                                                       \
-      &FalsePredicate),
+  FieldDescriptor(#NAME, FieldType::Text, true, &TYPE##SQliteGet##NAME,        \
+                  &TYPE##Get##NAME##EntityId, &FalsePredicate),
 #define MX_END_VISIT_DECL(NAME)                                                \
   });
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
@@ -679,6 +700,7 @@ static void Filter(int idxNum, const char *idxStr,
 
   if (!generatedEntities) {
     if ((idxNum & Containing) == Containing) {
+      int argIndexSave{argIndex};
       for (size_t i = 0; i < MaxNumContaining && data[i] >= 0; ++i) {
         auto col{data[i]};
         auto descendant_id{sqlite3_value_int64(args[argIndex++])};
@@ -688,6 +710,7 @@ static void Filter(int idxNum, const char *idxStr,
           break;
         }
       }
+      argIndex = argIndexSave;
     }
   }
 
