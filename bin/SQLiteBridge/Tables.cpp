@@ -320,8 +320,6 @@ using SQLiteFieldGetter = void(mx::Index &index, mx::EntityId id,
                                sqlite3_context *ctx);
 using EntityFieldGetter = std::optional<mx::EntityId>(mx::Index &index,
                                                       mx::EntityId id);
-using ContainingGenerator = void(mx::Index &index, mx::EntityId descendant_id,
-                                 std::vector<mx::EntityId> &entities);
 
 struct FieldDescriptor {
   // Name of the field
@@ -344,18 +342,12 @@ struct FieldDescriptor {
   // this field
   PredType *containingPredicate;
 
-  // Function to generate all entities that are returned from `containing` in
-  // case no other constraint is requested
-  ContainingGenerator *containingGenerator;
-
   FieldDescriptor(std::string name, FieldType type, bool nullable,
                   SQLiteFieldGetter *sqliteGetter,
                   EntityFieldGetter *entityGetter,
-                  PredType *containingPredicate,
-                  ContainingGenerator *containingGenerator)
+                  PredType *containingPredicate)
       : name(name), type(type), nullable(nullable), sqliteGetter(sqliteGetter),
-        entityGetter(entityGetter), containingPredicate(containingPredicate),
-        containingGenerator(containingGenerator) {}
+        entityGetter(entityGetter), containingPredicate(containingPredicate) {}
 };
 
 /* Schema definitions */
@@ -376,7 +368,7 @@ struct FieldDescriptor {
       [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
         return std::nullopt;                                                   \
       },                                                                       \
-      &FalsePredicate, &GenerateContaining<void>::Generate),
+      &FalsePredicate),
 #define MX_VISIT_INT MX_VISIT_BOOL
 #define MX_VISIT_ENUM MX_VISIT_BOOL
 #define MX_VISIT_ENTITY(TYPE, NAME, IGNORE0, IGNORE1, IGNORE2, ENTITY_TYPE,    \
@@ -396,8 +388,7 @@ struct FieldDescriptor {
         assert(entity.has_value());                                            \
         return entity->NAME().id();                                            \
       },                                                                       \
-      &ContainingPredicate<mx::ENTITY_TYPE>::Predicate,                        \
-      &GenerateContaining<mx::ENTITY_TYPE>::Generate),
+      &ContainingPredicate<mx::ENTITY_TYPE>::Predicate),
 #define MX_VISIT_TEXT(TYPE, NAME, ...)                                         \
   FieldDescriptor(                                                             \
       #NAME, FieldType::Text, false,                                           \
@@ -411,7 +402,7 @@ struct FieldDescriptor {
       [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
         return std::nullopt;                                                   \
       },                                                                       \
-      &FalsePredicate, &GenerateContaining<void>::Generate),
+      &FalsePredicate),
 #define MX_VISIT_OPTIONAL_BOOL(TYPE, NAME, ...)                                \
   FieldDescriptor(                                                             \
       #NAME, FieldType::Integer, true,                                         \
@@ -429,7 +420,7 @@ struct FieldDescriptor {
       [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
         return std::nullopt;                                                   \
       },                                                                       \
-      &FalsePredicate, &GenerateContaining<void>::Generate),
+      &FalsePredicate),
 #define MX_VISIT_OPTIONAL_INT MX_VISIT_OPTIONAL_BOOL
 #define MX_VISIT_OPTIONAL_ENUM MX_VISIT_OPTIONAL_BOOL
 #define MX_VISIT_OPTIONAL_ENTITY(TYPE, NAME, IGNORE0, IGNORE1, IGNORE2,        \
@@ -458,8 +449,7 @@ struct FieldDescriptor {
           return std::nullopt;                                                 \
         }                                                                      \
       },                                                                       \
-      &ContainingPredicate<mx::TYPE>::Predicate,                               \
-      &GenerateContaining<mx::ENTITY_TYPE>::Generate),
+      &ContainingPredicate<mx::TYPE>::Predicate),
 #define MX_VISIT_OPTIONAL_TEXT(TYPE, NAME, ...)                                \
   FieldDescriptor(                                                             \
       #NAME, FieldType::Text, true,                                            \
@@ -478,7 +468,7 @@ struct FieldDescriptor {
       [](mx::Index &index, mx::EntityId id) -> std::optional<mx::EntityId> {   \
         return std::nullopt;                                                   \
       },                                                                       \
-      &FalsePredicate, &GenerateContaining<void>::Generate),
+      &FalsePredicate),
 #define MX_END_VISIT_DECL(NAME)                                                \
   });
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
@@ -687,41 +677,16 @@ static void Filter(int idxNum, const char *idxStr,
     }
   }
 
-  if ((idxNum & Containing) == Containing) {
-    for (size_t i = 0; i < MaxNumContaining && data[i] >= 0; ++i) {
-      if (generatedEntities) {
-        auto col{data[i]};
-        auto descendant_id{sqlite3_value_int64(args[argIndex++])};
-        if (col == 0) {
-          entities.erase(std::remove_if(
-              entities.begin(), entities.end(), [&](mx::EntityId id) {
-                return !ContainingPredicate<T>::Predicate(index, id,
-                                                          descendant_id);
-              }));
-        } else if (col == 1) {
-          entities.clear();
-        } else {
-          entities.erase(std::remove_if(
-              entities.begin(), entities.end(), [&](mx::EntityId id) {
-                auto field{fields[col - 2]};
-                auto value{field.entityGetter(index, id)};
-                if (value) {
-                  return !field.containingPredicate(index, *value,
-                                                    descendant_id);
-                } else {
-                  return true;
-                }
-              }));
-        }
-      } else {
+  if (!generatedEntities) {
+    if ((idxNum & Containing) == Containing) {
+      for (size_t i = 0; i < MaxNumContaining && data[i] >= 0; ++i) {
         auto col{data[i]};
         auto descendant_id{sqlite3_value_int64(args[argIndex++])};
         if (col == 0) {
           GenerateContaining<T>::Generate(index, descendant_id, entities);
-        } else if (col > 1) {
-          fields[col - 2].containingGenerator(index, descendant_id, entities);
+          generatedEntities = true;
+          break;
         }
-        generatedEntities = true;
       }
     }
   }
@@ -732,6 +697,33 @@ static void Filter(int idxNum, const char *idxStr,
         for (auto entity : T::in(fragment)) {
           entities.push_back(entity.id());
         }
+      }
+    }
+  }
+
+  if ((idxNum & Containing) == Containing) {
+    for (size_t i = 0; i < MaxNumContaining && data[i] >= 0; ++i) {
+      auto col{data[i]};
+      auto descendant_id{sqlite3_value_int64(args[argIndex++])};
+      if (col == 0 && !generatedEntities) {
+        entities.erase(std::remove_if(
+            entities.begin(), entities.end(), [&](mx::EntityId id) {
+              return !ContainingPredicate<T>::Predicate(index, id,
+                                                        descendant_id);
+            }));
+      } else if (col == 1) {
+        entities.clear();
+      } else if (col > 1) {
+        entities.erase(std::remove_if(
+            entities.begin(), entities.end(), [&](mx::EntityId id) {
+              auto field{fields[col - 2]};
+              auto value{field.entityGetter(index, id)};
+              if (value) {
+                return !field.containingPredicate(index, *value, descendant_id);
+              } else {
+                return true;
+              }
+            }));
       }
     }
   }
