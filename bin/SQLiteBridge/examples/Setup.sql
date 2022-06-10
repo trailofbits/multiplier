@@ -5,6 +5,7 @@ CREATE VIRTUAL TABLE WeggliQuery       USING multiplier(WeggliQuery, localhost, 
 CREATE VIRTUAL TABLE Fragment          USING multiplier(Fragment, localhost, 50051);
 CREATE VIRTUAL TABLE Reference         USING multiplier(Reference, localhost, 50051);
 CREATE VIRTUAL TABLE Decl              USING multiplier(Decl, localhost, 50051);
+CREATE VIRTUAL TABLE NamedDecl         USING multiplier(NamedDecl, localhost, 50051);
 CREATE VIRTUAL TABLE Expr              USING multiplier(Expr, localhost, 50051);
 CREATE VIRTUAL TABLE Stmt              USING multiplier(Stmt, localhost, 50051);
 CREATE VIRTUAL TABLE CallExpr          USING multiplier(CallExpr, localhost, 50051);

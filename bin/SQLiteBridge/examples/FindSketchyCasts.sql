@@ -1,4 +1,10 @@
-SELECT DISTINCT call_expr.id FROM Decl decl
+SELECT DISTINCT
+    decl.id                  as decl_id,
+    call_expr.id             as call_id,
+    sub_expr.id              as sub_id,
+    source_type.builtin_kind as source_type,
+    dest_type.builtin_kind   as dest_type
+FROM Decl decl
 JOIN Reference AS ref ON ref.use_id = decl.id
 JOIN CallExpr AS call_expr ON containing(call_expr.id, ref.user_id)
 JOIN CallExprArguments AS argument ON argument.parent_id = call_expr.id
