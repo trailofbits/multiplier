@@ -552,6 +552,7 @@ class CodeGenerator {
   std::ofstream serialize_inc_os;  // `include/multiplier/Visitor.inc.h`
   std::stringstream late_serialize_inc_os;
   std::ofstream docs_md_os; // `docs/sqlite.md`
+  std::stringstream late_docs_md_os;
 
   // Keep track of where the decl/stmt/type kind is stored.
   unsigned decl_kind_id{0u};
@@ -1307,6 +1308,12 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
     lib_cpp_os
         << "vec.emplace_back(v.cStr(), v.size());\n";
 
+    late_docs_md_os
+        << "\n<details><summary><a name=\"" << class_name << method_name << "\"></a>" << class_name << method_name << "</summary>\n\n"
+        << "* Parent type: [`" << class_name << "`](#" << class_name << ")\n"
+        << "* Value type: `TEXT`\n\n"
+        << "</details>\n\n";
+
   // String views need to be converted to `std::string` because Cap'n
   // Proto requires `:Text` fields to be `NUL`-terminated.
   } else if (*element_name == "string_view" ||
@@ -1322,6 +1329,12 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
 
     lib_cpp_os
         << "vec.emplace_back(v.cStr(), v.size());\n";
+
+    late_docs_md_os
+        << "\n<details><summary><a name=\"" << class_name << method_name << "\"></a>" << class_name << method_name << "</summary>\n\n"
+        << "* Parent type: [`" << class_name << "`](#" << class_name << ")\n"
+        << "* Value type: `TEXT`\n\n"
+        << "</details>\n\n";
 
   // Filesystem paths.
   } else if (*element_name == "path") {
@@ -1405,6 +1418,13 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
       std::cerr << "??? vec " << (*element_name) << '\n';
       abort();
     }
+
+    late_docs_md_os
+        << "\n<details><summary><a name=\"" << class_name << method_name << "\"></a>" << class_name << method_name << "</summary>\n\n"
+        << "* Parent type: [`" << class_name << "`](#" << class_name << ")\n"
+        << "* Value type: `INTEGER`\n"
+        << "* References: [`" << *element_name << "`](#" << *element_name << ")\n\n"
+        << "</details>\n\n";
 
   // Not reference types, need to serialize offsets.
   } else {
@@ -3206,6 +3226,19 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   include_h_os << "}  // namespace mx\n";
   serialize_h_os << "}  // namespace indexer\n";
   serialize_cpp_os << "}  // namespace indexer\n";
+
+  docs_md_os
+      << "\n\n## List tables\n\n"
+      << "These tables represent one-to-many relations between objects. For examples, the arguments "
+      << "passed to a `CallExpr` will be represented as rows in the `CallExprArguments` table, "
+      << "which will contain a row for each argument.\n\n"
+      << "Each table consists of three fields:\n\n"
+      << "* `parent_id`: id of the object this list belongs to.\n"
+      << "* `pos`: position in the list of this row.\n"
+      << "* `value`: value of the list entry. May be either an `INTEGER` or `TEXT` field depending "
+      << "on whether this is a list of booleans, integers, strings or entities.\n\n"
+      << "These tables can only be queried on `parent_id`.\n\n"
+      << late_docs_md_os.str();
 }
 
 void CodeGenerator::RunOnUseSet(

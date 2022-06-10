@@ -10759,3 +10759,964 @@ This table also includes all of the fields contained in [`Decl`](#Decl).
 
 </details>
 
+
+
+## List tables
+
+These tables represent one-to-many relations between objects. For examples, the arguments passed to a `CallExpr` will be represented as rows in the `CallExprArguments` table, which will contain a row for each argument.
+
+Each table consists of three fields:
+
+* `parent_id`: id of the object this list belongs to.
+* `pos`: position in the list of this row.
+* `value`: value of the list entry. May be either an `INTEGER` or `TEXT` field depending on whether this is a list of booleans, integers, strings or entities.
+
+These tables can only be queried on `parent_id`.
+
+
+<details><summary><a name="TemplateParameterListParameters"></a>TemplateParameterListParameters</summary>
+
+* Parent type: [`TemplateParameterList`](#TemplateParameterList)
+* Value type: `INTEGER`
+* References: [`NamedDecl`](#NamedDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCObjectTypeTypeArguments"></a>ObjCObjectTypeTypeArguments</summary>
+
+* Parent type: [`ObjCObjectType`](#ObjCObjectType)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="ObjCObjectTypeTypeArgumentsAsWritten"></a>ObjCObjectTypeTypeArgumentsAsWritten</summary>
+
+* Parent type: [`ObjCObjectType`](#ObjCObjectType)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="ObjCObjectPointerTypeTypeArguments"></a>ObjCObjectPointerTypeTypeArguments</summary>
+
+* Parent type: [`ObjCObjectPointerType`](#ObjCObjectPointerType)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="ObjCObjectPointerTypeTypeArgumentsAsWritten"></a>ObjCObjectPointerTypeTypeArgumentsAsWritten</summary>
+
+* Parent type: [`ObjCObjectPointerType`](#ObjCObjectPointerType)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="ObjCObjectPointerTypeQualifieds"></a>ObjCObjectPointerTypeQualifieds</summary>
+
+* Parent type: [`ObjCObjectPointerType`](#ObjCObjectPointerType)
+* Value type: `INTEGER`
+* References: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCObjectPointerTypeProtocols"></a>ObjCObjectPointerTypeProtocols</summary>
+
+* Parent type: [`ObjCObjectPointerType`](#ObjCObjectPointerType)
+* Value type: `INTEGER`
+* References: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+
+</details>
+
+
+<details><summary><a name="FunctionProtoTypeExceptions"></a>FunctionProtoTypeExceptions</summary>
+
+* Parent type: [`FunctionProtoType`](#FunctionProtoType)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="FunctionProtoTypeParameterTypes"></a>FunctionProtoTypeParameterTypes</summary>
+
+* Parent type: [`FunctionProtoType`](#FunctionProtoType)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="FunctionProtoTypeExceptionTypes"></a>FunctionProtoTypeExceptionTypes</summary>
+
+* Parent type: [`FunctionProtoType`](#FunctionProtoType)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="StmtChildren"></a>StmtChildren</summary>
+
+* Parent type: [`Stmt`](#Stmt)
+* Value type: `INTEGER`
+* References: [`Stmt`](#Stmt)
+
+</details>
+
+
+<details><summary><a name="ObjCAtTryStmtCatchStatements"></a>ObjCAtTryStmtCatchStatements</summary>
+
+* Parent type: [`ObjCAtTryStmt`](#ObjCAtTryStmt)
+* Value type: `INTEGER`
+* References: [`ObjCAtCatchStmt`](#ObjCAtCatchStmt)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectiveCounters"></a>OMPLoopDirectiveCounters</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectiveDependentCounters"></a>OMPLoopDirectiveDependentCounters</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectiveDependentInitializers"></a>OMPLoopDirectiveDependentInitializers</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectiveFinals"></a>OMPLoopDirectiveFinals</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectiveFinalsConditions"></a>OMPLoopDirectiveFinalsConditions</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectiveInitializers"></a>OMPLoopDirectiveInitializers</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectivePrivateCounters"></a>OMPLoopDirectivePrivateCounters</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPLoopDirectiveUpdates"></a>OMPLoopDirectiveUpdates</summary>
+
+* Parent type: [`OMPLoopDirective`](#OMPLoopDirective)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="DeclStmtDeclarations"></a>DeclStmtDeclarations</summary>
+
+* Parent type: [`DeclStmt`](#DeclStmt)
+* Value type: `INTEGER`
+* References: [`Decl`](#Decl)
+
+</details>
+
+
+<details><summary><a name="CoroutineBodyStmtParameterMoves"></a>CoroutineBodyStmtParameterMoves</summary>
+
+* Parent type: [`CoroutineBodyStmt`](#CoroutineBodyStmt)
+* Value type: `INTEGER`
+* References: [`Stmt`](#Stmt)
+
+</details>
+
+
+<details><summary><a name="CXXTryStmtHandlers"></a>CXXTryStmtHandlers</summary>
+
+* Parent type: [`CXXTryStmt`](#CXXTryStmt)
+* Value type: `INTEGER`
+* References: [`CXXCatchStmt`](#CXXCatchStmt)
+
+</details>
+
+
+<details><summary><a name="AsmStmtInputs"></a>AsmStmtInputs</summary>
+
+* Parent type: [`AsmStmt`](#AsmStmt)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="AsmStmtOutputs"></a>AsmStmtOutputs</summary>
+
+* Parent type: [`AsmStmt`](#AsmStmt)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="AsmStmtOutputConstraints"></a>AsmStmtOutputConstraints</summary>
+
+* Parent type: [`AsmStmt`](#AsmStmt)
+* Value type: `TEXT`
+
+</details>
+
+
+<details><summary><a name="AsmStmtOutputExpressions"></a>AsmStmtOutputExpressions</summary>
+
+* Parent type: [`AsmStmt`](#AsmStmt)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="AsmStmtInputConstraints"></a>AsmStmtInputConstraints</summary>
+
+* Parent type: [`AsmStmt`](#AsmStmt)
+* Value type: `TEXT`
+
+</details>
+
+
+<details><summary><a name="AsmStmtInputExpressions"></a>AsmStmtInputExpressions</summary>
+
+* Parent type: [`AsmStmt`](#AsmStmt)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="AsmStmtClobbers"></a>AsmStmtClobbers</summary>
+
+* Parent type: [`AsmStmt`](#AsmStmt)
+* Value type: `TEXT`
+
+</details>
+
+
+<details><summary><a name="MSAsmStmtAllConstraints"></a>MSAsmStmtAllConstraints</summary>
+
+* Parent type: [`MSAsmStmt`](#MSAsmStmt)
+* Value type: `TEXT`
+
+</details>
+
+
+<details><summary><a name="MSAsmStmtAllExpressions"></a>MSAsmStmtAllExpressions</summary>
+
+* Parent type: [`MSAsmStmt`](#MSAsmStmt)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtLabels"></a>GCCAsmStmtLabels</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `INTEGER`
+* References: [`AddrLabelExpr`](#AddrLabelExpr)
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtOutputConstraintLiterals"></a>GCCAsmStmtOutputConstraintLiterals</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `INTEGER`
+* References: [`StringLiteral`](#StringLiteral)
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtOutputNames"></a>GCCAsmStmtOutputNames</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `TEXT`
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtInputConstraintLiterals"></a>GCCAsmStmtInputConstraintLiterals</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `INTEGER`
+* References: [`StringLiteral`](#StringLiteral)
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtInputNames"></a>GCCAsmStmtInputNames</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `TEXT`
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtClobberStringLiterals"></a>GCCAsmStmtClobberStringLiterals</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `INTEGER`
+* References: [`StringLiteral`](#StringLiteral)
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtLabelExpressions"></a>GCCAsmStmtLabelExpressions</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `INTEGER`
+* References: [`AddrLabelExpr`](#AddrLabelExpr)
+
+</details>
+
+
+<details><summary><a name="GCCAsmStmtLabelNames"></a>GCCAsmStmtLabelNames</summary>
+
+* Parent type: [`GCCAsmStmt`](#GCCAsmStmt)
+* Value type: `TEXT`
+
+</details>
+
+
+<details><summary><a name="DesignatedInitExprSubExpressions"></a>DesignatedInitExprSubExpressions</summary>
+
+* Parent type: [`DesignatedInitExpr`](#DesignatedInitExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="CallExprArguments"></a>CallExprArguments</summary>
+
+* Parent type: [`CallExpr`](#CallExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="CXXUnresolvedConstructExprArguments"></a>CXXUnresolvedConstructExprArguments</summary>
+
+* Parent type: [`CXXUnresolvedConstructExpr`](#CXXUnresolvedConstructExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="CXXNewExprPlacementArguments"></a>CXXNewExprPlacementArguments</summary>
+
+* Parent type: [`CXXNewExpr`](#CXXNewExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="CXXConstructExprArguments"></a>CXXConstructExprArguments</summary>
+
+* Parent type: [`CXXConstructExpr`](#CXXConstructExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="AtomicExprSubExpressions"></a>AtomicExprSubExpressions</summary>
+
+* Parent type: [`AtomicExpr`](#AtomicExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="TypeTraitExprArguments"></a>TypeTraitExprArguments</summary>
+
+* Parent type: [`TypeTraitExpr`](#TypeTraitExpr)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="RequiresExprLocalParameters"></a>RequiresExprLocalParameters</summary>
+
+* Parent type: [`RequiresExpr`](#RequiresExpr)
+* Value type: `INTEGER`
+* References: [`ParmVarDecl`](#ParmVarDecl)
+
+</details>
+
+
+<details><summary><a name="RecoveryExprSubExpressions"></a>RecoveryExprSubExpressions</summary>
+
+* Parent type: [`RecoveryExpr`](#RecoveryExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="PseudoObjectExprSemantics"></a>PseudoObjectExprSemantics</summary>
+
+* Parent type: [`PseudoObjectExpr`](#PseudoObjectExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="PseudoObjectExprSemanticExpressions"></a>PseudoObjectExprSemanticExpressions</summary>
+
+* Parent type: [`PseudoObjectExpr`](#PseudoObjectExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="ParenListExprExpressions"></a>ParenListExprExpressions</summary>
+
+* Parent type: [`ParenListExpr`](#ParenListExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="ObjCMessageExprArguments"></a>ObjCMessageExprArguments</summary>
+
+* Parent type: [`ObjCMessageExpr`](#ObjCMessageExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="ObjCMessageExprSelectorTokens"></a>ObjCMessageExprSelectorTokens</summary>
+
+* Parent type: [`ObjCMessageExpr`](#ObjCMessageExpr)
+* Value type: `INTEGER`
+* References: [`Token`](#Token)
+
+</details>
+
+
+<details><summary><a name="ObjCArrayLiteralElements"></a>ObjCArrayLiteralElements</summary>
+
+* Parent type: [`ObjCArrayLiteral`](#ObjCArrayLiteral)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPArrayShapingExprDimensions"></a>OMPArrayShapingExprDimensions</summary>
+
+* Parent type: [`OMPArrayShapingExpr`](#OMPArrayShapingExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="LambdaExprExplicitTemplateParameters"></a>LambdaExprExplicitTemplateParameters</summary>
+
+* Parent type: [`LambdaExpr`](#LambdaExpr)
+* Value type: `INTEGER`
+* References: [`NamedDecl`](#NamedDecl)
+
+</details>
+
+
+<details><summary><a name="InitListExprInitializers"></a>InitListExprInitializers</summary>
+
+* Parent type: [`InitListExpr`](#InitListExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="GenericSelectionExprAssociationExpressions"></a>GenericSelectionExprAssociationExpressions</summary>
+
+* Parent type: [`GenericSelectionExpr`](#GenericSelectionExpr)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="FunctionParmPackExprExpansions"></a>FunctionParmPackExprExpansions</summary>
+
+* Parent type: [`FunctionParmPackExpr`](#FunctionParmPackExpr)
+* Value type: `INTEGER`
+* References: [`VarDecl`](#VarDecl)
+
+</details>
+
+
+<details><summary><a name="DeclRedeclarations"></a>DeclRedeclarations</summary>
+
+* Parent type: [`Decl`](#Decl)
+* Value type: `INTEGER`
+* References: [`Decl`](#Decl)
+
+</details>
+
+
+<details><summary><a name="CapturedDeclParameters"></a>CapturedDeclParameters</summary>
+
+* Parent type: [`CapturedDecl`](#CapturedDecl)
+* Value type: `INTEGER`
+* References: [`ImplicitParamDecl`](#ImplicitParamDecl)
+
+</details>
+
+
+<details><summary><a name="BlockDeclParameters"></a>BlockDeclParameters</summary>
+
+* Parent type: [`BlockDecl`](#BlockDecl)
+* Value type: `INTEGER`
+* References: [`ParmVarDecl`](#ParmVarDecl)
+
+</details>
+
+
+<details><summary><a name="BlockDeclParameterDeclarations"></a>BlockDeclParameterDeclarations</summary>
+
+* Parent type: [`BlockDecl`](#BlockDecl)
+* Value type: `INTEGER`
+* References: [`ParmVarDecl`](#ParmVarDecl)
+
+</details>
+
+
+<details><summary><a name="OMPThreadPrivateDeclVarlists"></a>OMPThreadPrivateDeclVarlists</summary>
+
+* Parent type: [`OMPThreadPrivateDecl`](#OMPThreadPrivateDecl)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="OMPAllocateDeclVarlists"></a>OMPAllocateDeclVarlists</summary>
+
+* Parent type: [`OMPAllocateDecl`](#OMPAllocateDecl)
+* Value type: `INTEGER`
+* References: [`Expr`](#Expr)
+
+</details>
+
+
+<details><summary><a name="BaseUsingDeclShadows"></a>BaseUsingDeclShadows</summary>
+
+* Parent type: [`BaseUsingDecl`](#BaseUsingDecl)
+* Value type: `INTEGER`
+* References: [`UsingShadowDecl`](#UsingShadowDecl)
+
+</details>
+
+
+<details><summary><a name="IndirectFieldDeclChain"></a>IndirectFieldDeclChain</summary>
+
+* Parent type: [`IndirectFieldDecl`](#IndirectFieldDecl)
+* Value type: `INTEGER`
+* References: [`NamedDecl`](#NamedDecl)
+
+</details>
+
+
+<details><summary><a name="DecompositionDeclBindings"></a>DecompositionDeclBindings</summary>
+
+* Parent type: [`DecompositionDecl`](#DecompositionDecl)
+* Value type: `INTEGER`
+* References: [`BindingDecl`](#BindingDecl)
+
+</details>
+
+
+<details><summary><a name="NonTypeTemplateParmDeclExpansionTypes"></a>NonTypeTemplateParmDeclExpansionTypes</summary>
+
+* Parent type: [`NonTypeTemplateParmDecl`](#NonTypeTemplateParmDecl)
+* Value type: `INTEGER`
+* References: [`Type`](#Type)
+
+</details>
+
+
+<details><summary><a name="FunctionDeclParameters"></a>FunctionDeclParameters</summary>
+
+* Parent type: [`FunctionDecl`](#FunctionDecl)
+* Value type: `INTEGER`
+* References: [`ParmVarDecl`](#ParmVarDecl)
+
+</details>
+
+
+<details><summary><a name="CXXMethodDeclOverriddenMethods"></a>CXXMethodDeclOverriddenMethods</summary>
+
+* Parent type: [`CXXMethodDecl`](#CXXMethodDecl)
+* Value type: `INTEGER`
+* References: [`CXXMethodDecl`](#CXXMethodDecl)
+
+</details>
+
+
+<details><summary><a name="CXXMethodDeclParameterDeclarations"></a>CXXMethodDeclParameterDeclarations</summary>
+
+* Parent type: [`CXXMethodDecl`](#CXXMethodDecl)
+* Value type: `INTEGER`
+* References: [`ParmVarDecl`](#ParmVarDecl)
+
+</details>
+
+
+<details><summary><a name="CXXDeductionGuideDeclParameterDeclarations"></a>CXXDeductionGuideDeclParameterDeclarations</summary>
+
+* Parent type: [`CXXDeductionGuideDecl`](#CXXDeductionGuideDecl)
+* Value type: `INTEGER`
+* References: [`ParmVarDecl`](#ParmVarDecl)
+
+</details>
+
+
+<details><summary><a name="UsingPackDeclExpansions"></a>UsingPackDeclExpansions</summary>
+
+* Parent type: [`UsingPackDecl`](#UsingPackDecl)
+* Value type: `INTEGER`
+* References: [`NamedDecl`](#NamedDecl)
+
+</details>
+
+
+<details><summary><a name="RecordDeclFields"></a>RecordDeclFields</summary>
+
+* Parent type: [`RecordDecl`](#RecordDecl)
+* Value type: `INTEGER`
+* References: [`FieldDecl`](#FieldDecl)
+
+</details>
+
+
+<details><summary><a name="CXXRecordDeclConstructors"></a>CXXRecordDeclConstructors</summary>
+
+* Parent type: [`CXXRecordDecl`](#CXXRecordDecl)
+* Value type: `INTEGER`
+* References: [`CXXConstructorDecl`](#CXXConstructorDecl)
+
+</details>
+
+
+<details><summary><a name="CXXRecordDeclFriends"></a>CXXRecordDeclFriends</summary>
+
+* Parent type: [`CXXRecordDecl`](#CXXRecordDecl)
+* Value type: `INTEGER`
+* References: [`FriendDecl`](#FriendDecl)
+
+</details>
+
+
+<details><summary><a name="CXXRecordDeclLambdaExplicitTemplateParameters"></a>CXXRecordDeclLambdaExplicitTemplateParameters</summary>
+
+* Parent type: [`CXXRecordDecl`](#CXXRecordDecl)
+* Value type: `INTEGER`
+* References: [`NamedDecl`](#NamedDecl)
+
+</details>
+
+
+<details><summary><a name="CXXRecordDeclMethods"></a>CXXRecordDeclMethods</summary>
+
+* Parent type: [`CXXRecordDecl`](#CXXRecordDecl)
+* Value type: `INTEGER`
+* References: [`CXXMethodDecl`](#CXXMethodDecl)
+
+</details>
+
+
+<details><summary><a name="EnumDeclEnumerators"></a>EnumDeclEnumerators</summary>
+
+* Parent type: [`EnumDecl`](#EnumDecl)
+* Value type: `INTEGER`
+* References: [`EnumConstantDecl`](#EnumConstantDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCMethodDeclParameters"></a>ObjCMethodDeclParameters</summary>
+
+* Parent type: [`ObjCMethodDecl`](#ObjCMethodDecl)
+* Value type: `INTEGER`
+* References: [`ParmVarDecl`](#ParmVarDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCMethodDeclSelectorTokens"></a>ObjCMethodDeclSelectorTokens</summary>
+
+* Parent type: [`ObjCMethodDecl`](#ObjCMethodDecl)
+* Value type: `INTEGER`
+* References: [`Token`](#Token)
+
+</details>
+
+
+<details><summary><a name="ObjCContainerDeclClassMethods"></a>ObjCContainerDeclClassMethods</summary>
+
+* Parent type: [`ObjCContainerDecl`](#ObjCContainerDecl)
+* Value type: `INTEGER`
+* References: [`ObjCMethodDecl`](#ObjCMethodDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCContainerDeclClassProperties"></a>ObjCContainerDeclClassProperties</summary>
+
+* Parent type: [`ObjCContainerDecl`](#ObjCContainerDecl)
+* Value type: `INTEGER`
+* References: [`ObjCPropertyDecl`](#ObjCPropertyDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCContainerDeclInstanceMethods"></a>ObjCContainerDeclInstanceMethods</summary>
+
+* Parent type: [`ObjCContainerDecl`](#ObjCContainerDecl)
+* Value type: `INTEGER`
+* References: [`ObjCMethodDecl`](#ObjCMethodDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCContainerDeclInstanceProperties"></a>ObjCContainerDeclInstanceProperties</summary>
+
+* Parent type: [`ObjCContainerDecl`](#ObjCContainerDecl)
+* Value type: `INTEGER`
+* References: [`ObjCPropertyDecl`](#ObjCPropertyDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCContainerDeclMethods"></a>ObjCContainerDeclMethods</summary>
+
+* Parent type: [`ObjCContainerDecl`](#ObjCContainerDecl)
+* Value type: `INTEGER`
+* References: [`ObjCMethodDecl`](#ObjCMethodDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCContainerDeclProperties"></a>ObjCContainerDeclProperties</summary>
+
+* Parent type: [`ObjCContainerDecl`](#ObjCContainerDecl)
+* Value type: `INTEGER`
+* References: [`ObjCPropertyDecl`](#ObjCPropertyDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCCategoryDeclInstanceVariables"></a>ObjCCategoryDeclInstanceVariables</summary>
+
+* Parent type: [`ObjCCategoryDecl`](#ObjCCategoryDecl)
+* Value type: `INTEGER`
+* References: [`ObjCIvarDecl`](#ObjCIvarDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCCategoryDeclProtocolTokens"></a>ObjCCategoryDeclProtocolTokens</summary>
+
+* Parent type: [`ObjCCategoryDecl`](#ObjCCategoryDecl)
+* Value type: `INTEGER`
+* References: [`Token`](#Token)
+
+</details>
+
+
+<details><summary><a name="ObjCCategoryDeclProtocols"></a>ObjCCategoryDeclProtocols</summary>
+
+* Parent type: [`ObjCCategoryDecl`](#ObjCCategoryDecl)
+* Value type: `INTEGER`
+* References: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCProtocolDeclProtocolTokens"></a>ObjCProtocolDeclProtocolTokens</summary>
+
+* Parent type: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+* Value type: `INTEGER`
+* References: [`Token`](#Token)
+
+</details>
+
+
+<details><summary><a name="ObjCProtocolDeclProtocols"></a>ObjCProtocolDeclProtocols</summary>
+
+* Parent type: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+* Value type: `INTEGER`
+* References: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclAllReferencedProtocols"></a>ObjCInterfaceDeclAllReferencedProtocols</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclInstanceVariables"></a>ObjCInterfaceDeclInstanceVariables</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`ObjCIvarDecl`](#ObjCIvarDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclKnownCategories"></a>ObjCInterfaceDeclKnownCategories</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`ObjCCategoryDecl`](#ObjCCategoryDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclKnownExtensions"></a>ObjCInterfaceDeclKnownExtensions</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`ObjCCategoryDecl`](#ObjCCategoryDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclProtocolTokens"></a>ObjCInterfaceDeclProtocolTokens</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`Token`](#Token)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclProtocols"></a>ObjCInterfaceDeclProtocols</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclVisibleCategories"></a>ObjCInterfaceDeclVisibleCategories</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`ObjCCategoryDecl`](#ObjCCategoryDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCInterfaceDeclVisibleExtensions"></a>ObjCInterfaceDeclVisibleExtensions</summary>
+
+* Parent type: [`ObjCInterfaceDecl`](#ObjCInterfaceDecl)
+* Value type: `INTEGER`
+* References: [`ObjCCategoryDecl`](#ObjCCategoryDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCImplDeclPropertyImplementations"></a>ObjCImplDeclPropertyImplementations</summary>
+
+* Parent type: [`ObjCImplDecl`](#ObjCImplDecl)
+* Value type: `INTEGER`
+* References: [`ObjCPropertyImplDecl`](#ObjCPropertyImplDecl)
+
+</details>
+
+
+<details><summary><a name="ObjCImplementationDeclInstanceVariables"></a>ObjCImplementationDeclInstanceVariables</summary>
+
+* Parent type: [`ObjCImplementationDecl`](#ObjCImplementationDecl)
+* Value type: `INTEGER`
+* References: [`ObjCIvarDecl`](#ObjCIvarDecl)
+
+</details>
+
+
+<details><summary><a name="LifetimeExtendedTemporaryDeclChildrenExpression"></a>LifetimeExtendedTemporaryDeclChildrenExpression</summary>
+
+* Parent type: [`LifetimeExtendedTemporaryDecl`](#LifetimeExtendedTemporaryDecl)
+* Value type: `INTEGER`
+* References: [`Stmt`](#Stmt)
+
+</details>
+
+
+<details><summary><a name="ImportDeclIdentifierTokens"></a>ImportDeclIdentifierTokens</summary>
+
+* Parent type: [`ImportDecl`](#ImportDecl)
+* Value type: `INTEGER`
+* References: [`Token`](#Token)
+
+</details>
+
