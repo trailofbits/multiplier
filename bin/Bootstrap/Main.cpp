@@ -2923,7 +2923,14 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "\n"
       << "This document has been automatically generated and "
       << "provides a reference to the Multiplier API as exposes by the SQLite extension module.\n"
-      << "\n";
+      << "\n"
+      << "## `File` table\n\n"
+      << "Contains two fields `id` and `name`.\n\n"
+      << "## `Fragment` table\n\n"
+      << "Contains two field `id` and `file_id`.\n\n"
+      << "## `Reference` table\n\n"
+      << "Contains two fields `use_id` and `user_id`. It contains a row for each time a `Decl` "
+      << "with id `use_id` is referenced by a `Stmt` with id `user_id`. Can only be queried on `use_id`.\n\n";
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {

@@ -2,6 +2,18 @@
 
 This document has been automatically generated and provides a reference to the Multiplier API as exposes by the SQLite extension module.
 
+## `File` table
+
+Contains two fields `id` and `name`.
+
+## `Fragment` table
+
+Contains two field `id` and `file_id`.
+
+## `Reference` table
+
+Contains two fields `use_id` and `user_id`. It contains a row for each time a `Decl` with id `use_id` is referenced by a `Stmt` with id `user_id`. Can only be queried on `use_id`.
+
 ## Enum functions
 
 These functions allow users to refer to the numeric value of enum constants using their name. For example, `BuiltinTypeKind("U_LONG")` is equivalent to accessing `BuiltinTypeKind::U_LONG` in C++.
