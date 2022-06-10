@@ -42,6 +42,9 @@ class ReferenceBrowserView final : public QWidget {
 
   void InitializeWidgets(void);
   void FillRow(QTreeWidgetItem *item, const Decl &decl, const Token &use) const;
+  int ExpandSubTreeUpTo(QTreeWidgetItem *item, int depth, int count=0);
+
+  bool eventFilter(QObject *watched, QEvent *event) Q_DECL_FINAL;
 
  public:
   virtual ~ReferenceBrowserView(void);
@@ -65,7 +68,7 @@ class ReferenceBrowserView final : public QWidget {
                            std::optional<Decl> root_decl,
                            UserLocationsPtr users);
   void OnUsersOfLevel(QTreeWidgetItem *parent, uint64_t counter,
-                      UserLocationsPtr users);
+                      UserLocationsPtr users, int depth);
   void OnItemPressed(QTreeWidgetItem *item, int column);
   void OnItemSelectionChanged(void);
 
@@ -110,11 +113,11 @@ class ExpandReferenceHierarchyThread final : public QObject, public QRunnable {
   explicit ExpandReferenceHierarchyThread(const Index &index_, RawEntityId id_,
                                           const FileLocationCache &line_cache_,
                                           QTreeWidgetItem *parent_,
-                                          uint64_t counter);
+                                          uint64_t counter, int depth);
 
  signals:
   void UsersOfLevel(QTreeWidgetItem *item_parent, uint64_t counter,
-                    UserLocationsPtr users);
+                    UserLocationsPtr users, int depth);
 };
 
 }  // namespace gui
