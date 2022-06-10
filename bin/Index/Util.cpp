@@ -338,7 +338,9 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type_) {
 
 // Try to identify the declaration referenced by a statement.
 std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
-  // E.g. `a` or `a()` where `a` is a `Decl`.
+  
+  // E.g. `a` or `a()` where `a` is a `Decl`. This also covers things like
+  // `a + b` where `+` is a `T::operator+`.
   if (auto dre = pasta::DeclRefExpr::From(stmt)) {
     return dre->Declaration();
 

@@ -111,6 +111,9 @@ bool MayHaveRemoteUses(const mx::Decl &decl) {
     case mx::DeclKind::ENUM:
       return true;
 
+    // Enumerators.
+    case mx::DeclKind::ENUM_CONSTANT:
+
     // Redeclarable templates.
     case mx::DeclKind::REDECLARABLE_TEMPLATE:
     case mx::DeclKind::FUNCTION_TEMPLATE:
