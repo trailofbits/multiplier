@@ -1,6 +1,6 @@
 # SQLite bindings for Multiplier
 
-This document has been automatically generated and provides a reference to the Multiplier API as exposes by the SQLite extension module.
+This document has been automatically generated and provides a reference to the Multiplier API as exposed by the SQLite extension module.
 
 ## `File` table
 

@@ -2942,7 +2942,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "# SQLite bindings for Multiplier\n"
       << "\n"
       << "This document has been automatically generated and "
-      << "provides a reference to the Multiplier API as exposes by the SQLite extension module.\n"
+      << "provides a reference to the Multiplier API as exposed by the SQLite extension module.\n"
       << "\n"
       << "## `File` table\n\n"
       << "Contains two fields `id` and `name`.\n\n"
