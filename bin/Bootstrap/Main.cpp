@@ -2930,7 +2930,23 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "Contains two field `id` and `file_id`.\n\n"
       << "## `Reference` table\n\n"
       << "Contains two fields `use_id` and `user_id`. It contains a row for each time a `Decl` "
-      << "with id `use_id` is referenced by a `Stmt` with id `user_id`. Can only be queried on `use_id`.\n\n";
+      << "with id `use_id` is referenced by a `Stmt` with id `user_id`.\n\n"
+      << "This table can only be queried on `use_id`.\n\n"
+      << "## `RegexQuery` table\n\n"
+      << "Contains three fields:\n\n"
+      << "* `query`: Regex that should be used for querying\n"
+      << "* `variables`: JSON array of captured variable names\n"
+      << "* `captures`: JSON object with an entry for each of the variables contained in `variables`. "
+      << "Every entry will consist of an object containing an optional `data` entry with the capture "
+      << "data as a string, and a `tokens` array of token ids.\n\n"
+      << "This table can only be queried on `query`.\n\n"
+      << "## `WeggliQuery` table\n\n"
+      << "Contains three fields:\n\n"
+      << "* `query`: Weggli expression that should be used for querying\n"
+      << "* `variables`: JSON array of captured variable names\n"
+      << "* `captures`: JSON object with an entry for each of the variables contained in `variables`. "
+      << "Every entry will consist of an object containing a `tokens` array of token ids.\n\n"
+      << "This table can only be queried on `query`.\n\n";
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {

@@ -12,7 +12,29 @@ Contains two field `id` and `file_id`.
 
 ## `Reference` table
 
-Contains two fields `use_id` and `user_id`. It contains a row for each time a `Decl` with id `use_id` is referenced by a `Stmt` with id `user_id`. Can only be queried on `use_id`.
+Contains two fields `use_id` and `user_id`. It contains a row for each time a `Decl` with id `use_id` is referenced by a `Stmt` with id `user_id`.
+
+This table can only be queried on `use_id`.
+
+## `RegexQuery` table
+
+Contains three fields:
+
+* `query`: Regex that should be used for querying
+* `variables`: JSON array of captured variable names
+* `captures`: JSON object with an entry for each of the variables contained in `variables`. Every entry will consist of an object containing an optional `data` entry with the capture data as a string, and a `tokens` array of token ids.
+
+This table can only be queried on `query`.
+
+## `WeggliQuery` table
+
+Contains three fields:
+
+* `query`: Weggli expression that should be used for querying
+* `variables`: JSON array of captured variable names
+* `captures`: JSON object with an entry for each of the variables contained in `variables`. Every entry will consist of an object containing a `tokens` array of token ids.
+
+This table can only be queried on `query`.
 
 ## Enum functions
 

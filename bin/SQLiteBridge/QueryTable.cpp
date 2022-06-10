@@ -50,7 +50,7 @@ int QueryTable::BestIndex(sqlite3_index_info *info) {
       return SQLITE_OK;
     }
   }
-  return SQLITE_OK;
+  return SQLITE_CONSTRAINT;
 }
 
 class WeggliCursor : public VirtualTableCursor {
