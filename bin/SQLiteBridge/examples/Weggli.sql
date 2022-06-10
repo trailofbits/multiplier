@@ -1,0 +1,1 @@
+SELECT * FROM WeggliQuery WHERE WeggliQuery.query = @weggli_query;

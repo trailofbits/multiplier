@@ -13,3 +13,6 @@ CREATE VIRTUAL TABLE ImplicitCastExpr  USING multiplier(ImplicitCastExpr, localh
 CREATE VIRTUAL TABLE Type              USING multiplier(Type, localhost, 50051);
 CREATE VIRTUAL TABLE BuiltinType       USING multiplier(BuiltinType, localhost, 50051);
 CREATE VIRTUAL TABLE CallExprArguments USING multiplier(CallExprArguments, localhost, 50051);
+.parameter init
+.parameter set @regex_query "(\\w+)\\s+(\\w+)"
+.parameter set @weggli_query "_ $func(_) {_;}"

@@ -22,7 +22,9 @@ Contains three fields:
 
 * `query`: Regex that should be used for querying
 * `variables`: JSON array of captured variable names
-* `captures`: JSON object with an entry for each of the variables contained in `variables`. Every entry will consist of an object containing an optional `data` entry with the capture data as a string, and a `tokens` array of token ids.
+* `captures`: JSON object with two entries: `named` and `indexed`. `named` is an object that contains an entry for each of the captured variable names, consisting of a capture object. `indexed` is an array of capture objects containing all capture groups.
+
+A capture object contains an array of token ids `tokens` and an optional `data` field containing the capture data represented as a string.
 
 This table can only be queried on `query`.
 
