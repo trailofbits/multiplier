@@ -61,19 +61,19 @@ class ReferenceBrowserView final : public QWidget {
   void OnDownloadedFileList(FilePathList files);
 
  private slots:
-  MX_DECLARE_DECLARATION_SLOTS
-
   void OnTreeWidgetItemExpanded(QTreeWidgetItem *item);
   void OnUsersOfFirstLevel(QTreeWidgetItem *parent, uint64_t counter,
                            std::optional<Decl> root_decl,
                            UserLocationsPtr users);
   void OnUsersOfLevel(QTreeWidgetItem *parent, uint64_t counter,
                       UserLocationsPtr users, int depth);
-  void OnItemPressed(QTreeWidgetItem *item, int column);
+  void OnItemClicked(QTreeWidgetItem *item, int column);
+  void OnItemDoubleClicked(QTreeWidgetItem *item, int column);
   void OnItemSelectionChanged(void);
 
  signals:
-  MX_DECLARE_DECLARATION_SIGNALS
+  void DeclarationEvent(EventSource source, Event event,
+                        std::vector<RawEntityId> ids);
 };
 
 // A background thread that downloads the first level of references for one

@@ -21,17 +21,17 @@ class CodeTheme;
 // a file.
 struct FileConfiguration {
 
-  // If one or more declarations are hovered/clicked, then we evaluate these
-  // bindings are trigger the relevant actions.
-  std::vector<EventAction> declaration_actions;
+//  // If one or more declarations are hovered/clicked, then we evaluate these
+//  // bindings are trigger the relevant actions.
+//  std::vector<EventAction> declaration_actions;
 };
 
 // The configuration for the history browser.
 struct HistoryBrowserConfiguration {
 
-  // If one or more declarations are hovered/clicked, then we evaluate these
-  // bindings are trigger the relevant actions.
-  std::vector<EventAction> declaration_actions;
+//  // If one or more declarations are hovered/clicked, then we evaluate these
+//  // bindings are trigger the relevant actions.
+//  std::vector<EventAction> declaration_actions;
 };
 
 // Configuration for the file browser, which presents a tree view of all files
@@ -46,9 +46,9 @@ struct ReferenceBrowserCodeConfiguration {
   // selected?
   bool visible{true};
 
-  // If one or more declarations are hovered/clicked, then we evaluate these
-  // bindings are trigger the relevant actions.
-  std::vector<EventAction> declaration_actions;
+//  // If one or more declarations are hovered/clicked, then we evaluate these
+//  // bindings are trigger the relevant actions.
+//  std::vector<EventAction> declaration_actions;
 };
 
 // Configuration for the breadcrumb cell of the reference browser view.
@@ -95,6 +95,10 @@ struct ReferenceBrowserConfiguration {
 
   ReferenceBrowserBreadcrumbsConfiguration breadcrumbs;
   ReferenceBrowserCodeConfiguration code_preview;
+
+//  // If one or more declarations are clicked, then we evaluate these
+//  // bindings are trigger the relevant actions.
+//  std::vector<EventAction> declaration_actions;
 };
 
 struct Configuration {
@@ -106,6 +110,10 @@ struct Configuration {
   ReferenceBrowserConfiguration reference_browser;
   FileBrowserConfiguration file_browser;
   FileConfiguration file;
+
+  // If one or more declarations are hovered/clicked, then we evaluate these
+  // bindings are trigger the relevant actions.
+  std::vector<EventAction> declaration_actions;
 
   Configuration(void);
 };

@@ -9,6 +9,7 @@
 #include <cassert>
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
+#include <multiplier/Index.h>
 #include <multiplier/Iterator.h>
 #include <multiplier/Token.h>
 #include <multiplier/Use.h>
@@ -642,6 +643,57 @@ QString DeclName(const Decl &decl) {
     }
   }
   return QString("%1(%2)").arg(EnumeratorName(decl.category())).arg(decl.id());
+}
+
+// Return the file location of an entity.
+RawEntityId EntityFileLocation(const Index &index, RawEntityId eid) {
+  auto entity = index.entity(eid);
+  if (std::holds_alternative<Decl>(entity)) {
+    return DeclFileLocation(std::get<Decl>(entity));
+
+  // Statement, walk to the first fragent token, or the beginning of the
+  // fragment.
+  } if (std::holds_alternative<Stmt>(entity)) {
+    Stmt stmt = std::get<Stmt>(entity);
+    for (Token token : stmt.tokens()) {
+      if (auto nearest_file_loc = token.nearest_file_token()) {
+        return nearest_file_loc->id();
+      }
+    }
+
+    return Fragment::containing(stmt).file_tokens().begin()->id();
+
+  // Type; walk to the containing fragment.
+  } else if (std::holds_alternative<Type>(entity)) {
+    Type type = std::get<Type>(entity);
+    return Fragment::containing(type).file_tokens().begin()->id();
+
+  // Token substitution; walk up to the file location.
+  } else if (std::holds_alternative<TokenSubstitution>(entity)) {
+    auto sub = std::get<TokenSubstitution>(entity);
+    for (;;) {
+      for (auto tok_sub : sub.before()) {
+        if (std::holds_alternative<Token>(tok_sub)) {
+          Token tok = std::get<Token>(tok_sub);
+          if (auto nearest_file_loc = tok.nearest_file_token()) {
+            return nearest_file_loc->id();
+          }
+
+        } else if (std::holds_alternative<TokenSubstitution>(tok_sub)) {
+          sub = std::get<TokenSubstitution>(tok_sub);
+          goto next_sub;
+        }
+      }
+      return kInvalidEntityId;
+    next_sub:
+      continue;
+    }
+  } else if (std::holds_alternative<Token>(entity)) {
+    if (auto file_tok = std::get<Token>(entity).nearest_file_token()) {
+      return file_tok->id();
+    }
+  }
+  return kInvalidEntityId;
 }
 
 // Return the entity ID of the nearest file token associated with this

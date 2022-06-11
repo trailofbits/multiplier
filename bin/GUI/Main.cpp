@@ -41,48 +41,37 @@ int main(int argc, char *argv[]) {
   //    There's a finite number of times that I'll be able to click in my life
   //    before I get arthritis, so I don't want to halve it.
 
-  // Click to open something in the file view, as well as add it to history.
-  config.file.declaration_actions.emplace_back(
+  // Click to open something in the code browser view, or in the code preview
+  // view of the refernce browser, should open the thing in the code browser.
+  config.declaration_actions.emplace_back(
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
-      mx::gui::Action::kOpenCodeBrowser);
-
-  config.file.declaration_actions.emplace_back(
-      mx::gui::Event{{},
-                     Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kClick},
-      mx::gui::Action::kAddToHistoryUnderRoot);
+      mx::gui::EventSources{mx::gui::EventSource::kCodeBrowser,
+                            mx::gui::EventSource::kReferenceBrowserCodePreview},
+      mx::gui::Actions{mx::gui::Action::kOpenCodeBrowser,
+                       mx::gui::Action::kAddToHistoryUnderRoot});
 
   // Ctrl-click / Cmd-click to open something in the references view.
-  config.file.declaration_actions.emplace_back(
+  config.declaration_actions.emplace_back(
       mx::gui::Event{Qt::KeyboardModifier::ControlModifier,
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kClick},
-      mx::gui::Action::kOpenReferenceBrowser);
+      mx::gui::EventSources{mx::gui::EventSource::kCodeBrowser,
+                            mx::gui::EventSource::kReferenceBrowserCodePreview},
+      mx::gui::Actions{mx::gui::Action::kOpenReferenceBrowser});
 
-  // Ctrl-click / Cmd-click to open something from the reference view in the
-  // references view.
-  config.reference_browser.code_preview.declaration_actions.emplace_back(
-      mx::gui::Event{Qt::KeyboardModifier::ControlModifier,
-                     Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kClick},
-      mx::gui::Action::kOpenReferenceBrowser);
-
-  // Single click in the code preview of a reference browser opens in
-  // the code browser, as well as adds to history.
-  config.reference_browser.code_preview.declaration_actions.emplace_back(
+  // Double-clicking an item in the reference browser should open it up in the
+  // code browser.
+  config.declaration_actions.emplace_back(
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kClick},
-      mx::gui::Action::kOpenCodeBrowser);
+                     mx::gui::EventKind::kDoubleClick},
+      mx::gui::EventSources{mx::gui::EventSource::kReferenceBrowser},
+      mx::gui::Actions{mx::gui::Action::kOpenCodeBrowser,
+                       mx::gui::Action::kAddToHistoryUnderRoot});
 
-  config.reference_browser.code_preview.declaration_actions.emplace_back(
-      mx::gui::Event{{},
-                     Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kClick},
-      mx::gui::Action::kAddToHistoryUnderRoot);
-
+  qRegisterMetaType<mx::gui::EventSources>("EventSources");
   qRegisterMetaType<uint8_t>("uint8_t");
   qRegisterMetaType<uint16_t>("uint16_t");
   qRegisterMetaType<uint32_t>("uint32_t");

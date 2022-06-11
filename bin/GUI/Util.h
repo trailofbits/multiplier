@@ -13,6 +13,7 @@
 
 namespace mx {
 class Decl;
+class Index;
 class Token;
 
 enum class TokenKind : unsigned short;
@@ -59,6 +60,9 @@ Decl CanonicalDecl(const Decl &decl);
 
 // Return some kind of name for a declaration.
 QString DeclName(const Decl &decl);
+
+// Return the file location of an entity.
+RawEntityId EntityFileLocation(const Index &index, RawEntityId eid);
 
 // Return the entity ID of the nearest file token associated with this
 // declaration.

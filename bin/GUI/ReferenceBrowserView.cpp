@@ -241,6 +241,7 @@ struct ReferenceBrowserView::PrivateData {
     // this reference is selected. Finally, the contexts of the first token in
     // this range is used for the breadcrumbs.
     TokenRange tokens;
+    TokenRange file_tokens;
 
     // Have we expanded this item yet? When we first create an reference item,
     // we add a "Downloading..." child under it that is hidden, and leave this
@@ -338,6 +339,10 @@ void ReferenceBrowserView::InitializeWidgets(void) {
   header->setSectionResizeMode(
       QHeaderView::ResizeToContents);
 
+  // Don't let double click expand things in three; we capture double click so
+  // that we can make it open up the use in the code.
+  d->reference_tree->setExpandsOnDoubleClick(false);
+
   // Try to capture keypresses when items are selected.
   d->reference_tree->installEventFilter(this);
 
@@ -369,10 +374,16 @@ void ReferenceBrowserView::InitializeWidgets(void) {
           this, &ReferenceBrowserView::OnTreeWidgetItemExpanded);
 
   connect(d->reference_tree, &QTreeWidget::itemPressed,
-          this, &ReferenceBrowserView::OnItemPressed);
+          this, &ReferenceBrowserView::OnItemClicked);
+
+  connect(d->reference_tree, &QTreeWidget::itemDoubleClicked,
+          this, &ReferenceBrowserView::OnItemDoubleClicked);
 
   connect(d->reference_tree, &QTreeWidget::itemSelectionChanged,
           this, &ReferenceBrowserView::OnItemSelectionChanged);
+
+  connect(this, &ReferenceBrowserView::DeclarationEvent,
+          &d->multiplier, &Multiplier::ActOnDeclarations);
 }
 
 bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
@@ -390,28 +401,41 @@ bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
     return false;
   }
 
-  auto depth = 0;
-
   switch (kevent->key()) {
-    case Qt::Key_1: depth = 1; break;
-    case Qt::Key_2: depth = 2; break;
-    case Qt::Key_3: depth = 3; break;
-    case Qt::Key_4: depth = 4; break;
-    case Qt::Key_5: depth = 5; break;
-    case Qt::Key_6: depth = 6; break;
-    case Qt::Key_7: depth = 7; break;
-    case Qt::Key_8: depth = 8; break;
-    case Qt::Key_9: depth = 9; break;
-
+    case Qt::Key_0:
+      item->setExpanded(false);
+      break;
+    case Qt::Key_1:
+      ExpandSubTreeUpTo(item, 1);
+      break;
+    case Qt::Key_2:
+      ExpandSubTreeUpTo(item, 2);
+      break;
+    case Qt::Key_3:
+      ExpandSubTreeUpTo(item, 3);
+      break;
+    case Qt::Key_4:
+      ExpandSubTreeUpTo(item, 4);
+      break;
+    case Qt::Key_5:
+      ExpandSubTreeUpTo(item, 5);
+      break;
+    case Qt::Key_6:
+      ExpandSubTreeUpTo(item, 6);
+      break;
+    case Qt::Key_7:
+      ExpandSubTreeUpTo(item, 7);
+      break;
+    case Qt::Key_8:
+      ExpandSubTreeUpTo(item, 8);
+      break;
+    case Qt::Key_9:
+      ExpandSubTreeUpTo(item, 9);
+      break;
     default:
-      return false;
-//
-//    case Qt::Key_0:
-//    case Qt::Key_QuoteLeft:  // '`', appears beside `1` on qwerty keyboards.
-//    case Qt::Key_Equal: // `=`, appears beside `1` on Kinesis keyboards.
+      break;
   }
 
-  ExpandSubTreeUpTo(item, depth);
   return false;
 }
 
@@ -591,9 +615,8 @@ void ReferenceBrowserView::OnUsersOfFirstLevel(
     auto &item = d->item_to_info.emplace(
         root_item, std::move(root_decl.value())).first->second;
 
-    if (auto ft = item.decl.token().nearest_file_token()) {
-      item.tokens = ft.value();
-    }
+    item.tokens = item.decl.token();
+    item.file_tokens = item.tokens.file_tokens().strip_whitespace();
   }
 
   OnUsersOfLevel(root_item, counter, std::move(users), 0);
@@ -613,7 +636,7 @@ void ReferenceBrowserView::OnUsersOfFirstLevel(
   // By default, if we've just initialized this root, then trigger an expansion
   // of its immediate children.
   if (was_initialized) {
-    OnItemPressed(root_item, 0);
+    OnItemClicked(root_item, 0);
   }
 }
 
@@ -697,6 +720,7 @@ void ReferenceBrowserView::OnUsersOfLevel(
     PrivateData::ItemInfo &child_id =
         d->item_to_info.emplace(user_item, std::move(decl)).first->second;
     child_id.tokens = std::move(tokens);
+    child_id.file_tokens = child_id.tokens.file_tokens().strip_whitespace();
     child_id.has_been_expanded = false;
 
     QTreeWidgetItem *download_item = new QTreeWidgetItem;
@@ -722,12 +746,35 @@ void ReferenceBrowserView::OnUsersOfLevel(
 
 void ReferenceBrowserView::OnItemSelectionChanged(void) {
   for (QTreeWidgetItem *item : d->reference_tree->selectedItems()) {
-    OnItemPressed(item, 0);
+    OnItemClicked(item, 0);
     return;
   }
 }
 
-void ReferenceBrowserView::OnItemPressed(
+void ReferenceBrowserView::OnItemDoubleClicked(
+    QTreeWidgetItem *item, int column) {
+  auto id_it = d->item_to_info.find(item);
+  if (id_it == d->item_to_info.end()) {
+    return;
+  }
+
+  Event event = {QApplication::queryKeyboardModifiers(),
+                 QApplication::mouseButtons(),
+                 EventKind::kDoubleClick};
+
+  // Try to go to the specific use.
+  for (const Token &tok : id_it->second.file_tokens) {
+    emit DeclarationEvent(EventSource::kReferenceBrowser, event,
+                          {tok.id()});
+    return;
+  }
+
+  // Otherwise go to the
+  emit DeclarationEvent(EventSource::kReferenceBrowser, event,
+                        {id_it->second.decl.id()});
+}
+
+void ReferenceBrowserView::OnItemClicked(
     QTreeWidgetItem *item, int column) {
   auto id_it = d->item_to_info.find(item);
   if (id_it == d->item_to_info.end()) {
@@ -745,13 +792,13 @@ void ReferenceBrowserView::OnItemPressed(
       d->multiplier.Configuration().reference_browser;
 
   if (config.code_preview.visible && !d->code) {
-    d->code = new CodeView(d->theme);
+    d->code = new CodeView(d->theme, EventSource::kReferenceBrowserCodePreview);
     d->splitter->addWidget(d->code);
 
     auto &config = d->multiplier.Configuration().reference_browser.code_preview;
 
-    MX_CONNECT_CHILD_ACTIONS(config, ReferenceBrowserView, d->code, CodeView)
-    MX_ROUTE_ACTIONS(config, ReferenceBrowserView, d->multiplier)
+    connect(d->code, &CodeView::DeclarationEvent,
+            &(d->multiplier), &Multiplier::ActOnDeclarations);
   }
 
   // A human has just clicked on this thing, show the code preview.
@@ -759,19 +806,14 @@ void ReferenceBrowserView::OnItemPressed(
   auto [fragment_id, offset] = GetFragmentOffset(info.decl.id());
   if (fragment_id != kInvalidEntityId) {
     if (config.code_preview.visible && d->code) {
-      TokenRange tokens = info.tokens.file_tokens().strip_whitespace();
       d->code->show();
-      d->theme.SetRangeToHighlight(tokens);
+      d->theme.SetRangeToHighlight(info.file_tokens);
       d->code->SetFragment(index, fragment_id);
-      d->code->ScrollToToken(tokens);
+      d->code->ScrollToToken(info.file_tokens);
     }
   } else if (d->code) {
     d->code->hide();
   }
 }
-
-MX_DEFINE_DECLARATION_SLOTS(
-    ReferenceBrowserView,
-    d->multiplier.Configuration().reference_browser.code_preview)
 
 }  // namespace mx::gui

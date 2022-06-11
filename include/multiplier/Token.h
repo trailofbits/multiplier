@@ -286,8 +286,8 @@ class TokenSubstitution {
   friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const FragmentImpl> impl;
-  const unsigned offset;
-  const TokenSubstitutionKind kind_;
+  unsigned offset;
+  TokenSubstitutionKind kind_;
 
   inline TokenSubstitution(
       std::shared_ptr<const FragmentImpl> impl_,

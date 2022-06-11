@@ -40,7 +40,8 @@ class CodeView final : public QPlainTextEdit {
 
  public:
   virtual ~CodeView(void);
-  CodeView(const CodeTheme &theme_, QWidget *parent = nullptr);
+  CodeView(const CodeTheme &theme_, EventSource source_,
+           QWidget *parent = nullptr);
 
   void ScrollToToken(const TokenRange &tok);
   void ScrollToToken(const Token &tok);
@@ -75,7 +76,8 @@ class CodeView final : public QPlainTextEdit {
   void OnRenderCode(void *code, uint64_t counter);
 
  signals:
-  MX_DECLARE_DECLARATION_SIGNALS
+  void DeclarationEvent(EventSource source, Event event,
+                        std::vector<RawEntityId> ids);
 };
 
 // Thread that goes and downloads and structures the relevant code in the

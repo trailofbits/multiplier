@@ -59,15 +59,15 @@ struct Multiplier::PrivateData final {
 
   MainMindowMenus menus;
 
-  CodeBrowserView *code_browser_view{nullptr};
+  class CodeBrowserView *code_browser_view{nullptr};
 
-  FileBrowserView *file_browser_view{nullptr};
+  class FileBrowserView *file_browser_view{nullptr};
   QDockWidget *file_browser_dock{nullptr};
 
-  ReferenceBrowserView *reference_browser_view{nullptr};
+  class ReferenceBrowserView *reference_browser_view{nullptr};
   QDockWidget *reference_browser_dock{nullptr};
 
-  HistoryBrowserView *history_browser_view{nullptr};
+  class HistoryBrowserView *history_browser_view{nullptr};
   QDockWidget *history_browser_dock{nullptr};
 
   mx::Index index;
@@ -301,7 +301,7 @@ void Multiplier::OnMoveReferenceBrowser(Qt::DockWidgetArea area) {
 void Multiplier::OnHistoryDeclarationClicked(RawEntityId eid) {
   std::vector<RawEntityId> ids;
   ids.push_back(eid);
-  d->code_browser_view->OpenDeclarations(std::move(ids));
+  d->code_browser_view->OpenEntities(std::move(ids));
 }
 
 void Multiplier::OnConnected(void) {
@@ -355,35 +355,47 @@ void Multiplier::OnFileExitAction(void) { close(); }
 
 void Multiplier::OnHelpAboutAction(void) {}
 
-void Multiplier::OnActOnDeclarations(
-    Action action, std::vector<RawEntityId> ids) {
+void Multiplier::ActOnDeclarations(EventSource source, Event event,
+                                   std::vector<RawEntityId> ids) {
 
-  switch (action) {
-    case Action::kDoNothing: return;
-    case Action::kPropagate: return;
-    case Action::kOpenCodeBrowser:
-      d->code_browser_view->OpenDeclarations(std::move(ids));
-      break;
-    case Action::kOpenReferenceBrowser:
-      if (d->reference_browser_dock->isEnabled()) {
-        d->reference_browser_view->SetRoots(std::move(ids));
-        if (d->reference_browser_dock->visibleRegion().isEmpty()) {
-          d->reference_browser_dock->raise();
-        }
+  for (const auto &[mevent_, sources_, actions_] :
+       d->config.declaration_actions) {
+    const Event &mevent = mevent_;
+    const EventSources sources = sources_;
+    const Actions actions = actions_;
+    if (!sources.testFlag(source) ||
+        mevent.modifiers != event.modifiers ||
+        mevent.buttons != event.buttons ||
+        mevent.kind != event.kind) {
+      continue;
+    }
+
+    if (actions.testFlag(Action::kOpenCodeBrowser)) {
+      d->code_browser_view->OpenEntities(ids);
+    }
+
+    if (actions.testFlag(Action::kOpenReferenceBrowser)) {
+      d->reference_browser_view->SetRoots(ids);
+      if (d->reference_browser_dock->visibleRegion().isEmpty()) {
+        d->reference_browser_dock->raise();
       }
-      return;
-    case Action::kAddToHistoryAsChild:
-      d->history_browser_view->AddChildDeclarations(std::move(ids));
-      return;
-    case Action::kAddToHistoryAsSibling:
-      d->history_browser_view->AddSiblingDeclarations(std::move(ids));
-      return;
-    case Action::kAddToHistoryUnderRoot:
-      d->history_browser_view->AddDeclarationsUnderRoot(std::move(ids));
-      return;
-    case Action::kAddToHistoryAsRoots:
-      d->history_browser_view->AddDeclarationsUnderRoot(std::move(ids));
-      return;
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryAsChild)) {
+      d->history_browser_view->AddChildDeclarations(ids);
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryAsSibling)) {
+      d->history_browser_view->AddSiblingDeclarations(ids);
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryUnderRoot)) {
+      d->history_browser_view->AddDeclarationsUnderRoot(ids);
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryAsRoots)) {
+      d->history_browser_view->AddDeclarationsUnderRoot(ids);
+    }
   }
 }
 

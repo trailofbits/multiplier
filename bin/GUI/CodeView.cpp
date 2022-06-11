@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "CodeTheme.h"
-#include "Event.h"
 #include "Util.h"
 
 namespace mx::gui {
@@ -72,7 +71,11 @@ struct CodeView::PrivateData {
 
   // Thread-safe cache for figuring out line/column numbers.
   std::unique_ptr<Code> code;
+
   const CodeTheme &theme;
+
+  // How to mark events form this code view.
+  const EventSource source;
 
   // The entity id of a file token that we'll target for scrolling.
   RawEntityId scroll_target_eid{kInvalidEntityId};
@@ -86,8 +89,9 @@ struct CodeView::PrivateData {
 
   std::vector<RawEntityId> last_entity_ids;
 
-  inline PrivateData(const CodeTheme &theme_)
-      : theme(theme_) {}
+  inline PrivateData(const CodeTheme &theme_, EventSource source_)
+      : theme(theme_),
+        source(source_) {}
 };
 
 struct DownloadCodeThread::PrivateData {
@@ -433,9 +437,10 @@ void DownloadCodeThread::run(void) {
 
 CodeView::~CodeView(void) {}
 
-CodeView::CodeView(const CodeTheme &theme_, QWidget *parent)
+CodeView::CodeView(const CodeTheme &theme_, EventSource source_,
+                   QWidget *parent)
     : QPlainTextEdit(parent),
-      d(std::make_unique<PrivateData>(theme_)) {
+      d(std::make_unique<PrivateData>(theme_, source_)) {
   InitializeWidgets();
 }
 
@@ -456,53 +461,53 @@ void CodeView::ScrollToToken(const Token &tok) {
 }
 
 void CodeView::ScrollToToken(RawEntityId file_tok_id) {
-  if (d->state == CodeViewState::kRendered) {
-    if (file_tok_id == kInvalidEntityId) {
-      return;
-    }
-
-    auto begin_it = d->code->file_token_ids.begin();
-    auto end_it = d->code->file_token_ids.end();
-    auto it = std::lower_bound(begin_it, end_it, file_tok_id);
-    if (it == end_it || *it != file_tok_id) {
-      return;
-    }
-
-    auto tok_index = static_cast<unsigned>((it - begin_it));
-    if (tok_index >= d->code->start_of_token.size()) {
-      return;
-    }
-
-    OnHighlightLine();
-
-    int desired_position = d->code->start_of_token[tok_index];
-
-    // Figure out if we can avoid scrolling due to the text being (probably)
-    // visible. If we have a `last_block`, then we clicked on something in here,
-    // so it must have been visible.
-    if (d->last_block != -1) {
-      d->last_block = -1;
-
-      int start_pos = cursorForPosition(QPoint(0, 0)).position();
-      QPoint bottom_right(viewport()->width() - 1, viewport()->height() - 1);
-      int end_pos = cursorForPosition(bottom_right).position();
-      if (start_pos < desired_position && desired_position < end_pos) {
-        return;
-      }
-    }
-
-    QTextCursor loc = textCursor();
-    loc.setPosition(desired_position,
-                    QTextCursor::MoveMode::MoveAnchor);
-
-    moveCursor(QTextCursor::MoveOperation::End);
-    setTextCursor(loc);
-    ensureCursorVisible();
-    centerCursor();
-
-  } else {
+  if (d->state != CodeViewState::kRendered) {
     d->scroll_target_eid = file_tok_id;
+    return;
   }
+
+  if (file_tok_id == kInvalidEntityId) {
+    return;
+  }
+
+  auto begin_it = d->code->file_token_ids.begin();
+  auto end_it = d->code->file_token_ids.end();
+  auto it = std::lower_bound(begin_it, end_it, file_tok_id);
+  if (it == end_it || *it != file_tok_id) {
+    return;
+  }
+
+  auto tok_index = static_cast<unsigned>((it - begin_it));
+  if (tok_index >= d->code->start_of_token.size()) {
+    return;
+  }
+
+  OnHighlightLine();
+
+  int desired_position = d->code->start_of_token[tok_index];
+
+  // Figure out if we can avoid scrolling due to the text being (probably)
+  // visible. If we have a `last_block`, then we clicked on something in here,
+  // so it must have been visible.
+  if (d->last_block != -1) {
+    d->last_block = -1;
+
+    int start_pos = cursorForPosition(QPoint(0, 0)).position();
+    QPoint bottom_right(viewport()->width() - 1, viewport()->height() - 1);
+    int end_pos = cursorForPosition(bottom_right).position();
+    if (start_pos < desired_position && desired_position < end_pos) {
+      return;
+    }
+  }
+
+  QTextCursor loc = textCursor();
+  loc.setPosition(desired_position,
+                  QTextCursor::MoveMode::MoveAnchor);
+
+  moveCursor(QTextCursor::MoveOperation::End);
+  setTextCursor(loc);
+  ensureCursorVisible();
+  centerCursor();
 }
 
 void CodeView::SetFile(const File &file) {
@@ -727,7 +732,7 @@ void CodeView::mouseMoveEvent(QMouseEvent *event) {
       d->last_block = block;
       d->last_entity_ids = DeclsForToken(index);
       if (!d->last_entity_ids.empty()) {
-        emit DeclarationEvent({event->modifiers(), event->buttons(),
+        emit DeclarationEvent(d->source, {event->modifiers(), event->buttons(),
                                EventKind::kHover}, d->last_entity_ids);
       }
     }
@@ -746,7 +751,7 @@ void CodeView::mousePressEvent(QMouseEvent *event) {
     d->last_block = block;
     d->last_entity_ids = DeclsForToken(index);
     if (!d->last_entity_ids.empty()) {
-      emit DeclarationEvent({event->modifiers(), event->buttons(),
+      emit DeclarationEvent(d->source, {event->modifiers(), event->buttons(),
                              EventKind::kClick}, d->last_entity_ids);
     }
   } else {
@@ -762,7 +767,7 @@ void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
     d->last_block = block;
     d->last_entity_ids = DeclsForToken(index);
     if (!d->last_entity_ids.empty()) {
-      emit DeclarationEvent({event->modifiers(), event->buttons(),
+      emit DeclarationEvent(d->source, {event->modifiers(), event->buttons(),
                              EventKind::kDoubleClick}, d->last_entity_ids);
     }
   } else {

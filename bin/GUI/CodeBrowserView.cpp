@@ -11,6 +11,7 @@
 #include <QThreadPool>
 #include <QVBoxLayout>
 
+#include <algorithm>
 #include <cassert>
 #include <unordered_map>
 
@@ -36,7 +37,7 @@ struct CodeBrowserView::PrivateData {
       : multiplier(multiplier_) {}
 };
 
-struct LocateDeclarationsThread::PrivateData {
+struct LocateEntitiesThread::PrivateData {
   const Index index;
   const std::vector<RawEntityId> ids;
 
@@ -45,24 +46,29 @@ struct LocateDeclarationsThread::PrivateData {
         ids(std::move(ids_)) {}
 };
 
-LocateDeclarationsThread::~LocateDeclarationsThread(void) {}
+LocateEntitiesThread::~LocateEntitiesThread(void) {}
 
-LocateDeclarationsThread::LocateDeclarationsThread(
+LocateEntitiesThread::LocateEntitiesThread(
     const Index &index_, std::vector<RawEntityId> ids_)
     : d(new PrivateData(index_, ids_)) {}
 
-void LocateDeclarationsThread::run(void) {
-  std::unordered_map<FileId, Decl> decl_in_file;
-  for (RawEntityId eid : d->ids) {
-    auto entity = d->index.entity(eid);
-    if (std::holds_alternative<Decl>(entity)) {
-      Decl decl = std::move(std::get<Decl>(entity));
-      decl_in_file.emplace(File::containing(decl).id(), std::move(decl));
-    }
-  }
+void LocateEntitiesThread::run(void) {
+  std::vector<FileId> seen_file_ids;
+  seen_file_ids.reserve(d->ids.size());
 
-  for (const auto &[file_id, decl] : decl_in_file) {
-    emit OpenDeclarationInFile(file_id, DeclFileLocation(decl));
+  for (RawEntityId eid : d->ids) {
+    auto loc_id = EntityFileLocation(d->index, eid);
+    VariantId vid = EntityId(loc_id).Unpack();
+    if (!std::holds_alternative<FileTokenId>(vid)) {
+      continue;
+    }
+
+    auto file_id = std::get<FileTokenId>(vid).file_id;
+    if (std::find(seen_file_ids.begin(), seen_file_ids.end(), file_id) ==
+        seen_file_ids.end()) {
+      emit OpenEntityInFile(file_id, loc_id);
+      seen_file_ids.push_back(loc_id);
+    }
   }
 }
 
@@ -115,8 +121,10 @@ void CodeBrowserView::OnCloseFileViewTab(int index) {
 void CodeBrowserView::OnDownloadedFileList(FilePathList files) {
   Clear();
   d->file_id_to_path.clear();
-  for (auto &[path, index] : files) {
-    d->file_id_to_path.emplace(index, path);
+  for (auto &[path_, file_id_] : files) {
+    std::filesystem::path path = path_;
+    FileId file_id = file_id_;
+    d->file_id_to_path.emplace(file_id, std::move(path));
   }
 }
 
@@ -126,7 +134,8 @@ void CodeBrowserView::ScrollToTokenInFile(
   std::filesystem::path path;
   auto path_it = d->file_id_to_path.find(file_id);
   if (path_it == d->file_id_to_path.end()) {
-    path = tr("unknown").toStdString();
+    static const std::filesystem::path kUnknown = tr("unknown").toStdString();
+    path = kUnknown;
   } else {
     path = path_it->second;
   }
@@ -154,7 +163,8 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
   int tab_index = -1;
   FileView *&file_view = d->file_id_to_view[file_id];
   if (!file_view) {
-    file_view = new FileView(d->multiplier, path, file_id);
+    file_view = new FileView(d->multiplier, path, file_id,
+                             EventSource::kCodeBrowser);
 
     d->view_to_file_id.emplace(file_view, file_id);
 
@@ -166,11 +176,6 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
         tab_index, QString::fromStdString(path.generic_string()));
 #endif
 
-//    auto &config = d->multiplier.Configuration().code_browser;
-//
-//    MX_CONNECT_CHILD_ACTIONS(config, CodeBrowserView, file_view, FileView)
-//    MX_ROUTE_ACTIONS(config, CodeBrowserView, d->multiplier)
-
   } else {
     tab_index = d->content->indexOf(file_view);
   }
@@ -179,13 +184,13 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
 }
 
 // Open one or more declarations.
-void CodeBrowserView::OpenDeclarations(std::vector<RawEntityId> ids) {
-  auto locator = new LocateDeclarationsThread(
+void CodeBrowserView::OpenEntities(std::vector<RawEntityId> ids) {
+  auto locator = new LocateEntitiesThread(
       d->multiplier.Index(), std::move(ids));
 
   locator->setAutoDelete(true);
 
-  connect(locator, &LocateDeclarationsThread::OpenDeclarationInFile,
+  connect(locator, &LocateEntitiesThread::OpenEntityInFile,
           this, &CodeBrowserView::ScrollToTokenInFile);
 
   QThreadPool::globalInstance()->start(locator);
