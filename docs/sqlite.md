@@ -1,6 +1,25 @@
 # SQLite bindings for Multiplier
 
-This document has been automatically generated and provides a reference to the Multiplier API as exposed by the SQLite extension module.
+> This document has been automatically generated and provides a reference to the Multiplier API as exposed by the SQLite extension module.
+
+## Connections
+
+After loading the Multiplier SQLite extension into the SQLite session, the `MultiplierConnection` virtual table will be made available. This table is used to establish connections to Multiplier indices:
+
+    INSERT INTO MultiplierConnection(name, host, port) VALUES ('default', 'localhost', '50051');
+
+Use `'unix'` as `port` value to establish connections to Unix sockets.
+
+Once a connection has been established, the tables described in this document can be instantiated using the following syntax:
+
+    CREATE VIRTUAL TABLE CustomName USING multiplier(TableName, connection_name);
+
+where `CustomName` is a name of your choice to be used in queries, and `TableName` refers to one of the tables described in this document. Notice that the connection name is not quoted in this command.
+
+As an example, this command instantiates the `Decl` table for the connection `default`:
+
+    CREATE VIRTUAL TABLE Decl USING multiplier(Decl, default);
+
 
 ## `File` table
 
