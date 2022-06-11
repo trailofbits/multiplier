@@ -16,11 +16,20 @@ struct sqlite3_module;
 namespace sqlite_bridge {
 class VirtualTable;
 
+// FIXME(frabert): Only eponymous-only modules support DELETE/INSERT/UPDATE
+// queries with the current API.
+
 class Module {
 public:
   virtual ~Module() = default;
-  int Register(sqlite3 *db, const std::string &name);
+  virtual int Register(sqlite3 *db, const std::string &name);
   virtual mx::Result<std::unique_ptr<VirtualTable>, std::string>
   Create(sqlite3 *db, const std::vector<const char *> &args) = 0;
+};
+
+class EponymousOnlyModule : public Module {
+public:
+  virtual ~EponymousOnlyModule() = default;
+  virtual int Register(sqlite3 *db, const std::string &name) override;
 };
 } // namespace sqlite_bridge

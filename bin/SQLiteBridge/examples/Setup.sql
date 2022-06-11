@@ -1,18 +1,18 @@
 .load bin/SQLiteBridge/libsqlitebridge
-CREATE VIRTUAL TABLE File              USING multiplier(File, localhost, 50051);
-CREATE VIRTUAL TABLE RegexQuery        USING multiplier(RegexQuery, localhost, 50051);
-CREATE VIRTUAL TABLE WeggliQuery       USING multiplier(WeggliQuery, localhost, 50051);
-CREATE VIRTUAL TABLE Fragment          USING multiplier(Fragment, localhost, 50051);
-CREATE VIRTUAL TABLE Reference         USING multiplier(Reference, localhost, 50051);
-CREATE VIRTUAL TABLE Decl              USING multiplier(Decl, localhost, 50051);
-CREATE VIRTUAL TABLE NamedDecl         USING multiplier(NamedDecl, localhost, 50051);
-CREATE VIRTUAL TABLE Expr              USING multiplier(Expr, localhost, 50051);
-CREATE VIRTUAL TABLE Stmt              USING multiplier(Stmt, localhost, 50051);
-CREATE VIRTUAL TABLE CallExpr          USING multiplier(CallExpr, localhost, 50051);
-CREATE VIRTUAL TABLE ImplicitCastExpr  USING multiplier(ImplicitCastExpr, localhost, 50051);
-CREATE VIRTUAL TABLE Type              USING multiplier(Type, localhost, 50051);
-CREATE VIRTUAL TABLE BuiltinType       USING multiplier(BuiltinType, localhost, 50051);
-CREATE VIRTUAL TABLE CallExprArguments USING multiplier(CallExprArguments, localhost, 50051);
-.parameter init
-.parameter set @regex_query "(\\w+)\\s+(\\w+)"
-.parameter set @weggli_query "_ $func(_) {_;}"
+
+INSERT INTO MultiplierConnection(name, host, port) VALUES ("default", "localhost", "50051");
+
+CREATE VIRTUAL TABLE File              USING multiplier(File, default);
+CREATE VIRTUAL TABLE RegexQuery        USING multiplier(RegexQuery, default);
+CREATE VIRTUAL TABLE WeggliQuery       USING multiplier(WeggliQuery, default);
+CREATE VIRTUAL TABLE Fragment          USING multiplier(Fragment, default);
+CREATE VIRTUAL TABLE Reference         USING multiplier(Reference, default);
+CREATE VIRTUAL TABLE Decl              USING multiplier(Decl, default);
+CREATE VIRTUAL TABLE NamedDecl         USING multiplier(NamedDecl, default);
+CREATE VIRTUAL TABLE Expr              USING multiplier(Expr, default);
+CREATE VIRTUAL TABLE Stmt              USING multiplier(Stmt, default);
+CREATE VIRTUAL TABLE CallExpr          USING multiplier(CallExpr, default);
+CREATE VIRTUAL TABLE ImplicitCastExpr  USING multiplier(ImplicitCastExpr, default);
+CREATE VIRTUAL TABLE Type              USING multiplier(Type, default);
+CREATE VIRTUAL TABLE BuiltinType       USING multiplier(BuiltinType, default);
+CREATE VIRTUAL TABLE CallExprArguments USING multiplier(CallExprArguments, default);

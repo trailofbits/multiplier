@@ -8,7 +8,9 @@
 #include <memory>
 #include <multiplier/Result.h>
 #include <optional>
+#include <sqlite3ext.h>
 #include <string>
+#include <vector>
 
 struct sqlite3;
 struct sqlite3_index_info;
@@ -28,5 +30,7 @@ public:
                            void (**pxFunc)(sqlite3_context *, int,
                                            sqlite3_value **),
                            void **ppArg);
+  virtual int Update(const std::vector<sqlite3_value *> &args,
+                     sqlite3_int64 *row_id);
 };
 } // namespace sqlite_bridge

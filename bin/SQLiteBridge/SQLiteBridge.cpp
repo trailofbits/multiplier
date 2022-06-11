@@ -53,5 +53,11 @@ EXPORT int sqlite3_sqlitebridge_init(sqlite3 *db, char **pzErrMsg,
     return rc;
   }
 
-  return (new sqlite_bridge::MultiplierModule())->Register(db, "multiplier");
+  rc = (new sqlite_bridge::MultiplierModule())->Register(db, "multiplier");
+  if (rc != SQLITE_OK) {
+    return rc;
+  }
+
+  return (new sqlite_bridge::ConnectionModule())
+      ->Register(db, "MultiplierConnection");
 }

@@ -7,6 +7,7 @@
 #
 
 add_library("sqlitebridge"
+  "ConnectionModule.cpp"
   "FileTable.cpp"
   "FragmentTable.cpp"
   "Module.cpp"

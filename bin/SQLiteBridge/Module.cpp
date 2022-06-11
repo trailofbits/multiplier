@@ -116,6 +116,12 @@ static int module_find_function(sqlite3_vtab *base, int nArg, const char *zName,
   return tab->tab->FindFunction(nArg, zName, pxFunc, ppArg);
 }
 
+static int module_update(sqlite3_vtab *base, int argc, sqlite3_value **argv,
+                         sqlite_int64 *pRowid) {
+  auto tab = (module_vtab *)base;
+  return tab->tab->Update({argv, argv + argc}, pRowid);
+}
+
 static sqlite3_module module_vtbl = {
     0,                    /* iVersion      */
     module_create,        /* xCreate       */
@@ -142,6 +148,32 @@ static sqlite3_module module_vtbl = {
     nullptr               /* xRollbackto   */
 };
 
+static sqlite3_module epo_module_vtbl = {
+    0,                    /* iVersion      */
+    nullptr,              /* xCreate       */
+    module_create,        /* xConnect      */
+    module_best_index,    /* xBestIndex    */
+    module_destroy,       /* xDisconnect   */
+    module_destroy,       /* xDestroy      */
+    module_open,          /* xOpen         */
+    module_close,         /* xClose        */
+    module_filter,        /* xFilter       */
+    module_next,          /* xNext         */
+    module_eof,           /* xEof          */
+    module_column,        /* xColumn       */
+    module_rowid,         /* xRowid        */
+    module_update,        /* xUpdate       */
+    nullptr,              /* xBegin        */
+    nullptr,              /* xSync         */
+    nullptr,              /* xCommit       */
+    nullptr,              /* xRollback     */
+    module_find_function, /* xFindFunction */
+    nullptr,              /* xRename       */
+    nullptr,              /* xSavepoint    */
+    nullptr,              /* xRelease      */
+    nullptr               /* xRollbackto   */
+};
+
 #define CHECK_ERR(e)                                                           \
   if ((err = (e)) != SQLITE_OK)                                                \
     return err;
@@ -155,9 +187,21 @@ int VirtualTable::FindFunction(int nArg, const std::string &name,
   return 0;
 }
 
+int VirtualTable::Update(const std::vector<sqlite3_value *> &args,
+                         sqlite3_int64 *row_id) {
+  return SQLITE_READONLY;
+}
+
 int Module::Register(sqlite3 *db, const std::string &name) {
   int err;
   CHECK_ERR(sqlite3_create_module_v2(db, name.c_str(), &module_vtbl, this,
+                                     delete_module));
+  return SQLITE_OK;
+}
+
+int EponymousOnlyModule::Register(sqlite3 *db, const std::string &name) {
+  int err;
+  CHECK_ERR(sqlite3_create_module_v2(db, name.c_str(), &epo_module_vtbl, this,
                                      delete_module));
   return SQLITE_OK;
 }

@@ -1,1 +1,1 @@
-SELECT * FROM WeggliQuery WHERE WeggliQuery.query = @weggli_query;
+SELECT * FROM WeggliQuery WHERE WeggliQuery.query = "_ $func(_) {_;}";

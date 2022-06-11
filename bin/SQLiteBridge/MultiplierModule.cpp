@@ -19,37 +19,40 @@ using ResultType = mx::Result<std::unique_ptr<VirtualTable>, std::string>;
 
 ResultType MultiplierModule::Create(sqlite3 *db,
                                     const std::vector<const char *> &args) {
-  if (args.size() != 6) {
-    return ResultType("Exactly 3 arguments expected: table, host, port.");
+  if (args.size() != 5) {
+    return ResultType("Exactly 2 arguments expected: table, connection name.");
   }
 
   std::string table{args[3]};
-  std::string host{args[4]};
-  std::string port{args[5]};
+  std::string connection{args[4]};
 
-  auto ep{mx::EntityProvider::from_remote(host, port)};
+  auto ep{GetEntityProvider(connection)};
+  if (!ep) {
+    return ResultType("No connection found with name '" + connection + "'");
+  }
+
   std::unique_ptr<VirtualTable> vtab;
   if (table == "File") {
-    vtab = std::make_unique<FileTable>(ep);
+    vtab = std::make_unique<FileTable>(*ep);
   } else if (table == "Fragment") {
-    vtab = std::make_unique<FragmentTable>(ep);
+    vtab = std::make_unique<FragmentTable>(*ep);
   } else if (table == "Reference") {
-    vtab = std::make_unique<ReferenceTable>(ep);
+    vtab = std::make_unique<ReferenceTable>(*ep);
   } else if (table == "RegexQuery") {
-    vtab = std::make_unique<QueryTable>(ep, QueryType::Regex);
+    vtab = std::make_unique<QueryTable>(*ep, QueryType::Regex);
   } else if (table == "WeggliQuery") {
-    vtab = std::make_unique<QueryTable>(ep, QueryType::Weggli);
+    vtab = std::make_unique<QueryTable>(*ep, QueryType::Weggli);
   }
 
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \
   else if (table == #NAME) {                                                   \
-    vtab = std::make_unique<NAME##Table>(ep);                                  \
+    vtab = std::make_unique<NAME##Table>(*ep);                                 \
   }
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
   else {
-    vtab = GetListTable(ep, table);
+    vtab = GetListTable(*ep, table);
   }
 
   if (!vtab) {
