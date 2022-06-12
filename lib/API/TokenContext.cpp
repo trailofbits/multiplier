@@ -25,8 +25,19 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
   }
 
   FragmentReader frag_reader = frag->Fragment();
-  unsigned offset = frag_reader.getTokenContextOffsets()[tok.offset];
-  mx::rpc::TokenContext::Reader tc = frag_reader.getTokenContexts()[offset];
+  unsigned tagged_offset = frag_reader.getTokenContextOffsets()[tok.offset];
+  if (!(tagged_offset & 1u)) {
+    return std::nullopt;
+  }
+
+  unsigned offset = tagged_offset >> 1u;
+  auto contexts_reader = frag_reader.getTokenContexts();
+  if (offset >= contexts_reader.size()) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  mx::rpc::TokenContext::Reader tc = contexts_reader[offset];
   std::shared_ptr<const FragmentImpl> frag_ptr(tok.impl, frag);
 
   // NOTE(pag): +1 to skip `kInvalid`.
