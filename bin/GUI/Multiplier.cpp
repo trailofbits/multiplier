@@ -183,7 +183,6 @@ void Multiplier::InitializeWidgets(void) {
   tabifyDockWidget(d->file_browser_dock, d->history_browser_dock);
   tabifyDockWidget(d->history_browser_dock, d->reference_browser_dock);
 
-
   setCentralWidget(d->code_browser_view);
 
 #ifdef __APPLE__
@@ -191,6 +190,9 @@ void Multiplier::InitializeWidgets(void) {
     setTitleBarColor(winId(), palette().color(QPalette::Window), false);
   }
 #endif
+
+  connect(d->history_browser_dock, &QDockWidget::visibilityChanged,
+          this, &Multiplier::FocusOnHistory);
 
   connect(d->file_browser_view, &FileBrowserView::Connected,
           this, &Multiplier::OnConnected);
@@ -304,6 +306,12 @@ void Multiplier::OnHistoryDeclarationClicked(RawEntityId eid) {
   d->code_browser_view->OpenEntities(std::move(ids));
 }
 
+void Multiplier::FocusOnHistory(bool visible) {
+  if (visible) {
+    d->history_browser_view->Focus();
+  }
+}
+
 void Multiplier::OnConnected(void) {
   d->connection_state = ConnectionState::kConnected;
   UpdateUI();
@@ -354,7 +362,6 @@ void Multiplier::OnFileDisconnectAction(void) {
 void Multiplier::OnFileExitAction(void) { close(); }
 
 void Multiplier::OnHelpAboutAction(void) {}
-
 
 void Multiplier::ActOnTokens(EventSource source, Event event,
                              std::vector<RawEntityId> ids) {

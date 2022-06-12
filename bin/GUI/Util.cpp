@@ -532,10 +532,11 @@ std::optional<Decl> DeclForToken(const Token &token) {
     }
   }
 
-#ifndef NDEBUG
+#if 1
   if (ClassifyToken(token) == TokenClass::kIdentifier) {
     if (std::optional<Fragment> frag = Fragment::containing(token)) {
       std::cerr << "Missing decl for '" << token.data() << "': " << token.id() << ":\n";
+      std::cerr << "\tFragment ID: " << frag->id() << '\n';
       if (auto file = File::containing(token)) {
         std::cerr << "\tFile ID: " << file->id() << '\n';
       }

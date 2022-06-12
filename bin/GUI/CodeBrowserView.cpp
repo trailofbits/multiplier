@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <unordered_map>
 
@@ -19,6 +20,8 @@
 #include "FileView.h"
 #include "Multiplier.h"
 #include "Util.h"
+
+#include <iostream>
 
 namespace mx::gui {
 
@@ -33,6 +36,8 @@ struct CodeBrowserView::PrivateData {
   std::unordered_map<QWidget *, FileId> view_to_file_id;
   std::unordered_map<FileId, std::filesystem::path> file_id_to_path;
 
+  std::atomic<unsigned> counter;
+
   PrivateData(Multiplier &multiplier_)
       : multiplier(multiplier_) {}
 };
@@ -40,17 +45,20 @@ struct CodeBrowserView::PrivateData {
 struct LocateEntitiesThread::PrivateData {
   const Index index;
   const std::vector<RawEntityId> ids;
+  const unsigned counter;
 
-  inline PrivateData(const Index &index_, std::vector<RawEntityId> ids_)
+  inline PrivateData(const Index &index_, std::vector<RawEntityId> ids_,
+                     unsigned counter_)
       : index(index_),
-        ids(std::move(ids_)) {}
+        ids(std::move(ids_)),
+        counter(counter_) {}
 };
 
 LocateEntitiesThread::~LocateEntitiesThread(void) {}
 
 LocateEntitiesThread::LocateEntitiesThread(
-    const Index &index_, std::vector<RawEntityId> ids_)
-    : d(new PrivateData(index_, ids_)) {}
+    const Index &index_, std::vector<RawEntityId> ids_, unsigned counter_)
+    : d(new PrivateData(index_, std::move(ids_), counter_)) {}
 
 void LocateEntitiesThread::run(void) {
   std::vector<FileId> seen_file_ids;
@@ -66,7 +74,7 @@ void LocateEntitiesThread::run(void) {
     auto file_id = std::get<FileTokenId>(vid).file_id;
     if (std::find(seen_file_ids.begin(), seen_file_ids.end(), file_id) ==
         seen_file_ids.end()) {
-      emit OpenEntityInFile(file_id, loc_id);
+      emit OpenEntityInFile(file_id, loc_id, d->counter);
       seen_file_ids.push_back(loc_id);
     }
   }
@@ -128,8 +136,11 @@ void CodeBrowserView::OnDownloadedFileList(FilePathList files) {
   }
 }
 
+// Scroll to a specific target location in a file. If the file isn't open yet
+// then open it. If it is open but not the active view, then set it to the
+// active view.
 void CodeBrowserView::ScrollToTokenInFile(
-    FileId file_id, RawEntityId scroll_target) {
+    FileId file_id, RawEntityId scroll_target, unsigned counter) {
 
   std::filesystem::path path;
   auto path_it = d->file_id_to_path.find(file_id);
@@ -140,6 +151,9 @@ void CodeBrowserView::ScrollToTokenInFile(
     path = path_it->second;
   }
 
+  auto current_tab = d->content->currentWidget();
+  auto out_of_order = counter != d->counter.load();
+
   OpenFile(std::move(path), file_id);
 
   auto view_it = d->file_id_to_view.find(file_id);
@@ -147,8 +161,17 @@ void CodeBrowserView::ScrollToTokenInFile(
     return;  // Strange.
   }
 
-  if (scroll_target != kInvalidEntityId) {
-    view_it->second->ScrollToToken(scroll_target);
+  // If this scroll request came out of order, then ignore it.
+  if (out_of_order) {
+    d->content->setCurrentWidget(current_tab);
+
+  // Otherwise,  open it up and scroll to the specified location.
+  } else {
+    d->content->setCurrentWidget(view_it->second);
+
+    if (scroll_target != kInvalidEntityId) {
+      view_it->second->ScrollToToken(scroll_target);
+    }
   }
 }
 
@@ -158,9 +181,10 @@ void CodeBrowserView::Clear(void) {
   d->content->clear();
 }
 
-// Open a file.
+// Open a file in a tab.
+//
+// NOTE(pag): This does not set the file to be the active widget.
 void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
-  int tab_index = -1;
   FileView *&file_view = d->file_id_to_view[file_id];
   if (!file_view) {
     file_view = new FileView(d->multiplier, path, file_id,
@@ -168,25 +192,21 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
 
     d->view_to_file_id.emplace(file_view, file_id);
 
-    tab_index = d->content->addTab(
+    auto tab_index = d->content->addTab(
         file_view, QString("%1").arg(path.filename().c_str()));
 
 #ifndef QT_NO_TOOLTIP
     d->content->setTabToolTip(
         tab_index, QString::fromStdString(path.generic_string()));
 #endif
-
-  } else {
-    tab_index = d->content->indexOf(file_view);
   }
-
-  d->content->setCurrentIndex(tab_index);
 }
 
-// Open one or more declarations.
+// Request for one or more entities to be opened.
 void CodeBrowserView::OpenEntities(std::vector<RawEntityId> ids) {
   auto locator = new LocateEntitiesThread(
-      d->multiplier.Index(), std::move(ids));
+      d->multiplier.Index(), std::move(ids),
+      d->counter.fetch_add(1u) + 1u);
 
   locator->setAutoDelete(true);
 
@@ -196,9 +216,5 @@ void CodeBrowserView::OpenEntities(std::vector<RawEntityId> ids) {
   QThreadPool::globalInstance()->start(locator);
   update();
 }
-
-//MX_DEFINE_DECLARATION_SLOTS(
-//    CodeBrowserView,
-//    d->multiplier.Configuration().code_browser)
 
 }  // namespace mx::gui

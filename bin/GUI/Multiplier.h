@@ -56,6 +56,7 @@ class Multiplier final : public QMainWindow {
   void UpdateUI(void);
 
  public slots:
+  void FocusOnHistory(bool);
   void OnConnected(void);
   void OnSourceFileDoubleClicked(std::filesystem::path, FileId file_id);
 

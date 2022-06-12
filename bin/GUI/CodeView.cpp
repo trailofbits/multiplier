@@ -491,28 +491,33 @@ void CodeView::ScrollToToken(RawEntityId file_tok_id) {
     return;
   }
 
-  OnHighlightLine();
-
+  QPoint bottom_right(viewport()->width() - 1, viewport()->height() - 1);
   int desired_position = d->code->start_of_token[tok_index];
+  int start_pos = cursorForPosition(QPoint(0, 0)).position();
+  int end_pos = cursorForPosition(bottom_right).position();
+
+  // Move the cursor to the desired location.
+  QTextCursor loc = textCursor();
+  loc.setPosition(desired_position,
+                  QTextCursor::MoveMode::MoveAnchor);
+  setTextCursor(loc);
+
+  // Highlight the line containing the cursor.
+  OnHighlightLine();
 
   // Figure out if we can avoid scrolling due to the text being (probably)
   // visible. If we have a `last_block`, then we clicked on something in here,
   // so it must have been visible.
   if (d->last_block != -1) {
     d->last_block = -1;
-
-    int start_pos = cursorForPosition(QPoint(0, 0)).position();
-    QPoint bottom_right(viewport()->width() - 1, viewport()->height() - 1);
-    int end_pos = cursorForPosition(bottom_right).position();
     if (start_pos < desired_position && desired_position < end_pos) {
       return;
     }
   }
 
-  QTextCursor loc = textCursor();
-  loc.setPosition(desired_position,
-                  QTextCursor::MoveMode::MoveAnchor);
-
+  // We want to change the scroll in the viewport, so move us to the end of the
+  // document (trick from StackOverflow), then back to the text cursor, then
+  // center on the cursor.
   moveCursor(QTextCursor::MoveOperation::End);
   setTextCursor(loc);
   ensureCursorVisible();
@@ -792,7 +797,6 @@ void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
   if (auto pos = TokenIndexForPosition(event->pos())) {
     auto [index, block] = pos.value();
     d->last_block = block;
-    d->code->file_token_ids;
     EmitEventsForIndex(event, index, EventKind::kDoubleClick);
   } else {
     d->last_block = -1;

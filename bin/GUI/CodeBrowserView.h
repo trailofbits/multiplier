@@ -35,7 +35,12 @@ class CodeBrowserView final : public QWidget {
 
   CodeBrowserView(Multiplier &multiplier_, QWidget *parent=nullptr);
 
+  // Open a file in a tab.
+  //
+  // NOTE(pag): This does not set the file to be the active widget.
   void OpenFile(std::filesystem::path path, FileId file_id);
+
+  // Request for one or more entities to be opened.
   void OpenEntities(std::vector<RawEntityId> ids);
 
   void Clear(void);
@@ -45,7 +50,12 @@ class CodeBrowserView final : public QWidget {
 
  private slots:
   void OnCloseFileViewTab(int index);
-  void ScrollToTokenInFile(FileId file_id, RawEntityId scroll_target);
+
+  // Scroll to a specific target location in a file. If the file isn't open yet
+  // then open it. If it is open but not the active view, then set it to the
+  // active view.
+  void ScrollToTokenInFile(FileId file_id, RawEntityId scroll_target,
+                           unsigned counter);
 };
 
 // Thread that goes and downloads and structures the relevant code in the
@@ -64,10 +74,12 @@ class LocateEntitiesThread final : public QObject, public QRunnable {
  public:
   virtual ~LocateEntitiesThread(void);
 
-  LocateEntitiesThread(const Index &index_, std::vector<RawEntityId> ids);
+  LocateEntitiesThread(const Index &index_, std::vector<RawEntityId> ids,
+                       unsigned counter);
 
  signals:
-  void OpenEntityInFile(FileId file_id, RawEntityId scroll_target);
+  void OpenEntityInFile(FileId file_id, RawEntityId scroll_target,
+                        unsigned counter);
 };
 
 }  // namespace gui

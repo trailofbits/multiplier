@@ -370,6 +370,18 @@ void ReferenceBrowserView::InitializeWidgets(void) {
   d->reference_tree->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
 
+  // Create and connect the code preview.
+  if (config.code_preview.visible) {
+    d->code = new CodeView(d->theme, EventSource::kReferenceBrowserCodePreview);
+    d->splitter->addWidget(d->code);
+
+    connect(d->code, &CodeView::DeclarationEvent,
+            &(d->multiplier), &Multiplier::ActOnDeclarations);
+
+    connect(d->code, &CodeView::TokenEvent,
+            &(d->multiplier), &Multiplier::ActOnTokens);
+  }
+
   connect(d->reference_tree, &QTreeWidget::itemExpanded,
           this, &ReferenceBrowserView::OnTreeWidgetItemExpanded);
 
@@ -791,19 +803,6 @@ void ReferenceBrowserView::OnItemClicked(
 
   ReferenceBrowserConfiguration &config =
       d->multiplier.Configuration().reference_browser;
-
-  if (config.code_preview.visible && !d->code) {
-    d->code = new CodeView(d->theme, EventSource::kReferenceBrowserCodePreview);
-    d->splitter->addWidget(d->code);
-
-    auto &config = d->multiplier.Configuration().reference_browser.code_preview;
-
-    connect(d->code, &CodeView::DeclarationEvent,
-            &(d->multiplier), &Multiplier::ActOnDeclarations);
-
-    connect(d->code, &CodeView::TokenEvent,
-            &(d->multiplier), &Multiplier::ActOnTokens);
-  }
 
   // A human has just clicked on this thing, show the code preview.
   const Index &index = d->multiplier.Index();
