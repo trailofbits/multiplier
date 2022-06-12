@@ -355,6 +355,50 @@ void Multiplier::OnFileExitAction(void) { close(); }
 
 void Multiplier::OnHelpAboutAction(void) {}
 
+
+void Multiplier::ActOnTokens(EventSource source, Event event,
+                             std::vector<RawEntityId> ids) {
+
+  for (const auto &[mevent_, sources_, actions_] : d->config.token_actions) {
+    const Event &mevent = mevent_;
+    const EventSources sources = sources_;
+    const Actions actions = actions_;
+    if (!sources.testFlag(source) ||
+        mevent.modifiers != event.modifiers ||
+        mevent.buttons != event.buttons ||
+        mevent.kind != event.kind) {
+      continue;
+    }
+
+    if (actions.testFlag(Action::kOpenCodeBrowser)) {
+      d->code_browser_view->OpenEntities(ids);
+    }
+
+    if (actions.testFlag(Action::kOpenReferenceBrowser)) {
+      d->reference_browser_view->SetRoots(ids);
+      if (d->reference_browser_dock->visibleRegion().isEmpty()) {
+        d->reference_browser_dock->raise();
+      }
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryAsChild)) {
+      d->history_browser_view->AddChildDeclarations(ids);
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryAsSibling)) {
+      d->history_browser_view->AddSiblingDeclarations(ids);
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryUnderRoot)) {
+      d->history_browser_view->AddDeclarationsUnderRoot(ids);
+    }
+
+    if (actions.testFlag(Action::kAddToHistoryAsRoots)) {
+      d->history_browser_view->AddRootDeclarations(ids);
+    }
+  }
+}
+
 void Multiplier::ActOnDeclarations(EventSource source, Event event,
                                    std::vector<RawEntityId> ids) {
 
@@ -394,7 +438,7 @@ void Multiplier::ActOnDeclarations(EventSource source, Event event,
     }
 
     if (actions.testFlag(Action::kAddToHistoryAsRoots)) {
-      d->history_browser_view->AddDeclarationsUnderRoot(ids);
+      d->history_browser_view->AddRootDeclarations(ids);
     }
   }
 }

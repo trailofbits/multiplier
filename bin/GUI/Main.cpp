@@ -62,15 +62,26 @@ int main(int argc, char *argv[]) {
       mx::gui::Actions{mx::gui::Action::kOpenReferenceBrowser});
 
   // Double-clicking an item in the reference browser should open it up in the
-  // code browser.
+  // code browser. This is a declaration action, because we want to go to the
+  // declaration containing the reference.
   config.declaration_actions.emplace_back(
       mx::gui::Event{{},
                      Qt::MouseButton::LeftButton,
                      mx::gui::EventKind::kDoubleClick},
       mx::gui::EventSources{mx::gui::EventSource::kReferenceBrowser},
-      mx::gui::Actions{mx::gui::Action::kOpenCodeBrowser,
-                       mx::gui::Action::kAddToHistoryUnderRoot});
+      mx::gui::Actions{mx::gui::Action::kAddToHistoryUnderRoot});
 
+  // Double-clicking an item in the reference browser should open it up in the
+  // code browser. This is a token action because we want to go to the token
+  // where the reference is.
+  config.token_actions.emplace_back(
+      mx::gui::Event{{},
+                     Qt::MouseButton::LeftButton,
+                     mx::gui::EventKind::kDoubleClick},
+      mx::gui::EventSources{mx::gui::EventSource::kReferenceBrowser},
+      mx::gui::Actions{mx::gui::Action::kOpenCodeBrowser});
+
+  qRegisterMetaType<mx::gui::EventSource>("EventSource");
   qRegisterMetaType<mx::gui::EventSources>("EventSources");
   qRegisterMetaType<uint8_t>("uint8_t");
   qRegisterMetaType<uint16_t>("uint16_t");

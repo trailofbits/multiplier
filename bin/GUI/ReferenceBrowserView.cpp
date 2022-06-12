@@ -125,20 +125,20 @@ ExpandReferenceHierarchyThread::ExpandReferenceHierarchyThread(
     QTreeWidgetItem *parent_, uint64_t counter_, int depth_)
     : d(new PrivateData(index_, id_, line_cache_, parent_, counter_, depth_)) {}
 
+namespace {
 static constexpr size_t kEmitBatchSize = 32;
+}  // namespace
 
 void InitReferenceHierarchyThread::run(void) {
-
-  auto entity = d->index.entity(d->id);
-  if (!std::holds_alternative<Decl>(entity)) {
+  std::optional<Decl> root_decl = NearestDeclFor(d->index, d->id);
+  if (!root_decl) {
     return;
   }
 
   UserLocations users;
   FragmentId last_fragment_id = kInvalidEntityId;
 
-  const Decl &root_decl = std::get<Decl>(entity);
-  for (Reference ref : root_decl.references()) {
+  for (Reference ref : root_decl->references()) {
     Stmt stmt = ref.statement();
     if (auto decl = DeclContaining(stmt)) {
 
@@ -149,7 +149,7 @@ void InitReferenceHierarchyThread::run(void) {
 
         // Group them by file; they are already grouped by fragment.
         std::stable_sort(users.begin(), users.end(), UserLocationSort);
-        emit UsersOfRoot(d->item_parent, d->counter, root_decl,
+        emit UsersOfRoot(d->item_parent, d->counter, root_decl.value(),
                          std::make_shared<UserLocations>(std::move(users)));
       }
 
@@ -164,7 +164,7 @@ void InitReferenceHierarchyThread::run(void) {
 
   // Group them by file; they are already grouped by fragment.
   std::stable_sort(users.begin(), users.end(), UserLocationSort);
-  emit UsersOfRoot(d->item_parent, d->counter, root_decl,
+  emit UsersOfRoot(d->item_parent, d->counter, root_decl.value(),
                    std::make_shared<UserLocations>(std::move(users)));
 }
 
@@ -384,6 +384,9 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   connect(this, &ReferenceBrowserView::DeclarationEvent,
           &d->multiplier, &Multiplier::ActOnDeclarations);
+
+  connect(this, &ReferenceBrowserView::TokenEvent,
+          &d->multiplier, &Multiplier::ActOnTokens);
 }
 
 bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
@@ -763,13 +766,11 @@ void ReferenceBrowserView::OnItemDoubleClicked(
                  EventKind::kDoubleClick};
 
   // Try to go to the specific use.
-  for (const Token &tok : id_it->second.file_tokens) {
-    emit DeclarationEvent(EventSource::kReferenceBrowser, event,
-                          {tok.id()});
-    return;
+  for (const Token &tok : id_it->second.tokens) {
+    emit TokenEvent(EventSource::kReferenceBrowser, event, {tok.id()});
+    break;
   }
 
-  // Otherwise go to the
   emit DeclarationEvent(EventSource::kReferenceBrowser, event,
                         {id_it->second.decl.id()});
 }
@@ -799,6 +800,9 @@ void ReferenceBrowserView::OnItemClicked(
 
     connect(d->code, &CodeView::DeclarationEvent,
             &(d->multiplier), &Multiplier::ActOnDeclarations);
+
+    connect(d->code, &CodeView::TokenEvent,
+            &(d->multiplier), &Multiplier::ActOnTokens);
   }
 
   // A human has just clicked on this thing, show the code preview.

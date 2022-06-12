@@ -146,14 +146,13 @@ void HistoryBrowserView::AddDeclarationsUnderRoot(
   }
 
   for (RawEntityId eid : ids) {
-    auto entity = d->multiplier.Index().entity(eid);
-    if (!std::holds_alternative<Decl>(entity)) {
+    std::optional<Decl> decl = NearestDeclFor(d->multiplier.Index(), eid);
+    if (!decl) {
       continue;
     }
 
-    Decl decl(std::move(std::get<Decl>(entity)));
     auto *item = new QTreeWidgetItem;
-    item->setText(0, DeclName(decl));
+    item->setText(0, DeclName(decl.value()));
 
     d->item_to_decl.emplace(item, eid);
 

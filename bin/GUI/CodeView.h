@@ -68,7 +68,10 @@ class CodeView final : public QPlainTextEdit {
   void InitializeWidgets(void);
   std::optional<std::pair<unsigned, int>>
   TokenIndexForPosition(const QPoint &pos) const;
-  std::vector<RawEntityId> DeclsForToken(unsigned index) const;
+  std::vector<RawEntityId> DeclsForIndex(unsigned index) const;
+  std::vector<RawEntityId> TokensForIndex(unsigned index) const;
+
+  void EmitEventsForIndex(QMouseEvent *event, unsigned index, EventKind kind);
 
  private slots:
   void OnDownloadFailed(void);
@@ -76,6 +79,9 @@ class CodeView final : public QPlainTextEdit {
   void OnRenderCode(void *code, uint64_t counter);
 
  signals:
+  void TokenEvent(EventSource source, Event event,
+                  std::vector<RawEntityId> ids);
+
   void DeclarationEvent(EventSource source, Event event,
                         std::vector<RawEntityId> ids);
 };

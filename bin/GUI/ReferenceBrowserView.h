@@ -74,6 +74,9 @@ class ReferenceBrowserView final : public QWidget {
  signals:
   void DeclarationEvent(EventSource source, Event event,
                         std::vector<RawEntityId> ids);
+
+  void TokenEvent(EventSource source, Event event,
+                  std::vector<RawEntityId> ids);
 };
 
 // A background thread that downloads the first level of references for one

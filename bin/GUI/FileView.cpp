@@ -52,6 +52,9 @@ FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
 
   connect(d->content, &CodeView::DeclarationEvent,
           &multiplier, &Multiplier::ActOnDeclarations);
+
+  connect(d->content, &CodeView::TokenEvent,
+          &multiplier, &Multiplier::ActOnTokens);
 }
 
 void FileView::ScrollToToken(RawEntityId file_tok_id) const {

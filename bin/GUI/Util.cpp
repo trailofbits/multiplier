@@ -726,6 +726,25 @@ skip_name_match:
   return Fragment::containing(decl).file_tokens().begin()->id();
 }
 
+// Try to get the nearest declaration for `id`. Ideally, `id` is a declaration
+// ID. Otherwise, it will find the nearest enclosing declaration, and return
+// that.
+std::optional<Decl> NearestDeclFor(const Index &index, RawEntityId id) {
+  auto entity = index.entity(id);
+  if (std::holds_alternative<Decl>(entity)) {
+    return std::get<Decl>(entity);
+  } else if (std::holds_alternative<Stmt>(entity)) {
+    for (Decl decl : Decl::containing(std::get<Stmt>(entity))) {
+      return decl;
+    }
+  } else if (std::holds_alternative<Token>(entity)) {
+    for (Decl decl : Decl::containing(std::get<Token>(entity))) {
+      return decl;
+    }
+  }
+  return std::nullopt;
+}
+
 namespace {
 
 static const QString kBreadCrumb("%1%2%3");

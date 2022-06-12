@@ -69,6 +69,8 @@ class Multiplier final : public QMainWindow {
   void OnHistoryDeclarationClicked(RawEntityId eid);
 
  public slots:
+  void ActOnTokens(EventSource source, Event event,
+                   std::vector<RawEntityId> ids);
   void ActOnDeclarations(EventSource source, Event event,
                          std::vector<RawEntityId> ids);
 };

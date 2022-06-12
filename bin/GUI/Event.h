@@ -26,14 +26,20 @@ enum class EventSource : int {
 Q_DECLARE_FLAGS(EventSources, EventSource)
 
 enum class Action : int {
+  // Open the declaration or tokens in the code browser. This will render the
+  // containing file, then try to navigate to the relevant line.
   kOpenCodeBrowser              = 1 << 0,
+
+  // Open the declaration or nearest containing declaration in the reference
+  // browser. This will also auto-open the first level of references.
   kOpenReferenceBrowser         = 1 << 1,
+
+  // Add a declaration to the history.
   kAddToHistoryAsChild          = 1 << 2,
   kAddToHistoryAsSibling        = 1 << 3,
   kAddToHistoryUnderRoot        = 1 << 4,
   kAddToHistoryAsRoots          = 1 << 5,
 };
-
 
 Q_DECLARE_FLAGS(Actions, Action)
 

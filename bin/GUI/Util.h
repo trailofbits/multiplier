@@ -68,6 +68,11 @@ RawEntityId EntityFileLocation(const Index &index, RawEntityId eid);
 // declaration.
 RawEntityId DeclFileLocation(const Decl &decl);
 
+// Try to get the nearest declaration for `id`. Ideally, `id` is a declaration
+// ID. Otherwise, it will find the nearest enclosing declaration, and return
+// that.
+std::optional<Decl> NearestDeclFor(const Index &index, RawEntityId id);
+
 // Create a breadcrumbs string of the token contexts.
 QString TokenBreadCrumbs(const Token &ent, bool run_length_encode=true);
 
