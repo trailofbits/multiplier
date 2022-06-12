@@ -319,7 +319,7 @@ void Multiplier::OnConnected(void) {
 
 void Multiplier::OnSourceFileDoubleClicked(
     std::filesystem::path path, FileId file_id) {
-  d->code_browser_view->OpenFile(std::move(path), file_id);
+  d->code_browser_view->OpenFile(std::move(path), file_id, true);
 }
 
 void Multiplier::OnFileConnectAction(void) {

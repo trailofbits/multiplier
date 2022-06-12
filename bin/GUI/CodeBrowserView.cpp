@@ -184,7 +184,8 @@ void CodeBrowserView::Clear(void) {
 // Open a file in a tab.
 //
 // NOTE(pag): This does not set the file to be the active widget.
-void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
+void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id,
+                               bool show) {
   FileView *&file_view = d->file_id_to_view[file_id];
   if (!file_view) {
     file_view = new FileView(d->multiplier, path, file_id,
@@ -199,6 +200,10 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id) {
     d->content->setTabToolTip(
         tab_index, QString::fromStdString(path.generic_string()));
 #endif
+  }
+
+  if (show) {
+    d->content->setCurrentWidget(file_view);
   }
 }
 

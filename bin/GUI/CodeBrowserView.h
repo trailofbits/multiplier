@@ -38,7 +38,7 @@ class CodeBrowserView final : public QWidget {
   // Open a file in a tab.
   //
   // NOTE(pag): This does not set the file to be the active widget.
-  void OpenFile(std::filesystem::path path, FileId file_id);
+  void OpenFile(std::filesystem::path path, FileId file_id, bool show=false);
 
   // Request for one or more entities to be opened.
   void OpenEntities(std::vector<RawEntityId> ids);
