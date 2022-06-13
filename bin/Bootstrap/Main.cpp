@@ -1745,6 +1745,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("is_this_declaration_referenced");  // Disable this.
       seen_methods->emplace("is_used");  // Disable this.
       seen_methods->emplace("is_first_declaration");  // Disable this.
+      seen_methods->emplace("is_definition");  // Disable this; we've added it manually.
       seen_methods->emplace("is_this_declaration_a_definition");  // Disable this.
       seen_methods->emplace("parent");  // Disable this.
       seen_methods->emplace("prev_declaration_in_scope");  // TODO(pag): Disable this?
@@ -2142,6 +2143,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (snake_name == "is_this_declaration_a_definition") {
       snake_name = "is_definition";
+
+    } else if (snake_name == "is_this_declaration_a_demoted_definition") {
+      snake_name = "is_demoted_definition";
     
     } else if (snake_name == "kind") {
       if (class_name == "BuiltinType") {

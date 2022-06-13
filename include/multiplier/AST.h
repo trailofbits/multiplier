@@ -29371,7 +29371,7 @@ class VarDecl : public DeclaratorDecl {
   bool is_previous_declaration_in_same_block_scope(void) const;
   bool is_static_data_member(void) const;
   bool is_static_local(void) const;
-  bool is_this_declaration_a_demoted_definition(void) const;
+  bool is_demoted_definition(void) const;
   bool is_usable_in_constant_expressions(void) const;
   bool might_be_usable_in_constant_expressions(void) const;
   QualTypeDestructionKind needs_destruction(void) const;
@@ -30272,7 +30272,6 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_target_clones_multi_version(void) const;
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
-  bool is_definition(void) const;
   bool is_this_declaration_instantiated_from_a_friend_definition(void) const;
   bool is_trivial(void) const;
   bool is_trivial_for_call(void) const;
@@ -31835,7 +31834,6 @@ class TagDecl : public TypeDecl {
   bool is_free_standing(void) const;
   bool is_interface(void) const;
   bool is_struct(void) const;
-  bool is_definition(void) const;
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;
@@ -33676,7 +33674,6 @@ class ObjCMethodDecl : public NamedDecl {
   bool is_property_accessor(void) const;
   bool is_redeclaration(void) const;
   bool is_synthesized_accessor_stub(void) const;
-  bool is_definition(void) const;
   bool is_this_declaration_a_designated_initializer(void) const;
   bool is_variadic(void) const;
   std::vector<ParmVarDecl> parameters(void) const;
@@ -33900,7 +33897,6 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;
   bool is_non_runtime_protocol(void) const;
-  bool is_definition(void) const;
   std::vector<Token> protocol_tokens(void) const;
   std::vector<ObjCProtocolDecl> protocols(void) const;
 };
@@ -33986,7 +33982,6 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool is_arc_weakref_unavailable(void) const;
   bool is_implicit_interface_declaration(void) const;
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
-  bool is_definition(void) const;
   std::vector<ObjCIvarDecl> instance_variables(void) const;
   std::vector<ObjCCategoryDecl> known_categories(void) const;
   std::vector<ObjCCategoryDecl> known_extensions(void) const;
