@@ -134,6 +134,7 @@ public:
     }
 
     auto ep{mx::EntityProvider::from_remote(host_str, port_str)};
+    ep = mx::EntityProvider::in_memory_cache(ep);
     if (arg0_type == SQLITE_NULL) {
       // Insert query
       if (entity_providers.count(name_str)) {
