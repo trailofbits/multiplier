@@ -42,6 +42,7 @@ class Multiplier final : public QMainWindow {
  protected:
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
   void closeEvent(QCloseEvent *event) Q_DECL_FINAL;
+  bool eventFilter(QObject *watched, QEvent *event) Q_DECL_FINAL;
 
  private:
   struct PrivateData;
@@ -64,6 +65,9 @@ class Multiplier final : public QMainWindow {
   void OnFileConnectAction(void);
   void OnFileDisconnectAction(void);
   void OnFileExitAction(void);
+  void OnViewFileBrowserAction(void);
+  void OnViewReferenceBrowserAction(void);
+  void OnViewHistoryBrowserAction(void);
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
   void OnMoveReferenceBrowser(Qt::DockWidgetArea area);

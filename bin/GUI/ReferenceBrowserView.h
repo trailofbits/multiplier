@@ -52,6 +52,7 @@ class ReferenceBrowserView final : public QWidget {
   ReferenceBrowserView(Multiplier &multiplier, QWidget *parent = nullptr);
 
   void Clear(void);
+  void Focus(void);
   void AddRoot(RawEntityId id);
   void SetRoots(std::vector<RawEntityId> new_root_ids);
   void SetCodePreviewHorizontal(void);

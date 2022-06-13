@@ -43,12 +43,17 @@ enum class ConnectionState : int { kNotConnected, kConnecting, kConnected };
 namespace {
 
 struct MainMindowMenus final {
+
+  QMenu *file_menu{nullptr};
   QAction *file_connect_action{nullptr};
   QAction *file_disconnect_action{nullptr};
   QAction *file_exit_action{nullptr};
 
-  QMenu *file_menu{nullptr};
   QMenu *view_menu{nullptr};
+  QAction *view_reference_browser_action{nullptr};
+  QAction *view_history_browser_action{nullptr};
+  QAction *view_file_browser_action{nullptr};
+
   QMenu *help_menu{nullptr};
 };
 
@@ -152,6 +157,10 @@ void Multiplier::closeEvent(QCloseEvent *event) {
   event->accept();
 }
 
+bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
+  return false;
+}
+
 Multiplier::Multiplier(struct Configuration &config_)
     : QMainWindow(nullptr),
       d(new PrivateData(config_)) {
@@ -213,30 +222,48 @@ void Multiplier::InitializeMenus(void) {
   //
 
   d->menus.file_connect_action = new QAction(tr("&Connect"));
-  connect(d->menus.file_connect_action, &QAction::triggered, this,
-          &Multiplier::OnFileConnectAction);
+  connect(d->menus.file_connect_action, &QAction::triggered,
+          this, &Multiplier::OnFileConnectAction);
 
   d->menus.file_disconnect_action = new QAction(tr("&Disconnect"));
-  connect(d->menus.file_disconnect_action, &QAction::triggered, this,
-          &Multiplier::OnFileDisconnectAction);
+  connect(d->menus.file_disconnect_action, &QAction::triggered,
+          this, &Multiplier::OnFileDisconnectAction);
 
   d->menus.file_exit_action = new QAction(tr("&Exit"));
-  connect(d->menus.file_exit_action, &QAction::triggered, this,
-          &Multiplier::OnFileExitAction);
+  connect(d->menus.file_exit_action, &QAction::triggered,
+          this, &Multiplier::OnFileExitAction);
+
+  d->menus.view_file_browser_action = new QAction(tr("File Browser"));
+  connect(d->menus.view_file_browser_action, &QAction::triggered,
+          this, &Multiplier::OnViewFileBrowserAction);
+
+  d->menus.view_reference_browser_action = new QAction(tr("Reference Browser"));
+  connect(d->menus.view_reference_browser_action, &QAction::triggered,
+          this, &Multiplier::OnViewReferenceBrowserAction);
+
+  d->menus.view_history_browser_action = new QAction(tr("History Browser"));
+  connect(d->menus.view_history_browser_action, &QAction::triggered,
+          this, &Multiplier::OnViewHistoryBrowserAction);
 
   d->menus.file_menu = menuBar()->addMenu(tr("File"));
   d->menus.file_menu->addAction(d->menus.file_connect_action);
   d->menus.file_menu->addAction(d->menus.file_disconnect_action);
   d->menus.file_menu->addSeparator();
   d->menus.file_menu->addAction(d->menus.file_exit_action);
+
+  d->menus.view_menu = menuBar()->addMenu(tr("View"));
+  d->menus.view_menu->addAction(d->menus.view_reference_browser_action);
+  d->menus.view_menu->addAction(d->menus.view_history_browser_action);
+  d->menus.view_menu->addAction(d->menus.view_file_browser_action);
 }
 
 void Multiplier::UpdateMenus(void) {
-  d->menus.file_connect_action->setEnabled(d->connection_state ==
-                                           ConnectionState::kNotConnected);
-
-  d->menus.file_disconnect_action->setEnabled(d->connection_state ==
-                                              ConnectionState::kConnected);
+  bool is_connected = d->connection_state == ConnectionState::kConnected;
+  d->menus.file_connect_action->setEnabled(!is_connected);
+  d->menus.file_disconnect_action->setEnabled(is_connected);
+  d->menus.view_reference_browser_action->setEnabled(is_connected);
+  d->menus.view_history_browser_action->setEnabled(is_connected);
+  d->menus.view_file_browser_action->setEnabled(is_connected);
 }
 
 void Multiplier::UpdateWidgets(void) {
@@ -360,6 +387,27 @@ void Multiplier::OnFileDisconnectAction(void) {
 }
 
 void Multiplier::OnFileExitAction(void) { close(); }
+
+void Multiplier::OnViewFileBrowserAction(void) {
+  d->file_browser_dock->setEnabled(true);
+  d->file_browser_dock->toggleViewAction()->setChecked(true);
+  d->file_browser_dock->setVisible(true);
+  d->file_browser_view->Focus();
+}
+
+void Multiplier::OnViewReferenceBrowserAction(void) {
+  d->reference_browser_dock->setEnabled(true);
+  d->reference_browser_dock->toggleViewAction()->setChecked(true);
+  d->reference_browser_dock->setVisible(true);
+  d->reference_browser_view->Focus();
+}
+
+void Multiplier::OnViewHistoryBrowserAction(void) {
+  d->history_browser_dock->setEnabled(true);
+  d->history_browser_dock->toggleViewAction()->setChecked(true);
+  d->history_browser_dock->setVisible(true);
+  d->history_browser_view->Focus();
+}
 
 void Multiplier::OnHelpAboutAction(void) {}
 

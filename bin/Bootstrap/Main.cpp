@@ -1651,7 +1651,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_BOOL(Decl, is_definition, " << def
-            << ", MX_APPLY_METHOD, IsThisDeclarationADefinition, bool, NthDecl)\n";
+            << ", MX_APPLY_FUNC, IsDefinition, bool, NthDecl)\n";
 
         lib_cpp_os
             << "bool Decl::is_definition(void) const {\n"

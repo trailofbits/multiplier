@@ -51,11 +51,17 @@ class CodeBrowserView final : public QWidget {
  private slots:
   void OnCloseFileViewTab(int index);
 
+  // When a tab is changed.
+  void OnChangeTab(int index);
+
   // Scroll to a specific target location in a file. If the file isn't open yet
   // then open it. If it is open but not the active view, then set it to the
   // active view.
   void ScrollToTokenInFile(FileId file_id, RawEntityId scroll_target,
                            unsigned counter);
+
+ signals:
+  void CurrentFile(FileId file_id);
 };
 
 // Thread that goes and downloads and structures the relevant code in the

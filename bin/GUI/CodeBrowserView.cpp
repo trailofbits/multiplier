@@ -113,6 +113,19 @@ void CodeBrowserView::InitializeWidgets(void) {
 
   connect(d->content, &QTabWidget::tabCloseRequested,
           this, &CodeBrowserView::OnCloseFileViewTab);
+
+  connect(d->content, &QTabWidget::currentChanged,
+          this, &CodeBrowserView::OnChangeTab);
+}
+
+// When a tab is changed.
+void CodeBrowserView::OnChangeTab(int index) {
+  if (auto view = d->content->widget(index)) {
+    if (auto it = d->view_to_file_id.find(view);
+        it != d->view_to_file_id.end()) {
+      emit CurrentFile(it->second);
+    }
+  }
 }
 
 void CodeBrowserView::OnCloseFileViewTab(int index) {

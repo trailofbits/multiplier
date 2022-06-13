@@ -419,39 +419,37 @@ bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
   switch (kevent->key()) {
     case Qt::Key_0:
       item->setExpanded(false);
-      break;
+      return true;
     case Qt::Key_1:
       ExpandSubTreeUpTo(item, 1);
-      break;
+      return true;
     case Qt::Key_2:
       ExpandSubTreeUpTo(item, 2);
-      break;
+      return true;
     case Qt::Key_3:
       ExpandSubTreeUpTo(item, 3);
-      break;
+      return true;
     case Qt::Key_4:
       ExpandSubTreeUpTo(item, 4);
-      break;
+      return true;
     case Qt::Key_5:
       ExpandSubTreeUpTo(item, 5);
-      break;
+      return true;
     case Qt::Key_6:
       ExpandSubTreeUpTo(item, 6);
-      break;
+      return true;
     case Qt::Key_7:
       ExpandSubTreeUpTo(item, 7);
-      break;
+      return true;
     case Qt::Key_8:
       ExpandSubTreeUpTo(item, 8);
-      break;
+      return true;
     case Qt::Key_9:
       ExpandSubTreeUpTo(item, 9);
-      break;
+      return true;
     default:
-      break;
+      return false;
   }
-
-  return false;
 }
 
 void ReferenceBrowserView::SetRoots(std::vector<RawEntityId> new_root_ids) {
@@ -482,6 +480,10 @@ void ReferenceBrowserView::Clear(void) {
     d->code->hide();
   }
   update();
+}
+
+void ReferenceBrowserView::Focus(void) {
+  d->reference_tree->setFocus();
 }
 
 void ReferenceBrowserView::OnDownloadedFileList(FilePathList files) {
