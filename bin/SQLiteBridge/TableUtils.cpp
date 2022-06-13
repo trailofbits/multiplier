@@ -53,12 +53,42 @@ GetCreateTableStatement(const std::vector<FieldDescriptor> &fields) {
 }
 
 int BestIndex(sqlite3_index_info *info) {
+  /* This function is called multiple times by SQLite whenever a table is about
+   * to be queried. SQLite will pass different combinations of available
+   * constraints, and choose the cheapest index. For example, if a query is
+   * specified as
+   *
+   *   SELECT * FROM Decl WHERE id = 3 AND fragment_id = 1 SQLite
+   *
+   * might call BestIndex four times, once with only a constraint on id, once
+   * with fragment_id, once with both and once with none.
+   *
+   * Once the best index has been found, SQLite communicates the choice to the
+   * Filter method using the idxNum and idxStr fields. If idxNum is zero, SQLite
+   * assumes that no index was available, and an exhaustive scan is needed.
+   *
+   * The method I chose to communicate what information is available to Filter
+   * is the following: the first bit in idxNum is whether equality on id is
+   * available, the second communicates whether equality on fragment id is
+   * available, and the third whether there are any "containing" parent-child
+   * relations requested.
+   *
+   * This method cannot be scaled to represent each column on which a
+   * "containing" constraint is present, because the total number of columns for
+   * any given table can be greater than the number of bits in idxNum. To work
+   * around this limitation, we abuse the idxStr field by allocating an
+   * auxiliary structure containing a list of columns on which such a constraint
+   * is present. This structure must be trivial as no constructor nor destructor
+   * will be called on it.
+   */
   int argvIndex{0};
   ConstraintData data;
   data.fill(-1);
 
   info->estimatedCost = 10e9;
   // Search for index id constraint
+  // Having a query search by exact id is cheapest, and the preferred method if
+  // available.
   for (int i = 0; i < info->nConstraint; i++) {
     auto constraint = info->aConstraint[i];
     if (!constraint.usable) {
@@ -75,6 +105,9 @@ int BestIndex(sqlite3_index_info *info) {
   }
 
   // Search for fragment id constraint
+  // Searching for all of the entities in a fragment is more expensive than
+  // searching by entity id, but still cheaper than searching by parent-child
+  // relation.
   for (int i = 0; i < info->nConstraint; i++) {
     auto constraint = info->aConstraint[i];
     if (!constraint.usable) {
@@ -92,6 +125,8 @@ int BestIndex(sqlite3_index_info *info) {
 
   size_t constraint_i{1};
   // Search for fragment id constraints
+  // This is the most expensive option, especially if not based on the actual
+  // entity id.
   for (int i = 0; i < info->nConstraint; i++) {
     auto constraint = info->aConstraint[i];
     if (!constraint.usable && constraint.op == CONTAINING_OP) {
@@ -116,6 +151,9 @@ int BestIndex(sqlite3_index_info *info) {
 
   info->idxStr = static_cast<char *>(sqlite3_malloc(sizeof(data) + 1));
   info->idxStr[0] = 0;
+  // Skip the first character, so that when the index name is printed as a
+  // null-terminated string by EXPLAIN QUERY PLAN we don't get ugly data on the
+  // terminal.
   std::memcpy(info->idxStr + 1, data.data(), sizeof(data));
   info->needToFreeIdxStr = 1;
 
