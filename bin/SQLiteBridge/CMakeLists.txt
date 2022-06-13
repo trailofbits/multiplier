@@ -16,6 +16,7 @@ add_library("sqlitebridge"
   "ReferenceTable.cpp"
   "SQLiteBridge.cpp"
   "Tables.cpp"
+  "TableUtils.cpp"
 )
 
 target_link_libraries("sqlitebridge"

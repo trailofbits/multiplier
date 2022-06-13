@@ -1,4 +1,4 @@
-SELECT DISTINCT
+SELECT
     decl.id                  as decl_id,
     call_expr.id             as call_id,
     sub_expr.id              as sub_id,
@@ -16,4 +16,5 @@ JOIN BuiltinType AS dest_type ON dest_type.id = cast_expr.type
 WHERE cast_expr.cast_kind_name = "IntegralCast"
     AND NOT cast_expr.is_part_of_explicit_cast
     AND (source_type.builtin_kind = BuiltinTypeKind("U_LONG") OR source_type.builtin_kind = BuiltinTypeKind("U_LONG_LONG"))
-    AND dest_type.builtin_kind = BuiltinTypeKind("INT");
+    AND dest_type.builtin_kind = BuiltinTypeKind("INT")
+LIMIT 100;
