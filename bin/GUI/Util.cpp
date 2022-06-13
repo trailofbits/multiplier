@@ -9,6 +9,7 @@
 #include <cassert>
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
+#include <multiplier/Index.h>
 #include <multiplier/Iterator.h>
 #include <multiplier/Token.h>
 #include <multiplier/Use.h>
@@ -531,10 +532,11 @@ std::optional<Decl> DeclForToken(const Token &token) {
     }
   }
 
-#ifndef NDEBUG
+#if 1
   if (ClassifyToken(token) == TokenClass::kIdentifier) {
     if (std::optional<Fragment> frag = Fragment::containing(token)) {
       std::cerr << "Missing decl for '" << token.data() << "': " << token.id() << ":\n";
+      std::cerr << "\tFragment ID: " << frag->id() << '\n';
       if (auto file = File::containing(token)) {
         std::cerr << "\tFile ID: " << file->id() << '\n';
       }
@@ -644,6 +646,57 @@ QString DeclName(const Decl &decl) {
   return QString("%1(%2)").arg(EnumeratorName(decl.category())).arg(decl.id());
 }
 
+// Return the file location of an entity.
+RawEntityId EntityFileLocation(const Index &index, RawEntityId eid) {
+  auto entity = index.entity(eid);
+  if (std::holds_alternative<Decl>(entity)) {
+    return DeclFileLocation(std::get<Decl>(entity));
+
+  // Statement, walk to the first fragent token, or the beginning of the
+  // fragment.
+  } if (std::holds_alternative<Stmt>(entity)) {
+    Stmt stmt = std::get<Stmt>(entity);
+    for (Token token : stmt.tokens()) {
+      if (auto nearest_file_loc = token.nearest_file_token()) {
+        return nearest_file_loc->id();
+      }
+    }
+
+    return Fragment::containing(stmt).file_tokens().begin()->id();
+
+  // Type; walk to the containing fragment.
+  } else if (std::holds_alternative<Type>(entity)) {
+    Type type = std::get<Type>(entity);
+    return Fragment::containing(type).file_tokens().begin()->id();
+
+  // Token substitution; walk up to the file location.
+  } else if (std::holds_alternative<TokenSubstitution>(entity)) {
+    auto sub = std::get<TokenSubstitution>(entity);
+    for (;;) {
+      for (auto tok_sub : sub.before()) {
+        if (std::holds_alternative<Token>(tok_sub)) {
+          Token tok = std::get<Token>(tok_sub);
+          if (auto nearest_file_loc = tok.nearest_file_token()) {
+            return nearest_file_loc->id();
+          }
+
+        } else if (std::holds_alternative<TokenSubstitution>(tok_sub)) {
+          sub = std::get<TokenSubstitution>(tok_sub);
+          goto next_sub;
+        }
+      }
+      return kInvalidEntityId;
+    next_sub:
+      continue;
+    }
+  } else if (std::holds_alternative<Token>(entity)) {
+    if (auto file_tok = std::get<Token>(entity).nearest_file_token()) {
+      return file_tok->id();
+    }
+  }
+  return kInvalidEntityId;
+}
+
 // Return the entity ID of the nearest file token associated with this
 // declaration.
 RawEntityId DeclFileLocation(const Decl &decl) {
@@ -672,6 +725,155 @@ skip_name_match:
   }
 
   return Fragment::containing(decl).file_tokens().begin()->id();
+}
+
+// Try to get the nearest declaration for `id`. Ideally, `id` is a declaration
+// ID. Otherwise, it will find the nearest enclosing declaration, and return
+// that.
+std::optional<Decl> NearestDeclFor(const Index &index, RawEntityId id) {
+  auto entity = index.entity(id);
+  if (std::holds_alternative<Decl>(entity)) {
+    return std::get<Decl>(entity);
+  } else if (std::holds_alternative<Stmt>(entity)) {
+    for (Decl decl : Decl::containing(std::get<Stmt>(entity))) {
+      return decl;
+    }
+  } else if (std::holds_alternative<Token>(entity)) {
+    for (Decl decl : Decl::containing(std::get<Token>(entity))) {
+      return decl;
+    }
+  }
+  return std::nullopt;
+}
+
+namespace {
+
+static const QString kBreadCrumb("%1%2%3");
+static const QString kReps[] = {"", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
+static const QString kTooManyReps("⁺");
+static const QString kNextSep(" → ");
+
+struct BreadCrumbs {
+
+  QString sep;
+  QString breadcrumbs;
+
+  int repetitions{0};
+  const bool run_length_encode;
+
+  BreadCrumbs(bool run_length_encode_)
+      : run_length_encode(run_length_encode_) {}
+
+  QString Release(void) {
+    repetitions = 0;
+    return std::move(breadcrumbs);
+  }
+
+  template <typename T>
+  void AddEnum(T enumerator) {
+    std::string_view ret = EnumeratorName(enumerator);
+    if (ret.ends_with("_EXPR") || ret.ends_with("_STMT") ||
+        ret.ends_with("_DECL") || ret.ends_with("_TYPE")) {
+      AddStringView(ret.substr(0u, ret.size() - 5u));
+    } else if (ret.ends_with("_OPERATOR")) {
+      AddStringView(ret.substr(0u, ret.size() - 9u));
+    } else if (ret.ends_with("_DIRECTIVE")) {
+      AddStringView(ret.substr(0u, ret.size() - 10u));
+    } else {
+      AddStringView(ret);
+    }
+  }
+
+  void AddStringView(std::string_view ret) {
+    AddString(QString::fromUtf8(ret.data(), static_cast<int>(ret.size())));
+  }
+
+  void AddString(QString name) {
+    if (run_length_encode && breadcrumbs.endsWith(name)) {
+      ++repetitions;
+
+    } else if (repetitions < 9) {
+      breadcrumbs.append(kBreadCrumb.arg(kReps[repetitions]).arg(sep).arg(name));
+      repetitions = 0;
+
+    } else {
+      breadcrumbs.append(kBreadCrumb.arg(kTooManyReps).arg(sep).arg(name));
+      repetitions = 0;
+    }
+
+    sep = kNextSep;
+  }
+};
+
+}  // namespace
+
+// Create a breadcrumbs string of the token contexts.
+QString TokenBreadCrumbs(const Token &ent, bool run_length_encode) {
+  auto i = -1;
+
+  BreadCrumbs crumbs(run_length_encode);
+
+  for (auto context = TokenContext::of(ent);
+       context; context = context->parent()) {
+    ++i;
+
+    if (auto cdecl = context->as_declaration()) {
+      crumbs.AddEnum(cdecl->kind());
+
+    } else if (auto ctype = context->as_type()) {
+      crumbs.AddEnum(ctype->kind());
+
+    } else if (auto cstmt = context->as_statement()) {
+      switch (cstmt->kind()) {
+        case StmtKind::DECL_REF_EXPR:
+        case StmtKind::COMPOUND_STMT:
+        case StmtKind::PAREN_EXPR:
+          break;
+        case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR: {
+          auto &expr = reinterpret_cast<const UnaryExprOrTypeTraitExpr &>(
+              cstmt.value());
+          crumbs.AddEnum(expr.expression_or_trait_kind());
+          continue;
+        }
+
+        case StmtKind::IMPLICIT_CAST_EXPR: {
+          auto &cast = reinterpret_cast<const ImplicitCastExpr &>(cstmt.value());
+          auto ck = cast.cast_kind();
+          if (ck != CastKind::L_VALUE_TO_R_VALUE && ck != CastKind::BIT_CAST &&
+              ck != CastKind::FUNCTION_TO_POINTER_DECAY &&
+              ck != CastKind::ARRAY_TO_POINTER_DECAY) {
+            crumbs.AddEnum(ck);
+          }
+          break;
+        }
+
+        case StmtKind::UNARY_OPERATOR: {
+          auto &op = reinterpret_cast<const UnaryOperator &>(cstmt.value());
+          crumbs.AddEnum(op.opcode());
+          continue;
+        }
+
+        case StmtKind::BINARY_OPERATOR: {
+          auto &op = reinterpret_cast<const BinaryOperator &>(cstmt.value());
+          crumbs.AddEnum(op.opcode());
+          continue;
+        }
+
+        case StmtKind::MEMBER_EXPR:
+          // If we're asking for the use of a field, then every use will start
+          // with `MEMBER_EXPR`.
+          if (!i) {
+            continue;
+          }
+          [[clang::fallthrough]];
+
+        default:
+          crumbs.AddEnum(cstmt->kind());
+          break;
+      }
+    }
+  }
+  return crumbs.Release();
 }
 
 }  // namespace mx::gui

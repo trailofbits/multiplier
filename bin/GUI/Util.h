@@ -13,6 +13,7 @@
 
 namespace mx {
 class Decl;
+class Index;
 class Token;
 
 enum class TokenKind : unsigned short;
@@ -60,9 +61,20 @@ Decl CanonicalDecl(const Decl &decl);
 // Return some kind of name for a declaration.
 QString DeclName(const Decl &decl);
 
+// Return the file location of an entity.
+RawEntityId EntityFileLocation(const Index &index, RawEntityId eid);
+
 // Return the entity ID of the nearest file token associated with this
 // declaration.
 RawEntityId DeclFileLocation(const Decl &decl);
+
+// Try to get the nearest declaration for `id`. Ideally, `id` is a declaration
+// ID. Otherwise, it will find the nearest enclosing declaration, and return
+// that.
+std::optional<Decl> NearestDeclFor(const Index &index, RawEntityId id);
+
+// Create a breadcrumbs string of the token contexts.
+QString TokenBreadCrumbs(const Token &ent, bool run_length_encode=true);
 
 }  // namespace gui
 }  // namespace mx

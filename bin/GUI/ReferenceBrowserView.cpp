@@ -28,6 +28,8 @@
 #include "Multiplier.h"
 #include "Util.h"
 
+#include <iostream>
+
 namespace mx::gui {
 namespace {
 
@@ -95,15 +97,18 @@ struct ExpandReferenceHierarchyThread::PrivateData {
   FileLocationCache line_cache;
   QTreeWidgetItem * const item_parent;
   const uint64_t counter;
+  const int depth;
 
   explicit PrivateData(const Index &index_, RawEntityId id_,
                        const FileLocationCache &line_cache_,
-                       QTreeWidgetItem *parent_, uint64_t counter_)
+                       QTreeWidgetItem *parent_, uint64_t counter_,
+                       int depth_)
       : index(index_),
         id(id_),
         line_cache(line_cache_),
         item_parent(parent_),
-        counter(counter_) {}
+        counter(counter_),
+        depth(depth_) {}
 };
 
 InitReferenceHierarchyThread::~InitReferenceHierarchyThread(void) {}
@@ -117,23 +122,23 @@ ExpandReferenceHierarchyThread::~ExpandReferenceHierarchyThread(void) {}
 
 ExpandReferenceHierarchyThread::ExpandReferenceHierarchyThread(
     const Index &index_, RawEntityId id_, const FileLocationCache &line_cache_,
-    QTreeWidgetItem *parent_, uint64_t counter_)
-    : d(new PrivateData(index_, id_, line_cache_, parent_, counter_)) {}
+    QTreeWidgetItem *parent_, uint64_t counter_, int depth_)
+    : d(new PrivateData(index_, id_, line_cache_, parent_, counter_, depth_)) {}
 
+namespace {
 static constexpr size_t kEmitBatchSize = 32;
+}  // namespace
 
 void InitReferenceHierarchyThread::run(void) {
-
-  auto entity = d->index.entity(d->id);
-  if (!std::holds_alternative<Decl>(entity)) {
+  std::optional<Decl> root_decl = NearestDeclFor(d->index, d->id);
+  if (!root_decl) {
     return;
   }
 
   UserLocations users;
   FragmentId last_fragment_id = kInvalidEntityId;
 
-  const Decl &root_decl = std::get<Decl>(entity);
-  for (Reference ref : root_decl.references()) {
+  for (Reference ref : root_decl->references()) {
     Stmt stmt = ref.statement();
     if (auto decl = DeclContaining(stmt)) {
 
@@ -144,7 +149,7 @@ void InitReferenceHierarchyThread::run(void) {
 
         // Group them by file; they are already grouped by fragment.
         std::stable_sort(users.begin(), users.end(), UserLocationSort);
-        emit UsersOfRoot(d->item_parent, d->counter, root_decl,
+        emit UsersOfRoot(d->item_parent, d->counter, root_decl.value(),
                          std::make_shared<UserLocations>(std::move(users)));
       }
 
@@ -159,7 +164,7 @@ void InitReferenceHierarchyThread::run(void) {
 
   // Group them by file; they are already grouped by fragment.
   std::stable_sort(users.begin(), users.end(), UserLocationSort);
-  emit UsersOfRoot(d->item_parent, d->counter, root_decl,
+  emit UsersOfRoot(d->item_parent, d->counter, root_decl.value(),
                    std::make_shared<UserLocations>(std::move(users)));
 }
 
@@ -184,7 +189,8 @@ void ExpandReferenceHierarchyThread::run(void) {
         // Group them by file; they are already grouped by fragment.
         std::stable_sort(users.begin(), users.end(), UserLocationSort);
         emit UsersOfLevel(d->item_parent, d->counter,
-                          std::make_shared<UserLocations>(std::move(users)));
+                          std::make_shared<UserLocations>(std::move(users)),
+                          d->depth);
       }
 
       // Populate the cache in this background thread to not block the main
@@ -199,7 +205,8 @@ void ExpandReferenceHierarchyThread::run(void) {
   // Group them by file; they are already grouped by fragment.
   std::stable_sort(users.begin(), users.end(), UserLocationSort);
   emit UsersOfLevel(d->item_parent, d->counter,
-                    std::make_shared<UserLocations>(std::move(users)));
+                    std::make_shared<UserLocations>(std::move(users)),
+                    d->depth);
 }
 
 struct ReferenceBrowserView::PrivateData {
@@ -234,6 +241,7 @@ struct ReferenceBrowserView::PrivateData {
     // this reference is selected. Finally, the contexts of the first token in
     // this range is used for the breadcrumbs.
     TokenRange tokens;
+    TokenRange file_tokens;
 
     // Have we expanded this item yet? When we first create an reference item,
     // we add a "Downloading..." child under it that is hidden, and leave this
@@ -244,6 +252,10 @@ struct ReferenceBrowserView::PrivateData {
 
     // Is this the first expansion?
     bool is_first_expansion{true};
+
+    // Pending request for expansion. We have to store whether or not there's
+    // an outstanding request, because we only get children asynchronously.
+    int pending_expansion_request{0};
 
     inline explicit ItemInfo(Decl decl_)
         : decl(std::move(decl_)) {}
@@ -267,7 +279,19 @@ ReferenceBrowserView::ReferenceBrowserView(Multiplier &multiplier,
   InitializeWidgets();
 }
 
+enum : int {
+  kEntityColumnIndex,
+  kPathColumnIndex,
+  kFileColumnIndex,
+  kLineColumnIndex,
+  kColumnColumnIndex,
+  kContextColumnIndex,
+
+  kNumColumns
+};
+
 void ReferenceBrowserView::InitializeWidgets(void) {
+
   d->layout = new QVBoxLayout;
   d->splitter = new QSplitter(Qt::Vertical);
 
@@ -276,6 +300,29 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   d->reference_tree = new QTreeWidget;
   d->layout->addWidget(d->reference_tree);
+
+  // Add the column headers.
+  QHeaderView *header = d->reference_tree->header();
+  QTreeWidgetItem *header_item = d->reference_tree->headerItem();
+  d->reference_tree->setColumnCount(kNumColumns);
+  header_item->setText(kEntityColumnIndex, tr("Entity"));
+  header_item->setText(kPathColumnIndex, tr("Path"));
+  header_item->setText(kFileColumnIndex, tr("File"));
+  header_item->setText(kLineColumnIndex, tr("Line"));
+  header_item->setText(kColumnColumnIndex, tr("Column"));
+  header_item->setText(kContextColumnIndex, tr("Context"));
+
+  // Customize visibility of columns.
+  ReferenceBrowserConfiguration &config =
+      d->multiplier.Configuration().reference_browser;
+  d->reference_tree->setColumnHidden(kPathColumnIndex, !config.show_file_path);
+  d->reference_tree->setColumnHidden(kFileColumnIndex, !config.show_file_name);
+  d->reference_tree->setColumnHidden(kLineColumnIndex,
+                                     !config.show_line_numbers);
+  d->reference_tree->setColumnHidden(kColumnColumnIndex,
+                                     !config.show_column_numbers);
+  d->reference_tree->setColumnHidden(kContextColumnIndex,
+                                     !config.breadcrumbs.visible);
 
   setWindowTitle(tr("Reference Browser"));
   setLayout(d->layout);
@@ -288,9 +335,21 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   // We'll potentially have a bunch of columns depending on the configuration,
   // so make sure they span to use all available space.
-  d->reference_tree->header()->setStretchLastSection(true);
-  d->reference_tree->header()->setSectionResizeMode(
+  header->setStretchLastSection(true);
+  header->setSectionResizeMode(
       QHeaderView::ResizeToContents);
+
+  // Don't let double click expand things in three; we capture double click so
+  // that we can make it open up the use in the code.
+  d->reference_tree->setExpandsOnDoubleClick(false);
+
+  // Try to capture keypresses when items are selected.
+  d->reference_tree->installEventFilter(this);
+
+  // Enable sorting. We want to be able to sort by context (breadcrumbs) so that
+  // it's easy to pick out when a given thing is used differently among many
+  // common uses, e.g. every use but one is inside two nested `if` statements.
+  d->reference_tree->setSortingEnabled(true);
 
   // Disallow multiple selection. If we have grouping by file enabled, then when
   // a user clicks on a file name, we instead jump down to the first entry
@@ -311,14 +370,88 @@ void ReferenceBrowserView::InitializeWidgets(void) {
   d->reference_tree->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
 
+  // Create and connect the code preview.
+  if (config.code_preview.visible) {
+    d->code = new CodeView(d->theme, EventSource::kReferenceBrowserCodePreview);
+    d->splitter->addWidget(d->code);
+
+    connect(d->code, &CodeView::DeclarationEvent,
+            &(d->multiplier), &Multiplier::ActOnDeclarations);
+
+    connect(d->code, &CodeView::TokenEvent,
+            &(d->multiplier), &Multiplier::ActOnTokens);
+  }
+
   connect(d->reference_tree, &QTreeWidget::itemExpanded,
           this, &ReferenceBrowserView::OnTreeWidgetItemExpanded);
 
   connect(d->reference_tree, &QTreeWidget::itemPressed,
-          this, &ReferenceBrowserView::OnItemPressed);
+          this, &ReferenceBrowserView::OnItemClicked);
+
+  connect(d->reference_tree, &QTreeWidget::itemDoubleClicked,
+          this, &ReferenceBrowserView::OnItemDoubleClicked);
 
   connect(d->reference_tree, &QTreeWidget::itemSelectionChanged,
           this, &ReferenceBrowserView::OnItemSelectionChanged);
+
+  connect(this, &ReferenceBrowserView::DeclarationEvent,
+          &d->multiplier, &Multiplier::ActOnDeclarations);
+
+  connect(this, &ReferenceBrowserView::TokenEvent,
+          &d->multiplier, &Multiplier::ActOnTokens);
+}
+
+bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
+  if (event->type() != QEvent::KeyRelease) {
+    return false;
+  }
+
+  QKeyEvent *kevent = dynamic_cast<QKeyEvent *>(event);
+  if (!kevent) {
+    return false;
+  }
+
+  QTreeWidgetItem *item = d->reference_tree->currentItem();
+  if (!item) {
+    return false;
+  }
+
+  switch (kevent->key()) {
+    case Qt::Key_0:
+      item->setExpanded(false);
+      break;
+    case Qt::Key_1:
+      ExpandSubTreeUpTo(item, 1);
+      break;
+    case Qt::Key_2:
+      ExpandSubTreeUpTo(item, 2);
+      break;
+    case Qt::Key_3:
+      ExpandSubTreeUpTo(item, 3);
+      break;
+    case Qt::Key_4:
+      ExpandSubTreeUpTo(item, 4);
+      break;
+    case Qt::Key_5:
+      ExpandSubTreeUpTo(item, 5);
+      break;
+    case Qt::Key_6:
+      ExpandSubTreeUpTo(item, 6);
+      break;
+    case Qt::Key_7:
+      ExpandSubTreeUpTo(item, 7);
+      break;
+    case Qt::Key_8:
+      ExpandSubTreeUpTo(item, 8);
+      break;
+    case Qt::Key_9:
+      ExpandSubTreeUpTo(item, 9);
+      break;
+    default:
+      break;
+  }
+
+  return false;
 }
 
 void ReferenceBrowserView::SetRoots(std::vector<RawEntityId> new_root_ids) {
@@ -384,7 +517,11 @@ void ReferenceBrowserView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
     return;
   }
 
-  if (it->second.has_been_expanded) {
+  auto &info = it->second;
+  auto depth = info.pending_expansion_request;
+  info.pending_expansion_request = 0;
+
+  if (info.has_been_expanded) {
     return;  // Already attempted to expand.
   }
 
@@ -393,7 +530,8 @@ void ReferenceBrowserView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
 
   const Index &index = d->multiplier.Index();
   auto expander = new ExpandReferenceHierarchyThread(
-      index, it->second.decl.id(), d->line_cache, item, d->counter.load());
+      index, it->second.decl.id(), d->line_cache, item, d->counter.load(),
+      depth);
 
   expander->setAutoDelete(true);
 
@@ -401,108 +539,6 @@ void ReferenceBrowserView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
           this, &ReferenceBrowserView::OnUsersOfLevel);
 
   QThreadPool::globalInstance()->start(expander);
-}
-
-template <typename T>
-static QString NameOf(T enumerator) {
-  std::string_view ret = EnumeratorName(enumerator);
-  if (ret.ends_with("_EXPR") || ret.ends_with("_STMT") ||
-      ret.ends_with("_DECL") || ret.ends_with("_TYPE")) {
-    ret = ret.substr(0u, ret.size() - 5u);
-  } else if (ret.ends_with("_OPERATOR")) {
-    ret = ret.substr(0u, ret.size() - 9u);
-  } else if (ret.ends_with("_DIRECTIVE")) {
-    ret = ret.substr(0u, ret.size() - 10u);
-  }
-  return QString::fromUtf8(ret.data(), static_cast<int>(ret.size()));
-}
-
-QString ReferenceBrowserView::FormatBreadcrumbs(
-    const Token &use, bool run_length_encode) const {
-  QString breadcrumbs;
-  static const QString kBreadCrumb("%1%2%3");
-  const char *sep = "";
-  const char * const next_sep = " → ";
-  int repetitions = 0;
-  const char *reps[] = {"", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"};
-  auto i = -1;
-
-  auto add_name = [&] (QString name) {
-    if (run_length_encode && breadcrumbs.endsWith(name)) {
-      ++repetitions;
-
-    } else if (repetitions < 9) {
-      breadcrumbs.append(kBreadCrumb.arg(reps[repetitions]).arg(sep).arg(name));
-      repetitions = 0;
-
-    } else {
-      breadcrumbs.append(kBreadCrumb.arg("⁺").arg(sep).arg(name));
-      repetitions = 0;
-    }
-
-    sep = next_sep;
-  };
-
-  for (auto context = TokenContext::of(use);
-       context; context = context->parent()) {
-    ++i;
-
-    if (auto cdecl = context->as_declaration()) {
-      add_name(NameOf(cdecl->kind()));
-
-    } else if (auto ctype = context->as_type()) {
-      add_name(NameOf(ctype->kind()));
-
-    } else if (auto cstmt = context->as_statement()) {
-      switch (cstmt->kind()) {
-        case StmtKind::DECL_REF_EXPR:
-        case StmtKind::COMPOUND_STMT:
-        case StmtKind::PAREN_EXPR:
-          break;
-        case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR: {
-          auto &expr = reinterpret_cast<const UnaryExprOrTypeTraitExpr &>(
-              cstmt.value());
-          add_name(NameOf(expr.expression_or_trait_kind()));
-          continue;
-        }
-
-        case StmtKind::IMPLICIT_CAST_EXPR: {
-          auto &cast = reinterpret_cast<const ImplicitCastExpr &>(cstmt.value());
-          auto ck = cast.cast_kind();
-          if (ck != CastKind::L_VALUE_TO_R_VALUE && ck != CastKind::BIT_CAST &&
-              ck != CastKind::FUNCTION_TO_POINTER_DECAY &&
-              ck != CastKind::ARRAY_TO_POINTER_DECAY) {
-            add_name(NameOf(ck));
-          }
-          break;
-        }
-
-        case StmtKind::UNARY_OPERATOR: {
-          auto &op = reinterpret_cast<const UnaryOperator &>(cstmt.value());
-          add_name(NameOf(op.opcode()));
-          continue;
-        }
-
-        case StmtKind::BINARY_OPERATOR: {
-          auto &op = reinterpret_cast<const BinaryOperator &>(cstmt.value());
-          add_name(NameOf(op.opcode()));
-          continue;
-        }
-
-        case StmtKind::MEMBER_EXPR:
-          if (!i) {
-            continue;
-          }
-          [[clang::fallthrough]];
-
-        default: {
-          add_name(NameOf(cstmt->kind()));
-          break;
-        }
-      }
-    }
-  }
-  return breadcrumbs;
 }
 
 void ReferenceBrowserView::FillRow(
@@ -518,82 +554,55 @@ void ReferenceBrowserView::FillRow(
   // TODO(pag): Eventually use symbol names in here.
   item->setText(0, DeclName(decl));
 
-  auto index = 1;
-
   auto color = qApp->palette().text().color();
   color = QColor::fromRgbF(
       color.redF(), color.greenF(), color.blueF(), color.alphaF() * 0.75);
 
   // Show the line and column numbers.
-  if (config.show_line_numbers || config.show_column_numbers ||
-      config.show_file_path || config.show_file_name) {
-    if (auto loc = use.nearest_location(d->line_cache)) {
-      auto file = File::containing(use);
-      FileId file_id = file ? file->id() : kInvalidEntityId;
+  if (auto loc = use.nearest_location(d->line_cache)) {
+    auto file = File::containing(use);
+    FileId file_id = file ? file->id() : kInvalidEntityId;
 
-      if (config.show_file_path) {
-        if (auto fp_it = d->file_id_to_path.find(file_id);
-            fp_it != d->file_id_to_path.end()) {
-          item->setTextColor(index, color);
-          item->setTextAlignment(index, Qt::AlignRight);
-          item->setText(
-              index, QString::fromStdString(fp_it->second.generic_string()));
-        } else {
-          item->setText(index, "");
-        }
-        ++index;
-      }
+    if (auto fp_it = d->file_id_to_path.find(file_id);
+        fp_it != d->file_id_to_path.end()) {
+      item->setTextColor(kPathColumnIndex, color);
+      item->setTextAlignment(kPathColumnIndex, Qt::AlignRight);
+      item->setText(
+          kPathColumnIndex,
+          QString::fromStdString(fp_it->second.generic_string()));
 
-      if (config.show_file_name) {
-        if (auto fp_it = d->file_id_to_path.find(file_id);
-            fp_it != d->file_id_to_path.end()) {
-          item->setTextColor(index, color);
-          item->setTextAlignment(index, Qt::AlignRight);
-          item->setText(
-              index, QString::fromStdString(fp_it->second.filename().string()));
+      item->setTextColor(kFileColumnIndex, color);
+      item->setTextAlignment(kFileColumnIndex, Qt::AlignRight);
+      item->setText(
+          kFileColumnIndex,
+          QString::fromStdString(fp_it->second.filename().string()));
+
 #ifndef QT_NO_TOOLTIP
-          item->setToolTip(
-              index, QString::fromStdString(fp_it->second.generic_string()));
+      item->setToolTip(
+          kFileColumnIndex,
+          QString::fromStdString(fp_it->second.generic_string()));
 #endif
-        } else {
-          item->setText(index, "");
-        }
-        ++index;
-      }
-
-      if (config.show_line_numbers) {
-        item->setTextColor(index, color);
-        item->setText(index, QString::number(loc->first));  // Line.
-#ifndef QT_NO_TOOLTIP
-        item->setToolTip(index, tr("Line %1").arg(loc->first));
-#endif
-        ++index;
-      }
-
-      if (config.show_column_numbers) {
-        item->setTextColor(index, color);
-        item->setText(index, QString::number(loc->second));  // Column.
-#ifndef QT_NO_TOOLTIP
-        item->setToolTip(index, tr("Column %1").arg(loc->second));
-#endif
-        ++index;
-      }
     }
+
+    item->setTextColor(kLineColumnIndex, color);
+    item->setText(kLineColumnIndex, QString::number(loc->first));  // Line.
+#ifndef QT_NO_TOOLTIP
+    item->setToolTip(kLineColumnIndex, tr("Line %1").arg(loc->first));
+#endif
+
+    item->setTextColor(kColumnColumnIndex, color);
+    item->setText(kColumnColumnIndex, QString::number(loc->second));  // Column.
+#ifndef QT_NO_TOOLTIP
+    item->setToolTip(kColumnColumnIndex, tr("Column %1").arg(loc->second));
+#endif
   }
 
   // Show the context breadcrumbs. This is a chain of stringized enumerators
   // derived from the token contexts.
-  if (config.breadcrumbs.visible) {
-    item->setTextColor(index, color);
-    item->setText(
-        index, FormatBreadcrumbs(use, config.breadcrumbs.run_length_encode));
-    ++index;
-  }
-
-  // Make sure we're shoring the right number of columns.
-  if (index > d->reference_tree->columnCount()) {
-    d->reference_tree->setColumnCount(index);
-  }
+  item->setTextColor(kContextColumnIndex, color);
+  item->setText(
+      kContextColumnIndex,
+      TokenBreadCrumbs(use, config.breadcrumbs.run_length_encode));
 }
 
 void ReferenceBrowserView::OnUsersOfFirstLevel(
@@ -608,31 +617,84 @@ void ReferenceBrowserView::OnUsersOfFirstLevel(
 
   // This is the first batch of results for this root.
   auto id_it = d->item_to_info.find(root_item);
-  auto is_first = false;
+  auto is_first_batch_of_first_root = false;
+  auto was_initialized = false;
   if (id_it == d->item_to_info.end()) {
 
     FillRow(root_item, root_decl.value(), root_decl->token());
     d->item_to_info.clear();
 
+    is_first_batch_of_first_root = d->item_to_info.empty();
+    was_initialized = true;
+
     auto &item = d->item_to_info.emplace(
         root_item, std::move(root_decl.value())).first->second;
 
-    if (auto ft = item.decl.token().nearest_file_token()) {
-      item.tokens = ft.value();
-    }
-
-    is_first = true;
+    item.tokens = item.decl.token();
+    item.file_tokens = item.tokens.file_tokens().strip_whitespace();
   }
 
-  OnUsersOfLevel(root_item, counter, std::move(users));
+  OnUsersOfLevel(root_item, counter, std::move(users), 0);
 
-  if (is_first) {
-    OnItemPressed(root_item, 0);
+  // If this is the first time that we're adding items to the root (as we may
+  // have multiple batches of child items to add to the root, or we might have
+  // multiple roots), then we want to shift the cursor focus to the first
+  // `root_item`, so that if the user subsequently presses a key, e.g. `3`, then
+  // the `eventFilter` will trigger recursive expansion of the references
+  // tree up to depth 3.
+  if (is_first_batch_of_first_root) {
+    d->reference_tree->setFocus();
+    root_item->setSelected(true);
+    d->reference_tree->setCurrentItem(root_item);
+  }
+
+  // By default, if we've just initialized this root, then trigger an expansion
+  // of its immediate children.
+  if (was_initialized) {
+    OnItemClicked(root_item, 0);
   }
 }
 
+int ReferenceBrowserView::ExpandSubTreeUpTo(
+    QTreeWidgetItem *item, int depth, int count) {
+  if (0 >= depth) {
+    return count;
+  }
+
+  auto id_it = d->item_to_info.find(item);
+  if (id_it == d->item_to_info.end()) {
+    return count;
+  }
+
+  auto &info = id_it->second;
+
+  depth = std::max(depth, info.pending_expansion_request);
+  info.pending_expansion_request = 0;
+
+  if (!info.has_been_expanded) {
+    info.pending_expansion_request = depth;
+    OnTreeWidgetItemExpanded(item);
+    item->setExpanded(true);
+    return count;
+  }
+
+  item->setExpanded(true);
+  for (auto i = 0, max_i = item->childCount(); i < max_i; ++i, ++count) {
+    QTreeWidgetItem *child_item = item->child(i);
+    count = ExpandSubTreeUpTo(child_item, depth - 1, count);
+
+    // Trigger re-rendering.
+    if (count >= 20) {
+      update();
+    }
+  }
+
+  return count;
+}
+
 void ReferenceBrowserView::OnUsersOfLevel(
-    QTreeWidgetItem *parent_item, uint64_t counter, UserLocationsPtr users) {
+    QTreeWidgetItem *parent_item, uint64_t counter, UserLocationsPtr users,
+    int depth) {
 
   // Something else was requested before the background thread returned.
   if (counter != d->counter.load()) {
@@ -646,9 +708,10 @@ void ReferenceBrowserView::OnUsersOfLevel(
   }
 
   // Remove the `Downloading...` item.
-  id_it->second.has_been_expanded = true;
-  if (id_it->second.is_first_expansion) {
-    id_it->second.is_first_expansion = false;
+  auto &info = id_it->second;
+  info.has_been_expanded = true;
+  if (info.is_first_expansion) {
+    info.is_first_expansion = false;
     while (parent_item->childCount()) {
       parent_item->removeChild(parent_item->child(0));
     }
@@ -672,6 +735,7 @@ void ReferenceBrowserView::OnUsersOfLevel(
     PrivateData::ItemInfo &child_id =
         d->item_to_info.emplace(user_item, std::move(decl)).first->second;
     child_id.tokens = std::move(tokens);
+    child_id.file_tokens = child_id.tokens.file_tokens().strip_whitespace();
     child_id.has_been_expanded = false;
 
     QTreeWidgetItem *download_item = new QTreeWidgetItem;
@@ -679,6 +743,8 @@ void ReferenceBrowserView::OnUsersOfLevel(
 
     user_item->addChild(download_item);
     user_item->setExpanded(false);
+
+    ExpandSubTreeUpTo(user_item, depth - 1);
   };
 
   ReferenceBrowserConfiguration &config =
@@ -694,35 +760,41 @@ void ReferenceBrowserView::OnUsersOfLevel(
 }
 
 void ReferenceBrowserView::OnItemSelectionChanged(void) {
-
-  for (auto item : d->reference_tree->selectedItems()) {
-    auto id_it = d->item_to_info.find(item);
-    if (id_it == d->item_to_info.end()) {
-
-      // If we've done something like selected a file path, then try to deselect
-      // it, and then select the child (if any), triggering us to open the
-      // child. This is convenient when using up/down arrows through the
-      // reference list.
-      if (item->childCount()) {
-        d->reference_tree->clearSelection();
-        d->reference_tree->setItemSelected(item, false);
-        d->reference_tree->setItemSelected(item->child(0), true);
-        return;
-      }
-    } else {
-      OnItemPressed(item, 0);
-      return;
-    }
+  for (QTreeWidgetItem *item : d->reference_tree->selectedItems()) {
+    OnItemClicked(item, 0);
+    return;
   }
 }
 
-void ReferenceBrowserView::OnItemPressed(
+void ReferenceBrowserView::OnItemDoubleClicked(
     QTreeWidgetItem *item, int column) {
   auto id_it = d->item_to_info.find(item);
   if (id_it == d->item_to_info.end()) {
     return;
   }
 
+  Event event = {QApplication::queryKeyboardModifiers(),
+                 QApplication::mouseButtons(),
+                 EventKind::kDoubleClick};
+
+  // Try to go to the specific use.
+  for (const Token &tok : id_it->second.tokens) {
+    emit TokenEvent(EventSource::kReferenceBrowser, event, {tok.id()});
+    break;
+  }
+
+  emit DeclarationEvent(EventSource::kReferenceBrowser, event,
+                        {id_it->second.decl.id()});
+}
+
+void ReferenceBrowserView::OnItemClicked(
+    QTreeWidgetItem *item, int column) {
+  auto id_it = d->item_to_info.find(item);
+  if (id_it == d->item_to_info.end()) {
+    return;
+  }
+
+  const PrivateData::ItemInfo &info = id_it->second;
   if (item == d->active_item) {
     return;
   }
@@ -732,35 +804,19 @@ void ReferenceBrowserView::OnItemPressed(
   ReferenceBrowserConfiguration &config =
       d->multiplier.Configuration().reference_browser;
 
-  if (config.code_preview.visible && !d->code) {
-    d->code = new CodeView(d->theme);
-    d->splitter->addWidget(d->code);
-
-    auto &config = d->multiplier.Configuration().reference_browser.code_preview;
-
-    MX_CONNECT_CHILD_ACTIONS(config, ReferenceBrowserView, d->code, CodeView)
-    MX_ROUTE_ACTIONS(config, ReferenceBrowserView, d->multiplier)
-  }
-
-  const PrivateData::ItemInfo &info = id_it->second;
+  // A human has just clicked on this thing, show the code preview.
   const Index &index = d->multiplier.Index();
-
   auto [fragment_id, offset] = GetFragmentOffset(info.decl.id());
   if (fragment_id != kInvalidEntityId) {
     if (config.code_preview.visible && d->code) {
-      TokenRange tokens = info.tokens.file_tokens().strip_whitespace();
       d->code->show();
-      d->theme.SetRangeToHighlight(tokens);
+      d->theme.SetRangeToHighlight(info.file_tokens);
       d->code->SetFragment(index, fragment_id);
-      d->code->ScrollToToken(tokens);
+      d->code->ScrollToToken(info.file_tokens);
     }
   } else if (d->code) {
     d->code->hide();
   }
 }
-
-MX_DEFINE_DECLARATION_SLOTS(
-    ReferenceBrowserView,
-    d->multiplier.Configuration().reference_browser.code_preview)
 
 }  // namespace mx::gui

@@ -14,8 +14,6 @@
 #include <multiplier/Index.h>
 #include <vector>
 
-//#include "Event.h"
-
 namespace mx {
 class Index;
 
@@ -37,8 +35,13 @@ class CodeBrowserView final : public QWidget {
 
   CodeBrowserView(Multiplier &multiplier_, QWidget *parent=nullptr);
 
-  void OpenFile(std::filesystem::path path, FileId file_id);
-  void OpenDeclarations(std::vector<RawEntityId> ids);
+  // Open a file in a tab.
+  //
+  // NOTE(pag): This does not set the file to be the active widget.
+  void OpenFile(std::filesystem::path path, FileId file_id, bool show=false);
+
+  // Request for one or more entities to be opened.
+  void OpenEntities(std::vector<RawEntityId> ids);
 
   void Clear(void);
 
@@ -46,18 +49,18 @@ class CodeBrowserView final : public QWidget {
   void OnDownloadedFileList(FilePathList files);
 
  private slots:
-//  MX_DECLARE_DECLARATION_SLOTS
-
   void OnCloseFileViewTab(int index);
-  void ScrollToTokenInFile(FileId file_id, RawEntityId scroll_target);
-//
-// signals:
-//  MX_DECLARE_DECLARATION_SIGNALS
+
+  // Scroll to a specific target location in a file. If the file isn't open yet
+  // then open it. If it is open but not the active view, then set it to the
+  // active view.
+  void ScrollToTokenInFile(FileId file_id, RawEntityId scroll_target,
+                           unsigned counter);
 };
 
 // Thread that goes and downloads and structures the relevant code in the
 // background.
-class LocateDeclarationsThread final : public QObject, public QRunnable {
+class LocateEntitiesThread final : public QObject, public QRunnable {
   Q_OBJECT
 
  private:
@@ -66,15 +69,17 @@ class LocateDeclarationsThread final : public QObject, public QRunnable {
 
   void run(void) Q_DECL_FINAL;
 
-  LocateDeclarationsThread(void) = delete;
+  LocateEntitiesThread(void) = delete;
 
  public:
-  virtual ~LocateDeclarationsThread(void);
+  virtual ~LocateEntitiesThread(void);
 
-  LocateDeclarationsThread(const Index &index_, std::vector<RawEntityId> ids);
+  LocateEntitiesThread(const Index &index_, std::vector<RawEntityId> ids,
+                       unsigned counter);
 
  signals:
-  void OpenDeclarationInFile(FileId file_id, RawEntityId scroll_target);
+  void OpenEntityInFile(FileId file_id, RawEntityId scroll_target,
+                        unsigned counter);
 };
 
 }  // namespace gui

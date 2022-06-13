@@ -21,6 +21,8 @@
 #include "Multiplier.h"
 #include "Util.h"
 
+#include <iostream>
+
 namespace mx::gui {
 namespace {
 
@@ -34,6 +36,20 @@ static void MakeSmall(QPushButton *button) {
       button->style()->sizeFromContents(QStyle::CT_PushButton, &opt,
                                         s, button));
 }
+
+class ScopeReferenceCounted {
+  int &ref;
+
+ public:
+  ScopeReferenceCounted(int &ref_)
+      : ref(ref_) {
+    ++ref;
+  }
+
+  ~ScopeReferenceCounted(void) {
+    --ref;
+  }
+};
 
 }  // namespace
 
@@ -50,6 +66,8 @@ struct HistoryBrowserView::PrivateData {
 
   QPushButton *clear_button{nullptr};
   QPushButton *root_button{nullptr};
+
+  int event_suppress{0};
 
   std::unordered_map<QTreeWidgetItem *, RawEntityId> item_to_decl;
 
@@ -100,18 +118,15 @@ void HistoryBrowserView::InitializeWidgets(void) {
   setWindowTitle(tr("History Browser"));
   setLayout(d->layout);
 
+  d->history_tree->setSelectionMode(
+      QAbstractItemView::SelectionMode::SingleSelection);
   d->history_tree->setHeaderHidden(true);
   d->history_tree->expandAll();
   d->history_tree->setItemsExpandable(false);
   d->history_tree->setColumnCount(1);
   d->history_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   d->history_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-  d->history_tree->header()->setStretchLastSection(false);
-
-  // Disallow selection.
-  d->history_tree->setSelectionMode(
-      QAbstractItemView::SelectionMode::NoSelection);
-
+  d->history_tree->header()->setStretchLastSection(true);
   d->history_tree->setAutoScroll(true);
 
   connect(d->history_tree, &QTreeWidget::itemPressed,
@@ -119,6 +134,9 @@ void HistoryBrowserView::InitializeWidgets(void) {
 
   connect(d->history_tree, &QTreeWidget::itemDoubleClicked,
           this, &HistoryBrowserView::OnTreeWidgetItemDoubleClicked);
+
+  connect(d->history_tree, &QTreeWidget::itemSelectionChanged,
+          this, &HistoryBrowserView::OnTreeWidgetItemSelectionChanged);
 
   connect(d->filter_box, &QLineEdit::textChanged,
           this, &HistoryBrowserView::OnFilterHistoryView);
@@ -146,14 +164,15 @@ void HistoryBrowserView::AddDeclarationsUnderRoot(
   }
 
   for (RawEntityId eid : ids) {
-    auto entity = d->multiplier.Index().entity(eid);
-    if (!std::holds_alternative<Decl>(entity)) {
+    std::optional<Decl> decl = NearestDeclFor(d->multiplier.Index(), eid);
+    if (!decl) {
       continue;
     }
 
-    Decl decl(std::move(std::get<Decl>(entity)));
     auto *item = new QTreeWidgetItem;
-    item->setText(0, DeclName(decl));
+    item->setText(0, DeclName(decl.value()));
+
+    ScopeReferenceCounted suppress_event(d->event_suppress);
 
     d->item_to_decl.emplace(item, eid);
 
@@ -165,7 +184,9 @@ void HistoryBrowserView::AddDeclarationsUnderRoot(
     }
 
     d->history_tree->scrollToItem(item);
-
+    d->history_tree->clearSelection();
+    d->history_tree->setCurrentItem(item);
+    d->history_tree->setItemSelected(item, true);
     d->last_added = item;
   }
 }
@@ -212,12 +233,24 @@ void HistoryBrowserView::Clear(void) {
   d->item_to_decl.clear();
 }
 
+void HistoryBrowserView::Focus(void) {
+  d->history_tree->setFocus();
+}
+
 void HistoryBrowserView::OnTreeWidgetItemClicked(
     QTreeWidgetItem *item, int) {
+  if (d->event_suppress) {
+    return;
+  }
+
+  ScopeReferenceCounted suppress_event(d->event_suppress);
   auto decl_it = d->item_to_decl.find(item);
   if (decl_it != d->item_to_decl.end()) {
     emit HistoryDeclarationClicked(decl_it->second);
   }
+
+  d->history_tree->setFocus();
+  d->history_tree->setCurrentItem(item);
 }
 
 void HistoryBrowserView::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -226,12 +259,27 @@ void HistoryBrowserView::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void HistoryBrowserView::OnTreeWidgetItemDoubleClicked(
     QTreeWidgetItem *item, int) {
+  ScopeReferenceCounted suppress_event(d->event_suppress);
+
   auto decl_it = d->item_to_decl.find(item);
   if (decl_it == d->item_to_decl.end()) {
     return;
   }
 
   d->current_root = item;
+}
+
+// Selecting a different item, e.g. with up/down arrows, should act like a
+// click.
+void HistoryBrowserView::OnTreeWidgetItemSelectionChanged(void) {
+  if (d->event_suppress) {
+    return;
+  }
+
+  for (QTreeWidgetItem *item : d->history_tree->selectedItems()) {
+    OnTreeWidgetItemClicked(item, 0);
+    return;
+  }
 }
 
 void HistoryBrowserView::OnFilterHistoryView(const QString &text) {

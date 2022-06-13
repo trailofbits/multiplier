@@ -17,16 +17,31 @@ enum class EventKind : int {
   kHover,
 };
 
-enum class Action : int {
-  kDoNothing,
-  kPropagate,
-  kOpenCodeBrowser,
-  kOpenReferenceBrowser,
-  kAddToHistoryAsChild,
-  kAddToHistoryAsSibling,
-  kAddToHistoryUnderRoot,
-  kAddToHistoryAsRoots,
+enum class EventSource : int {
+  kReferenceBrowserCodePreview  = 1 << 0,
+  kReferenceBrowser             = 1 << 1,
+  kCodeBrowser                  = 1 << 2,
 };
+
+Q_DECLARE_FLAGS(EventSources, EventSource)
+
+enum class Action : int {
+  // Open the declaration or tokens in the code browser. This will render the
+  // containing file, then try to navigate to the relevant line.
+  kOpenCodeBrowser              = 1 << 0,
+
+  // Open the declaration or nearest containing declaration in the reference
+  // browser. This will also auto-open the first level of references.
+  kOpenReferenceBrowser         = 1 << 1,
+
+  // Add a declaration to the history.
+  kAddToHistoryAsChild          = 1 << 2,
+  kAddToHistoryAsSibling        = 1 << 3,
+  kAddToHistoryUnderRoot        = 1 << 4,
+  kAddToHistoryAsRoots          = 1 << 5,
+};
+
+Q_DECLARE_FLAGS(Actions, Action)
 
 struct Event {
   Qt::KeyboardModifiers modifiers;
@@ -37,44 +52,6 @@ struct Event {
   bool operator!=(const Event &) const = default;
 };
 
-using EventAction = std::pair<Event, Action>;
-
-#define MX_DECLARE_DECLARATION_SLOTS \
-    void OnDeclarationEvent(Event event, std::vector<RawEntityId> ids); \
-
-#define MX_DECLARE_DECLARATION_SIGNALS \
-    void DeclarationEvent(Event event, std::vector<RawEntityId> ids); \
-    void ActOnDeclarations(Action action, std::vector<RawEntityId> ids);
-
-#define MX_DEFINE_DECLARATION_SLOTS(cls, config) \
-    void cls::OnDeclarationEvent(Event event, \
-                                 std::vector<RawEntityId> ids) { \
-      for (const auto &[mevent, action] : config.declaration_actions) { \
-        if (mevent != event) { \
-          continue; \
-        } \
-        switch (action) { \
-          case Action::kDoNothing: break; \
-          case Action::kPropagate: \
-            emit DeclarationEvent(event, ids); \
-            break; \
-          default: \
-            emit ActOnDeclarations(action, ids); \
-            break; \
-        } \
-      } \
-    }
-
-#define MX_CONNECT_CHILD_ACTIONS(config, this_cls, that_cls_ptr, that_cls) \
-    if (!config.declaration_actions.empty()) { \
-      connect(that_cls_ptr, &that_cls::DeclarationEvent, \
-              this, &this_cls::OnDeclarationEvent); \
-    }
-
-#define MX_ROUTE_ACTIONS(config, this_cls, multiplier) \
-    if (!config.declaration_actions.empty()) { \
-      connect(this, &this_cls::ActOnDeclarations, \
-              &multiplier, &Multiplier::OnActOnDeclarations); \
-    }
+using EventAction = std::tuple<Event, EventSources, Actions>;
 
 }  // namespace mx::gui

@@ -28,7 +28,6 @@ class Multiplier;
 class HistoryBrowserView final : public QWidget {
   Q_OBJECT
 
-
   struct PrivateData;
   std::unique_ptr<PrivateData> d;
 
@@ -43,6 +42,7 @@ class HistoryBrowserView final : public QWidget {
   virtual ~HistoryBrowserView(void);
 
   void Clear(void);
+  void Focus(void);
 
   // Add the declarations to the history as children of the last added item.
   void AddChildDeclarations(std::vector<RawEntityId> ids) const;
@@ -63,6 +63,10 @@ class HistoryBrowserView final : public QWidget {
 
   // Double click re-roots the history at the selected item.
   void OnTreeWidgetItemDoubleClicked(QTreeWidgetItem *item, int);
+
+  // Selecting a different item, e.g. with up/down arrows, should act like a
+  // click.
+  void OnTreeWidgetItemSelectionChanged(void);
 
   void OnFilterHistoryView(const QString &filter);
 

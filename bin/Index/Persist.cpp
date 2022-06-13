@@ -243,9 +243,9 @@ static void PersistTokenContexts(
     for (auto context = tokens[i].Context();
          context; context = context->Parent()) {
 
-      auto c = *context;
-      if (auto alias_context = context->Aliasee()) {
-        c = *alias_context;
+      pasta::TokenContext c = context.value();
+      if (auto alias_context = c.Aliasee()) {
+        c = std::move(alias_context.value());
       }
 
       // NOTE(pag): PASTA stored the canonical decl in the decl context, so
@@ -253,19 +253,19 @@ static void PersistTokenContexts(
       if (auto decl = pasta::Decl::From(c)) {
         const mx::RawEntityId eid = IdOfRedeclInFragment(em, frag_id, *decl);
         if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(*context);
+          contexts[eid].insert(context.value());
         }
 
       } else if (auto stmt = pasta::Stmt::From(c)) {
         const mx::RawEntityId eid = em.EntityId(*stmt);
         if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(*context);
+          contexts[eid].insert(context.value());
         }
 
       } else if (auto type = pasta::Type::From(c)) {
         const mx::RawEntityId eid = em.EntityId(*type);
         if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(*context);
+          contexts[eid].insert(context.value());
         }
       }
     }
@@ -284,7 +284,7 @@ static void PersistTokenContexts(
   unsigned num_tokens = static_cast<unsigned>(end_index - begin_index + 1u);
   unsigned num_contexts = 0;
 
-  // Figure out the kinds of the contexts (stmt, decl), the index into the
+  // Figure out the kinds of the contexts (stmt, decl, type), the index into the
   // respective entity list in the serialized fragment where the contexts will
   // be placed, the offset at which each context will reside within an entity-
   // specific list, etc.
@@ -350,16 +350,19 @@ static void PersistTokenContexts(
       PendingTokenContext &info = pc_it->second;
       CHECK_NE(info.entity_id, mx::kInvalidEntityId);
 
-      if (auto alias_context = context.Aliasee()) {
-        PendingTokenContext &alias_info = pending_contexts[*alias_context];
-        CHECK(info.is_alias);
-        CHECK_EQ(info.entity_id, alias_info.entity_id);
-        CHECK_NE(info.offset, alias_info.offset);
-        CHECK_LT(alias_info.offset, num_contexts);
-        info.alias_offset = alias_info.offset;
-      } else {
-        CHECK(!info.is_alias);
+      if (!info.is_alias) {
+        DCHECK(!context.Aliasee());
+        continue;
       }
+
+      auto alias_context = context.Aliasee();
+      CHECK(alias_context.has_value());
+
+      PendingTokenContext &alias_info = pending_contexts[alias_context.value()];
+      CHECK_EQ(info.entity_id, alias_info.entity_id);
+      CHECK_NE(info.offset, alias_info.offset);
+      CHECK_LT(alias_info.offset, num_contexts);
+      info.alias_offset = alias_info.offset;
     }
   }
 
@@ -369,25 +372,27 @@ static void PersistTokenContexts(
   auto tco_list = fb.initTokenContextOffsets(num_tokens);
 
   // Finally, serialize the contexts.
-  auto j = 0u;
   for (auto i = begin_index; i <= end_index; ++i) {
 
     std::optional<mx::rpc::TokenContext::Builder> tcb;
-
-    for (auto context = tokens[i].Context();
-         context; context = context->Parent()) {
+    bool has_context = false;
+    pasta::Token tok = tokens[i];
+    for (auto context = tok.Context(); context; context = context->Parent()) {
 
       pasta::TokenContext c = *context;
       auto pc_it = pending_contexts.find(c);
       if (pc_it == pending_contexts.end()) {
-        continue;  // E.g. translation unit contexts.
+        continue;  // E.g. translation unit contexts, attributes.
       }
 
       const PendingTokenContext &info = pc_it->second;
 
       if (!tcb) {
-        tco_list.set(j++, info.offset);
+        has_context = true;
+        tco_list.set(static_cast<unsigned>(i - begin_index),
+                     (info.offset << 1u) | 1u);
       } else {
+        assert(has_context);
         tcb->setParentIndex((info.offset << 1u) | 1u);
       }
 
@@ -400,6 +405,11 @@ static void PersistTokenContexts(
       if (info.is_alias) {
         tcb->setAliasIndex((info.alias_offset << 1u) | 1u);
       }
+    }
+
+    // Didn't get any contexts for this token.
+    if (!has_context) {
+      tco_list.set(static_cast<unsigned>(i - begin_index), 0u);
     }
   }
 }

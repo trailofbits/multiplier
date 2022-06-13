@@ -56,6 +56,7 @@ class Multiplier final : public QMainWindow {
   void UpdateUI(void);
 
  public slots:
+  void FocusOnHistory(bool);
   void OnConnected(void);
   void OnSourceFileDoubleClicked(std::filesystem::path, FileId file_id);
 
@@ -69,7 +70,10 @@ class Multiplier final : public QMainWindow {
   void OnHistoryDeclarationClicked(RawEntityId eid);
 
  public slots:
-  void OnActOnDeclarations(Action action, std::vector<RawEntityId> ids);
+  void ActOnTokens(EventSource source, Event event,
+                   std::vector<RawEntityId> ids);
+  void ActOnDeclarations(EventSource source, Event event,
+                         std::vector<RawEntityId> ids);
 };
 
 }  // namespace gui

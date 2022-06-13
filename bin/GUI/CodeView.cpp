@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "CodeTheme.h"
-#include "Event.h"
 #include "Util.h"
 
 namespace mx::gui {
@@ -58,6 +57,8 @@ class Code {
   std::vector<const QBrush *> background;
   std::vector<unsigned> declaration_ids_begin;
   std::vector<RawEntityId> declaration_ids;
+  std::vector<unsigned> fragment_token_ids_begin;
+  std::vector<RawEntityId> fragment_token_ids;
   std::vector<RawEntityId> file_token_ids;
 };
 
@@ -72,7 +73,11 @@ struct CodeView::PrivateData {
 
   // Thread-safe cache for figuring out line/column numbers.
   std::unique_ptr<Code> code;
+
   const CodeTheme &theme;
+
+  // How to mark events form this code view.
+  const EventSource source;
 
   // The entity id of a file token that we'll target for scrolling.
   RawEntityId scroll_target_eid{kInvalidEntityId};
@@ -84,10 +89,9 @@ struct CodeView::PrivateData {
   // line, then we don't want to have to scroll, as that can be jarring.
   int last_block{-1};
 
-  std::vector<RawEntityId> last_entity_ids;
-
-  inline PrivateData(const CodeTheme &theme_)
-      : theme(theme_) {}
+  inline PrivateData(const CodeTheme &theme_, EventSource source_)
+      : theme(theme_),
+        source(source_) {}
 };
 
 struct DownloadCodeThread::PrivateData {
@@ -273,6 +277,7 @@ void DownloadCodeThread::run(void) {
   code->background.reserve(num_file_tokens);
   code->start_of_token.reserve(num_file_tokens + 1u);
   code->declaration_ids_begin.reserve(num_file_tokens + 1u);
+  code->fragment_token_ids_begin.reserve(num_file_tokens + 1u);
   code->file_token_ids.reserve(num_file_tokens);
 
   std::map<RawEntityId, std::vector<Token>> file_to_frag_toks;
@@ -344,6 +349,9 @@ void DownloadCodeThread::run(void) {
     code->declaration_ids_begin.push_back(
         static_cast<unsigned>(code->declaration_ids.size()));
 
+    code->fragment_token_ids_begin.push_back(
+        static_cast<unsigned>(code->fragment_token_ids.size()));
+
     tok_decls.clear();
 
     DeclCategory category = DeclCategory::UNKNOWN;
@@ -356,6 +364,9 @@ void DownloadCodeThread::run(void) {
     if (auto frag_tok_it = file_to_frag_toks.find(file_tok_id);
         frag_tok_it != file_to_frag_toks.end()) {
       for (const Token &frag_tok : frag_tok_it->second) {
+
+        code->fragment_token_ids.push_back(frag_tok.id());
+
         if (auto related_decl = DeclForToken(frag_tok)) {
           tok_decls.emplace_back(related_decl.value());
 
@@ -424,6 +435,8 @@ void DownloadCodeThread::run(void) {
   code->start_of_token.push_back(code->data.size());
   code->declaration_ids_begin.push_back(
       static_cast<unsigned>(code->declaration_ids.size()));
+  code->fragment_token_ids_begin.push_back(
+      static_cast<unsigned>(code->fragment_token_ids.size()));
 
   d->theme.EndTokens();
 
@@ -433,9 +446,10 @@ void DownloadCodeThread::run(void) {
 
 CodeView::~CodeView(void) {}
 
-CodeView::CodeView(const CodeTheme &theme_, QWidget *parent)
+CodeView::CodeView(const CodeTheme &theme_, EventSource source_,
+                   QWidget *parent)
     : QPlainTextEdit(parent),
-      d(std::make_unique<PrivateData>(theme_)) {
+      d(std::make_unique<PrivateData>(theme_, source_)) {
   InitializeWidgets();
 }
 
@@ -456,53 +470,58 @@ void CodeView::ScrollToToken(const Token &tok) {
 }
 
 void CodeView::ScrollToToken(RawEntityId file_tok_id) {
-  if (d->state == CodeViewState::kRendered) {
-    if (file_tok_id == kInvalidEntityId) {
-      return;
-    }
-
-    auto begin_it = d->code->file_token_ids.begin();
-    auto end_it = d->code->file_token_ids.end();
-    auto it = std::lower_bound(begin_it, end_it, file_tok_id);
-    if (it == end_it || *it != file_tok_id) {
-      return;
-    }
-
-    auto tok_index = static_cast<unsigned>((it - begin_it));
-    if (tok_index >= d->code->start_of_token.size()) {
-      return;
-    }
-
-    OnHighlightLine();
-
-    int desired_position = d->code->start_of_token[tok_index];
-
-    // Figure out if we can avoid scrolling due to the text being (probably)
-    // visible. If we have a `last_block`, then we clicked on something in here,
-    // so it must have been visible.
-    if (d->last_block != -1) {
-      d->last_block = -1;
-
-      int start_pos = cursorForPosition(QPoint(0, 0)).position();
-      QPoint bottom_right(viewport()->width() - 1, viewport()->height() - 1);
-      int end_pos = cursorForPosition(bottom_right).position();
-      if (start_pos < desired_position && desired_position < end_pos) {
-        return;
-      }
-    }
-
-    QTextCursor loc = textCursor();
-    loc.setPosition(desired_position,
-                    QTextCursor::MoveMode::MoveAnchor);
-
-    moveCursor(QTextCursor::MoveOperation::End);
-    setTextCursor(loc);
-    ensureCursorVisible();
-    centerCursor();
-
-  } else {
+  if (d->state != CodeViewState::kRendered) {
     d->scroll_target_eid = file_tok_id;
+    return;
   }
+
+  if (file_tok_id == kInvalidEntityId) {
+    return;
+  }
+
+  auto begin_it = d->code->file_token_ids.begin();
+  auto end_it = d->code->file_token_ids.end();
+  auto it = std::lower_bound(begin_it, end_it, file_tok_id);
+  if (it == end_it || *it != file_tok_id) {
+    return;
+  }
+
+  auto tok_index = static_cast<unsigned>((it - begin_it));
+  if (tok_index >= d->code->start_of_token.size()) {
+    return;
+  }
+
+  QPoint bottom_right(viewport()->width() - 1, viewport()->height() - 1);
+  int desired_position = d->code->start_of_token[tok_index];
+  int start_pos = cursorForPosition(QPoint(0, 0)).position();
+  int end_pos = cursorForPosition(bottom_right).position();
+
+  // Move the cursor to the desired location.
+  QTextCursor loc = textCursor();
+  loc.setPosition(desired_position,
+                  QTextCursor::MoveMode::MoveAnchor);
+  setTextCursor(loc);
+
+  // Highlight the line containing the cursor.
+  OnHighlightLine();
+
+  // Figure out if we can avoid scrolling due to the text being (probably)
+  // visible. If we have a `last_block`, then we clicked on something in here,
+  // so it must have been visible.
+  if (d->last_block != -1) {
+    d->last_block = -1;
+    if (start_pos < desired_position && desired_position < end_pos) {
+      return;
+    }
+  }
+
+  // We want to change the scroll in the viewport, so move us to the end of the
+  // document (trick from StackOverflow), then back to the text cursor, then
+  // center on the cursor.
+  moveCursor(QTextCursor::MoveOperation::End);
+  setTextCursor(loc);
+  ensureCursorVisible();
+  centerCursor();
 }
 
 void CodeView::SetFile(const File &file) {
@@ -574,7 +593,6 @@ void CodeView::Clear(void) {
   d->code.reset();
   d->last_mouse_move_index = ~0u;
   d->last_block = -1;
-  d->last_entity_ids.clear();
   d->scroll_target_eid = kInvalidEntityId;
   this->QPlainTextEdit::clear();
 }
@@ -635,7 +653,6 @@ void CodeView::OnRenderCode(void *code_, uint64_t counter) {
   d->state = CodeViewState::kRendering;
   d->last_mouse_move_index = ~0u;
   d->last_block = ~0u;
-  d->last_entity_ids.clear();
 
   // An event may have asked for a new rendering; check re-entrancy.
   update();
@@ -706,7 +723,7 @@ std::optional<std::pair<unsigned, int>> CodeView::TokenIndexForPosition(
       static_cast<unsigned>((it - begin_it) - 1), cursor.blockNumber());
 }
 
-std::vector<RawEntityId> CodeView::DeclsForToken(unsigned index) const {
+std::vector<RawEntityId> CodeView::DeclsForIndex(unsigned index) const {
   std::vector<RawEntityId> decl_ids;
   auto decls_begin_index = d->code->declaration_ids_begin[index];
   auto decls_end_index = d->code->declaration_ids_begin[index + 1u];
@@ -719,22 +736,47 @@ std::vector<RawEntityId> CodeView::DeclsForToken(unsigned index) const {
   return decl_ids;
 }
 
+std::vector<RawEntityId> CodeView::TokensForIndex(unsigned index) const {
+  std::vector<RawEntityId> tok_ids;
+  auto toks_begin_index = d->code->fragment_token_ids_begin[index];
+  auto toks_end_index = d->code->fragment_token_ids_begin[index + 1u];
+  if (auto num_decls = toks_end_index - toks_begin_index) {
+    tok_ids.reserve(num_decls);
+    for (auto i = toks_begin_index; i < toks_end_index; ++i) {
+      tok_ids.push_back(d->code->declaration_ids[i]);
+    }
+  }
+  return tok_ids;
+}
+
+void CodeView::EmitEventsForIndex(QMouseEvent *event, unsigned index,
+                                  EventKind kind) {
+  if (auto tok_ids = TokensForIndex(index); !tok_ids.empty()) {
+    emit TokenEvent(d->source,
+                    {event->modifiers(), event->buttons(), kind},
+                    std::move(tok_ids));
+
+    if (auto decl_ids = DeclsForIndex(index); !decl_ids.empty()) {
+      emit DeclarationEvent(
+          d->source,
+          {event->modifiers(), event->buttons(), kind},
+          std::move(decl_ids));
+    }
+  }
+}
+
 void CodeView::mouseMoveEvent(QMouseEvent *event) {
   if (auto pos = TokenIndexForPosition(event->pos())) {
     auto [index, block] = pos.value();
     if (index != d->last_mouse_move_index) {
       d->last_mouse_move_index = index;
       d->last_block = block;
-      d->last_entity_ids = DeclsForToken(index);
-      if (!d->last_entity_ids.empty()) {
-        emit DeclarationEvent({event->modifiers(), event->buttons(),
-                               EventKind::kHover}, d->last_entity_ids);
-      }
+      EmitEventsForIndex(event, index, EventKind::kHover);
     }
+
   } else {
     d->last_mouse_move_index = ~0u;
     d->last_block = -1;
-    d->last_entity_ids.clear();
   }
 
   this->QPlainTextEdit::mouseMoveEvent(event);
@@ -744,14 +786,9 @@ void CodeView::mousePressEvent(QMouseEvent *event) {
   if (auto pos = TokenIndexForPosition(event->pos())) {
     auto [index, block] = pos.value();
     d->last_block = block;
-    d->last_entity_ids = DeclsForToken(index);
-    if (!d->last_entity_ids.empty()) {
-      emit DeclarationEvent({event->modifiers(), event->buttons(),
-                             EventKind::kClick}, d->last_entity_ids);
-    }
+    EmitEventsForIndex(event, index, EventKind::kClick);
   } else {
     d->last_block = -1;
-    d->last_entity_ids.clear();
   }
   this->QPlainTextEdit::mousePressEvent(event);
 }
@@ -760,21 +797,15 @@ void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
   if (auto pos = TokenIndexForPosition(event->pos())) {
     auto [index, block] = pos.value();
     d->last_block = block;
-    d->last_entity_ids = DeclsForToken(index);
-    if (!d->last_entity_ids.empty()) {
-      emit DeclarationEvent({event->modifiers(), event->buttons(),
-                             EventKind::kDoubleClick}, d->last_entity_ids);
-    }
+    EmitEventsForIndex(event, index, EventKind::kDoubleClick);
   } else {
     d->last_block = -1;
-    d->last_entity_ids.clear();
   }
   this->QPlainTextEdit::mouseDoubleClickEvent(event);
 }
 
 void CodeView::scrollContentsBy(int dx, int dy) {
   d->last_block = -1;
-  d->last_entity_ids.clear();
   this->QPlainTextEdit::scrollContentsBy(dx, dy);
 }
 

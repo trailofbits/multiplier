@@ -7604,6 +7604,13 @@ class Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Type::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   bool is_qualified(void) const;
   Type unqualified_type(void) const;
   bool accepts_obj_c_type_parameters(void) const;
@@ -7902,6 +7909,13 @@ class TemplateTypeParmType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TemplateTypeParmType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_TYPE_PARM;
   }
@@ -7936,6 +7950,13 @@ class TemplateSpecializationType : public Type {
 
   inline static TemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TemplateSpecializationType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -7976,6 +7997,13 @@ class TagType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TagType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static std::optional<TagType> from(const TokenContext &c);
   static std::optional<TagType> from(const Type &parent);
 
@@ -8005,6 +8033,13 @@ class RecordType : public TagType {
 
   inline static RecordTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RecordType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8053,6 +8088,13 @@ class EnumType : public TagType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EnumType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ENUM;
   }
@@ -8097,6 +8139,13 @@ class SubstTemplateTypeParmType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SubstTemplateTypeParmType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::SUBST_TEMPLATE_TYPE_PARM;
   }
@@ -8131,6 +8180,13 @@ class SubstTemplateTypeParmPackType : public Type {
 
   inline static SubstTemplateTypeParmPackTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SubstTemplateTypeParmPackType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8168,6 +8224,13 @@ class ReferenceType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReferenceType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static std::optional<ReferenceType> from(const TokenContext &c);
   static std::optional<ReferenceType> from(const Type &parent);
 
@@ -8198,6 +8261,13 @@ class RValueReferenceType : public ReferenceType {
 
   inline static RValueReferenceTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RValueReferenceType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8245,6 +8315,13 @@ class LValueReferenceType : public ReferenceType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LValueReferenceType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::L_VALUE_REFERENCE;
   }
@@ -8289,6 +8366,13 @@ class PointerType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PointerType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::POINTER;
   }
@@ -8321,6 +8405,13 @@ class PipeType : public Type {
 
   inline static PipeTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PipeType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8359,6 +8450,13 @@ class ParenType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ParenType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::PAREN;
   }
@@ -8392,6 +8490,13 @@ class PackExpansionType : public Type {
 
   inline static PackExpansionTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PackExpansionType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8430,6 +8535,13 @@ class ObjCTypeParamType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCTypeParamType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_TYPE_PARAM;
   }
@@ -8463,6 +8575,13 @@ class ObjCObjectType : public Type {
 
   inline static ObjCObjectTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCObjectType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8519,6 +8638,13 @@ class ObjCInterfaceType : public ObjCObjectType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCInterfaceType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_INTERFACE;
   }
@@ -8560,6 +8686,13 @@ class ObjCObjectPointerType : public Type {
 
   inline static ObjCObjectPointerTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCObjectPointerType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8611,6 +8744,13 @@ class MemberPointerType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MemberPointerType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::MEMBER_POINTER;
   }
@@ -8649,6 +8789,13 @@ class MatrixType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MatrixType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static std::optional<MatrixType> from(const TokenContext &c);
   static std::optional<MatrixType> from(const Type &parent);
 
@@ -8679,6 +8826,13 @@ class DependentSizedMatrixType : public MatrixType {
 
   inline static DependentSizedMatrixTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentSizedMatrixType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8727,6 +8881,13 @@ class ConstantMatrixType : public MatrixType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConstantMatrixType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_MATRIX;
   }
@@ -8769,6 +8930,13 @@ class MacroQualifiedType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MacroQualifiedType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::MACRO_QUALIFIED;
   }
@@ -8803,6 +8971,13 @@ class InjectedClassNameType : public Type {
 
   inline static InjectedClassNameTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : InjectedClassNameType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8842,6 +9017,13 @@ class FunctionType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FunctionType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static std::optional<FunctionType> from(const TokenContext &c);
   static std::optional<FunctionType> from(const Type &parent);
 
@@ -8878,6 +9060,13 @@ class FunctionProtoType : public FunctionType {
 
   inline static FunctionProtoTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FunctionProtoType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -8945,6 +9134,13 @@ class FunctionNoProtoType : public FunctionType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FunctionNoProtoType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::FUNCTION_NO_PROTO;
   }
@@ -8989,6 +9185,13 @@ class DependentVectorType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentVectorType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_VECTOR;
   }
@@ -9025,6 +9228,13 @@ class DependentSizedExtVectorType : public Type {
 
   inline static DependentSizedExtVectorTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentSizedExtVectorType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9064,6 +9274,13 @@ class DependentBitIntType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentBitIntType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_BIT_INT;
   }
@@ -9099,6 +9316,13 @@ class DependentAddressSpaceType : public Type {
 
   inline static DependentAddressSpaceTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentAddressSpaceType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9137,6 +9361,13 @@ class DeducedType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DeducedType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static std::optional<DeducedType> from(const TokenContext &c);
   static std::optional<DeducedType> from(const Type &parent);
 
@@ -9168,6 +9399,13 @@ class DeducedTemplateSpecializationType : public DeducedType {
 
   inline static DeducedTemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DeducedTemplateSpecializationType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9211,6 +9449,13 @@ class AutoType : public DeducedType {
 
   inline static AutoTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AutoType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9260,6 +9505,13 @@ class DecltypeType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DecltypeType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DECLTYPE;
   }
@@ -9296,6 +9548,13 @@ class ComplexType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ComplexType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::COMPLEX;
   }
@@ -9329,6 +9588,13 @@ class BuiltinType : public Type {
 
   inline static BuiltinTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BuiltinType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9370,6 +9636,13 @@ class BlockPointerType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BlockPointerType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BLOCK_POINTER;
   }
@@ -9402,6 +9675,13 @@ class BitIntType : public Type {
 
   inline static BitIntTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BitIntType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9438,6 +9718,13 @@ class AttributedType : public Type {
 
   inline static AttributedTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AttributedType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9481,6 +9768,13 @@ class AtomicType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AtomicType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ATOMIC;
   }
@@ -9516,6 +9810,13 @@ class ArrayType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArrayType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static std::optional<ArrayType> from(const TokenContext &c);
   static std::optional<ArrayType> from(const Type &parent);
 
@@ -9545,6 +9846,13 @@ class VariableArrayType : public ArrayType {
 
   inline static VariableArrayTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VariableArrayType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9596,6 +9904,13 @@ class IncompleteArrayType : public ArrayType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IncompleteArrayType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::INCOMPLETE_ARRAY;
   }
@@ -9639,6 +9954,13 @@ class DependentSizedArrayType : public ArrayType {
 
   inline static DependentSizedArrayTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentSizedArrayType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9690,6 +10012,13 @@ class ConstantArrayType : public ArrayType {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConstantArrayType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_ARRAY;
   }
@@ -9735,6 +10064,13 @@ class AdjustedType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AdjustedType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ADJUSTED;
   }
@@ -9770,6 +10106,13 @@ class DecayedType : public AdjustedType {
 
   inline static DecayedTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DecayedType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9814,6 +10157,13 @@ class TypeWithKeyword : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeWithKeyword::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static std::optional<TypeWithKeyword> from(const TokenContext &c);
   static std::optional<TypeWithKeyword> from(const Type &parent);
 
@@ -9842,6 +10192,13 @@ class ElaboratedType : public TypeWithKeyword {
 
   inline static ElaboratedTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ElaboratedType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -9891,6 +10248,13 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentTemplateSpecializationType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_TEMPLATE_SPECIALIZATION;
   }
@@ -9937,6 +10301,13 @@ class DependentNameType : public TypeWithKeyword {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentNameType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_NAME;
   }
@@ -9981,6 +10352,13 @@ class VectorType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VectorType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::VECTOR;
   }
@@ -10016,6 +10394,13 @@ class ExtVectorType : public VectorType {
 
   inline static ExtVectorTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExtVectorType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -10060,6 +10445,13 @@ class UsingType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsingType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::USING;
   }
@@ -10096,6 +10488,13 @@ class UnresolvedUsingType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnresolvedUsingType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::UNRESOLVED_USING;
   }
@@ -10129,6 +10528,13 @@ class UnaryTransformType : public Type {
 
   inline static UnaryTransformTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnaryTransformType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -10168,6 +10574,13 @@ class TypedefType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypedefType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPEDEF;
   }
@@ -10203,6 +10616,13 @@ class TypeOfType : public Type {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeOfType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPE_OF;
   }
@@ -10236,6 +10656,13 @@ class TypeOfExprType : public Type {
 
   inline static TypeOfExprTypeContainingTokenRange containing(const Token &tok) {
     return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeOfExprType::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
   }
 
   inline static constexpr TypeKind static_kind(void) {
@@ -10324,8 +10751,18 @@ class Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Stmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static StmtContainingStmtRange containing(const Decl &decl);
   static StmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   Stmt ignore_containers(void) const;
   std::vector<Stmt> children(void) const;
@@ -10351,12 +10788,22 @@ class SEHTryStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SEHTryStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_TRY_STMT;
   }
 
   static SEHTryStmtContainingStmtRange containing(const Decl &decl);
   static SEHTryStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SEHTryStmt> from(const TokenContext &c);
   static std::optional<SEHTryStmt> from(const Stmt &parent);
@@ -10394,12 +10841,22 @@ class SEHLeaveStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SEHLeaveStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_LEAVE_STMT;
   }
 
   static SEHLeaveStmtContainingStmtRange containing(const Decl &decl);
   static SEHLeaveStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SEHLeaveStmt> from(const TokenContext &c);
   static std::optional<SEHLeaveStmt> from(const Stmt &parent);
@@ -10432,12 +10889,22 @@ class SEHFinallyStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SEHFinallyStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_FINALLY_STMT;
   }
 
   static SEHFinallyStmtContainingStmtRange containing(const Decl &decl);
   static SEHFinallyStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SEHFinallyStmt> from(const TokenContext &c);
   static std::optional<SEHFinallyStmt> from(const Stmt &parent);
@@ -10471,12 +10938,22 @@ class SEHExceptStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SEHExceptStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_EXCEPT_STMT;
   }
 
   static SEHExceptStmtContainingStmtRange containing(const Decl &decl);
   static SEHExceptStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SEHExceptStmt> from(const TokenContext &c);
   static std::optional<SEHExceptStmt> from(const Stmt &parent);
@@ -10511,12 +10988,22 @@ class ReturnStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReturnStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::RETURN_STMT;
   }
 
   static ReturnStmtContainingStmtRange containing(const Decl &decl);
   static ReturnStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ReturnStmt> from(const TokenContext &c);
   static std::optional<ReturnStmt> from(const Stmt &parent);
@@ -10551,12 +11038,22 @@ class ObjCForCollectionStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCForCollectionStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_FOR_COLLECTION_STMT;
   }
 
   static ObjCForCollectionStmtContainingStmtRange containing(const Decl &decl);
   static ObjCForCollectionStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCForCollectionStmt> from(const TokenContext &c);
   static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
@@ -10593,12 +11090,22 @@ class ObjCAutoreleasePoolStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAutoreleasePoolStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;
   }
 
   static ObjCAutoreleasePoolStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAutoreleasePoolStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &c);
   static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent);
@@ -10632,12 +11139,22 @@ class ObjCAtTryStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAtTryStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_TRY_STMT;
   }
 
   static ObjCAtTryStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtTryStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAtTryStmt> from(const TokenContext &c);
   static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
@@ -10673,12 +11190,22 @@ class ObjCAtThrowStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAtThrowStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_THROW_STMT;
   }
 
   static ObjCAtThrowStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtThrowStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAtThrowStmt> from(const TokenContext &c);
   static std::optional<ObjCAtThrowStmt> from(const Stmt &parent);
@@ -10712,12 +11239,22 @@ class ObjCAtSynchronizedStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAtSynchronizedStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;
   }
 
   static ObjCAtSynchronizedStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtSynchronizedStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAtSynchronizedStmt> from(const TokenContext &c);
   static std::optional<ObjCAtSynchronizedStmt> from(const Stmt &parent);
@@ -10752,12 +11289,22 @@ class ObjCAtFinallyStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAtFinallyStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_FINALLY_STMT;
   }
 
   static ObjCAtFinallyStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtFinallyStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAtFinallyStmt> from(const TokenContext &c);
   static std::optional<ObjCAtFinallyStmt> from(const Stmt &parent);
@@ -10791,12 +11338,22 @@ class ObjCAtCatchStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAtCatchStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_CATCH_STMT;
   }
 
   static ObjCAtCatchStmtContainingStmtRange containing(const Decl &decl);
   static ObjCAtCatchStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAtCatchStmt> from(const TokenContext &c);
   static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
@@ -10833,8 +11390,18 @@ class OMPExecutableDirective : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPExecutableDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static OMPExecutableDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPExecutableDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPExecutableDirective> from(const TokenContext &c);
   static std::optional<OMPExecutableDirective> from(const Stmt &parent);
@@ -10873,12 +11440,22 @@ class OMPDispatchDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDispatchDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISPATCH_DIRECTIVE;
   }
 
   static OMPDispatchDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDispatchDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDispatchDirective> from(const TokenContext &c);
   static std::optional<OMPDispatchDirective> from(const OMPExecutableDirective &parent);
@@ -10922,12 +11499,22 @@ class OMPDepobjDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDepobjDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DEPOBJ_DIRECTIVE;
   }
 
   static OMPDepobjDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDepobjDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDepobjDirective> from(const TokenContext &c);
   static std::optional<OMPDepobjDirective> from(const OMPExecutableDirective &parent);
@@ -10970,12 +11557,22 @@ class OMPCriticalDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPCriticalDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CRITICAL_DIRECTIVE;
   }
 
   static OMPCriticalDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPCriticalDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPCriticalDirective> from(const TokenContext &c);
   static std::optional<OMPCriticalDirective> from(const OMPExecutableDirective &parent);
@@ -11018,12 +11615,22 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPCancellationPointDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;
   }
 
   static OMPCancellationPointDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPCancellationPointDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPCancellationPointDirective> from(const TokenContext &c);
   static std::optional<OMPCancellationPointDirective> from(const OMPExecutableDirective &parent);
@@ -11066,12 +11673,22 @@ class OMPCancelDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPCancelDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANCEL_DIRECTIVE;
   }
 
   static OMPCancelDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPCancelDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPCancelDirective> from(const TokenContext &c);
   static std::optional<OMPCancelDirective> from(const OMPExecutableDirective &parent);
@@ -11114,12 +11731,22 @@ class OMPBarrierDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPBarrierDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_BARRIER_DIRECTIVE;
   }
 
   static OMPBarrierDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPBarrierDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPBarrierDirective> from(const TokenContext &c);
   static std::optional<OMPBarrierDirective> from(const OMPExecutableDirective &parent);
@@ -11162,12 +11789,22 @@ class OMPAtomicDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPAtomicDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ATOMIC_DIRECTIVE;
   }
 
   static OMPAtomicDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPAtomicDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPAtomicDirective> from(const TokenContext &c);
   static std::optional<OMPAtomicDirective> from(const OMPExecutableDirective &parent);
@@ -11216,12 +11853,22 @@ class OMPTeamsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTeamsDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DIRECTIVE;
   }
 
   static OMPTeamsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTeamsDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDirective> from(const OMPExecutableDirective &parent);
@@ -11264,12 +11911,22 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTaskyieldDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKYIELD_DIRECTIVE;
   }
 
   static OMPTaskyieldDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskyieldDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTaskyieldDirective> from(const TokenContext &c);
   static std::optional<OMPTaskyieldDirective> from(const OMPExecutableDirective &parent);
@@ -11312,12 +11969,22 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTaskwaitDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKWAIT_DIRECTIVE;
   }
 
   static OMPTaskwaitDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskwaitDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTaskwaitDirective> from(const TokenContext &c);
   static std::optional<OMPTaskwaitDirective> from(const OMPExecutableDirective &parent);
@@ -11360,12 +12027,22 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTaskgroupDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKGROUP_DIRECTIVE;
   }
 
   static OMPTaskgroupDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskgroupDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTaskgroupDirective> from(const TokenContext &c);
   static std::optional<OMPTaskgroupDirective> from(const OMPExecutableDirective &parent);
@@ -11409,12 +12086,22 @@ class OMPTaskDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTaskDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASK_DIRECTIVE;
   }
 
   static OMPTaskDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTaskDirective> from(const TokenContext &c);
   static std::optional<OMPTaskDirective> from(const OMPExecutableDirective &parent);
@@ -11458,12 +12145,22 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetUpdateDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_UPDATE_DIRECTIVE;
   }
 
   static OMPTargetUpdateDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetUpdateDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetUpdateDirective> from(const TokenContext &c);
   static std::optional<OMPTargetUpdateDirective> from(const OMPExecutableDirective &parent);
@@ -11506,12 +12203,22 @@ class OMPTargetTeamsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetTeamsDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_DIRECTIVE;
   }
 
   static OMPTargetTeamsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDirective> from(const OMPExecutableDirective &parent);
@@ -11554,12 +12261,22 @@ class OMPTargetParallelDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetParallelDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_PARALLEL_DIRECTIVE;
   }
 
   static OMPTargetParallelDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetParallelDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetParallelDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelDirective> from(const OMPExecutableDirective &parent);
@@ -11604,12 +12321,22 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetExitDataDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE;
   }
 
   static OMPTargetExitDataDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetExitDataDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetExitDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetExitDataDirective> from(const OMPExecutableDirective &parent);
@@ -11652,12 +12379,22 @@ class OMPTargetEnterDataDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetEnterDataDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_ENTER_DATA_DIRECTIVE;
   }
 
   static OMPTargetEnterDataDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetEnterDataDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetEnterDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetEnterDataDirective> from(const OMPExecutableDirective &parent);
@@ -11700,12 +12437,22 @@ class OMPTargetDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_DIRECTIVE;
   }
 
   static OMPTargetDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetDirective> from(const TokenContext &c);
   static std::optional<OMPTargetDirective> from(const OMPExecutableDirective &parent);
@@ -11748,12 +12495,22 @@ class OMPTargetDataDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetDataDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_DATA_DIRECTIVE;
   }
 
   static OMPTargetDataDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetDataDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetDataDirective> from(const TokenContext &c);
   static std::optional<OMPTargetDataDirective> from(const OMPExecutableDirective &parent);
@@ -11796,12 +12553,22 @@ class OMPSingleDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPSingleDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SINGLE_DIRECTIVE;
   }
 
   static OMPSingleDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSingleDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPSingleDirective> from(const TokenContext &c);
   static std::optional<OMPSingleDirective> from(const OMPExecutableDirective &parent);
@@ -11844,12 +12611,22 @@ class OMPSectionsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPSectionsDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SECTIONS_DIRECTIVE;
   }
 
   static OMPSectionsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSectionsDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPSectionsDirective> from(const OMPExecutableDirective &parent);
@@ -11894,12 +12671,22 @@ class OMPSectionDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPSectionDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SECTION_DIRECTIVE;
   }
 
   static OMPSectionDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSectionDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPSectionDirective> from(const TokenContext &c);
   static std::optional<OMPSectionDirective> from(const OMPExecutableDirective &parent);
@@ -11943,12 +12730,22 @@ class OMPScanDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPScanDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SCAN_DIRECTIVE;
   }
 
   static OMPScanDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPScanDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPScanDirective> from(const TokenContext &c);
   static std::optional<OMPScanDirective> from(const OMPExecutableDirective &parent);
@@ -11991,12 +12788,22 @@ class OMPParallelSectionsDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPParallelSectionsDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE;
   }
 
   static OMPParallelSectionsDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelSectionsDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPParallelSectionsDirective> from(const TokenContext &c);
   static std::optional<OMPParallelSectionsDirective> from(const OMPExecutableDirective &parent);
@@ -12041,12 +12848,22 @@ class OMPParallelMasterDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPParallelMasterDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASTER_DIRECTIVE;
   }
 
   static OMPParallelMasterDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelMasterDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPParallelMasterDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterDirective> from(const OMPExecutableDirective &parent);
@@ -12090,12 +12907,22 @@ class OMPParallelDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPParallelDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_DIRECTIVE;
   }
 
   static OMPParallelDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPParallelDirective> from(const TokenContext &c);
   static std::optional<OMPParallelDirective> from(const OMPExecutableDirective &parent);
@@ -12140,12 +12967,22 @@ class OMPOrderedDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPOrderedDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ORDERED_DIRECTIVE;
   }
 
   static OMPOrderedDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPOrderedDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPOrderedDirective> from(const TokenContext &c);
   static std::optional<OMPOrderedDirective> from(const OMPExecutableDirective &parent);
@@ -12188,12 +13025,22 @@ class OMPMetaDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPMetaDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_META_DIRECTIVE;
   }
 
   static OMPMetaDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMetaDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPMetaDirective> from(const TokenContext &c);
   static std::optional<OMPMetaDirective> from(const OMPExecutableDirective &parent);
@@ -12237,12 +13084,22 @@ class OMPMasterDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPMasterDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASTER_DIRECTIVE;
   }
 
   static OMPMasterDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMasterDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPMasterDirective> from(const TokenContext &c);
   static std::optional<OMPMasterDirective> from(const OMPExecutableDirective &parent);
@@ -12285,12 +13142,22 @@ class OMPMaskedDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPMaskedDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASKED_DIRECTIVE;
   }
 
   static OMPMaskedDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMaskedDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPMaskedDirective> from(const TokenContext &c);
   static std::optional<OMPMaskedDirective> from(const OMPExecutableDirective &parent);
@@ -12333,8 +13200,18 @@ class OMPLoopBasedDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPLoopBasedDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static OMPLoopBasedDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPLoopBasedDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPLoopBasedDirective> from(const TokenContext &c);
   static std::optional<OMPLoopBasedDirective> from(const OMPExecutableDirective &parent);
@@ -12378,8 +13255,18 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPLoopTransformationDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static OMPLoopTransformationDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPLoopTransformationDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPLoopTransformationDirective> from(const TokenContext &c);
   static std::optional<OMPLoopTransformationDirective> from(const OMPLoopBasedDirective &parent);
@@ -12436,12 +13323,22 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPUnrollDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_UNROLL_DIRECTIVE;
   }
 
   static OMPUnrollDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPUnrollDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPUnrollDirective> from(const TokenContext &c);
   static std::optional<OMPUnrollDirective> from(const OMPLoopTransformationDirective &parent);
@@ -12506,12 +13403,22 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTileDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TILE_DIRECTIVE;
   }
 
   static OMPTileDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTileDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTileDirective> from(const TokenContext &c);
   static std::optional<OMPTileDirective> from(const OMPLoopTransformationDirective &parent);
@@ -12575,8 +13482,18 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPLoopDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static OMPLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPLoopDirective> from(const TokenContext &c);
   static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
@@ -12669,12 +13586,22 @@ class OMPGenericLoopDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPGenericLoopDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_GENERIC_LOOP_DIRECTIVE;
   }
 
   static OMPGenericLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPGenericLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPGenericLoopDirective> from(const TokenContext &c);
   static std::optional<OMPGenericLoopDirective> from(const OMPLoopDirective &parent);
@@ -12739,12 +13666,22 @@ class OMPForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPForSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_FOR_SIMD_DIRECTIVE;
   }
 
   static OMPForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPForSimdDirective> from(const OMPLoopDirective &parent);
@@ -12809,12 +13746,22 @@ class OMPForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPForDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_FOR_DIRECTIVE;
   }
 
   static OMPForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPForDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPForDirective> from(const TokenContext &c);
   static std::optional<OMPForDirective> from(const OMPLoopDirective &parent);
@@ -12881,12 +13828,22 @@ class OMPDistributeSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDistributeSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISTRIBUTE_SIMD_DIRECTIVE;
   }
 
   static OMPDistributeSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeSimdDirective> from(const OMPLoopDirective &parent);
@@ -12951,12 +13908,22 @@ class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDistributeParallelForSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
   }
 
   static OMPDistributeParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
@@ -13021,12 +13988,22 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDistributeParallelForDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
   }
 
   static OMPDistributeParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopDirective &parent);
@@ -13093,12 +14070,22 @@ class OMPDistributeDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDistributeDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISTRIBUTE_DIRECTIVE;
   }
 
   static OMPDistributeDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPDistributeDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPDistributeDirective> from(const OMPLoopDirective &parent);
@@ -13163,12 +14150,22 @@ class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTeamsDistributeSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
   }
 
   static OMPTeamsDistributeSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
@@ -13233,12 +14230,22 @@ class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTeamsDistributeParallelForSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
   }
 
   static OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
@@ -13303,12 +14310,22 @@ class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTeamsDistributeParallelForDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
   }
 
   static OMPTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
@@ -13375,12 +14392,22 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTeamsDistributeDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE;
   }
 
   static OMPTeamsDistributeDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTeamsDistributeDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTeamsDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopDirective &parent);
@@ -13445,12 +14472,22 @@ class OMPTaskLoopSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTaskLoopSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASK_LOOP_SIMD_DIRECTIVE;
   }
 
   static OMPTaskLoopSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskLoopSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
@@ -13515,12 +14552,22 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTaskLoopDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASK_LOOP_DIRECTIVE;
   }
 
   static OMPTaskLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTaskLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPTaskLoopDirective> from(const OMPLoopDirective &parent);
@@ -13586,12 +14633,22 @@ class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetTeamsDistributeSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
   }
 
   static OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeSimdDirective> from(const OMPLoopDirective &parent);
@@ -13656,12 +14713,22 @@ class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;
   }
 
   static OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> from(const OMPLoopDirective &parent);
@@ -13726,12 +14793,22 @@ class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
   }
 
   static OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const OMPLoopDirective &parent);
@@ -13798,12 +14875,22 @@ class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetTeamsDistributeDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE;
   }
 
   static OMPTargetTeamsDistributeDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetTeamsDistributeDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetTeamsDistributeDirective> from(const TokenContext &c);
   static std::optional<OMPTargetTeamsDistributeDirective> from(const OMPLoopDirective &parent);
@@ -13868,12 +14955,22 @@ class OMPTargetSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_SIMD_DIRECTIVE;
   }
 
   static OMPTargetSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetSimdDirective> from(const OMPLoopDirective &parent);
@@ -13938,12 +15035,22 @@ class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetParallelForSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE;
   }
 
   static OMPTargetParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelForSimdDirective> from(const OMPLoopDirective &parent);
@@ -14008,12 +15115,22 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPTargetParallelForDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE;
   }
 
   static OMPTargetParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPTargetParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPTargetParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPTargetParallelForDirective> from(const OMPLoopDirective &parent);
@@ -14080,12 +15197,22 @@ class OMPSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SIMD_DIRECTIVE;
   }
 
   static OMPSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPSimdDirective> from(const TokenContext &c);
   static std::optional<OMPSimdDirective> from(const OMPLoopDirective &parent);
@@ -14150,12 +15277,22 @@ class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPParallelMasterTaskLoopSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
   }
 
   static OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
@@ -14220,12 +15357,22 @@ class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPParallelMasterTaskLoopDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_DIRECTIVE;
   }
 
   static OMPParallelMasterTaskLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelMasterTaskLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
@@ -14291,12 +15438,22 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPParallelForSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE;
   }
 
   static OMPParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPParallelForSimdDirective> from(const TokenContext &c);
   static std::optional<OMPParallelForSimdDirective> from(const OMPLoopDirective &parent);
@@ -14361,12 +15518,22 @@ class OMPParallelForDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPParallelForDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_FOR_DIRECTIVE;
   }
 
   static OMPParallelForDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPParallelForDirective> from(const TokenContext &c);
   static std::optional<OMPParallelForDirective> from(const OMPLoopDirective &parent);
@@ -14433,12 +15600,22 @@ class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPMasterTaskLoopSimdDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
   }
 
   static OMPMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMasterTaskLoopSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const TokenContext &c);
   static std::optional<OMPMasterTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
@@ -14503,12 +15680,22 @@ class OMPMasterTaskLoopDirective : public OMPLoopDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPMasterTaskLoopDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE;
   }
 
   static OMPMasterTaskLoopDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPMasterTaskLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPMasterTaskLoopDirective> from(const TokenContext &c);
   static std::optional<OMPMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
@@ -14572,12 +15759,22 @@ class OMPInteropDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPInteropDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_INTEROP_DIRECTIVE;
   }
 
   static OMPInteropDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPInteropDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPInteropDirective> from(const TokenContext &c);
   static std::optional<OMPInteropDirective> from(const OMPExecutableDirective &parent);
@@ -14620,12 +15817,22 @@ class OMPFlushDirective : public OMPExecutableDirective {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPFlushDirective::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_FLUSH_DIRECTIVE;
   }
 
   static OMPFlushDirectiveContainingStmtRange containing(const Decl &decl);
   static OMPFlushDirectiveContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPFlushDirective> from(const TokenContext &c);
   static std::optional<OMPFlushDirective> from(const OMPExecutableDirective &parent);
@@ -14667,12 +15874,22 @@ class OMPCanonicalLoop : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPCanonicalLoop::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANONICAL_LOOP;
   }
 
   static OMPCanonicalLoopContainingStmtRange containing(const Decl &decl);
   static OMPCanonicalLoopContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPCanonicalLoop> from(const TokenContext &c);
   static std::optional<OMPCanonicalLoop> from(const Stmt &parent);
@@ -14708,12 +15925,22 @@ class NullStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NullStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::NULL_STMT;
   }
 
   static NullStmtContainingStmtRange containing(const Decl &decl);
   static NullStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<NullStmt> from(const TokenContext &c);
   static std::optional<NullStmt> from(const Stmt &parent);
@@ -14747,12 +15974,22 @@ class MSDependentExistsStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSDependentExistsStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_DEPENDENT_EXISTS_STMT;
   }
 
   static MSDependentExistsStmtContainingStmtRange containing(const Decl &decl);
   static MSDependentExistsStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MSDependentExistsStmt> from(const TokenContext &c);
   static std::optional<MSDependentExistsStmt> from(const Stmt &parent);
@@ -14788,12 +16025,22 @@ class IndirectGotoStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IndirectGotoStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INDIRECT_GOTO_STMT;
   }
 
   static IndirectGotoStmtContainingStmtRange containing(const Decl &decl);
   static IndirectGotoStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<IndirectGotoStmt> from(const TokenContext &c);
   static std::optional<IndirectGotoStmt> from(const Stmt &parent);
@@ -14829,12 +16076,22 @@ class IfStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IfStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IF_STMT;
   }
 
   static IfStmtContainingStmtRange containing(const Decl &decl);
   static IfStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<IfStmt> from(const TokenContext &c);
   static std::optional<IfStmt> from(const Stmt &parent);
@@ -14885,12 +16142,22 @@ class GotoStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : GotoStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GOTO_STMT;
   }
 
   static GotoStmtContainingStmtRange containing(const Decl &decl);
   static GotoStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<GotoStmt> from(const TokenContext &c);
   static std::optional<GotoStmt> from(const Stmt &parent);
@@ -14925,12 +16192,22 @@ class ForStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ForStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FOR_STMT;
   }
 
   static ForStmtContainingStmtRange containing(const Decl &decl);
   static ForStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ForStmt> from(const TokenContext &c);
   static std::optional<ForStmt> from(const Stmt &parent);
@@ -14971,12 +16248,22 @@ class DoStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DoStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DO_STMT;
   }
 
   static DoStmtContainingStmtRange containing(const Decl &decl);
   static DoStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DoStmt> from(const TokenContext &c);
   static std::optional<DoStmt> from(const Stmt &parent);
@@ -15013,12 +16300,22 @@ class DeclStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DeclStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DECL_STMT;
   }
 
   static DeclStmtContainingStmtRange containing(const Decl &decl);
   static DeclStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DeclStmt> from(const TokenContext &c);
   static std::optional<DeclStmt> from(const Stmt &parent);
@@ -15053,12 +16350,22 @@ class CoroutineBodyStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CoroutineBodyStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COROUTINE_BODY_STMT;
   }
 
   static CoroutineBodyStmtContainingStmtRange containing(const Decl &decl);
   static CoroutineBodyStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CoroutineBodyStmt> from(const TokenContext &c);
   static std::optional<CoroutineBodyStmt> from(const Stmt &parent);
@@ -15105,12 +16412,22 @@ class CoreturnStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CoreturnStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CORETURN_STMT;
   }
 
   static CoreturnStmtContainingStmtRange containing(const Decl &decl);
   static CoreturnStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CoreturnStmt> from(const TokenContext &c);
   static std::optional<CoreturnStmt> from(const Stmt &parent);
@@ -15146,12 +16463,22 @@ class ContinueStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ContinueStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONTINUE_STMT;
   }
 
   static ContinueStmtContainingStmtRange containing(const Decl &decl);
   static ContinueStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ContinueStmt> from(const TokenContext &c);
   static std::optional<ContinueStmt> from(const Stmt &parent);
@@ -15184,12 +16511,22 @@ class CompoundStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CompoundStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_STMT;
   }
 
   static CompoundStmtContainingStmtRange containing(const Decl &decl);
   static CompoundStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CompoundStmt> from(const TokenContext &c);
   static std::optional<CompoundStmt> from(const Stmt &parent);
@@ -15224,12 +16561,22 @@ class CapturedStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CapturedStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CAPTURED_STMT;
   }
 
   static CapturedStmtContainingStmtRange containing(const Decl &decl);
   static CapturedStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CapturedStmt> from(const TokenContext &c);
   static std::optional<CapturedStmt> from(const Stmt &parent);
@@ -15265,12 +16612,22 @@ class CXXTryStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXTryStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TRY_STMT;
   }
 
   static CXXTryStmtContainingStmtRange containing(const Decl &decl);
   static CXXTryStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXTryStmt> from(const TokenContext &c);
   static std::optional<CXXTryStmt> from(const Stmt &parent);
@@ -15305,12 +16662,22 @@ class CXXForRangeStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXForRangeStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FOR_RANGE_STMT;
   }
 
   static CXXForRangeStmtContainingStmtRange containing(const Decl &decl);
   static CXXForRangeStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXForRangeStmt> from(const TokenContext &c);
   static std::optional<CXXForRangeStmt> from(const Stmt &parent);
@@ -15356,12 +16723,22 @@ class CXXCatchStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXCatchStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CATCH_STMT;
   }
 
   static CXXCatchStmtContainingStmtRange containing(const Decl &decl);
   static CXXCatchStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXCatchStmt> from(const TokenContext &c);
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
@@ -15397,12 +16774,22 @@ class BreakStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BreakStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BREAK_STMT;
   }
 
   static BreakStmtContainingStmtRange containing(const Decl &decl);
   static BreakStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BreakStmt> from(const TokenContext &c);
   static std::optional<BreakStmt> from(const Stmt &parent);
@@ -15435,8 +16822,18 @@ class AsmStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AsmStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static AsmStmtContainingStmtRange containing(const Decl &decl);
   static AsmStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<AsmStmt> from(const TokenContext &c);
   static std::optional<AsmStmt> from(const Stmt &parent);
@@ -15480,12 +16877,22 @@ class MSAsmStmt : public AsmStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSAsmStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_ASM_STMT;
   }
 
   static MSAsmStmtContainingStmtRange containing(const Decl &decl);
   static MSAsmStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MSAsmStmt> from(const TokenContext &c);
   static std::optional<MSAsmStmt> from(const AsmStmt &parent);
@@ -15533,12 +16940,22 @@ class GCCAsmStmt : public AsmStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : GCCAsmStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GCC_ASM_STMT;
   }
 
   static GCCAsmStmtContainingStmtRange containing(const Decl &decl);
   static GCCAsmStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<GCCAsmStmt> from(const TokenContext &c);
   static std::optional<GCCAsmStmt> from(const AsmStmt &parent);
@@ -15591,12 +17008,22 @@ class WhileStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WhileStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::WHILE_STMT;
   }
 
   static WhileStmtContainingStmtRange containing(const Decl &decl);
   static WhileStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<WhileStmt> from(const TokenContext &c);
   static std::optional<WhileStmt> from(const Stmt &parent);
@@ -15636,8 +17063,18 @@ class ValueStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ValueStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static ValueStmtContainingStmtRange containing(const Decl &decl);
   static ValueStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ValueStmt> from(const TokenContext &c);
   static std::optional<ValueStmt> from(const Stmt &parent);
@@ -15671,12 +17108,22 @@ class LabelStmt : public ValueStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LabelStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LABEL_STMT;
   }
 
   static LabelStmtContainingStmtRange containing(const Decl &decl);
   static LabelStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<LabelStmt> from(const TokenContext &c);
   static std::optional<LabelStmt> from(const ValueStmt &parent);
@@ -15724,8 +17171,18 @@ class Expr : public ValueStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Expr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static ExprContainingStmtRange containing(const Decl &decl);
   static ExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<Expr> from(const TokenContext &c);
   static std::optional<Expr> from(const ValueStmt &parent);
@@ -15813,12 +17270,22 @@ class DesignatedInitUpdateExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DesignatedInitUpdateExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;
   }
 
   static DesignatedInitUpdateExprContainingStmtRange containing(const Decl &decl);
   static DesignatedInitUpdateExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DesignatedInitUpdateExpr> from(const TokenContext &c);
   static std::optional<DesignatedInitUpdateExpr> from(const Expr &parent);
@@ -15874,12 +17341,22 @@ class DesignatedInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DesignatedInitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DESIGNATED_INIT_EXPR;
   }
 
   static DesignatedInitExprContainingStmtRange containing(const Decl &decl);
   static DesignatedInitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DesignatedInitExpr> from(const TokenContext &c);
   static std::optional<DesignatedInitExpr> from(const Expr &parent);
@@ -15939,12 +17416,22 @@ class DependentScopeDeclRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentScopeDeclRefExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;
   }
 
   static DependentScopeDeclRefExprContainingStmtRange containing(const Decl &decl);
   static DependentScopeDeclRefExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DependentScopeDeclRefExpr> from(const TokenContext &c);
   static std::optional<DependentScopeDeclRefExpr> from(const Expr &parent);
@@ -16003,12 +17490,22 @@ class DependentCoawaitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DependentCoawaitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEPENDENT_COAWAIT_EXPR;
   }
 
   static DependentCoawaitExprContainingStmtRange containing(const Decl &decl);
   static DependentCoawaitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DependentCoawaitExpr> from(const TokenContext &c);
   static std::optional<DependentCoawaitExpr> from(const Expr &parent);
@@ -16065,12 +17562,22 @@ class DeclRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DeclRefExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DECL_REF_EXPR;
   }
 
   static DeclRefExprContainingStmtRange containing(const Decl &decl);
   static DeclRefExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DeclRefExpr> from(const TokenContext &c);
   static std::optional<DeclRefExpr> from(const Expr &parent);
@@ -16136,8 +17643,18 @@ class CoroutineSuspendExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CoroutineSuspendExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static CoroutineSuspendExprContainingStmtRange containing(const Decl &decl);
   static CoroutineSuspendExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CoroutineSuspendExpr> from(const TokenContext &c);
   static std::optional<CoroutineSuspendExpr> from(const Expr &parent);
@@ -16198,12 +17715,22 @@ class CoawaitExpr : public CoroutineSuspendExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CoawaitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COAWAIT_EXPR;
   }
 
   static CoawaitExprContainingStmtRange containing(const Decl &decl);
   static CoawaitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CoawaitExpr> from(const TokenContext &c);
   static std::optional<CoawaitExpr> from(const CoroutineSuspendExpr &parent);
@@ -16270,12 +17797,22 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CoyieldExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COYIELD_EXPR;
   }
 
   static CoyieldExprContainingStmtRange containing(const Decl &decl);
   static CoyieldExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CoyieldExpr> from(const TokenContext &c);
   static std::optional<CoyieldExpr> from(const CoroutineSuspendExpr &parent);
@@ -16340,12 +17877,22 @@ class ConvertVectorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConvertVectorExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONVERT_VECTOR_EXPR;
   }
 
   static ConvertVectorExprContainingStmtRange containing(const Decl &decl);
   static ConvertVectorExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ConvertVectorExpr> from(const TokenContext &c);
   static std::optional<ConvertVectorExpr> from(const Expr &parent);
@@ -16402,12 +17949,22 @@ class ConceptSpecializationExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConceptSpecializationExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
   }
 
   static ConceptSpecializationExprContainingStmtRange containing(const Decl &decl);
   static ConceptSpecializationExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ConceptSpecializationExpr> from(const TokenContext &c);
   static std::optional<ConceptSpecializationExpr> from(const Expr &parent);
@@ -16463,12 +18020,22 @@ class CompoundLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CompoundLiteralExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_LITERAL_EXPR;
   }
 
   static CompoundLiteralExprContainingStmtRange containing(const Decl &decl);
   static CompoundLiteralExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CompoundLiteralExpr> from(const TokenContext &c);
   static std::optional<CompoundLiteralExpr> from(const Expr &parent);
@@ -16525,12 +18092,22 @@ class ChooseExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ChooseExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CHOOSE_EXPR;
   }
 
   static ChooseExprContainingStmtRange containing(const Decl &decl);
   static ChooseExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ChooseExpr> from(const TokenContext &c);
   static std::optional<ChooseExpr> from(const Expr &parent);
@@ -16592,12 +18169,22 @@ class CharacterLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CharacterLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CHARACTER_LITERAL;
   }
 
   static CharacterLiteralContainingStmtRange containing(const Decl &decl);
   static CharacterLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CharacterLiteral> from(const TokenContext &c);
   static std::optional<CharacterLiteral> from(const Expr &parent);
@@ -16653,8 +18240,18 @@ class CastExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static CastExprContainingStmtRange containing(const Decl &decl);
   static CastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CastExpr> from(const TokenContext &c);
   static std::optional<CastExpr> from(const Expr &parent);
@@ -16716,12 +18313,22 @@ class ImplicitCastExpr : public CastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ImplicitCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IMPLICIT_CAST_EXPR;
   }
 
   static ImplicitCastExprContainingStmtRange containing(const Decl &decl);
   static ImplicitCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ImplicitCastExpr> from(const TokenContext &c);
   static std::optional<ImplicitCastExpr> from(const CastExpr &parent);
@@ -16787,8 +18394,18 @@ class ExplicitCastExpr : public CastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExplicitCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static ExplicitCastExprContainingStmtRange containing(const Decl &decl);
   static ExplicitCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ExplicitCastExpr> from(const TokenContext &c);
   static std::optional<ExplicitCastExpr> from(const CastExpr &parent);
@@ -16855,8 +18472,18 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXNamedCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static CXXNamedCastExprContainingStmtRange containing(const Decl &decl);
   static CXXNamedCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXNamedCastExpr> from(const TokenContext &c);
   static std::optional<CXXNamedCastExpr> from(const ExplicitCastExpr &parent);
@@ -16937,12 +18564,22 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXDynamicCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DYNAMIC_CAST_EXPR;
   }
 
   static CXXDynamicCastExprContainingStmtRange containing(const Decl &decl);
   static CXXDynamicCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXDynamicCastExpr> from(const TokenContext &c);
   static std::optional<CXXDynamicCastExpr> from(const CXXNamedCastExpr &parent);
@@ -17030,12 +18667,22 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXConstCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CONST_CAST_EXPR;
   }
 
   static CXXConstCastExprContainingStmtRange containing(const Decl &decl);
   static CXXConstCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXConstCastExpr> from(const TokenContext &c);
   static std::optional<CXXConstCastExpr> from(const CXXNamedCastExpr &parent);
@@ -17122,12 +18769,22 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXAddrspaceCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_ADDRSPACE_CAST_EXPR;
   }
 
   static CXXAddrspaceCastExprContainingStmtRange containing(const Decl &decl);
   static CXXAddrspaceCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXAddrspaceCastExpr> from(const TokenContext &c);
   static std::optional<CXXAddrspaceCastExpr> from(const CXXNamedCastExpr &parent);
@@ -17214,12 +18871,22 @@ class CXXStaticCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXStaticCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_STATIC_CAST_EXPR;
   }
 
   static CXXStaticCastExprContainingStmtRange containing(const Decl &decl);
   static CXXStaticCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXStaticCastExpr> from(const TokenContext &c);
   static std::optional<CXXStaticCastExpr> from(const CXXNamedCastExpr &parent);
@@ -17306,12 +18973,22 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXReinterpretCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_REINTERPRET_CAST_EXPR;
   }
 
   static CXXReinterpretCastExprContainingStmtRange containing(const Decl &decl);
   static CXXReinterpretCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXReinterpretCastExpr> from(const TokenContext &c);
   static std::optional<CXXReinterpretCastExpr> from(const CXXNamedCastExpr &parent);
@@ -17397,12 +19074,22 @@ class CXXFunctionalCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXFunctionalCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FUNCTIONAL_CAST_EXPR;
   }
 
   static CXXFunctionalCastExprContainingStmtRange containing(const Decl &decl);
   static CXXFunctionalCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXFunctionalCastExpr> from(const TokenContext &c);
   static std::optional<CXXFunctionalCastExpr> from(const ExplicitCastExpr &parent);
@@ -17481,12 +19168,22 @@ class CStyleCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CStyleCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::C_STYLE_CAST_EXPR;
   }
 
   static CStyleCastExprContainingStmtRange containing(const Decl &decl);
   static CStyleCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CStyleCastExpr> from(const TokenContext &c);
   static std::optional<CStyleCastExpr> from(const ExplicitCastExpr &parent);
@@ -17564,12 +19261,22 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BuiltinBitCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BUILTIN_BIT_CAST_EXPR;
   }
 
   static BuiltinBitCastExprContainingStmtRange containing(const Decl &decl);
   static BuiltinBitCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BuiltinBitCastExpr> from(const TokenContext &c);
   static std::optional<BuiltinBitCastExpr> from(const ExplicitCastExpr &parent);
@@ -17645,12 +19352,22 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCBridgedCastExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;
   }
 
   static ObjCBridgedCastExprContainingStmtRange containing(const Decl &decl);
   static ObjCBridgedCastExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCBridgedCastExpr> from(const TokenContext &c);
   static std::optional<ObjCBridgedCastExpr> from(const ExplicitCastExpr &parent);
@@ -17728,12 +19445,22 @@ class CallExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CallExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CALL_EXPR;
   }
 
   static CallExprContainingStmtRange containing(const Decl &decl);
   static CallExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CallExpr> from(const TokenContext &c);
   static std::optional<CallExpr> from(const Expr &parent);
@@ -17801,12 +19528,22 @@ class CXXOperatorCallExpr : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXOperatorCallExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_OPERATOR_CALL_EXPR;
   }
 
   static CXXOperatorCallExprContainingStmtRange containing(const Decl &decl);
   static CXXOperatorCallExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXOperatorCallExpr> from(const TokenContext &c);
   static std::optional<CXXOperatorCallExpr> from(const CallExpr &parent);
@@ -17876,12 +19613,22 @@ class CXXMemberCallExpr : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXMemberCallExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_MEMBER_CALL_EXPR;
   }
 
   static CXXMemberCallExprContainingStmtRange containing(const Decl &decl);
   static CXXMemberCallExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXMemberCallExpr> from(const TokenContext &c);
   static std::optional<CXXMemberCallExpr> from(const CallExpr &parent);
@@ -17950,12 +19697,22 @@ class CUDAKernelCallExpr : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDAKernelCallExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CUDA_KERNEL_CALL_EXPR;
   }
 
   static CUDAKernelCallExprContainingStmtRange containing(const Decl &decl);
   static CUDAKernelCallExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CUDAKernelCallExpr> from(const TokenContext &c);
   static std::optional<CUDAKernelCallExpr> from(const CallExpr &parent);
@@ -18021,12 +19778,22 @@ class UserDefinedLiteral : public CallExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UserDefinedLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::USER_DEFINED_LITERAL;
   }
 
   static UserDefinedLiteralContainingStmtRange containing(const Decl &decl);
   static UserDefinedLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UserDefinedLiteral> from(const TokenContext &c);
   static std::optional<UserDefinedLiteral> from(const CallExpr &parent);
@@ -18093,12 +19860,22 @@ class CXXUuidofExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXUuidofExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UUIDOF_EXPR;
   }
 
   static CXXUuidofExprContainingStmtRange containing(const Decl &decl);
   static CXXUuidofExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXUuidofExpr> from(const TokenContext &c);
   static std::optional<CXXUuidofExpr> from(const Expr &parent);
@@ -18157,12 +19934,22 @@ class CXXUnresolvedConstructExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXUnresolvedConstructExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;
   }
 
   static CXXUnresolvedConstructExprContainingStmtRange containing(const Decl &decl);
   static CXXUnresolvedConstructExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXUnresolvedConstructExpr> from(const TokenContext &c);
   static std::optional<CXXUnresolvedConstructExpr> from(const Expr &parent);
@@ -18221,12 +20008,22 @@ class CXXTypeidExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXTypeidExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TYPEID_EXPR;
   }
 
   static CXXTypeidExprContainingStmtRange containing(const Decl &decl);
   static CXXTypeidExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXTypeidExpr> from(const TokenContext &c);
   static std::optional<CXXTypeidExpr> from(const Expr &parent);
@@ -18286,12 +20083,22 @@ class CXXThrowExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXThrowExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_THROW_EXPR;
   }
 
   static CXXThrowExprContainingStmtRange containing(const Decl &decl);
   static CXXThrowExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXThrowExpr> from(const TokenContext &c);
   static std::optional<CXXThrowExpr> from(const Expr &parent);
@@ -18348,12 +20155,22 @@ class CXXThisExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXThisExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_THIS_EXPR;
   }
 
   static CXXThisExprContainingStmtRange containing(const Decl &decl);
   static CXXThisExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXThisExpr> from(const TokenContext &c);
   static std::optional<CXXThisExpr> from(const Expr &parent);
@@ -18409,12 +20226,22 @@ class CXXStdInitializerListExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXStdInitializerListExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;
   }
 
   static CXXStdInitializerListExprContainingStmtRange containing(const Decl &decl);
   static CXXStdInitializerListExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXStdInitializerListExpr> from(const TokenContext &c);
   static std::optional<CXXStdInitializerListExpr> from(const Expr &parent);
@@ -18469,12 +20296,22 @@ class CXXScalarValueInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXScalarValueInitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;
   }
 
   static CXXScalarValueInitExprContainingStmtRange containing(const Decl &decl);
   static CXXScalarValueInitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXScalarValueInitExpr> from(const TokenContext &c);
   static std::optional<CXXScalarValueInitExpr> from(const Expr &parent);
@@ -18529,12 +20366,22 @@ class CXXRewrittenBinaryOperator : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXRewrittenBinaryOperator::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
   }
 
   static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Decl &decl);
   static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXRewrittenBinaryOperator> from(const TokenContext &c);
   static std::optional<CXXRewrittenBinaryOperator> from(const Expr &parent);
@@ -18598,12 +20445,22 @@ class CXXPseudoDestructorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXPseudoDestructorExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR;
   }
 
   static CXXPseudoDestructorExprContainingStmtRange containing(const Decl &decl);
   static CXXPseudoDestructorExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXPseudoDestructorExpr> from(const TokenContext &c);
   static std::optional<CXXPseudoDestructorExpr> from(const Expr &parent);
@@ -18666,12 +20523,22 @@ class CXXNullPtrLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXNullPtrLiteralExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NULL_PTR_LITERAL_EXPR;
   }
 
   static CXXNullPtrLiteralExprContainingStmtRange containing(const Decl &decl);
   static CXXNullPtrLiteralExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXNullPtrLiteralExpr> from(const TokenContext &c);
   static std::optional<CXXNullPtrLiteralExpr> from(const Expr &parent);
@@ -18726,12 +20593,22 @@ class CXXNoexceptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXNoexceptExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NOEXCEPT_EXPR;
   }
 
   static CXXNoexceptExprContainingStmtRange containing(const Decl &decl);
   static CXXNoexceptExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXNoexceptExpr> from(const TokenContext &c);
   static std::optional<CXXNoexceptExpr> from(const Expr &parent);
@@ -18787,12 +20664,22 @@ class CXXNewExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXNewExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NEW_EXPR;
   }
 
   static CXXNewExprContainingStmtRange containing(const Decl &decl);
   static CXXNewExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXNewExpr> from(const TokenContext &c);
   static std::optional<CXXNewExpr> from(const Expr &parent);
@@ -18863,12 +20750,22 @@ class CXXInheritedCtorInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXInheritedCtorInitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;
   }
 
   static CXXInheritedCtorInitExprContainingStmtRange containing(const Decl &decl);
   static CXXInheritedCtorInitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &c);
   static std::optional<CXXInheritedCtorInitExpr> from(const Expr &parent);
@@ -18927,12 +20824,22 @@ class CXXFoldExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXFoldExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FOLD_EXPR;
   }
 
   static CXXFoldExprContainingStmtRange containing(const Decl &decl);
   static CXXFoldExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXFoldExpr> from(const TokenContext &c);
   static std::optional<CXXFoldExpr> from(const Expr &parent);
@@ -18998,12 +20905,22 @@ class CXXDependentScopeMemberExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXDependentScopeMemberExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;
   }
 
   static CXXDependentScopeMemberExprContainingStmtRange containing(const Decl &decl);
   static CXXDependentScopeMemberExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXDependentScopeMemberExpr> from(const TokenContext &c);
   static std::optional<CXXDependentScopeMemberExpr> from(const Expr &parent);
@@ -19069,12 +20986,22 @@ class CXXDeleteExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXDeleteExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DELETE_EXPR;
   }
 
   static CXXDeleteExprContainingStmtRange containing(const Decl &decl);
   static CXXDeleteExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXDeleteExpr> from(const TokenContext &c);
   static std::optional<CXXDeleteExpr> from(const Expr &parent);
@@ -19135,12 +21062,22 @@ class CXXDefaultInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXDefaultInitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEFAULT_INIT_EXPR;
   }
 
   static CXXDefaultInitExprContainingStmtRange containing(const Decl &decl);
   static CXXDefaultInitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXDefaultInitExpr> from(const TokenContext &c);
   static std::optional<CXXDefaultInitExpr> from(const Expr &parent);
@@ -19197,12 +21134,22 @@ class CXXDefaultArgExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXDefaultArgExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEFAULT_ARG_EXPR;
   }
 
   static CXXDefaultArgExprContainingStmtRange containing(const Decl &decl);
   static CXXDefaultArgExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXDefaultArgExpr> from(const TokenContext &c);
   static std::optional<CXXDefaultArgExpr> from(const Expr &parent);
@@ -19259,12 +21206,22 @@ class CXXConstructExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXConstructExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CONSTRUCT_EXPR;
   }
 
   static CXXConstructExprContainingStmtRange containing(const Decl &decl);
   static CXXConstructExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXConstructExpr> from(const TokenContext &c);
   static std::optional<CXXConstructExpr> from(const Expr &parent);
@@ -19329,12 +21286,22 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXTemporaryObjectExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;
   }
 
   static CXXTemporaryObjectExprContainingStmtRange containing(const Decl &decl);
   static CXXTemporaryObjectExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXTemporaryObjectExpr> from(const TokenContext &c);
   static std::optional<CXXTemporaryObjectExpr> from(const CXXConstructExpr &parent);
@@ -19398,12 +21365,22 @@ class CXXBoolLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXBoolLiteralExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_BOOL_LITERAL_EXPR;
   }
 
   static CXXBoolLiteralExprContainingStmtRange containing(const Decl &decl);
   static CXXBoolLiteralExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXBoolLiteralExpr> from(const TokenContext &c);
   static std::optional<CXXBoolLiteralExpr> from(const Expr &parent);
@@ -19459,12 +21436,22 @@ class CXXBindTemporaryExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXBindTemporaryExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_BIND_TEMPORARY_EXPR;
   }
 
   static CXXBindTemporaryExprContainingStmtRange containing(const Decl &decl);
   static CXXBindTemporaryExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXBindTemporaryExpr> from(const TokenContext &c);
   static std::optional<CXXBindTemporaryExpr> from(const Expr &parent);
@@ -19519,12 +21506,22 @@ class BlockExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BlockExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BLOCK_EXPR;
   }
 
   static BlockExprContainingStmtRange containing(const Decl &decl);
   static BlockExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BlockExpr> from(const TokenContext &c);
   static std::optional<BlockExpr> from(const Expr &parent);
@@ -19582,12 +21579,22 @@ class BinaryOperator : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BinaryOperator::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_OPERATOR;
   }
 
   static BinaryOperatorContainingStmtRange containing(const Decl &decl);
   static BinaryOperatorContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BinaryOperator> from(const TokenContext &c);
   static std::optional<BinaryOperator> from(const Expr &parent);
@@ -19661,12 +21668,22 @@ class CompoundAssignOperator : public BinaryOperator {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CompoundAssignOperator::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_ASSIGN_OPERATOR;
   }
 
   static CompoundAssignOperatorContainingStmtRange containing(const Decl &decl);
   static CompoundAssignOperatorContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CompoundAssignOperator> from(const TokenContext &c);
   static std::optional<CompoundAssignOperator> from(const BinaryOperator &parent);
@@ -19732,12 +21749,22 @@ class AtomicExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AtomicExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATOMIC_EXPR;
   }
 
   static AtomicExprContainingStmtRange containing(const Decl &decl);
   static AtomicExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<AtomicExpr> from(const TokenContext &c);
   static std::optional<AtomicExpr> from(const Expr &parent);
@@ -19806,12 +21833,22 @@ class AsTypeExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AsTypeExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::AS_TYPE_EXPR;
   }
 
   static AsTypeExprContainingStmtRange containing(const Decl &decl);
   static AsTypeExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<AsTypeExpr> from(const TokenContext &c);
   static std::optional<AsTypeExpr> from(const Expr &parent);
@@ -19868,12 +21905,22 @@ class ArrayTypeTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArrayTypeTraitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
   }
 
   static ArrayTypeTraitExprContainingStmtRange containing(const Decl &decl);
   static ArrayTypeTraitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ArrayTypeTraitExpr> from(const TokenContext &c);
   static std::optional<ArrayTypeTraitExpr> from(const Expr &parent);
@@ -19930,12 +21977,22 @@ class ArraySubscriptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArraySubscriptExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_SUBSCRIPT_EXPR;
   }
 
   static ArraySubscriptExprContainingStmtRange containing(const Decl &decl);
   static ArraySubscriptExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ArraySubscriptExpr> from(const TokenContext &c);
   static std::optional<ArraySubscriptExpr> from(const Expr &parent);
@@ -19994,12 +22051,22 @@ class ArrayInitLoopExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArrayInitLoopExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_INIT_LOOP_EXPR;
   }
 
   static ArrayInitLoopExprContainingStmtRange containing(const Decl &decl);
   static ArrayInitLoopExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ArrayInitLoopExpr> from(const TokenContext &c);
   static std::optional<ArrayInitLoopExpr> from(const Expr &parent);
@@ -20055,12 +22122,22 @@ class ArrayInitIndexExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArrayInitIndexExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_INIT_INDEX_EXPR;
   }
 
   static ArrayInitIndexExprContainingStmtRange containing(const Decl &decl);
   static ArrayInitIndexExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ArrayInitIndexExpr> from(const TokenContext &c);
   static std::optional<ArrayInitIndexExpr> from(const Expr &parent);
@@ -20114,12 +22191,22 @@ class AddrLabelExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AddrLabelExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ADDR_LABEL_EXPR;
   }
 
   static AddrLabelExprContainingStmtRange containing(const Decl &decl);
   static AddrLabelExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<AddrLabelExpr> from(const TokenContext &c);
   static std::optional<AddrLabelExpr> from(const Expr &parent);
@@ -20176,8 +22263,18 @@ class AbstractConditionalOperator : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AbstractConditionalOperator::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static AbstractConditionalOperatorContainingStmtRange containing(const Decl &decl);
   static AbstractConditionalOperatorContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<AbstractConditionalOperator> from(const TokenContext &c);
   static std::optional<AbstractConditionalOperator> from(const Expr &parent);
@@ -20237,12 +22334,22 @@ class ConditionalOperator : public AbstractConditionalOperator {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConditionalOperator::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONDITIONAL_OPERATOR;
   }
 
   static ConditionalOperatorContainingStmtRange containing(const Decl &decl);
   static ConditionalOperatorContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ConditionalOperator> from(const TokenContext &c);
   static std::optional<ConditionalOperator> from(const AbstractConditionalOperator &parent);
@@ -20309,12 +22416,22 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BinaryConditionalOperator::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;
   }
 
   static BinaryConditionalOperatorContainingStmtRange containing(const Decl &decl);
   static BinaryConditionalOperatorContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BinaryConditionalOperator> from(const TokenContext &c);
   static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
@@ -20380,12 +22497,22 @@ class VAArgExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VAArgExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::VA_ARG_EXPR;
   }
 
   static VAArgExprContainingStmtRange containing(const Decl &decl);
   static VAArgExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<VAArgExpr> from(const TokenContext &c);
   static std::optional<VAArgExpr> from(const Expr &parent);
@@ -20444,12 +22571,22 @@ class UnaryOperator : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnaryOperator::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_OPERATOR;
   }
 
   static UnaryOperatorContainingStmtRange containing(const Decl &decl);
   static UnaryOperatorContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UnaryOperator> from(const TokenContext &c);
   static std::optional<UnaryOperator> from(const Expr &parent);
@@ -20514,12 +22651,22 @@ class UnaryExprOrTypeTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnaryExprOrTypeTraitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
   }
 
   static UnaryExprOrTypeTraitExprContainingStmtRange containing(const Decl &decl);
   static UnaryExprOrTypeTraitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UnaryExprOrTypeTraitExpr> from(const TokenContext &c);
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Expr &parent);
@@ -20580,12 +22727,22 @@ class TypoExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypoExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::TYPO_EXPR;
   }
 
   static TypoExprContainingStmtRange containing(const Decl &decl);
   static TypoExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TypoExpr> from(const TokenContext &c);
   static std::optional<TypoExpr> from(const Expr &parent);
@@ -20639,12 +22796,22 @@ class TypeTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeTraitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::TYPE_TRAIT_EXPR;
   }
 
   static TypeTraitExprContainingStmtRange containing(const Decl &decl);
   static TypeTraitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TypeTraitExpr> from(const TokenContext &c);
   static std::optional<TypeTraitExpr> from(const Expr &parent);
@@ -20701,12 +22868,22 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SubstNonTypeTemplateParmPackExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR;
   }
 
   static SubstNonTypeTemplateParmPackExprContainingStmtRange containing(const Decl &decl);
   static SubstNonTypeTemplateParmPackExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const TokenContext &c);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Expr &parent);
@@ -20762,12 +22939,22 @@ class SubstNonTypeTemplateParmExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SubstNonTypeTemplateParmExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;
   }
 
   static SubstNonTypeTemplateParmExprContainingStmtRange containing(const Decl &decl);
   static SubstNonTypeTemplateParmExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SubstNonTypeTemplateParmExpr> from(const TokenContext &c);
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Expr &parent);
@@ -20826,12 +23013,22 @@ class StringLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : StringLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::STRING_LITERAL;
   }
 
   static StringLiteralContainingStmtRange containing(const Decl &decl);
   static StringLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<StringLiteral> from(const TokenContext &c);
   static std::optional<StringLiteral> from(const Expr &parent);
@@ -20896,12 +23093,22 @@ class StmtExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : StmtExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::STMT_EXPR;
   }
 
   static StmtExprContainingStmtRange containing(const Decl &decl);
   static StmtExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<StmtExpr> from(const TokenContext &c);
   static std::optional<StmtExpr> from(const Expr &parent);
@@ -20958,12 +23165,22 @@ class SourceLocExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SourceLocExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SOURCE_LOC_EXPR;
   }
 
   static SourceLocExprContainingStmtRange containing(const Decl &decl);
   static SourceLocExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SourceLocExpr> from(const TokenContext &c);
   static std::optional<SourceLocExpr> from(const Expr &parent);
@@ -21022,12 +23239,22 @@ class SizeOfPackExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SizeOfPackExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SIZE_OF_PACK_EXPR;
   }
 
   static SizeOfPackExprContainingStmtRange containing(const Decl &decl);
   static SizeOfPackExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SizeOfPackExpr> from(const TokenContext &c);
   static std::optional<SizeOfPackExpr> from(const Expr &parent);
@@ -21088,12 +23315,22 @@ class ShuffleVectorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ShuffleVectorExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SHUFFLE_VECTOR_EXPR;
   }
 
   static ShuffleVectorExprContainingStmtRange containing(const Decl &decl);
   static ShuffleVectorExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ShuffleVectorExpr> from(const TokenContext &c);
   static std::optional<ShuffleVectorExpr> from(const Expr &parent);
@@ -21149,12 +23386,22 @@ class SYCLUniqueStableNameExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SYCLUniqueStableNameExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
   }
 
   static SYCLUniqueStableNameExprContainingStmtRange containing(const Decl &decl);
   static SYCLUniqueStableNameExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SYCLUniqueStableNameExpr> from(const TokenContext &c);
   static std::optional<SYCLUniqueStableNameExpr> from(const Expr &parent);
@@ -21212,12 +23459,22 @@ class RequiresExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RequiresExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::REQUIRES_EXPR;
   }
 
   static RequiresExprContainingStmtRange containing(const Decl &decl);
   static RequiresExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<RequiresExpr> from(const TokenContext &c);
   static std::optional<RequiresExpr> from(const Expr &parent);
@@ -21276,12 +23533,22 @@ class RecoveryExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RecoveryExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::RECOVERY_EXPR;
   }
 
   static RecoveryExprContainingStmtRange containing(const Decl &decl);
   static RecoveryExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<RecoveryExpr> from(const TokenContext &c);
   static std::optional<RecoveryExpr> from(const Expr &parent);
@@ -21336,12 +23603,22 @@ class PseudoObjectExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PseudoObjectExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PSEUDO_OBJECT_EXPR;
   }
 
   static PseudoObjectExprContainingStmtRange containing(const Decl &decl);
   static PseudoObjectExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<PseudoObjectExpr> from(const TokenContext &c);
   static std::optional<PseudoObjectExpr> from(const Expr &parent);
@@ -21399,12 +23676,22 @@ class PredefinedExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PredefinedExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PREDEFINED_EXPR;
   }
 
   static PredefinedExprContainingStmtRange containing(const Decl &decl);
   static PredefinedExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<PredefinedExpr> from(const TokenContext &c);
   static std::optional<PredefinedExpr> from(const Expr &parent);
@@ -21462,12 +23749,22 @@ class ParenListExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ParenListExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PAREN_LIST_EXPR;
   }
 
   static ParenListExprContainingStmtRange containing(const Decl &decl);
   static ParenListExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ParenListExpr> from(const TokenContext &c);
   static std::optional<ParenListExpr> from(const Expr &parent);
@@ -21524,12 +23821,22 @@ class ParenExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ParenExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PAREN_EXPR;
   }
 
   static ParenExprContainingStmtRange containing(const Decl &decl);
   static ParenExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ParenExpr> from(const TokenContext &c);
   static std::optional<ParenExpr> from(const Expr &parent);
@@ -21586,12 +23893,22 @@ class PackExpansionExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PackExpansionExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PACK_EXPANSION_EXPR;
   }
 
   static PackExpansionExprContainingStmtRange containing(const Decl &decl);
   static PackExpansionExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<PackExpansionExpr> from(const TokenContext &c);
   static std::optional<PackExpansionExpr> from(const Expr &parent);
@@ -21648,8 +23965,18 @@ class OverloadExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OverloadExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static OverloadExprContainingStmtRange containing(const Decl &decl);
   static OverloadExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OverloadExpr> from(const TokenContext &c);
   static std::optional<OverloadExpr> from(const Expr &parent);
@@ -21711,12 +24038,22 @@ class UnresolvedMemberExpr : public OverloadExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnresolvedMemberExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_MEMBER_EXPR;
   }
 
   static UnresolvedMemberExprContainingStmtRange containing(const Decl &decl);
   static UnresolvedMemberExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UnresolvedMemberExpr> from(const TokenContext &c);
   static std::optional<UnresolvedMemberExpr> from(const OverloadExpr &parent);
@@ -21788,12 +24125,22 @@ class UnresolvedLookupExpr : public OverloadExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnresolvedLookupExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_LOOKUP_EXPR;
   }
 
   static UnresolvedLookupExprContainingStmtRange containing(const Decl &decl);
   static UnresolvedLookupExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UnresolvedLookupExpr> from(const TokenContext &c);
   static std::optional<UnresolvedLookupExpr> from(const OverloadExpr &parent);
@@ -21859,12 +24206,22 @@ class OpaqueValueExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpaqueValueExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OPAQUE_VALUE_EXPR;
   }
 
   static OpaqueValueExprContainingStmtRange containing(const Decl &decl);
   static OpaqueValueExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OpaqueValueExpr> from(const TokenContext &c);
   static std::optional<OpaqueValueExpr> from(const Expr &parent);
@@ -21921,12 +24278,22 @@ class OffsetOfExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OffsetOfExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OFFSET_OF_EXPR;
   }
 
   static OffsetOfExprContainingStmtRange containing(const Decl &decl);
   static OffsetOfExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OffsetOfExpr> from(const TokenContext &c);
   static std::optional<OffsetOfExpr> from(const Expr &parent);
@@ -21982,12 +24349,22 @@ class ObjCSubscriptRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCSubscriptRefExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;
   }
 
   static ObjCSubscriptRefExprContainingStmtRange containing(const Decl &decl);
   static ObjCSubscriptRefExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCSubscriptRefExpr> from(const TokenContext &c);
   static std::optional<ObjCSubscriptRefExpr> from(const Expr &parent);
@@ -22046,12 +24423,22 @@ class ObjCStringLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCStringLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_STRING_LITERAL;
   }
 
   static ObjCStringLiteralContainingStmtRange containing(const Decl &decl);
   static ObjCStringLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCStringLiteral> from(const TokenContext &c);
   static std::optional<ObjCStringLiteral> from(const Expr &parent);
@@ -22107,12 +24494,22 @@ class ObjCSelectorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCSelectorExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_SELECTOR_EXPR;
   }
 
   static ObjCSelectorExprContainingStmtRange containing(const Decl &decl);
   static ObjCSelectorExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCSelectorExpr> from(const TokenContext &c);
   static std::optional<ObjCSelectorExpr> from(const Expr &parent);
@@ -22168,12 +24565,22 @@ class ObjCProtocolExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCProtocolExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_PROTOCOL_EXPR;
   }
 
   static ObjCProtocolExprContainingStmtRange containing(const Decl &decl);
   static ObjCProtocolExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCProtocolExpr> from(const TokenContext &c);
   static std::optional<ObjCProtocolExpr> from(const Expr &parent);
@@ -22231,12 +24638,22 @@ class ObjCPropertyRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCPropertyRefExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_PROPERTY_REF_EXPR;
   }
 
   static ObjCPropertyRefExprContainingStmtRange containing(const Decl &decl);
   static ObjCPropertyRefExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCPropertyRefExpr> from(const TokenContext &c);
   static std::optional<ObjCPropertyRefExpr> from(const Expr &parent);
@@ -22306,12 +24723,22 @@ class ObjCMessageExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCMessageExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_MESSAGE_EXPR;
   }
 
   static ObjCMessageExprContainingStmtRange containing(const Decl &decl);
   static ObjCMessageExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCMessageExpr> from(const TokenContext &c);
   static std::optional<ObjCMessageExpr> from(const Expr &parent);
@@ -22386,12 +24813,22 @@ class ObjCIvarRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCIvarRefExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_IVAR_REF_EXPR;
   }
 
   static ObjCIvarRefExprContainingStmtRange containing(const Decl &decl);
   static ObjCIvarRefExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCIvarRefExpr> from(const TokenContext &c);
   static std::optional<ObjCIvarRefExpr> from(const Expr &parent);
@@ -22451,12 +24888,22 @@ class ObjCIsaExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCIsaExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ISA_EXPR;
   }
 
   static ObjCIsaExprContainingStmtRange containing(const Decl &decl);
   static ObjCIsaExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCIsaExpr> from(const TokenContext &c);
   static std::optional<ObjCIsaExpr> from(const Expr &parent);
@@ -22515,12 +24962,22 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCIndirectCopyRestoreExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;
   }
 
   static ObjCIndirectCopyRestoreExprContainingStmtRange containing(const Decl &decl);
   static ObjCIndirectCopyRestoreExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const TokenContext &c);
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const Expr &parent);
@@ -22576,12 +25033,22 @@ class ObjCEncodeExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCEncodeExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ENCODE_EXPR;
   }
 
   static ObjCEncodeExprContainingStmtRange containing(const Decl &decl);
   static ObjCEncodeExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCEncodeExpr> from(const TokenContext &c);
   static std::optional<ObjCEncodeExpr> from(const Expr &parent);
@@ -22638,12 +25105,22 @@ class ObjCDictionaryLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCDictionaryLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_DICTIONARY_LITERAL;
   }
 
   static ObjCDictionaryLiteralContainingStmtRange containing(const Decl &decl);
   static ObjCDictionaryLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCDictionaryLiteral> from(const TokenContext &c);
   static std::optional<ObjCDictionaryLiteral> from(const Expr &parent);
@@ -22698,12 +25175,22 @@ class ObjCBoxedExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCBoxedExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BOXED_EXPR;
   }
 
   static ObjCBoxedExprContainingStmtRange containing(const Decl &decl);
   static ObjCBoxedExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCBoxedExpr> from(const TokenContext &c);
   static std::optional<ObjCBoxedExpr> from(const Expr &parent);
@@ -22761,12 +25248,22 @@ class ObjCBoolLiteralExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCBoolLiteralExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
   }
 
   static ObjCBoolLiteralExprContainingStmtRange containing(const Decl &decl);
   static ObjCBoolLiteralExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCBoolLiteralExpr> from(const TokenContext &c);
   static std::optional<ObjCBoolLiteralExpr> from(const Expr &parent);
@@ -22822,12 +25319,22 @@ class ObjCAvailabilityCheckExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAvailabilityCheckExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR;
   }
 
   static ObjCAvailabilityCheckExprContainingStmtRange containing(const Decl &decl);
   static ObjCAvailabilityCheckExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAvailabilityCheckExpr> from(const TokenContext &c);
   static std::optional<ObjCAvailabilityCheckExpr> from(const Expr &parent);
@@ -22882,12 +25389,22 @@ class ObjCArrayLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCArrayLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ARRAY_LITERAL;
   }
 
   static ObjCArrayLiteralContainingStmtRange containing(const Decl &decl);
   static ObjCArrayLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCArrayLiteral> from(const TokenContext &c);
   static std::optional<ObjCArrayLiteral> from(const Expr &parent);
@@ -22943,12 +25460,22 @@ class OMPIteratorExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPIteratorExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ITERATOR_EXPR;
   }
 
   static OMPIteratorExprContainingStmtRange containing(const Decl &decl);
   static OMPIteratorExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPIteratorExpr> from(const TokenContext &c);
   static std::optional<OMPIteratorExpr> from(const Expr &parent);
@@ -23005,12 +25532,22 @@ class OMPArrayShapingExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPArrayShapingExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ARRAY_SHAPING_EXPR;
   }
 
   static OMPArrayShapingExprContainingStmtRange containing(const Decl &decl);
   static OMPArrayShapingExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPArrayShapingExpr> from(const TokenContext &c);
   static std::optional<OMPArrayShapingExpr> from(const Expr &parent);
@@ -23068,12 +25605,22 @@ class OMPArraySectionExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPArraySectionExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ARRAY_SECTION_EXPR;
   }
 
   static OMPArraySectionExprContainingStmtRange containing(const Decl &decl);
   static OMPArraySectionExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPArraySectionExpr> from(const TokenContext &c);
   static std::optional<OMPArraySectionExpr> from(const Expr &parent);
@@ -23134,12 +25681,22 @@ class NoInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoInitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::NO_INIT_EXPR;
   }
 
   static NoInitExprContainingStmtRange containing(const Decl &decl);
   static NoInitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<NoInitExpr> from(const TokenContext &c);
   static std::optional<NoInitExpr> from(const Expr &parent);
@@ -23193,12 +25750,22 @@ class MemberExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MemberExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MEMBER_EXPR;
   }
 
   static MemberExprContainingStmtRange containing(const Decl &decl);
   static MemberExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MemberExpr> from(const TokenContext &c);
   static std::optional<MemberExpr> from(const Expr &parent);
@@ -23266,12 +25833,22 @@ class MatrixSubscriptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MatrixSubscriptExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MATRIX_SUBSCRIPT_EXPR;
   }
 
   static MatrixSubscriptExprContainingStmtRange containing(const Decl &decl);
   static MatrixSubscriptExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MatrixSubscriptExpr> from(const TokenContext &c);
   static std::optional<MatrixSubscriptExpr> from(const Expr &parent);
@@ -23330,12 +25907,22 @@ class MaterializeTemporaryExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MaterializeTemporaryExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MATERIALIZE_TEMPORARY_EXPR;
   }
 
   static MaterializeTemporaryExprContainingStmtRange containing(const Decl &decl);
   static MaterializeTemporaryExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MaterializeTemporaryExpr> from(const TokenContext &c);
   static std::optional<MaterializeTemporaryExpr> from(const Expr &parent);
@@ -23395,12 +25982,22 @@ class MSPropertySubscriptExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSPropertySubscriptExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
   }
 
   static MSPropertySubscriptExprContainingStmtRange containing(const Decl &decl);
   static MSPropertySubscriptExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MSPropertySubscriptExpr> from(const TokenContext &c);
   static std::optional<MSPropertySubscriptExpr> from(const Expr &parent);
@@ -23457,12 +26054,22 @@ class MSPropertyRefExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSPropertyRefExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_REF_EXPR;
   }
 
   static MSPropertyRefExprContainingStmtRange containing(const Decl &decl);
   static MSPropertyRefExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MSPropertyRefExpr> from(const TokenContext &c);
   static std::optional<MSPropertyRefExpr> from(const Expr &parent);
@@ -23521,12 +26128,22 @@ class LambdaExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LambdaExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LAMBDA_EXPR;
   }
 
   static LambdaExprContainingStmtRange containing(const Decl &decl);
   static LambdaExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<LambdaExpr> from(const TokenContext &c);
   static std::optional<LambdaExpr> from(const Expr &parent);
@@ -23594,12 +26211,22 @@ class IntegerLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IntegerLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INTEGER_LITERAL;
   }
 
   static IntegerLiteralContainingStmtRange containing(const Decl &decl);
   static IntegerLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<IntegerLiteral> from(const TokenContext &c);
   static std::optional<IntegerLiteral> from(const Expr &parent);
@@ -23654,12 +26281,22 @@ class InitListExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : InitListExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;
   }
 
   static InitListExprContainingStmtRange containing(const Decl &decl);
   static InitListExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<InitListExpr> from(const TokenContext &c);
   static std::optional<InitListExpr> from(const Expr &parent);
@@ -23727,12 +26364,22 @@ class ImplicitValueInitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ImplicitValueInitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IMPLICIT_VALUE_INIT_EXPR;
   }
 
   static ImplicitValueInitExprContainingStmtRange containing(const Decl &decl);
   static ImplicitValueInitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ImplicitValueInitExpr> from(const TokenContext &c);
   static std::optional<ImplicitValueInitExpr> from(const Expr &parent);
@@ -23786,12 +26433,22 @@ class ImaginaryLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ImaginaryLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IMAGINARY_LITERAL;
   }
 
   static ImaginaryLiteralContainingStmtRange containing(const Decl &decl);
   static ImaginaryLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ImaginaryLiteral> from(const TokenContext &c);
   static std::optional<ImaginaryLiteral> from(const Expr &parent);
@@ -23846,12 +26503,22 @@ class GenericSelectionExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : GenericSelectionExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GENERIC_SELECTION_EXPR;
   }
 
   static GenericSelectionExprContainingStmtRange containing(const Decl &decl);
   static GenericSelectionExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<GenericSelectionExpr> from(const TokenContext &c);
   static std::optional<GenericSelectionExpr> from(const Expr &parent);
@@ -23912,12 +26579,22 @@ class GNUNullExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : GNUNullExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GNU_NULL_EXPR;
   }
 
   static GNUNullExprContainingStmtRange containing(const Decl &decl);
   static GNUNullExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<GNUNullExpr> from(const TokenContext &c);
   static std::optional<GNUNullExpr> from(const Expr &parent);
@@ -23972,12 +26649,22 @@ class FunctionParmPackExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FunctionParmPackExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FUNCTION_PARM_PACK_EXPR;
   }
 
   static FunctionParmPackExprContainingStmtRange containing(const Decl &decl);
   static FunctionParmPackExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FunctionParmPackExpr> from(const TokenContext &c);
   static std::optional<FunctionParmPackExpr> from(const Expr &parent);
@@ -24034,8 +26721,18 @@ class FullExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FullExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static FullExprContainingStmtRange containing(const Decl &decl);
   static FullExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FullExpr> from(const TokenContext &c);
   static std::optional<FullExpr> from(const Expr &parent);
@@ -24091,12 +26788,22 @@ class ExprWithCleanups : public FullExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExprWithCleanups::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXPR_WITH_CLEANUPS;
   }
 
   static ExprWithCleanupsContainingStmtRange containing(const Decl &decl);
   static ExprWithCleanupsContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ExprWithCleanups> from(const TokenContext &c);
   static std::optional<ExprWithCleanups> from(const FullExpr &parent);
@@ -24162,12 +26869,22 @@ class ConstantExpr : public FullExpr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConstantExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONSTANT_EXPR;
   }
 
   static ConstantExprContainingStmtRange containing(const Decl &decl);
   static ConstantExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ConstantExpr> from(const TokenContext &c);
   static std::optional<ConstantExpr> from(const FullExpr &parent);
@@ -24234,12 +26951,22 @@ class FloatingLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FloatingLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FLOATING_LITERAL;
   }
 
   static FloatingLiteralContainingStmtRange containing(const Decl &decl);
   static FloatingLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FloatingLiteral> from(const TokenContext &c);
   static std::optional<FloatingLiteral> from(const Expr &parent);
@@ -24295,12 +27022,22 @@ class FixedPointLiteral : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FixedPointLiteral::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FIXED_POINT_LITERAL;
   }
 
   static FixedPointLiteralContainingStmtRange containing(const Decl &decl);
   static FixedPointLiteralContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FixedPointLiteral> from(const TokenContext &c);
   static std::optional<FixedPointLiteral> from(const Expr &parent);
@@ -24355,12 +27092,22 @@ class ExtVectorElementExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExtVectorElementExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXT_VECTOR_ELEMENT_EXPR;
   }
 
   static ExtVectorElementExprContainingStmtRange containing(const Decl &decl);
   static ExtVectorElementExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ExtVectorElementExpr> from(const TokenContext &c);
   static std::optional<ExtVectorElementExpr> from(const Expr &parent);
@@ -24418,12 +27165,22 @@ class ExpressionTraitExpr : public Expr {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExpressionTraitExpr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXPRESSION_TRAIT_EXPR;
   }
 
   static ExpressionTraitExprContainingStmtRange containing(const Decl &decl);
   static ExpressionTraitExprContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ExpressionTraitExpr> from(const TokenContext &c);
   static std::optional<ExpressionTraitExpr> from(const Expr &parent);
@@ -24479,12 +27236,22 @@ class AttributedStmt : public ValueStmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AttributedStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATTRIBUTED_STMT;
   }
 
   static AttributedStmtContainingStmtRange containing(const Decl &decl);
   static AttributedStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<AttributedStmt> from(const TokenContext &c);
   static std::optional<AttributedStmt> from(const ValueStmt &parent);
@@ -24528,12 +27295,22 @@ class SwitchStmt : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwitchStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SWITCH_STMT;
   }
 
   static SwitchStmtContainingStmtRange containing(const Decl &decl);
   static SwitchStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SwitchStmt> from(const TokenContext &c);
   static std::optional<SwitchStmt> from(const Stmt &parent);
@@ -24577,8 +27354,18 @@ class SwitchCase : public Stmt {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwitchCase::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static SwitchCaseContainingStmtRange containing(const Decl &decl);
   static SwitchCaseContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<SwitchCase> from(const TokenContext &c);
   static std::optional<SwitchCase> from(const Stmt &parent);
@@ -24615,12 +27402,22 @@ class DefaultStmt : public SwitchCase {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DefaultStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEFAULT_STMT;
   }
 
   static DefaultStmtContainingStmtRange containing(const Decl &decl);
   static DefaultStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DefaultStmt> from(const TokenContext &c);
   static std::optional<DefaultStmt> from(const SwitchCase &parent);
@@ -24664,12 +27461,22 @@ class CaseStmt : public SwitchCase {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CaseStmt::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CASE_STMT;
   }
 
   static CaseStmtContainingStmtRange containing(const Decl &decl);
   static CaseStmtContainingStmtRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CaseStmt> from(const TokenContext &c);
   static std::optional<CaseStmt> from(const SwitchCase &parent);
@@ -24768,8 +27575,18 @@ class Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Decl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static DeclContainingDeclRange containing(const Decl &decl);
   static DeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
@@ -24826,12 +27643,22 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ClassScopeFunctionSpecializationDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
   }
 
   static ClassScopeFunctionSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static ClassScopeFunctionSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
@@ -24865,12 +27692,22 @@ class CapturedDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CapturedDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CAPTURED;
   }
 
   static CapturedDeclContainingDeclRange containing(const Decl &decl);
   static CapturedDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CapturedDecl> from(const TokenContext &c);
   static std::optional<CapturedDecl> from(const Decl &parent);
@@ -24906,12 +27743,22 @@ class BlockDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BlockDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BLOCK;
   }
 
   static BlockDeclContainingDeclRange containing(const Decl &decl);
   static BlockDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BlockDecl> from(const TokenContext &c);
   static std::optional<BlockDecl> from(const Decl &parent);
@@ -24957,12 +27804,22 @@ class AccessSpecDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AccessSpecDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ACCESS_SPEC;
   }
 
   static AccessSpecDeclContainingDeclRange containing(const Decl &decl);
   static AccessSpecDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<AccessSpecDecl> from(const TokenContext &c);
   static std::optional<AccessSpecDecl> from(const Decl &parent);
@@ -24996,8 +27853,18 @@ class OMPDeclarativeDirectiveDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDeclarativeDirectiveDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static OMPDeclarativeDirectiveDeclContainingDeclRange containing(const Decl &decl);
   static OMPDeclarativeDirectiveDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDeclarativeDirectiveDecl> from(const TokenContext &c);
   static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent);
@@ -25030,12 +27897,22 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPThreadPrivateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_THREAD_PRIVATE;
   }
 
   static OMPThreadPrivateDeclContainingDeclRange containing(const Decl &decl);
   static OMPThreadPrivateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPThreadPrivateDecl> from(const TokenContext &c);
   static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
@@ -25079,12 +27956,22 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPRequiresDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_REQUIRES;
   }
 
   static OMPRequiresDeclContainingDeclRange containing(const Decl &decl);
   static OMPRequiresDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPRequiresDecl> from(const TokenContext &c);
   static std::optional<OMPRequiresDecl> from(const OMPDeclarativeDirectiveDecl &parent);
@@ -25127,12 +28014,22 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPAllocateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_ALLOCATE;
   }
 
   static OMPAllocateDeclContainingDeclRange containing(const Decl &decl);
   static OMPAllocateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPAllocateDecl> from(const TokenContext &c);
   static std::optional<OMPAllocateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
@@ -25175,12 +28072,22 @@ class TranslationUnitDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TranslationUnitDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TRANSLATION_UNIT;
   }
 
   static TranslationUnitDeclContainingDeclRange containing(const Decl &decl);
   static TranslationUnitDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TranslationUnitDecl> from(const TokenContext &c);
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
@@ -25213,12 +28120,22 @@ class StaticAssertDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : StaticAssertDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::STATIC_ASSERT;
   }
 
   static StaticAssertDeclContainingDeclRange containing(const Decl &decl);
   static StaticAssertDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<StaticAssertDecl> from(const TokenContext &c);
   static std::optional<StaticAssertDecl> from(const Decl &parent);
@@ -25254,12 +28171,22 @@ class RequiresExprBodyDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RequiresExprBodyDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::REQUIRES_EXPR_BODY;
   }
 
   static RequiresExprBodyDeclContainingDeclRange containing(const Decl &decl);
   static RequiresExprBodyDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<RequiresExprBodyDecl> from(const TokenContext &c);
   static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
@@ -25292,12 +28219,22 @@ class PragmaDetectMismatchDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PragmaDetectMismatchDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_DETECT_MISMATCH;
   }
 
   static PragmaDetectMismatchDeclContainingDeclRange containing(const Decl &decl);
   static PragmaDetectMismatchDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &c);
   static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
@@ -25331,12 +28268,22 @@ class PragmaCommentDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PragmaCommentDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_COMMENT;
   }
 
   static PragmaCommentDeclContainingDeclRange containing(const Decl &decl);
   static PragmaCommentDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<PragmaCommentDecl> from(const TokenContext &c);
   static std::optional<PragmaCommentDecl> from(const Decl &parent);
@@ -25370,12 +28317,22 @@ class ObjCPropertyImplDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCPropertyImplDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY_IMPL;
   }
 
   static ObjCPropertyImplDeclContainingDeclRange containing(const Decl &decl);
   static ObjCPropertyImplDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCPropertyImplDecl> from(const TokenContext &c);
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
@@ -25416,12 +28373,22 @@ class NamedDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NamedDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMED;
   }
 
   static NamedDeclContainingDeclRange containing(const Decl &decl);
   static NamedDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<NamedDecl> from(const TokenContext &c);
   static std::optional<NamedDecl> from(const Decl &parent);
@@ -25468,12 +28435,22 @@ class LabelDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LabelDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LABEL;
   }
 
   static LabelDeclContainingDeclRange containing(const Decl &decl);
   static LabelDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<LabelDecl> from(const TokenContext &c);
   static std::optional<LabelDecl> from(const NamedDecl &parent);
@@ -25521,12 +28498,22 @@ class BaseUsingDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BaseUsingDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BASE_USING;
   }
 
   static BaseUsingDeclContainingDeclRange containing(const Decl &decl);
   static BaseUsingDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BaseUsingDecl> from(const TokenContext &c);
   static std::optional<BaseUsingDecl> from(const NamedDecl &parent);
@@ -25571,12 +28558,22 @@ class UsingEnumDecl : public BaseUsingDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsingEnumDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_ENUM;
   }
 
   static UsingEnumDeclContainingDeclRange containing(const Decl &decl);
   static UsingEnumDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UsingEnumDecl> from(const TokenContext &c);
   static std::optional<UsingEnumDecl> from(const BaseUsingDecl &parent);
@@ -25633,12 +28630,22 @@ class UsingDecl : public BaseUsingDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsingDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING;
   }
 
   static UsingDeclContainingDeclRange containing(const Decl &decl);
   static UsingDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UsingDecl> from(const TokenContext &c);
   static std::optional<UsingDecl> from(const BaseUsingDecl &parent);
@@ -25694,12 +28701,22 @@ class ValueDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ValueDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VALUE;
   }
 
   static ValueDeclContainingDeclRange containing(const Decl &decl);
   static ValueDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ValueDecl> from(const TokenContext &c);
   static std::optional<ValueDecl> from(const NamedDecl &parent);
@@ -25745,12 +28762,22 @@ class UnresolvedUsingValueDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnresolvedUsingValueDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_VALUE;
   }
 
   static UnresolvedUsingValueDeclContainingDeclRange containing(const Decl &decl);
   static UnresolvedUsingValueDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingValueDecl> from(const ValueDecl &parent);
@@ -25808,12 +28835,22 @@ class TemplateParamObjectDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TemplateParamObjectDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_PARAM_OBJECT;
   }
 
   static TemplateParamObjectDeclContainingDeclRange containing(const Decl &decl);
   static TemplateParamObjectDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TemplateParamObjectDecl> from(const TokenContext &c);
   static std::optional<TemplateParamObjectDecl> from(const ValueDecl &parent);
@@ -25867,12 +28904,22 @@ class OMPDeclareReductionDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDeclareReductionDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_REDUCTION;
   }
 
   static OMPDeclareReductionDeclContainingDeclRange containing(const Decl &decl);
   static OMPDeclareReductionDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDeclareReductionDecl> from(const TokenContext &c);
   static std::optional<OMPDeclareReductionDecl> from(const ValueDecl &parent);
@@ -25934,12 +28981,22 @@ class MSGuidDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSGuidDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_GUID;
   }
 
   static MSGuidDeclContainingDeclRange containing(const Decl &decl);
   static MSGuidDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MSGuidDecl> from(const TokenContext &c);
   static std::optional<MSGuidDecl> from(const ValueDecl &parent);
@@ -25993,12 +29050,22 @@ class IndirectFieldDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IndirectFieldDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::INDIRECT_FIELD;
   }
 
   static IndirectFieldDeclContainingDeclRange containing(const Decl &decl);
   static IndirectFieldDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<IndirectFieldDecl> from(const TokenContext &c);
   static std::optional<IndirectFieldDecl> from(const ValueDecl &parent);
@@ -26055,12 +29122,22 @@ class EnumConstantDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EnumConstantDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM_CONSTANT;
   }
 
   static EnumConstantDeclContainingDeclRange containing(const Decl &decl);
   static EnumConstantDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<EnumConstantDecl> from(const TokenContext &c);
   static std::optional<EnumConstantDecl> from(const ValueDecl &parent);
@@ -26115,12 +29192,22 @@ class DeclaratorDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DeclaratorDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::DECLARATOR;
   }
 
   static DeclaratorDeclContainingDeclRange containing(const Decl &decl);
   static DeclaratorDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DeclaratorDecl> from(const TokenContext &c);
   static std::optional<DeclaratorDecl> from(const ValueDecl &parent);
@@ -26181,12 +29268,22 @@ class VarDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VarDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR;
   }
 
   static VarDeclContainingDeclRange containing(const Decl &decl);
   static VarDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<VarDecl> from(const TokenContext &c);
   static std::optional<VarDecl> from(const DeclaratorDecl &parent);
@@ -26274,7 +29371,7 @@ class VarDecl : public DeclaratorDecl {
   bool is_previous_declaration_in_same_block_scope(void) const;
   bool is_static_data_member(void) const;
   bool is_static_local(void) const;
-  bool is_this_declaration_a_demoted_definition(void) const;
+  bool is_demoted_definition(void) const;
   bool is_usable_in_constant_expressions(void) const;
   bool might_be_usable_in_constant_expressions(void) const;
   QualTypeDestructionKind needs_destruction(void) const;
@@ -26301,12 +29398,22 @@ class ParmVarDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ParmVarDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PARM_VAR;
   }
 
   static ParmVarDeclContainingDeclRange containing(const Decl &decl);
   static ParmVarDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ParmVarDecl> from(const TokenContext &c);
   static std::optional<ParmVarDecl> from(const VarDecl &parent);
@@ -26394,12 +29501,22 @@ class OMPCapturedExprDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPCapturedExprDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_CAPTURED_EXPR;
   }
 
   static OMPCapturedExprDeclContainingDeclRange containing(const Decl &decl);
   static OMPCapturedExprDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPCapturedExprDecl> from(const TokenContext &c);
   static std::optional<OMPCapturedExprDecl> from(const VarDecl &parent);
@@ -26475,12 +29592,22 @@ class ImplicitParamDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ImplicitParamDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPLICIT_PARAM;
   }
 
   static ImplicitParamDeclContainingDeclRange containing(const Decl &decl);
   static ImplicitParamDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ImplicitParamDecl> from(const TokenContext &c);
   static std::optional<ImplicitParamDecl> from(const VarDecl &parent);
@@ -26557,12 +29684,22 @@ class DecompositionDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DecompositionDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::DECOMPOSITION;
   }
 
   static DecompositionDeclContainingDeclRange containing(const Decl &decl);
   static DecompositionDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<DecompositionDecl> from(const TokenContext &c);
   static std::optional<DecompositionDecl> from(const VarDecl &parent);
@@ -26639,12 +29776,22 @@ class VarTemplateSpecializationDecl : public VarDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VarTemplateSpecializationDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE_SPECIALIZATION;
   }
 
   static VarTemplateSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static VarTemplateSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &c);
   static std::optional<VarTemplateSpecializationDecl> from(const VarDecl &parent);
@@ -26730,12 +29877,22 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VarTemplatePartialSpecializationDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
   }
 
   static VarTemplatePartialSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static VarTemplatePartialSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &c);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarTemplateSpecializationDecl &parent);
@@ -26820,12 +29977,22 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NonTypeTemplateParmDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NON_TYPE_TEMPLATE_PARM;
   }
 
   static NonTypeTemplateParmDeclContainingDeclRange containing(const Decl &decl);
   static NonTypeTemplateParmDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<NonTypeTemplateParmDecl> from(const TokenContext &c);
   static std::optional<NonTypeTemplateParmDecl> from(const DeclaratorDecl &parent);
@@ -26900,12 +30067,22 @@ class MSPropertyDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSPropertyDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_PROPERTY;
   }
 
   static MSPropertyDeclContainingDeclRange containing(const Decl &decl);
   static MSPropertyDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<MSPropertyDecl> from(const TokenContext &c);
   static std::optional<MSPropertyDecl> from(const DeclaratorDecl &parent);
@@ -26972,12 +30149,22 @@ class FunctionDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FunctionDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION;
   }
 
   static FunctionDeclContainingDeclRange containing(const Decl &decl);
   static FunctionDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FunctionDecl> from(const TokenContext &c);
   static std::optional<FunctionDecl> from(const DeclaratorDecl &parent);
@@ -27085,7 +30272,6 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_target_clones_multi_version(void) const;
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
-  bool is_definition(void) const;
   bool is_this_declaration_instantiated_from_a_friend_definition(void) const;
   bool is_trivial(void) const;
   bool is_trivial_for_call(void) const;
@@ -27120,12 +30306,22 @@ class CXXMethodDecl : public FunctionDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXMethodDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_METHOD;
   }
 
   static CXXMethodDeclContainingDeclRange containing(const Decl &decl);
   static CXXMethodDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXMethodDecl> from(const TokenContext &c);
   static std::optional<CXXMethodDecl> from(const FunctionDecl &parent);
@@ -27215,12 +30411,22 @@ class CXXDestructorDecl : public CXXMethodDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXDestructorDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DESTRUCTOR;
   }
 
   static CXXDestructorDeclContainingDeclRange containing(const Decl &decl);
   static CXXDestructorDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXDestructorDecl> from(const TokenContext &c);
   static std::optional<CXXDestructorDecl> from(const CXXMethodDecl &parent);
@@ -27309,12 +30515,22 @@ class CXXConversionDecl : public CXXMethodDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXConversionDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_CONVERSION;
   }
 
   static CXXConversionDeclContainingDeclRange containing(const Decl &decl);
   static CXXConversionDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXConversionDecl> from(const TokenContext &c);
   static std::optional<CXXConversionDecl> from(const CXXMethodDecl &parent);
@@ -27404,12 +30620,22 @@ class CXXConstructorDecl : public CXXMethodDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXConstructorDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_CONSTRUCTOR;
   }
 
   static CXXConstructorDeclContainingDeclRange containing(const Decl &decl);
   static CXXConstructorDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXConstructorDecl> from(const TokenContext &c);
   static std::optional<CXXConstructorDecl> from(const CXXMethodDecl &parent);
@@ -27501,12 +30727,22 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXDeductionGuideDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DEDUCTION_GUIDE;
   }
 
   static CXXDeductionGuideDeclContainingDeclRange containing(const Decl &decl);
   static CXXDeductionGuideDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXDeductionGuideDecl> from(const TokenContext &c);
   static std::optional<CXXDeductionGuideDecl> from(const FunctionDecl &parent);
@@ -27585,12 +30821,22 @@ class FieldDecl : public DeclaratorDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FieldDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FIELD;
   }
 
   static FieldDeclContainingDeclRange containing(const Decl &decl);
   static FieldDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FieldDecl> from(const TokenContext &c);
   static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
@@ -27668,12 +30914,22 @@ class ObjCIvarDecl : public FieldDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCIvarDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IVAR;
   }
 
   static ObjCIvarDeclContainingDeclRange containing(const Decl &decl);
   static ObjCIvarDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCIvarDecl> from(const TokenContext &c);
   static std::optional<ObjCIvarDecl> from(const FieldDecl &parent);
@@ -27754,12 +31010,22 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCAtDefsFieldDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_AT_DEFS_FIELD;
   }
 
   static ObjCAtDefsFieldDeclContainingDeclRange containing(const Decl &decl);
   static ObjCAtDefsFieldDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCAtDefsFieldDecl> from(const TokenContext &c);
   static std::optional<ObjCAtDefsFieldDecl> from(const FieldDecl &parent);
@@ -27833,12 +31099,22 @@ class BindingDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BindingDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BINDING;
   }
 
   static BindingDeclContainingDeclRange containing(const Decl &decl);
   static BindingDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BindingDecl> from(const TokenContext &c);
   static std::optional<BindingDecl> from(const ValueDecl &parent);
@@ -27895,8 +31171,18 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDeclarativeDirectiveValueDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   static OMPDeclarativeDirectiveValueDeclContainingDeclRange containing(const Decl &decl);
   static OMPDeclarativeDirectiveValueDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const TokenContext &c);
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const ValueDecl &parent);
@@ -27951,12 +31237,22 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDeclareMapperDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_MAPPER;
   }
 
   static OMPDeclareMapperDeclContainingDeclRange containing(const Decl &decl);
   static OMPDeclareMapperDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<OMPDeclareMapperDecl> from(const TokenContext &c);
   static std::optional<OMPDeclareMapperDecl> from(const OMPDeclarativeDirectiveValueDecl &parent);
@@ -28021,12 +31317,22 @@ class UsingShadowDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsingShadowDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_SHADOW;
   }
 
   static UsingShadowDeclContainingDeclRange containing(const Decl &decl);
   static UsingShadowDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UsingShadowDecl> from(const TokenContext &c);
   static std::optional<UsingShadowDecl> from(const NamedDecl &parent);
@@ -28073,12 +31379,22 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConstructorUsingShadowDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONSTRUCTOR_USING_SHADOW;
   }
 
   static ConstructorUsingShadowDeclContainingDeclRange containing(const Decl &decl);
   static ConstructorUsingShadowDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ConstructorUsingShadowDecl> from(const TokenContext &c);
   static std::optional<ConstructorUsingShadowDecl> from(const UsingShadowDecl &parent);
@@ -28136,12 +31452,22 @@ class UsingPackDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsingPackDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_PACK;
   }
 
   static UsingPackDeclContainingDeclRange containing(const Decl &decl);
   static UsingPackDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UsingPackDecl> from(const TokenContext &c);
   static std::optional<UsingPackDecl> from(const NamedDecl &parent);
@@ -28186,12 +31512,22 @@ class UsingDirectiveDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsingDirectiveDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_DIRECTIVE;
   }
 
   static UsingDirectiveDeclContainingDeclRange containing(const Decl &decl);
   static UsingDirectiveDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UsingDirectiveDecl> from(const TokenContext &c);
   static std::optional<UsingDirectiveDecl> from(const NamedDecl &parent);
@@ -28238,12 +31574,22 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnresolvedUsingIfExistsDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_IF_EXISTS;
   }
 
   static UnresolvedUsingIfExistsDeclContainingDeclRange containing(const Decl &decl);
   static UnresolvedUsingIfExistsDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UnresolvedUsingIfExistsDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingIfExistsDecl> from(const NamedDecl &parent);
@@ -28286,12 +31632,22 @@ class TypeDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE;
   }
 
   static TypeDeclContainingDeclRange containing(const Decl &decl);
   static TypeDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TypeDecl> from(const TokenContext &c);
   static std::optional<TypeDecl> from(const NamedDecl &parent);
@@ -28336,12 +31692,22 @@ class TemplateTypeParmDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TemplateTypeParmDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_TYPE_PARM;
   }
 
   static TemplateTypeParmDeclContainingDeclRange containing(const Decl &decl);
   static TemplateTypeParmDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TemplateTypeParmDecl> from(const TokenContext &c);
   static std::optional<TemplateTypeParmDecl> from(const TypeDecl &parent);
@@ -28404,12 +31770,22 @@ class TagDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TagDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TAG;
   }
 
   static TagDeclContainingDeclRange containing(const Decl &decl);
   static TagDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TagDecl> from(const TokenContext &c);
   static std::optional<TagDecl> from(const TypeDecl &parent);
@@ -28458,7 +31834,6 @@ class TagDecl : public TypeDecl {
   bool is_free_standing(void) const;
   bool is_interface(void) const;
   bool is_struct(void) const;
-  bool is_definition(void) const;
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;
@@ -28485,12 +31860,22 @@ class RecordDecl : public TagDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RecordDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::RECORD;
   }
 
   static RecordDeclContainingDeclRange containing(const Decl &decl);
   static RecordDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<RecordDecl> from(const TokenContext &c);
   static std::optional<RecordDecl> from(const TagDecl &parent);
@@ -28577,12 +31962,22 @@ class CXXRecordDecl : public RecordDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXXRecordDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_RECORD;
   }
 
   static CXXRecordDeclContainingDeclRange containing(const Decl &decl);
   static CXXRecordDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<CXXRecordDecl> from(const TokenContext &c);
   static std::optional<CXXRecordDecl> from(const RecordDecl &parent);
@@ -28774,12 +32169,22 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ClassTemplateSpecializationDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;
   }
 
   static ClassTemplateSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static ClassTemplateSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassTemplateSpecializationDecl> from(const CXXRecordDecl &parent);
@@ -28877,12 +32282,22 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ClassTemplatePartialSpecializationDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
   }
 
   static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Decl &decl);
   static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const TokenContext &c);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const ClassTemplateSpecializationDecl &parent);
@@ -28977,12 +32392,22 @@ class EnumDecl : public TagDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EnumDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM;
   }
 
   static EnumDeclContainingDeclRange containing(const Decl &decl);
   static EnumDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<EnumDecl> from(const TokenContext &c);
   static std::optional<EnumDecl> from(const TagDecl &parent);
@@ -29061,12 +32486,22 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnresolvedUsingTypenameDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_TYPENAME;
   }
 
   static UnresolvedUsingTypenameDeclContainingDeclRange containing(const Decl &decl);
   static UnresolvedUsingTypenameDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<UnresolvedUsingTypenameDecl> from(const TokenContext &c);
   static std::optional<UnresolvedUsingTypenameDecl> from(const TypeDecl &parent);
@@ -29124,12 +32559,22 @@ class TypedefNameDecl : public TypeDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypedefNameDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPEDEF_NAME;
   }
 
   static TypedefNameDeclContainingDeclRange containing(const Decl &decl);
   static TypedefNameDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TypedefNameDecl> from(const TokenContext &c);
   static std::optional<TypedefNameDecl> from(const TypeDecl &parent);
@@ -29188,12 +32633,22 @@ class TypedefDecl : public TypedefNameDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypedefDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPEDEF;
   }
 
   static TypedefDeclContainingDeclRange containing(const Decl &decl);
   static TypedefDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TypedefDecl> from(const TokenContext &c);
   static std::optional<TypedefDecl> from(const TypedefNameDecl &parent);
@@ -29258,12 +32713,22 @@ class TypeAliasDecl : public TypedefNameDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeAliasDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE_ALIAS;
   }
 
   static TypeAliasDeclContainingDeclRange containing(const Decl &decl);
   static TypeAliasDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TypeAliasDecl> from(const TokenContext &c);
   static std::optional<TypeAliasDecl> from(const TypedefNameDecl &parent);
@@ -29329,12 +32794,22 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCTypeParamDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_TYPE_PARAM;
   }
 
   static ObjCTypeParamDeclContainingDeclRange containing(const Decl &decl);
   static ObjCTypeParamDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCTypeParamDecl> from(const TokenContext &c);
   static std::optional<ObjCTypeParamDecl> from(const TypedefNameDecl &parent);
@@ -29401,12 +32876,22 @@ class TemplateDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE;
   }
 
   static TemplateDeclContainingDeclRange containing(const Decl &decl);
   static TemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TemplateDecl> from(const TokenContext &c);
   static std::optional<TemplateDecl> from(const NamedDecl &parent);
@@ -29450,12 +32935,22 @@ class RedeclarableTemplateDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RedeclarableTemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::REDECLARABLE_TEMPLATE;
   }
 
   static RedeclarableTemplateDeclContainingDeclRange containing(const Decl &decl);
   static RedeclarableTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<RedeclarableTemplateDecl> from(const TokenContext &c);
   static std::optional<RedeclarableTemplateDecl> from(const TemplateDecl &parent);
@@ -29510,12 +33005,22 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FunctionTemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION_TEMPLATE;
   }
 
   static FunctionTemplateDeclContainingDeclRange containing(const Decl &decl);
   static FunctionTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FunctionTemplateDecl> from(const TokenContext &c);
   static std::optional<FunctionTemplateDecl> from(const RedeclarableTemplateDecl &parent);
@@ -29580,12 +33085,22 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ClassTemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE;
   }
 
   static ClassTemplateDeclContainingDeclRange containing(const Decl &decl);
   static ClassTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ClassTemplateDecl> from(const TokenContext &c);
   static std::optional<ClassTemplateDecl> from(const RedeclarableTemplateDecl &parent);
@@ -29650,12 +33165,22 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VarTemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE;
   }
 
   static VarTemplateDeclContainingDeclRange containing(const Decl &decl);
   static VarTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<VarTemplateDecl> from(const TokenContext &c);
   static std::optional<VarTemplateDecl> from(const RedeclarableTemplateDecl &parent);
@@ -29720,12 +33245,22 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeAliasTemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE_ALIAS_TEMPLATE;
   }
 
   static TypeAliasTemplateDeclContainingDeclRange containing(const Decl &decl);
   static TypeAliasTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TypeAliasTemplateDecl> from(const TokenContext &c);
   static std::optional<TypeAliasTemplateDecl> from(const RedeclarableTemplateDecl &parent);
@@ -29791,12 +33326,22 @@ class ConceptDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConceptDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONCEPT;
   }
 
   static ConceptDeclContainingDeclRange containing(const Decl &decl);
   static ConceptDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ConceptDecl> from(const TokenContext &c);
   static std::optional<ConceptDecl> from(const TemplateDecl &parent);
@@ -29852,12 +33397,22 @@ class BuiltinTemplateDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BuiltinTemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BUILTIN_TEMPLATE;
   }
 
   static BuiltinTemplateDeclContainingDeclRange containing(const Decl &decl);
   static BuiltinTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<BuiltinTemplateDecl> from(const TokenContext &c);
   static std::optional<BuiltinTemplateDecl> from(const TemplateDecl &parent);
@@ -29911,12 +33466,22 @@ class TemplateTemplateParmDecl : public TemplateDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TemplateTemplateParmDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_TEMPLATE_PARM;
   }
 
   static TemplateTemplateParmDeclContainingDeclRange containing(const Decl &decl);
   static TemplateTemplateParmDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<TemplateTemplateParmDecl> from(const TokenContext &c);
   static std::optional<TemplateTemplateParmDecl> from(const TemplateDecl &parent);
@@ -29969,12 +33534,22 @@ class ObjCPropertyDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCPropertyDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY;
   }
 
   static ObjCPropertyDeclContainingDeclRange containing(const Decl &decl);
   static ObjCPropertyDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCPropertyDecl> from(const TokenContext &c);
   static std::optional<ObjCPropertyDecl> from(const NamedDecl &parent);
@@ -30035,12 +33610,22 @@ class ObjCMethodDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCMethodDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_METHOD;
   }
 
   static ObjCMethodDeclContainingDeclRange containing(const Decl &decl);
   static ObjCMethodDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCMethodDecl> from(const TokenContext &c);
   static std::optional<ObjCMethodDecl> from(const NamedDecl &parent);
@@ -30089,7 +33674,6 @@ class ObjCMethodDecl : public NamedDecl {
   bool is_property_accessor(void) const;
   bool is_redeclaration(void) const;
   bool is_synthesized_accessor_stub(void) const;
-  bool is_definition(void) const;
   bool is_this_declaration_a_designated_initializer(void) const;
   bool is_variadic(void) const;
   std::vector<ParmVarDecl> parameters(void) const;
@@ -30115,12 +33699,22 @@ class ObjCContainerDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCContainerDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_CONTAINER;
   }
 
   static ObjCContainerDeclContainingDeclRange containing(const Decl &decl);
   static ObjCContainerDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCContainerDecl> from(const TokenContext &c);
   static std::optional<ObjCContainerDecl> from(const NamedDecl &parent);
@@ -30173,12 +33767,22 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCCategoryDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_CATEGORY;
   }
 
   static ObjCCategoryDeclContainingDeclRange containing(const Decl &decl);
   static ObjCCategoryDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCCategoryDecl> from(const TokenContext &c);
   static std::optional<ObjCCategoryDecl> from(const ObjCContainerDecl &parent);
@@ -30242,12 +33846,22 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCProtocolDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROTOCOL;
   }
 
   static ObjCProtocolDeclContainingDeclRange containing(const Decl &decl);
   static ObjCProtocolDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCProtocolDecl> from(const TokenContext &c);
   static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
@@ -30283,7 +33897,6 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;
   bool is_non_runtime_protocol(void) const;
-  bool is_definition(void) const;
   std::vector<Token> protocol_tokens(void) const;
   std::vector<ObjCProtocolDecl> protocols(void) const;
 };
@@ -30307,12 +33920,22 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCInterfaceDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_INTERFACE;
   }
 
   static ObjCInterfaceDeclContainingDeclRange containing(const Decl &decl);
   static ObjCInterfaceDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCInterfaceDecl> from(const TokenContext &c);
   static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
@@ -30359,7 +33982,6 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool is_arc_weakref_unavailable(void) const;
   bool is_implicit_interface_declaration(void) const;
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
-  bool is_definition(void) const;
   std::vector<ObjCIvarDecl> instance_variables(void) const;
   std::vector<ObjCCategoryDecl> known_categories(void) const;
   std::vector<ObjCCategoryDecl> known_extensions(void) const;
@@ -30388,12 +34010,22 @@ class ObjCImplDecl : public ObjCContainerDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCImplDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IMPL;
   }
 
   static ObjCImplDeclContainingDeclRange containing(const Decl &decl);
   static ObjCImplDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCImplDecl> from(const TokenContext &c);
   static std::optional<ObjCImplDecl> from(const ObjCContainerDecl &parent);
@@ -30450,12 +34082,22 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCCategoryImplDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_CATEGORY_IMPL;
   }
 
   static ObjCCategoryImplDeclContainingDeclRange containing(const Decl &decl);
   static ObjCCategoryImplDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCCategoryImplDecl> from(const TokenContext &c);
   static std::optional<ObjCCategoryImplDecl> from(const ObjCImplDecl &parent);
@@ -30522,12 +34164,22 @@ class ObjCImplementationDecl : public ObjCImplDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCImplementationDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IMPLEMENTATION;
   }
 
   static ObjCImplementationDeclContainingDeclRange containing(const Decl &decl);
   static ObjCImplementationDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCImplementationDecl> from(const TokenContext &c);
   static std::optional<ObjCImplementationDecl> from(const ObjCImplDecl &parent);
@@ -30598,12 +34250,22 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCCompatibleAliasDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_COMPATIBLE_ALIAS;
   }
 
   static ObjCCompatibleAliasDeclContainingDeclRange containing(const Decl &decl);
   static ObjCCompatibleAliasDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ObjCCompatibleAliasDecl> from(const TokenContext &c);
   static std::optional<ObjCCompatibleAliasDecl> from(const NamedDecl &parent);
@@ -30647,12 +34309,22 @@ class NamespaceDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NamespaceDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE;
   }
 
   static NamespaceDeclContainingDeclRange containing(const Decl &decl);
   static NamespaceDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<NamespaceDecl> from(const TokenContext &c);
   static std::optional<NamespaceDecl> from(const NamedDecl &parent);
@@ -30696,12 +34368,22 @@ class NamespaceAliasDecl : public NamedDecl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NamespaceAliasDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE_ALIAS;
   }
 
   static NamespaceAliasDeclContainingDeclRange containing(const Decl &decl);
   static NamespaceAliasDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<NamespaceAliasDecl> from(const TokenContext &c);
   static std::optional<NamespaceAliasDecl> from(const NamedDecl &parent);
@@ -30747,12 +34429,22 @@ class LinkageSpecDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LinkageSpecDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LINKAGE_SPEC;
   }
 
   static LinkageSpecDeclContainingDeclRange containing(const Decl &decl);
   static LinkageSpecDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<LinkageSpecDecl> from(const TokenContext &c);
   static std::optional<LinkageSpecDecl> from(const Decl &parent);
@@ -30785,12 +34477,22 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LifetimeExtendedTemporaryDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LIFETIME_EXTENDED_TEMPORARY;
   }
 
   static LifetimeExtendedTemporaryDeclContainingDeclRange containing(const Decl &decl);
   static LifetimeExtendedTemporaryDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<LifetimeExtendedTemporaryDecl> from(const TokenContext &c);
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
@@ -30826,12 +34528,22 @@ class ImportDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ImportDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPORT;
   }
 
   static ImportDeclContainingDeclRange containing(const Decl &decl);
   static ImportDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ImportDecl> from(const TokenContext &c);
   static std::optional<ImportDecl> from(const Decl &parent);
@@ -30864,12 +34576,22 @@ class FriendTemplateDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FriendTemplateDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FRIEND_TEMPLATE;
   }
 
   static FriendTemplateDeclContainingDeclRange containing(const Decl &decl);
   static FriendTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FriendTemplateDecl> from(const TokenContext &c);
   static std::optional<FriendTemplateDecl> from(const Decl &parent);
@@ -30901,12 +34623,22 @@ class FriendDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FriendDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FRIEND;
   }
 
   static FriendDeclContainingDeclRange containing(const Decl &decl);
   static FriendDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FriendDecl> from(const TokenContext &c);
   static std::optional<FriendDecl> from(const Decl &parent);
@@ -30943,12 +34675,22 @@ class FileScopeAsmDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FileScopeAsmDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FILE_SCOPE_ASM;
   }
 
   static FileScopeAsmDeclContainingDeclRange containing(const Decl &decl);
   static FileScopeAsmDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<FileScopeAsmDecl> from(const TokenContext &c);
   static std::optional<FileScopeAsmDecl> from(const Decl &parent);
@@ -30983,12 +34725,22 @@ class ExternCContextDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExternCContextDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXTERN_C_CONTEXT;
   }
 
   static ExternCContextDeclContainingDeclRange containing(const Decl &decl);
   static ExternCContextDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ExternCContextDecl> from(const TokenContext &c);
   static std::optional<ExternCContextDecl> from(const Decl &parent);
@@ -31021,12 +34773,22 @@ class ExportDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExportDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXPORT;
   }
 
   static ExportDeclContainingDeclRange containing(const Decl &decl);
   static ExportDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<ExportDecl> from(const TokenContext &c);
   static std::optional<ExportDecl> from(const Decl &parent);
@@ -31062,12 +34824,22 @@ class EmptyDecl : public Decl {
     return TokenContextIterator(TokenContext::of(tok));
   }
 
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EmptyDecl::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EMPTY;
   }
 
   static EmptyDeclContainingDeclRange containing(const Decl &decl);
   static EmptyDeclContainingDeclRange containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   static std::optional<EmptyDecl> from(const TokenContext &c);
   static std::optional<EmptyDecl> from(const Decl &parent);
