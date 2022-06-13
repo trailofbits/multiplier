@@ -1845,6 +1845,12 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  inline static " << class_name
         << "ContainingTokenRange containing(const Token &tok) {\n"
         << "    return TokenContextIterator(TokenContext::of(tok));\n"
+        << "  }\n\n"
+        << "  inline bool contains(const Token &tok) {\n"
+        << "    for(auto &parent : " << class_name << "::containing(tok)) {\n"
+        << "      if(parent.id() == id()) { return true; }\n"
+        << "    }\n"
+        << "    return false;\n"
         << "  }\n\n";
 
     if (is_decl) {
@@ -1862,7 +1868,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  static " << class_name
           << "ContainingDeclRange containing(const Decl &decl);\n"
           << "  static " << class_name
-          << "ContainingDeclRange containing(const Stmt &stmt);\n\n";
+          << "ContainingDeclRange containing(const Stmt &stmt);\n\n"
+          << "  bool contains(const Decl &decl);\n"
+          << "  bool contains(const Stmt &stmt);\n\n";
 
       lib_cpp_os
           << class_name << "ContainingDeclRange " << class_name
@@ -1872,6 +1880,18 @@ MethodListPtr CodeGenerator::RunOnClass(
           << class_name << "ContainingDeclRange " << class_name
           << "::containing(const Stmt &stmt) {\n"
           << "  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());\n"
+          << "}\n\n"
+          << "bool " << class_name << "::contains(const Decl &decl) {\n"
+          << "  for(auto &parent : " << class_name << "::containing(decl)) {\n"
+          << "    if(parent.id() == id()) { return true; }\n"
+          << "  }\n"
+          << "  return false;\n"
+          << "}\n\n"
+          << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
+          << "  for(auto &parent : " << class_name << "::containing(stmt)) {\n"
+          << "    if(parent.id() == id()) { return true; }\n"
+          << "  }\n"
+          << "  return false;\n"
           << "}\n\n";
 
     } else if (is_stmt) {
@@ -1888,7 +1908,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  static " << class_name
           << "ContainingStmtRange containing(const Decl &decl);\n"
           << "  static " << class_name
-          << "ContainingStmtRange containing(const Stmt &stmt);\n\n";
+          << "ContainingStmtRange containing(const Stmt &stmt);\n\n"
+          << "  bool contains(const Decl &decl);\n"
+          << "  bool contains(const Stmt &stmt);\n\n";
 
       lib_cpp_os
           << class_name << "ContainingStmtRange " << class_name
@@ -1898,6 +1920,18 @@ MethodListPtr CodeGenerator::RunOnClass(
           << class_name << "ContainingStmtRange " << class_name
           << "::containing(const Stmt &stmt) {\n"
           << "  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());\n"
+          << "}\n\n"
+          << "bool " << class_name << "::contains(const Decl &decl) {\n"
+          << "  for(auto &parent : " << class_name << "::containing(decl)) {\n"
+          << "    if(parent.id() == id()) { return true; }\n"
+          << "  }\n"
+          << "  return false;\n"
+          << "}\n\n"
+          << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
+          << "  for(auto &parent : " << class_name << "::containing(stmt)) {\n"
+          << "    if(parent.id() == id()) { return true; }\n"
+          << "  }\n"
+          << "  return false;\n"
           << "}\n\n";
 
     } else if (is_type) {

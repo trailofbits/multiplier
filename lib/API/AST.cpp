@@ -13144,6 +13144,20 @@ StmtContainingStmtRange Stmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool Stmt::contains(const Decl &decl) {
+  for(auto &parent : Stmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool Stmt::contains(const Stmt &stmt) {
+  for(auto &parent : Stmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 Stmt Stmt::ignore_containers(void) const {
   auto self = fragment->NthStmt(offset);
   EntityId id(self.getVal3());
@@ -13186,6 +13200,20 @@ SEHTryStmtContainingStmtRange SEHTryStmt::containing(const Decl &decl) {
 
 SEHTryStmtContainingStmtRange SEHTryStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SEHTryStmt::contains(const Decl &decl) {
+  for(auto &parent : SEHTryStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SEHTryStmt::contains(const Stmt &stmt) {
+  for(auto &parent : SEHTryStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SEHTryStmt> SEHTryStmt::from(const TokenContext &c) {
@@ -13246,6 +13274,20 @@ SEHLeaveStmtContainingStmtRange SEHLeaveStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool SEHLeaveStmt::contains(const Decl &decl) {
+  for(auto &parent : SEHLeaveStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SEHLeaveStmt::contains(const Stmt &stmt) {
+  for(auto &parent : SEHLeaveStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13273,6 +13315,20 @@ SEHFinallyStmtContainingStmtRange SEHFinallyStmt::containing(const Decl &decl) {
 
 SEHFinallyStmtContainingStmtRange SEHFinallyStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SEHFinallyStmt::contains(const Decl &decl) {
+  for(auto &parent : SEHFinallyStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SEHFinallyStmt::contains(const Stmt &stmt) {
+  for(auto &parent : SEHFinallyStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const TokenContext &c) {
@@ -13308,6 +13364,20 @@ SEHExceptStmtContainingStmtRange SEHExceptStmt::containing(const Decl &decl) {
 
 SEHExceptStmtContainingStmtRange SEHExceptStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SEHExceptStmt::contains(const Decl &decl) {
+  for(auto &parent : SEHExceptStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SEHExceptStmt::contains(const Stmt &stmt) {
+  for(auto &parent : SEHExceptStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SEHExceptStmt> SEHExceptStmt::from(const TokenContext &c) {
@@ -13349,6 +13419,20 @@ ReturnStmtContainingStmtRange ReturnStmt::containing(const Decl &decl) {
 
 ReturnStmtContainingStmtRange ReturnStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ReturnStmt::contains(const Decl &decl) {
+  for(auto &parent : ReturnStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ReturnStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ReturnStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ReturnStmt> ReturnStmt::from(const TokenContext &c) {
@@ -13398,6 +13482,20 @@ ObjCForCollectionStmtContainingStmtRange ObjCForCollectionStmt::containing(const
 
 ObjCForCollectionStmtContainingStmtRange ObjCForCollectionStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCForCollectionStmt::contains(const Decl &decl) {
+  for(auto &parent : ObjCForCollectionStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCForCollectionStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCForCollectionStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const TokenContext &c) {
@@ -13456,6 +13554,20 @@ ObjCAutoreleasePoolStmtContainingStmtRange ObjCAutoreleasePoolStmt::containing(c
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCAutoreleasePoolStmt::contains(const Decl &decl) {
+  for(auto &parent : ObjCAutoreleasePoolStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAutoreleasePoolStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAutoreleasePoolStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13489,6 +13601,20 @@ ObjCAtTryStmtContainingStmtRange ObjCAtTryStmt::containing(const Decl &decl) {
 
 ObjCAtTryStmtContainingStmtRange ObjCAtTryStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCAtTryStmt::contains(const Decl &decl) {
+  for(auto &parent : ObjCAtTryStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAtTryStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAtTryStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const TokenContext &c) {
@@ -13548,6 +13674,20 @@ ObjCAtThrowStmtContainingStmtRange ObjCAtThrowStmt::containing(const Stmt &stmt)
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCAtThrowStmt::contains(const Decl &decl) {
+  for(auto &parent : ObjCAtThrowStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAtThrowStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAtThrowStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13581,6 +13721,20 @@ ObjCAtSynchronizedStmtContainingStmtRange ObjCAtSynchronizedStmt::containing(con
 
 ObjCAtSynchronizedStmtContainingStmtRange ObjCAtSynchronizedStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCAtSynchronizedStmt::contains(const Decl &decl) {
+  for(auto &parent : ObjCAtSynchronizedStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAtSynchronizedStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAtSynchronizedStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const TokenContext &c) {
@@ -13624,6 +13778,20 @@ ObjCAtFinallyStmtContainingStmtRange ObjCAtFinallyStmt::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCAtFinallyStmt::contains(const Decl &decl) {
+  for(auto &parent : ObjCAtFinallyStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAtFinallyStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAtFinallyStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13657,6 +13825,20 @@ ObjCAtCatchStmtContainingStmtRange ObjCAtCatchStmt::containing(const Decl &decl)
 
 ObjCAtCatchStmtContainingStmtRange ObjCAtCatchStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCAtCatchStmt::contains(const Decl &decl) {
+  for(auto &parent : ObjCAtCatchStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAtCatchStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAtCatchStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const TokenContext &c) {
@@ -13712,6 +13894,20 @@ OMPExecutableDirectiveContainingStmtRange OMPExecutableDirective::containing(con
 
 OMPExecutableDirectiveContainingStmtRange OMPExecutableDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPExecutableDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPExecutableDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPExecutableDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPExecutableDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const TokenContext &c) {
@@ -13828,6 +14024,20 @@ OMPDispatchDirectiveContainingStmtRange OMPDispatchDirective::containing(const S
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPDispatchDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPDispatchDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDispatchDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDispatchDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13861,6 +14071,20 @@ OMPDepobjDirectiveContainingStmtRange OMPDepobjDirective::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPDepobjDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPDepobjDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDepobjDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDepobjDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPDepobjDirective> OMPDepobjDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13883,6 +14107,20 @@ OMPCriticalDirectiveContainingStmtRange OMPCriticalDirective::containing(const D
 
 OMPCriticalDirectiveContainingStmtRange OMPCriticalDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPCriticalDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPCriticalDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPCriticalDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPCriticalDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPCriticalDirective> OMPCriticalDirective::from(const TokenContext &c) {
@@ -13909,6 +14147,20 @@ OMPCancellationPointDirectiveContainingStmtRange OMPCancellationPointDirective::
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPCancellationPointDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPCancellationPointDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPCancellationPointDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPCancellationPointDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13931,6 +14183,20 @@ OMPCancelDirectiveContainingStmtRange OMPCancelDirective::containing(const Decl 
 
 OMPCancelDirectiveContainingStmtRange OMPCancelDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPCancelDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPCancelDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPCancelDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPCancelDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPCancelDirective> OMPCancelDirective::from(const TokenContext &c) {
@@ -13957,6 +14223,20 @@ OMPBarrierDirectiveContainingStmtRange OMPBarrierDirective::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPBarrierDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPBarrierDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPBarrierDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPBarrierDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPBarrierDirective> OMPBarrierDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -13979,6 +14259,20 @@ OMPAtomicDirectiveContainingStmtRange OMPAtomicDirective::containing(const Decl 
 
 OMPAtomicDirectiveContainingStmtRange OMPAtomicDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPAtomicDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPAtomicDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPAtomicDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPAtomicDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const TokenContext &c) {
@@ -14039,6 +14333,20 @@ OMPTeamsDirectiveContainingStmtRange OMPTeamsDirective::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTeamsDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTeamsDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTeamsDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTeamsDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14061,6 +14369,20 @@ OMPTaskyieldDirectiveContainingStmtRange OMPTaskyieldDirective::containing(const
 
 OMPTaskyieldDirectiveContainingStmtRange OMPTaskyieldDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTaskyieldDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTaskyieldDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTaskyieldDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTaskyieldDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const TokenContext &c) {
@@ -14087,6 +14409,20 @@ OMPTaskwaitDirectiveContainingStmtRange OMPTaskwaitDirective::containing(const S
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTaskwaitDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTaskwaitDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTaskwaitDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14109,6 +14445,20 @@ OMPTaskgroupDirectiveContainingStmtRange OMPTaskgroupDirective::containing(const
 
 OMPTaskgroupDirectiveContainingStmtRange OMPTaskgroupDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTaskgroupDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTaskgroupDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTaskgroupDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTaskgroupDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const TokenContext &c) {
@@ -14141,6 +14491,20 @@ OMPTaskDirectiveContainingStmtRange OMPTaskDirective::containing(const Stmt &stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTaskDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTaskDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTaskDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTaskDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTaskDirective> OMPTaskDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14170,6 +14534,20 @@ OMPTargetUpdateDirectiveContainingStmtRange OMPTargetUpdateDirective::containing
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetUpdateDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetUpdateDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetUpdateDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetUpdateDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetUpdateDirective> OMPTargetUpdateDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14194,6 +14572,20 @@ OMPTargetTeamsDirectiveContainingStmtRange OMPTargetTeamsDirective::containing(c
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetTeamsDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetTeamsDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetTeamsDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetTeamsDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetTeamsDirective> OMPTargetTeamsDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14216,6 +14608,20 @@ OMPTargetParallelDirectiveContainingStmtRange OMPTargetParallelDirective::contai
 
 OMPTargetParallelDirectiveContainingStmtRange OMPTargetParallelDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTargetParallelDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetParallelDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetParallelDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetParallelDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const TokenContext &c) {
@@ -14253,6 +14659,20 @@ OMPTargetExitDataDirectiveContainingStmtRange OMPTargetExitDataDirective::contai
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetExitDataDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetExitDataDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetExitDataDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetExitDataDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14275,6 +14695,20 @@ OMPTargetEnterDataDirectiveContainingStmtRange OMPTargetEnterDataDirective::cont
 
 OMPTargetEnterDataDirectiveContainingStmtRange OMPTargetEnterDataDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTargetEnterDataDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetEnterDataDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetEnterDataDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetEnterDataDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const TokenContext &c) {
@@ -14301,6 +14735,20 @@ OMPTargetDirectiveContainingStmtRange OMPTargetDirective::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetDirective> OMPTargetDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14323,6 +14771,20 @@ OMPTargetDataDirectiveContainingStmtRange OMPTargetDataDirective::containing(con
 
 OMPTargetDataDirectiveContainingStmtRange OMPTargetDataDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTargetDataDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetDataDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetDataDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetDataDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTargetDataDirective> OMPTargetDataDirective::from(const TokenContext &c) {
@@ -14349,6 +14811,20 @@ OMPSingleDirectiveContainingStmtRange OMPSingleDirective::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPSingleDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPSingleDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPSingleDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPSingleDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPSingleDirective> OMPSingleDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14371,6 +14847,20 @@ OMPSectionsDirectiveContainingStmtRange OMPSectionsDirective::containing(const D
 
 OMPSectionsDirectiveContainingStmtRange OMPSectionsDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPSectionsDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPSectionsDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPSectionsDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPSectionsDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const TokenContext &c) {
@@ -14408,6 +14898,20 @@ OMPSectionDirectiveContainingStmtRange OMPSectionDirective::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPSectionDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPSectionDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPSectionDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPSectionDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPSectionDirective> OMPSectionDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14437,6 +14941,20 @@ OMPScanDirectiveContainingStmtRange OMPScanDirective::containing(const Stmt &stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPScanDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPScanDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPScanDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPScanDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPScanDirective> OMPScanDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14459,6 +14977,20 @@ OMPParallelSectionsDirectiveContainingStmtRange OMPParallelSectionsDirective::co
 
 OMPParallelSectionsDirectiveContainingStmtRange OMPParallelSectionsDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPParallelSectionsDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPParallelSectionsDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPParallelSectionsDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPParallelSectionsDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const TokenContext &c) {
@@ -14496,6 +15028,20 @@ OMPParallelMasterDirectiveContainingStmtRange OMPParallelMasterDirective::contai
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPParallelMasterDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPParallelMasterDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPParallelMasterDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPParallelMasterDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14524,6 +15070,20 @@ OMPParallelDirectiveContainingStmtRange OMPParallelDirective::containing(const D
 
 OMPParallelDirectiveContainingStmtRange OMPParallelDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPParallelDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPParallelDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPParallelDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPParallelDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPParallelDirective> OMPParallelDirective::from(const TokenContext &c) {
@@ -14561,6 +15121,20 @@ OMPOrderedDirectiveContainingStmtRange OMPOrderedDirective::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPOrderedDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPOrderedDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPOrderedDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPOrderedDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPOrderedDirective> OMPOrderedDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14583,6 +15157,20 @@ OMPMetaDirectiveContainingStmtRange OMPMetaDirective::containing(const Decl &dec
 
 OMPMetaDirectiveContainingStmtRange OMPMetaDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPMetaDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPMetaDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPMetaDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPMetaDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPMetaDirective> OMPMetaDirective::from(const TokenContext &c) {
@@ -14615,6 +15203,20 @@ OMPMasterDirectiveContainingStmtRange OMPMasterDirective::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPMasterDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPMasterDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPMasterDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPMasterDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPMasterDirective> OMPMasterDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14639,6 +15241,20 @@ OMPMaskedDirectiveContainingStmtRange OMPMaskedDirective::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPMaskedDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPMaskedDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPMaskedDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPMaskedDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPMaskedDirective> OMPMaskedDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14661,6 +15277,20 @@ OMPLoopBasedDirectiveContainingStmtRange OMPLoopBasedDirective::containing(const
 
 OMPLoopBasedDirectiveContainingStmtRange OMPLoopBasedDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPLoopBasedDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPLoopBasedDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPLoopBasedDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPLoopBasedDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const TokenContext &c) {
@@ -14715,6 +15345,20 @@ OMPLoopTransformationDirectiveContainingStmtRange OMPLoopTransformationDirective
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPLoopTransformationDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPLoopTransformationDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPLoopTransformationDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPLoopTransformationDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14756,6 +15400,20 @@ OMPUnrollDirectiveContainingStmtRange OMPUnrollDirective::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPUnrollDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPUnrollDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPUnrollDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPUnrollDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14788,6 +15446,20 @@ OMPTileDirectiveContainingStmtRange OMPTileDirective::containing(const Stmt &stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTileDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTileDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTileDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTileDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTileDirective> OMPTileDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -14818,6 +15490,20 @@ OMPLoopDirectiveContainingStmtRange OMPLoopDirective::containing(const Decl &dec
 
 OMPLoopDirectiveContainingStmtRange OMPLoopDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPLoopDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPLoopDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPLoopDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPLoopDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPLoopDirective> OMPLoopDirective::from(const TokenContext &c) {
@@ -15182,6 +15868,20 @@ OMPGenericLoopDirectiveContainingStmtRange OMPGenericLoopDirective::containing(c
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPGenericLoopDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPGenericLoopDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPGenericLoopDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPGenericLoopDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPGenericLoopDirective> OMPGenericLoopDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15214,6 +15914,20 @@ OMPForSimdDirectiveContainingStmtRange OMPForSimdDirective::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPForSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPForSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPForSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPForSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15244,6 +15958,20 @@ OMPForDirectiveContainingStmtRange OMPForDirective::containing(const Decl &decl)
 
 OMPForDirectiveContainingStmtRange OMPForDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPForDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPForDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPForDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPForDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPForDirective> OMPForDirective::from(const TokenContext &c) {
@@ -15289,6 +16017,20 @@ OMPDistributeSimdDirectiveContainingStmtRange OMPDistributeSimdDirective::contai
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPDistributeSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPDistributeSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDistributeSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDistributeSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15321,6 +16063,20 @@ OMPDistributeParallelForSimdDirectiveContainingStmtRange OMPDistributeParallelFo
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPDistributeParallelForSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPDistributeParallelForSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDistributeParallelForSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15351,6 +16107,20 @@ OMPDistributeParallelForDirectiveContainingStmtRange OMPDistributeParallelForDir
 
 OMPDistributeParallelForDirectiveContainingStmtRange OMPDistributeParallelForDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPDistributeParallelForDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPDistributeParallelForDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDistributeParallelForDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDistributeParallelForDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const TokenContext &c) {
@@ -15396,6 +16166,20 @@ OMPDistributeDirectiveContainingStmtRange OMPDistributeDirective::containing(con
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPDistributeDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPDistributeDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDistributeDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDistributeDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15426,6 +16210,20 @@ OMPTeamsDistributeSimdDirectiveContainingStmtRange OMPTeamsDistributeSimdDirecti
 
 OMPTeamsDistributeSimdDirectiveContainingStmtRange OMPTeamsDistributeSimdDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTeamsDistributeSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTeamsDistributeSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTeamsDistributeSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::from(const TokenContext &c) {
@@ -15460,6 +16258,20 @@ OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTeamsDistribute
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTeamsDistributeParallelForSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTeamsDistributeParallelForSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15490,6 +16302,20 @@ OMPTeamsDistributeParallelForDirectiveContainingStmtRange OMPTeamsDistributePara
 
 OMPTeamsDistributeParallelForDirectiveContainingStmtRange OMPTeamsDistributeParallelForDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTeamsDistributeParallelForDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTeamsDistributeParallelForDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTeamsDistributeParallelForDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::from(const TokenContext &c) {
@@ -15535,6 +16361,20 @@ OMPTeamsDistributeDirectiveContainingStmtRange OMPTeamsDistributeDirective::cont
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTeamsDistributeDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTeamsDistributeDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTeamsDistributeDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTeamsDistributeDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15567,6 +16407,20 @@ OMPTaskLoopSimdDirectiveContainingStmtRange OMPTaskLoopSimdDirective::containing
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTaskLoopSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTaskLoopSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTaskLoopSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15597,6 +16451,20 @@ OMPTaskLoopDirectiveContainingStmtRange OMPTaskLoopDirective::containing(const D
 
 OMPTaskLoopDirectiveContainingStmtRange OMPTaskLoopDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTaskLoopDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTaskLoopDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTaskLoopDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTaskLoopDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const TokenContext &c) {
@@ -15636,6 +16504,20 @@ OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange OMPTargetTeamsDistribut
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetTeamsDistributeSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetTeamsDistributeSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetTeamsDistributeSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15668,6 +16550,20 @@ OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTargetTea
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15698,6 +16594,20 @@ OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange OMPTargetTeamsDi
 
 OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange OMPTargetTeamsDistributeParallelForDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTargetTeamsDistributeParallelForDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const TokenContext &c) {
@@ -15743,6 +16653,20 @@ OMPTargetTeamsDistributeDirectiveContainingStmtRange OMPTargetTeamsDistributeDir
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetTeamsDistributeDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetTeamsDistributeDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetTeamsDistributeDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetTeamsDistributeDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15773,6 +16697,20 @@ OMPTargetSimdDirectiveContainingStmtRange OMPTargetSimdDirective::containing(con
 
 OMPTargetSimdDirectiveContainingStmtRange OMPTargetSimdDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTargetSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::from(const TokenContext &c) {
@@ -15807,6 +16745,20 @@ OMPTargetParallelForSimdDirectiveContainingStmtRange OMPTargetParallelForSimdDir
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPTargetParallelForSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetParallelForSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetParallelForSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetParallelForSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15837,6 +16789,20 @@ OMPTargetParallelForDirectiveContainingStmtRange OMPTargetParallelForDirective::
 
 OMPTargetParallelForDirectiveContainingStmtRange OMPTargetParallelForDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPTargetParallelForDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPTargetParallelForDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPTargetParallelForDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPTargetParallelForDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from(const TokenContext &c) {
@@ -15882,6 +16848,20 @@ OMPSimdDirectiveContainingStmtRange OMPSimdDirective::containing(const Stmt &stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPSimdDirective> OMPSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15914,6 +16894,20 @@ OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange OMPParallelMasterTaskL
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPParallelMasterTaskLoopSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPParallelMasterTaskLoopSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPParallelMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPParallelMasterTaskLoopSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -15944,6 +16938,20 @@ OMPParallelMasterTaskLoopDirectiveContainingStmtRange OMPParallelMasterTaskLoopD
 
 OMPParallelMasterTaskLoopDirectiveContainingStmtRange OMPParallelMasterTaskLoopDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPParallelMasterTaskLoopDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPParallelMasterTaskLoopDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPParallelMasterTaskLoopDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPParallelMasterTaskLoopDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const TokenContext &c) {
@@ -15983,6 +16991,20 @@ OMPParallelForSimdDirectiveContainingStmtRange OMPParallelForSimdDirective::cont
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPParallelForSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPParallelForSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPParallelForSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPParallelForSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16013,6 +17035,20 @@ OMPParallelForDirectiveContainingStmtRange OMPParallelForDirective::containing(c
 
 OMPParallelForDirectiveContainingStmtRange OMPParallelForDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPParallelForDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPParallelForDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPParallelForDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPParallelForDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const TokenContext &c) {
@@ -16058,6 +17094,20 @@ OMPMasterTaskLoopSimdDirectiveContainingStmtRange OMPMasterTaskLoopSimdDirective
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPMasterTaskLoopSimdDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPMasterTaskLoopSimdDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPMasterTaskLoopSimdDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16088,6 +17138,20 @@ OMPMasterTaskLoopDirectiveContainingStmtRange OMPMasterTaskLoopDirective::contai
 
 OMPMasterTaskLoopDirectiveContainingStmtRange OMPMasterTaskLoopDirective::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPMasterTaskLoopDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPMasterTaskLoopDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPMasterTaskLoopDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPMasterTaskLoopDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const TokenContext &c) {
@@ -16127,6 +17191,20 @@ OMPInteropDirectiveContainingStmtRange OMPInteropDirective::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPInteropDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPInteropDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPInteropDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPInteropDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPInteropDirective> OMPInteropDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16151,6 +17229,20 @@ OMPFlushDirectiveContainingStmtRange OMPFlushDirective::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OMPFlushDirective::contains(const Decl &decl) {
+  for(auto &parent : OMPFlushDirective::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPFlushDirective::contains(const Stmt &stmt) {
+  for(auto &parent : OMPFlushDirective::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPFlushDirective> OMPFlushDirective::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16173,6 +17265,20 @@ OMPCanonicalLoopContainingStmtRange OMPCanonicalLoop::containing(const Decl &dec
 
 OMPCanonicalLoopContainingStmtRange OMPCanonicalLoop::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPCanonicalLoop::contains(const Decl &decl) {
+  for(auto &parent : OMPCanonicalLoop::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPCanonicalLoop::contains(const Stmt &stmt) {
+  for(auto &parent : OMPCanonicalLoop::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const TokenContext &c) {
@@ -16219,6 +17325,20 @@ NullStmtContainingStmtRange NullStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool NullStmt::contains(const Decl &decl) {
+  for(auto &parent : NullStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool NullStmt::contains(const Stmt &stmt) {
+  for(auto &parent : NullStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<NullStmt> NullStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16251,6 +17371,20 @@ MSDependentExistsStmtContainingStmtRange MSDependentExistsStmt::containing(const
 
 MSDependentExistsStmtContainingStmtRange MSDependentExistsStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool MSDependentExistsStmt::contains(const Decl &decl) {
+  for(auto &parent : MSDependentExistsStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MSDependentExistsStmt::contains(const Stmt &stmt) {
+  for(auto &parent : MSDependentExistsStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const TokenContext &c) {
@@ -16296,6 +17430,20 @@ IndirectGotoStmtContainingStmtRange IndirectGotoStmt::containing(const Decl &dec
 
 IndirectGotoStmtContainingStmtRange IndirectGotoStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool IndirectGotoStmt::contains(const Decl &decl) {
+  for(auto &parent : IndirectGotoStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool IndirectGotoStmt::contains(const Stmt &stmt) {
+  for(auto &parent : IndirectGotoStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const TokenContext &c) {
@@ -16350,6 +17498,20 @@ IfStmtContainingStmtRange IfStmt::containing(const Decl &decl) {
 
 IfStmtContainingStmtRange IfStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool IfStmt::contains(const Decl &decl) {
+  for(auto &parent : IfStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool IfStmt::contains(const Stmt &stmt) {
+  for(auto &parent : IfStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<IfStmt> IfStmt::from(const TokenContext &c) {
@@ -16505,6 +17667,20 @@ GotoStmtContainingStmtRange GotoStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool GotoStmt::contains(const Decl &decl) {
+  for(auto &parent : GotoStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool GotoStmt::contains(const Stmt &stmt) {
+  for(auto &parent : GotoStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<GotoStmt> GotoStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16547,6 +17723,20 @@ ForStmtContainingStmtRange ForStmt::containing(const Decl &decl) {
 
 ForStmtContainingStmtRange ForStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ForStmt::contains(const Decl &decl) {
+  for(auto &parent : ForStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ForStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ForStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ForStmt> ForStmt::from(const TokenContext &c) {
@@ -16652,6 +17842,20 @@ DoStmtContainingStmtRange DoStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool DoStmt::contains(const Decl &decl) {
+  for(auto &parent : DoStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DoStmt::contains(const Stmt &stmt) {
+  for(auto &parent : DoStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<DoStmt> DoStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16711,6 +17915,20 @@ DeclStmtContainingStmtRange DeclStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool DeclStmt::contains(const Decl &decl) {
+  for(auto &parent : DeclStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DeclStmt::contains(const Stmt &stmt) {
+  for(auto &parent : DeclStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<DeclStmt> DeclStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16758,6 +17976,20 @@ CoroutineBodyStmtContainingStmtRange CoroutineBodyStmt::containing(const Decl &d
 
 CoroutineBodyStmtContainingStmtRange CoroutineBodyStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CoroutineBodyStmt::contains(const Decl &decl) {
+  for(auto &parent : CoroutineBodyStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CoroutineBodyStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CoroutineBodyStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const TokenContext &c) {
@@ -16877,6 +18109,20 @@ CoreturnStmtContainingStmtRange CoreturnStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CoreturnStmt::contains(const Decl &decl) {
+  for(auto &parent : CoreturnStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CoreturnStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CoreturnStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CoreturnStmt> CoreturnStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16923,6 +18169,20 @@ ContinueStmtContainingStmtRange ContinueStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ContinueStmt::contains(const Decl &decl) {
+  for(auto &parent : ContinueStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ContinueStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ContinueStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ContinueStmt> ContinueStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -16950,6 +18210,20 @@ CompoundStmtContainingStmtRange CompoundStmt::containing(const Decl &decl) {
 
 CompoundStmtContainingStmtRange CompoundStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CompoundStmt::contains(const Decl &decl) {
+  for(auto &parent : CompoundStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CompoundStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CompoundStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CompoundStmt> CompoundStmt::from(const TokenContext &c) {
@@ -17000,6 +18274,20 @@ CapturedStmtContainingStmtRange CapturedStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CapturedStmt::contains(const Decl &decl) {
+  for(auto &parent : CapturedStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CapturedStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CapturedStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CapturedStmt> CapturedStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -17041,6 +18329,20 @@ CXXTryStmtContainingStmtRange CXXTryStmt::containing(const Decl &decl) {
 
 CXXTryStmtContainingStmtRange CXXTryStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXTryStmt::contains(const Decl &decl) {
+  for(auto &parent : CXXTryStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXTryStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CXXTryStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXTryStmt> CXXTryStmt::from(const TokenContext &c) {
@@ -17092,6 +18394,20 @@ CXXForRangeStmtContainingStmtRange CXXForRangeStmt::containing(const Decl &decl)
 
 CXXForRangeStmtContainingStmtRange CXXForRangeStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXForRangeStmt::contains(const Decl &decl) {
+  for(auto &parent : CXXForRangeStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXForRangeStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CXXForRangeStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const TokenContext &c) {
@@ -17214,6 +18530,20 @@ CXXCatchStmtContainingStmtRange CXXCatchStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXCatchStmt::contains(const Decl &decl) {
+  for(auto &parent : CXXCatchStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXCatchStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CXXCatchStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXCatchStmt> CXXCatchStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -17265,6 +18595,20 @@ BreakStmtContainingStmtRange BreakStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool BreakStmt::contains(const Decl &decl) {
+  for(auto &parent : BreakStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BreakStmt::contains(const Stmt &stmt) {
+  for(auto &parent : BreakStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<BreakStmt> BreakStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -17292,6 +18636,20 @@ AsmStmtContainingStmtRange AsmStmt::containing(const Decl &decl) {
 
 AsmStmtContainingStmtRange AsmStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool AsmStmt::contains(const Decl &decl) {
+  for(auto &parent : AsmStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool AsmStmt::contains(const Stmt &stmt) {
+  for(auto &parent : AsmStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<AsmStmt> AsmStmt::from(const TokenContext &c) {
@@ -17437,6 +18795,20 @@ MSAsmStmtContainingStmtRange MSAsmStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool MSAsmStmt::contains(const Decl &decl) {
+  for(auto &parent : MSAsmStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MSAsmStmt::contains(const Stmt &stmt) {
+  for(auto &parent : MSAsmStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<MSAsmStmt> MSAsmStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -17506,6 +18878,20 @@ GCCAsmStmtContainingStmtRange GCCAsmStmt::containing(const Decl &decl) {
 
 GCCAsmStmtContainingStmtRange GCCAsmStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool GCCAsmStmt::contains(const Decl &decl) {
+  for(auto &parent : GCCAsmStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool GCCAsmStmt::contains(const Stmt &stmt) {
+  for(auto &parent : GCCAsmStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<GCCAsmStmt> GCCAsmStmt::from(const TokenContext &c) {
@@ -17665,6 +19051,20 @@ WhileStmtContainingStmtRange WhileStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool WhileStmt::contains(const Decl &decl) {
+  for(auto &parent : WhileStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool WhileStmt::contains(const Stmt &stmt) {
+  for(auto &parent : WhileStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<WhileStmt> WhileStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -17747,6 +19147,20 @@ ValueStmtContainingStmtRange ValueStmt::containing(const Decl &decl) {
 
 ValueStmtContainingStmtRange ValueStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ValueStmt::contains(const Decl &decl) {
+  for(auto &parent : ValueStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ValueStmt::contains(const Stmt &stmt) {
+  for(auto &parent : ValueStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ValueStmt> ValueStmt::from(const TokenContext &c) {
@@ -17903,6 +19317,20 @@ LabelStmtContainingStmtRange LabelStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool LabelStmt::contains(const Decl &decl) {
+  for(auto &parent : LabelStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool LabelStmt::contains(const Stmt &stmt) {
+  for(auto &parent : LabelStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<LabelStmt> LabelStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -17957,6 +19385,20 @@ ExprContainingStmtRange Expr::containing(const Decl &decl) {
 
 ExprContainingStmtRange Expr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool Expr::contains(const Decl &decl) {
+  for(auto &parent : Expr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool Expr::contains(const Stmt &stmt) {
+  for(auto &parent : Expr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<Expr> Expr::from(const TokenContext &c) {
@@ -18370,6 +19812,20 @@ DesignatedInitUpdateExprContainingStmtRange DesignatedInitUpdateExpr::containing
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool DesignatedInitUpdateExpr::contains(const Decl &decl) {
+  for(auto &parent : DesignatedInitUpdateExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DesignatedInitUpdateExpr::contains(const Stmt &stmt) {
+  for(auto &parent : DesignatedInitUpdateExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -18408,6 +19864,20 @@ DesignatedInitExprContainingStmtRange DesignatedInitExpr::containing(const Decl 
 
 DesignatedInitExprContainingStmtRange DesignatedInitExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool DesignatedInitExpr::contains(const Decl &decl) {
+  for(auto &parent : DesignatedInitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DesignatedInitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : DesignatedInitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const TokenContext &c) {
@@ -18484,6 +19954,20 @@ DependentScopeDeclRefExprContainingStmtRange DependentScopeDeclRefExpr::containi
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool DependentScopeDeclRefExpr::contains(const Decl &decl) {
+  for(auto &parent : DependentScopeDeclRefExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DependentScopeDeclRefExpr::contains(const Stmt &stmt) {
+  for(auto &parent : DependentScopeDeclRefExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -18549,6 +20033,20 @@ DependentCoawaitExprContainingStmtRange DependentCoawaitExpr::containing(const S
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool DependentCoawaitExpr::contains(const Decl &decl) {
+  for(auto &parent : DependentCoawaitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DependentCoawaitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : DependentCoawaitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -18596,6 +20094,20 @@ DeclRefExprContainingStmtRange DeclRefExpr::containing(const Decl &decl) {
 
 DeclRefExprContainingStmtRange DeclRefExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool DeclRefExpr::contains(const Decl &decl) {
+  for(auto &parent : DeclRefExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DeclRefExpr::contains(const Stmt &stmt) {
+  for(auto &parent : DeclRefExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<DeclRefExpr> DeclRefExpr::from(const TokenContext &c) {
@@ -18700,6 +20212,20 @@ CoroutineSuspendExprContainingStmtRange CoroutineSuspendExpr::containing(const S
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CoroutineSuspendExpr::contains(const Decl &decl) {
+  for(auto &parent : CoroutineSuspendExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CoroutineSuspendExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CoroutineSuspendExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -18768,6 +20294,20 @@ CoawaitExprContainingStmtRange CoawaitExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CoawaitExpr::contains(const Decl &decl) {
+  for(auto &parent : CoawaitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CoawaitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CoawaitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CoawaitExpr> CoawaitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -18811,6 +20351,20 @@ CoyieldExprContainingStmtRange CoyieldExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CoyieldExpr::contains(const Decl &decl) {
+  for(auto &parent : CoyieldExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CoyieldExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CoyieldExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CoyieldExpr> CoyieldExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -18847,6 +20401,20 @@ ConvertVectorExprContainingStmtRange ConvertVectorExpr::containing(const Decl &d
 
 ConvertVectorExprContainingStmtRange ConvertVectorExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ConvertVectorExpr::contains(const Decl &decl) {
+  for(auto &parent : ConvertVectorExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ConvertVectorExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ConvertVectorExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const TokenContext &c) {
@@ -18901,6 +20469,20 @@ ConceptSpecializationExprContainingStmtRange ConceptSpecializationExpr::containi
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ConceptSpecializationExpr::contains(const Decl &decl) {
+  for(auto &parent : ConceptSpecializationExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ConceptSpecializationExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ConceptSpecializationExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -18943,6 +20525,20 @@ CompoundLiteralExprContainingStmtRange CompoundLiteralExpr::containing(const Dec
 
 CompoundLiteralExprContainingStmtRange CompoundLiteralExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CompoundLiteralExpr::contains(const Decl &decl) {
+  for(auto &parent : CompoundLiteralExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CompoundLiteralExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CompoundLiteralExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const TokenContext &c) {
@@ -18991,6 +20587,20 @@ ChooseExprContainingStmtRange ChooseExpr::containing(const Decl &decl) {
 
 ChooseExprContainingStmtRange ChooseExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ChooseExpr::contains(const Decl &decl) {
+  for(auto &parent : ChooseExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ChooseExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ChooseExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ChooseExpr> ChooseExpr::from(const TokenContext &c) {
@@ -19073,6 +20683,20 @@ CharacterLiteralContainingStmtRange CharacterLiteral::containing(const Stmt &stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CharacterLiteral::contains(const Decl &decl) {
+  for(auto &parent : CharacterLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CharacterLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : CharacterLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CharacterLiteral> CharacterLiteral::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19113,6 +20737,20 @@ CastExprContainingStmtRange CastExpr::containing(const Decl &decl) {
 
 CastExprContainingStmtRange CastExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CastExpr::contains(const Decl &decl) {
+  for(auto &parent : CastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CastExpr> CastExpr::from(const TokenContext &c) {
@@ -19200,6 +20838,20 @@ ImplicitCastExprContainingStmtRange ImplicitCastExpr::containing(const Stmt &stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ImplicitCastExpr::contains(const Decl &decl) {
+  for(auto &parent : ImplicitCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ImplicitCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ImplicitCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19235,6 +20887,20 @@ ExplicitCastExprContainingStmtRange ExplicitCastExpr::containing(const Decl &dec
 
 ExplicitCastExprContainingStmtRange ExplicitCastExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ExplicitCastExpr::contains(const Decl &decl) {
+  for(auto &parent : ExplicitCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ExplicitCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ExplicitCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const TokenContext &c) {
@@ -19281,6 +20947,20 @@ CXXNamedCastExprContainingStmtRange CXXNamedCastExpr::containing(const Decl &dec
 
 CXXNamedCastExprContainingStmtRange CXXNamedCastExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXNamedCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXNamedCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXNamedCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXNamedCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const TokenContext &c) {
@@ -19352,6 +21032,20 @@ CXXDynamicCastExprContainingStmtRange CXXDynamicCastExpr::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXDynamicCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXDynamicCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXDynamicCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXDynamicCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19397,6 +21091,20 @@ CXXConstCastExprContainingStmtRange CXXConstCastExpr::containing(const Stmt &stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXConstCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXConstCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXConstCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXConstCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19435,6 +21143,20 @@ CXXAddrspaceCastExprContainingStmtRange CXXAddrspaceCastExpr::containing(const D
 
 CXXAddrspaceCastExprContainingStmtRange CXXAddrspaceCastExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXAddrspaceCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXAddrspaceCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXAddrspaceCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXAddrspaceCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const TokenContext &c) {
@@ -19477,6 +21199,20 @@ CXXStaticCastExprContainingStmtRange CXXStaticCastExpr::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXStaticCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXStaticCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXStaticCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXStaticCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19517,6 +21253,20 @@ CXXReinterpretCastExprContainingStmtRange CXXReinterpretCastExpr::containing(con
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXReinterpretCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXReinterpretCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXReinterpretCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXReinterpretCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19555,6 +21305,20 @@ CXXFunctionalCastExprContainingStmtRange CXXFunctionalCastExpr::containing(const
 
 CXXFunctionalCastExprContainingStmtRange CXXFunctionalCastExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXFunctionalCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXFunctionalCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXFunctionalCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXFunctionalCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const TokenContext &c) {
@@ -19616,6 +21380,20 @@ CStyleCastExprContainingStmtRange CStyleCastExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CStyleCastExpr::contains(const Decl &decl) {
+  for(auto &parent : CStyleCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CStyleCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CStyleCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CStyleCastExpr> CStyleCastExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19670,6 +21448,20 @@ BuiltinBitCastExprContainingStmtRange BuiltinBitCastExpr::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool BuiltinBitCastExpr::contains(const Decl &decl) {
+  for(auto &parent : BuiltinBitCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BuiltinBitCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : BuiltinBitCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19704,6 +21496,20 @@ ObjCBridgedCastExprContainingStmtRange ObjCBridgedCastExpr::containing(const Dec
 
 ObjCBridgedCastExprContainingStmtRange ObjCBridgedCastExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCBridgedCastExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCBridgedCastExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCBridgedCastExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCBridgedCastExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const TokenContext &c) {
@@ -19769,6 +21575,20 @@ CallExprContainingStmtRange CallExpr::containing(const Decl &decl) {
 
 CallExprContainingStmtRange CallExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CallExpr::contains(const Decl &decl) {
+  for(auto &parent : CallExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CallExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CallExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CallExpr> CallExpr::from(const TokenContext &c) {
@@ -19895,6 +21715,20 @@ CXXOperatorCallExprContainingStmtRange CXXOperatorCallExpr::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXOperatorCallExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXOperatorCallExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXOperatorCallExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXOperatorCallExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -19954,6 +21788,20 @@ CXXMemberCallExprContainingStmtRange CXXMemberCallExpr::containing(const Decl &d
 
 CXXMemberCallExprContainingStmtRange CXXMemberCallExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXMemberCallExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXMemberCallExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXMemberCallExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXMemberCallExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const TokenContext &c) {
@@ -20016,6 +21864,20 @@ CUDAKernelCallExprContainingStmtRange CUDAKernelCallExpr::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CUDAKernelCallExpr::contains(const Decl &decl) {
+  for(auto &parent : CUDAKernelCallExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CUDAKernelCallExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CUDAKernelCallExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -20052,6 +21914,20 @@ UserDefinedLiteralContainingStmtRange UserDefinedLiteral::containing(const Decl 
 
 UserDefinedLiteralContainingStmtRange UserDefinedLiteral::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool UserDefinedLiteral::contains(const Decl &decl) {
+  for(auto &parent : UserDefinedLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UserDefinedLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : UserDefinedLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const TokenContext &c) {
@@ -20104,6 +21980,20 @@ CXXUuidofExprContainingStmtRange CXXUuidofExpr::containing(const Decl &decl) {
 
 CXXUuidofExprContainingStmtRange CXXUuidofExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXUuidofExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXUuidofExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXUuidofExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXUuidofExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const TokenContext &c) {
@@ -20165,6 +22055,20 @@ CXXUnresolvedConstructExprContainingStmtRange CXXUnresolvedConstructExpr::contai
 
 CXXUnresolvedConstructExprContainingStmtRange CXXUnresolvedConstructExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXUnresolvedConstructExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXUnresolvedConstructExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXUnresolvedConstructExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXUnresolvedConstructExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const TokenContext &c) {
@@ -20240,6 +22144,20 @@ CXXTypeidExprContainingStmtRange CXXTypeidExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXTypeidExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXTypeidExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXTypeidExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXTypeidExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -20309,6 +22227,20 @@ CXXThrowExprContainingStmtRange CXXThrowExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXThrowExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXThrowExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXThrowExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXThrowExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXThrowExpr> CXXThrowExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -20361,6 +22293,20 @@ CXXThisExprContainingStmtRange CXXThisExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXThisExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXThisExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXThisExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXThisExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXThisExpr> CXXThisExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -20403,6 +22349,20 @@ CXXStdInitializerListExprContainingStmtRange CXXStdInitializerListExpr::containi
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXStdInitializerListExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXStdInitializerListExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXStdInitializerListExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXStdInitializerListExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -20435,6 +22395,20 @@ CXXScalarValueInitExprContainingStmtRange CXXScalarValueInitExpr::containing(con
 
 CXXScalarValueInitExprContainingStmtRange CXXScalarValueInitExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXScalarValueInitExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXScalarValueInitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXScalarValueInitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const TokenContext &c) {
@@ -20472,6 +22446,20 @@ CXXRewrittenBinaryOperatorContainingStmtRange CXXRewrittenBinaryOperator::contai
 
 CXXRewrittenBinaryOperatorContainingStmtRange CXXRewrittenBinaryOperator::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXRewrittenBinaryOperator::contains(const Decl &decl) {
+  for(auto &parent : CXXRewrittenBinaryOperator::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXRewrittenBinaryOperator::contains(const Stmt &stmt) {
+  for(auto &parent : CXXRewrittenBinaryOperator::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const TokenContext &c) {
@@ -20558,6 +22546,20 @@ CXXPseudoDestructorExprContainingStmtRange CXXPseudoDestructorExpr::containing(c
 
 CXXPseudoDestructorExprContainingStmtRange CXXPseudoDestructorExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXPseudoDestructorExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXPseudoDestructorExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXPseudoDestructorExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXPseudoDestructorExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const TokenContext &c) {
@@ -20656,6 +22658,20 @@ CXXNullPtrLiteralExprContainingStmtRange CXXNullPtrLiteralExpr::containing(const
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXNullPtrLiteralExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXNullPtrLiteralExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXNullPtrLiteralExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXNullPtrLiteralExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -20691,6 +22707,20 @@ CXXNoexceptExprContainingStmtRange CXXNoexceptExpr::containing(const Decl &decl)
 
 CXXNoexceptExprContainingStmtRange CXXNoexceptExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXNoexceptExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXNoexceptExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXNoexceptExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXNoexceptExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const TokenContext &c) {
@@ -20730,6 +22760,20 @@ CXXNewExprContainingStmtRange CXXNewExpr::containing(const Decl &decl) {
 
 CXXNewExprContainingStmtRange CXXNewExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXNewExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXNewExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXNewExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXNewExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXNewExpr> CXXNewExpr::from(const TokenContext &c) {
@@ -20874,6 +22918,20 @@ CXXInheritedCtorInitExprContainingStmtRange CXXInheritedCtorInitExpr::containing
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXInheritedCtorInitExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXInheritedCtorInitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXInheritedCtorInitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXInheritedCtorInitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -20930,6 +22988,20 @@ CXXFoldExprContainingStmtRange CXXFoldExpr::containing(const Decl &decl) {
 
 CXXFoldExprContainingStmtRange CXXFoldExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXFoldExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXFoldExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXFoldExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXFoldExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXFoldExpr> CXXFoldExpr::from(const TokenContext &c) {
@@ -21039,6 +23111,20 @@ CXXDependentScopeMemberExprContainingStmtRange CXXDependentScopeMemberExpr::cont
 
 CXXDependentScopeMemberExprContainingStmtRange CXXDependentScopeMemberExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXDependentScopeMemberExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXDependentScopeMemberExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXDependentScopeMemberExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXDependentScopeMemberExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const TokenContext &c) {
@@ -21160,6 +23246,20 @@ CXXDeleteExprContainingStmtRange CXXDeleteExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXDeleteExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXDeleteExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXDeleteExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXDeleteExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -21226,6 +23326,20 @@ CXXDefaultInitExprContainingStmtRange CXXDefaultInitExpr::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXDefaultInitExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXDefaultInitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXDefaultInitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXDefaultInitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -21279,6 +23393,20 @@ CXXDefaultArgExprContainingStmtRange CXXDefaultArgExpr::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXDefaultArgExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXDefaultArgExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXDefaultArgExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXDefaultArgExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -21326,6 +23454,20 @@ CXXConstructExprContainingStmtRange CXXConstructExpr::containing(const Decl &dec
 
 CXXConstructExprContainingStmtRange CXXConstructExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXConstructExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXConstructExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXConstructExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXConstructExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXConstructExpr> CXXConstructExpr::from(const TokenContext &c) {
@@ -21423,6 +23565,20 @@ CXXTemporaryObjectExprContainingStmtRange CXXTemporaryObjectExpr::containing(con
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXTemporaryObjectExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXTemporaryObjectExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXTemporaryObjectExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXTemporaryObjectExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -21453,6 +23609,20 @@ CXXBoolLiteralExprContainingStmtRange CXXBoolLiteralExpr::containing(const Decl 
 
 CXXBoolLiteralExprContainingStmtRange CXXBoolLiteralExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CXXBoolLiteralExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXBoolLiteralExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXBoolLiteralExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXBoolLiteralExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const TokenContext &c) {
@@ -21497,6 +23667,20 @@ CXXBindTemporaryExprContainingStmtRange CXXBindTemporaryExpr::containing(const S
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CXXBindTemporaryExpr::contains(const Decl &decl) {
+  for(auto &parent : CXXBindTemporaryExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXBindTemporaryExpr::contains(const Stmt &stmt) {
+  for(auto &parent : CXXBindTemporaryExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -21529,6 +23713,20 @@ BlockExprContainingStmtRange BlockExpr::containing(const Decl &decl) {
 
 BlockExprContainingStmtRange BlockExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool BlockExpr::contains(const Decl &decl) {
+  for(auto &parent : BlockExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BlockExpr::contains(const Stmt &stmt) {
+  for(auto &parent : BlockExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<BlockExpr> BlockExpr::from(const TokenContext &c) {
@@ -21584,6 +23782,20 @@ BinaryOperatorContainingStmtRange BinaryOperator::containing(const Decl &decl) {
 
 BinaryOperatorContainingStmtRange BinaryOperator::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool BinaryOperator::contains(const Decl &decl) {
+  for(auto &parent : BinaryOperator::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BinaryOperator::contains(const Stmt &stmt) {
+  for(auto &parent : BinaryOperator::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<BinaryOperator> BinaryOperator::from(const TokenContext &c) {
@@ -21717,6 +23929,20 @@ CompoundAssignOperatorContainingStmtRange CompoundAssignOperator::containing(con
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool CompoundAssignOperator::contains(const Decl &decl) {
+  for(auto &parent : CompoundAssignOperator::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CompoundAssignOperator::contains(const Stmt &stmt) {
+  for(auto &parent : CompoundAssignOperator::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -21759,6 +23985,20 @@ AtomicExprContainingStmtRange AtomicExpr::containing(const Decl &decl) {
 
 AtomicExprContainingStmtRange AtomicExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool AtomicExpr::contains(const Decl &decl) {
+  for(auto &parent : AtomicExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool AtomicExpr::contains(const Stmt &stmt) {
+  for(auto &parent : AtomicExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<AtomicExpr> AtomicExpr::from(const TokenContext &c) {
@@ -21911,6 +24151,20 @@ AsTypeExprContainingStmtRange AsTypeExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool AsTypeExpr::contains(const Decl &decl) {
+  for(auto &parent : AsTypeExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool AsTypeExpr::contains(const Stmt &stmt) {
+  for(auto &parent : AsTypeExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<AsTypeExpr> AsTypeExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -21963,6 +24217,20 @@ ArrayTypeTraitExprContainingStmtRange ArrayTypeTraitExpr::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ArrayTypeTraitExpr::contains(const Decl &decl) {
+  for(auto &parent : ArrayTypeTraitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ArrayTypeTraitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ArrayTypeTraitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22006,6 +24274,20 @@ ArraySubscriptExprContainingStmtRange ArraySubscriptExpr::containing(const Decl 
 
 ArraySubscriptExprContainingStmtRange ArraySubscriptExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ArraySubscriptExpr::contains(const Decl &decl) {
+  for(auto &parent : ArraySubscriptExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ArraySubscriptExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ArraySubscriptExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const TokenContext &c) {
@@ -22069,6 +24351,20 @@ ArrayInitLoopExprContainingStmtRange ArrayInitLoopExpr::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ArrayInitLoopExpr::contains(const Decl &decl) {
+  for(auto &parent : ArrayInitLoopExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ArrayInitLoopExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ArrayInitLoopExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22109,6 +24405,20 @@ ArrayInitIndexExprContainingStmtRange ArrayInitIndexExpr::containing(const Stmt 
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ArrayInitIndexExpr::contains(const Decl &decl) {
+  for(auto &parent : ArrayInitIndexExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ArrayInitIndexExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ArrayInitIndexExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22135,6 +24445,20 @@ AddrLabelExprContainingStmtRange AddrLabelExpr::containing(const Decl &decl) {
 
 AddrLabelExprContainingStmtRange AddrLabelExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool AddrLabelExpr::contains(const Decl &decl) {
+  for(auto &parent : AddrLabelExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool AddrLabelExpr::contains(const Stmt &stmt) {
+  for(auto &parent : AddrLabelExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<AddrLabelExpr> AddrLabelExpr::from(const TokenContext &c) {
@@ -22187,6 +24511,20 @@ AbstractConditionalOperatorContainingStmtRange AbstractConditionalOperator::cont
 
 AbstractConditionalOperatorContainingStmtRange AbstractConditionalOperator::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool AbstractConditionalOperator::contains(const Decl &decl) {
+  for(auto &parent : AbstractConditionalOperator::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool AbstractConditionalOperator::contains(const Stmt &stmt) {
+  for(auto &parent : AbstractConditionalOperator::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const TokenContext &c) {
@@ -22254,6 +24592,20 @@ ConditionalOperatorContainingStmtRange ConditionalOperator::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ConditionalOperator::contains(const Decl &decl) {
+  for(auto &parent : ConditionalOperator::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ConditionalOperator::contains(const Stmt &stmt) {
+  for(auto &parent : ConditionalOperator::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ConditionalOperator> ConditionalOperator::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22298,6 +24650,20 @@ BinaryConditionalOperatorContainingStmtRange BinaryConditionalOperator::containi
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool BinaryConditionalOperator::contains(const Decl &decl) {
+  for(auto &parent : BinaryConditionalOperator::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BinaryConditionalOperator::contains(const Stmt &stmt) {
+  for(auto &parent : BinaryConditionalOperator::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22340,6 +24706,20 @@ VAArgExprContainingStmtRange VAArgExpr::containing(const Decl &decl) {
 
 VAArgExprContainingStmtRange VAArgExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool VAArgExpr::contains(const Decl &decl) {
+  for(auto &parent : VAArgExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool VAArgExpr::contains(const Stmt &stmt) {
+  for(auto &parent : VAArgExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<VAArgExpr> VAArgExpr::from(const TokenContext &c) {
@@ -22403,6 +24783,20 @@ UnaryOperatorContainingStmtRange UnaryOperator::containing(const Decl &decl) {
 
 UnaryOperatorContainingStmtRange UnaryOperator::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool UnaryOperator::contains(const Decl &decl) {
+  for(auto &parent : UnaryOperator::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UnaryOperator::contains(const Stmt &stmt) {
+  for(auto &parent : UnaryOperator::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<UnaryOperator> UnaryOperator::from(const TokenContext &c) {
@@ -22493,6 +24887,20 @@ UnaryExprOrTypeTraitExprContainingStmtRange UnaryExprOrTypeTraitExpr::containing
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool UnaryExprOrTypeTraitExpr::contains(const Decl &decl) {
+  for(auto &parent : UnaryExprOrTypeTraitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UnaryExprOrTypeTraitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : UnaryExprOrTypeTraitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22575,6 +24983,20 @@ TypoExprContainingStmtRange TypoExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool TypoExpr::contains(const Decl &decl) {
+  for(auto &parent : TypoExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TypoExpr::contains(const Stmt &stmt) {
+  for(auto &parent : TypoExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<TypoExpr> TypoExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22601,6 +25023,20 @@ TypeTraitExprContainingStmtRange TypeTraitExpr::containing(const Decl &decl) {
 
 TypeTraitExprContainingStmtRange TypeTraitExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool TypeTraitExpr::contains(const Decl &decl) {
+  for(auto &parent : TypeTraitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TypeTraitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : TypeTraitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<TypeTraitExpr> TypeTraitExpr::from(const TokenContext &c) {
@@ -22659,6 +25095,20 @@ SubstNonTypeTemplateParmPackExprContainingStmtRange SubstNonTypeTemplateParmPack
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool SubstNonTypeTemplateParmPackExpr::contains(const Decl &decl) {
+  for(auto &parent : SubstNonTypeTemplateParmPackExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SubstNonTypeTemplateParmPackExpr::contains(const Stmt &stmt) {
+  for(auto &parent : SubstNonTypeTemplateParmPackExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22700,6 +25150,20 @@ SubstNonTypeTemplateParmExprContainingStmtRange SubstNonTypeTemplateParmExpr::co
 
 SubstNonTypeTemplateParmExprContainingStmtRange SubstNonTypeTemplateParmExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SubstNonTypeTemplateParmExpr::contains(const Decl &decl) {
+  for(auto &parent : SubstNonTypeTemplateParmExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SubstNonTypeTemplateParmExpr::contains(const Stmt &stmt) {
+  for(auto &parent : SubstNonTypeTemplateParmExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const TokenContext &c) {
@@ -22760,6 +25224,20 @@ StringLiteralContainingStmtRange StringLiteral::containing(const Decl &decl) {
 
 StringLiteralContainingStmtRange StringLiteral::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool StringLiteral::contains(const Decl &decl) {
+  for(auto &parent : StringLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool StringLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : StringLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<StringLiteral> StringLiteral::from(const TokenContext &c) {
@@ -22859,6 +25337,20 @@ StmtExprContainingStmtRange StmtExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool StmtExpr::contains(const Decl &decl) {
+  for(auto &parent : StmtExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool StmtExpr::contains(const Stmt &stmt) {
+  for(auto &parent : StmtExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<StmtExpr> StmtExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -22909,6 +25401,20 @@ SourceLocExprContainingStmtRange SourceLocExpr::containing(const Decl &decl) {
 
 SourceLocExprContainingStmtRange SourceLocExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SourceLocExpr::contains(const Decl &decl) {
+  for(auto &parent : SourceLocExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SourceLocExpr::contains(const Stmt &stmt) {
+  for(auto &parent : SourceLocExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SourceLocExpr> SourceLocExpr::from(const TokenContext &c) {
@@ -22967,6 +25473,20 @@ SizeOfPackExprContainingStmtRange SizeOfPackExpr::containing(const Decl &decl) {
 
 SizeOfPackExprContainingStmtRange SizeOfPackExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SizeOfPackExpr::contains(const Decl &decl) {
+  for(auto &parent : SizeOfPackExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SizeOfPackExpr::contains(const Stmt &stmt) {
+  for(auto &parent : SizeOfPackExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const TokenContext &c) {
@@ -23058,6 +25578,20 @@ ShuffleVectorExprContainingStmtRange ShuffleVectorExpr::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ShuffleVectorExpr::contains(const Decl &decl) {
+  for(auto &parent : ShuffleVectorExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ShuffleVectorExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ShuffleVectorExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23102,6 +25636,20 @@ SYCLUniqueStableNameExprContainingStmtRange SYCLUniqueStableNameExpr::containing
 
 SYCLUniqueStableNameExprContainingStmtRange SYCLUniqueStableNameExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SYCLUniqueStableNameExpr::contains(const Decl &decl) {
+  for(auto &parent : SYCLUniqueStableNameExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SYCLUniqueStableNameExpr::contains(const Stmt &stmt) {
+  for(auto &parent : SYCLUniqueStableNameExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const TokenContext &c) {
@@ -23163,6 +25711,20 @@ RequiresExprContainingStmtRange RequiresExpr::containing(const Decl &decl) {
 
 RequiresExprContainingStmtRange RequiresExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool RequiresExpr::contains(const Decl &decl) {
+  for(auto &parent : RequiresExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool RequiresExpr::contains(const Stmt &stmt) {
+  for(auto &parent : RequiresExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<RequiresExpr> RequiresExpr::from(const TokenContext &c) {
@@ -23238,6 +25800,20 @@ RecoveryExprContainingStmtRange RecoveryExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool RecoveryExpr::contains(const Decl &decl) {
+  for(auto &parent : RecoveryExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool RecoveryExpr::contains(const Stmt &stmt) {
+  for(auto &parent : RecoveryExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<RecoveryExpr> RecoveryExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23280,6 +25856,20 @@ PseudoObjectExprContainingStmtRange PseudoObjectExpr::containing(const Decl &dec
 
 PseudoObjectExprContainingStmtRange PseudoObjectExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool PseudoObjectExpr::contains(const Decl &decl) {
+  for(auto &parent : PseudoObjectExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool PseudoObjectExpr::contains(const Stmt &stmt) {
+  for(auto &parent : PseudoObjectExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const TokenContext &c) {
@@ -23354,6 +25944,20 @@ PredefinedExprContainingStmtRange PredefinedExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool PredefinedExpr::contains(const Decl &decl) {
+  for(auto &parent : PredefinedExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool PredefinedExpr::contains(const Stmt &stmt) {
+  for(auto &parent : PredefinedExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<PredefinedExpr> PredefinedExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23406,6 +26010,20 @@ ParenListExprContainingStmtRange ParenListExpr::containing(const Decl &decl) {
 
 ParenListExprContainingStmtRange ParenListExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ParenListExpr::contains(const Decl &decl) {
+  for(auto &parent : ParenListExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ParenListExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ParenListExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ParenListExpr> ParenListExpr::from(const TokenContext &c) {
@@ -23470,6 +26088,20 @@ ParenExprContainingStmtRange ParenExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ParenExpr::contains(const Decl &decl) {
+  for(auto &parent : ParenExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ParenExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ParenExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ParenExpr> ParenExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23522,6 +26154,20 @@ PackExpansionExprContainingStmtRange PackExpansionExpr::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool PackExpansionExpr::contains(const Decl &decl) {
+  for(auto &parent : PackExpansionExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool PackExpansionExpr::contains(const Stmt &stmt) {
+  for(auto &parent : PackExpansionExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<PackExpansionExpr> PackExpansionExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23572,6 +26218,20 @@ OverloadExprContainingStmtRange OverloadExpr::containing(const Decl &decl) {
 
 OverloadExprContainingStmtRange OverloadExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OverloadExpr::contains(const Decl &decl) {
+  for(auto &parent : OverloadExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OverloadExpr::contains(const Stmt &stmt) {
+  for(auto &parent : OverloadExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OverloadExpr> OverloadExpr::from(const TokenContext &c) {
@@ -23659,6 +26319,20 @@ UnresolvedMemberExprContainingStmtRange UnresolvedMemberExpr::containing(const S
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool UnresolvedMemberExpr::contains(const Decl &decl) {
+  for(auto &parent : UnresolvedMemberExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UnresolvedMemberExpr::contains(const Stmt &stmt) {
+  for(auto &parent : UnresolvedMemberExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23736,6 +26410,20 @@ UnresolvedLookupExprContainingStmtRange UnresolvedLookupExpr::containing(const S
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool UnresolvedLookupExpr::contains(const Decl &decl) {
+  for(auto &parent : UnresolvedLookupExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UnresolvedLookupExpr::contains(const Stmt &stmt) {
+  for(auto &parent : UnresolvedLookupExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23776,6 +26464,20 @@ OpaqueValueExprContainingStmtRange OpaqueValueExpr::containing(const Decl &decl)
 
 OpaqueValueExprContainingStmtRange OpaqueValueExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OpaqueValueExpr::contains(const Decl &decl) {
+  for(auto &parent : OpaqueValueExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OpaqueValueExpr::contains(const Stmt &stmt) {
+  for(auto &parent : OpaqueValueExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const TokenContext &c) {
@@ -23826,6 +26528,20 @@ OffsetOfExprContainingStmtRange OffsetOfExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool OffsetOfExpr::contains(const Decl &decl) {
+  for(auto &parent : OffsetOfExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OffsetOfExpr::contains(const Stmt &stmt) {
+  for(auto &parent : OffsetOfExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OffsetOfExpr> OffsetOfExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23870,6 +26586,20 @@ ObjCSubscriptRefExprContainingStmtRange ObjCSubscriptRefExpr::containing(const D
 
 ObjCSubscriptRefExprContainingStmtRange ObjCSubscriptRefExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCSubscriptRefExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCSubscriptRefExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCSubscriptRefExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCSubscriptRefExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const TokenContext &c) {
@@ -23932,6 +26662,20 @@ ObjCStringLiteralContainingStmtRange ObjCStringLiteral::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCStringLiteral::contains(const Decl &decl) {
+  for(auto &parent : ObjCStringLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCStringLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCStringLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -23973,6 +26717,20 @@ ObjCSelectorExprContainingStmtRange ObjCSelectorExpr::containing(const Decl &dec
 
 ObjCSelectorExprContainingStmtRange ObjCSelectorExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCSelectorExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCSelectorExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCSelectorExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCSelectorExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const TokenContext &c) {
@@ -24019,6 +26777,20 @@ ObjCProtocolExprContainingStmtRange ObjCProtocolExpr::containing(const Decl &dec
 
 ObjCProtocolExprContainingStmtRange ObjCProtocolExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCProtocolExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCProtocolExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCProtocolExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCProtocolExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const TokenContext &c) {
@@ -24080,6 +26852,20 @@ ObjCPropertyRefExprContainingStmtRange ObjCPropertyRefExpr::containing(const Dec
 
 ObjCPropertyRefExprContainingStmtRange ObjCPropertyRefExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCPropertyRefExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCPropertyRefExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCPropertyRefExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCPropertyRefExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const TokenContext &c) {
@@ -24203,6 +26989,20 @@ ObjCMessageExprContainingStmtRange ObjCMessageExpr::containing(const Decl &decl)
 
 ObjCMessageExprContainingStmtRange ObjCMessageExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCMessageExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCMessageExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCMessageExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCMessageExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const TokenContext &c) {
@@ -24382,6 +27182,20 @@ ObjCIvarRefExprContainingStmtRange ObjCIvarRefExpr::containing(const Stmt &stmt)
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCIvarRefExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCIvarRefExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCIvarRefExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCIvarRefExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -24450,6 +27264,20 @@ ObjCIsaExprContainingStmtRange ObjCIsaExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCIsaExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCIsaExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCIsaExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCIsaExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -24516,6 +27344,20 @@ ObjCIndirectCopyRestoreExprContainingStmtRange ObjCIndirectCopyRestoreExpr::cont
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCIndirectCopyRestoreExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCIndirectCopyRestoreExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCIndirectCopyRestoreExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCIndirectCopyRestoreExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -24553,6 +27395,20 @@ ObjCEncodeExprContainingStmtRange ObjCEncodeExpr::containing(const Decl &decl) {
 
 ObjCEncodeExprContainingStmtRange ObjCEncodeExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCEncodeExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCEncodeExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCEncodeExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCEncodeExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const TokenContext &c) {
@@ -24607,6 +27463,20 @@ ObjCDictionaryLiteralContainingStmtRange ObjCDictionaryLiteral::containing(const
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCDictionaryLiteral::contains(const Decl &decl) {
+  for(auto &parent : ObjCDictionaryLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCDictionaryLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCDictionaryLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -24639,6 +27509,20 @@ ObjCBoxedExprContainingStmtRange ObjCBoxedExpr::containing(const Decl &decl) {
 
 ObjCBoxedExprContainingStmtRange ObjCBoxedExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCBoxedExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCBoxedExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCBoxedExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCBoxedExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const TokenContext &c) {
@@ -24695,6 +27579,20 @@ ObjCBoolLiteralExprContainingStmtRange ObjCBoolLiteralExpr::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCBoolLiteralExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCBoolLiteralExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCBoolLiteralExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCBoolLiteralExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -24737,6 +27635,20 @@ ObjCAvailabilityCheckExprContainingStmtRange ObjCAvailabilityCheckExpr::containi
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ObjCAvailabilityCheckExpr::contains(const Decl &decl) {
+  for(auto &parent : ObjCAvailabilityCheckExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAvailabilityCheckExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAvailabilityCheckExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -24768,6 +27680,20 @@ ObjCArrayLiteralContainingStmtRange ObjCArrayLiteral::containing(const Decl &dec
 
 ObjCArrayLiteralContainingStmtRange ObjCArrayLiteral::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ObjCArrayLiteral::contains(const Decl &decl) {
+  for(auto &parent : ObjCArrayLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCArrayLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCArrayLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const TokenContext &c) {
@@ -24818,6 +27744,20 @@ OMPIteratorExprContainingStmtRange OMPIteratorExpr::containing(const Decl &decl)
 
 OMPIteratorExprContainingStmtRange OMPIteratorExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPIteratorExpr::contains(const Decl &decl) {
+  for(auto &parent : OMPIteratorExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPIteratorExpr::contains(const Stmt &stmt) {
+  for(auto &parent : OMPIteratorExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const TokenContext &c) {
@@ -24873,6 +27813,20 @@ OMPArrayShapingExprContainingStmtRange OMPArrayShapingExpr::containing(const Dec
 
 OMPArrayShapingExprContainingStmtRange OMPArrayShapingExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPArrayShapingExpr::contains(const Decl &decl) {
+  for(auto &parent : OMPArrayShapingExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPArrayShapingExpr::contains(const Stmt &stmt) {
+  for(auto &parent : OMPArrayShapingExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const TokenContext &c) {
@@ -24941,6 +27895,20 @@ OMPArraySectionExprContainingStmtRange OMPArraySectionExpr::containing(const Dec
 
 OMPArraySectionExprContainingStmtRange OMPArraySectionExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool OMPArraySectionExpr::contains(const Decl &decl) {
+  for(auto &parent : OMPArraySectionExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPArraySectionExpr::contains(const Stmt &stmt) {
+  for(auto &parent : OMPArraySectionExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const TokenContext &c) {
@@ -25022,6 +27990,20 @@ NoInitExprContainingStmtRange NoInitExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool NoInitExpr::contains(const Decl &decl) {
+  for(auto &parent : NoInitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool NoInitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : NoInitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<NoInitExpr> NoInitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -25048,6 +28030,20 @@ MemberExprContainingStmtRange MemberExpr::containing(const Decl &decl) {
 
 MemberExprContainingStmtRange MemberExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool MemberExpr::contains(const Decl &decl) {
+  for(auto &parent : MemberExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MemberExpr::contains(const Stmt &stmt) {
+  for(auto &parent : MemberExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<MemberExpr> MemberExpr::from(const TokenContext &c) {
@@ -25170,6 +28166,20 @@ MatrixSubscriptExprContainingStmtRange MatrixSubscriptExpr::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool MatrixSubscriptExpr::contains(const Decl &decl) {
+  for(auto &parent : MatrixSubscriptExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MatrixSubscriptExpr::contains(const Stmt &stmt) {
+  for(auto &parent : MatrixSubscriptExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -25228,6 +28238,20 @@ MaterializeTemporaryExprContainingStmtRange MaterializeTemporaryExpr::containing
 
 MaterializeTemporaryExprContainingStmtRange MaterializeTemporaryExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool MaterializeTemporaryExpr::contains(const Decl &decl) {
+  for(auto &parent : MaterializeTemporaryExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
+  for(auto &parent : MaterializeTemporaryExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const TokenContext &c) {
@@ -25299,6 +28323,20 @@ MSPropertySubscriptExprContainingStmtRange MSPropertySubscriptExpr::containing(c
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool MSPropertySubscriptExpr::contains(const Decl &decl) {
+  for(auto &parent : MSPropertySubscriptExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MSPropertySubscriptExpr::contains(const Stmt &stmt) {
+  for(auto &parent : MSPropertySubscriptExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -25346,6 +28384,20 @@ MSPropertyRefExprContainingStmtRange MSPropertyRefExpr::containing(const Decl &d
 
 MSPropertyRefExprContainingStmtRange MSPropertyRefExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool MSPropertyRefExpr::contains(const Decl &decl) {
+  for(auto &parent : MSPropertyRefExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MSPropertyRefExpr::contains(const Stmt &stmt) {
+  for(auto &parent : MSPropertyRefExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const TokenContext &c) {
@@ -25405,6 +28457,20 @@ LambdaExprContainingStmtRange LambdaExpr::containing(const Decl &decl) {
 
 LambdaExprContainingStmtRange LambdaExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool LambdaExpr::contains(const Decl &decl) {
+  for(auto &parent : LambdaExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool LambdaExpr::contains(const Stmt &stmt) {
+  for(auto &parent : LambdaExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<LambdaExpr> LambdaExpr::from(const TokenContext &c) {
@@ -25533,6 +28599,20 @@ IntegerLiteralContainingStmtRange IntegerLiteral::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool IntegerLiteral::contains(const Decl &decl) {
+  for(auto &parent : IntegerLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool IntegerLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : IntegerLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<IntegerLiteral> IntegerLiteral::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -25568,6 +28648,20 @@ InitListExprContainingStmtRange InitListExpr::containing(const Decl &decl) {
 
 InitListExprContainingStmtRange InitListExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool InitListExpr::contains(const Decl &decl) {
+  for(auto &parent : InitListExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool InitListExpr::contains(const Stmt &stmt) {
+  for(auto &parent : InitListExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<InitListExpr> InitListExpr::from(const TokenContext &c) {
@@ -25711,6 +28805,20 @@ ImplicitValueInitExprContainingStmtRange ImplicitValueInitExpr::containing(const
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ImplicitValueInitExpr::contains(const Decl &decl) {
+  for(auto &parent : ImplicitValueInitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ImplicitValueInitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ImplicitValueInitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -25737,6 +28845,20 @@ ImaginaryLiteralContainingStmtRange ImaginaryLiteral::containing(const Decl &dec
 
 ImaginaryLiteralContainingStmtRange ImaginaryLiteral::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ImaginaryLiteral::contains(const Decl &decl) {
+  for(auto &parent : ImaginaryLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ImaginaryLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : ImaginaryLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const TokenContext &c) {
@@ -25771,6 +28893,20 @@ GenericSelectionExprContainingStmtRange GenericSelectionExpr::containing(const D
 
 GenericSelectionExprContainingStmtRange GenericSelectionExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool GenericSelectionExpr::contains(const Decl &decl) {
+  for(auto &parent : GenericSelectionExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool GenericSelectionExpr::contains(const Stmt &stmt) {
+  for(auto &parent : GenericSelectionExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const TokenContext &c) {
@@ -25861,6 +28997,20 @@ GNUNullExprContainingStmtRange GNUNullExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool GNUNullExpr::contains(const Decl &decl) {
+  for(auto &parent : GNUNullExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool GNUNullExpr::contains(const Stmt &stmt) {
+  for(auto &parent : GNUNullExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<GNUNullExpr> GNUNullExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -25896,6 +29046,20 @@ FunctionParmPackExprContainingStmtRange FunctionParmPackExpr::containing(const D
 
 FunctionParmPackExprContainingStmtRange FunctionParmPackExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool FunctionParmPackExpr::contains(const Decl &decl) {
+  for(auto &parent : FunctionParmPackExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FunctionParmPackExpr::contains(const Stmt &stmt) {
+  for(auto &parent : FunctionParmPackExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const TokenContext &c) {
@@ -25957,6 +29121,20 @@ FullExprContainingStmtRange FullExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool FullExpr::contains(const Decl &decl) {
+  for(auto &parent : FullExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FullExpr::contains(const Stmt &stmt) {
+  for(auto &parent : FullExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<FullExpr> FullExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -25990,6 +29168,20 @@ ExprWithCleanupsContainingStmtRange ExprWithCleanups::containing(const Decl &dec
 
 ExprWithCleanupsContainingStmtRange ExprWithCleanups::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ExprWithCleanups::contains(const Decl &decl) {
+  for(auto &parent : ExprWithCleanups::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ExprWithCleanups::contains(const Stmt &stmt) {
+  for(auto &parent : ExprWithCleanups::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ExprWithCleanups> ExprWithCleanups::from(const TokenContext &c) {
@@ -26027,6 +29219,20 @@ ConstantExprContainingStmtRange ConstantExpr::containing(const Decl &decl) {
 
 ConstantExprContainingStmtRange ConstantExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ConstantExpr::contains(const Decl &decl) {
+  for(auto &parent : ConstantExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ConstantExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ConstantExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ConstantExpr> ConstantExpr::from(const TokenContext &c) {
@@ -26076,6 +29282,20 @@ FloatingLiteralContainingStmtRange FloatingLiteral::containing(const Stmt &stmt)
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool FloatingLiteral::contains(const Decl &decl) {
+  for(auto &parent : FloatingLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FloatingLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : FloatingLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<FloatingLiteral> FloatingLiteral::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -26118,6 +29338,20 @@ FixedPointLiteralContainingStmtRange FixedPointLiteral::containing(const Stmt &s
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool FixedPointLiteral::contains(const Decl &decl) {
+  for(auto &parent : FixedPointLiteral::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FixedPointLiteral::contains(const Stmt &stmt) {
+  for(auto &parent : FixedPointLiteral::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<FixedPointLiteral> FixedPointLiteral::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -26153,6 +29387,20 @@ ExtVectorElementExprContainingStmtRange ExtVectorElementExpr::containing(const D
 
 ExtVectorElementExprContainingStmtRange ExtVectorElementExpr::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool ExtVectorElementExpr::contains(const Decl &decl) {
+  for(auto &parent : ExtVectorElementExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ExtVectorElementExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ExtVectorElementExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const TokenContext &c) {
@@ -26208,6 +29456,20 @@ ExpressionTraitExprContainingStmtRange ExpressionTraitExpr::containing(const Stm
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool ExpressionTraitExpr::contains(const Decl &decl) {
+  for(auto &parent : ExpressionTraitExpr::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ExpressionTraitExpr::contains(const Stmt &stmt) {
+  for(auto &parent : ExpressionTraitExpr::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -26252,6 +29514,20 @@ AttributedStmtContainingStmtRange AttributedStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool AttributedStmt::contains(const Decl &decl) {
+  for(auto &parent : AttributedStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool AttributedStmt::contains(const Stmt &stmt) {
+  for(auto &parent : AttributedStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<AttributedStmt> AttributedStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -26289,6 +29565,20 @@ SwitchStmtContainingStmtRange SwitchStmt::containing(const Decl &decl) {
 
 SwitchStmtContainingStmtRange SwitchStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool SwitchStmt::contains(const Decl &decl) {
+  for(auto &parent : SwitchStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SwitchStmt::contains(const Stmt &stmt) {
+  for(auto &parent : SwitchStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<SwitchStmt> SwitchStmt::from(const TokenContext &c) {
@@ -26405,6 +29695,20 @@ SwitchCaseContainingStmtRange SwitchCase::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool SwitchCase::contains(const Decl &decl) {
+  for(auto &parent : SwitchCase::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool SwitchCase::contains(const Stmt &stmt) {
+  for(auto &parent : SwitchCase::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<SwitchCase> SwitchCase::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -26460,6 +29764,20 @@ DefaultStmtContainingStmtRange DefaultStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
 }
 
+bool DefaultStmt::contains(const Decl &decl) {
+  for(auto &parent : DefaultStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DefaultStmt::contains(const Stmt &stmt) {
+  for(auto &parent : DefaultStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<DefaultStmt> DefaultStmt::from(const TokenContext &c) {
   return from(c.as_statement());
 }
@@ -26491,6 +29809,20 @@ CaseStmtContainingStmtRange CaseStmt::containing(const Decl &decl) {
 
 CaseStmtContainingStmtRange CaseStmt::containing(const Stmt &stmt) {
   return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+}
+
+bool CaseStmt::contains(const Decl &decl) {
+  for(auto &parent : CaseStmt::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CaseStmt::contains(const Stmt &stmt) {
+  for(auto &parent : CaseStmt::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CaseStmt> CaseStmt::from(const TokenContext &c) {
@@ -26577,6 +29909,20 @@ DeclContainingDeclRange Decl::containing(const Decl &decl) {
 
 DeclContainingDeclRange Decl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool Decl::contains(const Decl &decl) {
+  for(auto &parent : Decl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool Decl::contains(const Stmt &stmt) {
+  for(auto &parent : Decl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 AccessSpecifier Decl::access(void) const {
@@ -26794,6 +30140,20 @@ ClassScopeFunctionSpecializationDeclContainingDeclRange ClassScopeFunctionSpecia
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ClassScopeFunctionSpecializationDecl::contains(const Decl &decl) {
+  for(auto &parent : ClassScopeFunctionSpecializationDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ClassScopeFunctionSpecializationDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ClassScopeFunctionSpecializationDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -26823,6 +30183,20 @@ CapturedDeclContainingDeclRange CapturedDecl::containing(const Decl &decl) {
 
 CapturedDeclContainingDeclRange CapturedDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool CapturedDecl::contains(const Decl &decl) {
+  for(auto &parent : CapturedDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CapturedDecl::contains(const Stmt &stmt) {
+  for(auto &parent : CapturedDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CapturedDecl> CapturedDecl::from(const TokenContext &c) {
@@ -26884,6 +30258,20 @@ BlockDeclContainingDeclRange BlockDecl::containing(const Decl &decl) {
 
 BlockDeclContainingDeclRange BlockDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool BlockDecl::contains(const Decl &decl) {
+  for(auto &parent : BlockDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BlockDecl::contains(const Stmt &stmt) {
+  for(auto &parent : BlockDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<BlockDecl> BlockDecl::from(const TokenContext &c) {
@@ -27018,6 +30406,20 @@ AccessSpecDeclContainingDeclRange AccessSpecDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool AccessSpecDecl::contains(const Decl &decl) {
+  for(auto &parent : AccessSpecDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool AccessSpecDecl::contains(const Stmt &stmt) {
+  for(auto &parent : AccessSpecDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<AccessSpecDecl> AccessSpecDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27056,6 +30458,20 @@ OMPDeclarativeDirectiveDeclContainingDeclRange OMPDeclarativeDirectiveDecl::cont
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool OMPDeclarativeDirectiveDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPDeclarativeDirectiveDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDeclarativeDirectiveDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDeclarativeDirectiveDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27076,6 +30492,20 @@ OMPThreadPrivateDeclContainingDeclRange OMPThreadPrivateDecl::containing(const D
 
 OMPThreadPrivateDeclContainingDeclRange OMPThreadPrivateDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool OMPThreadPrivateDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPThreadPrivateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPThreadPrivateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPThreadPrivateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const TokenContext &c) {
@@ -27118,6 +30548,20 @@ OMPRequiresDeclContainingDeclRange OMPRequiresDecl::containing(const Stmt &stmt)
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool OMPRequiresDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPRequiresDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPRequiresDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPRequiresDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27140,6 +30584,20 @@ OMPAllocateDeclContainingDeclRange OMPAllocateDecl::containing(const Decl &decl)
 
 OMPAllocateDeclContainingDeclRange OMPAllocateDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool OMPAllocateDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPAllocateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPAllocateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPAllocateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const TokenContext &c) {
@@ -27182,6 +30640,20 @@ TranslationUnitDeclContainingDeclRange TranslationUnitDecl::containing(const Stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool TranslationUnitDecl::contains(const Decl &decl) {
+  for(auto &parent : TranslationUnitDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TranslationUnitDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TranslationUnitDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27214,6 +30686,20 @@ StaticAssertDeclContainingDeclRange StaticAssertDecl::containing(const Decl &dec
 
 StaticAssertDeclContainingDeclRange StaticAssertDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool StaticAssertDecl::contains(const Decl &decl) {
+  for(auto &parent : StaticAssertDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool StaticAssertDecl::contains(const Stmt &stmt) {
+  for(auto &parent : StaticAssertDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<StaticAssertDecl> StaticAssertDecl::from(const TokenContext &c) {
@@ -27262,6 +30748,20 @@ RequiresExprBodyDeclContainingDeclRange RequiresExprBodyDecl::containing(const S
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool RequiresExprBodyDecl::contains(const Decl &decl) {
+  for(auto &parent : RequiresExprBodyDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool RequiresExprBodyDecl::contains(const Stmt &stmt) {
+  for(auto &parent : RequiresExprBodyDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27296,6 +30796,20 @@ PragmaDetectMismatchDeclContainingDeclRange PragmaDetectMismatchDecl::containing
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool PragmaDetectMismatchDecl::contains(const Decl &decl) {
+  for(auto &parent : PragmaDetectMismatchDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool PragmaDetectMismatchDecl::contains(const Stmt &stmt) {
+  for(auto &parent : PragmaDetectMismatchDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27328,6 +30842,20 @@ PragmaCommentDeclContainingDeclRange PragmaCommentDecl::containing(const Stmt &s
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool PragmaCommentDecl::contains(const Decl &decl) {
+  for(auto &parent : PragmaCommentDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool PragmaCommentDecl::contains(const Stmt &stmt) {
+  for(auto &parent : PragmaCommentDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27357,6 +30885,20 @@ ObjCPropertyImplDeclContainingDeclRange ObjCPropertyImplDecl::containing(const D
 
 ObjCPropertyImplDeclContainingDeclRange ObjCPropertyImplDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ObjCPropertyImplDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCPropertyImplDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCPropertyImplDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCPropertyImplDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const TokenContext &c) {
@@ -27432,6 +30974,20 @@ NamedDeclContainingDeclRange NamedDecl::containing(const Decl &decl) {
 
 NamedDeclContainingDeclRange NamedDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool NamedDecl::contains(const Decl &decl) {
+  for(auto &parent : NamedDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool NamedDecl::contains(const Stmt &stmt) {
+  for(auto &parent : NamedDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<NamedDecl> NamedDecl::from(const TokenContext &c) {
@@ -27602,6 +31158,20 @@ LabelDeclContainingDeclRange LabelDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool LabelDecl::contains(const Decl &decl) {
+  for(auto &parent : LabelDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool LabelDecl::contains(const Stmt &stmt) {
+  for(auto &parent : LabelDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<LabelDecl> LabelDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27653,6 +31223,20 @@ BaseUsingDeclContainingDeclRange BaseUsingDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool BaseUsingDecl::contains(const Decl &decl) {
+  for(auto &parent : BaseUsingDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BaseUsingDecl::contains(const Stmt &stmt) {
+  for(auto &parent : BaseUsingDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<BaseUsingDecl> BaseUsingDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27693,6 +31277,20 @@ UsingEnumDeclContainingDeclRange UsingEnumDecl::containing(const Decl &decl) {
 
 UsingEnumDeclContainingDeclRange UsingEnumDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool UsingEnumDecl::contains(const Decl &decl) {
+  for(auto &parent : UsingEnumDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UsingEnumDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UsingEnumDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<UsingEnumDecl> UsingEnumDecl::from(const TokenContext &c) {
@@ -27747,6 +31345,20 @@ UsingDeclContainingDeclRange UsingDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool UsingDecl::contains(const Decl &decl) {
+  for(auto &parent : UsingDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UsingDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UsingDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UsingDecl> UsingDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27792,6 +31404,20 @@ ValueDeclContainingDeclRange ValueDecl::containing(const Decl &decl) {
 
 ValueDeclContainingDeclRange ValueDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ValueDecl::contains(const Decl &decl) {
+  for(auto &parent : ValueDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ValueDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ValueDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ValueDecl> ValueDecl::from(const TokenContext &c) {
@@ -27856,6 +31482,20 @@ UnresolvedUsingValueDeclContainingDeclRange UnresolvedUsingValueDecl::containing
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool UnresolvedUsingValueDecl::contains(const Decl &decl) {
+  for(auto &parent : UnresolvedUsingValueDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UnresolvedUsingValueDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UnresolvedUsingValueDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27912,6 +31552,20 @@ TemplateParamObjectDeclContainingDeclRange TemplateParamObjectDecl::containing(c
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool TemplateParamObjectDecl::contains(const Decl &decl) {
+  for(auto &parent : TemplateParamObjectDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TemplateParamObjectDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TemplateParamObjectDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -27938,6 +31592,20 @@ OMPDeclareReductionDeclContainingDeclRange OMPDeclareReductionDecl::containing(c
 
 OMPDeclareReductionDeclContainingDeclRange OMPDeclareReductionDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool OMPDeclareReductionDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPDeclareReductionDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDeclareReductionDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDeclareReductionDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const TokenContext &c) {
@@ -28023,6 +31691,20 @@ MSGuidDeclContainingDeclRange MSGuidDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool MSGuidDecl::contains(const Decl &decl) {
+  for(auto &parent : MSGuidDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MSGuidDecl::contains(const Stmt &stmt) {
+  for(auto &parent : MSGuidDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<MSGuidDecl> MSGuidDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -28049,6 +31731,20 @@ IndirectFieldDeclContainingDeclRange IndirectFieldDecl::containing(const Decl &d
 
 IndirectFieldDeclContainingDeclRange IndirectFieldDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool IndirectFieldDecl::contains(const Decl &decl) {
+  for(auto &parent : IndirectFieldDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool IndirectFieldDecl::contains(const Stmt &stmt) {
+  for(auto &parent : IndirectFieldDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const TokenContext &c) {
@@ -28115,6 +31811,20 @@ EnumConstantDeclContainingDeclRange EnumConstantDecl::containing(const Stmt &stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool EnumConstantDecl::contains(const Decl &decl) {
+  for(auto &parent : EnumConstantDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool EnumConstantDecl::contains(const Stmt &stmt) {
+  for(auto &parent : EnumConstantDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<EnumConstantDecl> EnumConstantDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -28151,6 +31861,20 @@ DeclaratorDeclContainingDeclRange DeclaratorDecl::containing(const Decl &decl) {
 
 DeclaratorDeclContainingDeclRange DeclaratorDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool DeclaratorDecl::contains(const Decl &decl) {
+  for(auto &parent : DeclaratorDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DeclaratorDecl::contains(const Stmt &stmt) {
+  for(auto &parent : DeclaratorDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<DeclaratorDecl> DeclaratorDecl::from(const TokenContext &c) {
@@ -28254,6 +31978,20 @@ VarDeclContainingDeclRange VarDecl::containing(const Decl &decl) {
 
 VarDeclContainingDeclRange VarDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool VarDecl::contains(const Decl &decl) {
+  for(auto &parent : VarDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool VarDecl::contains(const Stmt &stmt) {
+  for(auto &parent : VarDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<VarDecl> VarDecl::from(const TokenContext &c) {
@@ -28572,6 +32310,20 @@ ParmVarDeclContainingDeclRange ParmVarDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ParmVarDecl::contains(const Decl &decl) {
+  for(auto &parent : ParmVarDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ParmVarDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ParmVarDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ParmVarDecl> ParmVarDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -28679,6 +32431,20 @@ OMPCapturedExprDeclContainingDeclRange OMPCapturedExprDecl::containing(const Stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool OMPCapturedExprDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPCapturedExprDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPCapturedExprDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPCapturedExprDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -28713,6 +32479,20 @@ ImplicitParamDeclContainingDeclRange ImplicitParamDecl::containing(const Decl &d
 
 ImplicitParamDeclContainingDeclRange ImplicitParamDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ImplicitParamDecl::contains(const Decl &decl) {
+  for(auto &parent : ImplicitParamDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ImplicitParamDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ImplicitParamDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const TokenContext &c) {
@@ -28754,6 +32534,20 @@ DecompositionDeclContainingDeclRange DecompositionDecl::containing(const Decl &d
 
 DecompositionDeclContainingDeclRange DecompositionDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool DecompositionDecl::contains(const Decl &decl) {
+  for(auto &parent : DecompositionDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool DecompositionDecl::contains(const Stmt &stmt) {
+  for(auto &parent : DecompositionDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<DecompositionDecl> DecompositionDecl::from(const TokenContext &c) {
@@ -28806,6 +32600,20 @@ VarTemplateSpecializationDeclContainingDeclRange VarTemplateSpecializationDecl::
 
 VarTemplateSpecializationDeclContainingDeclRange VarTemplateSpecializationDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool VarTemplateSpecializationDecl::contains(const Decl &decl) {
+  for(auto &parent : VarTemplateSpecializationDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool VarTemplateSpecializationDecl::contains(const Stmt &stmt) {
+  for(auto &parent : VarTemplateSpecializationDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const TokenContext &c) {
@@ -28911,6 +32719,20 @@ VarTemplatePartialSpecializationDeclContainingDeclRange VarTemplatePartialSpecia
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool VarTemplatePartialSpecializationDecl::contains(const Decl &decl) {
+  for(auto &parent : VarTemplatePartialSpecializationDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool VarTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
+  for(auto &parent : VarTemplatePartialSpecializationDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -28949,6 +32771,20 @@ NonTypeTemplateParmDeclContainingDeclRange NonTypeTemplateParmDecl::containing(c
 
 NonTypeTemplateParmDeclContainingDeclRange NonTypeTemplateParmDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool NonTypeTemplateParmDecl::contains(const Decl &decl) {
+  for(auto &parent : NonTypeTemplateParmDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool NonTypeTemplateParmDecl::contains(const Stmt &stmt) {
+  for(auto &parent : NonTypeTemplateParmDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const TokenContext &c) {
@@ -29060,6 +32896,20 @@ MSPropertyDeclContainingDeclRange MSPropertyDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool MSPropertyDecl::contains(const Decl &decl) {
+  for(auto &parent : MSPropertyDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool MSPropertyDecl::contains(const Stmt &stmt) {
+  for(auto &parent : MSPropertyDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<MSPropertyDecl> MSPropertyDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -29100,6 +32950,20 @@ FunctionDeclContainingDeclRange FunctionDecl::containing(const Decl &decl) {
 
 FunctionDeclContainingDeclRange FunctionDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool FunctionDecl::contains(const Decl &decl) {
+  for(auto &parent : FunctionDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FunctionDecl::contains(const Stmt &stmt) {
+  for(auto &parent : FunctionDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<FunctionDecl> FunctionDecl::from(const TokenContext &c) {
@@ -29590,6 +33454,20 @@ CXXMethodDeclContainingDeclRange CXXMethodDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool CXXMethodDecl::contains(const Decl &decl) {
+  for(auto &parent : CXXMethodDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXMethodDecl::contains(const Stmt &stmt) {
+  for(auto &parent : CXXMethodDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXMethodDecl> CXXMethodDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -29726,6 +33604,20 @@ CXXDestructorDeclContainingDeclRange CXXDestructorDecl::containing(const Stmt &s
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool CXXDestructorDecl::contains(const Decl &decl) {
+  for(auto &parent : CXXDestructorDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXDestructorDecl::contains(const Stmt &stmt) {
+  for(auto &parent : CXXDestructorDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -29786,6 +33678,20 @@ CXXConversionDeclContainingDeclRange CXXConversionDecl::containing(const Stmt &s
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool CXXConversionDecl::contains(const Decl &decl) {
+  for(auto &parent : CXXConversionDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXConversionDecl::contains(const Stmt &stmt) {
+  for(auto &parent : CXXConversionDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXConversionDecl> CXXConversionDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -29840,6 +33746,20 @@ CXXConstructorDeclContainingDeclRange CXXConstructorDecl::containing(const Decl 
 
 CXXConstructorDeclContainingDeclRange CXXConstructorDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool CXXConstructorDecl::contains(const Decl &decl) {
+  for(auto &parent : CXXConstructorDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXConstructorDecl::contains(const Stmt &stmt) {
+  for(auto &parent : CXXConstructorDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const TokenContext &c) {
@@ -29917,6 +33837,20 @@ CXXDeductionGuideDeclContainingDeclRange CXXDeductionGuideDecl::containing(const
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool CXXDeductionGuideDecl::contains(const Decl &decl) {
+  for(auto &parent : CXXDeductionGuideDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXDeductionGuideDecl::contains(const Stmt &stmt) {
+  for(auto &parent : CXXDeductionGuideDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -29983,6 +33917,20 @@ FieldDeclContainingDeclRange FieldDecl::containing(const Decl &decl) {
 
 FieldDeclContainingDeclRange FieldDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool FieldDecl::contains(const Decl &decl) {
+  for(auto &parent : FieldDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FieldDecl::contains(const Stmt &stmt) {
+  for(auto &parent : FieldDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<FieldDecl> FieldDecl::from(const TokenContext &c) {
@@ -30094,6 +34042,20 @@ ObjCIvarDeclContainingDeclRange ObjCIvarDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCIvarDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCIvarDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCIvarDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCIvarDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -30157,6 +34119,20 @@ ObjCAtDefsFieldDeclContainingDeclRange ObjCAtDefsFieldDecl::containing(const Stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCAtDefsFieldDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCAtDefsFieldDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCAtDefsFieldDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCAtDefsFieldDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -30191,6 +34167,20 @@ BindingDeclContainingDeclRange BindingDecl::containing(const Decl &decl) {
 
 BindingDeclContainingDeclRange BindingDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool BindingDecl::contains(const Decl &decl) {
+  for(auto &parent : BindingDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BindingDecl::contains(const Stmt &stmt) {
+  for(auto &parent : BindingDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<BindingDecl> BindingDecl::from(const TokenContext &c) {
@@ -30239,6 +34229,20 @@ OMPDeclarativeDirectiveValueDeclContainingDeclRange OMPDeclarativeDirectiveValue
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool OMPDeclarativeDirectiveValueDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPDeclarativeDirectiveValueDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDeclarativeDirectiveValueDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDeclarativeDirectiveValueDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -30265,6 +34269,20 @@ OMPDeclareMapperDeclContainingDeclRange OMPDeclareMapperDecl::containing(const D
 
 OMPDeclareMapperDeclContainingDeclRange OMPDeclareMapperDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool OMPDeclareMapperDecl::contains(const Decl &decl) {
+  for(auto &parent : OMPDeclareMapperDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool OMPDeclareMapperDecl::contains(const Stmt &stmt) {
+  for(auto &parent : OMPDeclareMapperDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const TokenContext &c) {
@@ -30319,6 +34337,20 @@ UsingShadowDeclContainingDeclRange UsingShadowDecl::containing(const Stmt &stmt)
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool UsingShadowDecl::contains(const Decl &decl) {
+  for(auto &parent : UsingShadowDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UsingShadowDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UsingShadowDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UsingShadowDecl> UsingShadowDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -30364,6 +34396,20 @@ ConstructorUsingShadowDeclContainingDeclRange ConstructorUsingShadowDecl::contai
 
 ConstructorUsingShadowDeclContainingDeclRange ConstructorUsingShadowDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ConstructorUsingShadowDecl::contains(const Decl &decl) {
+  for(auto &parent : ConstructorUsingShadowDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ConstructorUsingShadowDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ConstructorUsingShadowDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const TokenContext &c) {
@@ -30431,6 +34477,20 @@ UsingPackDeclContainingDeclRange UsingPackDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool UsingPackDecl::contains(const Decl &decl) {
+  for(auto &parent : UsingPackDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UsingPackDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UsingPackDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UsingPackDecl> UsingPackDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -30475,6 +34535,20 @@ UsingDirectiveDeclContainingDeclRange UsingDirectiveDecl::containing(const Decl 
 
 UsingDirectiveDeclContainingDeclRange UsingDirectiveDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool UsingDirectiveDecl::contains(const Decl &decl) {
+  for(auto &parent : UsingDirectiveDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UsingDirectiveDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UsingDirectiveDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const TokenContext &c) {
@@ -30534,6 +34608,20 @@ UnresolvedUsingIfExistsDeclContainingDeclRange UnresolvedUsingIfExistsDecl::cont
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool UnresolvedUsingIfExistsDecl::contains(const Decl &decl) {
+  for(auto &parent : UnresolvedUsingIfExistsDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UnresolvedUsingIfExistsDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UnresolvedUsingIfExistsDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -30556,6 +34644,20 @@ TypeDeclContainingDeclRange TypeDecl::containing(const Decl &decl) {
 
 TypeDeclContainingDeclRange TypeDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool TypeDecl::contains(const Decl &decl) {
+  for(auto &parent : TypeDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TypeDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TypeDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<TypeDecl> TypeDecl::from(const TokenContext &c) {
@@ -30602,6 +34704,20 @@ TemplateTypeParmDeclContainingDeclRange TemplateTypeParmDecl::containing(const D
 
 TemplateTypeParmDeclContainingDeclRange TemplateTypeParmDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool TemplateTypeParmDecl::contains(const Decl &decl) {
+  for(auto &parent : TemplateTypeParmDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TemplateTypeParmDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TemplateTypeParmDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TokenContext &c) {
@@ -30689,6 +34805,20 @@ TagDeclContainingDeclRange TagDecl::containing(const Decl &decl) {
 
 TagDeclContainingDeclRange TagDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool TagDecl::contains(const Decl &decl) {
+  for(auto &parent : TagDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TagDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TagDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<TagDecl> TagDecl::from(const TokenContext &c) {
@@ -30857,6 +34987,20 @@ RecordDeclContainingDeclRange RecordDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool RecordDecl::contains(const Decl &decl) {
+  for(auto &parent : RecordDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool RecordDecl::contains(const Stmt &stmt) {
+  for(auto &parent : RecordDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<RecordDecl> RecordDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -31006,6 +35150,20 @@ CXXRecordDeclContainingDeclRange CXXRecordDecl::containing(const Decl &decl) {
 
 CXXRecordDeclContainingDeclRange CXXRecordDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool CXXRecordDecl::contains(const Decl &decl) {
+  for(auto &parent : CXXRecordDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool CXXRecordDecl::contains(const Stmt &stmt) {
+  for(auto &parent : CXXRecordDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::from(const TokenContext &c) {
@@ -32119,6 +36277,20 @@ ClassTemplateSpecializationDeclContainingDeclRange ClassTemplateSpecializationDe
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ClassTemplateSpecializationDecl::contains(const Decl &decl) {
+  for(auto &parent : ClassTemplateSpecializationDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ClassTemplateSpecializationDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ClassTemplateSpecializationDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32239,6 +36411,20 @@ ClassTemplatePartialSpecializationDeclContainingDeclRange ClassTemplatePartialSp
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ClassTemplatePartialSpecializationDecl::contains(const Decl &decl) {
+  for(auto &parent : ClassTemplatePartialSpecializationDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ClassTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ClassTemplatePartialSpecializationDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32281,6 +36467,20 @@ EnumDeclContainingDeclRange EnumDecl::containing(const Decl &decl) {
 
 EnumDeclContainingDeclRange EnumDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool EnumDecl::contains(const Decl &decl) {
+  for(auto &parent : EnumDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool EnumDecl::contains(const Stmt &stmt) {
+  for(auto &parent : EnumDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<EnumDecl> EnumDecl::from(const TokenContext &c) {
@@ -32421,6 +36621,20 @@ UnresolvedUsingTypenameDeclContainingDeclRange UnresolvedUsingTypenameDecl::cont
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool UnresolvedUsingTypenameDecl::contains(const Decl &decl) {
+  for(auto &parent : UnresolvedUsingTypenameDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool UnresolvedUsingTypenameDecl::contains(const Stmt &stmt) {
+  for(auto &parent : UnresolvedUsingTypenameDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32481,6 +36695,20 @@ TypedefNameDeclContainingDeclRange TypedefNameDecl::containing(const Stmt &stmt)
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool TypedefNameDecl::contains(const Decl &decl) {
+  for(auto &parent : TypedefNameDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TypedefNameDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TypedefNameDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<TypedefNameDecl> TypedefNameDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32538,6 +36766,20 @@ TypedefDeclContainingDeclRange TypedefDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool TypedefDecl::contains(const Decl &decl) {
+  for(auto &parent : TypedefDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TypedefDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TypedefDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<TypedefDecl> TypedefDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32568,6 +36810,20 @@ TypeAliasDeclContainingDeclRange TypeAliasDecl::containing(const Decl &decl) {
 
 TypeAliasDeclContainingDeclRange TypeAliasDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool TypeAliasDecl::contains(const Decl &decl) {
+  for(auto &parent : TypeAliasDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TypeAliasDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TypeAliasDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<TypeAliasDecl> TypeAliasDecl::from(const TokenContext &c) {
@@ -32610,6 +36866,20 @@ ObjCTypeParamDeclContainingDeclRange ObjCTypeParamDecl::containing(const Decl &d
 
 ObjCTypeParamDeclContainingDeclRange ObjCTypeParamDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ObjCTypeParamDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCTypeParamDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCTypeParamDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCTypeParamDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TokenContext &c) {
@@ -32672,6 +36942,20 @@ TemplateDeclContainingDeclRange TemplateDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool TemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : TemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<TemplateDecl> TemplateDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32702,6 +36986,20 @@ RedeclarableTemplateDeclContainingDeclRange RedeclarableTemplateDecl::containing
 
 RedeclarableTemplateDeclContainingDeclRange RedeclarableTemplateDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool RedeclarableTemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : RedeclarableTemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool RedeclarableTemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : RedeclarableTemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const TokenContext &c) {
@@ -32736,6 +37034,20 @@ FunctionTemplateDeclContainingDeclRange FunctionTemplateDecl::containing(const S
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool FunctionTemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : FunctionTemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FunctionTemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : FunctionTemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32766,6 +37078,20 @@ ClassTemplateDeclContainingDeclRange ClassTemplateDecl::containing(const Decl &d
 
 ClassTemplateDeclContainingDeclRange ClassTemplateDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ClassTemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : ClassTemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ClassTemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ClassTemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const TokenContext &c) {
@@ -32800,6 +37126,20 @@ VarTemplateDeclContainingDeclRange VarTemplateDecl::containing(const Stmt &stmt)
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool VarTemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : VarTemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool VarTemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : VarTemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<VarTemplateDecl> VarTemplateDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32830,6 +37170,20 @@ TypeAliasTemplateDeclContainingDeclRange TypeAliasTemplateDecl::containing(const
 
 TypeAliasTemplateDeclContainingDeclRange TypeAliasTemplateDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool TypeAliasTemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : TypeAliasTemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TypeAliasTemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TypeAliasTemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const TokenContext &c) {
@@ -32880,6 +37234,20 @@ ConceptDeclContainingDeclRange ConceptDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ConceptDecl::contains(const Decl &decl) {
+  for(auto &parent : ConceptDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ConceptDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ConceptDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ConceptDecl> ConceptDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32919,6 +37287,20 @@ BuiltinTemplateDeclContainingDeclRange BuiltinTemplateDecl::containing(const Stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool BuiltinTemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : BuiltinTemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool BuiltinTemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : BuiltinTemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32947,6 +37329,20 @@ TemplateTemplateParmDeclContainingDeclRange TemplateTemplateParmDecl::containing
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool TemplateTemplateParmDecl::contains(const Decl &decl) {
+  for(auto &parent : TemplateTemplateParmDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool TemplateTemplateParmDecl::contains(const Stmt &stmt) {
+  for(auto &parent : TemplateTemplateParmDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -32973,6 +37369,20 @@ ObjCPropertyDeclContainingDeclRange ObjCPropertyDecl::containing(const Decl &dec
 
 ObjCPropertyDeclContainingDeclRange ObjCPropertyDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ObjCPropertyDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCPropertyDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCPropertyDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCPropertyDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const TokenContext &c) {
@@ -33107,6 +37517,20 @@ ObjCMethodDeclContainingDeclRange ObjCMethodDecl::containing(const Decl &decl) {
 
 ObjCMethodDeclContainingDeclRange ObjCMethodDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ObjCMethodDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCMethodDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCMethodDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCMethodDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const TokenContext &c) {
@@ -33335,6 +37759,20 @@ ObjCContainerDeclContainingDeclRange ObjCContainerDecl::containing(const Stmt &s
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCContainerDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCContainerDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCContainerDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCContainerDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -33489,6 +37927,20 @@ ObjCCategoryDeclContainingDeclRange ObjCCategoryDecl::containing(const Stmt &stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCCategoryDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCCategoryDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCCategoryDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCCategoryDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -33613,6 +38065,20 @@ ObjCProtocolDeclContainingDeclRange ObjCProtocolDecl::containing(const Stmt &stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCProtocolDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCProtocolDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCProtocolDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCProtocolDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -33690,6 +38156,20 @@ ObjCInterfaceDeclContainingDeclRange ObjCInterfaceDecl::containing(const Decl &d
 
 ObjCInterfaceDeclContainingDeclRange ObjCInterfaceDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ObjCInterfaceDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCInterfaceDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCInterfaceDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCInterfaceDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const TokenContext &c) {
@@ -33938,6 +38418,20 @@ ObjCImplDeclContainingDeclRange ObjCImplDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCImplDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCImplDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCImplDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCImplDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCImplDecl> ObjCImplDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -33990,6 +38484,20 @@ ObjCCategoryImplDeclContainingDeclRange ObjCCategoryImplDecl::containing(const S
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCCategoryImplDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCCategoryImplDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCCategoryImplDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCCategoryImplDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -34035,6 +38543,20 @@ ObjCImplementationDeclContainingDeclRange ObjCImplementationDecl::containing(con
 
 ObjCImplementationDeclContainingDeclRange ObjCImplementationDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ObjCImplementationDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCImplementationDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCImplementationDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCImplementationDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const TokenContext &c) {
@@ -34134,6 +38656,20 @@ ObjCCompatibleAliasDeclContainingDeclRange ObjCCompatibleAliasDecl::containing(c
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ObjCCompatibleAliasDecl::contains(const Decl &decl) {
+  for(auto &parent : ObjCCompatibleAliasDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ObjCCompatibleAliasDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ObjCCompatibleAliasDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -34162,6 +38698,20 @@ NamespaceDeclContainingDeclRange NamespaceDecl::containing(const Decl &decl) {
 
 NamespaceDeclContainingDeclRange NamespaceDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool NamespaceDecl::contains(const Decl &decl) {
+  for(auto &parent : NamespaceDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool NamespaceDecl::contains(const Stmt &stmt) {
+  for(auto &parent : NamespaceDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &c) {
@@ -34200,6 +38750,20 @@ NamespaceAliasDeclContainingDeclRange NamespaceAliasDecl::containing(const Decl 
 
 NamespaceAliasDeclContainingDeclRange NamespaceAliasDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool NamespaceAliasDecl::contains(const Decl &decl) {
+  for(auto &parent : NamespaceAliasDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool NamespaceAliasDecl::contains(const Stmt &stmt) {
+  for(auto &parent : NamespaceAliasDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const TokenContext &c) {
@@ -34259,6 +38823,20 @@ LinkageSpecDeclContainingDeclRange LinkageSpecDecl::containing(const Stmt &stmt)
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool LinkageSpecDecl::contains(const Decl &decl) {
+  for(auto &parent : LinkageSpecDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool LinkageSpecDecl::contains(const Stmt &stmt) {
+  for(auto &parent : LinkageSpecDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -34291,6 +38869,20 @@ LifetimeExtendedTemporaryDeclContainingDeclRange LifetimeExtendedTemporaryDecl::
 
 LifetimeExtendedTemporaryDeclContainingDeclRange LifetimeExtendedTemporaryDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool LifetimeExtendedTemporaryDecl::contains(const Decl &decl) {
+  for(auto &parent : LifetimeExtendedTemporaryDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool LifetimeExtendedTemporaryDecl::contains(const Stmt &stmt) {
+  for(auto &parent : LifetimeExtendedTemporaryDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const TokenContext &c) {
@@ -34344,6 +38936,20 @@ ImportDeclContainingDeclRange ImportDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ImportDecl::contains(const Decl &decl) {
+  for(auto &parent : ImportDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ImportDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ImportDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ImportDecl> ImportDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -34378,6 +38984,20 @@ FriendTemplateDeclContainingDeclRange FriendTemplateDecl::containing(const Stmt 
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool FriendTemplateDecl::contains(const Decl &decl) {
+  for(auto &parent : FriendTemplateDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FriendTemplateDecl::contains(const Stmt &stmt) {
+  for(auto &parent : FriendTemplateDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -34396,6 +39016,20 @@ FriendDeclContainingDeclRange FriendDecl::containing(const Decl &decl) {
 
 FriendDeclContainingDeclRange FriendDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool FriendDecl::contains(const Decl &decl) {
+  for(auto &parent : FriendDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FriendDecl::contains(const Stmt &stmt) {
+  for(auto &parent : FriendDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<FriendDecl> FriendDecl::from(const TokenContext &c) {
@@ -34463,6 +39097,20 @@ FileScopeAsmDeclContainingDeclRange FileScopeAsmDecl::containing(const Stmt &stm
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool FileScopeAsmDecl::contains(const Decl &decl) {
+  for(auto &parent : FileScopeAsmDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool FileScopeAsmDecl::contains(const Stmt &stmt) {
+  for(auto &parent : FileScopeAsmDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -34507,6 +39155,20 @@ ExternCContextDeclContainingDeclRange ExternCContextDecl::containing(const Stmt 
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
 }
 
+bool ExternCContextDecl::contains(const Decl &decl) {
+  for(auto &parent : ExternCContextDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ExternCContextDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ExternCContextDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
 std::optional<ExternCContextDecl> ExternCContextDecl::from(const TokenContext &c) {
   return from(c.as_declaration());
 }
@@ -34539,6 +39201,20 @@ ExportDeclContainingDeclRange ExportDecl::containing(const Decl &decl) {
 
 ExportDeclContainingDeclRange ExportDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool ExportDecl::contains(const Decl &decl) {
+  for(auto &parent : ExportDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool ExportDecl::contains(const Stmt &stmt) {
+  for(auto &parent : ExportDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<ExportDecl> ExportDecl::from(const TokenContext &c) {
@@ -34596,6 +39272,20 @@ EmptyDeclContainingDeclRange EmptyDecl::containing(const Decl &decl) {
 
 EmptyDeclContainingDeclRange EmptyDecl::containing(const Stmt &stmt) {
   return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+}
+
+bool EmptyDecl::contains(const Decl &decl) {
+  for(auto &parent : EmptyDecl::containing(decl)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
+}
+
+bool EmptyDecl::contains(const Stmt &stmt) {
+  for(auto &parent : EmptyDecl::containing(stmt)) {
+    if(parent.id() == id()) { return true; }
+  }
+  return false;
 }
 
 std::optional<EmptyDecl> EmptyDecl::from(const TokenContext &c) {
