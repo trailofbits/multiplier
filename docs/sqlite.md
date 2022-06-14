@@ -8,7 +8,7 @@ After loading the Multiplier SQLite extension into the SQLite session, the `Mult
 
     INSERT INTO MultiplierConnection(name, host, port) VALUES ('default', 'localhost', '50051');
 
-Use `'unix'` as `port` value to establish connections to Unix sockets.
+Use `'unix'` as `host` value to establish connections to Unix sockets.
 
 Once a connection has been established, the tables described in this document can be instantiated using the following syntax:
 
@@ -9635,7 +9635,7 @@ This table also includes all of the fields contained in [`ValueDecl`](#ValueDecl
 | `is_previous_declaration_in_same_block_scope` | `INTEGER` | :heavy_check_mark: | |
 | `is_static_data_member` | `INTEGER` | :heavy_check_mark: | |
 | `is_static_local` | `INTEGER` | :heavy_check_mark: | |
-| `is_this_declaration_a_demoted_definition` | `INTEGER` | :heavy_check_mark: | |
+| `is_demoted_definition` | `INTEGER` | :heavy_check_mark: | |
 | `is_usable_in_constant_expressions` | `INTEGER` | :heavy_check_mark: | |
 | `might_be_usable_in_constant_expressions` | `INTEGER` | :heavy_check_mark: | |
 | `needs_destruction` | `INTEGER` | :heavy_check_mark: | [`QualTypeDestructionKind`](#QualTypeDestructionKind) |
@@ -9821,7 +9821,6 @@ This table also includes all of the fields contained in [`DeclaratorDecl`](#Decl
 | `is_target_clones_multi_version` | `INTEGER` | :heavy_check_mark: | |
 | `is_target_multi_version` | `INTEGER` | :heavy_check_mark: | |
 | `is_template_instantiation` | `INTEGER` | :heavy_check_mark: | |
-| `is_definition` | `INTEGER` | :heavy_check_mark: | |
 | `is_this_declaration_instantiated_from_a_friend_definition` | `INTEGER` | :heavy_check_mark: | |
 | `is_trivial` | `INTEGER` | :heavy_check_mark: | |
 | `is_trivial_for_call` | `INTEGER` | :heavy_check_mark: | |
@@ -10105,7 +10104,6 @@ This table also includes all of the fields contained in [`TypeDecl`](#TypeDecl).
 | `is_free_standing` | `INTEGER` | :heavy_check_mark: | |
 | `is_interface` | `INTEGER` | :heavy_check_mark: | |
 | `is_struct` | `INTEGER` | :heavy_check_mark: | |
-| `is_definition` | `INTEGER` | :heavy_check_mark: | |
 | `is_union` | `INTEGER` | :heavy_check_mark: | |
 | `may_have_out_of_date_definition` | `INTEGER` | :heavy_check_mark: | |
 
@@ -10527,7 +10525,6 @@ This table also includes all of the fields contained in [`NamedDecl`](#NamedDecl
 | `is_property_accessor` | `INTEGER` | :heavy_check_mark: | |
 | `is_redeclaration` | `INTEGER` | :heavy_check_mark: | |
 | `is_synthesized_accessor_stub` | `INTEGER` | :heavy_check_mark: | |
-| `is_definition` | `INTEGER` | :heavy_check_mark: | |
 | `is_this_declaration_a_designated_initializer` | `INTEGER` | :heavy_check_mark: | |
 | `is_variadic` | `INTEGER` | :heavy_check_mark: | |
 
@@ -10571,7 +10568,6 @@ This table also includes all of the fields contained in [`ObjCContainerDecl`](#O
 | `obj_c_runtime_name_as_string` | `TEXT` | :heavy_check_mark: | |
 | `has_definition` | `INTEGER` | :heavy_check_mark: | |
 | `is_non_runtime_protocol` | `INTEGER` | :heavy_check_mark: | |
-| `is_definition` | `INTEGER` | :heavy_check_mark: | |
 
 This table also includes all of the fields contained in [`ObjCContainerDecl`](#ObjCContainerDecl).
 
@@ -10595,7 +10591,6 @@ This table also includes all of the fields contained in [`ObjCContainerDecl`](#O
 | `is_arc_weakref_unavailable` | `INTEGER` | :heavy_check_mark: | |
 | `is_implicit_interface_declaration` | `INTEGER` | :heavy_check_mark: | |
 | `is_obj_c_requires_property_definitions` | `INTEGER` | :heavy_check_mark: | [`ObjCInterfaceDecl`](#ObjCInterfaceDecl) |
-| `is_definition` | `INTEGER` | :heavy_check_mark: | |
 
 This table also includes all of the fields contained in [`ObjCContainerDecl`](#ObjCContainerDecl).
 

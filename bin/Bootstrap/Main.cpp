@@ -2985,7 +2985,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "`MultiplierConnection` virtual table will be made available. This table is used to "
       << "establish connections to Multiplier indices:\n\n"
       << "    INSERT INTO MultiplierConnection(name, host, port) VALUES ('default', 'localhost', '50051');\n\n"
-      << "Use `'unix'` as `port` value to establish connections to Unix sockets.\n\n"
+      << "Use `'unix'` as `host` value to establish connections to Unix sockets.\n\n"
       << "Once a connection has been established, the tables described in this document can be "
       << "instantiated using the following syntax:\n\n"
       << "    CREATE VIRTUAL TABLE CustomName USING multiplier(TableName, connection_name);\n\n"
