@@ -49,12 +49,10 @@ FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
   d->content = new CodeView(multiplier.CodeTheme(), event_source);
   d->layout->addWidget(d->content);
   d->content->SetFile(multiplier.Index(), file_id);
+  d->content->viewport()->installEventFilter(&multiplier);
 
-  connect(d->content, &CodeView::DeclarationEvent,
-          &multiplier, &Multiplier::ActOnDeclarations);
-
-  connect(d->content, &CodeView::TokenEvent,
-          &multiplier, &Multiplier::ActOnTokens);
+  connect(d->content, &CodeView::TokenPressEvent,
+          &multiplier, &Multiplier::ActOnTokenPressEvent);
 }
 
 void FileView::ScrollToToken(RawEntityId file_tok_id) const {

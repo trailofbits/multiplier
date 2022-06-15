@@ -99,10 +99,14 @@ struct Configuration {
   FileBrowserConfiguration file_browser;
   FileConfiguration file;
 
-  // If one or more declarations are hovered/clicked, then we evaluate these
-  // bindings are trigger the relevant actions.
-  std::vector<EventAction> declaration_actions;
-  std::vector<EventAction> token_actions;
+  // These actions are evaluated during event filterings. If you want to check
+  // clicks or keys, then do so here.
+  std::vector<EventAction> actions;
+
+  // These actions are evaluated immediately upon receipt of an event. If you
+  // always want an event to fire, then do it here. The only tested thing for
+  // these is the source; the modifiers/click/key constraints are ignored.
+  std::vector<EventAction> immediate_actions;
 
   Configuration(void);
 };

@@ -22,6 +22,9 @@ enum class ConnectionState : int;
 class Multiplier final : public QMainWindow {
   Q_OBJECT
 
+  struct PrivateData;
+  std::unique_ptr<PrivateData> d;
+
   Multiplier(void) = delete;
   Multiplier(const Multiplier &) = delete;
   Multiplier &operator=(const Multiplier &) = delete;
@@ -45,9 +48,6 @@ class Multiplier final : public QMainWindow {
   bool eventFilter(QObject *watched, QEvent *event) Q_DECL_FINAL;
 
  private:
-  struct PrivateData;
-  std::unique_ptr<PrivateData> d;
-
   void InitializeWidgets(void);
   void InitializeMenus(void);
   void InitializeUI(void);
@@ -55,6 +55,9 @@ class Multiplier final : public QMainWindow {
   void UpdateMenus(void);
   void UpdateWidgets(void);
   void UpdateUI(void);
+
+  bool DoActions(const EventAction &ea);
+  bool EmitEvent(void);
 
  public slots:
   void FocusOnHistory(bool);
@@ -71,13 +74,9 @@ class Multiplier final : public QMainWindow {
   void OnHelpAboutAction(void);
   void OnConnectionStateChange(ConnectionState state);
   void OnMoveReferenceBrowser(Qt::DockWidgetArea area);
-  void OnHistoryDeclarationClicked(RawEntityId eid);
 
  public slots:
-  void ActOnTokens(EventSource source, Event event,
-                   std::vector<RawEntityId> ids);
-  void ActOnDeclarations(EventSource source, Event event,
-                         std::vector<RawEntityId> ids);
+  void ActOnTokenPressEvent(EventSource source, EventLocations locs);
 };
 
 }  // namespace gui

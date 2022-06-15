@@ -36,6 +36,8 @@
 #include "OpenConnectionDialog.h"
 #include "ReferenceBrowserView.h"
 
+#include <iostream>
+
 namespace mx::gui {
 
 enum class ConnectionState : int { kNotConnected, kConnecting, kConnected };
@@ -74,6 +76,16 @@ struct Multiplier::PrivateData final {
 
   class HistoryBrowserView *history_browser_view{nullptr};
   QDockWidget *history_browser_dock{nullptr};
+
+  Qt::KeyboardModifiers modifiers;
+  Qt::Key key{Qt::Key_unknown};
+  Qt::MouseButtons buttons;
+  Qt::MouseButtons double_click_buttons;
+  MouseClickKind click_kind{MouseClickKind::kNotClicked};
+
+  // The last-pressed locations.
+  EventSources last_sources;
+  EventLocations last_locations;
 
   mx::Index index;
 
@@ -157,8 +169,126 @@ void Multiplier::closeEvent(QCloseEvent *event) {
   event->accept();
 }
 
+#ifdef Q_OS_MAC
+#  define IF_APPLE_ELSE(a, b) a
+#else
+#  define IF_APPLE_ELSE(a, b) b
+#endif
+
 bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
-  return false;
+
+//  std::cerr << "et=" << int(et) << '\n';
+  switch (const QEvent::Type et = event->type(); et) {
+//    case QEvent::Enter:
+//      ++d->in_widget;
+//      std::cerr << "enter=" << d->in_widget << '\n';
+//      return false;
+//    case QEvent::Leave:
+//      d->in_widget = std::max(d->in_widget - 1, 0);
+//      std::cerr << "leave=" << d->in_widget << '\n';
+//      if (1 <= d->in_widget) {
+//        d->modifiers = {};
+//        d->click_kind = MouseClickKind::kNotClicked;
+//        d->key = Qt::Key_unknown;
+//        std::cerr << "outside of gui\n";
+//      }
+//      return false;
+    case QEvent::KeyPress:
+      d->key = Qt::Key_unknown;
+      d->click_kind = MouseClickKind::kNotClicked;
+      switch (auto key = dynamic_cast<QKeyEvent *>(event)->key(); key) {
+        case IF_APPLE_ELSE(Qt::Key_Meta, Qt::Key_Control):
+          d->modifiers.setFlag(Qt::KeyboardModifier::ControlModifier);
+          break;
+        case Qt::Key_Shift:
+          d->modifiers.setFlag(Qt::KeyboardModifier::ShiftModifier);
+          break;
+        case Qt::Key_Alt:
+        case Qt::Key_Option:
+          d->modifiers.setFlag(Qt::KeyboardModifier::AltModifier);
+          break;
+        case IF_APPLE_ELSE(Qt::Key_Control, Qt::Key_Meta):
+          d->modifiers.setFlag(Qt::KeyboardModifier::MetaModifier);
+          break;
+        default:
+          d->key = static_cast<Qt::Key>(key);
+          break;
+      }
+      break;
+
+    case QEvent::KeyRelease:
+      switch (auto key = dynamic_cast<QKeyEvent *>(event)->key(); key) {
+        case IF_APPLE_ELSE(Qt::Key_Meta, Qt::Key_Control):
+          d->modifiers.setFlag(Qt::KeyboardModifier::ControlModifier, false);
+          break;
+        case Qt::Key_Shift:
+          d->modifiers.setFlag(Qt::KeyboardModifier::ShiftModifier, false);
+          break;
+        case Qt::Key_Alt:
+        case Qt::Key_Option:
+          d->modifiers.setFlag(Qt::KeyboardModifier::AltModifier, false);
+          break;
+        case IF_APPLE_ELSE(Qt::Key_Control, Qt::Key_Meta):
+          d->modifiers.setFlag(Qt::KeyboardModifier::MetaModifier, false);
+          break;
+        default:
+          if (d->key == key) {
+            d->key = Qt::Key_unknown;
+          }
+          break;
+      }
+      break;
+
+    case QEvent::MouseButtonPress:
+    case QEvent::NonClientAreaMouseButtonPress:
+    case QEvent::GraphicsSceneMousePress: {
+      QMouseEvent *me = dynamic_cast<QMouseEvent *>(event);
+      const Qt::MouseButton button = me->button();
+      d->buttons.setFlag(button, true);
+      d->double_click_buttons = {};
+      d->click_kind = MouseClickKind::kNotClicked;
+      return false;
+    }
+
+    case QEvent::MouseButtonRelease:
+    case QEvent::NonClientAreaMouseButtonRelease:
+    case QEvent::GraphicsSceneMouseRelease: {
+      QMouseEvent *me = dynamic_cast<QMouseEvent *>(event);
+      const Qt::MouseButton button = me->button();
+      d->click_kind = MouseClickKind::kNotClicked;
+      if (d->buttons.testFlag(button)) {
+        d->buttons.setFlag(button, false);
+        if (button == Qt::MouseButton::LeftButton) {
+          d->click_kind = MouseClickKind::kLeftClick;
+        } else if (button == Qt::MouseButton::RightButton) {
+          d->click_kind = MouseClickKind::kRightClick;
+        }
+      } else if (d->double_click_buttons.testFlag(button)) {
+        d->double_click_buttons.setFlag(button, false);
+        if (button == Qt::MouseButton::LeftButton) {
+          d->click_kind = MouseClickKind::kLeftDoubleClick;
+        } else if (button == Qt::MouseButton::RightButton) {
+          d->click_kind = MouseClickKind::kRightDoubleClick;
+        }
+      }
+      break;
+    }
+    case QEvent::MouseButtonDblClick:
+    case QEvent::NonClientAreaMouseButtonDblClick:
+    case QEvent::GraphicsSceneMouseDoubleClick: {
+      QMouseEvent *me = dynamic_cast<QMouseEvent *>(event);
+      d->double_click_buttons.setFlag(me->button(), true);
+      break;
+    }
+
+    default:
+      return false;
+  }
+
+  auto ret = EmitEvent();
+  d->key = Qt::Key_unknown;
+  d->click_kind = MouseClickKind::kNotClicked;
+  return ret;
 }
 
 Multiplier::Multiplier(struct Configuration &config_)
@@ -169,6 +299,8 @@ Multiplier::Multiplier(struct Configuration &config_)
 }
 
 void Multiplier::InitializeWidgets(void) {
+  installEventFilter(this);
+
   d->code_browser_view = new CodeBrowserView(*this);
 
   d->file_browser_view = new FileBrowserView(d->config.file_browser);
@@ -212,8 +344,8 @@ void Multiplier::InitializeWidgets(void) {
   connect(d->reference_browser_dock, &QDockWidget::dockLocationChanged,
           this, &Multiplier::OnMoveReferenceBrowser);
 
-  connect(d->history_browser_view, &HistoryBrowserView::HistoryDeclarationClicked,
-          this, &Multiplier::OnHistoryDeclarationClicked);
+  connect(d->history_browser_view, &HistoryBrowserView::TokenPressEvent,
+          this, &Multiplier::ActOnTokenPressEvent);
 }
 
 void Multiplier::InitializeMenus(void) {
@@ -327,12 +459,6 @@ void Multiplier::OnMoveReferenceBrowser(Qt::DockWidgetArea area) {
   }
 }
 
-void Multiplier::OnHistoryDeclarationClicked(RawEntityId eid) {
-  std::vector<RawEntityId> ids;
-  ids.push_back(eid);
-  d->code_browser_view->OpenEntities(std::move(ids));
-}
-
 void Multiplier::FocusOnHistory(bool visible) {
   if (visible) {
     d->history_browser_view->Focus();
@@ -411,91 +537,124 @@ void Multiplier::OnViewHistoryBrowserAction(void) {
 
 void Multiplier::OnHelpAboutAction(void) {}
 
-void Multiplier::ActOnTokens(EventSource source, Event event,
-                             std::vector<RawEntityId> ids) {
+bool Multiplier::DoActions(const EventAction &ea) {
+  if ((ea.match_sources & d->last_sources) != d->last_sources) {
+    std::cerr << "failed on sources: " << ea.description << "\n";
+    return false;
+  }
 
-  for (const auto &[mevent_, sources_, actions_] : d->config.token_actions) {
-    const Event &mevent = mevent_;
-    const EventSources sources = sources_;
-    const Actions actions = actions_;
-    if (!sources.testFlag(source) ||
-        mevent.modifiers != event.modifiers ||
-        mevent.buttons != event.buttons ||
-        mevent.kind != event.kind) {
-      continue;
-    }
-
-    if (actions.testFlag(Action::kOpenCodeBrowser)) {
-      d->code_browser_view->OpenEntities(ids);
-    }
-
-    if (actions.testFlag(Action::kOpenReferenceBrowser)) {
-      d->reference_browser_view->SetRoots(ids);
+  switch (ea.do_action) {
+    case Action::kDoNothing:
+      return false;
+    case Action::kOpenCodeBrowser:
+      d->code_browser_view->OpenEntities(d->last_locations);
+      return true;
+    case Action::kOpenReferenceBrowser:
+      d->reference_browser_view->SetRoots(d->last_locations);
       if (d->reference_browser_dock->visibleRegion().isEmpty()) {
         d->reference_browser_dock->raise();
       }
-    }
+      return true;
+    case Action::kAddToHistoryAsChild:
+      d->history_browser_view->AddChildDeclarations(d->last_locations);
+      return true;
+    case Action::kAddToHistoryAsSibling:
+      d->history_browser_view->AddSiblingDeclarations(d->last_locations);
+      return true;
+    case Action::kAddToHistoryUnderRoot:
+      d->history_browser_view->AddDeclarationsUnderRoot(d->last_locations);
+      return true;
+    case Action::kAddToHistoryAsRoots:
+      d->history_browser_view->AddRootDeclarations(d->last_locations);
+      return true;
+    case Action::kGoBackLinearHistory:
+      return d->history_browser_view->GoBackInLinearHistory();
 
-    if (actions.testFlag(Action::kAddToHistoryAsChild)) {
-      d->history_browser_view->AddChildDeclarations(ids);
-    }
-
-    if (actions.testFlag(Action::kAddToHistoryAsSibling)) {
-      d->history_browser_view->AddSiblingDeclarations(ids);
-    }
-
-    if (actions.testFlag(Action::kAddToHistoryUnderRoot)) {
-      d->history_browser_view->AddDeclarationsUnderRoot(ids);
-    }
-
-    if (actions.testFlag(Action::kAddToHistoryAsRoots)) {
-      d->history_browser_view->AddRootDeclarations(ids);
-    }
   }
+
+  return false;
 }
 
-void Multiplier::ActOnDeclarations(EventSource source, Event event,
-                                   std::vector<RawEntityId> ids) {
+bool Multiplier::EmitEvent(void) {
+  if (d->last_locations.IsEmpty()) {
+    std::cerr << "no events\n";
+    return false;  // Let the event through.
+  }
 
-  for (const auto &[mevent_, sources_, actions_] :
-       d->config.declaration_actions) {
-    const Event &mevent = mevent_;
-    const EventSources sources = sources_;
-    const Actions actions = actions_;
-    if (!sources.testFlag(source) ||
-        mevent.modifiers != event.modifiers ||
-        mevent.buttons != event.buttons ||
-        mevent.kind != event.kind) {
+  switch (d->click_kind) {
+    case MouseClickKind::kLeftClick: std::cerr << "left "; break;
+    case MouseClickKind::kLeftDoubleClick: std::cerr << "left-double "; break;
+    case MouseClickKind::kRightClick: std::cerr << "right "; break;
+    case MouseClickKind::kRightDoubleClick: std::cerr << "right-double "; break;
+    default: break;
+  }
+
+  if (d->modifiers) {
+    std::cerr << "modifiers=" << std::hex << int(d->modifiers) << std::dec << ' ';
+  }
+
+  if (d->key != Qt::Key_unknown) {
+    std::cerr << "key=" << int(d->key) << ' ';
+  }
+
+  std::cerr << '\n';
+
+  auto acted = false;
+  for (const EventAction &ea : d->config.actions) {
+    if (ea.match_modifiers != d->modifiers) {
+      std::cerr << "failed on modifiers: " << ea.description << "\n";
       continue;
     }
 
-    if (actions.testFlag(Action::kOpenCodeBrowser)) {
-      d->code_browser_view->OpenEntities(ids);
+    if (ea.match_key != d->key) {
+      std::cerr << "failed on key: " << ea.description << "\n";
+      continue;
     }
 
-    if (actions.testFlag(Action::kOpenReferenceBrowser)) {
-      d->reference_browser_view->SetRoots(ids);
-      if (d->reference_browser_dock->visibleRegion().isEmpty()) {
-        d->reference_browser_dock->raise();
-      }
+    if (ea.match_click != d->click_kind) {
+      std::cerr << "failed on click kind: " << ea.description << "\n";
+      continue;
     }
 
-    if (actions.testFlag(Action::kAddToHistoryAsChild)) {
-      d->history_browser_view->AddChildDeclarations(ids);
+    for (const auto &loc : d->last_locations) {
+      std::cerr
+          << "EmitEvent"
+          << "; decl_id=" << loc.DeclarationId()
+          << "; file_tok_id=" << loc.FileTokenId()
+          << "; frag_tok_id=" << loc.FragmentTokenId()
+          << ": " << ea.description << '\n';
     }
 
-    if (actions.testFlag(Action::kAddToHistoryAsSibling)) {
-      d->history_browser_view->AddSiblingDeclarations(ids);
-    }
-
-    if (actions.testFlag(Action::kAddToHistoryUnderRoot)) {
-      d->history_browser_view->AddDeclarationsUnderRoot(ids);
-    }
-
-    if (actions.testFlag(Action::kAddToHistoryAsRoots)) {
-      d->history_browser_view->AddRootDeclarations(ids);
+    if (DoActions(ea)) {
+      acted = true;
     }
   }
+
+  return acted;
+}
+
+void Multiplier::ActOnTokenPressEvent(EventSource source, EventLocations locs) {
+  d->last_sources = source;
+  d->last_locations = std::move(locs);
+  d->key = Qt::Key_unknown;
+  d->click_kind = MouseClickKind::kNotClicked;
+  for (const EventAction &ea : d->config.immediate_actions) {
+    DoActions(ea);
+  }
+//  for (const EventLocation &loc : d->last_locations) {
+//    std::cerr
+//        << "ActOnTokenPressEvent"
+//        << "; decl_id=" << loc.DeclarationId()
+//        << "; file_tok_id=" << loc.FileTokenId()
+//        << "; frag_tok_id=" << loc.FragmentTokenId();
+//    switch (source) {
+//      case EventSource::kCodeBrowser: std::cerr << " (from code browser)"; break;
+//      case EventSource::kReferenceBrowser: std::cerr << " (from ref browser)"; break;
+//      case EventSource::kReferenceBrowserCodePreview: std::cerr << " (from ref code browser)"; break;
+//      case EventSource::kHistoryBrowser: std::cerr << " (from history browser)"; break;
+//    }
+//    std::cerr << '\n';
+//  }
 }
 
 }  // namespace mx::gui

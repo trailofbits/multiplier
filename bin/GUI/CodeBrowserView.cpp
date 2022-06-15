@@ -44,38 +44,60 @@ struct CodeBrowserView::PrivateData {
 
 struct LocateEntitiesThread::PrivateData {
   const Index index;
-  const std::vector<RawEntityId> ids;
+  const EventLocations locs;
   const unsigned counter;
+  std::vector<FileId> seen_file_ids;
 
-  inline PrivateData(const Index &index_, std::vector<RawEntityId> ids_,
+  inline PrivateData(const Index &index_, const EventLocations &ids_,
                      unsigned counter_)
       : index(index_),
-        ids(std::move(ids_)),
+        locs(ids_),
         counter(counter_) {}
 };
 
 LocateEntitiesThread::~LocateEntitiesThread(void) {}
 
 LocateEntitiesThread::LocateEntitiesThread(
-    const Index &index_, std::vector<RawEntityId> ids_, unsigned counter_)
-    : d(new PrivateData(index_, std::move(ids_), counter_)) {}
+    const Index &index_, const EventLocations &ids_, unsigned counter_)
+    : d(new PrivateData(index_, ids_, counter_)) {}
+
+void LocateEntitiesThread::RunOnToken(Token file_tok) {
+  FileId file_id = File::containing(file_tok)->id();
+  if (std::find(d->seen_file_ids.begin(), d->seen_file_ids.end(), file_id) ==
+      d->seen_file_ids.end()) {
+    emit OpenEntityInFile(file_id, file_tok.id(), d->counter);
+    d->seen_file_ids.push_back(file_id);
+  }
+}
 
 void LocateEntitiesThread::run(void) {
-  std::vector<FileId> seen_file_ids;
-  seen_file_ids.reserve(d->ids.size());
+  d->seen_file_ids.reserve(d->locs.Size());
 
-  for (RawEntityId eid : d->ids) {
-    auto loc_id = EntityFileLocation(d->index, eid);
-    VariantId vid = EntityId(loc_id).Unpack();
-    if (!std::holds_alternative<FileTokenId>(vid)) {
-      continue;
+  for (const EventLocation &loc : d->locs) {
+
+    auto entity = d->index.entity(loc.FileTokenId());
+    if (std::holds_alternative<Token>(entity)) {
+      if (auto file_tok = std::get<Token>(entity).nearest_file_token()) {
+
+        RunOnToken(std::move(file_tok.value()));
+        continue;
+      }
     }
 
-    auto file_id = std::get<FileTokenId>(vid).file_id;
-    if (std::find(seen_file_ids.begin(), seen_file_ids.end(), file_id) ==
-        seen_file_ids.end()) {
-      emit OpenEntityInFile(file_id, loc_id, d->counter);
-      seen_file_ids.push_back(loc_id);
+    entity = d->index.entity(loc.FragmentTokenId());
+    if (std::holds_alternative<Token>(entity)) {
+      if (auto file_tok = std::get<Token>(entity).nearest_file_token()) {
+        RunOnToken(std::move(file_tok.value()));
+        continue;
+      }
+    }
+
+    entity = d->index.entity(loc.DeclarationId());
+    if (std::holds_alternative<Decl>(entity)) {
+      if (auto file_tok = DeclFileToken(std::get<Decl>(entity))) {
+        RunOnToken(std::move(file_tok.value()));
+        continue;
+      }
     }
   }
 }
@@ -221,10 +243,9 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id,
 }
 
 // Request for one or more entities to be opened.
-void CodeBrowserView::OpenEntities(std::vector<RawEntityId> ids) {
+void CodeBrowserView::OpenEntities(const EventLocations &locs) {
   auto locator = new LocateEntitiesThread(
-      d->multiplier.Index(), std::move(ids),
-      d->counter.fetch_add(1u) + 1u);
+      d->multiplier.Index(), locs, d->counter.fetch_add(1u) + 1u);
 
   locator->setAutoDelete(true);
 

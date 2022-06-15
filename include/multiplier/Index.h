@@ -202,6 +202,17 @@ class Index {
   std::variant<Decl, Stmt, Type, Token, TokenSubstitution, NotAnEntity>
   entity(EntityId) const;
 
+  // Return an entity given its ID.
+  template <typename T>
+  inline auto
+  entity(const std::optional<T> &id) const -> decltype(entity(T())) {
+    if (id) {
+      return entity(id.value());
+    } else {
+      return NotAnEntity{};
+    }
+  }
+
   // Run a Weggli search over the fragments in the index.
   //
   // NOTE(pag): This will only match inside of indexed code, i.e. fragments.

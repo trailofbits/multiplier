@@ -51,6 +51,26 @@ class ScopeReferenceCounted {
   }
 };
 
+enum : int {
+  kDeclaratioNameColumn,
+  kBreadCrumbsColumn,
+  kNumColumns
+};
+
+//struct HistoryItem {
+//  EventLocation loc;
+//  QTreeWidgetItem *item{nullptr};
+//  unsigned version{0};
+//
+//  HistoryItem **next_ptr_to_self{nullptr};
+//  HistoryItem *prev{nullptr};
+//
+//  explicit HistoryItem(const EventLocation &loc_)
+//      : loc(loc_) {}
+//};
+
+static constexpr size_t kDefaultReadHead = 2;
+
 }  // namespace
 
 struct HistoryBrowserView::PrivateData {
@@ -67,9 +87,13 @@ struct HistoryBrowserView::PrivateData {
   QPushButton *clear_button{nullptr};
   QPushButton *root_button{nullptr};
 
-  int event_suppress{0};
+  std::vector<QTreeWidgetItem *> linear_history;
+  size_t read_head{kDefaultReadHead};
 
-  std::unordered_map<QTreeWidgetItem *, RawEntityId> item_to_decl;
+  int event_suppress{0};
+  unsigned counter{1u};  // Version of this history view.
+
+  std::unordered_map<QTreeWidgetItem *, EventLocation> item_to_loc;
 
   inline PrivateData(Multiplier &multiplier_)
       : multiplier(multiplier_) {}
@@ -118,12 +142,15 @@ void HistoryBrowserView::InitializeWidgets(void) {
   setWindowTitle(tr("History Browser"));
   setLayout(d->layout);
 
+  // Try to capture keypresses when items are selected.
+  d->history_tree->viewport()->installEventFilter(&(d->multiplier));
+
   d->history_tree->setSelectionMode(
       QAbstractItemView::SelectionMode::SingleSelection);
   d->history_tree->setHeaderHidden(true);
   d->history_tree->expandAll();
   d->history_tree->setItemsExpandable(false);
-  d->history_tree->setColumnCount(1);
+  d->history_tree->setColumnCount(kNumColumns);
   d->history_tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   d->history_tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
   d->history_tree->header()->setStretchLastSection(true);
@@ -145,55 +172,109 @@ void HistoryBrowserView::InitializeWidgets(void) {
           this, &HistoryBrowserView::OnFilterHistoryView);
 
   connect(d->clear_button, &QPushButton::pressed,
-          this, &HistoryBrowserView::OnClearButton);
+          this, &HistoryBrowserView::Clear);
 
   connect(d->root_button, &QPushButton::pressed,
           this, &HistoryBrowserView::OnRootButton);
 }
 
 // Add the declarations to the history nested under the current selected root.
-void HistoryBrowserView::AddDeclarationsUnderRoot(
-    std::vector<RawEntityId> ids) const {
+void HistoryBrowserView::AddDeclarationsUnderRoot(const EventLocations &locs) {
 
   // Double check its sanity.
   if (d->current_root) {
-    auto root_it = d->item_to_decl.find(d->current_root);
-    if (root_it == d->item_to_decl.end()) {
+    auto root_it = d->item_to_loc.find(d->current_root);
+    if (root_it == d->item_to_loc.end()) {
       d->current_root = nullptr;
     }
   }
 
-  for (RawEntityId eid : ids) {
-    std::optional<Decl> decl = NearestDeclFor(d->multiplier.Index(), eid);
-    if (!decl) {
-      continue;
-    }
-
-    auto *item = new QTreeWidgetItem;
-    item->setText(0, DeclName(decl.value()));
+  bool is_first = true;
+  for (EventLocation loc : locs) {
 
     ScopeReferenceCounted suppress_event(d->event_suppress);
 
-    d->item_to_decl.emplace(item, eid);
+    QTreeWidgetItem *item = nullptr;
+    auto history_index = loc.HistoryItem();
+    loc.SetHistoryItem(static_cast<unsigned>(d->linear_history.size()));
 
-    if (!d->current_root) {
-      d->history_tree->addTopLevelItem(item);
+    if (history_index && *history_index < d->linear_history.size()) {
+      item = d->linear_history[*history_index];
+
     } else {
-      d->current_root->addChild(item);
-      d->current_root->setExpanded(true);
+      auto &index = d->multiplier.Index();
+      auto entity = index.entity(loc.DeclarationId());
+      if (!std::holds_alternative<Decl>(entity)) {
+        continue;
+      }
+
+      // Fix up any missing info in the location using the decl as our anchor.
+      Decl decl = std::move(std::get<Decl>(entity));
+      if (std::optional<Token> frag_tok = DeclFragmentToken(decl)) {
+        if (!loc.UnpackFragmentTokenId()) {
+          loc.SetFragmentTokenId(frag_tok->id());
+        }
+        if (!loc.UnpackFileTokenId()) {
+          if (auto file_tok = frag_tok->nearest_file_token()) {
+            loc.SetFileTokenId(file_tok->id());
+          }
+        }
+      }
+
+      item = new QTreeWidgetItem;
+      item->setText(kDeclaratioNameColumn, DeclName(decl));
+      item->setText(kBreadCrumbsColumn, "");
+
+      d->item_to_loc.emplace(item, loc);
+
+      if (!d->current_root) {
+        d->history_tree->addTopLevelItem(item);
+      } else {
+        d->current_root->addChild(item);
+        d->current_root->setExpanded(true);
+      }
     }
+
+    d->read_head = kDefaultReadHead;
+    d->linear_history.push_back(item);
 
     d->history_tree->scrollToItem(item);
     d->history_tree->clearSelection();
     d->history_tree->setCurrentItem(item);
-    d->history_tree->setItemSelected(item, true);
+    d->history_tree->setItemSelected(item, is_first);
     d->last_added = item;
+
+    if (is_first) {
+      emit TokenPressEvent(EventSource::kHistoryBrowser, loc);
+      is_first = false;
+    }
   }
 }
 
+// Go back one step in the linear history.
+bool HistoryBrowserView::GoBackInLinearHistory(void) {
+  auto history_size = d->linear_history.size();
+  if (d->read_head > history_size) {
+    return false;
+  }
+
+  assert(0 < d->read_head);
+
+  auto item = d->linear_history[history_size - d->read_head];
+  auto it = d->item_to_loc.find(item);
+  if (it == d->item_to_loc.end()) {
+    return false;
+  }
+
+  EventLocations loc = it->second;
+  auto old_read_head = d->read_head;
+  AddDeclarationsUnderRoot(loc);
+  d->read_head = old_read_head + 2;  // One for previous, one for just added.
+  return true;
+}
+
 // Add the declarations to the history as siblings of the last added item.
-void HistoryBrowserView::AddSiblingDeclarations(
-    std::vector<RawEntityId> ids) const {
+void HistoryBrowserView::AddSiblingDeclarations(const EventLocations &locs) {
 
   auto prev_root = d->current_root;
   if (d->last_added) {
@@ -202,26 +283,23 @@ void HistoryBrowserView::AddSiblingDeclarations(
     d->current_root = nullptr;
   }
 
-  AddDeclarationsUnderRoot(std::move(ids));
+  AddDeclarationsUnderRoot(locs);
   d->current_root = prev_root;
 }
 
 // Add the declarations to the history as children of the last added item.
-void HistoryBrowserView::AddChildDeclarations(
-    std::vector<RawEntityId> ids) const {
-
+void HistoryBrowserView::AddChildDeclarations(const EventLocations &locs) {
   auto prev_root = d->current_root;
   d->current_root = d->last_added;
-  AddDeclarationsUnderRoot(std::move(ids));
+  AddDeclarationsUnderRoot(locs);
   d->current_root = prev_root;
 }
 
 // Add the declarations to the history view as top-level items.
-void HistoryBrowserView::AddRootDeclarations(
-    std::vector<RawEntityId> ids) const {
+void HistoryBrowserView::AddRootDeclarations(const EventLocations &locs) {
   auto prev_root = d->current_root;
   d->current_root = nullptr;
-  AddDeclarationsUnderRoot(std::move(ids));
+  AddDeclarationsUnderRoot(locs);
   d->current_root = prev_root;
 }
 
@@ -230,7 +308,10 @@ void HistoryBrowserView::Clear(void) {
   d->history_tree->clear();
   d->current_root = nullptr;
   d->last_added = nullptr;
-  d->item_to_decl.clear();
+  d->item_to_loc.clear();
+  d->counter++;
+  d->read_head = kDefaultReadHead;
+  d->linear_history.clear();
 }
 
 void HistoryBrowserView::Focus(void) {
@@ -244,9 +325,9 @@ void HistoryBrowserView::OnTreeWidgetItemClicked(
   }
 
   ScopeReferenceCounted suppress_event(d->event_suppress);
-  auto decl_it = d->item_to_decl.find(item);
-  if (decl_it != d->item_to_decl.end()) {
-    emit HistoryDeclarationClicked(decl_it->second);
+  auto decl_it = d->item_to_loc.find(item);
+  if (decl_it != d->item_to_loc.end()) {
+    emit TokenPressEvent(EventSource::kHistoryBrowser, decl_it->second);
   }
 
   d->history_tree->setFocus();
@@ -261,8 +342,8 @@ void HistoryBrowserView::OnTreeWidgetItemDoubleClicked(
     QTreeWidgetItem *item, int) {
   ScopeReferenceCounted suppress_event(d->event_suppress);
 
-  auto decl_it = d->item_to_decl.find(item);
-  if (decl_it == d->item_to_decl.end()) {
+  auto decl_it = d->item_to_loc.find(item);
+  if (decl_it == d->item_to_loc.end()) {
     return;
   }
 
@@ -284,15 +365,15 @@ void HistoryBrowserView::OnTreeWidgetItemSelectionChanged(void) {
 
 void HistoryBrowserView::OnFilterHistoryView(const QString &text) {
   if (!text.size()) {
-    for (auto &[item, eid] : d->item_to_decl) {
+    for (auto &[item, eid] : d->item_to_loc) {
       item->setHidden(false);
     }
   } else {
-    for (auto &[item, eid] : d->item_to_decl) {
+    for (auto &[item, eid] : d->item_to_loc) {
       item->setHidden(true);
     }
 
-    for (auto &[item, eid] : d->item_to_decl) {
+    for (auto &[item, eid] : d->item_to_loc) {
       if (item->text(0).contains(text)) {
 
         // Show all of the parents leading to a visible item.
@@ -305,14 +386,6 @@ void HistoryBrowserView::OnFilterHistoryView(const QString &text) {
   }
 
   update();
-}
-
-void HistoryBrowserView::OnClearButton(void) {
-  d->filter_box->clear();
-  d->history_tree->clear();
-  d->item_to_decl.clear();
-  d->current_root = nullptr;
-  d->last_added = nullptr;
 }
 
 void HistoryBrowserView::OnRootButton(void) {

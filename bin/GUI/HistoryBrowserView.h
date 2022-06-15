@@ -12,6 +12,8 @@
 #include <multiplier/Types.h>
 #include <vector>
 
+#include "Event.h"
+
 QT_BEGIN_NAMESPACE
 class QTreeWidgetItem;
 QT_END_NAMESPACE
@@ -41,20 +43,25 @@ class HistoryBrowserView final : public QWidget {
   HistoryBrowserView(Multiplier &multiplier_, QWidget *parent=nullptr);
   virtual ~HistoryBrowserView(void);
 
-  void Clear(void);
   void Focus(void);
 
   // Add the declarations to the history as children of the last added item.
-  void AddChildDeclarations(std::vector<RawEntityId> ids) const;
+  void AddChildDeclarations(const EventLocations &locs);
 
   // Add the declarations to the history as siblings of the last added item.
-  void AddSiblingDeclarations(std::vector<RawEntityId> ids) const;
+  void AddSiblingDeclarations(const EventLocations &locs);
 
   // Add the declarations to the history view as top-level items.
-  void AddRootDeclarations(std::vector<RawEntityId> ids) const;
+  void AddRootDeclarations(const EventLocations &locs);
 
   // Add the declarations to the history nested under the current selected root.
-  void AddDeclarationsUnderRoot(std::vector<RawEntityId> ids) const;
+  void AddDeclarationsUnderRoot(const EventLocations &locs);
+
+  // Go back one step in the linear history.
+  bool GoBackInLinearHistory(void);
+
+ public slots:
+  void Clear(void);
 
  private slots:
 
@@ -70,11 +77,10 @@ class HistoryBrowserView final : public QWidget {
 
   void OnFilterHistoryView(const QString &filter);
 
-  void OnClearButton(void);
   void OnRootButton(void);
 
  signals:
-  void HistoryDeclarationClicked(RawEntityId eid);
+  void TokenPressEvent(EventSource source, EventLocations loc_ids);
 };
 
 }  // namespace gui

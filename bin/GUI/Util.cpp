@@ -697,9 +697,8 @@ RawEntityId EntityFileLocation(const Index &index, RawEntityId eid) {
   return kInvalidEntityId;
 }
 
-// Return the entity ID of the nearest file token associated with this
-// declaration.
-RawEntityId DeclFileLocation(const Decl &decl) {
+// Return the optional nearest fragment token associated with this declaration.
+std::optional<Token> DeclFragmentToken(const Decl &decl) {
 
   // Structs and enums and such can often be defined inside of a typedef so we
   // want to go to the beginning of them.
@@ -710,21 +709,40 @@ RawEntityId DeclFileLocation(const Decl &decl) {
   if (auto nd = NamedDecl::from(decl)) {
     if (auto tok = nd->token()) {
       if (tok.data() == nd->name()) {
-        if (auto file_tok = tok.nearest_file_token()) {
-          return file_tok->id();
-        }
+        return tok;
       }
     }
   }
 
 skip_name_match:
-  for (const Token &token : decl.tokens()) {
-    if (auto file_tok = token.nearest_file_token()) {
-      return file_tok->id();
-    }
+  for (Token decl_tok : decl.tokens()) {
+    return decl_tok;
   }
 
-  return Fragment::containing(decl).file_tokens().begin()->id();
+  for (Token parsed_tok : Fragment::containing(decl).parsed_tokens()) {
+    return parsed_tok;
+  }
+
+  return std::nullopt;
+}
+
+// Return the optional nearest file token associated with this declaration.
+std::optional<Token> DeclFileToken(const Decl &decl) {
+  if (auto frag_tok = DeclFragmentToken(decl)) {
+    return frag_tok->nearest_file_token();
+  } else {
+    return std::nullopt;
+  }
+}
+
+// Return the entity ID of the nearest file token associated with this
+// declaration.
+RawEntityId DeclFileLocation(const Decl &decl) {
+  if (auto tok = DeclFileToken(decl)) {
+    return tok->id();
+  } else {
+    return kInvalidEntityId;
+  }
 }
 
 // Try to get the nearest declaration for `id`. Ideally, `id` is a declaration
