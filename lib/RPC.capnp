@@ -179,6 +179,15 @@ struct RegexMatch @0xc119a143d978fd1e {
   fragmentId @1 :UInt64;
 }
 
+struct SymbolMatch @0xb119a123d978fd1e {
+  # Entity id of the symbol
+  entityId @0 :UInt64;
+  # Symbol name
+  symbol   @1 :Text;
+  # Symbol kind
+  kind     @2 :Text;
+}
+
 interface Multiplier @0xb0c484f9ec88f1d6 {
 
   hello @0 () -> (versionNumber: UInt32);
@@ -221,4 +230,7 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
 
   # Find the list of fragment IDs associated with a specific file.
   findFileFragments @10 (fileId :UInt64) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
+
+  # Find the entity ids from the given symbol name
+  findSymbols @11 (query :Text) -> (symbols :List(SymbolMatch));
 }

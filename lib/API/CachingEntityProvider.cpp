@@ -208,6 +208,11 @@ void CachingEntityProvider::FillReferences(
   }
 }
 
+void CachingEntityProvider::FindSymbol(
+    const Ptr &self, std::string name, SymbolList &ids_out) {
+  return;
+}
+
 // Returns an entity provider that gets entities from a UNIX domain socket.
 EntityProvider::Ptr EntityProvider::in_memory_cache(
     Ptr next, unsigned timeout_s_) {

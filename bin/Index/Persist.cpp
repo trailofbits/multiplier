@@ -517,10 +517,10 @@ void PersistFile(IndexingContext &context, mx::FileId file_id,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(IndexingContext &context, NameMangler &mangler,
+void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
                      const pasta::TokenRange &tokens,
-                     PendingFragment frag) {
+                     PendingFragment frag, mx::WorkerId worker_id) {
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
@@ -611,6 +611,8 @@ void PersistFragment(IndexingContext &context, NameMangler &mangler,
 
   context.PutSerializedFragment(
       fragment_id, CompressedMessage("fragment", message));
+
+  frag.PersistDeclarationSymbols(context, em, ast, worker_id);
 }
 
 }  // namespace indexer
