@@ -10,7 +10,8 @@ add_subdirectory("Examples")
 add_subdirectory("Import")
 add_subdirectory("Index")
 add_subdirectory("Syntex")
-  
+add_subdirectory("SQLiteBridge")
+
 if(MX_ENABLE_GUI)
   add_subdirectory("GUI")
 endif(MX_ENABLE_GUI)

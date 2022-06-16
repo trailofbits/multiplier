@@ -436,6 +436,35 @@ void RemoteEntityProvider::FillReferences(
   fragment_ids_out.clear();
 }
 
+void RemoteEntityProvider::FindSymbol(
+    const Ptr &self, std::string name, SymbolList &out) try {
+  ClientConnection &cc = Connection(self);
+
+  capnp::Request<mx::rpc::Multiplier::FindSymbolsParams,
+                   mx::rpc::Multiplier::FindSymbolsResults>
+        request = cc.client.findSymbolsRequest();
+
+  request.setQuery(name);
+
+  capnp::Response<mx::rpc::Multiplier::FindSymbolsResults> response =
+      request.send().wait(cc.connection.getWaitScope());
+
+  auto symbols_reader = response.getSymbols();
+  out.clear();
+  out.reserve(symbols_reader.size());
+
+  for (rpc::SymbolMatch::Reader item : symbols_reader) {
+    const FileId entity_id = item.getEntityId();
+    std::string name(item.getSymbol().cStr(), item.getSymbol().size());
+    std::string kind(item.getKind().cStr(), item.getKind().size());
+    out.emplace_back(std::tuple(entity_id, name, kind));
+  }
+
+  return;
+} catch(...) {
+  out.clear();
+}
+
 // Returns an entity provider that gets entities from a remote host.
 EntityProvider::Ptr EntityProvider::from_remote(
     std::string host, std::string port) {

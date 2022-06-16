@@ -52,6 +52,8 @@ class InvalidEntityProvider final : public EntityProvider {
   void FillReferences(const Ptr &, RawEntityId eid,
                       std::vector<RawEntityId> &redecl_ids_out,
                       std::vector<FragmentId> &fragment_ids_out) final;
+
+  void FindSymbol(const Ptr &, std::string name, SymbolList &ids_out) final;
 };
 
 }  // namespace mx

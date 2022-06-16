@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <cassert>
-#include <map>
+//#include <cassert>
+//#include <map>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/AST.h>
 #include <multiplier/RPC.capnp.h>
@@ -18,8 +18,12 @@
 #include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
+#include <cassert>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "Context.h"
 
 namespace indexer {
 
@@ -117,6 +121,10 @@ struct PendingFragment {
   // TODO(pag): Eventually make this identify the type of reference, or use
   //            the SourceIR to do so.
   void LinkReferences(IndexingContext &context, EntityMapper &em);
+
+  // Store serialized declaration fragments symbol to the persistent store
+  void PersistDeclarationSymbols(IndexingContext &context, EntityMapper &em,
+                                 pasta::AST &ast, mx::WorkerId worker_id);
 };
 
 }  // namespace indexer

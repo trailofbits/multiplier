@@ -6,26 +6,35 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-include(ExternalProject)
+include(FetchContent)
 
-if(APPLE)
-  set(sysroot_for_sqlite "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-endif(APPLE)
+macro(DownloadSQLite3)
+  FetchContent_Declare(
+    sqlite
+    URL      https://sqlite.org/2022/sqlite-amalgamation-3380500.zip
+    URL_HASH SHA3_256=bfad5c42b767520a546251b9876e4a4b127fb651c437b968b149070e09252807
+  )
+  FetchContent_MakeAvailable(sqlite)
 
-ExternalProject_Add(sqlite3
-  URL
-    https://www.sqlite.org/2022/sqlite-autoconf-3370200.tar.gz
-  URL_HASH
-    SHA3_256=3764f471d188ef4e7a70a120f6cb80014dc50bb5fa53406b566508390a32e745
-  SOURCE_DIR
-    ${CMAKE_CURRENT_BINARY_DIR}/sqlite3/source
-  BINARY_DIR
-    ${CMAKE_CURRENT_BINARY_DIR}/sqlite3/build
-  CONFIGURE_COMMAND
-    env "CFLAGS=-DSQLITE_PRINT_BUF_SIZE=256 ${sysroot_for_sqlite}" ${CMAKE_CURRENT_BINARY_DIR}/sqlite3/source/configure  "--prefix=${CMAKE_CURRENT_BINARY_DIR}/install" --enable-fts5 --enable-threadsafe --enable-rtree --enable-static --disable-shared CC=${CMAKE_C_COMPILER}
-  BUILD_COMMAND
-    make install
-  INSTALL_COMMAND
-    ""
-  TEST_COMMAND
-    "")
+  add_library(SQLite3
+    "${sqlite_SOURCE_DIR}/sqlite3.c"
+  )
+  target_include_directories(SQLite3
+    PUBLIC
+      "${SQLite3_INCLUDE_DIRS}")
+  target_compile_definitions(SQLite3
+    PRIVATE
+      "-DSQLITE_ENABLE_FTS5"
+      "-DSQLITE_ENABLE_RTREE")
+  set_target_properties(SQLite3
+    PROPERTIES
+      C_VISIBILITY_PRESET   default
+      CXX_VISIBILITY_PRESET default
+  )
+  add_library(SQLite::SQLite3 ALIAS SQLite3)
+
+  set(SQLite3_VERSION "3.38.5")
+  set(SQLite3_INCLUDE_DIRS "${sqlite_SOURCE_DIR}")
+  set(SQLite3_LIBRARIES SQLite::SQLite3)
+  set(SQLite3_FOUND TRUE)
+endmacro()

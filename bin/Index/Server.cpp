@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "Context.h"
+#include "Database.h"
 #include "IndexCompileJob.h"
 #include "RegexSearchAction.h"
 #include "WeggliSearchAction.h"
@@ -558,6 +559,32 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
   auto fragments = result.initFragmentIds(num_fragments);
   for (auto i = 0u; i < num_fragments; ++i) {
     fragments.set(i, fragment_ids[i]);
+  }
+
+  return kj::READY_NOW;
+}
+
+kj::Promise<void> Server::findSymbols(FindSymbolsContext context) {
+  mx::rpc::Multiplier::FindSymbolsParams::Reader params = context.getParams();
+
+  mx::rpc::Multiplier::FindSymbolsResults::Builder result = context.getResults();
+
+  std::string symbol(params.getQuery().cStr(), params.getQuery().size());
+
+  std::vector<std::tuple<uint64_t, std::string, std::string>> entity_map;
+
+  d->server_context.connection->QuerySymbol(
+      symbol, [&entity_map](uint64_t id, std::string &symbol, std::string &kind) {
+    entity_map.emplace_back(std::tuple(id, symbol, kind));
+  });
+
+  auto num_entities = entity_map.size();
+  auto symbols = result.initSymbols(num_entities);
+  for (auto i = 0u; i < num_entities; ++i) {
+    mx::rpc::SymbolMatch::Builder info = symbols[i];
+    info.setEntityId(std::get<0>(entity_map[i]));
+    info.setSymbol(std::get<1>(entity_map[i]));
+    info.setKind(std::get<2>(entity_map[i]));
   }
 
   return kj::READY_NOW;

@@ -30,6 +30,8 @@ enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
+class Database;
+
 enum : char {
   kMetaNameToId,
   kFileIdToPath,
@@ -192,6 +194,8 @@ class ServerContext {
   mx::PersistentSet<kEntityIdReference, mx::RawEntityId, mx::FragmentId>
       entity_id_reference;
 
+  std::unique_ptr<Database> connection;
+
   void Flush(void);
 
   ~ServerContext(void);
@@ -287,6 +291,8 @@ class IndexingContext {
 
   std::unique_ptr<CodeGenerator> codegen;
 
+  std::vector<std::unique_ptr<Database>> databases;
+
   explicit IndexingContext(ServerContext &server_context_,
                            const mx::Executor &exe_);
 
@@ -331,6 +337,12 @@ class IndexingContext {
   // which fragments overlap which lines.
   void PutFragmentLineCoverage(mx::FileId file_id, mx::FragmentId fragment_id,
                                unsigned start_line, unsigned end_line);
+
+  // Prepare database
+  void PrepareDatabase(mx::WorkerId id);
+
+  // Commit database
+  void CommitDatabase(mx::WorkerId id);
 };
 
 class SearchingContext {

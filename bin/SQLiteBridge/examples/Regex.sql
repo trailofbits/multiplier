@@ -1,0 +1,1 @@
+SELECT * FROM RegexQuery WHERE RegexQuery.query = "(\w+)\s+(\w+)";

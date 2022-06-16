@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "Codegen.h"
+#include "Database.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 
@@ -51,6 +52,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       MetadataName::kNextSmallCodeId, mx::kMaxBigFragmentId));
   next_big_fragment_id.store(meta_to_value.GetOrSet(
       MetadataName::kNextBigCodeId, mx::kMinEntityIdIncrement));
+
+  connection = std::make_unique<Database>(Database::Name(workspace_dir));
 }
 
 ServerContext::~ServerContext(void) {
@@ -94,6 +97,12 @@ IndexingContext::IndexingContext(ServerContext &server_context_,
 
   // Save the updated version number.
   server_context.Flush();
+
+  // Initialize database instance for each worker
+  for (auto i = 0U; i < num_workers; ++i) {
+    databases.emplace_back(new Database(
+        Database::Name(server_context_.workspace_dir)));
+  }
 }
 
 IndexingContext::~IndexingContext(void) {
@@ -104,6 +113,15 @@ IndexingContext::~IndexingContext(void) {
 
   // Save the updated version number.
   server_context.Flush();
+
+  // Create the virtual table using fts5 module that will enable
+  // index based searching.
+  for (auto i = 0U; i < num_workers; ++i) {
+    if (auto db = database[i].get()) {
+      db->CreateIndexedTable();
+    }
+  }
+
 }
 
 void IndexingContext::InitializeProgressBars(void) {
@@ -381,6 +399,24 @@ void IndexingContext::PutFragmentLineCoverage(
   server_context.file_fragment_ids.Insert(file_id, fragment_id);
   for (auto i = start_line; i <= end_line; ++i) {
     server_context.file_fragment_lines.Insert(file_id, i, fragment_id);
+  }
+}
+
+void IndexingContext::PrepareDatabase(mx::WorkerId id) {
+  if (id >= database.size()) {
+    return;
+  }
+  if (auto db = database[id].get()) {
+    db->Prepare();
+  }
+}
+
+void IndexingContext::CommitDatabase(mx::WorkerId id) {
+  if (id >= database.size()) {
+    return;
+  }
+  if (auto db = database[id].get()) {
+    db->Commit();
   }
 }
 

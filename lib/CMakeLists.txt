@@ -170,6 +170,8 @@ set_target_properties("mx-api"
       YES
     CXX_VISIBILITY_PRESET
       hidden
+    POSITION_INDEPENDENT_CODE
+      YES
 )
 
 target_compile_features("mx-api"
@@ -237,6 +239,7 @@ add_library("mx-util"
     "WorkerPool.cpp"
     "Weggli.cpp"
     "Re2.cpp"
+    "SQLiteStore.cpp"
     
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
@@ -265,6 +268,7 @@ target_link_libraries("mx-util"
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
     RocksDB::rocksdb
+    SQLite::SQLite3
     ZLIB::ZLIB
   PUBLIC
     glog::glog
@@ -294,6 +298,8 @@ set_target_properties("mx-util"
       YES
     CXX_VISIBILITY_PRESET
       hidden
+    POSITION_INDEPENDENT_CODE
+      YES
 )
 
 target_compile_features("mx-util"
