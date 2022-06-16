@@ -9,7 +9,7 @@
 #include <QWidget>
 
 #include <memory>
-#include <multiplier/Types.h>
+#include <multiplier/Index.h>
 #include <vector>
 
 #include "Event.h"
@@ -39,6 +39,9 @@ class HistoryBrowserView final : public QWidget {
 
   void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_FINAL;
 
+  void FillRow(QTreeWidgetItem *item, const Decl &decl, const Token &frag_tok,
+               const Token &file_tok) const;
+
  public:
   HistoryBrowserView(Multiplier &multiplier_, QWidget *parent=nullptr);
   virtual ~HistoryBrowserView(void);
@@ -57,10 +60,14 @@ class HistoryBrowserView final : public QWidget {
   // Add the declarations to the history nested under the current selected root.
   void AddDeclarationsUnderRoot(const EventLocations &locs);
 
+  // Add the locations to the linear history.
+  void AddToLinearHistory(const EventLocations &locs);
+
   // Go back one step in the linear history.
   bool GoBackInLinearHistory(void);
 
  public slots:
+ void OnDownloadedFileList(FilePathList files);
   void Clear(void);
 
  private slots:
@@ -78,6 +85,9 @@ class HistoryBrowserView final : public QWidget {
   void OnFilterHistoryView(const QString &filter);
 
   void OnRootButton(void);
+
+  // NOTE(pag): This doesn't clear the linear history.
+  void OnClearButton(void);
 
  signals:
   void TokenPressEvent(EventSource source, EventLocations loc_ids);

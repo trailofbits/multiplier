@@ -70,6 +70,7 @@ class ReferenceBrowserView final : public QWidget {
                       UserLocationsPtr users, int depth);
   void OnItemClicked(QTreeWidgetItem *item, int column);
   void OnItemSelectionChanged(void);
+  void ActOnTokenPressEvent(EventLocations locs);
 
  signals:
   void TokenPressEvent(EventSource source, EventLocations locs);

@@ -223,8 +223,7 @@ void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id,
                                bool show) {
   FileView *&file_view = d->file_id_to_view[file_id];
   if (!file_view) {
-    file_view = new FileView(d->multiplier, path, file_id,
-                             EventSource::kCodeBrowser);
+    file_view = new FileView(d->multiplier, path, file_id);
 
     d->view_to_file_id.emplace(file_view, file_id);
 

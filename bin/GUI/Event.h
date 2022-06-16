@@ -52,26 +52,6 @@ class EventLocation {
   EventLocation &operator=(const EventLocation &) = default;
   EventLocation &operator=(EventLocation &&) noexcept = default;
 
-//  inline EventLocation(const EventLocation &that)
-//      : referenced_decl_id(that.referenced_decl_id),
-//        fragment_token_id(that.fragment_token_id),
-//        file_token_id(that.file_token_id),
-//        is_present(!!(that.referenced_decl_id | that.fragment_token_id |
-//                      that.file_token_id)),
-//        history_item(that.history_item) {
-//    assert(IsSane());
-//  }
-//
-//  inline EventLocation(EventLocation &&that) noexcept
-//      : history_item(that.history_item),
-//        referenced_decl_id(that.referenced_decl_id),
-//        fragment_token_id(that.fragment_token_id),
-//        file_token_id(that.file_token_id),
-//        is_present(!!(that.referenced_decl_id | that.fragment_token_id |
-//                      that.file_token_id)) {
-//    assert(IsSane());
-//  }
-
   inline std::optional<unsigned> HistoryItem(void) const {
     if (history_item) {
       return history_item - 1u;
@@ -99,20 +79,6 @@ class EventLocation {
     file_token_id = ent_id;
     is_present = !!(referenced_decl_id | fragment_token_id | file_token_id);
   }
-
-//  inline EventLocation &operator=(const EventLocation &that_) {
-//    EventLocation that(that_);
-//    memcpy(this, &that, sizeof(that));
-//    assert(IsSane());
-//    return *this;
-//  }
-//
-//  EventLocation &operator=(EventLocation &&that_) noexcept {
-//    EventLocation that(std::forward<EventLocation>(that_));
-//    memcpy(this, &that, sizeof(that));
-//    assert(IsSane());
-//    return *this;
-//  }
 
   bool IsSane(void) const;
 
@@ -150,7 +116,7 @@ class EventLocations {
 
  public:
   EventLocations(void) {
-    memset(this, 0, sizeof(*this));
+    __builtin_memset(this, 0, sizeof(*this));
   }
 
   ~EventLocations(void);
@@ -160,8 +126,8 @@ class EventLocations {
   }
 
   inline EventLocations(EventLocations &&that) noexcept {
-    memcpy(this, &that, sizeof(that));
-    memset(&that, 0, sizeof(that));
+    __builtin_memcpy(this, &that, sizeof(that));
+    __builtin_memset(&that, 0, sizeof(that));
   }
 
   // Copy constructor.
@@ -201,10 +167,17 @@ enum class MouseClickKind : int {
 Q_DECLARE_FLAGS(MouseClickKinds, MouseClickKind)
 
 enum class EventSource : int {
-  kReferenceBrowserCodePreview  = 1 << 0,
-  kReferenceBrowser             = 1 << 1,
-  kCodeBrowser                  = 1 << 2,
-  kHistoryBrowser               = 1 << 3,
+  kReferenceBrowserPreviewClickSource  = 1 << 0,
+  kReferenceBrowserPreviewClickDest    = 1 << 1,
+  kReferenceBrowser                    = 1 << 2,
+  kCodeBrowserClickSource              = 1 << 3,
+  kCodeBrowserClickDest                = 1 << 4,
+
+  // When we select a visual item, the location is published.
+  kHistoryBrowserVisualItemSelected    = 1 << 5,
+
+  // When we go back/forward through the linear history.
+  kHistoryBrowserLinearItemChanged     = 1 << 6,
 };
 
 Q_DECLARE_FLAGS(EventSources, EventSource)
@@ -221,10 +194,12 @@ enum class Action : int {
   kOpenReferenceBrowser,
 
   // Add a declaration to the history.
-  kAddToHistoryAsChild,
-  kAddToHistoryAsSibling,
-  kAddToHistoryUnderRoot,
-  kAddToHistoryAsRoots,
+  kAddToVisualHistoryAsChild,
+  kAddToVisualHistoryAsSibling,
+  kAddToVisualHistoryUnderRoot,
+  kAddToVisualHistoryAsRoots,
+
+  kAddToLinearHistory,
 
   kGoBackLinearHistory,
 };
@@ -244,7 +219,7 @@ struct EventAction {
   // Any of the sources are allowed to match.
   EventSources match_sources;
 
-  // Do all of these actions.
+  // Do this action.
   Action do_action{Action::kDoNothing};
 };
 

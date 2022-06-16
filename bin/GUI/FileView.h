@@ -30,12 +30,16 @@ class FileView final : public QTabWidget {
  public:
   virtual ~FileView(void);
 
-  FileView(Multiplier &multiplier,
-           std::filesystem::path file_path,
-           FileId file_id, EventSource event_source,
-           QWidget *parent = nullptr);
+  FileView(Multiplier &multiplier, std::filesystem::path file_path,
+           FileId file_id, QWidget *parent = nullptr);
 
   void ScrollToToken(RawEntityId eid) const;
+
+ private slots:
+  void ActOnTokenPressEvent(EventLocations locs);
+
+ signals:
+  void TokenPressEvent(EventSource source, EventLocations locs);
 };
 
 }  // namespace gui

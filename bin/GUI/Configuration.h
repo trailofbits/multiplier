@@ -17,31 +17,6 @@ namespace mx::gui {
 
 class CodeTheme;
 
-// Configuration for a single file view, which presents the source code of
-// a file.
-struct FileConfiguration {
-
-};
-
-// The configuration for the history browser.
-struct HistoryBrowserConfiguration {
-
-};
-
-// Configuration for the file browser, which presents a tree view of all files
-// indexed by Multiplier.
-struct FileBrowserConfiguration {
-
-};
-
-// Configuration for the code preview pane within the reference browser view.
-struct ReferenceBrowserCodeConfiguration {
-  // Should a code preview be shown when an item in the reference view is
-  // selected?
-  bool visible{true};
-
-};
-
 // Configuration for the breadcrumb cell of the reference browser view.
 //
 // This will show a trail of usage-specific contextual information for each
@@ -58,7 +33,7 @@ struct ReferenceBrowserCodeConfiguration {
 // look like:
 //
 //    MEMBER > RETURN > IF > FUNCTION
-struct ReferenceBrowserBreadcrumbsConfiguration {
+struct BreadcrumbsConfiguration {
 
   // Should the breadcrumbs be shown at all?
   bool visible{true};
@@ -67,6 +42,44 @@ struct ReferenceBrowserBreadcrumbsConfiguration {
   // something like `IF > IF > IF`, you will see `IF^3` (using a superscript
   // number `3`). When the repetitions exceeds `9`, a `+` will be shown.
   bool run_length_encode{true};
+};
+
+
+// Configuration for a single file view, which presents the source code of
+// a file.
+struct FileConfiguration {
+
+};
+
+// The configuration for the history browser.
+struct HistoryBrowserConfiguration {
+
+  // Should the full file path be shown?
+  bool show_file_path{false};
+
+  // Should the file name be shown?
+  bool show_file_name{true};
+
+  // Should line and column numbers show up as additional cells in the reference
+  // tree.
+  bool show_line_numbers{true};
+  bool show_column_numbers{true};
+
+  BreadcrumbsConfiguration breadcrumbs;
+};
+
+// Configuration for the file browser, which presents a tree view of all files
+// indexed by Multiplier.
+struct FileBrowserConfiguration {
+
+};
+
+// Configuration for the code preview pane within the reference browser view.
+struct ReferenceBrowserCodeConfiguration {
+  // Should a code preview be shown when an item in the reference view is
+  // selected?
+  bool visible{true};
+
 };
 
 // Configuration for the reference browser, which presents a tree view of
@@ -84,7 +97,7 @@ struct ReferenceBrowserConfiguration {
   bool show_line_numbers{true};
   bool show_column_numbers{true};
 
-  ReferenceBrowserBreadcrumbsConfiguration breadcrumbs;
+  BreadcrumbsConfiguration breadcrumbs;
   ReferenceBrowserCodeConfiguration code_preview;
 
 };

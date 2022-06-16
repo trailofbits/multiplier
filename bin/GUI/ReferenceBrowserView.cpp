@@ -66,12 +66,6 @@ static bool UserLocationSort(const UserLocation &a, const UserLocation &b) {
                                            GetFileOffset(b.second[0].id()));
 }
 
-static FileLocationConfiguration LineNumConfig(const CodeTheme &theme) {
-  FileLocationConfiguration config;
-  config.tab_width = static_cast<unsigned>(theme.NumSpacesInTab());
-  return config;
-}
-
 }  // namespace
 
 struct InitReferenceHierarchyThread::PrivateData {
@@ -225,10 +219,6 @@ struct ReferenceBrowserView::PrivateData {
   CodeView *code{nullptr};
   QTreeWidgetItem *active_item{nullptr};
 
-  // Thread-safe line/column counting cache. Used to calculate the locations of
-  // references.
-  FileLocationCache line_cache;
-
   // Used to detect re-entrancy issues when the underlying view is swapped out.
   std::atomic<uint64_t> counter;
 
@@ -265,8 +255,7 @@ struct ReferenceBrowserView::PrivateData {
 
   inline PrivateData(Multiplier &multiplier_)
       : multiplier(multiplier_),
-        theme(multiplier.CodeTheme()),
-        line_cache(LineNumConfig(theme)) {}
+        theme(multiplier.CodeTheme()) {}
 };
 
 ReferenceBrowserView::~ReferenceBrowserView(void) {}
@@ -372,12 +361,12 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   // Create and connect the code preview.
   if (config.code_preview.visible) {
-    d->code = new CodeView(d->theme, EventSource::kReferenceBrowserCodePreview);
+    d->code = new CodeView(d->theme);
     d->code->viewport()->installEventFilter(&(d->multiplier));
     d->splitter->addWidget(d->code);
 
     connect(d->code, &CodeView::TokenPressEvent,
-            &(d->multiplier), &Multiplier::ActOnTokenPressEvent);
+            this, &ReferenceBrowserView::ActOnTokenPressEvent);
   }
 
   connect(d->reference_tree, &QTreeWidget::itemExpanded,
@@ -394,6 +383,17 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   connect(this, &ReferenceBrowserView::TokenPressEvent,
           &d->multiplier, &Multiplier::ActOnTokenPressEvent);
+}
+
+void ReferenceBrowserView::ActOnTokenPressEvent(EventLocations locs) {
+  for (EventLocation loc : locs) {
+    emit TokenPressEvent(EventSource::kReferenceBrowserPreviewClickSource, loc);
+    if (loc.UnpackDeclarationId()) {
+      loc.SetFragmentTokenId(kInvalidEntityId);
+      loc.SetFileTokenId(kInvalidEntityId);
+      emit TokenPressEvent(EventSource::kReferenceBrowserPreviewClickDest, loc);
+    }
+  }
 }
 
 bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
@@ -500,7 +500,8 @@ void ReferenceBrowserView::AddRoot(EventLocation loc) {
 
   const Index &index = d->multiplier.Index();
   auto expander = new InitReferenceHierarchyThread(
-      index, eid, d->line_cache, root_item, d->counter.load());
+      index, eid, d->multiplier.FileLocationCache(),
+      root_item, d->counter.load());
 
   expander->setAutoDelete(true);
 
@@ -531,8 +532,8 @@ void ReferenceBrowserView::OnTreeWidgetItemExpanded(QTreeWidgetItem *item) {
 
   const Index &index = d->multiplier.Index();
   auto expander = new ExpandReferenceHierarchyThread(
-      index, it->second.decl.id(), d->line_cache, item, d->counter.load(),
-      depth);
+      index, it->second.decl.id(), d->multiplier.FileLocationCache(),
+      item, d->counter.load(), depth);
 
   expander->setAutoDelete(true);
 
@@ -560,7 +561,7 @@ void ReferenceBrowserView::FillRow(
       color.redF(), color.greenF(), color.blueF(), color.alphaF() * 0.75);
 
   // Show the line and column numbers.
-  if (auto loc = use.nearest_location(d->line_cache)) {
+  if (auto loc = use.nearest_location(d->multiplier.FileLocationCache())) {
     auto file = File::containing(use);
     FileId file_id = file ? file->id() : kInvalidEntityId;
 

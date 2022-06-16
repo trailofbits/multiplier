@@ -74,9 +74,6 @@ struct CodeView::PrivateData {
 
   const CodeTheme &theme;
 
-  // How to mark events form this code view.
-  const EventSource source;
-
   // The entity id of a file token that we'll target for scrolling.
   RawEntityId scroll_target_eid{kInvalidEntityId};
 
@@ -85,9 +82,8 @@ struct CodeView::PrivateData {
   // line, then we don't want to have to scroll, as that can be jarring.
   int last_block{-1};
 
-  inline PrivateData(const CodeTheme &theme_, EventSource source_)
-      : theme(theme_),
-        source(source_) {}
+  inline PrivateData(const CodeTheme &theme_)
+      : theme(theme_) {}
 };
 
 struct DownloadCodeThread::PrivateData {
@@ -420,10 +416,9 @@ void DownloadCodeThread::run(void) {
 
 CodeView::~CodeView(void) {}
 
-CodeView::CodeView(const CodeTheme &theme_, EventSource source_,
-                   QWidget *parent)
+CodeView::CodeView(const CodeTheme &theme_, QWidget *parent)
     : QPlainTextEdit(parent),
-      d(std::make_unique<PrivateData>(theme_, source_)) {
+      d(std::make_unique<PrivateData>(theme_)) {
   InitializeWidgets();
 }
 
@@ -705,40 +700,30 @@ void CodeView::EmitEventsForIndex(unsigned index) {
   assert((index + 1u) < d->code->tok_decl_ids_begin.size());
   auto locs_begin_index = d->code->tok_decl_ids_begin[index];
   auto locs_end_index = d->code->tok_decl_ids_begin[index + 1u];
-
+  EventLocation loc;
+  RawEntityId file_tok_id = d->code->file_token_ids[index];
+  assert(file_tok_id != kInvalidEntityId);
+  loc.SetFileTokenId(file_tok_id);
 
   if (auto num_locs = locs_end_index - locs_begin_index) {
     if (num_locs == 1u) {
       auto [frag_tok_id, decl_id] = d->code->tok_decl_ids[locs_begin_index];
+      assert(frag_tok_id != kInvalidEntityId);
+      loc.SetFragmentTokenId(frag_tok_id);
+      loc.SetReferencedDeclarationId(decl_id);
 
-      // NOTE(pag): This is ugly. Often, we want a click in the code view to
-      //            go to the referenced declaration, not just go back to
-      //            itself. Therefore, we need to "mute" some of the components
-      //            that we actually have data for.
-      EventLocation loc;
-      if (decl_id == kInvalidEntityId) {
-        loc.SetFileTokenId(d->code->file_token_ids[index]);
-        loc.SetFragmentTokenId(frag_tok_id);
-      } else {
-        loc.SetReferencedDeclarationId(decl_id);
-      }
-
-      emit TokenPressEvent(d->source, loc);
+      emit TokenPressEvent(loc);
 
     } else {
       std::vector<EventLocation> locs(num_locs);
       for (auto i = locs_begin_index; i < locs_end_index; ++i) {
         auto [frag_tok_id, decl_id] = d->code->tok_decl_ids[i];
-        EventLocation loc;
-        if (decl_id == kInvalidEntityId) {
-          loc.SetFileTokenId(d->code->file_token_ids[index]);
-          loc.SetFragmentTokenId(frag_tok_id);
-        } else {
-          loc.SetReferencedDeclarationId(decl_id);
-        }
+        assert(frag_tok_id != kInvalidEntityId);
+        loc.SetFragmentTokenId(frag_tok_id);
+        loc.SetReferencedDeclarationId(decl_id);
         locs[i - locs_begin_index] = loc;
       }
-      emit TokenPressEvent(d->source, locs);
+      emit TokenPressEvent(locs);
     }
   }
 }

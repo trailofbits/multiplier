@@ -12,6 +12,7 @@
 #include "Event.h"
 
 namespace mx {
+class FileLocationCache;
 class Index;
 namespace gui {
 
@@ -42,6 +43,9 @@ class Multiplier final : public QMainWindow {
   // Return the current code theme.
   const ::mx::gui::CodeTheme &CodeTheme(void) const;
 
+  // Return a cache of pre-computed file locations.
+  const ::mx::FileLocationCache &FileLocationCache(void) const;
+
  protected:
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
   void closeEvent(QCloseEvent *event) Q_DECL_FINAL;
@@ -56,7 +60,7 @@ class Multiplier final : public QMainWindow {
   void UpdateWidgets(void);
   void UpdateUI(void);
 
-  bool DoActions(const EventAction &ea);
+  bool DoActions(EventSource source, const EventAction &ea);
   bool EmitEvent(void);
 
  public slots:

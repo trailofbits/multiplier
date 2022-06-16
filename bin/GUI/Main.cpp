@@ -44,16 +44,32 @@ int main(int argc, char *argv[]) {
   // Click to open something in the code browser view, or in the code preview
   // view of the reference browser, should open the thing in the code browser.
   config.actions.emplace_back(mx::gui::EventAction{
-    .description = "When clicked, code should add to the history",
+    .description = "A clicked token should be added to the linear history",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
-    .match_sources = {mx::gui::EventSource::kCodeBrowser,
-                      mx::gui::EventSource::kReferenceBrowserCodePreview},
-    .do_action = mx::gui::Action::kAddToHistoryUnderRoot,
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource,
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource},
+    .do_action = mx::gui::Action::kAddToLinearHistory,
   });
 
-  config.immediate_actions.emplace_back(mx::gui::EventAction{
-    .description = "A change in the selected history item should navigate to the entity",
-    .match_sources = {mx::gui::EventSource::kHistoryBrowser},
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A clicked declaration should be added to the linear history",
+    .match_click = mx::gui::MouseClickKind::kLeftClick,
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest},
+    .do_action = mx::gui::Action::kAddToLinearHistory,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A clicked declaration should be added to the visual history",
+    .match_click = mx::gui::MouseClickKind::kLeftClick,
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest},
+    .do_action = mx::gui::Action::kAddToVisualHistoryUnderRoot,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "The code browser should show a clicked entity",
+    .match_click = mx::gui::MouseClickKind::kLeftClick,
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest,
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource},
     .do_action = mx::gui::Action::kOpenCodeBrowser,
   });
 
@@ -61,29 +77,43 @@ int main(int argc, char *argv[]) {
     .description = "A meta-click on an entity should open up the references view",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
     .match_modifiers = {Qt::KeyboardModifier::MetaModifier},
-    .match_sources = {mx::gui::EventSource::kHistoryBrowser,
-                      mx::gui::EventSource::kCodeBrowser,
-                      mx::gui::EventSource::kReferenceBrowser,
-                      mx::gui::EventSource::kReferenceBrowserCodePreview},
+    .match_sources = ~mx::gui::EventSources(),
     .do_action = mx::gui::Action::kOpenReferenceBrowser,
   });
 
   config.actions.emplace_back(mx::gui::EventAction{
-    .description = "A double click in the reference browser adds to the history",
+    .description = "A double click in the reference browser adds to the linear history",
     .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
     .match_sources = {mx::gui::EventSource::kReferenceBrowser},
-    .do_action = mx::gui::Action::kAddToHistoryUnderRoot,
+    .do_action = mx::gui::Action::kAddToLinearHistory,
   });
 
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A double click in the reference browser adds to the visual history",
+    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+    .match_sources = {mx::gui::EventSource::kReferenceBrowser},
+    .do_action = mx::gui::Action::kAddToVisualHistoryUnderRoot,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A double click in the reference browser shows the used code in the code browser",
+    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+    .match_sources = {mx::gui::EventSource::kReferenceBrowser},
+    .do_action = mx::gui::Action::kOpenCodeBrowser,
+  });
 
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "Pressing ESC should go back in linear history",
     .match_key = Qt::Key_Escape,
-    .match_sources = {mx::gui::EventSource::kHistoryBrowser,
-                      mx::gui::EventSource::kCodeBrowser,
-                      mx::gui::EventSource::kReferenceBrowser,
-                      mx::gui::EventSource::kReferenceBrowserCodePreview},
+    .match_sources = ~mx::gui::EventSources(),
     .do_action = mx::gui::Action::kGoBackLinearHistory,
+  });
+
+  config.immediate_actions.emplace_back(mx::gui::EventAction{
+    .description = "A change in the current active history item should be shown in the code browser",
+    .match_sources = {mx::gui::EventSource::kHistoryBrowserLinearItemChanged,
+                      mx::gui::EventSource::kHistoryBrowserVisualItemSelected},
+    .do_action = mx::gui::Action::kOpenCodeBrowser,
   });
 
   qRegisterMetaType<mx::gui::EventLocation>("EventLocation");

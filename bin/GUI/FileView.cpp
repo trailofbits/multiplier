@@ -32,7 +32,7 @@ struct FileView::PrivateData {
 FileView::~FileView(void) {}
 
 FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
-                   FileId file_id, EventSource event_source, QWidget *parent)
+                   FileId file_id, QWidget *parent)
     : QTabWidget(parent),
       d(std::make_unique<PrivateData>(multiplier.Configuration().file)) {
 
@@ -46,17 +46,37 @@ FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
   d->layout->setContentsMargins(0, 0, 0, 0);
   setLayout(d->layout);
 
-  d->content = new CodeView(multiplier.CodeTheme(), event_source);
+  d->content = new CodeView(multiplier.CodeTheme());
   d->layout->addWidget(d->content);
   d->content->SetFile(multiplier.Index(), file_id);
   d->content->viewport()->installEventFilter(&multiplier);
 
   connect(d->content, &CodeView::TokenPressEvent,
+          this, &FileView::ActOnTokenPressEvent);
+
+  connect(this, &FileView::TokenPressEvent,
           &multiplier, &Multiplier::ActOnTokenPressEvent);
 }
 
 void FileView::ScrollToToken(RawEntityId file_tok_id) const {
   d->content->ScrollToToken(file_tok_id);
+}
+
+void FileView::ActOnTokenPressEvent(EventLocations locs) {
+
+  // NOTE(pag): This is ugly. Often, we want a click in the code view to
+  //            go to the referenced declaration, not just go back to
+  //            itself. Therefore, we need to "mute" some of the components
+  //            that we actually have data for.
+
+  for (EventLocation loc : locs) {
+    emit TokenPressEvent(EventSource::kCodeBrowserClickSource, loc);
+    if (loc.UnpackDeclarationId()) {
+      loc.SetFragmentTokenId(kInvalidEntityId);
+      loc.SetFileTokenId(kInvalidEntityId);
+      emit TokenPressEvent(EventSource::kCodeBrowserClickDest, loc);
+    }
+  }
 }
 
 }  // namespace mx::gui
