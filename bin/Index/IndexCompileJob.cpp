@@ -582,10 +582,12 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
 
   NameMangler mangler(ast);
 
+  context->PrepareDatabase(worker_id);
   for (PendingFragment &pending_fragment : pending_fragments) {
     PersistFragment(*context, ast, mangler, entity_ids, file_ids, tok_range,
                     std::move(pending_fragment), worker_id);
   }
+  context->CommitDatabase(worker_id);
 }
 
 }  // namespace indexer
