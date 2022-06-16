@@ -337,12 +337,6 @@ class IndexingContext {
   // which fragments overlap which lines.
   void PutFragmentLineCoverage(mx::FileId file_id, mx::FragmentId fragment_id,
                                unsigned start_line, unsigned end_line);
-
-  // Prepare database
-  void PrepareDatabase(mx::WorkerId id);
-
-  // Commit database
-  void CommitDatabase(mx::WorkerId id);
 };
 
 class SearchingContext {

@@ -6,7 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-add_library("sqlitebridge"
+add_library("mx-sqlitebridge"
   "ConnectionModule.cpp"
   "FileTable.cpp"
   "FragmentTable.cpp"
@@ -19,25 +19,28 @@ add_library("sqlitebridge"
   "TableUtils.cpp"
 )
 
-target_link_libraries("sqlitebridge"
+target_link_libraries("mx-sqlitebridge"
   PRIVATE
     "mx-api"
-    "mx-util"
     LLVMCore
     LLVMSupport
 )
 
-add_library("${PROJECT_NAME}::sqlitebridge" ALIAS "sqlitebridge")
-target_include_directories("sqlitebridge" PRIVATE ${SQLite3_INCLUDE_DIRS})
+add_library("${PROJECT_NAME}::sqlitebridge" ALIAS "mx-sqlitebridge")
+
+target_include_directories("mx-sqlitebridge"
+  PRIVATE
+    ${SQLite3_INCLUDE_DIRS}
+)
 
 if(NOT BUILD_SHARED_LIBS)
-  target_compile_definitions("sqlitebridge" PRIVATE "-DSQLITE_CORE")
+  target_compile_definitions("mx-sqlitebridge" PRIVATE "-DSQLITE_CORE")
 endif()
 
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
-      "sqlitebridge"
+      "mx-sqlitebridge"
     EXPORT
       "${PROJECT_NAME}Targets"
     RUNTIME
