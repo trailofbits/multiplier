@@ -55,11 +55,9 @@ class Code {
   std::vector<bool> underline;
   std::vector<const QBrush *> foreground;
   std::vector<const QBrush *> background;
-  std::vector<unsigned> declaration_ids_begin;
-  std::vector<RawEntityId> declaration_ids;
-  std::vector<unsigned> fragment_token_ids_begin;
-  std::vector<RawEntityId> fragment_token_ids;
   std::vector<RawEntityId> file_token_ids;
+  std::vector<std::pair<RawEntityId, RawEntityId>> tok_decl_ids;
+  std::vector<unsigned> tok_decl_ids_begin;
 };
 
 struct CodeView::PrivateData {
@@ -81,8 +79,6 @@ struct CodeView::PrivateData {
 
   // The entity id of a file token that we'll target for scrolling.
   RawEntityId scroll_target_eid{kInvalidEntityId};
-
-  unsigned last_mouse_move_index{~0u};
 
   // Keep track of the last clicked block number. If we click to go somewhere
   // in our own file, and where we're going is on the same line or a nearby
@@ -276,9 +272,8 @@ void DownloadCodeThread::run(void) {
   code->foreground.reserve(num_file_tokens);
   code->background.reserve(num_file_tokens);
   code->start_of_token.reserve(num_file_tokens + 1u);
-  code->declaration_ids_begin.reserve(num_file_tokens + 1u);
-  code->fragment_token_ids_begin.reserve(num_file_tokens + 1u);
   code->file_token_ids.reserve(num_file_tokens);
+  code->tok_decl_ids_begin.reserve(num_file_tokens + 1);
 
   std::map<RawEntityId, std::vector<Token>> file_to_frag_toks;
   std::vector<Decl> tok_decls;
@@ -344,15 +339,10 @@ void DownloadCodeThread::run(void) {
       continue;
     }
 
+    // This is a template of sorts for this location.
     code->file_token_ids.push_back(file_tok_id);
-
-    code->declaration_ids_begin.push_back(
-        static_cast<unsigned>(code->declaration_ids.size()));
-
-    code->fragment_token_ids_begin.push_back(
-        static_cast<unsigned>(code->fragment_token_ids.size()));
-
-    tok_decls.clear();
+    code->tok_decl_ids_begin.push_back(
+        static_cast<unsigned>(code->tok_decl_ids.size()));
 
     DeclCategory category = DeclCategory::UNKNOWN;
     TokenClass file_tok_class = ClassifyToken(file_tok);
@@ -363,17 +353,20 @@ void DownloadCodeThread::run(void) {
     // the related declarations are unique.
     if (auto frag_tok_it = file_to_frag_toks.find(file_tok_id);
         frag_tok_it != file_to_frag_toks.end()) {
+
       for (const Token &frag_tok : frag_tok_it->second) {
 
-        code->fragment_token_ids.push_back(frag_tok.id());
-
         if (auto related_decl = DeclForToken(frag_tok)) {
+          code->tok_decl_ids.emplace_back(frag_tok.id(), related_decl->id());
           tok_decls.emplace_back(related_decl.value());
 
           // Take the first category we get.
           if (category == DeclCategory::UNKNOWN) {
             category = related_decl->category();
           }
+
+        } else {
+          code->tok_decl_ids.emplace_back(frag_tok.id(), kInvalidEntityId);
         }
 
         // Try to make a better default classification of this token (for syntax
@@ -412,31 +405,12 @@ void DownloadCodeThread::run(void) {
         file_tok, tok_decls, kind)));
     code->background.push_back(&(d->theme.TokenBackgroundColor(
         file_tok, tok_decls, kind)));
-
-    // We might have found multiple declarations associated with this token, but
-    // they might not be unique (e.g. different template instantiations that
-    // all call the same global function).
-    if (!tok_decls.empty()) {
-      static constexpr auto decl_sort = +[] (const Decl &a, const Decl &b) {
-        return a.id() < b.id();
-      };
-      static constexpr auto decl_eq = +[] (const Decl &a, const Decl &b) {
-        return a.id() == b.id();
-      };
-      std::sort(tok_decls.begin(), tok_decls.end(), decl_sort);
-      auto it = std::unique(tok_decls.begin(), tok_decls.end(), decl_eq);
-      tok_decls.erase(it, tok_decls.end());
-      for (const Decl &decl : tok_decls) {
-        code->declaration_ids.push_back(decl.id());
-      }
-    }
+    tok_decls.clear();
   }
 
   code->start_of_token.push_back(code->data.size());
-  code->declaration_ids_begin.push_back(
-      static_cast<unsigned>(code->declaration_ids.size()));
-  code->fragment_token_ids_begin.push_back(
-      static_cast<unsigned>(code->fragment_token_ids.size()));
+  code->tok_decl_ids_begin.push_back(
+      static_cast<unsigned>(code->tok_decl_ids.size()));
 
   d->theme.EndTokens();
 
@@ -479,6 +453,11 @@ void CodeView::ScrollToToken(RawEntityId file_tok_id) {
     return;
   }
 
+  VariantId vid = EntityId(file_tok_id).Unpack();
+  if (!std::holds_alternative<FileTokenId>(vid)) {
+    return;
+  }
+
   auto begin_it = d->code->file_token_ids.begin();
   auto end_it = d->code->file_token_ids.end();
   auto it = std::lower_bound(begin_it, end_it, file_tok_id);
@@ -488,6 +467,7 @@ void CodeView::ScrollToToken(RawEntityId file_tok_id) {
 
   auto tok_index = static_cast<unsigned>((it - begin_it));
   if (tok_index >= d->code->start_of_token.size()) {
+    assert(false);  // Strange.
     return;
   }
 
@@ -591,7 +571,6 @@ void CodeView::Clear(void) {
   d->counter.fetch_add(1u);
   d->state = CodeViewState::kInitialized;
   d->code.reset();
-  d->last_mouse_move_index = ~0u;
   d->last_block = -1;
   d->scroll_target_eid = kInvalidEntityId;
   this->QPlainTextEdit::clear();
@@ -601,7 +580,6 @@ void CodeView::InitializeWidgets(void) {
 
   setReadOnly(true);
   setOverwriteMode(false);
-  setMouseTracking(true);  // Enable `mouseMoveEvent`.
   setTextInteractionFlags(Qt::TextSelectableByMouse);
   viewport()->setCursor(Qt::ArrowCursor);
   setFont(d->theme.Font());
@@ -651,7 +629,6 @@ void CodeView::OnRenderCode(void *code_, uint64_t counter) {
   }
 
   d->state = CodeViewState::kRendering;
-  d->last_mouse_move_index = ~0u;
   d->last_block = ~0u;
 
   // An event may have asked for a new rendering; check re-entrancy.
@@ -723,85 +700,58 @@ std::optional<std::pair<unsigned, int>> CodeView::TokenIndexForPosition(
       static_cast<unsigned>((it - begin_it) - 1), cursor.blockNumber());
 }
 
-std::vector<RawEntityId> CodeView::DeclsForIndex(unsigned index) const {
-  std::vector<RawEntityId> decl_ids;
-  auto decls_begin_index = d->code->declaration_ids_begin[index];
-  auto decls_end_index = d->code->declaration_ids_begin[index + 1u];
-  if (auto num_decls = decls_end_index - decls_begin_index) {
-    decl_ids.reserve(num_decls);
-    for (auto i = decls_begin_index; i < decls_end_index; ++i) {
-      decl_ids.push_back(d->code->declaration_ids[i]);
+void CodeView::EmitEventsForIndex(unsigned index) {
+
+  assert((index + 1u) < d->code->tok_decl_ids_begin.size());
+  auto locs_begin_index = d->code->tok_decl_ids_begin[index];
+  auto locs_end_index = d->code->tok_decl_ids_begin[index + 1u];
+
+
+  if (auto num_locs = locs_end_index - locs_begin_index) {
+    if (num_locs == 1u) {
+      auto [frag_tok_id, decl_id] = d->code->tok_decl_ids[locs_begin_index];
+
+      // NOTE(pag): This is ugly. Often, we want a click in the code view to
+      //            go to the referenced declaration, not just go back to
+      //            itself. Therefore, we need to "mute" some of the components
+      //            that we actually have data for.
+      EventLocation loc;
+      if (decl_id == kInvalidEntityId) {
+        loc.SetFileTokenId(d->code->file_token_ids[index]);
+        loc.SetFragmentTokenId(frag_tok_id);
+      } else {
+        loc.SetReferencedDeclarationId(decl_id);
+      }
+
+      emit TokenPressEvent(d->source, loc);
+
+    } else {
+      std::vector<EventLocation> locs(num_locs);
+      for (auto i = locs_begin_index; i < locs_end_index; ++i) {
+        auto [frag_tok_id, decl_id] = d->code->tok_decl_ids[i];
+        EventLocation loc;
+        if (decl_id == kInvalidEntityId) {
+          loc.SetFileTokenId(d->code->file_token_ids[index]);
+          loc.SetFragmentTokenId(frag_tok_id);
+        } else {
+          loc.SetReferencedDeclarationId(decl_id);
+        }
+        locs[i - locs_begin_index] = loc;
+      }
+      emit TokenPressEvent(d->source, locs);
     }
   }
-  return decl_ids;
-}
-
-std::vector<RawEntityId> CodeView::TokensForIndex(unsigned index) const {
-  std::vector<RawEntityId> tok_ids;
-  auto toks_begin_index = d->code->fragment_token_ids_begin[index];
-  auto toks_end_index = d->code->fragment_token_ids_begin[index + 1u];
-  if (auto num_decls = toks_end_index - toks_begin_index) {
-    tok_ids.reserve(num_decls);
-    for (auto i = toks_begin_index; i < toks_end_index; ++i) {
-      tok_ids.push_back(d->code->declaration_ids[i]);
-    }
-  }
-  return tok_ids;
-}
-
-void CodeView::EmitEventsForIndex(QMouseEvent *event, unsigned index,
-                                  EventKind kind) {
-  if (auto tok_ids = TokensForIndex(index); !tok_ids.empty()) {
-    emit TokenEvent(d->source,
-                    {event->modifiers(), event->buttons(), kind},
-                    std::move(tok_ids));
-
-    if (auto decl_ids = DeclsForIndex(index); !decl_ids.empty()) {
-      emit DeclarationEvent(
-          d->source,
-          {event->modifiers(), event->buttons(), kind},
-          std::move(decl_ids));
-    }
-  }
-}
-
-void CodeView::mouseMoveEvent(QMouseEvent *event) {
-  if (auto pos = TokenIndexForPosition(event->pos())) {
-    auto [index, block] = pos.value();
-    if (index != d->last_mouse_move_index) {
-      d->last_mouse_move_index = index;
-      d->last_block = block;
-      EmitEventsForIndex(event, index, EventKind::kHover);
-    }
-
-  } else {
-    d->last_mouse_move_index = ~0u;
-    d->last_block = -1;
-  }
-
-  this->QPlainTextEdit::mouseMoveEvent(event);
 }
 
 void CodeView::mousePressEvent(QMouseEvent *event) {
   if (auto pos = TokenIndexForPosition(event->pos())) {
     auto [index, block] = pos.value();
     d->last_block = block;
-    EmitEventsForIndex(event, index, EventKind::kClick);
+    EmitEventsForIndex(index);
   } else {
     d->last_block = -1;
   }
   this->QPlainTextEdit::mousePressEvent(event);
-}
-
-void CodeView::mouseDoubleClickEvent(QMouseEvent *event) {
-  if (auto pos = TokenIndexForPosition(event->pos())) {
-    auto [index, block] = pos.value();
-    d->last_block = block;
-    EmitEventsForIndex(event, index, EventKind::kDoubleClick);
-  } else {
-    d->last_block = -1;
-  }
-  this->QPlainTextEdit::mouseDoubleClickEvent(event);
 }
 
 void CodeView::scrollContentsBy(int dx, int dy) {

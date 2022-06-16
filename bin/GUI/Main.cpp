@@ -42,52 +42,58 @@ int main(int argc, char *argv[]) {
   //    before I get arthritis, so I don't want to halve it.
 
   // Click to open something in the code browser view, or in the code preview
-  // view of the refernce browser, should open the thing in the code browser.
-  config.declaration_actions.emplace_back(
-      mx::gui::Event{{},
-                     Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kClick},
-      mx::gui::EventSources{mx::gui::EventSource::kCodeBrowser,
-                            mx::gui::EventSource::kReferenceBrowserCodePreview},
-      mx::gui::Actions{mx::gui::Action::kOpenCodeBrowser,
-                       mx::gui::Action::kAddToHistoryUnderRoot});
+  // view of the reference browser, should open the thing in the code browser.
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "When clicked, code should add to the history",
+    .match_click = mx::gui::MouseClickKind::kLeftClick,
+    .match_sources = {mx::gui::EventSource::kCodeBrowser,
+                      mx::gui::EventSource::kReferenceBrowserCodePreview},
+    .do_action = mx::gui::Action::kAddToHistoryUnderRoot,
+  });
 
-  // Ctrl-click / Cmd-click to open something in the references view.
-  config.declaration_actions.emplace_back(
-      mx::gui::Event{Qt::KeyboardModifier::ControlModifier,
-                     Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kClick},
-      mx::gui::EventSources{mx::gui::EventSource::kCodeBrowser,
-                            mx::gui::EventSource::kReferenceBrowserCodePreview},
-      mx::gui::Actions{mx::gui::Action::kOpenReferenceBrowser});
+  config.immediate_actions.emplace_back(mx::gui::EventAction{
+    .description = "A change in the selected history item should navigate to the entity",
+    .match_sources = {mx::gui::EventSource::kHistoryBrowser},
+    .do_action = mx::gui::Action::kOpenCodeBrowser,
+  });
 
-  // Double-clicking an item in the reference browser should open it up in the
-  // code browser. This is a declaration action, because we want to go to the
-  // declaration containing the reference.
-  config.declaration_actions.emplace_back(
-      mx::gui::Event{{},
-                     Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kDoubleClick},
-      mx::gui::EventSources{mx::gui::EventSource::kReferenceBrowser},
-      mx::gui::Actions{mx::gui::Action::kAddToHistoryUnderRoot});
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A meta-click on an entity should open up the references view",
+    .match_click = mx::gui::MouseClickKind::kLeftClick,
+    .match_modifiers = {Qt::KeyboardModifier::MetaModifier},
+    .match_sources = {mx::gui::EventSource::kHistoryBrowser,
+                      mx::gui::EventSource::kCodeBrowser,
+                      mx::gui::EventSource::kReferenceBrowser,
+                      mx::gui::EventSource::kReferenceBrowserCodePreview},
+    .do_action = mx::gui::Action::kOpenReferenceBrowser,
+  });
 
-  // Double-clicking an item in the reference browser should open it up in the
-  // code browser. This is a token action because we want to go to the token
-  // where the reference is.
-  config.token_actions.emplace_back(
-      mx::gui::Event{{},
-                     Qt::MouseButton::LeftButton,
-                     mx::gui::EventKind::kDoubleClick},
-      mx::gui::EventSources{mx::gui::EventSource::kReferenceBrowser},
-      mx::gui::Actions{mx::gui::Action::kOpenCodeBrowser});
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A double click in the reference browser adds to the history",
+    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+    .match_sources = {mx::gui::EventSource::kReferenceBrowser},
+    .do_action = mx::gui::Action::kAddToHistoryUnderRoot,
+  });
 
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "Pressing ESC should go back in linear history",
+    .match_key = Qt::Key_Escape,
+    .match_sources = {mx::gui::EventSource::kHistoryBrowser,
+                      mx::gui::EventSource::kCodeBrowser,
+                      mx::gui::EventSource::kReferenceBrowser,
+                      mx::gui::EventSource::kReferenceBrowserCodePreview},
+    .do_action = mx::gui::Action::kGoBackLinearHistory,
+  });
+
+  qRegisterMetaType<mx::gui::EventLocation>("EventLocation");
+  qRegisterMetaType<mx::gui::EventLocations>("EventLocations");
   qRegisterMetaType<mx::gui::EventSource>("EventSource");
   qRegisterMetaType<mx::gui::EventSources>("EventSources");
   qRegisterMetaType<uint8_t>("uint8_t");
   qRegisterMetaType<uint16_t>("uint16_t");
   qRegisterMetaType<uint32_t>("uint32_t");
   qRegisterMetaType<uint64_t>("uint64_t");
-  qRegisterMetaType<mx::gui::Event>("Event");
   qRegisterMetaType<std::optional<mx::Decl>>("std::optional<Decl>");
   qRegisterMetaType<std::optional<mx::Stmt>>("std::optional<Stmt>");
   qRegisterMetaType<std::optional<mx::Type>>("std::optional<Type>");

@@ -23,30 +23,33 @@ namespace sqlite {
 class Connection;
 class Statement;
 
-class error : public std::runtime_error {
+class Error : public std::runtime_error {
  public:
-  error(const std::string& msg) :runtime_error("[SQLite Error] " + msg) {};
+  Error(const std::string& msg) :runtime_error("[SQLite Error] " + msg) {};
 };
 
 class QueryResult {
  public:
-  QueryResult(Connection& conn, const std::string& query);
+  ~QueryResult() = default;
 
-  std::vector<std::string> getColumnNames();
+  std::vector<std::string> GetColumnNames();
 
-  int numColumns();
+  uint32_t NumColumns();
 
-  bool next(std::vector<std::string>& row);
+  bool Columns(std::vector<std::string>& row);
 
  private:
   friend class Statement;
+  friend class Connection;
 
-  bool next();
+  QueryResult(Connection& conn, const std::string& query);
+
+  QueryResult(std::shared_ptr<Statement> stmt_);
 
   std::shared_ptr<Statement> stmt;
 };
 
-class Statement {
+class Statement : public std::enable_shared_from_this<Statement> {
  public:
 
   // Compile and register a sqlite query with the database connection
@@ -63,26 +66,28 @@ class Statement {
   template<typename... Args>
   void BindValues(Args... args) {
     if (sizeof...(Args) > num_params) {
-      std::string msg = "Too many arguments to bind() " +
-          std::to_string(num_params) + " expected " +
-          std::to_string(sizeof...(Args)) + " specified";
-      throw error(msg);
+      std::string msg = "Too many arguments to bind() " + std::to_string(num_params) +
+          " expected " + std::to_string(sizeof...(Args)) + " specified";
+      throw Error(msg);
     }
     size_t i = 0;
     bind_many(i, args...);
-    executeStep();
   }
 
-  // Close sqlite statement
-  void close() noexcept;
+  void Execute(void);
+
+  bool ExecuteStep(void);
+
+  QueryResult GetResult(void);
+
+  void Close() noexcept;
 
   // Get prepared statement
   sqlite3_stmt* GetPreparedStatement() const;
 
  private:
 
-  // Execute a sqlite statement
-  void executeStep();
+  int tryExecuteStep(void);
 
   // Binding functions for the statements
   void bind(const size_t i, const int32_t &value);
@@ -104,7 +109,6 @@ class Statement {
   template<typename T>
   void bind_many(size_t i, T& value) {
     bind(i, value);
-    i++;
   }
 
   template<typename T, typename... Args>
@@ -150,7 +154,10 @@ class Connection {
 
 
   // Get prepared statements before executing to database
-  std::unique_ptr<Statement> Prepare(const std::string& stmt);
+  std::shared_ptr<Statement> Prepare(const std::string& stmt);
+
+  // Begin transactions to the database
+  void Begin(void);
 
   // Commit transactions to the database
   void Commit(void);

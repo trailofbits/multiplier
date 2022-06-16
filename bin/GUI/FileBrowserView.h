@@ -41,6 +41,7 @@ class FileBrowserView final : public QWidget {
   virtual ~FileBrowserView(void);
 
   void Clear(void);
+  void Focus(void);
 
  public slots:
   void OnDownloadedFileList(FilePathList files);

@@ -52,6 +52,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       MetadataName::kNextSmallCodeId, mx::kMaxBigFragmentId));
   next_big_fragment_id.store(meta_to_value.GetOrSet(
       MetadataName::kNextBigCodeId, mx::kMinEntityIdIncrement));
+
+  connection = std::make_unique<Database>(Database::Name(workspace_dir));
 }
 
 ServerContext::~ServerContext(void) {
@@ -98,8 +100,8 @@ IndexingContext::IndexingContext(ServerContext &server_context_,
 
   // Initialize database instance for each worker
   for (auto i = 0U; i < num_workers; ++i) {
-    database.emplace_back(new Database(
-        sqlite_dbname(server_context_.workspace_dir)));
+    databases.emplace_back(new Database(
+        Database::Name(server_context_.workspace_dir)));
   }
 }
 

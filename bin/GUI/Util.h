@@ -64,6 +64,12 @@ QString DeclName(const Decl &decl);
 // Return the file location of an entity.
 RawEntityId EntityFileLocation(const Index &index, RawEntityId eid);
 
+// Return the optional nearest fragment token associated with this declaration.
+std::optional<Token> DeclFragmentToken(const Decl &decl);
+
+// Return the optional nearest file token associated with this declaration.
+std::optional<Token> DeclFileToken(const Decl &decl);
+
 // Return the entity ID of the nearest file token associated with this
 // declaration.
 RawEntityId DeclFileLocation(const Decl &decl);

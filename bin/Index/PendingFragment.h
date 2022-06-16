@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <cassert>
-#include <map>
+//#include <cassert>
+//#include <map>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/AST.h>
 #include <multiplier/RPC.capnp.h>
@@ -18,6 +18,8 @@
 #include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
+#include <cassert>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 

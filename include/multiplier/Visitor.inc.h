@@ -9303,7 +9303,7 @@ MX_BEGIN_VISIT_ABSTRACT_DECL(Decl)
   MX_ENTER_VISIT_Decl
   MX_VISIT_DECL_LINK(Decl, parent_declaration, 0)
   MX_VISIT_STMT_LINK(Decl, parent_statement, 1)
-  MX_VISIT_BOOL(Decl, is_definition, 2, MX_APPLY_METHOD, IsThisDeclarationADefinition, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_definition, 2, MX_APPLY_FUNC, IsDefinition, bool, NthDecl)
   MX_VISIT_ENUM(Decl, access, 3, MX_APPLY_METHOD, Access, AccessSpecifier, NthDecl)
   MX_VISIT_ENUM(Decl, availability, 4, MX_APPLY_METHOD, Availability, AvailabilityResult, NthDecl)
   MX_VISIT_OPTIONAL_PSEUDO(Decl, described_template_parameters, 5, MX_APPLY_METHOD, DescribedTemplateParameters, TemplateParameterList, NthDecl)

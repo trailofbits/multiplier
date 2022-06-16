@@ -6,6 +6,7 @@
 
 #include <multiplier/SQLiteStore.h>
 
+#include <variant>
 #include <atomic>
 #include <cstring>
 #include <cstdio>
@@ -15,87 +16,123 @@
 #include <iostream>
 #include <thread>
 
-
 #include "Database.h"
+
 
 namespace indexer {
 
-struct DatabaseItem {
-  std::string symbol_name;
-  uint64_t entity_id;
-};
-
-class DatabaseImpl {
+// Class to insert symbol into database
+class SymbolInserter {
  public:
-  DatabaseImpl(std::string path) :
-    db(std::make_unique<sqlite::Connection>(path)),
-    stmt(nullptr) {
-    static const char entities_table_create[]
-        = "create table if not exists entities "
-          " (entity_id integer, symbol text)";
-    db->Execute(entities_table_create);
-  }
-
-  virtual ~DatabaseImpl() {}
-
-  // Get the prepared statement from the query string that is ready
-  // to bind the values
-  void PrepareStatement(const std::string &query) {
-    // query string should not be empty
-    if (query.empty()) {
-      std::cerr << "Failed to prepare statement; empty query string" << std::endl;
-      return;
+  SymbolInserter(sqlite::Connection &db_) : db(db_) {
+    try {
+      db.Begin();
+      stmt = db.Prepare("insert into entities_fts (symbol, entity_id, kind) values (?1, ?2, ?3)");
+    } catch (sqlite::Error &e) {
+      std::cerr << "Failed to begin transaction " << e.what();
     }
-    stmt = db->Prepare(query);
   }
 
-  void CommitToDatabase() {
-    db->Commit();
-  }
-
-  void BindValues(uint64_t entity_id, std::string &symbol) {
-    if (!stmt) {
-      std::cerr << "Failed to bind values; no statement to bind with";
-      return;
+  template<typename... Args>
+  void BindValues(Args... args){
+    if (stmt) {
+      stmt->BindValues(args ...);
     }
-    stmt->BindValues(entity_id, symbol);
   }
 
-  void CreateIndexFromEntityTable(void) {
-    static const char entities_fts_table_query[]
-        = R"(create virtual table if not exists entities_fts using fts5
-             (symbol, content='entities'))";
-    db->Execute(entities_fts_table_query);
+  ~SymbolInserter() {
+    try {
+      if (stmt) {
+        stmt->Execute();
+      }
+      db.Commit();
+    }catch(sqlite::Error &e) {
+      std::cerr << "Failed to commit transaction " << e.what();
+    }
   }
 
  private:
-  friend class Database;
+  sqlite::Connection &db;
+  std::shared_ptr<sqlite::Statement> stmt;
 
-  std::unique_ptr<sqlite::Connection> db;
-  std::unique_ptr<sqlite::Statement> stmt;
 };
 
 Database::Database(std::filesystem::path workspace_dir)
-    : impl(std::make_unique<DatabaseImpl>(workspace_dir.generic_string())) {}
+    :  db(std::make_unique<sqlite::Connection>(workspace_dir.generic_string())) {
 
-Database::~Database() {}
+  static const char entities_fts_table_query[]
+      = R"(create virtual table if not exists entities_fts using fts5
+           (symbol, entity_id, kind))";
+  db->Execute(entities_fts_table_query);
 
-void Database::StoreEntities(uint64_t entity_id, std::string &symbol) {
-  impl->BindValues(entity_id, symbol);
+  auto bulk_inserter = [this] (void) {
+     for (;;) {
+       QueueItem item;
+       insertion_queue.wait_dequeue(item);
+
+       SymbolInserter sym(*db.get());
+
+       bool should_exit = false;
+       do {
+         std::visit([&sym, &should_exit] (const auto &arg) {
+           using arg_t = std::decay_t<decltype(arg)>;
+           if constexpr (std::is_same_v<std::nullptr_t, arg_t>) {
+             should_exit = true;
+           } else {
+             QueueData item = arg;
+             sym.BindValues(std::get<0>(item), std::get<1>(item), std::get<2>(item));
+           }
+         }, item);
+
+       } while (insertion_queue.try_dequeue(item)
+           || insertion_queue.wait_dequeue_timed(item, 10 * 1000));
+       if (should_exit) {
+         break;
+       }
+     }
+   };
+
+  bulk_insertion_thread = std::thread(bulk_inserter);
 }
 
-void Database::Prepare() {
-  static const char entity_insert_query[]
-    = "insert into entities (entity_id, symbol) values (?1, ?2)";
-  impl->PrepareStatement(entity_insert_query);
+Database::~Database() {
+  insertion_queue.enqueue(nullptr);
+  bulk_insertion_thread.join();
 }
 
-void Database::Commit() {
-  impl->CommitToDatabase();
+void Database::StoreEntities(uint64_t entity_id, std::string &symbol, const char *category) {
+  insertion_queue.enqueue(std::tuple(symbol, entity_id, category));
 }
 
-void Database::CreateIndexedTable(void) {
-  impl->CreateIndexFromEntityTable();
+void Database::QuerySymbol(
+    std::string name, std::function<void(uint64_t, std::string&, std::string&)> cb) {
+  static const char select_query[] =
+      "select * from entities_fts where entities_fts match ?1";
+
+  try {
+    auto stmt = db->Prepare(select_query);
+    if (!stmt) {
+      std::cerr << "Failed to prepare query statement\n";
+      return;
+    }
+
+    stmt->BindValues(name);
+
+    while(stmt->ExecuteStep()) {
+      std::vector<std::string> entry;
+      auto result = stmt->GetResult();
+      result.Columns(entry);
+      if (entry.size() >= 3) {
+        auto symbol_name = entry[0];
+        auto entity_id = std::strtoull(entry[1].c_str(), 0, 0);
+        auto kind = entry[2];
+        cb(entity_id, symbol_name, kind);
+      }
+    }
+
+  } catch(sqlite::Error &e) {
+    std::cerr << "Failed to get symbol from database " << e.what();
+  }
 }
 
 }

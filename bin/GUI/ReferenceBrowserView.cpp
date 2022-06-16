@@ -224,7 +224,6 @@ struct ReferenceBrowserView::PrivateData {
   // Code preview.
   CodeView *code{nullptr};
   QTreeWidgetItem *active_item{nullptr};
-  std::vector<RawEntityId> root_ids;
 
   // Thread-safe line/column counting cache. Used to calculate the locations of
   // references.
@@ -344,6 +343,7 @@ void ReferenceBrowserView::InitializeWidgets(void) {
   d->reference_tree->setExpandsOnDoubleClick(false);
 
   // Try to capture keypresses when items are selected.
+  d->reference_tree->viewport()->installEventFilter(&(d->multiplier));
   d->reference_tree->installEventFilter(this);
 
   // Enable sorting. We want to be able to sort by context (breadcrumbs) so that
@@ -373,13 +373,11 @@ void ReferenceBrowserView::InitializeWidgets(void) {
   // Create and connect the code preview.
   if (config.code_preview.visible) {
     d->code = new CodeView(d->theme, EventSource::kReferenceBrowserCodePreview);
+    d->code->viewport()->installEventFilter(&(d->multiplier));
     d->splitter->addWidget(d->code);
 
-    connect(d->code, &CodeView::DeclarationEvent,
-            &(d->multiplier), &Multiplier::ActOnDeclarations);
-
-    connect(d->code, &CodeView::TokenEvent,
-            &(d->multiplier), &Multiplier::ActOnTokens);
+    connect(d->code, &CodeView::TokenPressEvent,
+            &(d->multiplier), &Multiplier::ActOnTokenPressEvent);
   }
 
   connect(d->reference_tree, &QTreeWidget::itemExpanded,
@@ -388,17 +386,14 @@ void ReferenceBrowserView::InitializeWidgets(void) {
   connect(d->reference_tree, &QTreeWidget::itemPressed,
           this, &ReferenceBrowserView::OnItemClicked);
 
-  connect(d->reference_tree, &QTreeWidget::itemDoubleClicked,
-          this, &ReferenceBrowserView::OnItemDoubleClicked);
+//  connect(d->reference_tree, &QTreeWidget::itemDoubleClicked,
+//          this, &ReferenceBrowserView::OnItemDoubleClicked);
 
   connect(d->reference_tree, &QTreeWidget::itemSelectionChanged,
           this, &ReferenceBrowserView::OnItemSelectionChanged);
 
-  connect(this, &ReferenceBrowserView::DeclarationEvent,
-          &d->multiplier, &Multiplier::ActOnDeclarations);
-
-  connect(this, &ReferenceBrowserView::TokenEvent,
-          &d->multiplier, &Multiplier::ActOnTokens);
+  connect(this, &ReferenceBrowserView::TokenPressEvent,
+          &d->multiplier, &Multiplier::ActOnTokenPressEvent);
 }
 
 bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
@@ -419,47 +414,43 @@ bool ReferenceBrowserView::eventFilter(QObject *watched, QEvent *event) {
   switch (kevent->key()) {
     case Qt::Key_0:
       item->setExpanded(false);
-      break;
+      return true;
     case Qt::Key_1:
       ExpandSubTreeUpTo(item, 1);
-      break;
+      return true;
     case Qt::Key_2:
       ExpandSubTreeUpTo(item, 2);
-      break;
+      return true;
     case Qt::Key_3:
       ExpandSubTreeUpTo(item, 3);
-      break;
+      return true;
     case Qt::Key_4:
       ExpandSubTreeUpTo(item, 4);
-      break;
+      return true;
     case Qt::Key_5:
       ExpandSubTreeUpTo(item, 5);
-      break;
+      return true;
     case Qt::Key_6:
       ExpandSubTreeUpTo(item, 6);
-      break;
+      return true;
     case Qt::Key_7:
       ExpandSubTreeUpTo(item, 7);
-      break;
+      return true;
     case Qt::Key_8:
       ExpandSubTreeUpTo(item, 8);
-      break;
+      return true;
     case Qt::Key_9:
       ExpandSubTreeUpTo(item, 9);
-      break;
+      return true;
     default:
-      break;
+      return false;
   }
-
-  return false;
 }
 
-void ReferenceBrowserView::SetRoots(std::vector<RawEntityId> new_root_ids) {
-  if (d->root_ids != new_root_ids) {
-    Clear();
-    for (RawEntityId root_id : new_root_ids) {
-      AddRoot(root_id);
-    }
+void ReferenceBrowserView::SetRoots(const EventLocations &new_root_ids) {
+  Clear();
+  for (const EventLocation &loc : new_root_ids) {
+    AddRoot(loc);
   }
 }
 
@@ -475,13 +466,16 @@ void ReferenceBrowserView::Clear(void) {
   d->item_to_info.clear();
   d->reference_tree->clear();
   d->active_item = nullptr;
-  d->root_ids.clear();
   d->counter.fetch_add(1u);
   if (d->code) {
     d->code->Clear();
     d->code->hide();
   }
   update();
+}
+
+void ReferenceBrowserView::Focus(void) {
+  d->reference_tree->setFocus();
 }
 
 void ReferenceBrowserView::OnDownloadedFileList(FilePathList files) {
@@ -491,15 +485,22 @@ void ReferenceBrowserView::OnDownloadedFileList(FilePathList files) {
   }
 }
 
-void ReferenceBrowserView::AddRoot(RawEntityId root_id) {
+void ReferenceBrowserView::AddRoot(EventLocation loc) {
+  auto decl_id = loc.UnpackDeclarationId();
+  if (!decl_id) {
+    return;
+  }
+
+  RawEntityId eid = EntityId(decl_id.value());
   QTreeWidgetItem *root_item = new QTreeWidgetItem;
-  root_item->setText(0, tr("Downloading entity %1 references...").arg(root_id));
+  root_item->setText(
+      0,
+      tr("Downloading entity %1 references...").arg(eid));
   d->reference_tree->addTopLevelItem(root_item);
-  d->root_ids.push_back(root_id);
 
   const Index &index = d->multiplier.Index();
   auto expander = new InitReferenceHierarchyThread(
-      index, root_id, d->line_cache, root_item, d->counter.load());
+      index, eid, d->line_cache, root_item, d->counter.load());
 
   expander->setAutoDelete(true);
 
@@ -766,26 +767,31 @@ void ReferenceBrowserView::OnItemSelectionChanged(void) {
   }
 }
 
-void ReferenceBrowserView::OnItemDoubleClicked(
-    QTreeWidgetItem *item, int column) {
-  auto id_it = d->item_to_info.find(item);
-  if (id_it == d->item_to_info.end()) {
-    return;
-  }
-
-  Event event = {QApplication::queryKeyboardModifiers(),
-                 QApplication::mouseButtons(),
-                 EventKind::kDoubleClick};
-
-  // Try to go to the specific use.
-  for (const Token &tok : id_it->second.tokens) {
-    emit TokenEvent(EventSource::kReferenceBrowser, event, {tok.id()});
-    break;
-  }
-
-  emit DeclarationEvent(EventSource::kReferenceBrowser, event,
-                        {id_it->second.decl.id()});
-}
+//void ReferenceBrowserView::OnItemDoubleClicked(
+//    QTreeWidgetItem *item, int column) {
+//  auto id_it = d->item_to_info.find(item);
+//  if (id_it == d->item_to_info.end()) {
+//    return;
+//  }
+//
+//  const PrivateData::ItemInfo &info = id_it->second;
+//
+//  EventLocation loc;
+//  loc.referenced_decl_id = info.decl.id();
+//
+//  // Try to go to the specific use.
+//  for (const Token &tok : info.tokens) {
+//    loc.fragment_token_id = tok.id();
+//    break;
+//  }
+//
+//  for (const Token &file_tok : info.file_tokens) {
+//    loc.file_token_id = file_tok.id();
+//    break;
+//  }
+//
+//  emit TokenEvent(EventSource::kReferenceBrowser, loc);
+//}
 
 void ReferenceBrowserView::OnItemClicked(
     QTreeWidgetItem *item, int column) {
@@ -795,28 +801,42 @@ void ReferenceBrowserView::OnItemClicked(
   }
 
   const PrivateData::ItemInfo &info = id_it->second;
-  if (item == d->active_item) {
-    return;
-  }
 
-  d->active_item = item;
+  if (item != d->active_item) {
+    d->active_item = item;
+    ReferenceBrowserConfiguration &config =
+        d->multiplier.Configuration().reference_browser;
 
-  ReferenceBrowserConfiguration &config =
-      d->multiplier.Configuration().reference_browser;
-
-  // A human has just clicked on this thing, show the code preview.
-  const Index &index = d->multiplier.Index();
-  auto [fragment_id, offset] = GetFragmentOffset(info.decl.id());
-  if (fragment_id != kInvalidEntityId) {
-    if (config.code_preview.visible && d->code) {
-      d->code->show();
-      d->theme.SetRangeToHighlight(info.file_tokens);
-      d->code->SetFragment(index, fragment_id);
-      d->code->ScrollToToken(info.file_tokens);
+    // A human has just clicked on this thing, show the code preview.
+    const Index &index = d->multiplier.Index();
+    auto [fragment_id, offset] = GetFragmentOffset(info.decl.id());
+    if (fragment_id != kInvalidEntityId) {
+      if (config.code_preview.visible && d->code) {
+        d->code->show();
+        d->theme.SetRangeToHighlight(info.file_tokens);
+        d->code->SetFragment(index, fragment_id);
+        d->code->ScrollToToken(info.file_tokens);
+      }
+    } else if (d->code) {
+      d->code->hide();
     }
-  } else if (d->code) {
-    d->code->hide();
   }
+
+  EventLocation loc;
+  loc.SetReferencedDeclarationId(info.decl.id());
+
+  // Try to go to the specific use.
+  for (const Token &tok : info.tokens) {
+    loc.SetFragmentTokenId(tok.id());
+    break;
+  }
+
+  for (const Token &file_tok : info.file_tokens) {
+    loc.SetFileTokenId(file_tok.id());
+    break;
+  }
+
+  emit TokenPressEvent(EventSource::kReferenceBrowser, loc);
 }
 
 }  // namespace mx::gui

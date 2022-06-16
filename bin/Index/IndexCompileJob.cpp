@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "Context.h"
+#include "Database.h"
 #include "Hash.h"
 #include "NameMangler.h"
 #include "PrintTokenGraph.h"

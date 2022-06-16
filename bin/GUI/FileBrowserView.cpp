@@ -59,6 +59,10 @@ void FileBrowserView::Clear(void) {
   d->source_file_tree->clear();
 }
 
+void FileBrowserView::Focus(void) {
+  d->source_file_tree->setFocus();
+}
+
 void FileBrowserView::InitializeWidgets(void) {
   d->layout = new QVBoxLayout;
   d->layout->setContentsMargins(0, 0, 0, 0);

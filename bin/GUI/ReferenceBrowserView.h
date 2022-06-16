@@ -52,8 +52,9 @@ class ReferenceBrowserView final : public QWidget {
   ReferenceBrowserView(Multiplier &multiplier, QWidget *parent = nullptr);
 
   void Clear(void);
-  void AddRoot(RawEntityId id);
-  void SetRoots(std::vector<RawEntityId> new_root_ids);
+  void Focus(void);
+  void AddRoot(EventLocation loc);
+  void SetRoots(const EventLocations &new_root_ids);
   void SetCodePreviewHorizontal(void);
   void SetCodePreviewVertical(void);
 
@@ -68,15 +69,10 @@ class ReferenceBrowserView final : public QWidget {
   void OnUsersOfLevel(QTreeWidgetItem *parent, uint64_t counter,
                       UserLocationsPtr users, int depth);
   void OnItemClicked(QTreeWidgetItem *item, int column);
-  void OnItemDoubleClicked(QTreeWidgetItem *item, int column);
   void OnItemSelectionChanged(void);
 
  signals:
-  void DeclarationEvent(EventSource source, Event event,
-                        std::vector<RawEntityId> ids);
-
-  void TokenEvent(EventSource source, Event event,
-                  std::vector<RawEntityId> ids);
+  void TokenPressEvent(EventSource source, EventLocations locs);
 };
 
 // A background thread that downloads the first level of references for one

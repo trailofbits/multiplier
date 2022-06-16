@@ -60,18 +60,14 @@ class CodeView final : public QPlainTextEdit {
  protected:
   void scrollContentsBy(int dx, int dy) Q_DECL_FINAL;
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
-  void mouseMoveEvent(QMouseEvent *event) Q_DECL_FINAL;
   void mousePressEvent(QMouseEvent *event) Q_DECL_FINAL;
-  void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_FINAL;
 
  private:
   void InitializeWidgets(void);
   std::optional<std::pair<unsigned, int>>
   TokenIndexForPosition(const QPoint &pos) const;
-  std::vector<RawEntityId> DeclsForIndex(unsigned index) const;
-  std::vector<RawEntityId> TokensForIndex(unsigned index) const;
 
-  void EmitEventsForIndex(QMouseEvent *event, unsigned index, EventKind kind);
+  void EmitEventsForIndex(unsigned index);
 
  private slots:
   void OnDownloadFailed(void);
@@ -79,11 +75,7 @@ class CodeView final : public QPlainTextEdit {
   void OnRenderCode(void *code, uint64_t counter);
 
  signals:
-  void TokenEvent(EventSource source, Event event,
-                  std::vector<RawEntityId> ids);
-
-  void DeclarationEvent(EventSource source, Event event,
-                        std::vector<RawEntityId> ids);
+  void TokenPressEvent(EventSource source, EventLocations loc_ids);
 };
 
 // Thread that goes and downloads and structures the relevant code in the

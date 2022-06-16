@@ -65,9 +65,10 @@ void PendingFragment::PersistDeclarationSymbols(
     mx::WorkerId worker_id) {
   for (const pasta::Decl &decl : decls_to_serialize) {
     if (ShouldGetSymbolName(decl)) {
-      auto str = DeclToString(ast, decl);
+      auto str = DeclToString(ast, decl.CanonicalDeclaration());
       auto id = em.EntityId(decl);
-      context.database[worker_id]->StoreEntities(id, str);
+      auto category = mx::EnumeratorName(mx::FromPasta(decl.Category()));
+      context.databases[worker_id]->StoreEntities(id, str, category);
     }
   }
 }

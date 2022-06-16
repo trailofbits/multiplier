@@ -25,6 +25,7 @@ add_executable("${exe_name}"
   Configuration.cpp
   Configuration.h
   
+  Event.cpp
   Event.h
 
   FileBrowserView.cpp

@@ -172,4 +172,11 @@ RegexQueryResult Index::query_fragments(const RegexQuery &query) const {
   return RegexQueryResult(impl->Query(impl, query));
 }
 
+SymbolList Index::query_symbol(const std::string &name) const {
+  SymbolList entity_ids;
+  impl->FindSymbol(impl, name, entity_ids);
+  return entity_ids;
+}
+
+
 }  // namespace mx

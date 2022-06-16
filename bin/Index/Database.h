@@ -12,18 +12,25 @@
 #include <optional>
 #include <string_view>
 
-namespace indexer {
+#include <blockingconcurrentqueue.h>
 
-static inline
-std::filesystem::path sqlite_dbname(std::filesystem::path path) {
-  auto db_path = path.append("db.sqlite");
-  return db_path;
+namespace sqlite {
+class Connection;
+class Statement;
 }
 
-class DatabaseImpl;
+namespace indexer {
 
 class Database {
  public:
+  using QueueData = std::tuple<std::string, uint64_t, const char*>;
+  using QueueItem = std::variant<QueueData, std::nullptr_t>;
+
+  static std::filesystem::path Name(std::filesystem::path path) {
+    auto db_path = path.append("db.sqlite");
+    return db_path;
+  }
+
   Database(std::filesystem::path workspace_dir);
 
   Database(std::string workspace_dir);
@@ -35,19 +42,18 @@ class Database {
   Database &operator=(const Database &) = delete;
 
   // Store the entity ids and symbol name in sqlite table
-  void StoreEntities(uint64_t entity_id, std::string &data);
+  void StoreEntities(uint64_t entity_id, std::string &data, const char*);
 
-  // Prepare statement to bind values to and commit
-  void Prepare();
-
-  void Commit();
-
-  // Create indexed table that will enable text based seaching
-  // on entity table
-  void CreateIndexedTable(void);
+  void QuerySymbol(std::string name, std::function<
+                   void(uint64_t, std::string&, std::string&)> cb);
 
  private:
-  std::unique_ptr<DatabaseImpl> impl;
+  std::unique_ptr<sqlite::Connection> db;
+
+  std::thread bulk_insertion_thread;
+  moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
+
+  //std::map<uint32_t, std::string> table_map;
 };
 
 } // namespace indexer
