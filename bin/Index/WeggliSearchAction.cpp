@@ -28,7 +28,7 @@
 
 namespace indexer {
 
-void WeggliSearchAction::QuerySyntaxInFile(mx::FileId file_id) {
+void WeggliSearchAction::QuerySyntaxInFile(mx::RawFileId file_id) {
 
   // Get the contents of the file. We may fail, which is OK, and generally
   // implies a bad file id. There can be small gaps in the file ID space, which
@@ -86,7 +86,7 @@ void WeggliSearchAction::Run(mx::Executor, mx::WorkerId) {
   }
 
   while (true) {
-    mx::FileId file_id = context->local_next_file_id.fetch_add(1ull);
+    mx::RawFileId file_id = context->local_next_file_id.fetch_add(1ull);
     if (file_id >= context->server_context.next_file_id.load()) {
       break;
     }

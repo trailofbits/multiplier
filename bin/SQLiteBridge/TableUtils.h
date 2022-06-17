@@ -368,8 +368,8 @@ void Filter(int idxNum, const char *idxStr,
     generatedEntities = true;
   }
   if ((idxNum & FragmentId) == FragmentId) {
-    auto frag_id{get_int64(args[argIndex++])};
-    auto fragment{index.fragment(frag_id)};
+    auto frag_id{static_cast<uint64_t>(get_int64(args[argIndex++]))};
+    auto fragment{index.fragment({frag_id})};
     if (fragment) {
       if (generatedEntities) {
         entities.erase(std::remove_if(entities.begin(), entities.end(),
@@ -378,7 +378,7 @@ void Filter(int idxNum, const char *idxStr,
                                         if (!frag) {
                                           return true;
                                         }
-                                        return frag_id != *frag;
+                                        return frag_id != frag->value;
                                       }));
       } else {
         for (auto entity : T::in(*fragment)) {

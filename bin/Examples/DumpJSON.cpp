@@ -42,13 +42,13 @@ llvm::json::Object UnparsedToken(mx::Token token) {
   mx::VariantId vid = token.id().Unpack();
   if (std::holds_alternative<mx::FileTokenId>(vid)) {
     auto ft = std::get<mx::FileTokenId>(vid);
-    obj["file_id"] = ft.file_id;
+    obj["file_id"] = ft.file_id.value;
     obj["file_offset"] = ft.offset;
     obj["type"] = "file_token";
 
   } else if (std::holds_alternative<mx::FragmentTokenId>(vid)) {
     auto ft = std::get<mx::FragmentTokenId>(vid);
-    obj["fragment_id"] = ft.fragment_id;
+    obj["fragment_id"] = ft.fragment_id.value;
     obj["fragment_offset"] = ft.offset;
     obj["type"] = "fragment_token";
   }
@@ -112,7 +112,7 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
   llvm::json::Array fragment_ids;
 
   for(mx::Fragment frag : mx::Fragment::in(file)) {
-    fragment_ids.push_back(frag.id());
+    fragment_ids.push_back(frag.id().value);
 
     for (mx::Token token : mx::Token::in(frag)) {
       llvm::json::Object tok;
@@ -155,7 +155,7 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
 
     llvm::json::Object obj;
     obj["path"] = file_path.generic_string();
-    obj["id"] = file.id();
+    obj["id"] = file.id().value;
     obj["fragments"] = std::move(fragment_ids);
     obj["tokens"] = std::move(tokens);
 

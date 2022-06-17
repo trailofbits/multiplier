@@ -267,7 +267,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     return *this;
   }
 
-  FileId file_id = kInvalidEntityId;
+  FileId file_id = kInvalidFileId;
 
   // Find the nearest file token for the first token.
   for (auto i = 0u; i <= index; ++i) {
@@ -283,7 +283,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     }
   }
 
-  if (file_id == kInvalidEntityId) {
+  if (file_id == kInvalidFileId) {
     return ret;
   }
 

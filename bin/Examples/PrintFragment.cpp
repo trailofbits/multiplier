@@ -25,7 +25,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index = InitExample();
 
-  auto fragment = index.fragment(FLAGS_fragment_id);
+  auto fragment = index.fragment({FLAGS_fragment_id});
   if (!fragment) {
     std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
     return EXIT_FAILURE;

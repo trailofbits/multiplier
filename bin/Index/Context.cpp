@@ -243,13 +243,13 @@ void IndexingContext::InitializeCodeGenerator(void) {
 
 // Get or create a file ID for the file at `file_path` with contents
 // `contents_hash`.
-std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
+std::pair<mx::RawFileId, bool> IndexingContext::GetOrCreateFileId(
     mx::WorkerId worker_id_, std::filesystem::path file_path,
     const std::string &contents_hash) {
 
   const auto worker_id = static_cast<unsigned>(worker_id_);
   auto &maybe_id = this->local_next_file_id[worker_id].id;
-  mx::FileId created_id = mx::kInvalidEntityId;
+  mx::RawFileId created_id = mx::kInvalidEntityId;
   if (!maybe_id.has_value()) {
     created_id = server_context.next_file_id.fetch_add(
         mx::kMinEntityIdIncrement);;
@@ -258,7 +258,7 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
     maybe_id = {};
   }
 
-  mx::FileId file_id = server_context.file_hash_to_file_id.GetOrSet(
+  mx::RawFileId file_id = server_context.file_hash_to_file_id.GetOrSet(
       contents_hash, created_id);
 
   CHECK_LT(file_id, mx::kMaxFileId);
@@ -269,14 +269,14 @@ std::pair<mx::FileId, bool> IndexingContext::GetOrCreateFileId(
     return {file_id, true};
 
   } else {
-    maybe_id = created_id;  // Put it back in the worker-specific cache.
+    maybe_id = {created_id};  // Put it back in the worker-specific cache.
     return {file_id, false};
   }
 }
 
 // Get or create a code ID for the top-level declarations that hash to
 // `code_hash`.
-std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
+std::pair<mx::RawFragmentId, bool> IndexingContext::GetOrCreateFragmentId(
     mx::WorkerId worker_id_, const std::string &code_hash,
     uint64_t num_tokens) {
 
@@ -285,7 +285,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   if (num_tokens >= mx::kNumTokensInBigFragment) {
     auto &maybe_id = this->local_next_big_fragment_id[worker_id].id;
-    mx::FileId created_id = mx::kInvalidEntityId;
+    mx::RawFileId created_id = mx::kInvalidEntityId;
     if (!maybe_id.has_value()) {
       created_id = server_context.next_big_fragment_id.fetch_add(
           mx::kMinEntityIdIncrement);;
@@ -294,7 +294,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
       maybe_id = {};
     }
 
-    mx::FragmentId code_id = server_context.code_hash_to_fragment_id.GetOrSet(
+    mx::RawFragmentId code_id = server_context.code_hash_to_fragment_id.GetOrSet(
         code_hash, created_id);
 
     CHECK_LT(code_id, mx::kMaxBigFragmentId);
@@ -309,7 +309,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
   // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigPendingFragments, ...)`.
   } else {
     auto &maybe_id = this->local_next_small_fragment_id[worker_id].id;
-    mx::FileId created_id = mx::kInvalidEntityId;
+    mx::RawFileId created_id = mx::kInvalidEntityId;
     if (!maybe_id.has_value()) {
       created_id = server_context.next_small_fragment_id.fetch_add(
           mx::kMinEntityIdIncrement);;
@@ -318,7 +318,7 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
       maybe_id = {};
     }
 
-    mx::FragmentId code_id = server_context.code_hash_to_fragment_id.GetOrSet(
+    mx::RawFragmentId code_id = server_context.code_hash_to_fragment_id.GetOrSet(
         code_hash, created_id);
 
     CHECK_GE(code_id, mx::kMaxBigFragmentId);
@@ -333,12 +333,12 @@ std::pair<mx::FragmentId, bool> IndexingContext::GetOrCreateFragmentId(
 }
 
 // Save the tokenized contents of a file.
-void IndexingContext::PutSerializedFile(mx::FileId id, std::string data) {
+void IndexingContext::PutSerializedFile(mx::RawFileId id, std::string data) {
   server_context.file_id_to_serialized_file.Set(id, std::move(data));
 }
 
 // Save the serialized top-level entities and the parsed tokens.
-void IndexingContext::PutSerializedFragment(mx::FragmentId id,
+void IndexingContext::PutSerializedFragment(mx::RawFragmentId id,
                                             std::string data) {
   server_context.fragment_id_to_serialized_fragment.Set(id, std::move(data));
 }
@@ -362,7 +362,7 @@ void IndexingContext::LinkMangledName(const std::string &name,
 
 // Link an entity to the fragment that uses the entity.
 void IndexingContext::LinkUseInFragment(mx::RawEntityId use,
-                                        mx::FragmentId user) {
+                                        mx::RawFragmentId user) {
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
     server_context.entity_id_use_to_fragment_id.Insert(use, user);
   }
@@ -370,7 +370,7 @@ void IndexingContext::LinkUseInFragment(mx::RawEntityId use,
 
 // Link a direct reference to an entity from another entity.
 void IndexingContext::LinkReferenceInFragment(mx::RawEntityId use,
-                                              mx::FragmentId user) {
+                                              mx::RawFragmentId user) {
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
     server_context.entity_id_reference.Insert(use, user);
   }
@@ -385,7 +385,7 @@ void IndexingContext::LinkReferenceInFragment(mx::RawEntityId use,
 // TODO(pag): Eventually implement an async writer for `PersistentMap` and
 //            `PersistentSet` using a RocksDB `WriteBatch`.
 void IndexingContext::PutFragmentLineCoverage(
-    mx::FileId file_id, mx::FragmentId fragment_id,
+    mx::RawFileId file_id, mx::RawFragmentId fragment_id,
     unsigned start_line, unsigned end_line) {
   server_context.file_fragment_ids.Insert(file_id, fragment_id);
   for (auto i = start_line; i <= end_line; ++i) {
@@ -400,7 +400,7 @@ SearchingContext::SearchingContext(ServerContext &server_context_)
 SearchingContext::~SearchingContext(void) {}
 
 std::optional<std::string>
-SearchingContext::GetSerializedFile(mx::FileId file_id) {
+SearchingContext::GetSerializedFile(mx::RawFileId file_id) {
   return server_context.file_id_to_serialized_file.TryGet(file_id);
 }
 

@@ -29,7 +29,7 @@ class IndexCompileJobAction final : public mx::Action {
   const pasta::CompileJob job;
 
   // Maps pasta files to their unique IDs.
-  std::unordered_map<pasta::File, mx::FileId> file_ids;
+  std::unordered_map<pasta::File, mx::RawFileId> file_ids;
 
   // Maps pasta files to their hashes, represented as SHA256 checksums.
   std::unordered_map<pasta::File, std::string> file_hashes;

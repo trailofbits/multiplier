@@ -256,7 +256,7 @@ class GrammarImpl {
   // bloom filter for X and we make it for Y, then compose them (bitwise OR) and
   // then exhaustively scan all fragment bloom filters to get a likely set of
   // fragments to do a deeper, tree-based match.
-  mx::PersistentMap<2, mx::FragmentId, SmallBloomFilter> features;
+  mx::PersistentMap<2, mx::RawFragmentId, SmallBloomFilter> features;
 
   inline GrammarImpl(std::filesystem::path grammar_dir)
       : tokens(grammar_dir),
@@ -335,7 +335,7 @@ void Grammar::Import(const mx::Fragment &fragment) {
     }
   }
 
-  impl->features.Set(fragment.id(), fragment_features);
+  impl->features.Set(fragment.id().value, fragment_features);
 }
 
 }  // namespace syntex

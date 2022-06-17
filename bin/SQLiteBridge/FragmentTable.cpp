@@ -78,12 +78,12 @@ public:
     fragments.clear();
     auto constraint{static_cast<ConstraintType>(idxNum)};
     if (constraint == ConstraintType::FragmentId) {
-      auto fragment{index.fragment(sqlite3_value_int64(args[0]))};
+      auto fragment{index.fragment({static_cast<uint64_t>(sqlite3_value_int64(args[0]))})};
       if (fragment) {
         fragments.push_back(fragment->id());
       }
     } else if (constraint == ConstraintType::FileId) {
-      auto file{index.file(sqlite3_value_int64(args[0]))};
+      auto file{index.file({static_cast<uint64_t>(sqlite3_value_int64(args[0]))})};
       if (file) {
         for (auto fragment : mx::Fragment::in(*file)) {
           fragments.push_back(fragment.id());

@@ -551,7 +551,7 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
         end_index - begin_index + 1u);
 
     PendingFragment pending_fragment;
-    pending_fragment.fragment_id = code_id;
+    pending_fragment.fragment_id = {code_id};
     pending_fragment.decls = std::move(decls_for_group);
     pending_fragment.begin_index = begin_index;
     pending_fragment.end_index = end_index;

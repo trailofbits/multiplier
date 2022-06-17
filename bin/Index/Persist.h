@@ -16,7 +16,7 @@ namespace indexer {
 
 class IndexingContext;
 
-void PersistFile(IndexingContext &context, mx::FileId file_id,
+void PersistFile(IndexingContext &context, mx::RawFileId file_id,
                  std::string file_hash, pasta::File file);
 
 void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &mangler,

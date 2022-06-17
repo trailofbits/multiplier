@@ -25,8 +25,8 @@ RegexQueryResultImpl::RegexQueryResultImpl(
   auto fragment_ids_reader = response.getFragmentIds();
   fragment_ids.reserve(fragment_ids_reader.size());
 
-  for (mx::FragmentId frag_id : fragment_ids_reader) {
-    fragment_ids.emplace_back(frag_id);
+  for (uint64_t frag_id : fragment_ids_reader) {
+    fragment_ids.push_back({frag_id});
   }
 }
 

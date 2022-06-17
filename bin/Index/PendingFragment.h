@@ -28,7 +28,7 @@
 namespace indexer {
 
 using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
-using FileIdMap = std::unordered_map<pasta::File, mx::FileId>;
+using FileIdMap = std::unordered_map<pasta::File, mx::RawFileId>;
 using TypeKey = std::pair<const void *, uint32_t>;
 using TypeIdMap = std::map<TypeKey, mx::EntityId>;
 using PseudoOffsetMap = std::unordered_map<const void *, uint32_t>;

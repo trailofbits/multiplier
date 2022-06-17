@@ -32,7 +32,7 @@ class WeggliSearchAction final : public mx::Action {
   WeggliSearchAction(std::shared_ptr<SearchingContext> context_,
                      std::string syntax_string, bool is_cpp);
 
-  void QuerySyntaxInFile(mx::FileId file_id);
+  void QuerySyntaxInFile(mx::RawFileId file_id);
 
   // Build and index the AST.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

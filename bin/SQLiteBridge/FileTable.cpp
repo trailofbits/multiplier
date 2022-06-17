@@ -41,7 +41,7 @@ template <> struct TypeAdapter<mx::FilePathList::value_type> {
                 int idxCol) {
     switch (idxCol) {
     case 0:
-      sqlite3_result_int64(ctx, obj.second);
+      sqlite3_result_int64(ctx, obj.second.value);
       return SQLITE_OK;
     case 1:
       sqlite3_result_text(ctx, obj.first.c_str(), -1, SQLITE_TRANSIENT);
@@ -53,7 +53,7 @@ template <> struct TypeAdapter<mx::FilePathList::value_type> {
 
   std::int64_t
   GetRowId(const std::pair<const std::filesystem::path, mx::FileId> &obj) {
-    return obj.second;
+    return obj.second.value;
   }
 };
 

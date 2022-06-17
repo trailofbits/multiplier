@@ -34,7 +34,7 @@ FileId PackedFragmentImpl::FileContaingFirstToken(void) const {
       std::holds_alternative<FileTokenId>(unpacked_id)) {
     return std::get<FileTokenId>(unpacked_id).file_id;
   } else {
-    return kInvalidEntityId;
+    return kInvalidFileId;
   }
 }
 

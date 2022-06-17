@@ -424,7 +424,7 @@ static void PersistTokenContexts(
 // for every such query. Similarly, we often want to map from matches in files
 // to matches in fragments, and so we create and persist a mapping of file
 // offsets to line numbers here to help us with those translations later.
-void PersistFile(IndexingContext &context, mx::FileId file_id,
+void PersistFile(IndexingContext &context, mx::RawFileId file_id,
                  std::string file_hash, pasta::File file) {
   auto file_tokens = file.Tokens();
   auto maybe_file_data = file.Data();
@@ -571,7 +571,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
   FindFileRange(token_tree, file, &min_token, &max_token, num_substitutions);
 
   mx::FileId file_id = em.FileId(file);
-  fb.setId(fragment_id);
+  fb.setId(fragment_id.value);
   fb.setFirstFileTokenId(em.EntityId(min_token));
   fb.setLastFileTokenId(em.EntityId(max_token));
 
@@ -602,7 +602,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
       next_substitution_index);
   CHECK_EQ(next_substitution_index, num_substitutions);
 
-  context.PutFragmentLineCoverage(file_id, fragment_id, min_token.Line(),
+  context.PutFragmentLineCoverage(file_id, fragment_id.value, min_token.Line(),
                                   max_token.Line());
 
   frag.LinkDeclarations(context, em, mangler);
@@ -610,7 +610,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
   frag.FindDeclarationUses(context, fb);
 
   context.PutSerializedFragment(
-      fragment_id, CompressedMessage("fragment", message));
+      fragment_id.value, CompressedMessage("fragment", message));
 
   frag.PersistDeclarationSymbols(context, em, ast, worker_id);
 }

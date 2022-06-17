@@ -14,9 +14,6 @@ namespace rpc {
 class FileInfo;
 }  // namespace rpc
 
-using FileId = uint64_t;
-using FragmentId = uint64_t;
-
 class Fragment;
 class FragmentImpl;
 
@@ -33,6 +30,36 @@ enum class TokenSubstitutionKind : unsigned char {
 
 using RawEntityId = uint64_t;
 
+using RawFileId = uint64_t;
+struct FileId {
+  RawFileId value;
+
+  inline constexpr bool operator==(const FileId &f) const noexcept { return value == f.value; }
+  inline constexpr bool operator!=(const FileId &f) const noexcept { return value != f.value; }
+  inline constexpr bool operator<(const FileId &f) const noexcept { return value < f.value; }
+  inline constexpr bool operator<=(const FileId &f) const noexcept { return value <= f.value; }
+  inline constexpr bool operator>(const FileId &f) const noexcept { return value > f.value; }
+  inline constexpr bool operator>=(const FileId &f) const noexcept { return value >= f.value; }
+
+  inline constexpr operator bool() { return value; }
+};
+
+using RawFragmentId = uint64_t;
+struct FragmentId {
+  RawFragmentId value;
+
+  inline constexpr bool operator==(const FragmentId &f) const noexcept { return value == f.value; };
+  inline constexpr bool operator!=(const FragmentId &f) const noexcept { return value != f.value; };
+  inline constexpr bool operator<(const FragmentId &f) const noexcept { return value < f.value; }
+  inline constexpr bool operator<=(const FragmentId &f) const noexcept { return value <= f.value; }
+  inline constexpr bool operator>(const FragmentId &f) const noexcept { return value > f.value; }
+  inline constexpr bool operator>=(const FragmentId &f) const noexcept { return value >= f.value; }
+
+  inline constexpr operator bool() { return value; }
+};
+
+static constexpr FileId kInvalidFileId = {0};
+static constexpr FragmentId kInvalidFragmentId = {0};
 static constexpr RawEntityId kInvalidEntityId = 0ull;
 static constexpr RawEntityId kMinEntityIdIncrement = 1ull;
 
@@ -40,12 +67,12 @@ static constexpr RawEntityId kMinEntityIdIncrement = 1ull;
 // this a "big code" chunk. We assume that we'll have few of these, i.e. less
 // than 2^16 of them.
 static constexpr unsigned kBigFragmentIdNumBits = 16u;
-static constexpr FragmentId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
+static constexpr uint64_t kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
 static constexpr uint64_t kNumTokensInBigFragment =
     1ull << kBigFragmentIdNumBits;
 
 static constexpr unsigned kFileIdNumBits = 20u;
-static constexpr FileId kMaxFileId = 1ull << kFileIdNumBits;
+static constexpr uint64_t kMaxFileId = 1ull << kFileIdNumBits;
 
 // Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
 // inside of a `Fragment`.
@@ -136,8 +163,8 @@ struct InvalidId {};
 
 // Possible types of entity ids represented by a packed
 // `EntityId`.
-using VariantId = std::variant<InvalidId, DeclarationId, StatementId, TypeId,
-                               FragmentTokenId, FileTokenId,
+using VariantId = std::variant<InvalidId, FileId, FragmentId, DeclarationId,
+                               StatementId, TypeId, FragmentTokenId, FileTokenId,
                                TokenSubstitutionId>;
 
 // An opaque, compressed entity id.
@@ -152,6 +179,8 @@ class EntityId {
       : opaque(opaque_) {}
 
   // Pack an elaborated entity ID into an opaque entity ID.
+  /* implicit */ EntityId(FileId id);
+  /* implicit */ EntityId(FragmentId id);
   /* implicit */ EntityId(DeclarationId id);
   /* implicit */ EntityId(StatementId id);
   /* implicit */ EntityId(TypeId id);
@@ -225,3 +254,21 @@ class EntityId {
 };
 
 }  // namespace mx
+
+namespace std {
+  template<>
+  struct hash<mx::FileId> {
+    std::size_t operator()(const mx::FileId& id) const noexcept {
+      std::hash<uint64_t> h;
+      return h(id.value);
+    }
+  };
+
+  template<>
+  struct hash<mx::FragmentId> {
+    std::size_t operator()(const mx::FragmentId& id) const noexcept {
+      std::hash<uint64_t> h;
+      return h(id.value);
+    }
+  };
+}

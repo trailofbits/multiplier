@@ -122,7 +122,7 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
   } else if (FLAGS_fragment_id) {
-    auto fragment = index.fragment(FLAGS_fragment_id);
+    auto fragment = index.fragment({FLAGS_fragment_id});
     if (!fragment) {
       std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
       return EXIT_FAILURE;
@@ -130,7 +130,7 @@ extern "C" int main(int argc, char *argv[]) {
     FindSketchyUsesOfFragment(std::move(*fragment));
 
   } else if (FLAGS_file_id) {
-    auto file = index.file(FLAGS_file_id);
+    auto file = index.file({FLAGS_file_id});
     if (!file) {
       std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
       return EXIT_FAILURE;

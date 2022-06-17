@@ -29,7 +29,7 @@ class RegexSearchAction final : public mx::Action {
   RegexSearchAction(std::shared_ptr<SearchingContext> context_,
                     std::string pattern);
 
-  void QueryExprInFile(mx::FileId file_id);
+  void QueryExprInFile(mx::RawFileId file_id);
 
   // Build and index the AST.
   void Run(mx::Executor exe, mx::WorkerId worker_id) final;

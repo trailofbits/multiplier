@@ -16,6 +16,7 @@
 #include <set>
 
 #include "../Re2.h"
+#include "multiplier/Types.h"
 
 namespace mx {
 namespace {
@@ -144,8 +145,8 @@ FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) try {
 
   FilePathList files;
   for (rpc::FileInfo::Reader entry : response.getFiles()) {
-    const FileId file_id = entry.getId();
-    assert(file_id != kInvalidEntityId);
+    const FileId file_id = {entry.getId()};
+    assert(file_id != kInvalidFileId);
     assert(entry.hasPath());
     capnp::Text::Reader path = entry.getPath();
     assert(0u < path.size());
@@ -167,7 +168,7 @@ std::vector<FragmentId> RemoteEntityProvider::ListFragmentsInFile(
   capnp::Request<mx::rpc::Multiplier::FindFileFragmentsParams,
                  mx::rpc::Multiplier::FindFileFragmentsResults>
       request = cc.client.findFileFragmentsRequest();
-  request.setFileId(id);
+  request.setFileId(id.value);
 
   capnp::Response<mx::rpc::Multiplier::FindFileFragmentsResults> response =
       request.send().wait(cc.connection.getWaitScope());
@@ -177,8 +178,8 @@ std::vector<FragmentId> RemoteEntityProvider::ListFragmentsInFile(
 
   std::vector<FragmentId> fragments;
   fragments.reserve(response.getFragmentIds().size());
-  for (FragmentId fragment_id : response.getFragmentIds()) {
-    fragments.push_back(fragment_id);
+  for (RawFragmentId fragment_id : response.getFragmentIds()) {
+    fragments.push_back({fragment_id});
   }
 
   return fragments;
@@ -194,7 +195,7 @@ FileImpl::Ptr RemoteEntityProvider::FileFor(const Ptr &self, FileId id) try {
   capnp::Request<mx::rpc::Multiplier::DownloadFileParams,
                  mx::rpc::Multiplier::DownloadFileResults>
   request = cc.client.downloadFileRequest();
-  request.setId(id);
+  request.setId(id.value);
 
   capnp::Response<mx::rpc::Multiplier::DownloadFileResults> response =
       request.send().wait(cc.connection.getWaitScope());
@@ -219,7 +220,7 @@ FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(
   capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
                  mx::rpc::Multiplier::DownloadFragmentResults>
       request = cc.client.downloadFragmentRequest();
-  request.setId(id);
+  request.setId(id.value);
 
   capnp::Response<mx::rpc::Multiplier::DownloadFragmentResults> response =
       request.send().wait(cc.connection.getWaitScope());
@@ -369,7 +370,7 @@ void RemoteEntityProvider::FillUses(
     fragment_ids_out.clear();
     fragment_ids_out.reserve(fragment_ids_reader.size());
     for (auto frag_id : fragment_ids_reader) {
-      fragment_ids_out.push_back(frag_id);
+      fragment_ids_out.push_back({frag_id});
     }
 
     return;
@@ -424,7 +425,7 @@ void RemoteEntityProvider::FillReferences(
     fragment_ids_out.clear();
     fragment_ids_out.reserve(fragment_ids_reader.size());
     for (auto frag_id : fragment_ids_reader) {
-      fragment_ids_out.push_back(frag_id);
+      fragment_ids_out.push_back({frag_id});
     }
 
     return;
@@ -454,7 +455,7 @@ void RemoteEntityProvider::FindSymbol(
   out.reserve(symbols_reader.size());
 
   for (rpc::SymbolMatch::Reader item : symbols_reader) {
-    const FileId entity_id = item.getEntityId();
+    const FileId entity_id = {item.getEntityId()};
     std::string name(item.getSymbol().cStr(), item.getSymbol().size());
     std::string kind(item.getKind().cStr(), item.getKind().size());
     out.emplace_back(std::tuple(entity_id, name, kind));

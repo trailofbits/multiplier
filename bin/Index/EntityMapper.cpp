@@ -86,9 +86,9 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
 
 mx::FileId EntityMapper::FileId(const pasta::File &file) {
   if (auto fit = file_ids.find(file); fit != file_ids.end()) {
-    return fit->second;
+    return {fit->second};
   } else {
-    return mx::kInvalidEntityId;
+    return mx::kInvalidFileId;
   }
 }
 
