@@ -51,7 +51,7 @@ using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
 
 using FilePathList = std::set<std::pair<std::filesystem::path, FileId>>;
 
-using SymbolList = std::vector<std::tuple<RawEntityId, std::string, std::string>>;
+using SymbolList = std::vector<std::tuple<RawEntityId, std::string>>;
 
 template <typename T>
 inline ParentDeclIteratorImpl<T> &
@@ -164,7 +164,8 @@ class EntityProvider {
                               std::vector<FragmentId> &fragment_ids_out) = 0;
 
   // Find the entity ids matching the name
-  virtual void FindSymbol(const Ptr &, std::string name, SymbolList &ids_out) = 0;
+  virtual void FindSymbol(const Ptr &, std::string name,
+                          mx::DeclCategory category, SymbolList &ids_out) = 0;
 };
 
 class NotAnEntity {};
@@ -229,7 +230,7 @@ class Index {
   RegexQueryResult query_fragments(const RegexQuery &query) const;
 
 
-  SymbolList query_symbol(const std::string &name) const;
+  SymbolList query_entities(const std::string &name, mx::DeclCategory category) const;
 };
 
 }  // namespace mx

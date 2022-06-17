@@ -184,8 +184,6 @@ struct SymbolMatch @0xb119a123d978fd1e {
   entityId @0 :UInt64;
   # Symbol name
   symbol   @1 :Text;
-  # Symbol kind
-  kind     @2 :Text;
 }
 
 interface Multiplier @0xb0c484f9ec88f1d6 {
@@ -232,5 +230,5 @@ interface Multiplier @0xb0c484f9ec88f1d6 {
   findFileFragments @10 (fileId :UInt64) -> (versionNumber :UInt32, fragmentIds :List(UInt64));
 
   # Find the entity ids from the given symbol name
-  findSymbols @11 (query :Text) -> (symbols :List(SymbolMatch));
+  findSymbols @11 (query :Text, category :UInt32) -> (symbols :List(SymbolMatch));
 }

@@ -21,24 +21,26 @@ QueryResult::QueryResult(std::shared_ptr<Statement> stmt_)
 std::vector<std::string>
 QueryResult::GetColumnNames() {
   std::vector<std::string> result;
-  int col_size = NumColumns();
-  for (int i = 0; i < col_size; i++) {
+  auto col_size = NumColumns();
+  auto prepared_stmt = stmt->prepareStatement();
+
+  for (auto i = 0u; i < col_size; i++) {
     result.push_back(
-        sqlite3_column_name(stmt->GetPreparedStatement(), i));
+        sqlite3_column_name(prepared_stmt, i));
   }
   return result;
 }
 
 bool QueryResult::Columns(std::vector<std::string>& row) {
   std::vector<std::string> ret;
-  int col_size = NumColumns();
-  const unsigned char * col_val;
+  auto col_size = NumColumns();
+  auto prepared_stmt = stmt->prepareStatement();
 
   for (int i = 0; i < col_size; i++) {
-    col_val = sqlite3_column_text(stmt->GetPreparedStatement(), i);
+    auto col_val = sqlite3_column_text(prepared_stmt, i);
 
     if (col_val) {
-      ret.push_back(std::string((char *)col_val));
+      ret.push_back(std::string(reinterpret_cast<const char*>(col_val)));
     } else {
       ret.push_back("");
     }
@@ -49,46 +51,56 @@ bool QueryResult::Columns(std::vector<std::string>& row) {
 }
 
 uint32_t QueryResult::NumColumns() {
-  return sqlite3_column_count(stmt->GetPreparedStatement());
+  auto prepared_stmt = stmt->prepareStatement();
+  return sqlite3_column_count(prepared_stmt);
+}
+
+int64_t QueryResult::getInt64(int32_t idx) {
+  auto prepared_stmt = stmt->prepareStatement();
+  return sqlite3_column_int64(prepared_stmt, idx);
+}
+
+std::string QueryResult::getText(int32_t idx) {
+  auto prepared_stmt = stmt->prepareStatement();
+  auto ptr = reinterpret_cast<const char*>(sqlite3_column_text(prepared_stmt, idx));
+  auto len = sqlite3_column_bytes(prepared_stmt, idx);
+  return std::string(ptr, len);
 }
 
 Statement::Statement(Connection& conn, const std::string& stmt)
     : db(conn), query(stmt)
 {
   conn.stmts.emplace_back(this);
-  prepared_stmt = prepareStatement();
-  num_params = sqlite3_bind_parameter_count(GetPreparedStatement());
+
+  auto getPrepareStatement = [this](void) -> std::shared_ptr<sqlite3_stmt> {
+    sqlite3_stmt* stmt;
+    char *tail;
+    auto ret = sqlite3_prepare_v2(db.GetHandler(), query.c_str(),
+                                  static_cast<int>(query.size()),
+                                  &stmt, const_cast<const char**>(&tail));
+    if (SQLITE_OK != ret) {
+      assert(0);
+      throw Error("Failed to prepare statement");
+    }
+
+    return std::shared_ptr<sqlite3_stmt>(
+        stmt, [](sqlite3_stmt* stmt) { sqlite3_finalize(stmt);});
+  };
+
+  prepared_stmt = getPrepareStatement();
+  num_params = sqlite3_bind_parameter_count(prepared_stmt.get());
 }
 
 Statement::~Statement(){}
 
-std::shared_ptr<sqlite3_stmt> Statement::prepareStatement(void){
-  sqlite3_stmt* stmt;
-  char *tail;
-  auto ret = sqlite3_prepare_v2(db.GetHandler(), query.c_str(),
-                                static_cast<int>(query.size()),
-                                &stmt, const_cast<const char**>(&tail));
-  if (SQLITE_OK != ret) {
-    throw Error("Failed to prepare statement");
-  }
-
-  return std::shared_ptr<sqlite3_stmt>(
-      stmt, [](sqlite3_stmt* stmt) { sqlite3_finalize(stmt);});
-}
-
-sqlite3_stmt* Statement::GetPreparedStatement() const {
-  sqlite3_stmt* stmt_ptr = prepared_stmt.get();
-  if (!stmt_ptr) {
-    throw Error("Statement is not prepared.");
-  }
-  return stmt_ptr;
+sqlite3_stmt* Statement::prepareStatement(void){
+  return prepared_stmt.get();
 }
 
 void Statement::Close() noexcept {
-  auto stmt = GetPreparedStatement();
-  if (stmt) {
-    sqlite3_finalize(stmt);
-    stmt = nullptr;
+  if (prepared_stmt) {
+    sqlite3_finalize(prepared_stmt.get());
+    prepared_stmt.reset();
   }
 }
 
@@ -112,7 +124,7 @@ bool Statement::ExecuteStep() {
     if (ret == sqlite3_errcode(db.GetHandler())) {
       throw Error("ExecuteStep failed");
     } else {
-      sqlite3_reset(GetPreparedStatement());
+      sqlite3_reset(prepared_stmt.get());
     }
   }
   return (ret == SQLITE_ROW);
@@ -124,41 +136,41 @@ QueryResult Statement::GetResult() {
 
 
 int Statement::tryExecuteStep(void) {
-  return sqlite3_step(GetPreparedStatement());
+  return sqlite3_step(prepared_stmt.get());
 }
 
 void Statement::bind(const size_t i, const int32_t &value) {
-  sqlite3_bind_int(GetPreparedStatement(), i + 1, value);
+  sqlite3_bind_int(prepared_stmt.get(), i + 1, value);
 }
 
 
 void Statement::bind(const size_t i, const uint32_t &value) {
-  sqlite3_bind_int(GetPreparedStatement(), i + 1, value);
+  sqlite3_bind_int(prepared_stmt.get(), i + 1, value);
 }
 
 void Statement::bind(const size_t i, const int64_t &value) {
-  sqlite3_bind_int64(GetPreparedStatement(), i + 1, value);
+  sqlite3_bind_int64(prepared_stmt.get(), i + 1, value);
 }
 
 void Statement::bind(const size_t i, const uint64_t &value) {
-  sqlite3_bind_int64(GetPreparedStatement(), i + 1, value);
+  sqlite3_bind_int64(prepared_stmt.get(), i + 1, value);
 }
 
 void Statement::bind(const size_t i, const double &value) {
-  sqlite3_bind_double(GetPreparedStatement(), i + 1, value);
+  sqlite3_bind_double(prepared_stmt.get(), i + 1, value);
 }
 
 void Statement::bind(const size_t i, const std::nullptr_t &value) {
-  sqlite3_bind_null(GetPreparedStatement(), i + 1);
+  sqlite3_bind_null(prepared_stmt.get(), i + 1);
 }
 
 void Statement::bind(const size_t i, const char* &value) {
-  sqlite3_bind_text(GetPreparedStatement(), i + 1,
+  sqlite3_bind_text(prepared_stmt.get(), i + 1,
                     value, strlen(value), SQLITE_TRANSIENT);
 }
 
 void Statement::bind(const size_t i, const std::string &value) {
-  sqlite3_bind_text(GetPreparedStatement(), i + 1,
+  sqlite3_bind_text(prepared_stmt.get(), i + 1,
                     value.c_str(), value.size(), SQLITE_TRANSIENT);
 }
 

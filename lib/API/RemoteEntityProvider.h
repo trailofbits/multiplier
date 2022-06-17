@@ -105,7 +105,8 @@ class RemoteEntityProvider final : public EntityProvider {
                       std::vector<RawEntityId> &redecl_ids_out,
                       std::vector<FragmentId> &fragment_ids_out) final;
 
-  void FindSymbol(const Ptr &, std::string name, SymbolList &ids_out) final;
+  void FindSymbol(const Ptr &, std::string name,
+                  mx::DeclCategory category, SymbolList &ids_out) final;
 };
 
 }  // namespace mx

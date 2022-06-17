@@ -6,11 +6,14 @@
 
 #pragma once
 
+#include <multiplier/AST.h>
+
 #include <filesystem>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 
 #include <blockingconcurrentqueue.h>
 
@@ -21,19 +24,22 @@ class Statement;
 
 namespace indexer {
 
+class DatabaseWriterImpl;
+class DatabaseReaderImpl;
+
+// Database defines the interface for inserting/reading the symbol entries
+// from sqlite database. It creates a database reader for querying the
+// symbol. The database writer gets instantiated during storing the entities.
 class Database {
  public:
-  using QueueData = std::tuple<std::string, uint64_t, const char*>;
-  using QueueItem = std::variant<QueueData, std::nullptr_t>;
-
   static std::filesystem::path Name(std::filesystem::path path) {
     auto db_path = path.append("db.sqlite");
     return db_path;
   }
 
-  Database(std::filesystem::path workspace_dir);
+  Database(std::filesystem::path workspace);
 
-  Database(std::string workspace_dir);
+  Database(std::string workspace);
 
   virtual ~Database(void);
 
@@ -41,19 +47,15 @@ class Database {
   Database(const Database &) = delete;
   Database &operator=(const Database &) = delete;
 
-  // Store the entity ids and symbol name in sqlite table
-  void StoreEntities(uint64_t entity_id, std::string &data, const char*);
+  void StoreEntities(uint64_t entity_id, std::string &data, mx::DeclCategory category);
 
-  void QuerySymbol(std::string name, std::function<
-                   void(uint64_t, std::string&, std::string&)> cb);
+  void QueryEntities(std::string name, uint32_t table_id,
+                     std::function<void(uint64_t, std::string&)> cb);
 
  private:
-  std::unique_ptr<sqlite::Connection> db;
+  std::unique_ptr<DatabaseReaderImpl> reader;
 
-  std::thread bulk_insertion_thread;
-  moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
-
-  //std::map<uint32_t, std::string> table_map;
+  std::string database_path;
 };
 
 } // namespace indexer

@@ -38,6 +38,31 @@ class QueryResult {
 
   bool Columns(std::vector<std::string>& row);
 
+  template <typename... Ts>
+  void Columns(Ts &&...args) {
+    if (static_cast<int>(sizeof...(args)) > NumColumns()) {
+      throw Error("Failed to read columns; no of arguments are less than column size");
+    }
+
+    int idx = 0;
+    auto column_dispatcher = [this, &idx] (auto &&arg, auto &self) {
+      using arg_t = std::decay_t<decltype(arg)>;
+      if constexpr (std::is_integral_v<arg_t>) {
+        arg = getInt64(idx);
+      } else if (std::is_same_v<std::string, arg_t> ||
+          std::is_same_v<std::string_view, arg_t>) {
+        arg = getText(idx);
+      } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
+        ;
+      } else {
+        throw Error("Can't read column data; Type not supported!");
+      }
+      idx++;
+    };
+
+    (column_dispatcher(std::forward<Ts>(args), column_dispatcher), ...);
+  }
+
  private:
   friend class Statement;
   friend class Connection;
@@ -45,6 +70,10 @@ class QueryResult {
   QueryResult(Connection& conn, const std::string& query);
 
   QueryResult(std::shared_ptr<Statement> stmt_);
+
+  int64_t getInt64(int32_t idx);
+
+  std::string getText(int32_t idx);
 
   std::shared_ptr<Statement> stmt;
 };
@@ -82,10 +111,8 @@ class Statement : public std::enable_shared_from_this<Statement> {
 
   void Close() noexcept;
 
-  // Get prepared statement
-  sqlite3_stmt* GetPreparedStatement() const;
-
  private:
+  friend class QueryResult;
 
   int tryExecuteStep(void);
 
@@ -119,7 +146,7 @@ class Statement : public std::enable_shared_from_this<Statement> {
   }
 
 
-  std::shared_ptr<sqlite3_stmt> prepareStatement();
+  sqlite3_stmt* prepareStatement();
 
   // Database connection instance
   Connection &db;
