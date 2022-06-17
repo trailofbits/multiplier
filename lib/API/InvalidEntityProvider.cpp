@@ -68,7 +68,7 @@ void InvalidEntityProvider::FillReferences(
 
 void InvalidEntityProvider::FindSymbol(
     const Ptr &, std::string name,
-    uint32_t category, SymbolList &ids_out) {
+    mx::DeclCategory category, SymbolList &ids_out) {
   ids_out.clear();
 }
 

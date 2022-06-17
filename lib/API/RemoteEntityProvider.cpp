@@ -437,14 +437,14 @@ void RemoteEntityProvider::FillReferences(
 }
 
 void RemoteEntityProvider::FindSymbol(const Ptr &self, std::string name,
-                                      uint32_t category, SymbolList &out) try {
+                                      mx::DeclCategory category, SymbolList &out) try {
   ClientConnection &cc = Connection(self);
   capnp::Request<mx::rpc::Multiplier::FindSymbolsParams,
                    mx::rpc::Multiplier::FindSymbolsResults>
         request = cc.client.findSymbolsRequest();
 
   request.setQuery(name);
-  request.setCategory(category);
+  request.setCategory(static_cast<uint32_t>(category));
 
   capnp::Response<mx::rpc::Multiplier::FindSymbolsResults> response =
       request.send().wait(cc.connection.getWaitScope());

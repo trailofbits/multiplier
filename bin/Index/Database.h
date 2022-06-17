@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <multiplier/AST.h>
+
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -45,7 +47,7 @@ class Database {
   Database(const Database &) = delete;
   Database &operator=(const Database &) = delete;
 
-  void StoreEntities(uint64_t entity_id, std::string &data, uint32_t category);
+  void StoreEntities(uint64_t entity_id, std::string &data, mx::DeclCategory category);
 
   void QueryEntities(std::string name, uint32_t table_id,
                      std::function<void(uint64_t, std::string&)> cb);

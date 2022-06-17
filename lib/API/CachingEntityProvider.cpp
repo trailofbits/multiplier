@@ -210,7 +210,7 @@ void CachingEntityProvider::FillReferences(
 
 void CachingEntityProvider::FindSymbol(
     const Ptr &self, std::string name,
-    uint32_t category, SymbolList &ids_out) {
+    mx::DeclCategory category, SymbolList &ids_out) {
   return;
 }
 

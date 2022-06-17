@@ -49,12 +49,14 @@ class QueryResult {
       using arg_t = std::decay_t<decltype(arg)>;
       if constexpr (std::is_integral_v<arg_t>) {
         arg = getInt64(idx);
-      } else if (std::is_same_v<std::string, arg_t>) {
+      } else if (std::is_same_v<std::string, arg_t> ||
+          std::is_same_v<std::string_view, arg_t>) {
         arg = getText(idx);
       } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
         ;
+      } else {
+        throw Error("Can't read column data; Type not supported!");
       }
-
       idx++;
     };
 
@@ -109,10 +111,8 @@ class Statement : public std::enable_shared_from_this<Statement> {
 
   void Close() noexcept;
 
-  // Get prepared statement
-  sqlite3_stmt* GetPreparedStatement() const;
-
  private:
+  friend class QueryResult;
 
   int tryExecuteStep(void);
 
@@ -146,7 +146,7 @@ class Statement : public std::enable_shared_from_this<Statement> {
   }
 
 
-  std::shared_ptr<sqlite3_stmt> prepareStatement();
+  sqlite3_stmt* prepareStatement();
 
   // Database connection instance
   Connection &db;

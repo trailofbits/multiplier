@@ -42,8 +42,8 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  for (auto idx = 0u; idx < mx::NumEnumerators(mx::DeclCategory{}); idx++) {
-    auto symbols = index.query_entities(FLAGS_name, idx);
+  for (auto category : mx::EnumerationRange<mx::DeclCategory>()) {
+    auto symbols = index.query_entities(FLAGS_name, category);
     for (auto sym : symbols) {
       std::cout << std::get<0>(sym) << '\t' << std::get<1>(sym) << std::endl;
     }

@@ -165,7 +165,7 @@ class EntityProvider {
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,
-                          uint32_t category, SymbolList &ids_out) = 0;
+                          mx::DeclCategory category, SymbolList &ids_out) = 0;
 };
 
 class NotAnEntity {};
@@ -230,7 +230,7 @@ class Index {
   RegexQueryResult query_fragments(const RegexQuery &query) const;
 
 
-  SymbolList query_entities(const std::string &name, uint32_t category) const;
+  SymbolList query_entities(const std::string &name, mx::DeclCategory category) const;
 };
 
 }  // namespace mx
