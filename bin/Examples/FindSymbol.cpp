@@ -42,11 +42,13 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  auto ids = index.query_symbol(FLAGS_name);
-  for (auto id : ids) {
-    std::cout << std::get<0>(id) << '\t' << std::get<1>(id) << '\t' << std::get<2>(id) << std::endl;
+  for (auto idx = 0u; idx < mx::NumEnumerators(mx::DeclCategory{}); idx++) {
+    auto symbols = index.query_entities(FLAGS_name, idx);
+    for (auto sym : symbols) {
+      std::cout << std::get<0>(sym) << '\t' << std::get<1>(sym) << std::endl;
+    }
   }
-  
+
   return EXIT_SUCCESS;
 }
 

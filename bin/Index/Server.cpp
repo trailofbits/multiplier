@@ -570,21 +570,21 @@ kj::Promise<void> Server::findSymbols(FindSymbolsContext context) {
   mx::rpc::Multiplier::FindSymbolsResults::Builder result = context.getResults();
 
   std::string symbol(params.getQuery().cStr(), params.getQuery().size());
+  auto category = params.getCategory();
 
-  std::vector<std::tuple<uint64_t, std::string, std::string>> entity_map;
+  std::vector<std::pair<uint64_t, std::string>> entity_map;
 
-  d->server_context.connection->QuerySymbol(
-      symbol, [&entity_map](uint64_t id, std::string &symbol, std::string &kind) {
-    entity_map.emplace_back(std::tuple(id, symbol, kind));
+  d->server_context.connection->QueryEntities(
+      symbol, category, [&entity_map](uint64_t id, std::string &symbol) {
+    entity_map.emplace_back(std::pair(id, symbol));
   });
 
   auto num_entities = entity_map.size();
-  auto symbols = result.initSymbols(num_entities);
+  auto entities = result.initSymbols(num_entities);
   for (auto i = 0u; i < num_entities; ++i) {
-    mx::rpc::SymbolMatch::Builder info = symbols[i];
-    info.setEntityId(std::get<0>(entity_map[i]));
-    info.setSymbol(std::get<1>(entity_map[i]));
-    info.setKind(std::get<2>(entity_map[i]));
+    mx::rpc::SymbolMatch::Builder info = entities[i];
+    info.setEntityId(entity_map[i].first);
+    info.setSymbol(entity_map[i].second);
   }
 
   return kj::READY_NOW;

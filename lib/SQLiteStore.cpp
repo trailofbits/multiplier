@@ -52,6 +52,16 @@ uint32_t QueryResult::NumColumns() {
   return sqlite3_column_count(stmt->GetPreparedStatement());
 }
 
+int64_t QueryResult::getInt64(int32_t idx) {
+  return sqlite3_column_int64(stmt->GetPreparedStatement(), idx);
+}
+
+std::string QueryResult::getText(int32_t idx) {
+  auto ptr = (const char *)sqlite3_column_text(stmt->GetPreparedStatement(), idx);
+  auto len = sqlite3_column_bytes(stmt->GetPreparedStatement(), idx);
+  return std::string(ptr, len);
+}
+
 Statement::Statement(Connection& conn, const std::string& stmt)
     : db(conn), query(stmt)
 {
