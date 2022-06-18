@@ -361,8 +361,17 @@ kj::Promise<void> Server::weggliQueryFragments(
         });
   }
 
-  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
-  auto fragments = result.initFragmentIds(num_fragments);
+  auto num_fragments = fragment_ids.size();
+  std::stringstream err;
+  if (num_fragments >= std::numeric_limits<unsigned>::max()) {
+    err << "Too many fragments found: " << num_fragments
+        << "; for weggli: " << syntax_string;
+    LOG(ERROR) << err.str();
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  auto fragments = result.initFragmentIds(static_cast<unsigned>(num_fragments));
   auto index = 0u;
   for (auto fragment_id : fragment_ids) {
     fragments.set(index++, fragment_id);
@@ -388,9 +397,6 @@ kj::Promise<void> Server::regexQueryFragments(
     return kj::READY_NOW;
   }
 
-  LOG(INFO)
-      << "Got regex expression to query: " << pattern;
-
   auto sc = std::make_shared<SearchingContext>(d->server_context);
   mx::ExecutorOptions opts;
   opts.num_workers = static_cast<int>(d->executor.NumWorkers());
@@ -412,8 +418,18 @@ kj::Promise<void> Server::regexQueryFragments(
     });
   }
 
-  auto num_fragments = static_cast<unsigned>(matches.size());
-  auto match_builder = result.initFragmentIds(num_fragments);
+  auto num_fragments = matches.size();
+  std::stringstream err;
+  if (num_fragments >= std::numeric_limits<unsigned>::max()) {
+    err << "Too many fragments found: " << num_fragments
+        << "; for regex: " << pattern;
+    LOG(ERROR) << err.str();
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  auto match_builder = result.initFragmentIds(
+      static_cast<unsigned>(num_fragments));
   auto index = 0u;
   for (mx::FragmentId frag_id : matches) {
     match_builder.set(index++, frag_id);
@@ -484,7 +500,16 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
   auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it, fragment_ids.end());
 
-  auto fib = result.initFragmentIds(static_cast<unsigned>(fragment_ids.size()));
+  auto num_fragments = fragment_ids.size();
+  std::stringstream err;
+  if (num_fragments >= std::numeric_limits<unsigned>::max()) {
+    err << "Too many fragments found: " << num_fragments;
+    LOG(ERROR) << err.str();
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  auto fib = result.initFragmentIds(static_cast<unsigned>(num_fragments));
   auto i = 0u;
   for (mx::FragmentId frag_id : fragment_ids) {
     fib.set(i++, frag_id);
@@ -521,7 +546,16 @@ kj::Promise<void> Server::findReferences(FindReferencesContext context) {
   auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it, fragment_ids.end());
 
-  auto fib = result.initFragmentIds(static_cast<unsigned>(fragment_ids.size()));
+  auto num_fragments = fragment_ids.size();
+  std::stringstream err;
+  if (num_fragments >= std::numeric_limits<unsigned>::max()) {
+    err << "Too many fragments found: " << num_fragments;
+    LOG(ERROR) << err.str();
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  auto fib = result.initFragmentIds(static_cast<unsigned>(num_fragments));
   auto i = 0u;
   for (mx::FragmentId frag_id : fragment_ids) {
     fib.set(i++, frag_id);
@@ -555,8 +589,16 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
         return file_id == found_file_id;
       });
 
-  auto num_fragments = static_cast<unsigned>(fragment_ids.size());
-  auto fragments = result.initFragmentIds(num_fragments);
+  auto num_fragments = fragment_ids.size();
+  std::stringstream err;
+  if (num_fragments >= std::numeric_limits<unsigned>::max()) {
+    err << "Too many fragments found: " << num_fragments;
+    LOG(ERROR) << err.str();
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  auto fragments = result.initFragmentIds(static_cast<unsigned>(num_fragments));
   for (auto i = 0u; i < num_fragments; ++i) {
     fragments.set(i, fragment_ids[i]);
   }
@@ -579,8 +621,17 @@ kj::Promise<void> Server::findSymbols(FindSymbolsContext context) {
     entity_map.emplace_back(std::pair(id, symbol));
   });
 
+  std::stringstream err;
   auto num_entities = entity_map.size();
-  auto entities = result.initSymbols(num_entities);
+  if (num_entities >= std::numeric_limits<unsigned>::max()) {
+
+    err << "Too many results returned: " << num_entities;
+    LOG(ERROR) << err.str();
+    return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
+                         kj::heapString(err.str()));
+  }
+
+  auto entities = result.initSymbols(static_cast<unsigned>(num_entities));
   for (auto i = 0u; i < num_entities; ++i) {
     mx::rpc::SymbolMatch::Builder info = entities[i];
     info.setEntityId(entity_map[i].first);

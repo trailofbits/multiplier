@@ -17,8 +17,8 @@ SQLITE_EXTENSION_INIT1
 #define EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
-EXPORT int sqlite3_sqlitebridge_init(sqlite3 *db, char **pzErrMsg,
-                                     const sqlite3_api_routines *pApi) {
+EXPORT int sqlite3_mxsqlitebridge_init(sqlite3 *db, char **pzErrMsg,
+                                       const sqlite3_api_routines *pApi) {
   int rc = SQLITE_OK;
   SQLITE_EXTENSION_INIT2(pApi);
 

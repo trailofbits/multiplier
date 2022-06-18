@@ -30,6 +30,7 @@ class RegexQueryImpl {
     return re.ok();
   }
 
+  const std::string real_pattern;
   const std::string pattern;
   re2::RE2 re;
 };

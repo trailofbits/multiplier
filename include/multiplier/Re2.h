@@ -25,9 +25,8 @@ class RegexQuery final {
 
   std::shared_ptr<RegexQueryImpl> impl;
 
-  RegexQuery(void) = delete;
-
  public:
+  RegexQuery(void) = default;
 
   // TODO(pag): Eventually make a `Create` static method and return a result
   //            type.

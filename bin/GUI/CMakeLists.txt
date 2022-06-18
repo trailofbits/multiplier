@@ -41,6 +41,9 @@ add_executable("${exe_name}"
   
   Multiplier.cpp
   Multiplier.h
+  
+  OmniBoxView.cpp
+  OmniBoxView.h
 
   OpenConnectionDialog.cpp
   OpenConnectionDialog.h

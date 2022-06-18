@@ -10,7 +10,7 @@
 #include <memory>
 #include <multiplier/Types.h>
 #include <optional>
-#include <QTabWidget>
+#include <QWidget>
 #include <vector>
 
 #include "Event.h"
@@ -21,7 +21,7 @@ namespace gui {
 
 class Multiplier;
 
-class FileView final : public QTabWidget {
+class FileView final : public QWidget {
   Q_OBJECT
 
   struct PrivateData;

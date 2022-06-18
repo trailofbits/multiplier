@@ -430,6 +430,7 @@ void Multiplier::UpdateWidgets(void) {
       d->file_browser_dock->show();
       d->history_browser_dock->show();
       d->reference_browser_dock->show();
+      d->code_browser_view->Connected();
       break;
   }
 }
@@ -530,6 +531,7 @@ void Multiplier::OnFileDisconnectAction(void) {
   d->reference_browser_view->Clear();
   d->history_browser_view->Clear();
   d->code_browser_view->Clear();
+  d->code_browser_view->Disconnected();
   d->last_locations.clear();
   UpdateUI();
 }

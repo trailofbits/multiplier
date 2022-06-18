@@ -221,6 +221,19 @@ std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
   return std::nullopt;
 }
 
+// Return the index of a capture variable.
+std::optional<size_t> RegexQueryMatch::index_of_captured_variable(
+    const std::string &var) const {
+
+  const auto &named_captures = query->re.NamedCapturingGroups();
+  auto index_it = named_captures.find(var);
+  if (index_it == named_captures.end()) {
+    return std::nullopt;
+  } else {
+    return static_cast<unsigned>(index_it->second);
+  }
+}
+
 // Return the captured tokens for a given named capture group.
 std::optional<TokenRange> RegexQueryMatch::captured_tokens(
     const std::string &var) const {

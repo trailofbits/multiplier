@@ -229,8 +229,9 @@ class Index {
   // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
   RegexQueryResult query_fragments(const RegexQuery &query) const;
 
-
-  SymbolList query_entities(const std::string &name, mx::DeclCategory category) const;
+  // Search for entities by their name and category.
+  SymbolList query_entities(std::string name,
+                            mx::DeclCategory category) const;
 };
 
 }  // namespace mx

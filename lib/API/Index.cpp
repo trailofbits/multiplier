@@ -172,9 +172,11 @@ RegexQueryResult Index::query_fragments(const RegexQuery &query) const {
   return RegexQueryResult(impl->Query(impl, query));
 }
 
-SymbolList Index::query_entities(const std::string &name, mx::DeclCategory category) const {
+// Search for entities by their name and category.
+SymbolList Index::query_entities(
+    std::string name, mx::DeclCategory category) const {
   SymbolList entity_ids;
-  impl->FindSymbol(impl, name, category, entity_ids);
+  impl->FindSymbol(impl, std::move(name), category, entity_ids);
   return entity_ids;
 }
 

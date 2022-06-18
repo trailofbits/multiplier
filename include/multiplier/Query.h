@@ -183,6 +183,9 @@ class RegexQueryMatch : public TokenRange {
     return matched_ranges[0];
   }
 
+  // Return the index of a capture variable.
+  std::optional<size_t> index_of_captured_variable(const std::string &var) const;
+
   // Return the captured tokens for a given named capture group.
   std::optional<TokenRange> captured_tokens(const std::string &var) const;
 

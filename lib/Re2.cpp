@@ -59,19 +59,24 @@ void RegexQuery::ForEachMatch(
         std::string_view /* match */,
         unsigned /* begin_offset */,
         unsigned /* end_offset */)> cb) const {
-  impl->ForEachMatch(source, std::move(cb));
+  if (impl) {
+    impl->ForEachMatch(source, std::move(cb));
+  }
 }
 
 // Returns the underlying pattern.
 std::string_view RegexQuery::Pattern(void) const {
-
-  // NOTE(pag): Need to remove the wrapping `(` and `)`.
-  return std::string_view(impl->pattern).substr(1u, impl->pattern.size() - 2u);
+  if (impl) {
+    // NOTE(pag): Need to remove the wrapping `(` and `)`.
+    return std::string_view(impl->pattern).substr(1u, impl->pattern.size() - 2u);
+  } else {
+    return {};
+  }
 }
 
 // Returns `true` if we successfully compiled this regular expression.
 bool RegexQuery::IsValid(void) const {
-  return impl->IsValid();
+  return impl && impl->IsValid();
 }
 
 }  // namespace mx

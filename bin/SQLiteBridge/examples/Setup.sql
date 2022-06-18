@@ -1,4 +1,4 @@
-.load bin/SQLiteBridge/libsqlitebridge
+.load bin/SQLiteBridge/libmxsqlitebridge
 
 INSERT INTO MultiplierConnection(name, host, port) VALUES ("default", "localhost", "50051");
 

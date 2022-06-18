@@ -91,7 +91,7 @@ void WeggliQuery::ForEachMatch(
     std::string_view source,
     std::function<bool(const WeggliMatchData &)> cb) const {
 
-  if (!impl->qtree || source.empty()) {
+  if (!impl || !impl->qtree || source.empty()) {
     return;
   }
 
@@ -105,15 +105,15 @@ void WeggliQuery::ForEachMatch(
 }
 
 std::string_view WeggliQuery::Pattern(void) const {
-  return impl->pattern;
+  return impl ? impl->pattern : {};
 }
 
 bool WeggliQuery::IsValid(void) const {
-  return impl->qtree != nullptr;
+  return impl && impl->qtree != nullptr;
 }
 
 bool WeggliQuery::IsCPlusPlus(void) const {
-  return impl->is_cpp;
+  return impl && impl->is_cpp;
 }
 
 }  // namespace mx

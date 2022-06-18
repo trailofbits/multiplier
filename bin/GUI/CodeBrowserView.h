@@ -45,6 +45,8 @@ class CodeBrowserView final : public QWidget {
   void OpenEntities(const EventLocations &);
 
   void Clear(void);
+  void Disconnected(void);
+  void Connected(void);
 
  public slots:
   void OnDownloadedFileList(FilePathList files);

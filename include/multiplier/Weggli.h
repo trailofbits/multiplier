@@ -31,7 +31,6 @@ class WeggliQuery final {
  private:
   friend class Index;
 
-  WeggliQuery(void) = delete;
   std::shared_ptr<WeggliQueryImpl> impl;
 
  public:
@@ -40,6 +39,7 @@ class WeggliQuery final {
   using ResultsPtr = void *;
   using UserDataPtr = void *;
 
+  WeggliQuery(void) = default;
   explicit WeggliQuery(std::string query, bool is_cpp);
 
   ~WeggliQuery();

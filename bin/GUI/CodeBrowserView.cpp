@@ -6,7 +6,7 @@
 
 #include "CodeBrowserView.h"
 
-#include <QSplitter>
+#include <QTabBar>
 #include <QTabWidget>
 #include <QThreadPool>
 #include <QVBoxLayout>
@@ -19,6 +19,7 @@
 #include "CodeView.h"
 #include "FileView.h"
 #include "Multiplier.h"
+#include "OmniBoxView.h"
 #include "Util.h"
 
 #include <iostream>
@@ -29,8 +30,8 @@ struct CodeBrowserView::PrivateData {
   Multiplier &multiplier;
 
   QVBoxLayout *layout{nullptr};
-  QSplitter *splitter{nullptr};
   QTabWidget *content{nullptr};
+  OmniBoxView *omnibox{nullptr};
 
   std::unordered_map<FileId, FileView *> file_id_to_view;
   std::unordered_map<QWidget *, FileId> view_to_file_id;
@@ -117,21 +118,26 @@ void CodeBrowserView::InitializeWidgets(void) {
   d->layout->setContentsMargins(0, 0, 0, 0);
   setLayout(d->layout);
 
-  d->splitter = new QSplitter(Qt::Horizontal);
-  d->layout->addWidget(d->splitter);
-
-  QList<int> splitter_sizes;
-  splitter_sizes.push_back(d->splitter->width() / 2);
-  splitter_sizes.push_back(splitter_sizes.back());
-  d->splitter->setSizes(splitter_sizes);
-
   d->content = new QTabWidget;
   d->content->setTabsClosable(true);
   d->content->setMovable(true);
   d->content->setDocumentMode(true);
   d->content->setUsesScrollButtons(true);
+  d->layout->addWidget(d->content);
 
-  d->splitter->addWidget(d->content);
+  auto tab_bar = d->content->tabBar();
+
+  // Make the omnibox, and make it non-closable.
+  d->omnibox = new OmniBoxView(d->multiplier);
+  auto omni_index = d->content->addTab(d->omnibox, d->omnibox->windowTitle());
+#ifndef QT_NO_TOOLTIP
+  d->content->setTabToolTip(omni_index, d->omnibox->windowTitle());
+#endif
+  d->content->setCurrentWidget(d->omnibox);
+  tab_bar->setTabButton(omni_index, QTabBar::LeftSide, nullptr);
+  tab_bar->setTabButton(omni_index, QTabBar::RightSide, nullptr);
+
+  d->content->hide();
 
   connect(d->content, &QTabWidget::tabCloseRequested,
           this, &CodeBrowserView::OnCloseFileViewTab);
@@ -142,7 +148,7 @@ void CodeBrowserView::InitializeWidgets(void) {
 
 // When a tab is changed.
 void CodeBrowserView::OnChangeTab(int index) {
-  if (auto view = d->content->widget(index)) {
+  if (auto view = d->content->widget(index); view && view != d->omnibox) {
     if (auto it = d->view_to_file_id.find(view);
         it != d->view_to_file_id.end()) {
       emit CurrentFile(it->second);
@@ -151,7 +157,7 @@ void CodeBrowserView::OnChangeTab(int index) {
 }
 
 void CodeBrowserView::OnCloseFileViewTab(int index) {
-  if (QWidget *view = d->content->widget(index)) {
+  if (QWidget *view = d->content->widget(index); view && view != d->omnibox) {
     const FileId file_id = d->view_to_file_id[view];
     assert(file_id != kInvalidEntityId);
 
@@ -213,7 +219,33 @@ void CodeBrowserView::ScrollToTokenInFile(
 void CodeBrowserView::Clear(void) {
   d->file_id_to_view.clear();
   d->view_to_file_id.clear();
-  d->content->clear();
+  d->omnibox->Clear();
+
+  for (auto i = 0, max_i = d->content->count(); i < max_i;) {
+    if (auto item = d->content->widget(i)) {
+      if (item == d->omnibox) {
+        ++i;
+      } else {
+        d->content->removeTab(i);
+        item->disconnect();
+        item->deleteLater();
+        i = 0;
+        max_i -= 1;
+      }
+    }
+  }
+}
+
+void CodeBrowserView::Disconnected(void) {
+  d->omnibox->Disconnected();
+  d->content->hide();
+  update();
+}
+
+void CodeBrowserView::Connected(void) {
+  d->omnibox->Connected();
+  d->content->show();
+  update();
 }
 
 // Open a file in a tab.

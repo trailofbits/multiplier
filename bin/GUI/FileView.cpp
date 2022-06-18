@@ -33,13 +33,9 @@ FileView::~FileView(void) {}
 
 FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
                    FileId file_id, QWidget *parent)
-    : QTabWidget(parent),
+    : QWidget(parent),
       d(std::make_unique<PrivateData>(multiplier.Configuration().file)) {
 
-  setMovable(true);
-  setTabsClosable(true);
-  setDocumentMode(true);
-  setTabPosition(TabPosition::North);
   setWindowTitle(file_path.c_str());
 
   d->layout = new QVBoxLayout;
