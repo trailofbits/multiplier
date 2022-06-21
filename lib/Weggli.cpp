@@ -105,7 +105,7 @@ void WeggliQuery::ForEachMatch(
 }
 
 std::string_view WeggliQuery::Pattern(void) const {
-  return impl ? impl->pattern : {};
+  return impl ? impl->pattern : std::string_view();
 }
 
 bool WeggliQuery::IsValid(void) const {
