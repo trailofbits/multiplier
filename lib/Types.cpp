@@ -283,7 +283,7 @@ EntityId::EntityId(TokenSubstitutionId id) {
 EntityId::EntityId(FileTokenId id) {
   if (id.file_id) {
     PackedEntityId packed = {};
-    packed.file_token.file_id = id.file_id;
+    packed.file_token.file_id = id.file_id.value;
     packed.file_token.entity_kind = static_cast<uint64_t>(kFileToken);
     packed.file_token.token_kind = static_cast<uint64_t>(id.kind);
     packed.file_token.offset = id.offset;
