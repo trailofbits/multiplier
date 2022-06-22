@@ -14,6 +14,8 @@
 #include <multiplier/Token.h>
 #include <multiplier/Use.h>
 
+#include "CodeTheme.h"
+
 #include <iostream>
 
 namespace mx::gui {
@@ -434,6 +436,38 @@ TokenClass ClassifyToken(const Token &tok) {
       return TokenClass::kIdentifier;
     default:
       return TokenClass::kUnknown;
+  }
+}
+
+// Categorize a token.
+TokenCategory CategorizeToken(const Token &token, DeclCategory category) {
+  auto file_tok_class = ClassifyToken(token);
+  TokenCategory kind = TokenCategory::kUnknown;
+
+  auto is_whitespace = token.kind() == TokenKind::WHITESPACE;
+  for (auto ch : token.data()) {
+    switch (ch) {
+      case ' ':
+      case '\t':
+      case '\r':
+      case '\n':
+        continue;
+      default:
+        is_whitespace = false;
+        break;
+    }
+  }
+
+  if (is_whitespace) {
+    return TokenCategory::kWhitespace;
+
+  } else if (category == DeclCategory::UNKNOWN) {
+    return static_cast<TokenCategory>(file_tok_class);
+
+  } else {
+    return static_cast<TokenCategory>(
+        static_cast<int>(TokenCategory::kComment) +
+        static_cast<int>(category));
   }
 }
 

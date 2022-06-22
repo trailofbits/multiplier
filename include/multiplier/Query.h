@@ -42,14 +42,18 @@ class WeggliQueryResultImpl;
 // The range of tokens of a match.
 class WeggliQueryMatch : public TokenRange {
  private:
+  friend class File;
   friend class Fragment;
   friend class WeggliQueryResult;
   friend class WeggliQueryResultImpl;
 
   // Fragment with the match
   std::shared_ptr<const FragmentImpl> frag;
-  // Map variables with token range
+
+  // Map variables with token range.
   std::unordered_map<std::string, TokenRange> var_matches;
+
+  WeggliQueryMatch(void) = delete;
 
  public:
   WeggliQueryMatch(
@@ -152,8 +156,9 @@ class WeggliQueryResult {
 // The range of tokens that matches a regular expression.
 class RegexQueryMatch : public TokenRange {
  private:
-  friend class Fragment;
   friend class File;
+  friend class Fragment;
+  friend class RegexQuery;
   friend class RegexQueryResult;
   friend class RegexQueryResultImpl;
 
@@ -173,6 +178,8 @@ class RegexQueryMatch : public TokenRange {
   RegexQueryMatch(TokenRange range_, std::string_view data_range_,
                   std::shared_ptr<const FragmentImpl> frag_,
                   const RegexQuery &query_);
+
+  RegexQueryMatch(void) = delete;
 
  public:
   ~RegexQueryMatch(void);

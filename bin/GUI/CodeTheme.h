@@ -21,7 +21,7 @@ class Token;
 class TokenRange;
 namespace gui {
 
-enum class CodeTokenKind : unsigned char {
+enum class TokenCategory : unsigned char {
   // These line up with `TokenClass`.
   kUnknown,
   kIdentifier,
@@ -105,7 +105,7 @@ class CodeTheme {
   //            exceed the lifetime of theme itself.
   virtual const QBrush &TokenBackgroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const = 0;
+      TokenCategory kind) const = 0;
 
   // Text color of a specific token.
   //
@@ -113,12 +113,12 @@ class CodeTheme {
   //            exceed the lifetime of theme itself.
   virtual const QBrush &TokenForegroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const = 0;
+      TokenCategory kind) const = 0;
 
   // Format (bold, italic, underline) for a specific token.
   virtual TokenFormat Format(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const = 0;
+      TokenCategory kind) const = 0;
 };
 
 class ProxyCodeTheme : public CodeTheme {
@@ -155,17 +155,17 @@ class ProxyCodeTheme : public CodeTheme {
   // Background color for a specific token.
   const QBrush &TokenBackgroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const override;
+      TokenCategory kind) const override;
 
   // Text color of a specific token.
   const QBrush &TokenForegroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const override;
+      TokenCategory kind) const override;
 
   // Format (bold, italic, underline) for a specific token.
   TokenFormat Format(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const override;
+      TokenCategory kind) const override;
 };
 
 // Wraps around a theme to let us highlight a range of tokens.
@@ -189,12 +189,12 @@ class HighlightRangeTheme final : public ProxyCodeTheme {
   // Background color for a specific token.
   const QBrush &TokenBackgroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const override;
+      TokenCategory kind) const override;
 
   // Foreground color for a specific token.
   const QBrush &TokenForegroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const override;
+      TokenCategory kind) const override;
 };
 
 }  // namespace gui

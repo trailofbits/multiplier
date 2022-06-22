@@ -30,6 +30,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Code.h"
 #include "CodeTheme.h"
 #include "Util.h"
 
@@ -45,20 +46,6 @@ enum class CodeViewState {
 };
 
 }  // namespace
-
-class Code {
- public:
-  QString data;
-  std::vector<int> start_of_token;
-  std::vector<bool> italic;
-  std::vector<bool> bold;
-  std::vector<bool> underline;
-  std::vector<const QBrush *> foreground;
-  std::vector<const QBrush *> background;
-  std::vector<RawEntityId> file_token_ids;
-  std::vector<std::pair<RawEntityId, RawEntityId>> tok_decl_ids;
-  std::vector<unsigned> tok_decl_ids_begin;
-};
 
 struct CodeView::PrivateData {
 
@@ -335,6 +322,8 @@ void DownloadCodeThread::run(void) {
       continue;
     }
 
+    tok_decls.clear();
+
     // This is a template of sorts for this location.
     code->file_token_ids.push_back(file_tok_id);
     code->tok_decl_ids_begin.push_back(
@@ -378,19 +367,7 @@ void DownloadCodeThread::run(void) {
       file_to_frag_toks.erase(file_tok_id);  // Garbage collect.
     }
 
-    CodeTokenKind kind = CodeTokenKind::kUnknown;
-
-    if (is_whitespace) {
-      kind = CodeTokenKind::kWhitespace;
-
-    } else if (category == DeclCategory::UNKNOWN) {
-      kind = static_cast<CodeTokenKind>(file_tok_class);
-
-    } else {
-      kind = static_cast<CodeTokenKind>(
-          static_cast<int>(CodeTokenKind::kComment) +
-          static_cast<int>(category));
-    }
+    TokenCategory kind = CategorizeToken(file_tok, category);
 
     code->start_of_token.push_back(tok_start);
     auto [b, i, u] = d->theme.Format(file_tok, tok_decls, kind);
@@ -401,7 +378,6 @@ void DownloadCodeThread::run(void) {
         file_tok, tok_decls, kind)));
     code->background.push_back(&(d->theme.TokenBackgroundColor(
         file_tok, tok_decls, kind)));
-    tok_decls.clear();
   }
 
   code->start_of_token.push_back(code->data.size());

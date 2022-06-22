@@ -22,6 +22,8 @@
 #include <iostream>
 #include <string>
 
+#include "CodeSearchResults.h"
+#include "CodeTheme.h"
 #include "Multiplier.h"
 
 namespace mx::gui {
@@ -73,10 +75,14 @@ void OmniBoxView::InitializeWidgets(void) {
   d->regex_layout = new QGridLayout;
   d->regex_input = new QLineEdit;
   d->regex_button = new QPushButton(tr("Query"));
-  QFont font = d->regex_input->font();
-  font.setPointSize(font.pointSize() * 2);
-  d->regex_input->setFont(font);
-  d->regex_button->setFont(font);
+
+  QFont input_font = d->multiplier.CodeTheme().Font();
+  d->regex_input->setFont(input_font);
+
+  QFont button_font = d->regex_button->font();
+  button_font.setPointSize(input_font.pointSize());
+  d->regex_button->setFont(button_font);
+
   d->regex_box->setLayout(d->regex_layout);
   d->regex_layout->addWidget(d->regex_button, 0, 0, 1, 1, Qt::AlignTop);
   d->regex_layout->addWidget(d->regex_input, 0, 1, 1, 1, Qt::AlignTop);
@@ -167,48 +173,62 @@ void OmniBoxView::OnFoundFragmentsWithRegex(RegexQueryResultIterator *list_,
 
   ClearRegexResults();
 
-  QTableWidget *table = nullptr;
-  size_t num_captures = 0;
+  const CodeTheme &theme = d->multiplier.CodeTheme();
+  theme.BeginTokens();
+
+//  size_t num_captures = 0;
+
+  auto model = new CodeSearchResultsModel(d->multiplier);
+  auto table = new CodeSearchResultsView(model);
+
   for (auto j = 1; *list != IteratorEnd{}; ++*list, ++j) {
     const RegexQueryMatch &match = **list;
     if (!d->regex_results) {
-      table = new QTableWidget;
+
       d->regex_results = table;
       d->regex_layout->addWidget(d->regex_results, 1, 0, 1, 2);
-
-      num_captures = match.num_captures();
-      table->setColumnCount(static_cast<int>(num_captures));
-      for (auto i = 0u; i < num_captures; ++i) {
-        table->setHorizontalHeaderItem(
-            static_cast<int>(i),
-            new QTableWidgetItem(QString::number(i)));
-      }
-
-      for (const std::string &var : match.captured_variables()) {
-        if (auto index = match.index_of_captured_variable(var)) {
-          auto item = table->horizontalHeaderItem(static_cast<int>(*index));
-          item->setText(QString::fromStdString(var));
-        }
-      }
+//
+//      num_captures = match.num_captures();
+//      table->setColumnCount(static_cast<int>(num_captures));
+//      for (auto i = 0u; i < num_captures; ++i) {
+//        table->setHorizontalHeaderItem(
+//            static_cast<int>(i),
+//            new QTableWidgetItem(QString::number(i)));
+//      }
+//
+//      for (const std::string &var : match.captured_variables()) {
+//        if (auto index = match.index_of_captured_variable(var)) {
+//          auto item = table->horizontalHeaderItem(static_cast<int>(*index));
+//          item->setText(QString::fromStdString(var));
+//        }
+//      }
     }
 
-    auto rc = table->rowCount();
-    table->insertRow(rc);
-    for (auto i = 0u; i < num_captures; ++i) {
-      if (auto data = match.captured_data(i)) {
-        table->setItem(
-            rc, static_cast<int>(i),
-            new QTableWidgetItem(
-                QString::fromUtf8(data->data(),
-                                  static_cast<int>(data->size()))));
-      }
-    }
+    model->AddResult(match);
 
-    if (j >= kNumEntriesPerRefresh) {
-      update();
-      j = 1;
-    }
+//    auto rc = table->rowCount();
+//    table->insertRow(rc);
+//
+//    for (auto i = 0u; i < num_captures; ++i) {
+//      auto data = match.captured_data(i);
+//      if (!data) {
+//        continue;
+//      }
+//
+//      QTableWidgetItem *item = new QTableWidgetItem(
+//          QString::fromUtf8(data->data(), static_cast<int>(data->size())));
+//      item->setFont(theme.Font());
+//      item->setBackground(theme.BackgroundColor());
+//      table->setItem(rc, static_cast<int>(i), item);
+//    }
+//
+//    if (j >= kNumEntriesPerRefresh) {
+//      update();
+//      j = 1;
+//    }
   }
+
+  theme.EndTokens();
 
   if (!d->regex_results) {
     d->regex_results = new QLabel(tr("No matches"));

@@ -9,6 +9,8 @@
 #include <cctype>
 
 #include "Fragment.h"
+#include "Re2.h"
+#include "Weggli.h"
 
 namespace mx {
 
@@ -169,6 +171,26 @@ std::optional<File> File::containing(const Token &token) {
 
   } else {
     return std::nullopt;
+  }
+}
+
+// Return the file containing a regex match.
+File File::containing(const RegexQueryMatch &match) {
+  if (auto file = dynamic_cast<const PackedFileImpl *>(match.impl.get())) {
+    return File(FileImpl::Ptr(match.impl, file));
+
+  } else {
+    return File::containing(Fragment::containing(match));
+  }
+}
+
+// Return the file containing a specific fragment.
+File File::containing(const WeggliQueryMatch &match) {
+  if (auto file = dynamic_cast<const PackedFileImpl *>(match.impl.get())) {
+    return File(FileImpl::Ptr(match.impl, file));
+
+  } else {
+    return File::containing(Fragment::containing(match));
   }
 }
 

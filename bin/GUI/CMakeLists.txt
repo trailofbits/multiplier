@@ -13,11 +13,16 @@ find_package(${MX_QT} COMPONENTS Core Widgets REQUIRED)
 set(exe_name "multiplier")
 add_executable("${exe_name}"
   
+  Code.h
+  
   CodeTheme.cpp
   CodeTheme.h
   
   CodeBrowserView.cpp
   CodeBrowserView.h
+  
+  CodeSearchResults.cpp
+  CodeSearchResults.h
   
   CodeView.cpp
   CodeView.h

@@ -25,7 +25,12 @@ class RegexQuery final {
 
   std::shared_ptr<RegexQueryImpl> impl;
 
+  /* implicit */ inline RegexQuery(std::shared_ptr<RegexQueryImpl> impl_)
+      : impl(std::move(impl_)) {}
+
  public:
+  static RegexQuery from(const RegexQueryMatch &match);
+
   RegexQuery(void) = default;
 
   // TODO(pag): Eventually make a `Create` static method and return a result
