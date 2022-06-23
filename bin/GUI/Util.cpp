@@ -440,8 +440,8 @@ TokenClass ClassifyToken(const Token &tok) {
 }
 
 // Categorize a token.
-TokenCategory CategorizeToken(const Token &token, DeclCategory category) {
-  auto file_tok_class = ClassifyToken(token);
+TokenCategory CategorizeToken(const Token &token, TokenClass tok_class,
+                              DeclCategory decl_category) {
   TokenCategory kind = TokenCategory::kUnknown;
 
   auto is_whitespace = token.kind() == TokenKind::WHITESPACE;
@@ -461,14 +461,19 @@ TokenCategory CategorizeToken(const Token &token, DeclCategory category) {
   if (is_whitespace) {
     return TokenCategory::kWhitespace;
 
-  } else if (category == DeclCategory::UNKNOWN) {
-    return static_cast<TokenCategory>(file_tok_class);
+  } else if (decl_category == DeclCategory::UNKNOWN) {
+    return static_cast<TokenCategory>(tok_class);
 
   } else {
     return static_cast<TokenCategory>(
         static_cast<int>(TokenCategory::kComment) +
-        static_cast<int>(category));
+        static_cast<int>(decl_category));
   }
+}
+
+// Categorize a token.
+TokenCategory CategorizeToken(const Token &token, DeclCategory category) {
+  return CategorizeToken(token, ClassifyToken(token), category);
 }
 
 namespace {

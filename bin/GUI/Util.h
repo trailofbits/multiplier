@@ -41,6 +41,10 @@ enum class TokenClass {
 TokenClass ClassifyToken(const Token &token);
 
 // Categorize a token.
+TokenCategory CategorizeToken(const Token &token, TokenClass tok_class,
+                              DeclCategory decl_category);
+
+// Categorize a token.
 TokenCategory CategorizeToken(const Token &token, DeclCategory decl_category);
 
 // Try to determine the declarations associated with this token.

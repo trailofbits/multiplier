@@ -730,7 +730,7 @@ void CodeSearchResultsView::InitializeWidgets(void) {
   // Create and connect the code preview.
   auto &config = d->model_data->multiplier.Configuration().code_search_results;
   if (config.code_preview.visible) {
-    d->code = new CodeView(d->model_data->theme);
+    d->code = new CodeView(d->theme);
     d->code->viewport()->installEventFilter(&(d->model_data->multiplier));
     d->splitter->addWidget(d->code);
     d->code->hide();
@@ -776,6 +776,15 @@ void CodeSearchResultsView::ShowFileToken(unsigned row,
   if (!config.code_preview.visible) {
     return;
   }
+
+  const RowData &result = d->model_data->rows[row];
+  const File &file = d->model_data->files[result.file_index];
+
+  d->code->show();
+  d->theme.HighlightFileTokenRange(
+      file.tokens().slice(result.file_tokens_begin, result.file_tokens_end));
+  d->code->SetFile(file);
+  d->code->ScrollToFileToken(file_tok_id);
 }
 
 void CodeSearchResultsView::ClickedOnToken(unsigned row, unsigned index) {

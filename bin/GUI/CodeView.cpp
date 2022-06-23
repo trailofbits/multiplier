@@ -367,7 +367,7 @@ void DownloadCodeThread::run(void) {
       file_to_frag_toks.erase(file_tok_id);  // Garbage collect.
     }
 
-    TokenCategory kind = CategorizeToken(file_tok, category);
+    TokenCategory kind = CategorizeToken(file_tok, file_tok_class, category);
 
     code->start_of_token.push_back(tok_start);
     auto [b, i, u] = d->theme.Format(file_tok, tok_decls, kind);
