@@ -97,7 +97,7 @@ class CodeTheme {
   virtual QColor BackgroundColor(void) const = 0;
 
   // The color to use as a highlight for the line containing the cursor.
-  virtual QColor SelectedLineBackgroundColor(void) const = 0;
+  virtual QColor SelectedLineBackgroundColor(unsigned group=0) const = 0;
 
   // Background color for a specific token.
   //
@@ -150,7 +150,7 @@ class ProxyCodeTheme : public CodeTheme {
   QColor BackgroundColor(void) const override;
 
   // The color to use as a highlight for the line containing the cursor.
-  QColor SelectedLineBackgroundColor(void) const override;
+  QColor SelectedLineBackgroundColor(unsigned group) const override;
 
   // Background color for a specific token.
   const QBrush &TokenBackgroundColor(

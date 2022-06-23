@@ -90,8 +90,8 @@ class CodeSearchResultsView : public QTableView {
   using QTableView::setSelectionBehavior;
   using QTableView::setEditTriggers;
 
-  struct PrivateData;
-  std::unique_ptr<PrivateData> d;
+  CodeSearchResultsModel * const model;
+  SortableCodeSearchResultsModel * const proxy;
 
   void InitializeWidgets(void);
 
@@ -106,6 +106,8 @@ class CodeSearchResultsView : public QTableView {
 
  private slots:
   void OnRowsAdded(void);
+  void OnClick(const QModelIndex &index);
+  void OnDoubleClick(const QModelIndex &index);
 };
 
 }  // namespace gui

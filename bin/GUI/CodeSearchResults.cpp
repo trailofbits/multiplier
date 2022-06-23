@@ -30,6 +30,8 @@
 #include "Multiplier.h"
 #include "Util.h"
 
+#include <iostream>
+
 namespace mx::gui {
 
 enum class ModelMode {
@@ -38,7 +40,7 @@ enum class ModelMode {
   kWeggli
 };
 
-struct Result {
+struct RowData {
   const TokenRange file_tokens;
   const Fragment frag;
 
@@ -47,10 +49,9 @@ struct Result {
   unsigned tokens_begin{1u};
   unsigned tokens_end{0u};
 
-  const std::string_view token_data;
   std::vector<std::string_view> captures;
 
-  explicit Result(const RegexQueryMatch &);
+  explicit RowData(const RegexQueryMatch &);
 
   std::pair<unsigned, unsigned> Tokens(CodeSearchResultsModelImpl &d);
 };
@@ -60,11 +61,11 @@ class CodeSearchResultsModelImpl {
   Multiplier &multiplier;
   const CodeTheme &theme;
   const QFont font;
-  const QFontMetricsF font_metrics;
   const QColor bg_color_even;
   const QColor bg_color_odd;
 
   std::vector<Decl> related_decls;
+  std::vector<uint8_t> capture_indexes;
 
   // Formatted tokens from the results. Also used by `CodeView`.
   Code code;
@@ -75,7 +76,7 @@ class CodeSearchResultsModelImpl {
   std::vector<std::variant<Token, TokenSubstitution>> toks;
 
   QVector<QString> headers;
-  std::vector<Result> rows;
+  std::vector<RowData> rows;
 
   ModelMode mode{ModelMode::kNoData};
 
@@ -83,7 +84,6 @@ class CodeSearchResultsModelImpl {
       : multiplier(multiplier_),
         theme(multiplier.CodeTheme()),
         font(theme.Font()),
-        font_metrics(font),
         bg_color_even(theme.BackgroundColor()),
         bg_color_odd(bg_color_even.lighter()) {}
 };
@@ -93,7 +93,7 @@ class CodeSearchResultsModelImpl {
 // `CodeView`. This approach mostly just lets us keep data in a small number of
 // giant linear containers, rather than a large number of small-to-medium sized
 // linear containers.
-std::pair<unsigned, unsigned> Result::Tokens(CodeSearchResultsModelImpl &d) {
+std::pair<unsigned, unsigned> RowData::Tokens(CodeSearchResultsModelImpl &d) {
   if (tokens_end >= tokens_begin) {
     return {tokens_begin, tokens_end};
   }
@@ -200,10 +200,9 @@ std::pair<unsigned, unsigned> Result::Tokens(CodeSearchResultsModelImpl &d) {
   return {tokens_begin, tokens_end};
 }
 
-Result::Result(const RegexQueryMatch &match)
+RowData::RowData(const RegexQueryMatch &match)
     : file_tokens(match),
       frag(Fragment::containing(match)),
-      token_data(match.data()),
       captures(match.num_captures()) {
 
   for (size_t i = 0u, max_i = captures.size(); i < max_i; ++i) {
@@ -212,13 +211,6 @@ Result::Result(const RegexQueryMatch &match)
     }
   }
 }
-
-struct CodeSearchResultsView::PrivateData {
-  CodeSearchResultsModel * const model;
-
-  inline PrivateData(CodeSearchResultsModel *model_)
-      : model(model_) {}
-};
 
 CodeSearchResultsItemDelegate::~CodeSearchResultsItemDelegate(void) {}
 
@@ -253,46 +245,81 @@ void CodeSearchResultsItemDelegate::paint(
     return;
   }
 
-  auto &result = d->rows[static_cast<size_t>(row)];
-
-  if (option.state & QStyle::State_Selected) {
-
-  } else {
-
-  }
-
-  QStyleOptionViewItem opt = option;
-  QStyledItemDelegate::initStyleOption(&opt, index);
-  QStyle *style = opt.widget ? opt.widget->style() : QApplication::style();
-  QRectF rect = style->subElementRect(QStyle::SE_ItemViewItemText, &opt);
-  QPointF pos = rect.topLeft();
-
-  painter->save();
-  painter->resetTransform();
-  painter->translate(rect.topLeft());
-  painter->setRenderHint(QPainter::Antialiasing, true);
+  QPalette palette = option.widget ? option.widget->palette() : qApp->palette();
+  RowData &result = d->rows[static_cast<size_t>(row)];
 
   // Try to get the background color from the model; we want to get the right
   // alternating color, if any.
   QVariant bg_color;
-  if (proxy) {
-    bg_color = proxy->data(index, Qt::BackgroundColorRole);
+
+  unsigned disp = 1u;
+  if (option.state & QStyle::State_Selected) {
+    bg_color = d->theme.SelectedLineBackgroundColor();
+    disp = 0u;
   } else {
-    bg_color = model->data(index, Qt::BackgroundColorRole);
+    if (proxy) {
+      bg_color = proxy->data(index, Qt::BackgroundColorRole);
+    } else {
+      bg_color = model->data(index, Qt::BackgroundColorRole);
+    }
   }
 
+  painter->save();
+
+  // Fill the background color of the cell. `setBackground` doesn't really
+  // do this.
   auto has_bg = false;
   if (bg_color.userType() == QMetaType::QColor) {
-    painter->setBackground(qvariant_cast<QColor>(bg_color));
+    QColor color = qvariant_cast<QColor>(bg_color);
+//    painter->setBackground(color);
+    painter->fillRect(option.rect, color);
     has_bg = true;
   }
 
+  QColor colors[] = {Qt::darkRed, Qt::darkGreen, Qt::darkBlue, Qt::darkCyan};
+
+  QPointF pos = option.rect.topLeft();
+
+  // Note that the tokens enclose the capture, including the first capture.
+  const char *all_data_utf8 = result.file_tokens.data().data();
+//  QString all_data_utf16 = QString::fromUtf8(
+//      all_data_utf8, static_cast<int>(result.token_data.size()));
+
+
+  // Figure out to which capture group a character belongs.
+  uint8_t c = 1;
+  d->capture_indexes.clear();
+  for (std::string_view capture : result.captures) {
+    auto prefix_len = QString::fromUtf8(
+        all_data_utf8, static_cast<int>(capture.data() - all_data_utf8)).size();
+
+    auto capture_len = QString::fromUtf8(
+        capture.data(), static_cast<int>(capture.size())).size();
+
+    auto needed = static_cast<size_t>(prefix_len + capture_len);
+    d->capture_indexes.resize(
+        std::max<size_t>(needed + 1u, d->capture_indexes.size()));
+    for (auto i = 0; i < capture_len; ++i) {
+      d->capture_indexes[static_cast<unsigned>(prefix_len + i)] = c;
+    }
+//
+//    QRectF prefix_rect = d->font_metrics.boundingRect();
+//
+//    QRectF capture_rect = d->font_metrics.boundingRect();
+//
+//    prefix_rect.moveTo(pos);
+//    capture_rect.moveTo(prefix_rect.topRight());
+//
+//    painter->setBackground(colors[c]);
+//    painter->fillRect(capture_rect, colors[c]);
+    ++c;
+  }
+
+  painter->setRenderHint(QPainter::Antialiasing, true);
+
+  c = 0;
   auto [begin_index, end_index] = result.Tokens(*d);
   for (unsigned i = begin_index; i < end_index; ++i) {
-
-    if (!has_bg) {
-      painter->setBackground(*(d->code.background[i]));
-    }
 
     painter->setPen(d->code.foreground[i]->color());
 
@@ -301,31 +328,44 @@ void CodeSearchResultsItemDelegate::paint(
     font.setUnderline(d->code.underline[i]);
     font.setWeight(d->code.bold[i] ? QFont::DemiBold : QFont::Normal);
     painter->setFont(font);
+    const QFontMetricsF font_metrics(font);
 
     auto j = d->code.start_of_token[i];
-    auto max_j = d->code.start_of_token[i + 1u];
+    const auto max_j = d->code.start_of_token[i + 1u];
 
     for (; j < max_j; ++j) {
-      switch (QChar ch = d->code.data[j]; ch.unicode()) {
+      const QChar ch = d->code.data[j];
+      QRectF glyph_rect(0.0, 0.0, font_metrics.width(ch),
+                        font_metrics.height());
+      glyph_rect.moveTo(pos);
+
+      const int sel_index = d->capture_indexes[c++];
+      if (!sel_index) {
+        if (!has_bg) {
+          painter->fillRect(glyph_rect, *(d->code.background[i]));
+        }
+      } else {
+        painter->fillRect(
+            glyph_rect, d->theme.SelectedLineBackgroundColor(sel_index));
+      }
+
+      switch (ch.unicode()) {
         case QChar::Tabulation:
         case QChar::Space:
         case QChar::Nbsp:
-          pos.setX(pos.x() + d->font_metrics.width(ch));
+          pos.setX(glyph_rect.right());
           break;
         case QChar::ParagraphSeparator:
         case QChar::LineFeed:
         case QChar::LineSeparator:
           pos.setX(option.rect.x());
-          pos.setY(pos.y() + d->font_metrics.height());
+          pos.setY(glyph_rect.bottom());
           break;
         case QChar::CarriageReturn:
           continue;
         default: {
-          qreal width = d->font_metrics.width(ch);
-          QRectF glyph_rect(0.0, 0.0, width, d->font_metrics.height());
-          glyph_rect.moveTo(pos);
           painter->drawText(glyph_rect, option.displayAlignment, ch);
-          pos.setX(pos.x() + width);
+          pos.setX(glyph_rect.right());
           break;
         }
       }
@@ -458,32 +498,39 @@ CodeSearchResultsView::~CodeSearchResultsView(void) {}
 CodeSearchResultsView::CodeSearchResultsView(CodeSearchResultsModel *model_,
                                              QWidget *parent_)
     : QTableView(parent_),
-      d(std::make_unique<PrivateData>(model_)) {
+      model(model_),
+      proxy(new SortableCodeSearchResultsModel) {
   InitializeWidgets();
 }
 
 int CodeSearchResultsView::columnCount(void) const {
-  return d->model->columnCount(QModelIndex());
+  return model->columnCount(QModelIndex());
 }
 
 int CodeSearchResultsView::rowCount(void) const {
-  return d->model->rowCount(QModelIndex());
+  return model->rowCount(QModelIndex());
 }
 
 void CodeSearchResultsView::OnRowsAdded(void) {
   resizeColumnsToContents();
-  resizeRowsToContents();
+}
+
+void CodeSearchResultsView::OnClick(const QModelIndex &index) {
+
+}
+
+void CodeSearchResultsView::OnDoubleClick(const QModelIndex &index) {
+
 }
 
 void CodeSearchResultsView::InitializeWidgets(void) {
 
   // Make a proxy model for sorting, and an item delegate for painting syntax-
   // colored text.
-  auto proxy_model = new SortableCodeSearchResultsModel;
-  setItemDelegate(new CodeSearchResultsItemDelegate(d->model, proxy_model));
-  proxy_model->setSourceModel(d->model);
-  setModel(proxy_model);
-  connect(d->model, &CodeSearchResultsModel::AddedRows,
+  setItemDelegate(new CodeSearchResultsItemDelegate(model, proxy));
+  proxy->setSourceModel(model);
+  setModel(proxy);
+  connect(model, &CodeSearchResultsModel::AddedRows,
           this, &CodeSearchResultsView::OnRowsAdded);
 
   // Allow sorting; this works in conjunction with the proxy model. Without
@@ -505,7 +552,6 @@ void CodeSearchResultsView::InitializeWidgets(void) {
   // "isntantaneous" and isn't a persistent setting, so any time we add more
   // stuff, we need to call these again.
   resizeColumnsToContents();
-  resizeRowsToContents();
 
   // When scrolling, scroll by pixel. Vertically this doesn't matter too much,
   // unless a result is really large. Horizontally, scrolling by item means
@@ -517,6 +563,12 @@ void CodeSearchResultsView::InitializeWidgets(void) {
   // item, then DON'T automatically scroll to left-adjust the item to the
   // viewport.
   setAutoScroll(false);
+
+  connect(this, &QAbstractItemView::clicked,
+          this, &CodeSearchResultsView::OnClick);
+
+  connect(this, &QAbstractItemView::doubleClicked,
+          this, &CodeSearchResultsView::OnDoubleClick);
 }
 
 }  // namespace mx::gui

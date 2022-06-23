@@ -234,8 +234,18 @@ class PetersTheme final : public CodeTheme {
     return QColor::fromRgb(20, 20, 20);
   }
 
-  QColor SelectedLineBackgroundColor(void) const final {
-    return QColor::fromRgb(0, 0, 0);
+  QColor SelectedLineBackgroundColor(unsigned group) const final {
+
+    static constexpr unsigned mul[3][3] = {
+        {10, 15, 20},
+        {15, 20, 10},
+        {20, 10, 15}
+    };
+
+    return QColor::fromRgb(
+        static_cast<int>(std::min(255u, group * mul[group % 3u][0u])),
+        static_cast<int>(std::min(255u, group * mul[group % 3u][1u])),
+        static_cast<int>(std::min(255u, group * mul[group % 3u][2u])));
   }
 };
 
@@ -280,8 +290,8 @@ QColor ProxyCodeTheme::BackgroundColor(void) const {
 }
 
 // The color to use as a highlight for the line containing the cursor.
-QColor ProxyCodeTheme::SelectedLineBackgroundColor(void) const {
-  return next.SelectedLineBackgroundColor();
+QColor ProxyCodeTheme::SelectedLineBackgroundColor(unsigned group) const {
+  return next.SelectedLineBackgroundColor(group);
 }
 
 // Background color for a specific token.
