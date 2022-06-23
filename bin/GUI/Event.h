@@ -178,6 +178,11 @@ enum class EventSource : int {
 
   // When we go back/forward through the linear history.
   kHistoryBrowserLinearItemChanged     = 1 << 6,
+
+  // When we click on a token in a code search result.
+  kCodeSearchResult                    = 1 << 7,
+  kCodeSearchResultPreviewClickSource  = 1 << 0,
+  kCodeSearchResultPreviewClickDest    = 1 << 1,
 };
 
 Q_DECLARE_FLAGS(EventSources, EventSource)

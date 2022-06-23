@@ -12,6 +12,10 @@
 #include <utility>
 #include <vector>
 
+QT_BEGIN_NAMESPACE
+class QPainter;
+class QRectF;
+QT_END_NAMESPACE
 namespace mx::gui {
 
 class Code {
@@ -26,6 +30,10 @@ class Code {
   std::vector<RawEntityId> file_token_ids;
   std::vector<std::pair<RawEntityId, RawEntityId>> tok_decl_ids;
   std::vector<unsigned> tok_decl_ids_begin;
+
+//  // Paint the tokens in the range `[begin_index, end_index)`.
+//  void PaintTokens(const QRectF &rect, QPainter *painter, unsigned begin_index,
+//                   unsigned end_index) const;
 };
 
 }  // namespace mx::gui

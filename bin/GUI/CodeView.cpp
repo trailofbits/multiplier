@@ -398,23 +398,23 @@ CodeView::CodeView(const CodeTheme &theme_, QWidget *parent)
   InitializeWidgets();
 }
 
-void CodeView::ScrollToToken(const TokenRange &range) {
+void CodeView::ScrollToFileToken(const TokenRange &range) {
   if (range) {
-    ScrollToToken(range[0].id());
+    ScrollToFileToken(range[0].id());
   } else {
-    ScrollToToken(kInvalidEntityId);
+    ScrollToFileToken(kInvalidEntityId);
   }
 }
 
-void CodeView::ScrollToToken(const Token &tok) {
+void CodeView::ScrollToFileToken(const Token &tok) {
   if (tok) {
-    ScrollToToken(tok.id());
+    ScrollToFileToken(tok.id());
   } else {
-    ScrollToToken(kInvalidEntityId);
+    ScrollToFileToken(kInvalidEntityId);
   }
 }
 
-void CodeView::ScrollToToken(RawEntityId file_tok_id) {
+void CodeView::ScrollToFileToken(RawEntityId file_tok_id) {
   if (d->state != CodeViewState::kRendered) {
     d->scroll_target_eid = file_tok_id;
     return;
@@ -637,7 +637,7 @@ void CodeView::OnRenderCode(void *code_, uint64_t counter) {
   cursor.endEditBlock();
 
   d->state = CodeViewState::kRendered;
-  ScrollToToken(d->scroll_target_eid);
+  ScrollToFileToken(d->scroll_target_eid);
 
   assert(d->counter.load() == counter);
   update();

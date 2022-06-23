@@ -13,13 +13,19 @@
 #include <QHeaderView>
 #include <QList>
 #include <QModelIndex>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QRect>
 #include <QRectF>
 #include <QSortFilterProxyModel>
+#include <QSplitter>
 #include <QStyle>
+#include <QTableView>
+#include <QThreadPool>
+#include <QVBoxLayout>
 #include <QVector>
 
+#include <cassert>
 #include <multiplier/Index.h>
 #include <multiplier/Re2.h>
 #include <variant>
@@ -27,6 +33,8 @@
 
 #include "Code.h"
 #include "CodeTheme.h"
+#include "CodeView.h"
+#include "Configuration.h"
 #include "Multiplier.h"
 #include "Util.h"
 
@@ -41,17 +49,22 @@ enum class ModelMode {
 };
 
 struct RowData {
-  const TokenRange file_tokens;
-  const Fragment frag;
 
-  // A mix of fragment tokens and file tokens. Ideally, we want as many fragment
-  // tokens as possible.
-  unsigned tokens_begin{1u};
-  unsigned tokens_end{0u};
+  // Indexes into `CodeSearchResultsModelImpl::files` and
+  // `CodeSearchResultsModelImpl::fragments`.
+  const unsigned file_index;
+  const unsigned frag_index;
 
-  std::vector<std::string_view> captures;
+  unsigned file_tokens_begin{0u};
+  unsigned file_tokens_end{0u};
 
-  explicit RowData(const RegexQueryMatch &);
+  // Indexes into tokens inside of `CodeSearchResultsModelImpl::code`.
+  unsigned code_tokens_begin{1u};
+  unsigned code_tokens_end{0u};
+
+  explicit RowData(CodeSearchResultsModelImpl &d,
+                   const RegexQueryMatch &, unsigned file_index_,
+                   unsigned frag_index_);
 
   std::pair<unsigned, unsigned> Tokens(CodeSearchResultsModelImpl &d);
 };
@@ -66,6 +79,7 @@ class CodeSearchResultsModelImpl {
 
   std::vector<Decl> related_decls;
   std::vector<uint8_t> capture_indexes;
+  int last_capture_indexes_row{-1};
 
   // Formatted tokens from the results. Also used by `CodeView`.
   Code code;
@@ -77,6 +91,25 @@ class CodeSearchResultsModelImpl {
 
   QVector<QString> headers;
   std::vector<RowData> rows;
+
+  // These are per-row things.
+
+  std::vector<std::string_view> captured_data;
+
+  // `(offset, len)` for utf-16 characters of the sub-ranges of covered token
+  // data within the entire range of matched token data.
+  std::vector<std::pair<int, int>> token_sub_ranges;
+
+  // `(offset, len)` for utf-16 characters of the sub-ranges of covered data
+  // within the entire range of matched data, which is often a subsequence of
+  // token data.
+  std::vector<std::pair<int, int>> capture_sub_ranges;
+
+  std::vector<File> files;
+  std::unordered_map<FileId, unsigned> file_indexes;
+
+  std::vector<Fragment> fragments;
+  std::unordered_map<FragmentId, unsigned> fragment_indexes;
 
   ModelMode mode{ModelMode::kNoData};
 
@@ -94,8 +127,8 @@ class CodeSearchResultsModelImpl {
 // giant linear containers, rather than a large number of small-to-medium sized
 // linear containers.
 std::pair<unsigned, unsigned> RowData::Tokens(CodeSearchResultsModelImpl &d) {
-  if (tokens_end >= tokens_begin) {
-    return {tokens_begin, tokens_end};
+  if (code_tokens_end >= code_tokens_begin) {
+    return {code_tokens_begin, code_tokens_end};
   }
 
   auto j = 0u;
@@ -107,12 +140,14 @@ std::pair<unsigned, unsigned> RowData::Tokens(CodeSearchResultsModelImpl &d) {
     d.code.tok_decl_ids_begin.pop_back();
   }
 
-  tokens_begin = static_cast<unsigned>(d.code.start_of_token.size());
+  code_tokens_begin = static_cast<unsigned>(d.code.start_of_token.size());
 
-  TokenList frag_tokens = frag.parsed_tokens();
+  TokenList file_tokens = d.files[file_index].tokens();
+  TokenList frag_tokens = d.fragments[frag_index].parsed_tokens();
   auto max_j = frag_tokens.size();
 
-  for (Token file_tok : file_tokens) {
+  for (auto i = file_tokens_begin; i < file_tokens_end; ++i) {
+    const Token file_tok = file_tokens[i];
     auto tok_data = file_tok.data();
     if (tok_data.empty()) {
       continue;
@@ -193,21 +228,66 @@ std::pair<unsigned, unsigned> RowData::Tokens(CodeSearchResultsModelImpl &d) {
     d.code.underline.push_back(format.underline);
   }
 
-  tokens_end = static_cast<unsigned>(d.code.start_of_token.size());
+  code_tokens_end = static_cast<unsigned>(d.code.start_of_token.size());
   d.code.start_of_token.push_back(d.code.data.size());
   d.code.tok_decl_ids_begin.push_back(d.code.tok_decl_ids.size());
 
-  return {tokens_begin, tokens_end};
+  return {code_tokens_begin, code_tokens_end};
 }
 
-RowData::RowData(const RegexQueryMatch &match)
-    : file_tokens(match),
-      frag(Fragment::containing(match)),
-      captures(match.num_captures()) {
+RowData::RowData(CodeSearchResultsModelImpl &d,
+                 const RegexQueryMatch &match, unsigned file_index_,
+                 unsigned frag_index_)
+    : file_index(file_index_),
+      frag_index(frag_index_) {
 
-  for (size_t i = 0u, max_i = captures.size(); i < max_i; ++i) {
-    if (auto capture = match.captured_data(i)) {
-      captures[i] = capture.value();
+  VariantId first_vid = EntityId(match.front().id()).Unpack();
+  VariantId last_vid = EntityId(match.back().id()).Unpack();
+
+  assert(std::holds_alternative<FileTokenId>(first_vid));
+  assert(std::holds_alternative<FileTokenId>(last_vid));
+
+  file_tokens_begin = std::get<FileTokenId>(first_vid).offset;
+  file_tokens_end = std::get<FileTokenId>(last_vid).offset + 1u;
+
+  const char *begin_utf8 = match.TokenRange::data().data();
+  for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {
+
+    auto &capture_sub_range = d.capture_sub_ranges.emplace_back(0, 0);
+    auto &token_sub_range = d.token_sub_ranges.emplace_back(0, 0);
+    auto &captured_data = d.captured_data.emplace_back();
+
+    auto capture = match.captured_data(i);
+    if (!capture) {
+      continue;
+    }
+
+    captured_data = capture.value();
+
+    const ptrdiff_t len_utf8 = captured_data.data() - begin_utf8;
+
+    capture_sub_range.first =
+        QString::fromUtf8(begin_utf8, static_cast<int>(len_utf8)).size();
+
+    capture_sub_range.second =
+        QString::fromUtf8(capture->data(),
+                          static_cast<int>(capture->size())).size();
+
+    if (auto captured_tokens = match.captured_tokens(i)) {
+      const std::string_view tok_data = captured_tokens->data();
+      const ptrdiff_t tok_len_utf8 = tok_data.data() - begin_utf8;
+
+      token_sub_range.first =
+          QString::fromUtf8(begin_utf8, static_cast<int>(tok_len_utf8)).size();
+
+      token_sub_range.second =
+          QString::fromUtf8(tok_data.data(),
+                            static_cast<int>(tok_data.size())).size();
+
+    } else if (!capture->empty()) {
+      assert(false);
+      token_sub_range.first = capture_sub_range.first;
+      token_sub_range.second = capture_sub_range.second;
     }
   }
 }
@@ -226,32 +306,24 @@ void CodeSearchResultsItemDelegate::paint(
     QPainter *painter, const QStyleOptionViewItem &option,
     const QModelIndex &index) const {
 
-  auto row = index.row();
-  auto col = index.column();
+  CodeSearchResultsModelImpl * const d = model->d.get();
+  const QModelIndex real_index = proxy->mapToSource(index);
+  const int row = real_index.row();
+  const int col = real_index.column();
 
-  if (proxy) {
-    auto real_index = proxy->mapToSource(index);
-    row = real_index.row();
-    col = real_index.column();
-  }
-
-  auto d = model->d.get();
   if (0 > row || 0 > col || row >= d->num_rows || col >= d->num_columns) {
-    return;
-
-  // TODO(pag): Only syntax highlight column 0.
-  } else if (0 < col) {
     QStyledItemDelegate::paint(painter, option, index);
     return;
   }
 
-  QPalette palette = option.widget ? option.widget->palette() : qApp->palette();
+  CodeSearchResultsConfiguration &config =
+      d->multiplier.Configuration().code_search_results;
+
   RowData &result = d->rows[static_cast<size_t>(row)];
 
   // Try to get the background color from the model; we want to get the right
   // alternating color, if any.
   QVariant bg_color;
-
   unsigned disp = 1u;
   if (option.state & QStyle::State_Selected) {
     bg_color = d->theme.SelectedLineBackgroundColor();
@@ -271,102 +343,130 @@ void CodeSearchResultsItemDelegate::paint(
   auto has_bg = false;
   if (bg_color.userType() == QMetaType::QColor) {
     QColor color = qvariant_cast<QColor>(bg_color);
-//    painter->setBackground(color);
     painter->fillRect(option.rect, color);
     has_bg = true;
   }
 
-  QColor colors[] = {Qt::darkRed, Qt::darkGreen, Qt::darkBlue, Qt::darkCyan};
+  auto capture_offset = row * d->num_columns;
+  auto capture_index = static_cast<unsigned>(col);
 
-  QPointF pos = option.rect.topLeft();
-
+  // Figure out to which capture group a character belongs. Try to not have to
+  // recompute this.
+  //
   // Note that the tokens enclose the capture, including the first capture.
-  const char *all_data_utf8 = result.file_tokens.data().data();
-//  QString all_data_utf16 = QString::fromUtf8(
-//      all_data_utf8, static_cast<int>(result.token_data.size()));
+  if (config.highlight_captures) {
+    if (d->capture_indexes.empty() ||
+        d->last_capture_indexes_row != row) {
+      uint8_t c = 1;
+      d->capture_indexes.clear();
+      d->last_capture_indexes_row = row;
+      for (auto i = 0; i < d->num_columns; ++i) {
+        auto [prefix_len, capture_len] =
+            d->capture_sub_ranges[static_cast<unsigned>(capture_offset + i)];
 
-
-  // Figure out to which capture group a character belongs.
-  uint8_t c = 1;
-  d->capture_indexes.clear();
-  for (std::string_view capture : result.captures) {
-    auto prefix_len = QString::fromUtf8(
-        all_data_utf8, static_cast<int>(capture.data() - all_data_utf8)).size();
-
-    auto capture_len = QString::fromUtf8(
-        capture.data(), static_cast<int>(capture.size())).size();
-
-    auto needed = static_cast<size_t>(prefix_len + capture_len);
-    d->capture_indexes.resize(
-        std::max<size_t>(needed + 1u, d->capture_indexes.size()));
-    for (auto i = 0; i < capture_len; ++i) {
-      d->capture_indexes[static_cast<unsigned>(prefix_len + i)] = c;
+        auto needed = static_cast<size_t>(prefix_len + capture_len);
+        d->capture_indexes.resize(
+            std::max<size_t>(needed + 1u, d->capture_indexes.size()));
+        for (int i = 0; i < capture_len; ++i) {
+          d->capture_indexes[static_cast<unsigned>(prefix_len + i)] = c;
+        }
+        ++c;
+      }
     }
-//
-//    QRectF prefix_rect = d->font_metrics.boundingRect();
-//
-//    QRectF capture_rect = d->font_metrics.boundingRect();
-//
-//    prefix_rect.moveTo(pos);
-//    capture_rect.moveTo(prefix_rect.topRight());
-//
-//    painter->setBackground(colors[c]);
-//    painter->fillRect(capture_rect, colors[c]);
-    ++c;
   }
 
-  painter->setRenderHint(QPainter::Antialiasing, true);
+  if (config.highlight_syntax) {
+    painter->setRenderHint(QPainter::Antialiasing, true);
+  }
 
-  c = 0;
-  auto [begin_index, end_index] = result.Tokens(*d);
-  for (unsigned i = begin_index; i < end_index; ++i) {
+  if (!config.highlight_syntax && !config.highlight_captures) {
+    QStyledItemDelegate::paint(painter, option, index);
 
-    painter->setPen(d->code.foreground[i]->color());
-
+  } else {
     QFont font = d->font;
-    font.setItalic(d->code.italic[i]);
-    font.setUnderline(d->code.underline[i]);
-    font.setWeight(d->code.bold[i] ? QFont::DemiBold : QFont::Normal);
-    painter->setFont(font);
-    const QFontMetricsF font_metrics(font);
+    QFontMetricsF font_metrics(font);
+    QPointF pos = option.rect.topLeft();
 
-    auto j = d->code.start_of_token[i];
-    const auto max_j = d->code.start_of_token[i + 1u];
+    // The begin/end indices of tokens in `CodeSearchResultsModelImpl::code`
+    // for all the matched tokens.
+    auto [begin_index, end_index] = result.Tokens(*d);
 
-    for (; j < max_j; ++j) {
-      const QChar ch = d->code.data[j];
-      QRectF glyph_rect(0.0, 0.0, font_metrics.width(ch),
-                        font_metrics.height());
-      glyph_rect.moveTo(pos);
+    auto [num_chars_to_skip, num_chars_to_print] =
+        d->token_sub_ranges[static_cast<unsigned>(capture_offset + col)];
 
-      const int sel_index = d->capture_indexes[c++];
-      if (!sel_index) {
-        if (!has_bg) {
-          painter->fillRect(glyph_rect, *(d->code.background[i]));
-        }
-      } else {
-        painter->fillRect(
-            glyph_rect, d->theme.SelectedLineBackgroundColor(sel_index));
+    int num_skipped_chars = 0;
+    int num_printed_chars = 0;
+    auto c = 0u;
+    for (unsigned i = begin_index; i < end_index; ++i) {
+
+      // Recalculate font metrics; bold/italic might take more or less space.
+      if (config.highlight_syntax) {
+        painter->setPen(d->code.foreground[i]->color());
+        font.setItalic(d->code.italic[i]);
+        font.setUnderline(d->code.underline[i]);
+        font.setWeight(d->code.bold[i] ? QFont::DemiBold : QFont::Normal);
+        font_metrics = QFontMetricsF(font);
       }
 
-      switch (ch.unicode()) {
-        case QChar::Tabulation:
-        case QChar::Space:
-        case QChar::Nbsp:
-          pos.setX(glyph_rect.right());
-          break;
-        case QChar::ParagraphSeparator:
-        case QChar::LineFeed:
-        case QChar::LineSeparator:
-          pos.setX(option.rect.x());
-          pos.setY(glyph_rect.bottom());
-          break;
-        case QChar::CarriageReturn:
+      painter->setFont(font);
+
+      auto j = d->code.start_of_token[i];
+      const auto max_j = d->code.start_of_token[i + 1u];
+
+      for (; j < max_j && num_printed_chars < num_chars_to_print; ++j, ++c) {
+
+        // If we're in the Nth column, then we only want to show the tokens
+        // and matched data for the Nth capture group, but all of our info
+        // relating printed characters to capture indices is based on the entire
+        // match, so we might need to skip open some stuff.
+        if (num_skipped_chars++ < num_chars_to_skip) {
           continue;
-        default: {
-          painter->drawText(glyph_rect, option.displayAlignment, ch);
-          pos.setX(glyph_rect.right());
-          break;
+        }
+
+        // If we're not in skipping mode, then we need to count how many
+        // characters have been rendered, because if we're in the Nth column,
+        // then we will want to limit ourselves to rendering just the token
+        // data associated with the Nth capture group.
+        ++num_printed_chars;
+
+        const QChar ch = d->code.data[j];
+        QRectF glyph_rect(0.0, 0.0, font_metrics.width(ch),
+                          font_metrics.height());
+        glyph_rect.moveTo(pos);
+
+        // Optionally fill behind the character-to-be-printed with the highlight
+        // color for this capture group.
+        if (config.highlight_captures) {
+          const int sel_index = d->capture_indexes[c];
+          if (!sel_index) {
+            if (!has_bg) {
+              painter->fillRect(glyph_rect, *(d->code.background[i]));
+            }
+          } else {
+            painter->fillRect(
+                glyph_rect, d->theme.SelectedLineBackgroundColor(sel_index));
+          }
+        }
+
+        switch (ch.unicode()) {
+          case QChar::Tabulation:
+          case QChar::Space:
+          case QChar::Nbsp:
+            pos.setX(glyph_rect.right());
+            break;
+          case QChar::ParagraphSeparator:
+          case QChar::LineFeed:
+          case QChar::LineSeparator:
+            pos.setX(option.rect.x());
+            pos.setY(glyph_rect.bottom());
+            break;
+          case QChar::CarriageReturn:
+            continue;
+          default: {
+            painter->drawText(glyph_rect, option.displayAlignment, ch);
+            pos.setX(glyph_rect.right());
+            break;
+          }
         }
       }
     }
@@ -430,9 +530,7 @@ QVariant CodeSearchResultsModel::data(
   }
 
   auto &result = d->rows[static_cast<unsigned>(row)];
-//  result.FillTokens();
-
-  auto view = result.captures[static_cast<unsigned>(col)];
+  auto view = d->captured_data[static_cast<unsigned>(row * d->num_columns + col)];
   return QString::fromUtf8(view.data(), static_cast<int>(view.size()));
 }
 
@@ -484,7 +582,32 @@ void CodeSearchResultsModel::AddResult(const RegexQueryMatch &match) {
   }
 
   beginInsertRows(QModelIndex(), d->num_rows, d->num_rows);
-  d->rows.emplace_back(match);
+
+  Fragment frag = Fragment::containing(match);
+  File file = File::containing(match);
+
+  unsigned file_index;
+  unsigned frag_index;
+
+  if (auto file_index_it = d->file_indexes.find(file.id());
+      file_index_it != d->file_indexes.end()) {
+    file_index = file_index_it->second;
+  } else {
+    file_index = static_cast<unsigned>(d->files.size());
+    d->file_indexes.emplace(file.id(), file_index);
+    d->files.emplace_back(std::move(file));
+  }
+
+  if (auto frag_index_it = d->fragment_indexes.find(frag.id());
+      frag_index_it != d->fragment_indexes.end()) {
+    frag_index = frag_index_it->second;
+  } else {
+    frag_index = static_cast<unsigned>(d->fragments.size());
+    d->fragment_indexes.emplace(frag.id(), frag_index);
+    d->fragments.emplace_back(std::move(frag));
+  }
+
+  d->rows.emplace_back(*d, match, file_index, frag_index);
   ++d->num_rows;
   endInsertRows();
 
@@ -493,82 +616,299 @@ void CodeSearchResultsModel::AddResult(const RegexQueryMatch &match) {
 
 SortableCodeSearchResultsModel::~SortableCodeSearchResultsModel(void) {}
 
+struct CodeSearchResultsView::PrivateData {
+  CodeSearchResultsModel * const model;
+  CodeSearchResultsModelImpl * const model_data;
+  SortableCodeSearchResultsModel * const proxy;
+  QVBoxLayout *layout{nullptr};
+  QSplitter *splitter{nullptr};
+  QTableView *table{nullptr};
+  CodeView *code{nullptr};
+  HighlightRangeTheme theme;
+
+  inline PrivateData(CodeSearchResultsModel *model_)
+      : model(model_),
+        model_data(model->d.get()),
+        proxy(new SortableCodeSearchResultsModel),
+        theme(model_data->theme) {
+    proxy->setSourceModel(model);
+  }
+};
+
 CodeSearchResultsView::~CodeSearchResultsView(void) {}
 
 CodeSearchResultsView::CodeSearchResultsView(CodeSearchResultsModel *model_,
                                              QWidget *parent_)
-    : QTableView(parent_),
-      model(model_),
-      proxy(new SortableCodeSearchResultsModel) {
+    : QWidget(parent_),
+      d(std::make_unique<PrivateData>(model_)) {
   InitializeWidgets();
 }
 
-int CodeSearchResultsView::columnCount(void) const {
-  return model->columnCount(QModelIndex());
-}
-
-int CodeSearchResultsView::rowCount(void) const {
-  return model->rowCount(QModelIndex());
-}
-
 void CodeSearchResultsView::OnRowsAdded(void) {
-  resizeColumnsToContents();
+  d->table->resizeColumnsToContents();
 }
 
-void CodeSearchResultsView::OnClick(const QModelIndex &index) {
+bool CodeSearchResultsView::eventFilter(QObject *watched, QEvent *event) {
+  switch (event->type()) {
+    default:
+      break;
+    case QEvent::MouseButtonPress:
+    case QEvent::NonClientAreaMouseButtonPress:
+    case QEvent::GraphicsSceneMousePress: {
+      auto mevent = dynamic_cast<QMouseEvent *>(event);
+      QPoint last_click_loc = mevent->pos();
+      QModelIndex index = d->table->indexAt(last_click_loc);
+      if (index.isValid()) {
+        MapClickToToken(last_click_loc, index);
+      }
+      break;
+    }
+  }
 
-}
-
-void CodeSearchResultsView::OnDoubleClick(const QModelIndex &index) {
-
+  return false;
 }
 
 void CodeSearchResultsView::InitializeWidgets(void) {
+  d->layout = new QVBoxLayout;
+  setLayout(d->layout);
+
+  d->splitter = new QSplitter(Qt::Orientation::Vertical);
+  d->layout->addWidget(d->splitter);
+
+  d->table = new QTableView;
+
+  d->splitter->addWidget(d->table);
+
+  // Make it possible to capture mouse events on the table.
+  d->table->viewport()->installEventFilter(this);
 
   // Make a proxy model for sorting, and an item delegate for painting syntax-
   // colored text.
-  setItemDelegate(new CodeSearchResultsItemDelegate(model, proxy));
-  proxy->setSourceModel(model);
-  setModel(proxy);
-  connect(model, &CodeSearchResultsModel::AddedRows,
+  d->table->setItemDelegate(
+      new CodeSearchResultsItemDelegate(d->model, d->proxy));
+
+  d->table->setModel(d->proxy);
+  connect(d->model, &CodeSearchResultsModel::AddedRows,
           this, &CodeSearchResultsView::OnRowsAdded);
 
   // Allow sorting; this works in conjunction with the proxy model. Without
   // the proxy model, if we used sorting, then it would do nothing :-/
-  setSortingEnabled(true);
+  d->table->setSortingEnabled(true);
 
   // Only allow one cell to be selected at a time.
-  setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-  setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-  setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+  d->table->setSelectionBehavior(
+      QAbstractItemView::SelectionBehavior::SelectItems);
+  d->table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+  d->table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
   // Magic from StackOverflow to enable multi-line cells that also auto add
-  // `...` when the cell isn't wide enough.
-  setWordWrap(true);
-  setTextElideMode(Qt::ElideMiddle);
-  verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  // `...` when the cell isn't wide enough. This only really works when the
+  // cells contain text. When we render syntax-highlighted code, this has
+  // no effect.
+  d->table->setWordWrap(true);
+  d->table->setTextElideMode(Qt::ElideMiddle);
+  d->table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   // Resize for the current contents as they are now. This has an
   // "isntantaneous" and isn't a persistent setting, so any time we add more
   // stuff, we need to call these again.
-  resizeColumnsToContents();
+  d->table->resizeColumnsToContents();
 
   // When scrolling, scroll by pixel. Vertically this doesn't matter too much,
   // unless a result is really large. Horizontally, scrolling by item means
   // jumping to show the next cell, and that ends up being very jarring.
-  setVerticalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
-  setHorizontalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
+  d->table->setVerticalScrollMode(
+      QAbstractItemView::ScrollMode::ScrollPerPixel);
+  d->table->setHorizontalScrollMode(
+      QAbstractItemView::ScrollMode::ScrollPerPixel);
 
   // When the viewport is looking partially at an item, and you click on the
   // item, then DON'T automatically scroll to left-adjust the item to the
   // viewport.
-  setAutoScroll(false);
+  d->table->setAutoScroll(false);
 
-  connect(this, &QAbstractItemView::clicked,
-          this, &CodeSearchResultsView::OnClick);
+  // Create and connect the code preview.
+  auto &config = d->model_data->multiplier.Configuration().code_search_results;
+  if (config.code_preview.visible) {
+    d->code = new CodeView(d->model_data->theme);
+    d->code->viewport()->installEventFilter(&(d->model_data->multiplier));
+    d->splitter->addWidget(d->code);
+    d->code->hide();
 
-  connect(this, &QAbstractItemView::doubleClicked,
-          this, &CodeSearchResultsView::OnDoubleClick);
+    connect(d->code, &CodeView::TokenPressEvent,
+            this, &CodeSearchResultsView::ActOnTokenPressEvent);
+  }
+}
+
+void CodeSearchResultsView::ActOnTokenPressEvent(EventLocations locs) {
+  for (EventLocation loc : locs) {
+    emit TokenPressEvent(EventSource::kCodeSearchResultPreviewClickSource, loc);
+    if (loc.UnpackDeclarationId()) {
+      loc.SetFragmentTokenId(kInvalidEntityId);
+      loc.SetFileTokenId(kInvalidEntityId);
+      emit TokenPressEvent(EventSource::kCodeSearchResultPreviewClickDest, loc);
+    }
+  }
+}
+
+void CodeSearchResultsView::ShowFragmentToken(unsigned row,
+                                              RawEntityId file_tok_id,
+                                              RawEntityId frag_tok_id) {
+  auto &config = d->model_data->multiplier.Configuration().code_search_results;
+  if (!config.code_preview.visible || !d->code) {
+    return;
+  }
+
+  const RowData &result = d->model_data->rows[row];
+  const File &file = d->model_data->files[result.file_index];
+  const Fragment &frag = d->model_data->fragments[result.frag_index];
+
+  d->code->show();
+  d->theme.HighlightFileTokenRange(
+      file.tokens().slice(result.file_tokens_begin, result.file_tokens_end));
+  d->code->SetFragment(frag);
+  d->code->ScrollToFileToken(file_tok_id);
+}
+
+void CodeSearchResultsView::ShowFileToken(unsigned row,
+                                          RawEntityId file_tok_id) {
+  auto &config = d->model_data->multiplier.Configuration().code_search_results;
+  if (!config.code_preview.visible) {
+    return;
+  }
+}
+
+void CodeSearchResultsView::ClickedOnToken(unsigned row, unsigned index) {
+  CodeSearchResultsModelImpl * const model_data = d->model_data;
+  assert((index + 1u) < model_data->code.tok_decl_ids_begin.size());
+  auto locs_begin_index = model_data->code.tok_decl_ids_begin[index];
+  auto locs_end_index = model_data->code.tok_decl_ids_begin[index + 1u];
+  EventLocation loc;
+  RawEntityId file_tok_id = model_data->code.file_token_ids[index];
+  assert(file_tok_id != kInvalidEntityId);
+  loc.SetFileTokenId(file_tok_id);
+
+  if (auto num_locs = locs_end_index - locs_begin_index) {
+    if (num_locs == 1u) {
+      auto [frag_tok_id, decl_id] = model_data->code.tok_decl_ids[locs_begin_index];
+      assert(frag_tok_id != kInvalidEntityId);
+      loc.SetFragmentTokenId(frag_tok_id);
+      loc.SetReferencedDeclarationId(decl_id);
+      emit TokenPressEvent(EventSource::kCodeSearchResult, loc);
+      ShowFragmentToken(row, file_tok_id, frag_tok_id);
+
+    } else {
+      std::vector<EventLocation> locs(num_locs);
+      for (auto i = locs_begin_index; i < locs_end_index; ++i) {
+        auto [frag_tok_id, decl_id] = model_data->code.tok_decl_ids[i];
+        assert(frag_tok_id != kInvalidEntityId);
+        loc.SetFragmentTokenId(frag_tok_id);
+        loc.SetReferencedDeclarationId(decl_id);
+        locs[i - locs_begin_index] = loc;
+      }
+      emit TokenPressEvent(EventSource::kCodeSearchResult, locs);
+      ShowFileToken(row, file_tok_id);
+    }
+  }
+}
+
+// This method pretends to re-render the tokens, so as to find the specific
+// character containing the last clicked point.
+void CodeSearchResultsView::MapClickToToken(QPoint last_click_loc,
+                                            const QModelIndex &index) {
+  QRect visual_rect = d->table->visualRect(index);
+  if (!visual_rect.contains(last_click_loc)) {
+    return;
+  }
+
+  const QModelIndex real_index = d->proxy->mapToSource(index);
+  const int row = real_index.row();
+  const int col = real_index.column();
+  CodeSearchResultsModelImpl * const model_data = d->model_data;
+  if (0 > row || 0 > col || row >= model_data->num_rows ||
+      col >= model_data->num_columns) {
+    return;
+  }
+
+  QPointF pos = visual_rect.topLeft();
+
+  // The begin/end indices of tokens in `CodeSearchResultsModelImpl::code`
+  // for all the matched tokens.
+  RowData &result = model_data->rows[static_cast<size_t>(row)];
+  auto [begin_index, end_index] = result.Tokens(*model_data);
+  auto capture_offset = row * model_data->num_columns;
+  auto capture_index = static_cast<unsigned>(col);
+  auto [num_chars_to_skip, num_chars_to_print] =
+      model_data->token_sub_ranges[static_cast<unsigned>(capture_offset + col)];
+
+  QFont font = model_data->font;
+  QFontMetricsF font_metrics(font);
+  CodeSearchResultsConfiguration &config =
+      model_data->multiplier.Configuration().code_search_results;
+
+  int num_skipped_chars = 0;
+  int num_printed_chars = 0;
+  auto c = 0u;
+  for (unsigned i = begin_index; i < end_index; ++i) {
+
+    // Recalculate font metrics; bold/italic might take more or less space.
+    if (config.highlight_syntax) {
+      font.setItalic(model_data->code.italic[i]);
+      font.setUnderline(model_data->code.underline[i]);
+      font.setWeight(model_data->code.bold[i] ? QFont::DemiBold : QFont::Normal);
+      font_metrics = QFontMetricsF(font);
+    }
+
+    auto j = model_data->code.start_of_token[i];
+    const auto max_j = model_data->code.start_of_token[i + 1u];
+
+    for (; j < max_j && num_printed_chars < num_chars_to_print; ++j, ++c) {
+
+      // If we're in the Nth column, then we only want to show the tokens
+      // and matched data for the Nth capture group, but all of our info
+      // relating printed characters to capture indices is based on the entire
+      // match, so we might need to skip open some stuff.
+      if (num_skipped_chars++ < num_chars_to_skip) {
+        continue;
+      }
+
+      // If we're not in skipping mode, then we need to count how many
+      // characters have been rendered, because if we're in the Nth column,
+      // then we will want to limit ourselves to rendering just the token
+      // data associated with the Nth capture group.
+      ++num_printed_chars;
+
+      const QChar ch = model_data->code.data[j];
+      QRectF glyph_rect(0.0, 0.0, font_metrics.width(ch),
+                        font_metrics.height());
+      glyph_rect.moveTo(pos);
+
+      if (glyph_rect.contains(last_click_loc)) {
+        ClickedOnToken(static_cast<unsigned>(row), i);
+        return;
+      }
+
+      switch (ch.unicode()) {
+        case QChar::Tabulation:
+        case QChar::Space:
+        case QChar::Nbsp:
+          pos.setX(glyph_rect.right());
+          break;
+        case QChar::ParagraphSeparator:
+        case QChar::LineFeed:
+        case QChar::LineSeparator:
+          pos.setX(visual_rect.x());
+          pos.setY(glyph_rect.bottom());
+          break;
+        case QChar::CarriageReturn:
+          continue;
+        default: {
+          pos.setX(glyph_rect.right());
+          break;
+        }
+      }
+    }
+  }
 }
 
 }  // namespace mx::gui

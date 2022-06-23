@@ -182,6 +182,16 @@ Token TokenRange::operator[](size_t relative_index) const {
   }
 }
 
+// Return the first token.
+Token TokenRange::front(void) const {
+  return Token(impl, index);
+}
+
+// Return the last token.
+Token TokenRange::back(void) const {
+  return Token(impl, num_tokens - 1u);
+}
+
 // Return a slice of this token range. If the indices given are invalid, then
 // an empty token range is returned. The indices cover the tokens in the
 // exclusive range `[start_index, end_index)`.

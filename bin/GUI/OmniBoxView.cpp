@@ -89,6 +89,8 @@ void OmniBoxView::InitializeWidgets(void) {
   d->content->addTab(d->regex_box, tr("Code Search"));
   d->regex_button->setDisabled(true);
 
+  d->regex_layout->installEventFilter(&d->multiplier);
+
   connect(d->regex_input, &QLineEdit::textChanged,
           this, &OmniBoxView::BuildRegex);
 
@@ -180,6 +182,9 @@ void OmniBoxView::OnFoundFragmentsWithRegex(RegexQueryResultIterator *list_,
 
   auto model = new CodeSearchResultsModel(d->multiplier);
   auto table = new CodeSearchResultsView(model);
+
+  connect(table, &CodeSearchResultsView::TokenPressEvent,
+          &d->multiplier, &Multiplier::ActOnTokenPressEvent);
 
   for (auto j = 1; *list != IteratorEnd{}; ++*list, ++j) {
     const RegexQueryMatch &match = **list;

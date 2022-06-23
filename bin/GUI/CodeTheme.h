@@ -181,7 +181,7 @@ class HighlightRangeTheme final : public ProxyCodeTheme {
   HighlightRangeTheme(const CodeTheme &next_);
 
   // Set the entity to be highlighted.
-  void SetRangeToHighlight(const TokenRange &range_);
+  void HighlightFileTokenRange(const TokenRange &range_);
 
   void BeginTokens(void) const override;
   void EndTokens(void) const override;

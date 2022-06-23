@@ -42,9 +42,9 @@ class CodeView final : public QPlainTextEdit {
   virtual ~CodeView(void);
   CodeView(const CodeTheme &theme_, QWidget *parent = nullptr);
 
-  void ScrollToToken(const TokenRange &tok);
-  void ScrollToToken(const Token &tok);
-  void ScrollToToken(RawEntityId file_tok_id);
+  void ScrollToFileToken(const TokenRange &tok);
+  void ScrollToFileToken(const Token &tok);
+  void ScrollToFileToken(RawEntityId file_tok_id);
 
   // Change the underlying data of this view.
   void SetFile(const File &file);

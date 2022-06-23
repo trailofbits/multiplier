@@ -7,11 +7,14 @@
 #pragma once
 
 #include <QAbstractTableModel>
+#include <QPoint>
 #include <QSortFilterProxyModel>
 #include <QStyledItemDelegate>
-#include <QTableView>
+#include <QWidget>
 
 #include <memory>
+
+#include "Event.h"
 
 namespace mx {
 class RegexQueryMatch;
@@ -81,19 +84,19 @@ class SortableCodeSearchResultsModel final : public QSortFilterProxyModel {
   QVariant data(const QModelIndex &index, int role) const Q_DECL_FINAL;
 };
 
-class CodeSearchResultsView : public QTableView {
+class CodeSearchResultsView : public QWidget {
   Q_OBJECT
 
-  using QTableView::setModel;
-  using QTableView::setRootIndex;
-  using QTableView::setSelectionMode;
-  using QTableView::setSelectionBehavior;
-  using QTableView::setEditTriggers;
-
-  CodeSearchResultsModel * const model;
-  SortableCodeSearchResultsModel * const proxy;
+  struct PrivateData;
+  std::unique_ptr<PrivateData> d;
 
   void InitializeWidgets(void);
+  void ClickedOnToken(unsigned row, unsigned tok_index);
+  void ShowFragmentToken(unsigned row, RawEntityId file_tok_id,
+                         RawEntityId frag_tok_id);
+  void ShowFileToken(unsigned row, RawEntityId file_tok_id);
+  void MapClickToToken(QPoint last_click_loc, const QModelIndex &index);
+  bool eventFilter(QObject *watched, QEvent *event) Q_DECL_FINAL;
 
  public:
   virtual ~CodeSearchResultsView(void);
@@ -101,13 +104,12 @@ class CodeSearchResultsView : public QTableView {
   explicit CodeSearchResultsView(CodeSearchResultsModel *model_,
                                  QWidget *parent_=nullptr);
 
-  int columnCount(void) const;
-  int rowCount(void) const;
-
  private slots:
+  void ActOnTokenPressEvent(EventLocations locs);
   void OnRowsAdded(void);
-  void OnClick(const QModelIndex &index);
-  void OnDoubleClick(const QModelIndex &index);
+
+ signals:
+  void TokenPressEvent(EventSource source, EventLocations loc_ids);
 };
 
 }  // namespace gui

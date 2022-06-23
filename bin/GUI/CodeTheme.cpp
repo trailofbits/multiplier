@@ -334,7 +334,7 @@ HighlightRangeTheme::HighlightRangeTheme(const CodeTheme &next_)
 HighlightRangeTheme::~HighlightRangeTheme(void) {}
 
 // Set the entity to be highlighted.
-void HighlightRangeTheme::SetRangeToHighlight(const TokenRange &range) {
+void HighlightRangeTheme::HighlightFileTokenRange(const TokenRange &range) {
   std::unique_lock<std::mutex> locker(d->lock);
   d->tokens = range;
 }
