@@ -8,7 +8,7 @@ the directory where everything goes.
 ## Step 1
 
 Download the [latest release of cxx-common](https://github.com/lifting-bits/cxx-common/releases)
-for LLVM 13 for your OS/architecture. Extract the downloaded archive. For example,
+for LLVM 14 for your OS/architecture. Extract the downloaded archive. For example,
 if you downloaded `vcpkg_macos-11_llvm-14_xcode-13.0_amd64.tar.xz` then after extracting
 you will have a directory `vcpkg_macos-11_llvm-14_xcode-13.0_amd64` containing two
 subdirectories, `scripts` and `installed`. Rename the extracted directory to

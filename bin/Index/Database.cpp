@@ -18,6 +18,7 @@
 #include <thread>
 #include <sstream>
 #include <shared_mutex>
+#include <mutex>
 
 #include "Database.h"
 
