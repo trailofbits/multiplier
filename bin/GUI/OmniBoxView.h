@@ -44,6 +44,12 @@ class OmniBoxView final : public QWidget {
   void RunRegex(void);
   void OnFoundFragmentsWithRegex(RegexQueryResultIterator *list,
                                  unsigned counter);
+  void OnOpenRegexResultsInTab(void);
+  void OnOpenRegexResultsInDock(void);
+
+ signals:
+  void OpenTab(QString title, QWidget *widget);
+  void OpenDock(QString title, QWidget *widget);
 };
 
 // Downloads the file list in the background.

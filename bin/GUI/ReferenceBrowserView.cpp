@@ -814,9 +814,9 @@ void ReferenceBrowserView::OnItemClicked(
     if (fragment_id != kInvalidEntityId) {
       if (config.code_preview.visible && d->code) {
         d->code->show();
-        d->theme.SetRangeToHighlight(info.file_tokens);
+        d->theme.HighlightFileTokenRange(info.file_tokens);
         d->code->SetFragment(index, fragment_id);
-        d->code->ScrollToToken(info.file_tokens);
+        d->code->ScrollToFileToken(info.file_tokens);
       }
     } else if (d->code) {
       d->code->hide();

@@ -17,8 +17,11 @@ class Index;
 class Token;
 
 enum class TokenKind : unsigned short;
+enum class DeclCategory : unsigned char;
 
 namespace gui {
+
+enum class TokenCategory : unsigned char;
 
 enum class TokenClass {
   kUnknown,
@@ -36,6 +39,13 @@ enum class TokenClass {
 // Classify a token kind into a `TokenClass`. Token classes are good baseline
 // indicators for syntax coloring.
 TokenClass ClassifyToken(const Token &token);
+
+// Categorize a token.
+TokenCategory CategorizeToken(const Token &token, TokenClass tok_class,
+                              DeclCategory decl_category);
+
+// Categorize a token.
+TokenCategory CategorizeToken(const Token &token, DeclCategory decl_category);
 
 // Try to determine the declarations associated with this token.
 std::optional<Decl> DeclForToken(const Token &token);

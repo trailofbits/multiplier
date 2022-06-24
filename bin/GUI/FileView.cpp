@@ -55,7 +55,7 @@ FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
 }
 
 void FileView::ScrollToToken(RawEntityId file_tok_id) const {
-  d->content->ScrollToToken(file_tok_id);
+  d->content->ScrollToFileToken(file_tok_id);
 }
 
 void FileView::ActOnTokenPressEvent(EventLocations locs) {

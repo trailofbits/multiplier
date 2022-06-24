@@ -20,11 +20,16 @@ add_executable("${exe_name}" "${executable_type}"
 
   resources/resources.qrc
   
+  Code.h
+  
   CodeTheme.cpp
   CodeTheme.h
   
   CodeBrowserView.cpp
   CodeBrowserView.h
+  
+  CodeSearchResults.cpp
+  CodeSearchResults.h
   
   CodeView.cpp
   CodeView.h
@@ -57,6 +62,9 @@ add_executable("${exe_name}" "${executable_type}"
 
   ReferenceBrowserView.cpp
   ReferenceBrowserView.h
+  
+  TitleNamePrompt.cpp
+  TitleNamePrompt.h
   
   Util.cpp
   Util.h

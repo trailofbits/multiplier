@@ -17,6 +17,28 @@ namespace mx::gui {
 
 class CodeTheme;
 
+// Configuration for the code preview pane within the reference browser view,
+// or the code search view.
+struct CodePreviewConfiguration {
+  // Should a code preview be shown when an item in the reference view is
+  // selected?
+  bool visible{true};
+
+};
+
+struct CodeSearchResultsConfiguration {
+
+  // Apply syntax highlighting to code search results?
+  bool highlight_syntax{true};
+
+  // Should the capture groups be highlighted? This manifests in highlighting
+  // with a background color on the tokens, where the background color for the
+  // `N`th capture group is the `N`th theme highlight background color.
+  bool highlight_captures{true};
+
+  CodePreviewConfiguration code_preview;
+};
+
 // Configuration for the breadcrumb cell of the reference browser view.
 //
 // This will show a trail of usage-specific contextual information for each
@@ -74,14 +96,6 @@ struct FileBrowserConfiguration {
 
 };
 
-// Configuration for the code preview pane within the reference browser view.
-struct ReferenceBrowserCodeConfiguration {
-  // Should a code preview be shown when an item in the reference view is
-  // selected?
-  bool visible{true};
-
-};
-
 // Configuration for the reference browser, which presents a tree view of
 // the references / call hierarchy of a particular entity.
 struct ReferenceBrowserConfiguration {
@@ -98,7 +112,7 @@ struct ReferenceBrowserConfiguration {
   bool show_column_numbers{true};
 
   BreadcrumbsConfiguration breadcrumbs;
-  ReferenceBrowserCodeConfiguration code_preview;
+  CodePreviewConfiguration code_preview;
 
 };
 
@@ -107,6 +121,7 @@ struct Configuration {
 
   const CodeTheme *theme;
 
+  CodeSearchResultsConfiguration code_search_results;
   HistoryBrowserConfiguration history_browser;
   ReferenceBrowserConfiguration reference_browser;
   FileBrowserConfiguration file_browser;

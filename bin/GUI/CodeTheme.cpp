@@ -43,70 +43,70 @@ class PetersTheme final : public CodeTheme {
   }
 
   const QBrush &TokenBackgroundColor(
-      const Token &, const std::vector<Decl> &, CodeTokenKind) const final {
+      const Token &, const std::vector<Decl> &, TokenCategory) const final {
     static const QBrush kColor(BackgroundColor());
     return kColor;
   }
 
   const QBrush &TokenForegroundColor(
       const Token &tok, const std::vector<Decl> &related_decls,
-      CodeTokenKind kind) const final {
+      TokenCategory kind) const final {
 
     switch (kind) {
-      case CodeTokenKind::kUnknown: {
+      case TokenCategory::kUnknown: {
         static const QBrush kColor(QColor::fromRgb(20, 20, 20));
         return kColor;
       }
-      case CodeTokenKind::kIdentifier: {
+      case TokenCategory::kIdentifier: {
         static const QBrush kColor(QColor::fromRgb(114, 114, 114));
         return kColor;
       }
-      case CodeTokenKind::kMacroName: {
+      case TokenCategory::kMacroName: {
         static const QBrush kColor(QColor::fromRgb(121, 244, 241));
         return kColor;
       }
-      case CodeTokenKind::kKeyword: {
+      case TokenCategory::kKeyword: {
         static const QBrush kColor(QColor::fromRgb(181, 116, 122));
         return kColor;
       }
-      case CodeTokenKind::kObjectiveCKeyword: {
+      case TokenCategory::kObjectiveCKeyword: {
         static const QBrush kColor(QColor::fromRgb(181, 116, 122));
         return kColor;
       }
-      case CodeTokenKind::kPreProcessorKeyword: {
+      case TokenCategory::kPreProcessorKeyword: {
         static const QBrush kColor(QColor::fromRgb(114, 111, 58));
         return kColor;
       }
-      case CodeTokenKind::kBuiltinTypeName: {
+      case TokenCategory::kBuiltinTypeName: {
         static const QBrush kColor(QColor::fromRgb(115, 61, 60));
         return kColor;
       }
-      case CodeTokenKind::kPunctuation: {
+      case TokenCategory::kPunctuation: {
         static const QBrush kColor(QColor::fromRgb(93, 93, 93));
         return kColor;
       }
-      case CodeTokenKind::kLiteral: {
+      case TokenCategory::kLiteral: {
         static const QBrush kColor(QColor::fromRgb(226, 211, 148));
         return kColor;
       }
-      case CodeTokenKind::kComment: {
+      case TokenCategory::kComment: {
         static const QBrush kColor(QColor::fromRgb(105, 104, 97));
         return kColor;
       }
-      case CodeTokenKind::kLocalVariable: {
+      case TokenCategory::kLocalVariable: {
         static const QBrush kColor(QColor::fromRgb(198, 125, 237));
         return kColor;
       }
-      case CodeTokenKind::kGlobalVariable: {
+      case TokenCategory::kGlobalVariable: {
         static const QBrush kColor(QColor::fromRgb(198, 163, 73));
         return kColor;
       }
-      case CodeTokenKind::kParameterVariable: {
+      case TokenCategory::kParameterVariable: {
         static const QBrush kColor(QColor::fromRgb(172, 122, 180));
         return kColor;
       }
-      case CodeTokenKind::kInstanceMethod:
-      case CodeTokenKind::kFunction: {
+      case TokenCategory::kInstanceMethod:
+      case TokenCategory::kFunction: {
         static const QBrush kDefColor(QColor::fromRgb(126, 125, 186));
         static const QBrush kUseOfDefColor(QColor::fromRgb(97, 142, 149));
         static const QBrush kUseOfDeclColor(QColor::fromRgb(168, 82, 226));
@@ -123,67 +123,67 @@ class PetersTheme final : public CodeTheme {
         }
         return *use_color;
       }
-      case CodeTokenKind::kInstanceMember: {
+      case TokenCategory::kInstanceMember: {
         static const QBrush kColor(QColor::fromRgb(207, 130, 235));
         return kColor;
       }
-      case CodeTokenKind::kClassMethod: {
+      case TokenCategory::kClassMethod: {
         static const QBrush kColor(QColor::fromRgb(170, 129, 52));
         return kColor;
       }
-      case CodeTokenKind::kClassMember: {
+      case TokenCategory::kClassMember: {
         static const QBrush kColor(QColor::fromRgb(170, 129, 52));
         return kColor;
       }
-      case CodeTokenKind::kThis: {
+      case TokenCategory::kThis: {
         static const QBrush kColor(QColor::fromRgb(181, 116, 122));
         return kColor;
       }
-      case CodeTokenKind::kClass: {
+      case TokenCategory::kClass: {
         static const QBrush kColor(QColor::fromRgb(0, 177, 110));
         return kColor;
       }
-      case CodeTokenKind::kStruct: {
+      case TokenCategory::kStruct: {
         static const QBrush kColor(QColor::fromRgb(0, 177, 110));
         return kColor;
       }
-      case CodeTokenKind::kUnion: {
+      case TokenCategory::kUnion: {
         static const QBrush kColor(QColor::fromRgb(0, 177, 110));
         return kColor;
       }
-      case CodeTokenKind::kInterface: {
+      case TokenCategory::kInterface: {
         static const QBrush kColor(QColor::fromRgb(0, 177, 110));
         return kColor;
       }
-      case CodeTokenKind::kEnum: {
+      case TokenCategory::kEnum: {
         static const QBrush kColor(QColor::fromRgb(175, 144, 65));
         return kColor;
       }
-      case CodeTokenKind::kEnumerator: {
+      case TokenCategory::kEnumerator: {
         static const QBrush kColor(QColor::fromRgb(113, 163, 98));
         return kColor;
       }
-      case CodeTokenKind::kNamespace: {
+      case TokenCategory::kNamespace: {
         static const QBrush kColor(QColor::fromRgb(95, 154, 160));
         return kColor;
       }
-      case CodeTokenKind::kTypeAlias: {
+      case TokenCategory::kTypeAlias: {
         static const QBrush kColor(QColor::fromRgb(3, 171, 108));
         return kColor;
       }
-      case CodeTokenKind::kTemplateParameterType: {
+      case TokenCategory::kTemplateParameterType: {
         static const QBrush kColor(QColor::fromRgb(198, 117, 29));
         return kColor;
       }
-      case CodeTokenKind::kTemplateParameterValue: {
+      case TokenCategory::kTemplateParameterValue: {
         static const QBrush kColor(QColor::fromRgb(174, 144, 65));
         return kColor;
       }
-      case CodeTokenKind::kLabel: {
+      case TokenCategory::kLabel: {
         static const QBrush kColor(QColor::fromRgb(149, 149, 149));
         return kColor;
       }
-      case CodeTokenKind::kWhitespace: {
+      case TokenCategory::kWhitespace: {
         static const QBrush kColor;
         return kColor;
       }
@@ -192,27 +192,27 @@ class PetersTheme final : public CodeTheme {
 
   TokenFormat Format(
       const Token &, const std::vector<Decl> &,
-      CodeTokenKind kind) const final {
+      TokenCategory kind) const final {
     TokenFormat format = {false, false, false};
     switch (kind) {
-      case CodeTokenKind::kPreProcessorKeyword:
-      case CodeTokenKind::kTypeAlias:
-      case CodeTokenKind::kClass:
-      case CodeTokenKind::kStruct:
-      case CodeTokenKind::kUnion:
-      case CodeTokenKind::kInterface:
-      case CodeTokenKind::kFunction:
-      case CodeTokenKind::kInstanceMethod:
+      case TokenCategory::kPreProcessorKeyword:
+      case TokenCategory::kTypeAlias:
+      case TokenCategory::kClass:
+      case TokenCategory::kStruct:
+      case TokenCategory::kUnion:
+      case TokenCategory::kInterface:
+      case TokenCategory::kFunction:
+      case TokenCategory::kInstanceMethod:
         format.bold = true;
         break;
-      case CodeTokenKind::kGlobalVariable:
-      case CodeTokenKind::kClassMethod:
+      case TokenCategory::kGlobalVariable:
+      case TokenCategory::kClassMethod:
         format.italic = true;
         format.bold = true;
         break;
-      case CodeTokenKind::kEnumerator:
-      case CodeTokenKind::kClassMember:
-      case CodeTokenKind::kTemplateParameterValue:
+      case TokenCategory::kEnumerator:
+      case TokenCategory::kClassMember:
+      case TokenCategory::kTemplateParameterValue:
         format.italic = true;
         break;
       default:
@@ -234,8 +234,18 @@ class PetersTheme final : public CodeTheme {
     return QColor::fromRgb(20, 20, 20);
   }
 
-  QColor SelectedLineBackgroundColor(void) const final {
-    return QColor::fromRgb(0, 0, 0);
+  QColor SelectedLineBackgroundColor(unsigned group) const final {
+
+    static constexpr unsigned mul[3][3] = {
+        {10, 15, 20},
+        {15, 20, 10},
+        {20, 10, 15}
+    };
+
+    return QColor::fromRgb(
+        static_cast<int>(std::min(255u, group * mul[group % 3u][0u])),
+        static_cast<int>(std::min(255u, group * mul[group % 3u][1u])),
+        static_cast<int>(std::min(255u, group * mul[group % 3u][2u])));
   }
 };
 
@@ -280,28 +290,28 @@ QColor ProxyCodeTheme::BackgroundColor(void) const {
 }
 
 // The color to use as a highlight for the line containing the cursor.
-QColor ProxyCodeTheme::SelectedLineBackgroundColor(void) const {
-  return next.SelectedLineBackgroundColor();
+QColor ProxyCodeTheme::SelectedLineBackgroundColor(unsigned group) const {
+  return next.SelectedLineBackgroundColor(group);
 }
 
 // Background color for a specific token.
 const QBrush &ProxyCodeTheme::TokenBackgroundColor(
     const Token &tok, const std::vector<Decl> &related_decls,
-    CodeTokenKind kind) const {
+    TokenCategory kind) const {
   return next.TokenBackgroundColor(tok, related_decls, kind);
 }
 
 // Text color of a specific token.
 const QBrush &ProxyCodeTheme::TokenForegroundColor(
     const Token &tok, const std::vector<Decl> &related_decls,
-    CodeTokenKind kind) const {
+    TokenCategory kind) const {
   return next.TokenForegroundColor(tok, related_decls, kind);
 }
 
 // Format (bold, italic, underline) for a specific token.
 TokenFormat ProxyCodeTheme::Format(
     const Token &tok, const std::vector<Decl> &related_decls,
-    CodeTokenKind kind) const {
+    TokenCategory kind) const {
   return next.Format(tok, related_decls, kind);
 }
 
@@ -324,7 +334,7 @@ HighlightRangeTheme::HighlightRangeTheme(const CodeTheme &next_)
 HighlightRangeTheme::~HighlightRangeTheme(void) {}
 
 // Set the entity to be highlighted.
-void HighlightRangeTheme::SetRangeToHighlight(const TokenRange &range) {
+void HighlightRangeTheme::HighlightFileTokenRange(const TokenRange &range) {
   std::unique_lock<std::mutex> locker(d->lock);
   d->tokens = range;
 }
@@ -344,7 +354,7 @@ void HighlightRangeTheme::EndTokens(void) const {
 // Background color for a specific token.
 const QBrush &HighlightRangeTheme::TokenBackgroundColor(
     const Token &tok, const std::vector<Decl> &related_decls,
-    CodeTokenKind kind) const {
+    TokenCategory kind) const {
 
   const QBrush &brush = this->ProxyCodeTheme::TokenBackgroundColor(
       tok, related_decls, kind);
@@ -361,7 +371,7 @@ const QBrush &HighlightRangeTheme::TokenBackgroundColor(
 // Foreground color for a specific token.
 const QBrush &HighlightRangeTheme::TokenForegroundColor(
     const Token &tok, const std::vector<Decl> &related_decls,
-    CodeTokenKind kind) const {
+    TokenCategory kind) const {
   const QBrush &brush = this->ProxyCodeTheme::TokenForegroundColor(
       tok, related_decls, kind);
 

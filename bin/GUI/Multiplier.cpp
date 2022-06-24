@@ -25,7 +25,9 @@
 #include <QRect>
 #include <QThreadPool>
 
+#include <algorithm>
 #include <multiplier/Index.h>
+#include <vector>
 
 #include "Configuration.h"
 #include "CodeBrowserView.h"
@@ -486,6 +488,19 @@ void Multiplier::OnConnected(void) {
   UpdateUI();
 }
 
+void Multiplier::OnOpenTab(QString title, QWidget *widget) {
+  widget->setWindowTitle(title);
+  d->code_browser_view->OpenCustom(title, widget);
+}
+
+void Multiplier::OnOpenDock(QString title, QWidget *widget) {
+  QDockWidget *custom_dock = new QDockWidget(title);
+  widget->setWindowTitle(title);
+  custom_dock->setWidget(widget);
+  addDockWidget(Qt::LeftDockWidgetArea, custom_dock);
+  custom_dock->setAttribute(Qt::WA_DeleteOnClose);
+}
+
 void Multiplier::OnSourceFileDoubleClicked(
     std::filesystem::path path, FileId file_id) {
   d->code_browser_view->OpenFile(std::move(path), file_id, true);
@@ -716,7 +731,7 @@ void Multiplier::ActOnTokenPressEvent(EventSource source, EventLocations locs) {
 //  }
 
   d->last_locations[source] = std::move(locs);
-  d->key = Qt::Key_unknown;
+//  d->key = Qt::Key_unknown;
   d->click_kind = MouseClickKind::kNotClicked;
   for (const EventAction &ea : d->config.immediate_actions) {
     DoActions(source, ea);

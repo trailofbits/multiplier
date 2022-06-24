@@ -210,6 +210,12 @@ class TokenRange {
   // Return the token at index `index`.
   Token operator[](size_t index) const;
 
+  // Return the first token.
+  Token front(void) const;
+
+  // Return the last token.
+  Token back(void) const;
+
   // Return the underlying token data associated with the tokens covered by this
   // token range.
   std::string_view data(void) const;

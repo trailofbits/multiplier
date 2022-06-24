@@ -46,10 +46,11 @@ class Multiplier final : public QMainWindow {
   // Return a cache of pre-computed file locations.
   const ::mx::FileLocationCache &FileLocationCache(void) const;
 
+  bool eventFilter(QObject *watched, QEvent *event) Q_DECL_FINAL;
+
  protected:
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
   void closeEvent(QCloseEvent *event) Q_DECL_FINAL;
-  bool eventFilter(QObject *watched, QEvent *event) Q_DECL_FINAL;
 
  private:
   void InitializeWidgets(void);
@@ -67,6 +68,8 @@ class Multiplier final : public QMainWindow {
   void FocusOnHistory(bool);
   void OnConnected(void);
   void OnSourceFileDoubleClicked(std::filesystem::path, FileId file_id);
+  void OnOpenTab(QString title, QWidget *widget);
+  void OnOpenDock(QString title, QWidget *widget);
 
  private slots:
   void OnFileConnectAction(void);

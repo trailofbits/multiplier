@@ -115,6 +115,8 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
     return std::nullopt;
   }
 
+  assert(begin_token_index_it->second <= end_token_index_it->second);
+
   return RegexQueryMatch(
       frag_file_tokens.slice(begin_token_index_it->second,
                              end_token_index_it->second + 1u),
@@ -145,8 +147,8 @@ void RegexQueryResultIterator::Advance(void) {
 
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
-RegexQueryMatch::RegexQueryMatch(TokenRange range_,
-                                 std::string_view data_range,
+RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
+                                 std::string_view data_range /* file data */,
                                  std::shared_ptr<const FragmentImpl> frag_,
                                  const RegexQuery &query_)
     : TokenRange(std::move(range_)),
@@ -162,7 +164,7 @@ RegexQueryMatch::RegexQueryMatch(TokenRange range_,
   std::vector<re2::StringPiece> parts;
   parts.resize(static_cast<unsigned>(num_captures) + 2u);
   auto ret = query->re.Match(data_range, 0, data_range.size(),
-                             re2::RE2::Anchor::UNANCHORED,
+                             re2::RE2::Anchor::ANCHOR_BOTH,
                              &(parts[0]), num_captures + 1);
   if (ret) {
     // `0` is the whole range, which we've already added.
@@ -179,7 +181,7 @@ RegexQueryMatch::RegexQueryMatch(TokenRange range_,
   }
 }
 
-// Translate a data capture into a token range catpure.
+// Translate a data capture into a token range capture.
 std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
     std::string_view capture) const {
 
@@ -241,7 +243,11 @@ std::optional<TokenRange> RegexQueryMatch::captured_tokens(
   if (!maybe_data) {
     return std::nullopt;
   } else {
-    return TranslateCapture(*maybe_data);
+    if (index_of_captured_variable(var).value()) {
+      return TranslateCapture(*maybe_data);
+    } else {
+      return *this;
+    }
   }
 }
 
@@ -264,8 +270,10 @@ std::optional<TokenRange> RegexQueryMatch::captured_tokens(
   std::optional<std::string_view> maybe_data = captured_data(index);
   if (!maybe_data) {
     return std::nullopt;
-  } else {
+  } else if (index) {
     return TranslateCapture(*maybe_data);
+  } else {
+    return *this;
   }
 }
 
@@ -294,9 +302,12 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return ret;
 }
 
-
 RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
     : impl(std::move(impl_)),
       num_fragments(impl ? impl->fragment_ids.size() : 0u) {}
+
+RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
+  return RegexQuery(match.query);
+}
 
 }  // namespace mx

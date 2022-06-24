@@ -25,6 +25,8 @@ class Fragment;
 class FragmentImpl;
 class FragmentList;
 class Index;
+class RegexQueryMatch;
+class WeggliQueryMatch;
 
 class FileLocationConfiguration {
  public:
@@ -167,6 +169,12 @@ class File {
       : impl(std::move(impl_)) {}
 
  public:
+
+  // Return the file containing a regex match.
+  static File containing(const RegexQueryMatch &match);
+
+  // Return the file containing a specific fragment.
+  static File containing(const WeggliQueryMatch &match);
 
   // Return the file containing a specific fragment.
   static File containing(const Fragment &fragment);

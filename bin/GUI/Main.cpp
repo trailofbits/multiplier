@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
     .description = "A clicked token should be added to the linear history",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
     .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource,
-                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource},
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
+                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
     .do_action = mx::gui::Action::kAddToLinearHistory,
   });
 
@@ -75,7 +76,8 @@ int main(int argc, char *argv[]) {
     .description = "The code browser should show a clicked entity",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
     .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest,
-                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource},
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
+                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
     .do_action = mx::gui::Action::kOpenCodeBrowser,
   });
 
