@@ -10,8 +10,15 @@ set(MX_QT "Qt${MX_QT_VERSION}")
 set(MX_GUI_DIR "${CMAKE_CURRENT_LIST_DIR}")
 find_package(${MX_QT} COMPONENTS Core Widgets REQUIRED)
 
+if(PLATFORM_MACOS)
+  set(executable_type "MACOSX_BUNDLE")
+  set(MACOSX_BUNDLE_ICON_FILE "icon.ico")
+endif()
+
 set(exe_name "multiplier")
-add_executable("${exe_name}"
+add_executable("${exe_name}" "${executable_type}"
+
+  resources/resources.qrc
   
   CodeTheme.cpp
   CodeTheme.h
@@ -54,6 +61,19 @@ add_executable("${exe_name}"
   Util.cpp
   Util.h
 )
+
+if(PLATFORM_MACOS)
+  set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
+
+  target_sources("${exe_name}" PRIVATE
+    "${icon_path}"
+  )
+
+  set_source_files_properties("${icon_path}"
+    PROPERTIES
+      MACOSX_PACKAGE_LOCATION "Resources"
+  )
+endif()
 
 target_link_libraries("${exe_name}" PRIVATE
   "mx-api"
