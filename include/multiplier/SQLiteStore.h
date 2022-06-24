@@ -14,7 +14,7 @@
 #include <string>
 #include <memory>
 #include <iostream>
-
+#include <optional>
 
 #include <sqlite3.h>
 
