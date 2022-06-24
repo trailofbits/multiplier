@@ -12,6 +12,8 @@
 #include <multiplier/Index.h>
 #include <QApplication>
 #include <QMetaType>
+#include <QPixmap>
+#include <QSplashScreen>
 
 #include "CodeView.h"
 #include "Configuration.h"
@@ -26,6 +28,10 @@ int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
   QApplication application(argc, argv);
+
+  QSplashScreen splash_screen(QPixmap(":/icons/appicon"));
+  splash_screen.show();
+  application.processEvents();
 
   mx::gui::Configuration config;
 
@@ -149,6 +155,8 @@ int main(int argc, char *argv[]) {
 
   mx::gui::Multiplier main_window(config);
   main_window.show();
+
+  splash_screen.finish(&main_window);
 
   return application.exec();
 }
