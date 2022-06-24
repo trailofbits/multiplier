@@ -25,14 +25,9 @@
 #include "CodeSearchResults.h"
 #include "CodeTheme.h"
 #include "Multiplier.h"
+#include "TitleNamePrompt.h"
 
 namespace mx::gui {
-namespace {
-
-static constexpr int kNumEntriesPerRefresh = 5;
-
-}  // namespace
-
 struct OmniBoxView::PrivateData {
   Multiplier &multiplier;
 
@@ -43,6 +38,8 @@ struct OmniBoxView::PrivateData {
   QGridLayout *regex_layout{nullptr};
   QLineEdit *regex_input{nullptr};
   QPushButton *regex_button{nullptr};
+  QPushButton *regex_to_tab_button{nullptr};
+  QPushButton *regex_to_dock_button{nullptr};
   QWidget *regex_results{nullptr};
   RegexQuery regex_query;
   unsigned regex_counter{0};
@@ -75,6 +72,8 @@ void OmniBoxView::InitializeWidgets(void) {
   d->regex_layout = new QGridLayout;
   d->regex_input = new QLineEdit;
   d->regex_button = new QPushButton(tr("Query"));
+  d->regex_to_tab_button = new QPushButton(tr("⍐ tab"));
+  d->regex_to_dock_button = new QPushButton(tr("⍇ dock"));
 
   QFont input_font = d->multiplier.CodeTheme().Font();
   d->regex_input->setFont(input_font);
@@ -82,12 +81,18 @@ void OmniBoxView::InitializeWidgets(void) {
   QFont button_font = d->regex_button->font();
   button_font.setPointSize(input_font.pointSize());
   d->regex_button->setFont(button_font);
+  d->regex_to_tab_button->setFont(button_font);
+  d->regex_to_dock_button->setFont(button_font);
 
   d->regex_box->setLayout(d->regex_layout);
   d->regex_layout->addWidget(d->regex_button, 0, 0, 1, 1, Qt::AlignTop);
+  d->regex_layout->addWidget(d->regex_to_tab_button, 0, 2, 1, 1, Qt::AlignTop);
+  d->regex_layout->addWidget(d->regex_to_dock_button, 0, 3, 1, 1, Qt::AlignTop);
   d->regex_layout->addWidget(d->regex_input, 0, 1, 1, 1, Qt::AlignTop);
   d->content->addTab(d->regex_box, tr("Code Search"));
   d->regex_button->setDisabled(true);
+  d->regex_to_dock_button->setDisabled(true);
+  d->regex_to_tab_button->setDisabled(true);
 
   d->regex_layout->installEventFilter(&d->multiplier);
 
@@ -99,6 +104,18 @@ void OmniBoxView::InitializeWidgets(void) {
 
   connect(d->regex_button, &QPushButton::pressed,
           this, &OmniBoxView::RunRegex);
+
+  connect(d->regex_to_dock_button, &QPushButton::pressed,
+          this, &OmniBoxView::OnOpenRegexResultsInDock);
+
+  connect(d->regex_to_tab_button, &QPushButton::pressed,
+          this, &OmniBoxView::OnOpenRegexResultsInTab);
+
+  connect(this, &OmniBoxView::OpenTab,
+          &d->multiplier, &Multiplier::OnOpenTab);
+
+  connect(this, &OmniBoxView::OpenDock,
+          &d->multiplier, &Multiplier::OnOpenDock);
 
   d->content->hide();
 }
@@ -116,6 +133,8 @@ void OmniBoxView::ClearRegexResults(void) {
     d->regex_results->disconnect();
     d->regex_results->deleteLater();
     d->regex_results = nullptr;
+    d->regex_to_dock_button->setDisabled(true);
+    d->regex_to_tab_button->setDisabled(true);
     update();
   }
 }
@@ -153,7 +172,7 @@ void OmniBoxView::RunRegex(void) {
 
   ClearRegexResults();
   d->regex_results = new QLabel(tr("Querying..."));
-  d->regex_layout->addWidget(d->regex_results, 1, 1, 1, 2,
+  d->regex_layout->addWidget(d->regex_results, 1, 0, 1, 4,
                              Qt::AlignmentFlag::AlignHCenter);
 
   auto runnable = new RegexQueryThread(
@@ -191,8 +210,10 @@ void OmniBoxView::OnFoundFragmentsWithRegex(RegexQueryResultIterator *list_,
     if (!d->regex_results) {
 
       d->regex_results = table;
-      d->regex_layout->addWidget(d->regex_results, 1, 0, 1, 2);
-//
+      d->regex_to_dock_button->setEnabled(true);
+      d->regex_to_tab_button->setEnabled(true);
+      d->regex_layout->addWidget(d->regex_results, 1, 0, 1, 4);
+
 //      num_captures = match.num_captures();
 //      table->setColumnCount(static_cast<int>(num_captures));
 //      for (auto i = 0u; i < num_captures; ++i) {
@@ -237,9 +258,47 @@ void OmniBoxView::OnFoundFragmentsWithRegex(RegexQueryResultIterator *list_,
 
   if (!d->regex_results) {
     d->regex_results = new QLabel(tr("No matches"));
-    d->regex_layout->addWidget(d->regex_results, 1, 1, 1, 2,
+    d->regex_layout->addWidget(d->regex_results, 1, 0, 1, 4,
                                Qt::AlignmentFlag::AlignHCenter);
   }
+  update();
+}
+
+void OmniBoxView::OnOpenRegexResultsInTab(void) {
+  if (!d->regex_results) {
+    return;
+  }
+
+  TitleNamePrompt dialog(tr("Set tab name"), this);
+  if (dialog.exec() != QDialog::Accepted) {
+    return;
+  }
+
+  d->regex_layout->removeWidget(d->regex_results);
+  d->regex_results->setParent(nullptr);
+  emit OpenTab(dialog.NewName(), d->regex_results);
+  d->regex_results = nullptr;
+  d->regex_to_dock_button->setDisabled(true);
+  d->regex_to_tab_button->setDisabled(true);
+  update();
+}
+
+void OmniBoxView::OnOpenRegexResultsInDock(void) {
+  if (!d->regex_results) {
+    return;
+  }
+
+  TitleNamePrompt dialog(tr("Set dock name"), this);
+  if (dialog.exec() != QDialog::Accepted) {
+    return;
+  }
+
+  d->regex_layout->removeWidget(d->regex_results);
+  d->regex_results->setParent(nullptr);
+  emit OpenDock(dialog.NewName(), d->regex_results);
+  d->regex_results = nullptr;
+  d->regex_to_dock_button->setDisabled(true);
+  d->regex_to_tab_button->setDisabled(true);
   update();
 }
 

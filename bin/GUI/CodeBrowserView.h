@@ -44,6 +44,9 @@ class CodeBrowserView final : public QWidget {
   // Request for one or more entities to be opened.
   void OpenEntities(const EventLocations &);
 
+  // Open a custom tab.
+  void OpenCustom(const QString &tab_name, QWidget *contents);
+
   void Clear(void);
   void Disconnected(void);
   void Connected(void);

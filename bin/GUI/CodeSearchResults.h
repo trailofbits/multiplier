@@ -78,9 +78,9 @@ class CodeSearchResultsModel final : public QAbstractTableModel {
 class SortableCodeSearchResultsModel final : public QSortFilterProxyModel {
   Q_OBJECT
 
+ public:
   virtual ~SortableCodeSearchResultsModel(void);
 
- public:
   QVariant data(const QModelIndex &index, int role) const Q_DECL_FINAL;
 };
 

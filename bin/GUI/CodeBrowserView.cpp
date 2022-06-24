@@ -158,11 +158,15 @@ void CodeBrowserView::OnChangeTab(int index) {
 
 void CodeBrowserView::OnCloseFileViewTab(int index) {
   if (QWidget *view = d->content->widget(index); view && view != d->omnibox) {
-    const FileId file_id = d->view_to_file_id[view];
-    assert(file_id != kInvalidEntityId);
+    if (auto file_it = d->view_to_file_id.find(view);
+        file_it != d->view_to_file_id.end()) {
+      const FileId file_id = file_it->second;
+      assert(file_id != kInvalidEntityId);
 
-    d->view_to_file_id.erase(view);
-    d->file_id_to_view.erase(file_id);
+      d->view_to_file_id.erase(view);
+      d->file_id_to_view.erase(file_id);
+    }
+
     d->content->removeTab(index);
   }
 }
@@ -285,6 +289,17 @@ void CodeBrowserView::OpenEntities(const EventLocations &locs) {
 
   QThreadPool::globalInstance()->start(locator);
   update();
+}
+
+// Open a custom tab.
+void CodeBrowserView::OpenCustom(const QString &tab_name, QWidget *contents) {
+  auto tab_index = d->content->addTab(contents, tab_name);
+
+#ifndef QT_NO_TOOLTIP
+  d->content->setTabToolTip(tab_index, tab_name);
+#endif
+
+  d->content->setCurrentWidget(contents);
 }
 
 }  // namespace mx::gui

@@ -617,9 +617,10 @@ void CodeSearchResultsModel::AddResult(const RegexQueryMatch &match) {
 SortableCodeSearchResultsModel::~SortableCodeSearchResultsModel(void) {}
 
 struct CodeSearchResultsView::PrivateData {
-  CodeSearchResultsModel * const model;
+  const std::unique_ptr<CodeSearchResultsModel> model;
   CodeSearchResultsModelImpl * const model_data;
-  SortableCodeSearchResultsModel * const proxy;
+  const std::unique_ptr<SortableCodeSearchResultsModel> proxy;
+  const std::unique_ptr<CodeSearchResultsItemDelegate> delegate;
   QVBoxLayout *layout{nullptr};
   QSplitter *splitter{nullptr};
   QTableView *table{nullptr};
@@ -630,8 +631,9 @@ struct CodeSearchResultsView::PrivateData {
       : model(model_),
         model_data(model->d.get()),
         proxy(new SortableCodeSearchResultsModel),
+        delegate(new CodeSearchResultsItemDelegate(model.get(), proxy.get())),
         theme(model_data->theme) {
-    proxy->setSourceModel(model);
+    proxy->setSourceModel(model.get());
   }
 };
 
@@ -646,9 +648,11 @@ CodeSearchResultsView::CodeSearchResultsView(CodeSearchResultsModel *model_,
 
 void CodeSearchResultsView::OnRowsAdded(void) {
   d->table->resizeColumnsToContents();
+  d->table->resizeRowsToContents();
 }
 
 bool CodeSearchResultsView::eventFilter(QObject *watched, QEvent *event) {
+  auto ret = d->model_data->multiplier.eventFilter(watched, event);
   switch (event->type()) {
     default:
       break;
@@ -665,7 +669,7 @@ bool CodeSearchResultsView::eventFilter(QObject *watched, QEvent *event) {
     }
   }
 
-  return false;
+  return ret;
 }
 
 void CodeSearchResultsView::InitializeWidgets(void) {
@@ -684,12 +688,8 @@ void CodeSearchResultsView::InitializeWidgets(void) {
 
   // Make a proxy model for sorting, and an item delegate for painting syntax-
   // colored text.
-  d->table->setItemDelegate(
-      new CodeSearchResultsItemDelegate(d->model, d->proxy));
-
-  d->table->setModel(d->proxy);
-  connect(d->model, &CodeSearchResultsModel::AddedRows,
-          this, &CodeSearchResultsView::OnRowsAdded);
+  d->table->setItemDelegate(d->delegate.get());
+  d->table->setModel(d->proxy.get());
 
   // Allow sorting; this works in conjunction with the proxy model. Without
   // the proxy model, if we used sorting, then it would do nothing :-/
@@ -705,14 +705,18 @@ void CodeSearchResultsView::InitializeWidgets(void) {
   // `...` when the cell isn't wide enough. This only really works when the
   // cells contain text. When we render syntax-highlighted code, this has
   // no effect.
-  d->table->setWordWrap(true);
-  d->table->setTextElideMode(Qt::ElideMiddle);
+  auto &config = d->model_data->multiplier.Configuration().code_search_results;
+  if (!config.highlight_syntax && !config.highlight_captures) {
+    d->table->setWordWrap(true);
+    d->table->setTextElideMode(Qt::ElideMiddle);
+  }
   d->table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   // Resize for the current contents as they are now. This has an
   // "isntantaneous" and isn't a persistent setting, so any time we add more
   // stuff, we need to call these again.
   d->table->resizeColumnsToContents();
+  d->table->resizeRowsToContents();
 
   // When scrolling, scroll by pixel. Vertically this doesn't matter too much,
   // unless a result is really large. Horizontally, scrolling by item means
@@ -728,7 +732,6 @@ void CodeSearchResultsView::InitializeWidgets(void) {
   d->table->setAutoScroll(false);
 
   // Create and connect the code preview.
-  auto &config = d->model_data->multiplier.Configuration().code_search_results;
   if (config.code_preview.visible) {
     d->code = new CodeView(d->theme);
     d->code->viewport()->installEventFilter(&(d->model_data->multiplier));
@@ -738,6 +741,9 @@ void CodeSearchResultsView::InitializeWidgets(void) {
     connect(d->code, &CodeView::TokenPressEvent,
             this, &CodeSearchResultsView::ActOnTokenPressEvent);
   }
+
+  connect(d->model.get(), &CodeSearchResultsModel::AddedRows,
+          this, &CodeSearchResultsView::OnRowsAdded);
 }
 
 void CodeSearchResultsView::ActOnTokenPressEvent(EventLocations locs) {
@@ -755,7 +761,8 @@ void CodeSearchResultsView::ShowFragmentToken(unsigned row,
                                               RawEntityId file_tok_id,
                                               RawEntityId frag_tok_id) {
   auto &config = d->model_data->multiplier.Configuration().code_search_results;
-  if (!config.code_preview.visible || !d->code) {
+  if (!config.code_preview.visible || !d->code ||
+      !!QApplication::keyboardModifiers()) {
     return;
   }
 
@@ -773,7 +780,8 @@ void CodeSearchResultsView::ShowFragmentToken(unsigned row,
 void CodeSearchResultsView::ShowFileToken(unsigned row,
                                           RawEntityId file_tok_id) {
   auto &config = d->model_data->multiplier.Configuration().code_search_results;
-  if (!config.code_preview.visible) {
+  if (!config.code_preview.visible || !d->code ||
+      !!QApplication::keyboardModifiers()) {
     return;
   }
 

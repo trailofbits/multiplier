@@ -56,6 +56,9 @@ add_executable("${exe_name}"
   ReferenceBrowserView.cpp
   ReferenceBrowserView.h
   
+  TitleNamePrompt.cpp
+  TitleNamePrompt.h
+  
   Util.cpp
   Util.h
 )
