@@ -51,7 +51,7 @@ using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
 
 using FilePathList = std::set<std::pair<std::filesystem::path, FileId>>;
 
-using SymbolList = std::vector<std::tuple<RawEntityId, std::string>>;
+using SymbolList = std::vector<std::pair<RawEntityId, std::string>>;
 
 template <typename T>
 inline ParentDeclIteratorImpl<T> &

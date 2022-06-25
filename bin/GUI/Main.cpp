@@ -124,6 +124,8 @@ int main(int argc, char *argv[]) {
     .do_action = mx::gui::Action::kOpenCodeBrowser,
   });
 
+  qRegisterMetaType<mx::SymbolList>("SymbolList");
+  qRegisterMetaType<mx::DeclCategory>("DeclCategory");
   qRegisterMetaType<mx::gui::EventLocation>("EventLocation");
   qRegisterMetaType<mx::gui::EventLocations>("EventLocations");
   qRegisterMetaType<mx::gui::EventSource>("EventSource");

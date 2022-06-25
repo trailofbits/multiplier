@@ -180,5 +180,4 @@ SymbolList Index::query_entities(
   return entity_ids;
 }
 
-
 }  // namespace mx

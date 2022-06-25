@@ -436,11 +436,13 @@ void RemoteEntityProvider::FillReferences(
   fragment_ids_out.clear();
 }
 
-void RemoteEntityProvider::FindSymbol(const Ptr &self, std::string name,
-                                      mx::DeclCategory category, SymbolList &out) try {
+void RemoteEntityProvider::FindSymbol(
+  const Ptr &self, std::string name, mx::DeclCategory category,
+  SymbolList &out) try {
+
   ClientConnection &cc = Connection(self);
   capnp::Request<mx::rpc::Multiplier::FindSymbolsParams,
-                   mx::rpc::Multiplier::FindSymbolsResults>
+                 mx::rpc::Multiplier::FindSymbolsResults>
         request = cc.client.findSymbolsRequest();
 
   request.setQuery(name);
@@ -455,11 +457,12 @@ void RemoteEntityProvider::FindSymbol(const Ptr &self, std::string name,
 
   for (rpc::SymbolMatch::Reader item : symbols_reader) {
     const FileId entity_id = item.getEntityId();
-    std::string name(item.getSymbol().cStr(), item.getSymbol().size());
-    out.emplace_back(std::tuple(entity_id, name));
+    auto symbol_name_reader = item.getSymbol();
+    std::string name(symbol_name_reader.cStr(), symbol_name_reader.size());
+    out.emplace_back(entity_id, std::move(name));
   }
 
-  return;
+// TODO(pag): Log something.
 } catch(...) {
   out.clear();
 }

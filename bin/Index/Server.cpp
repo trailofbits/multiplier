@@ -608,23 +608,23 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
 
 kj::Promise<void> Server::findSymbols(FindSymbolsContext context) {
   mx::rpc::Multiplier::FindSymbolsParams::Reader params = context.getParams();
-
-  mx::rpc::Multiplier::FindSymbolsResults::Builder result = context.getResults();
+  mx::rpc::Multiplier::FindSymbolsResults::Builder result =
+      context.getResults();
 
   std::string symbol(params.getQuery().cStr(), params.getQuery().size());
-  auto category = params.getCategory();
+  unsigned category = params.getCategory();
 
   std::vector<std::pair<uint64_t, std::string>> entity_map;
 
   d->server_context.connection->QueryEntities(
-      symbol, category, [&entity_map](uint64_t id, std::string &symbol) {
-    entity_map.emplace_back(std::pair(id, symbol));
-  });
+      symbol, category,
+      [&entity_map] (uint64_t id, const std::string &symbol) {
+        entity_map.emplace_back(id, symbol);
+      });
 
   std::stringstream err;
   auto num_entities = entity_map.size();
   if (num_entities >= std::numeric_limits<unsigned>::max()) {
-
     err << "Too many results returned: " << num_entities;
     LOG(ERROR) << err.str();
     return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,

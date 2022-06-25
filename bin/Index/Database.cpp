@@ -22,14 +22,10 @@
 
 #include "Database.h"
 
-
 namespace indexer {
-
 namespace details {
-
-inline std::shared_mutex writer_mutex;
-
-}
+static std::shared_mutex gWriterMutex;
+}  // namespace details
 
 // SymbolInserter prepares the statement, bind values and commit it to sqlite database
 class SymbolInserter {
@@ -118,24 +114,18 @@ class DatabaseWriterImpl {
     bulk_insertion_thread = std::thread(bulk_inserter);
   }
 
-  ~DatabaseWriterImpl() {
+  ~DatabaseWriterImpl(void) {
     insertion_queue.enqueue(nullptr);
     bulk_insertion_thread.join();
   }
 
-  void StoreEntities(uint64_t entity_id, std::string &symbol) {
+  void StoreEntities(uint64_t entity_id, const std::string &symbol) {
     insertion_queue.enqueue(std::tuple(symbol, entity_id));
   }
 
   // Get the writer instance and add it to the table if not present
   static std::shared_ptr<DatabaseWriterImpl>
-  getWriterInstance(std::string &path, mx::DeclCategory table) {
-    std::shared_lock<std::shared_mutex> guard(details::writer_mutex);
-    if (writers.find(table) != writers.end()) {
-      return writers.at(table);
-    }
-    return nullptr;
-  }
+  getWriterInstance(const std::string &path, mx::DeclCategory table);
 
  private:
   friend class Database;
@@ -145,23 +135,44 @@ class DatabaseWriterImpl {
   std::thread bulk_insertion_thread;
   moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
 
-  static std::unordered_map<mx::DeclCategory, std::shared_ptr<DatabaseWriterImpl>> writers;
+  // TODO(pag): Why is this a global variable?
+  static std::unordered_map<mx::DeclCategory,
+                            std::shared_ptr<DatabaseWriterImpl>>
+      gWriters;
 };
 
-// Initialize writers table
-std::unordered_map<mx::DeclCategory, std::shared_ptr<DatabaseWriterImpl>> DatabaseWriterImpl::writers;
+// Initialize writers table.
+//
+// TODO(pag): Why is this a global variable?
+std::unordered_map<mx::DeclCategory, std::shared_ptr<DatabaseWriterImpl>>
+DatabaseWriterImpl::gWriters;
 
-// DatabaseReaderImpl implements the database reader interface for querying the entities.
+// Get the writer instance and add it to the table if not present
+std::shared_ptr<DatabaseWriterImpl>
+DatabaseWriterImpl::getWriterInstance(
+    const std::string &path, mx::DeclCategory table) {
+  
+  std::shared_lock<std::shared_mutex> guard(details::gWriterMutex);
+  if (gWriters.find(table) != gWriters.end()) {
+    return gWriters.at(table);
+  }
+  return nullptr;
+}
+
+// DatabaseReaderImpl implements the database reader interface for querying
+// the entities.
 class DatabaseReaderImpl {
  public:
   DatabaseReaderImpl(std::filesystem::path workspace_dir)
-    : db(std::make_unique<sqlite::Connection>(workspace_dir.generic_string())) {}
+    : db(std::make_unique<sqlite::Connection>(
+          workspace_dir.generic_string())) {}
 
-  void QueryEntities(std::string name, uint32_t table_id,
-                     std::function<void(uint64_t, std::string&)> cb) {
+  void QueryEntities(const std::string &name, uint32_t table_id,
+                     std::function<void(uint64_t, const std::string &)> cb) {
 
     std::stringstream select_query;
-    select_query <<  "select * from entities_fts" << table_id
+    select_query
+        << "select symbol, entity_id from entities_fts" << table_id
         << " where entities_fts" << table_id << " match ?1";
 
     try {
@@ -173,8 +184,13 @@ class DatabaseReaderImpl {
 
       stmt->BindValues(name);
 
+      std::string symbol_name;
+      std::string entity;
+
       while (stmt->ExecuteStep()) {
-        std::string symbol_name, entity;
+        symbol_name.clear();
+        entity.clear();
+
         auto result = stmt->GetResult();
         result.Columns(symbol_name, entity);
         auto entity_id = std::strtoull(entity.c_str(), 0, 0);
@@ -194,16 +210,19 @@ Database::Database(std::filesystem::path workspace)
     : reader(std::make_unique<DatabaseReaderImpl>(workspace.generic_string())),
       database_path(workspace.generic_string()) {
 
-  // Initialize database writer at one time. It will create table for each category.
-  // This is avoid error when looking for table that has no entry and otherwise table
-  // have not existed.
-  std::unique_lock<std::shared_mutex> guard(details::writer_mutex, std::defer_lock);
+  // Initialize database writer at one time. It will create table for each
+  // category. This is avoid error when looking for table that has no entry
+  // and otherwise table have not existed.
+  std::unique_lock<std::shared_mutex> guard(
+      details::gWriterMutex, std::defer_lock);
+  
   // try acquiring the lock
   if (guard.try_lock()) {
-    if (DatabaseWriterImpl::writers.size() == 0) {
+    if (DatabaseWriterImpl::gWriters.empty()) {
       for (auto category : mx::EnumerationRange<mx::DeclCategory>()) {
-        DatabaseWriterImpl::writers[category] = std::make_shared<DatabaseWriterImpl>(
-            database_path, static_cast<uint32_t>(category));
+        DatabaseWriterImpl::gWriters[category] =
+            std::make_shared<DatabaseWriterImpl>(
+                database_path, static_cast<uint32_t>(category));
       }
     }
   }
@@ -215,15 +234,18 @@ Database::Database(std::string workspace)
 
 Database::~Database() {}
 
-void Database::StoreEntities(uint64_t entity_id, std::string &symbol, mx::DeclCategory category) {
-  if (auto impl = DatabaseWriterImpl::getWriterInstance(database_path, category)) {
+void Database::StoreEntities(uint64_t entity_id, const std::string &symbol,
+                             mx::DeclCategory category) {
+  if (auto impl = DatabaseWriterImpl::getWriterInstance(
+          database_path, category)) {
     impl->StoreEntities(entity_id, symbol);
   }
 }
 
-void Database::QueryEntities(std::string name, uint32_t id,
-                             std::function<void(uint64_t, std::string&)> cb) {
+void Database::QueryEntities(
+    const std::string &name, uint32_t id,
+    std::function<void(uint64_t, const std::string &)> cb) {
   reader->QueryEntities(name, id, cb);
 }
 
-}
+}  // namespace indexer

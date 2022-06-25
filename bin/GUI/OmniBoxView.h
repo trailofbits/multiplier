@@ -7,6 +7,7 @@
 #pragma once
 
 #include <memory>
+#include <multiplier/Index.h>
 #include <QRunnable>
 #include <QWidget>
 
@@ -28,6 +29,7 @@ class OmniBoxView final : public QWidget {
   std::unique_ptr<PrivateData> d;
 
   void InitializeWidgets(void);
+  void ClearSymbolResults(void);
   void ClearRegexResults(void);
 
  public:
@@ -40,6 +42,12 @@ class OmniBoxView final : public QWidget {
   void Connected(void);
 
  private slots:
+  void MaybeDisableSymbolSearch(int);
+  void SetSymbolQueryString(const QString &text);
+  void RunSymbolSearch(void);
+  void OnFoundSymbols(SymbolList symbols, DeclCategory category,
+                      unsigned counter);
+
   void BuildRegex(const QString &text);
   void RunRegex(void);
   void OnFoundFragmentsWithRegex(RegexQueryResultIterator *list,
@@ -50,6 +58,26 @@ class OmniBoxView final : public QWidget {
  signals:
   void OpenTab(QString title, QWidget *widget);
   void OpenDock(QString title, QWidget *widget);
+};
+
+// Downloads the file list in the background.
+class SymbolSearchThread final : public QObject, public QRunnable {
+  Q_OBJECT
+
+  struct PrivateData;
+  std::unique_ptr<PrivateData> d;
+
+  void run(void) Q_DECL_FINAL;
+
+ public:
+  virtual ~SymbolSearchThread(void);
+
+  explicit SymbolSearchThread(const Index &index_, const QString &name,
+                              DeclCategory category_, unsigned counter_);
+
+ signals:
+  void FoundSymbols(SymbolList symbols, DeclCategory category,
+                    unsigned counter);
 };
 
 // Downloads the file list in the background.

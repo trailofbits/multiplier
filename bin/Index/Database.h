@@ -47,10 +47,11 @@ class Database {
   Database(const Database &) = delete;
   Database &operator=(const Database &) = delete;
 
-  void StoreEntities(uint64_t entity_id, std::string &data, mx::DeclCategory category);
+  void StoreEntities(uint64_t entity_id, const std::string &data,
+                     mx::DeclCategory category);
 
-  void QueryEntities(std::string name, uint32_t table_id,
-                     std::function<void(uint64_t, std::string&)> cb);
+  void QueryEntities(const std::string &name, uint32_t table_id,
+                     std::function<void(uint64_t, const std::string &)> cb);
 
  private:
   std::unique_ptr<DatabaseReaderImpl> reader;
