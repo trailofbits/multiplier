@@ -22,14 +22,31 @@ target_link_libraries("syntex-index"
     gflags::gflags
 )
 
-# TODO: Add syntex-query.
-
+add_executable("${PROJECT_NAME}::syntex-index" ALIAS "syntex-index")
 set_target_properties("syntex-index" PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable("syntex-query"
+  "Lexer.cpp"
+  "Lexer.h"
+  "Query.cpp"
+)
+
+target_link_libraries("syntex-query"
+  PRIVATE
+    "mx-api"
+    "mx-util"
+    glog::glog
+    gflags::gflags
+)
+
+add_executable("${PROJECT_NAME}::syntex-query" ALIAS "syntex-query")
+set_target_properties("syntex-query" PROPERTIES LINKER_LANGUAGE CXX)
 
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "syntex-index"
+      "syntex-query"
     EXPORT
       "${PROJECT_NAME}Targets"
     RUNTIME
