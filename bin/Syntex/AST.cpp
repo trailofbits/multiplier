@@ -207,6 +207,10 @@ static std::string Data(const std::string &data) {
   std::stringstream ss;
   for (auto ch : data) {
     switch (ch) {
+      // To keep xdot happy
+      case '[': ss << "\\["; break;
+      case ']': ss << "\\]"; break;
+      // HTML escapes
       case '<': ss << "&lt;"; break;
       case '>': ss << "&gt;"; break;
       case '"': ss << "&quot;"; break;
