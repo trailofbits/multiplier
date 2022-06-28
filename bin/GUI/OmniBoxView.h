@@ -13,10 +13,15 @@
 
 #include "Event.h"
 
+QT_BEGIN_NAMESPACE
+class QTreeWidgetItem;
+QT_END_NAMESPACE
+
 namespace mx {
+class FileLocationCache;
+class Index;
 class RegexQuery;
 class RegexQueryResultIterator;
-class Index;
 namespace gui {
 
 class Multiplier;
@@ -32,21 +37,30 @@ class OmniBoxView final : public QWidget {
   void ClearSymbolResults(void);
   void ClearRegexResults(void);
 
+  void FillRow(QTreeWidgetItem *item, const NamedDecl &decl) const;
+
  public:
   virtual ~OmniBoxView(void);
 
   OmniBoxView(Multiplier &multiplier, QWidget *parent = nullptr);
   void Clear(void);
+  void OpenRegexSearch(void);
+  void OpenEntitySearch(void);
 
   void Disconnected(void);
   void Connected(void);
+
+ public slots:
+  void Focus(void);
+  void OnDownloadedFileList(FilePathList files);
 
  private slots:
   void MaybeDisableSymbolSearch(int);
   void SetSymbolQueryString(const QString &text);
   void RunSymbolSearch(void);
-  void OnFoundSymbols(SymbolList symbols, DeclCategory category,
+  void OnFoundSymbols(NamedDeclList symbols, DeclCategory category,
                       unsigned counter);
+  void OnSymbolItemClicked(QTreeWidgetItem *item, int column);
 
   void BuildRegex(const QString &text);
   void RunRegex(void);
@@ -58,6 +72,7 @@ class OmniBoxView final : public QWidget {
  signals:
   void OpenTab(QString title, QWidget *widget);
   void OpenDock(QString title, QWidget *widget);
+  void TokenPressEvent(EventSource source, EventLocations loc_ids);
 };
 
 // Downloads the file list in the background.
@@ -72,11 +87,12 @@ class SymbolSearchThread final : public QObject, public QRunnable {
  public:
   virtual ~SymbolSearchThread(void);
 
-  explicit SymbolSearchThread(const Index &index_, const QString &name,
-                              DeclCategory category_, unsigned counter_);
+  explicit SymbolSearchThread(
+      const Index &index_, const FileLocationCache &cache_, const QString &name,
+      DeclCategory category_, unsigned counter_);
 
  signals:
-  void FoundSymbols(SymbolList symbols, DeclCategory category,
+  void FoundSymbols(NamedDeclList symbols, DeclCategory category,
                     unsigned counter);
 };
 

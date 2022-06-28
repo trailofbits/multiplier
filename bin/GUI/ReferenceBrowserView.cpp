@@ -567,13 +567,13 @@ void ReferenceBrowserView::FillRow(
 
     if (auto fp_it = d->file_id_to_path.find(file_id);
         fp_it != d->file_id_to_path.end()) {
-      item->setTextColor(kPathColumnIndex, color);
+      item->setForeground(kPathColumnIndex, color);
       item->setTextAlignment(kPathColumnIndex, Qt::AlignRight);
       item->setText(
           kPathColumnIndex,
           QString::fromStdString(fp_it->second.generic_string()));
 
-      item->setTextColor(kFileColumnIndex, color);
+      item->setForeground(kFileColumnIndex, color);
       item->setTextAlignment(kFileColumnIndex, Qt::AlignRight);
       item->setText(
           kFileColumnIndex,
@@ -586,13 +586,13 @@ void ReferenceBrowserView::FillRow(
 #endif
     }
 
-    item->setTextColor(kLineColumnIndex, color);
+    item->setForeground(kLineColumnIndex, color);
     item->setText(kLineColumnIndex, QString::number(loc->first));  // Line.
 #ifndef QT_NO_TOOLTIP
     item->setToolTip(kLineColumnIndex, tr("Line %1").arg(loc->first));
 #endif
 
-    item->setTextColor(kColumnColumnIndex, color);
+    item->setForeground(kColumnColumnIndex, color);
     item->setText(kColumnColumnIndex, QString::number(loc->second));  // Column.
 #ifndef QT_NO_TOOLTIP
     item->setToolTip(kColumnColumnIndex, tr("Column %1").arg(loc->second));
@@ -601,7 +601,7 @@ void ReferenceBrowserView::FillRow(
 
   // Show the context breadcrumbs. This is a chain of stringized enumerators
   // derived from the token contexts.
-  item->setTextColor(kContextColumnIndex, color);
+  item->setForeground(kContextColumnIndex, color);
   item->setText(
       kContextColumnIndex,
       TokenBreadCrumbs(use, config.breadcrumbs.run_length_encode));

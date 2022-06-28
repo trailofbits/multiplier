@@ -24,6 +24,7 @@
 #include <QThreadPool>
 #include <QVBoxLayout>
 #include <QVector>
+#include <QWidget>
 
 #include <cassert>
 #include <multiplier/Index.h>
@@ -91,6 +92,7 @@ class CodeSearchResultsModelImpl {
 
   QVector<QString> headers;
   std::vector<RowData> rows;
+  std::vector<QSize> sizes;
 
   // These are per-row things.
 
@@ -302,6 +304,73 @@ CodeSearchResultsItemDelegate::CodeSearchResultsItemDelegate(
       model(model_),
       proxy(proxy_) {}
 
+QSize CodeSearchResultsItemDelegate::sizeHint(
+    const QStyleOptionViewItem &option,
+    const QModelIndex &index) const {
+
+  CodeSearchResultsModelImpl * const d = model->d.get();
+  const QModelIndex real_index = proxy->mapToSource(index);
+  const int row = real_index.row();
+  const int col = real_index.column();
+  if (0 > row || 0 > col || row >= d->num_rows ||
+      col >= d->num_columns) {
+    return QStyledItemDelegate::sizeHint(option, index);
+  }
+
+  size_t size_index = static_cast<size_t>((row * d->num_columns) + col);
+  if (d->sizes.size() <= size_index) {
+    d->sizes.resize(size_index + 1u);
+  }
+
+  QSize &size = d->sizes[size_index];
+  if (!size.isEmpty()) {
+    return size;
+  }
+
+  RowData &result = d->rows[static_cast<size_t>(row)];
+  TokenList file_tokens = d->files[result.file_index].tokens();
+  QFontMetricsF font_metrics(d->font);
+  qreal curr_width = 0;
+  qreal width = 0;
+  qreal num_lines = 1;
+
+  for (auto i = result.file_tokens_begin; i < result.file_tokens_end; ++i) {
+    auto v = file_tokens[i].data();
+    auto x = -1;
+    for (QChar ch : QString::fromUtf8(v.data(), static_cast<int>(v.size()))) {
+      auto ascii_ch = v[++x];
+      switch (ch.unicode()) {
+        case QChar::Tabulation:
+        case QChar::Space:
+        case QChar::Nbsp:
+        default:
+          curr_width += font_metrics.horizontalAdvance(ch);
+          width = std::max(curr_width, width);
+          break;
+        case QChar::ParagraphSeparator:
+        case QChar::LineFeed:
+        case QChar::LineSeparator:
+          num_lines++;
+          curr_width = 0;
+          break;
+        case QChar::CarriageReturn:
+          continue;
+      }
+    }
+  }
+
+  QStyleOptionViewItem opt = option;
+  initStyleOption(&opt, index);
+  QSize contents_size = QSizeF(width, font_metrics.height() * num_lines).toSize();
+  QStyle *style = opt.widget ? opt.widget->style() : qApp->style();
+  size = style->sizeFromContents(QStyle::ContentsType::CT_ItemViewItem,
+                                 &opt, size /* empty */, opt.widget);
+
+  size.setWidth(size.width() + contents_size.width());
+  size.setHeight(contents_size.height());
+  return size;
+}
+
 void CodeSearchResultsItemDelegate::paint(
     QPainter *painter, const QStyleOptionViewItem &option,
     const QModelIndex &index) const {
@@ -330,9 +399,9 @@ void CodeSearchResultsItemDelegate::paint(
     disp = 0u;
   } else {
     if (proxy) {
-      bg_color = proxy->data(index, Qt::BackgroundColorRole);
+      bg_color = proxy->data(index, Qt::BackgroundRole);
     } else {
-      bg_color = model->data(index, Qt::BackgroundColorRole);
+      bg_color = model->data(index, Qt::BackgroundRole);
     }
   }
 
@@ -361,14 +430,18 @@ void CodeSearchResultsItemDelegate::paint(
       d->capture_indexes.clear();
       d->last_capture_indexes_row = row;
       for (auto i = 0; i < d->num_columns; ++i) {
+        auto [num_chars_to_skip, num_chars_to_print] =
+            d->token_sub_ranges[static_cast<unsigned>(capture_offset + i)];
         auto [prefix_len, capture_len] =
             d->capture_sub_ranges[static_cast<unsigned>(capture_offset + i)];
 
         auto needed = static_cast<size_t>(prefix_len + capture_len);
+        needed = std::max<size_t>(
+            needed, static_cast<unsigned>(num_chars_to_print));
         d->capture_indexes.resize(
             std::max<size_t>(needed + 1u, d->capture_indexes.size()));
-        for (int i = 0; i < capture_len; ++i) {
-          d->capture_indexes[static_cast<unsigned>(prefix_len + i)] = c;
+        for (int k = 0; k < capture_len; ++k) {
+          d->capture_indexes[static_cast<unsigned>(prefix_len + k)] = c;
         }
         ++c;
       }
@@ -440,11 +513,15 @@ void CodeSearchResultsItemDelegate::paint(
           const int sel_index = d->capture_indexes[c];
           if (!sel_index) {
             if (!has_bg) {
+              assert(i < d->code.background.size());
               painter->fillRect(glyph_rect, *(d->code.background[i]));
             }
           } else {
+            assert(0 < sel_index);
+            assert(sel_index <= d->num_columns);
             painter->fillRect(
-                glyph_rect, d->theme.SelectedLineBackgroundColor(sel_index));
+                glyph_rect, d->theme.SelectedLineBackgroundColor(
+                    static_cast<unsigned>(sel_index - 1)));
           }
         }
 
@@ -508,7 +585,7 @@ QVariant CodeSearchResultsModel::headerData(
 QVariant CodeSearchResultsModel::data(
     const QModelIndex &index, int role) const {
   switch (role) {
-    case Qt::BackgroundColorRole:
+    case Qt::BackgroundRole:
       if (index.row() % 2) {
         return d->bg_color_odd;
       } else {
@@ -537,7 +614,7 @@ QVariant CodeSearchResultsModel::data(
 // Overload the implementation of alternating background colors.
 QVariant SortableCodeSearchResultsModel::data(
     const QModelIndex &index, int role) const {
-  if (role == Qt::BackgroundColorRole) {
+  if (role == Qt::BackgroundRole) {
     if (auto model = dynamic_cast<CodeSearchResultsModel *>(sourceModel())) {
       if (auto d = model->d.get()) {
         if (index.row() % 2) {
@@ -706,11 +783,10 @@ void CodeSearchResultsView::InitializeWidgets(void) {
   // cells contain text. When we render syntax-highlighted code, this has
   // no effect.
   auto &config = d->model_data->multiplier.Configuration().code_search_results;
-  if (!config.highlight_syntax && !config.highlight_captures) {
-    d->table->setWordWrap(true);
-    d->table->setTextElideMode(Qt::ElideMiddle);
-  }
-  d->table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  d->table->setWordWrap(true);
+  d->table->setTextElideMode(Qt::ElideMiddle);
+//  d->table->horizontalHeader()->setStretchLastSection(true);
+//  d->table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   // Resize for the current contents as they are now. This has an
   // "isntantaneous" and isn't a persistent setting, so any time we add more
@@ -896,7 +972,7 @@ void CodeSearchResultsView::MapClickToToken(QPoint last_click_loc,
       ++num_printed_chars;
 
       const QChar ch = model_data->code.data[j];
-      QRectF glyph_rect(0.0, 0.0, font_metrics.width(ch),
+      QRectF glyph_rect(0.0, 0.0, font_metrics.horizontalAdvance(ch),
                         font_metrics.height());
       glyph_rect.moveTo(pos);
 

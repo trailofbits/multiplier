@@ -148,8 +148,11 @@ void CodeBrowserView::InitializeWidgets(void) {
 
 // When a tab is changed.
 void CodeBrowserView::OnChangeTab(int index) {
-  if (auto view = d->content->widget(index); view && view != d->omnibox) {
-    if (auto it = d->view_to_file_id.find(view);
+  if (auto view = d->content->widget(index); view) {
+    if (view == d->omnibox) {
+      d->omnibox->Focus();
+
+    } else if (auto it = d->view_to_file_id.find(view);
         it != d->view_to_file_id.end()) {
       emit CurrentFile(it->second);
     }
@@ -250,6 +253,23 @@ void CodeBrowserView::Connected(void) {
   d->omnibox->Connected();
   d->content->show();
   update();
+}
+
+// Return the omnibox.
+OmniBoxView *CodeBrowserView::OmniBox(void) {
+  return d->omnibox;
+}
+
+void CodeBrowserView::OpenRegexSearch(void) {
+  d->content->setCurrentWidget(d->omnibox);
+  d->omnibox->raise();
+  d->omnibox->OpenRegexSearch();
+}
+
+void CodeBrowserView::OpenEntitySearch(void) {
+  d->content->setCurrentWidget(d->omnibox);
+  d->omnibox->raise();
+  d->omnibox->OpenEntitySearch();
 }
 
 // Open a file in a tab.

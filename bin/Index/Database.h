@@ -7,6 +7,7 @@
 #pragma once
 
 #include <multiplier/AST.h>
+#include <multiplier/Types.h>
 
 #include <filesystem>
 #include <functional>
@@ -14,14 +15,14 @@
 #include <optional>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include <blockingconcurrentqueue.h>
 
 namespace sqlite {
 class Connection;
 class Statement;
-}
-
+}  // namespace sqlite
 namespace indexer {
 
 class DatabaseWriterImpl;
@@ -47,11 +48,11 @@ class Database {
   Database(const Database &) = delete;
   Database &operator=(const Database &) = delete;
 
-  void StoreEntities(uint64_t entity_id, const std::string &data,
+  void StoreEntities(mx::RawEntityId entity_id, const std::string &data,
                      mx::DeclCategory category);
 
-  void QueryEntities(const std::string &name, uint32_t table_id,
-                     std::function<void(uint64_t, const std::string &)> cb);
+  std::vector<mx::RawEntityId> QueryEntities(
+      const std::string &name, mx::DeclCategory table_id);
 
  private:
   std::unique_ptr<DatabaseReaderImpl> reader;

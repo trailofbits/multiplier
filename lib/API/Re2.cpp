@@ -193,7 +193,7 @@ std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
   auto data_begin_ptr = data_range.data();
   auto data_end_ptr = &(data_begin_ptr[data_range.size()]);
   assert(begin_ptr >= data_begin_ptr);
-  assert(begin_ptr < data_end_ptr);
+  assert(begin_ptr <= data_end_ptr);  // Empty capture.
   assert(end_ptr >= data_begin_ptr);
   assert(end_ptr <= data_end_ptr);
 #endif

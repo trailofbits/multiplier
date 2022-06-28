@@ -44,8 +44,8 @@ extern "C" int main(int argc, char *argv[]) {
 
   for (auto category : mx::EnumerationRange<mx::DeclCategory>()) {
     auto symbols = index.query_entities(FLAGS_name, category);
-    for (auto sym : symbols) {
-      std::cout << std::get<0>(sym) << '\t' << std::get<1>(sym) << std::endl;
+    for (const mx::NamedDecl &decl : symbols) {
+      std::cout << decl.id() << '\t' << decl.name() << std::endl;
     }
   }
 

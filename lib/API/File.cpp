@@ -95,12 +95,12 @@ const FileLocationVector &FileLocationCacheImpl::Add(File file) {
 }
 
 // Add a file to the cache.
-void FileLocationCache::add(const File &file) {
+void FileLocationCache::add(const File &file) const {
   impl->Add(file);
 }
 
 // Remove a file from the cache.
-void FileLocationCache::remove(const File &file) {
+void FileLocationCache::remove(const File &file) const {
   impl->cache.erase(file.impl->file_id);
 }
 

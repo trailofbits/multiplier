@@ -239,14 +239,14 @@ void HistoryBrowserView::FillRow(
 
     if (auto fp_it = d->file_id_to_path.find(file_id);
         fp_it != d->file_id_to_path.end()) {
-      item->setTextColor(kPathColumnIndex, color);
+      item->setForeground(kPathColumnIndex, color);
       item->setTextAlignment(kPathColumnIndex, Qt::AlignRight);
       item->setText(
           kPathColumnIndex,
           QString::fromStdString(fp_it->second.generic_string()));
       assert(!item->text(kPathColumnIndex).startsWith(QChar::Space));
 
-      item->setTextColor(kFileColumnIndex, color);
+      item->setForeground(kFileColumnIndex, color);
       item->setTextAlignment(kFileColumnIndex, Qt::AlignRight);
       item->setText(
           kFileColumnIndex,
@@ -259,13 +259,13 @@ void HistoryBrowserView::FillRow(
 #endif
     }
 
-    item->setTextColor(kLineColumnIndex, color);
+    item->setForeground(kLineColumnIndex, color);
     item->setText(kLineColumnIndex, QString::number(loc->first));  // Line.
 #ifndef QT_NO_TOOLTIP
     item->setToolTip(kLineColumnIndex, tr("Line %1").arg(loc->first));
 #endif
 
-    item->setTextColor(kColumnColumnIndex, color);
+    item->setForeground(kColumnColumnIndex, color);
     item->setText(kColumnColumnIndex, QString::number(loc->second));  // Column.
 #ifndef QT_NO_TOOLTIP
     item->setToolTip(kColumnColumnIndex, tr("Column %1").arg(loc->second));
@@ -274,7 +274,7 @@ void HistoryBrowserView::FillRow(
 
   // Show the context breadcrumbs. This is a chain of stringized enumerators
   // derived from the token contexts.
-  item->setTextColor(kContextColumnIndex, color);
+  item->setForeground(kContextColumnIndex, color);
   item->setText(
       kContextColumnIndex,
       TokenBreadCrumbs(frag_tok, config.breadcrumbs.run_length_encode));
@@ -374,7 +374,7 @@ void HistoryBrowserView::AddDeclarationsUnderRoot(const EventLocations &locs) {
     d->history_tree->scrollToItem(item);
     d->history_tree->clearSelection();
     d->history_tree->setCurrentItem(item);
-    d->history_tree->setItemSelected(item, true);
+    item->setSelected(true);
     d->last_added = item;
   }
 }
@@ -405,7 +405,7 @@ bool HistoryBrowserView::GoBackInLinearHistory(void) {
     d->history_tree->scrollToItem(history_item->item);
     d->history_tree->clearSelection();
     d->history_tree->setCurrentItem(history_item->item);
-    d->history_tree->setItemSelected(history_item->item, true);
+    history_item->item->setSelected(true);
   }
 
   emit TokenPressEvent(EventSource::kHistoryBrowserLinearItemChanged,

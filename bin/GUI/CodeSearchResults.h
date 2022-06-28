@@ -43,6 +43,9 @@ class CodeSearchResultsItemDelegate final : public QStyledItemDelegate {
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
              const QModelIndex &index) const Q_DECL_FINAL;
+
+  QSize sizeHint(const QStyleOptionViewItem &option,
+                 const QModelIndex &index) const Q_DECL_FINAL;
 };
 
 class CodeSearchResultsModel final : public QAbstractTableModel {

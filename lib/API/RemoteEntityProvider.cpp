@@ -438,28 +438,44 @@ void RemoteEntityProvider::FillReferences(
 
 void RemoteEntityProvider::FindSymbol(
   const Ptr &self, std::string name, mx::DeclCategory category,
-  SymbolList &out) try {
+  std::vector<RawEntityId> &out) try {
 
   ClientConnection &cc = Connection(self);
-  capnp::Request<mx::rpc::Multiplier::FindSymbolsParams,
-                 mx::rpc::Multiplier::FindSymbolsResults>
-        request = cc.client.findSymbolsRequest();
 
-  request.setQuery(name);
-  request.setCategory(static_cast<uint32_t>(category));
+  auto prev_version_number = self->VersionNumber();
+  for (auto changed = true; changed; ) {
+    changed = false;
 
-  capnp::Response<mx::rpc::Multiplier::FindSymbolsResults> response =
-      request.send().wait(cc.connection.getWaitScope());
+    capnp::Request<mx::rpc::Multiplier::FindSymbolsParams,
+                   mx::rpc::Multiplier::FindSymbolsResults>
+          request = cc.client.findSymbolsRequest();
 
-  auto symbols_reader = response.getSymbols();
-  out.clear();
-  out.reserve(symbols_reader.size());
+    request.setQuery(name);
+    request.setCategory(static_cast<uint32_t>(category));
 
-  for (rpc::SymbolMatch::Reader item : symbols_reader) {
-    const FileId entity_id = item.getEntityId();
-    auto symbol_name_reader = item.getSymbol();
-    std::string name(symbol_name_reader.cStr(), symbol_name_reader.size());
-    out.emplace_back(entity_id, std::move(name));
+    capnp::Response<mx::rpc::Multiplier::FindSymbolsResults> response =
+        request.send().wait(cc.connection.getWaitScope());
+
+    // Make sure that we re-try if the version number when we requested the
+    // redeclaration IDs is now out-of-date.
+    auto resp_version_number = response.getVersionNumber();
+    if (MaybeUpdateVersionNumber(self, resp_version_number) ||
+        prev_version_number < resp_version_number) {
+      prev_version_number = resp_version_number;
+      changed = true;
+      continue;
+    }
+
+
+    auto ids_reader = response.getDeclarationIds();
+    out.clear();
+    out.reserve(ids_reader.size());
+
+    for (auto decl_id : ids_reader) {
+      out.emplace_back(decl_id);
+    }
+
+    return;
   }
 
 // TODO(pag): Log something.

@@ -16,6 +16,7 @@
 #include "Util.h"
 
 namespace indexer {
+namespace {
 
 static bool ShouldGetSymbolName(const pasta::Decl &decl) {
   switch (mx::FromPasta(decl.Kind())) {
@@ -45,6 +46,7 @@ static bool ShouldGetSymbolName(const pasta::Decl &decl) {
     case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
     case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
     case mx::DeclKind::ENUM:
+    case mx::DeclKind::ENUM_CONSTANT:
       return true;
 
     // Redeclarable templates.
@@ -55,22 +57,85 @@ static bool ShouldGetSymbolName(const pasta::Decl &decl) {
     case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
       return true;
 
+    // Fields.
+    case mx::DeclKind::FIELD:
+    case mx::DeclKind::INDIRECT_FIELD:
+      return true;
+
+    // Types.
+    case mx::DeclKind::TYPE_ALIAS:
+    case mx::DeclKind::TYPE:
+    case mx::DeclKind::TYPEDEF:
+    case mx::DeclKind::TYPEDEF_NAME:
+      return true;
+
     default:
       return false;
   }
 }
 
+static std::string SymbolName(const pasta::NamedDecl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kNamespace: {
+      auto ns = reinterpret_cast<const pasta::NamespaceDecl &>(decl);
+      if (ns.IsAnonymousNamespace()) {
+        return {};
+      } else if (ns.IsInline()) {
+        auto n = ns.Name();
+        if (n.empty()) {
+          return n;
+        } else if (n[0] == '_') {  // E.g. `__1` in `std::__1`.
+          return {};
+        } else {
+          return n;
+        }
+      } else {
+        return ns.Name();
+      }
+    }
+    default:
+      return decl.Name();
+  }
+}
+
+static std::string ContextualSymbolName(const pasta::NamedDecl &decl);
+
+static std::string ContextualSymbolName(const pasta::DeclContext &dc) {
+  pasta::Decl d(dc);
+  if (auto nd = pasta::NamedDecl::From(d)) {
+    return ContextualSymbolName(nd.value());
+  } else if (auto dc_parent = dc.Parent()) {
+    return ContextualSymbolName(dc_parent.value());
+  } else {
+    return {};
+  }
+}
+
+std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
+  auto name = ContextualSymbolName(decl.DeclarationContext());
+  if (name.empty()) {
+    return decl.Name();
+  } else {
+    return name + "::" + decl.Name();
+  }
+}
+
+}  // namespace
+
 void PendingFragment::PersistDeclarationSymbols(
     IndexingContext &context, EntityMapper &em, pasta::AST &ast,
     mx::WorkerId worker_id) {
   for (const pasta::Decl &decl : decls_to_serialize) {
-    if (ShouldGetSymbolName(decl)) {
-      auto str = DeclToString(ast, decl.CanonicalDeclaration());
-      auto id = em.EntityId(decl);
-      context.databases[worker_id]->StoreEntities(id, str, mx::FromPasta(decl.Category()));
+    if (auto nd = pasta::NamedDecl::From(decl);
+        nd && ShouldGetSymbolName(decl)) {
+
+      std::string str = ContextualSymbolName(nd.value());
+      
+      mx::RawEntityId id = em.EntityId(decl);
+      context.databases[worker_id]->StoreEntities(
+          id, str, mx::FromPasta(decl.Category()));
     }
   }
 }
 
-}
-
+}  // namespace indexer

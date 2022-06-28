@@ -173,11 +173,71 @@ RegexQueryResult Index::query_fragments(const RegexQuery &query) const {
 }
 
 // Search for entities by their name and category.
-SymbolList Index::query_entities(
+NamedDeclList Index::query_entities(
     std::string name, mx::DeclCategory category) const {
-  SymbolList entity_ids;
+  std::vector<RawEntityId> entity_ids;
   impl->FindSymbol(impl, std::move(name), category, entity_ids);
-  return entity_ids;
+  
+  NamedDeclList decls;
+  decls.reserve(entity_ids.size());
+
+  for (RawEntityId eid : entity_ids) {
+    VariantId vid = EntityId(eid).Unpack();
+    if (!std::holds_alternative<DeclarationId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    DeclarationId id = std::get<DeclarationId>(vid);
+    FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+    if (!frag_ptr) {
+      assert(false);
+      continue;
+    }
+
+    if (id.offset >= frag_ptr->num_decls) {
+      assert(false);
+      continue;
+    }
+
+    Decl decl(std::move(frag_ptr), id.offset);
+    if (decl.id() != eid) {
+      assert(false);
+      continue;
+    }
+
+    auto nd = NamedDecl::from(decl);
+    if (!nd) {
+      assert(false);
+      continue;
+    }
+
+    if (!id.is_definition) {
+      if (auto def = decl.definition()) {
+        decls.emplace_back(std::move(NamedDecl::from(def.value()).value()));
+      } else {
+        decls.emplace_back(std::move(nd.value())); 
+      }
+    } else {
+      decls.emplace_back(std::move(nd.value()));
+    }
+  }
+
+  std::sort(
+      decls.begin(), decls.end(),
+      [] (const NamedDecl &a, const NamedDecl &b) {
+        return a.id() < b.id();
+      });
+
+  auto it = std::unique(
+      decls.begin(), decls.end(),
+      [] (const NamedDecl &a, const NamedDecl &b) {
+        return a.id() == b.id();
+      });
+
+  decls.erase(it, decls.end());
+  
+  return decls;
 }
 
 }  // namespace mx

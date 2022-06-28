@@ -53,10 +53,10 @@ class FileLocationCache {
     const FileLocationConfiguration &config=FileLocationConfiguration());
 
   // Add a file to the cache.
-  void add(const File &);
+  void add(const File &) const;
 
   // Remove a file from the cache.
-  void remove(const File &);
+  void remove(const File &) const;
 
   // Clear the cache.
   void clear(void);

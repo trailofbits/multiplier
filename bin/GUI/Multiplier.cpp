@@ -18,11 +18,13 @@
 #include <QDesktopWidget>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QGuiApplication>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QRect>
+#include <QScreen>
 #include <QThreadPool>
 
 #include <algorithm>
@@ -35,6 +37,7 @@
 #include "FileBrowserView.h"
 #include "FileView.h"
 #include "HistoryBrowserView.h"
+#include "OmniBoxView.h"
 #include "OpenConnectionDialog.h"
 #include "ReferenceBrowserView.h"
 
@@ -445,7 +448,7 @@ void Multiplier::UpdateUI(void) {
 
 void Multiplier::InitializeUI(void) {
   setWindowTitle("Multiplier");
-  QRect rect = QApplication::desktop()->screenGeometry();
+  QRect rect = QGuiApplication::primaryScreen()->geometry();
 
   resize(rect.width(), rect.height());
 
@@ -536,6 +539,9 @@ void Multiplier::OnFileConnectAction(void) {
   connect(downloader, &DownloadFileListThread::DownloadedFileList,
           d->code_browser_view, &CodeBrowserView::OnDownloadedFileList);
 
+  connect(downloader, &DownloadFileListThread::DownloadedFileList,
+          d->code_browser_view->OmniBox(), &OmniBoxView::OnDownloadedFileList);
+
   QThreadPool::globalInstance()->start(downloader);
 }
 
@@ -580,7 +586,6 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
   const EventLocations &locs = d->last_locations[source];
 
   if ((ea.match_sources & source) != EventSources(source)) {
-//    std::cerr << "failed on sources: " << ea.description << "\n";
     return false;
   }
 
@@ -591,7 +596,6 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       break;
     case Action::kOpenCodeBrowser:
       if (has_locs) {
-//        std::cerr << "> opening code browser\n";
         d->code_browser_view->OpenEntities(locs);
         return true;
       } else {
@@ -599,7 +603,6 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kOpenReferenceBrowser:
       if (has_locs) {
-//        std::cerr << "> opening ref browser\n";
         d->reference_browser_view->SetRoots(locs);
         if (d->reference_browser_dock->visibleRegion().isEmpty()) {
           d->reference_browser_dock->raise();
@@ -610,7 +613,6 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryAsChild:
       if (has_locs) {
-//        std::cerr << "> adding to visual history as child\n";
         d->history_browser_view->AddChildDeclarations(locs);
         return true;
       } else {
@@ -618,7 +620,6 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryAsSibling:
       if (has_locs) {
-//        std::cerr << "> adding to visual history as sibling\n";
         d->history_browser_view->AddSiblingDeclarations(locs);
         return true;
       } else {
@@ -626,7 +627,6 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryUnderRoot:
       if (has_locs) {
-//        std::cerr << "> adding to visual history under root\n";
         d->history_browser_view->AddDeclarationsUnderRoot(locs);
         return true;
       } else {
@@ -634,7 +634,6 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryAsRoots:
       if (has_locs) {
-//        std::cerr << "> adding to visual history as root\n";
         d->history_browser_view->AddRootDeclarations(locs);
         return true;
       } else {
@@ -642,15 +641,21 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToLinearHistory:
       if (has_locs) {
-//        std::cerr << "> adding to linear history\n";
         d->history_browser_view->AddToLinearHistory(locs);
         return true;
       } else {
         return false;
       }
     case Action::kGoBackLinearHistory:
-//      std::cerr << "> going back in linear history\n";
       return d->history_browser_view->GoBackInLinearHistory();
+
+    case Action::kOpenRegexSearch:
+      d->code_browser_view->OpenRegexSearch();
+      return true;
+
+    case Action::kOpenEntitySearch:
+      d->code_browser_view->OpenEntitySearch();
+      return true;
   }
 
   return false;

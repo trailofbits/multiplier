@@ -181,8 +181,11 @@ enum class EventSource : int {
 
   // When we click on a token in a code search result.
   kCodeSearchResult                    = 1 << 7,
-  kCodeSearchResultPreviewClickSource  = 1 << 0,
-  kCodeSearchResultPreviewClickDest    = 1 << 1,
+  kCodeSearchResultPreviewClickSource  = 1 << 8,
+  kCodeSearchResultPreviewClickDest    = 1 << 9,
+
+  // When we click on an entity name from the entity symbol search.
+  kEntitySearchResult                  = 1 << 10,
 };
 
 Q_DECLARE_FLAGS(EventSources, EventSource)
@@ -207,6 +210,9 @@ enum class Action : int {
   kAddToLinearHistory,
 
   kGoBackLinearHistory,
+
+  kOpenEntitySearch,
+  kOpenRegexSearch,
 };
 
 struct EventAction {

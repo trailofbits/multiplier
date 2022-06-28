@@ -67,7 +67,7 @@ class HistoryBrowserView final : public QWidget {
   bool GoBackInLinearHistory(void);
 
  public slots:
- void OnDownloadedFileList(FilePathList files);
+  void OnDownloadedFileList(FilePathList files);
   void Clear(void);
 
  private slots:
