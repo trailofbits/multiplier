@@ -521,7 +521,7 @@ void CodeSearchResultsItemDelegate::paint(
             assert(sel_index <= d->num_columns);
             painter->fillRect(
                 glyph_rect, d->theme.SelectedLineBackgroundColor(
-                    static_cast<unsigned>(sel_index - 1)));
+                    static_cast<unsigned>(sel_index)));
           }
         }
 

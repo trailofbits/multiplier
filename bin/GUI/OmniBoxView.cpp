@@ -458,7 +458,7 @@ void OmniBoxView::RunSymbolSearch(void) {
 
   d->symbol_results->viewport()->installEventFilter(&d->multiplier);
 
-  connect(d->symbol_results, &QTreeWidget::itemActivated,
+  connect(d->symbol_results, &QTreeWidget::itemPressed,
           this, &OmniBoxView::OnSymbolItemClicked);
 
   connect(d->symbol_results, &QTreeWidget::itemDoubleClicked,
