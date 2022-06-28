@@ -436,30 +436,49 @@ void RemoteEntityProvider::FillReferences(
   fragment_ids_out.clear();
 }
 
-void RemoteEntityProvider::FindSymbol(const Ptr &self, std::string name,
-                                      mx::DeclCategory category, SymbolList &out) try {
+void RemoteEntityProvider::FindSymbol(
+  const Ptr &self, std::string name, mx::DeclCategory category,
+  std::vector<RawEntityId> &out) try {
+
   ClientConnection &cc = Connection(self);
-  capnp::Request<mx::rpc::Multiplier::FindSymbolsParams,
+
+  auto prev_version_number = self->VersionNumber();
+  for (auto changed = true; changed; ) {
+    changed = false;
+
+    capnp::Request<mx::rpc::Multiplier::FindSymbolsParams,
                    mx::rpc::Multiplier::FindSymbolsResults>
-        request = cc.client.findSymbolsRequest();
+          request = cc.client.findSymbolsRequest();
 
-  request.setQuery(name);
-  request.setCategory(static_cast<uint32_t>(category));
+    request.setQuery(name);
+    request.setCategory(static_cast<uint32_t>(category));
 
-  capnp::Response<mx::rpc::Multiplier::FindSymbolsResults> response =
-      request.send().wait(cc.connection.getWaitScope());
+    capnp::Response<mx::rpc::Multiplier::FindSymbolsResults> response =
+        request.send().wait(cc.connection.getWaitScope());
 
-  auto symbols_reader = response.getSymbols();
-  out.clear();
-  out.reserve(symbols_reader.size());
+    // Make sure that we re-try if the version number when we requested the
+    // redeclaration IDs is now out-of-date.
+    auto resp_version_number = response.getVersionNumber();
+    if (MaybeUpdateVersionNumber(self, resp_version_number) ||
+        prev_version_number < resp_version_number) {
+      prev_version_number = resp_version_number;
+      changed = true;
+      continue;
+    }
 
-  for (rpc::SymbolMatch::Reader item : symbols_reader) {
-    const FileId entity_id = item.getEntityId();
-    std::string name(item.getSymbol().cStr(), item.getSymbol().size());
-    out.emplace_back(std::tuple(entity_id, name));
+
+    auto ids_reader = response.getDeclarationIds();
+    out.clear();
+    out.reserve(ids_reader.size());
+
+    for (auto decl_id : ids_reader) {
+      out.emplace_back(decl_id);
+    }
+
+    return;
   }
 
-  return;
+// TODO(pag): Log something.
 } catch(...) {
   out.clear();
 }

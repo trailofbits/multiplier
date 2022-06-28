@@ -26,6 +26,23 @@ struct CodePreviewConfiguration {
 
 };
 
+struct EntitySearchResultsConfiguration {
+
+  // Should the declaration kind be shown?
+  bool show_declaration_kind{true};
+
+  // Should the full file path be shown?
+  bool show_file_path{false};
+
+  // Should the file name be shown?
+  bool show_file_name{true};
+
+  // Should line and column numbers show up as additional cells in the reference
+  // tree.
+  bool show_line_numbers{true};
+  bool show_column_numbers{true};
+};
+
 struct CodeSearchResultsConfiguration {
 
   // Apply syntax highlighting to code search results?
@@ -121,6 +138,7 @@ struct Configuration {
 
   const CodeTheme *theme;
 
+  EntitySearchResultsConfiguration entity_search_results;
   CodeSearchResultsConfiguration code_search_results;
   HistoryBrowserConfiguration history_browser;
   ReferenceBrowserConfiguration reference_browser;

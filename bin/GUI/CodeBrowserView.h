@@ -19,6 +19,7 @@ class Index;
 
 namespace gui {
 
+class OmniBoxView;
 class EventLocations;
 class Multiplier;
 
@@ -50,6 +51,11 @@ class CodeBrowserView final : public QWidget {
   void Clear(void);
   void Disconnected(void);
   void Connected(void);
+
+  // Return the omnibox.
+  OmniBoxView *OmniBox(void);
+  void OpenRegexSearch(void);
+  void OpenEntitySearch(void);
 
  public slots:
   void OnDownloadedFileList(FilePathList files);

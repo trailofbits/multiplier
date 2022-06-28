@@ -210,8 +210,8 @@ void CachingEntityProvider::FillReferences(
 
 void CachingEntityProvider::FindSymbol(
     const Ptr &self, std::string name,
-    mx::DeclCategory category, SymbolList &ids_out) {
-  return;
+    mx::DeclCategory category, std::vector<RawEntityId> &ids_out) {
+  return next->FindSymbol(self, std::move(name), category, ids_out);
 }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.

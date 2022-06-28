@@ -22,24 +22,22 @@
 
 #include "Database.h"
 
-
 namespace indexer {
-
 namespace details {
-
-inline std::shared_mutex writer_mutex;
-
-}
+static std::shared_mutex gWriterMutex;
+}  // namespace details
 
 // SymbolInserter prepares the statement, bind values and commit it to sqlite database
 class SymbolInserter {
  public:
-  SymbolInserter(sqlite::Connection &db_, uint32_t table_id_) : db(db_) {
+  SymbolInserter(sqlite::Connection &db_, uint32_t table_id_)
+      : db(db_) {
+    std::stringstream insert_query;
+    insert_query
+        << "insert or ignore into entities_fts" << table_id_
+        << " (rowid, symbol) values (?1, ?2)";
     try {
       db.Begin();
-      std::stringstream insert_query;
-      insert_query << "insert into entities_fts" << table_id_
-          << " (symbol, entity_id) values (?1, ?2)";
       stmt = db.Prepare(insert_query.str());
     } catch (sqlite::Error &e) {
       LOG(ERROR) << "Failed to begin transaction " << e.what();
@@ -76,15 +74,16 @@ class SymbolInserter {
 //
 class DatabaseWriterImpl {
  public:
-  using QueueData = std::tuple<std::string, uint64_t>;
+  using QueueData = std::pair<mx::RawEntityId, std::string>;
   using QueueItem = std::variant<QueueData, std::nullptr_t>;
 
   DatabaseWriterImpl(std::string &path, uint32_t table_id_)
     : db(std::make_unique<sqlite::Connection>(path)) {
 
     std::stringstream entities_fts_table;
-    entities_fts_table << "create virtual table if not exists entities_fts"
-        << table_id_ << " using fts5(symbol, entity_id)";
+    entities_fts_table
+        << "create virtual table if not exists entities_fts"
+        << table_id_ << " using fts5(content='', symbol)";
 
     db->Execute(entities_fts_table.str());
 
@@ -101,9 +100,11 @@ class DatabaseWriterImpl {
             using arg_t = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<std::nullptr_t, arg_t>) {
               should_exit = true;
+            } else if constexpr (std::is_same_v<QueueData, arg_t>) {
+              sym.BindValues(arg.first, std::move(arg.second));
             } else {
-              QueueData item = arg;
-              sym.BindValues(std::get<0>(item), std::get<1>(item));
+              LOG(FATAL)
+                  << "Unknown data kind";
             }
           }, item);
 
@@ -118,24 +119,18 @@ class DatabaseWriterImpl {
     bulk_insertion_thread = std::thread(bulk_inserter);
   }
 
-  ~DatabaseWriterImpl() {
+  ~DatabaseWriterImpl(void) {
     insertion_queue.enqueue(nullptr);
     bulk_insertion_thread.join();
   }
 
-  void StoreEntities(uint64_t entity_id, std::string &symbol) {
-    insertion_queue.enqueue(std::tuple(symbol, entity_id));
+  void StoreEntities(mx::RawEntityId entity_id, const std::string &symbol) {
+    insertion_queue.enqueue(QueueData(entity_id, symbol));
   }
 
   // Get the writer instance and add it to the table if not present
   static std::shared_ptr<DatabaseWriterImpl>
-  getWriterInstance(std::string &path, mx::DeclCategory table) {
-    std::shared_lock<std::shared_mutex> guard(details::writer_mutex);
-    if (writers.find(table) != writers.end()) {
-      return writers.at(table);
-    }
-    return nullptr;
-  }
+  getWriterInstance(const std::string &path, mx::DeclCategory table);
 
  private:
   friend class Database;
@@ -145,45 +140,66 @@ class DatabaseWriterImpl {
   std::thread bulk_insertion_thread;
   moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
 
-  static std::unordered_map<mx::DeclCategory, std::shared_ptr<DatabaseWriterImpl>> writers;
+  // TODO(pag): Why is this a global variable?
+  static std::unordered_map<mx::DeclCategory,
+                            std::shared_ptr<DatabaseWriterImpl>>
+      gWriters;
 };
 
-// Initialize writers table
-std::unordered_map<mx::DeclCategory, std::shared_ptr<DatabaseWriterImpl>> DatabaseWriterImpl::writers;
+// Initialize writers table.
+//
+// TODO(pag): Why is this a global variable?
+std::unordered_map<mx::DeclCategory, std::shared_ptr<DatabaseWriterImpl>>
+DatabaseWriterImpl::gWriters;
 
-// DatabaseReaderImpl implements the database reader interface for querying the entities.
+// Get the writer instance and add it to the table if not present
+std::shared_ptr<DatabaseWriterImpl>
+DatabaseWriterImpl::getWriterInstance(
+    const std::string &path, mx::DeclCategory table) {
+  
+  std::shared_lock<std::shared_mutex> guard(details::gWriterMutex);
+  if (gWriters.find(table) != gWriters.end()) {
+    return gWriters.at(table);
+  }
+  return nullptr;
+}
+
+// DatabaseReaderImpl implements the database reader interface for querying
+// the entities.
 class DatabaseReaderImpl {
  public:
   DatabaseReaderImpl(std::filesystem::path workspace_dir)
-    : db(std::make_unique<sqlite::Connection>(workspace_dir.generic_string())) {}
+    : db(std::make_unique<sqlite::Connection>(
+          workspace_dir.generic_string())) {}
 
-  void QueryEntities(std::string name, uint32_t table_id,
-                     std::function<void(uint64_t, std::string&)> cb) {
+  std::vector<mx::RawEntityId> QueryEntities(const std::string &name,
+                                             uint32_t table_id) {
 
     std::stringstream select_query;
-    select_query <<  "select * from entities_fts" << table_id
+    select_query
+        << "select rowid from entities_fts" << table_id
         << " where entities_fts" << table_id << " match ?1";
-
+    std::vector<mx::RawEntityId> entity_ids;
     try {
       auto stmt = db->Prepare(select_query.str());
       if (!stmt) {
         LOG(ERROR) << "Failed to prepare query statement";
-        return;
+        return entity_ids;
       }
 
       stmt->BindValues(name);
-
       while (stmt->ExecuteStep()) {
-        std::string symbol_name, entity;
         auto result = stmt->GetResult();
-        result.Columns(symbol_name, entity);
-        auto entity_id = std::strtoull(entity.c_str(), 0, 0);
-        cb(entity_id, symbol_name);
+        mx::RawEntityId entity_id = mx::kInvalidEntityId;
+        result.Columns(entity_id);
+        entity_ids.push_back(entity_id);
       }
 
     } catch (sqlite::Error &e) {
       LOG(ERROR) << "Failed to get symbol from database " << e.what();
     }
+
+    return entity_ids;
   }
 
  private:
@@ -194,16 +210,19 @@ Database::Database(std::filesystem::path workspace)
     : reader(std::make_unique<DatabaseReaderImpl>(workspace.generic_string())),
       database_path(workspace.generic_string()) {
 
-  // Initialize database writer at one time. It will create table for each category.
-  // This is avoid error when looking for table that has no entry and otherwise table
-  // have not existed.
-  std::unique_lock<std::shared_mutex> guard(details::writer_mutex, std::defer_lock);
+  // Initialize database writer at one time. It will create table for each
+  // category. This is avoid error when looking for table that has no entry
+  // and otherwise table have not existed.
+  std::unique_lock<std::shared_mutex> guard(
+      details::gWriterMutex, std::defer_lock);
+  
   // try acquiring the lock
   if (guard.try_lock()) {
-    if (DatabaseWriterImpl::writers.size() == 0) {
+    if (DatabaseWriterImpl::gWriters.empty()) {
       for (auto category : mx::EnumerationRange<mx::DeclCategory>()) {
-        DatabaseWriterImpl::writers[category] = std::make_shared<DatabaseWriterImpl>(
-            database_path, static_cast<uint32_t>(category));
+        DatabaseWriterImpl::gWriters[category] =
+            std::make_shared<DatabaseWriterImpl>(
+                database_path, static_cast<uint32_t>(category));
       }
     }
   }
@@ -215,15 +234,18 @@ Database::Database(std::string workspace)
 
 Database::~Database() {}
 
-void Database::StoreEntities(uint64_t entity_id, std::string &symbol, mx::DeclCategory category) {
-  if (auto impl = DatabaseWriterImpl::getWriterInstance(database_path, category)) {
+void Database::StoreEntities(mx::RawEntityId entity_id,
+                             const std::string &symbol,
+                             mx::DeclCategory category) {
+  if (auto impl = DatabaseWriterImpl::getWriterInstance(
+          database_path, category)) {
     impl->StoreEntities(entity_id, symbol);
   }
 }
 
-void Database::QueryEntities(std::string name, uint32_t id,
-                             std::function<void(uint64_t, std::string&)> cb) {
-  reader->QueryEntities(name, id, cb);
+std::vector<mx::RawEntityId> Database::QueryEntities(
+    const std::string &name, mx::DeclCategory id) {
+  return reader->QueryEntities(name, static_cast<uint32_t>(id));
 }
 
-}
+}  // namespace indexer

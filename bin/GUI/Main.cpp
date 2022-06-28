@@ -66,9 +66,34 @@ int main(int argc, char *argv[]) {
   });
 
   config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A double clicked declaration search result should be added "
+                   "to the linear history",
+    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+    .match_sources = {mx::gui::EventSource::kEntitySearchResult},
+    .do_action = mx::gui::Action::kAddToLinearHistory,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "A double clicked declaration search result should be added "
+                   "to the visual history",
+    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+    .match_sources = {mx::gui::EventSource::kEntitySearchResult},
+    .do_action = mx::gui::Action::kAddToVisualHistoryUnderRoot,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "The code browser should show a double clicked entity result",
+    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+    .match_sources = {mx::gui::EventSource::kEntitySearchResult},
+    .do_action = mx::gui::Action::kOpenCodeBrowser,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
     .description = "A clicked declaration should be added to the visual history",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
-    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest},
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest,
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource},
     .do_action = mx::gui::Action::kAddToVisualHistoryUnderRoot,
   });
 
@@ -117,6 +142,7 @@ int main(int argc, char *argv[]) {
     .do_action = mx::gui::Action::kGoBackLinearHistory,
   });
 
+  // This is to handle `ESC` to go back.
   config.immediate_actions.emplace_back(mx::gui::EventAction{
     .description = "A change in the current active history item should be shown in the code browser",
     .match_sources = {mx::gui::EventSource::kHistoryBrowserLinearItemChanged,
@@ -124,6 +150,22 @@ int main(int argc, char *argv[]) {
     .do_action = mx::gui::Action::kOpenCodeBrowser,
   });
 
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "Meta-F should open the regex search.",
+    .match_sources = ~mx::gui::EventSources(),
+    .match_key = Qt::Key_F,
+    .do_action = mx::gui::Action::kOpenRegexSearch,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "G should open the entity search.",
+    .match_sources = ~mx::gui::EventSources(),
+    .match_key = Qt::Key_G,
+    .do_action = mx::gui::Action::kOpenEntitySearch,
+  });
+
+  qRegisterMetaType<mx::NamedDeclList>("NamedDeclList");
+  qRegisterMetaType<mx::DeclCategory>("DeclCategory");
   qRegisterMetaType<mx::gui::EventLocation>("EventLocation");
   qRegisterMetaType<mx::gui::EventLocations>("EventLocations");
   qRegisterMetaType<mx::gui::EventSource>("EventSource");

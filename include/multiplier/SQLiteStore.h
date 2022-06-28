@@ -48,7 +48,7 @@ class QueryResult {
     auto column_dispatcher = [this, &idx] (auto &&arg, auto &self) {
       using arg_t = std::decay_t<decltype(arg)>;
       if constexpr (std::is_integral_v<arg_t>) {
-        arg = getInt64(idx);
+        arg = static_cast<arg_t>(getInt64(idx));
       } else if (std::is_same_v<std::string, arg_t> ||
           std::is_same_v<std::string_view, arg_t>) {
         arg = getText(idx);

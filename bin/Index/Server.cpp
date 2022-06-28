@@ -608,34 +608,43 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
 
 kj::Promise<void> Server::findSymbols(FindSymbolsContext context) {
   mx::rpc::Multiplier::FindSymbolsParams::Reader params = context.getParams();
+  mx::rpc::Multiplier::FindSymbolsResults::Builder result =
+      context.getResults();
 
-  mx::rpc::Multiplier::FindSymbolsResults::Builder result = context.getResults();
+  result.setVersionNumber(d->server_context.version_number.load());
 
   std::string symbol(params.getQuery().cStr(), params.getQuery().size());
-  auto category = params.getCategory();
+  mx::DeclCategory category = static_cast<mx::DeclCategory>(
+      params.getCategory());
 
-  std::vector<std::pair<uint64_t, std::string>> entity_map;
+  std::vector<mx::RawEntityId> entity_ids =
+      d->server_context.connection->QueryEntities(
+          symbol, category);
 
-  d->server_context.connection->QueryEntities(
-      symbol, category, [&entity_map](uint64_t id, std::string &symbol) {
-    entity_map.emplace_back(std::pair(id, symbol));
-  });
+  // Sort the redeclaration IDs to that they are always in the same order,
+  // regardless of which one we ask for first, then partition them and move
+  // the definitions before the declarations.
+  std::sort(entity_ids.begin(), entity_ids.end());
+  std::partition(
+      entity_ids.begin(), entity_ids.end(),
+      [] (mx::RawEntityId eid) {
+        return std::get<mx::DeclarationId>(
+            mx::EntityId(eid).Unpack()).is_definition;
+      });
 
   std::stringstream err;
-  auto num_entities = entity_map.size();
+  auto num_entities = entity_ids.size();
   if (num_entities >= std::numeric_limits<unsigned>::max()) {
-
     err << "Too many results returned: " << num_entities;
     LOG(ERROR) << err.str();
     return kj::Exception(kj::Exception::Type::FAILED, __FILE__, __LINE__,
                          kj::heapString(err.str()));
   }
 
-  auto entities = result.initSymbols(static_cast<unsigned>(num_entities));
+  auto info = result.initDeclarationIds(
+      static_cast<unsigned>(num_entities));
   for (auto i = 0u; i < num_entities; ++i) {
-    mx::rpc::SymbolMatch::Builder info = entities[i];
-    info.setEntityId(entity_map[i].first);
-    info.setSymbol(entity_map[i].second);
+    info.set(i, entity_ids[i]);
   }
 
   return kj::READY_NOW;

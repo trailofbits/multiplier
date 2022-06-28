@@ -559,7 +559,8 @@ void CodeView::InitializeWidgets(void) {
   setLineWrapMode(d->theme.LineWrap() ?
                   QPlainTextEdit::LineWrapMode::WidgetWidth :
                   QPlainTextEdit::LineWrapMode::NoWrap);
-  setTabStopDistance(d->theme.NumSpacesInTab() * fm.width(QChar::Space));
+  setTabStopDistance(d->theme.NumSpacesInTab() *
+                     fm.horizontalAdvance(QChar::Space));
 
   auto p = palette();
   p.setColor(QPalette::All, QPalette::Base, d->theme.BackgroundColor());
