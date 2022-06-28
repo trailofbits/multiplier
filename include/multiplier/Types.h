@@ -299,28 +299,28 @@ class EntityId {
 namespace std {
 
 template <>
-struct std::hash<mx::FileId> {
+struct hash<mx::FileId> {
   inline mx::RawEntityId operator()(mx::FileId id) const noexcept {
     return id.file_id;
   }
 };
 
 template <>
-struct std::less<mx::FileId> {
+struct less<mx::FileId> {
   inline bool operator()(mx::FileId a, mx::FileId b) const noexcept {
     return a.file_id < b.file_id;
   }
 };
 
 template <>
-struct std::hash<mx::FragmentId> {
+struct hash<mx::FragmentId> {
   inline mx::RawEntityId operator()(mx::FragmentId id) const noexcept {
     return id.fragment_id;
   }
 };
 
 template <>
-struct std::less<mx::FragmentId> {
+struct less<mx::FragmentId> {
   inline bool operator()(mx::FragmentId a, mx::FragmentId b) const noexcept {
     return a.fragment_id < b.fragment_id;
   }
