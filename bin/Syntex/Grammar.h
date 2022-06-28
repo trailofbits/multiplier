@@ -90,6 +90,9 @@ class Grammar {
   // Import a fragment into the grammar. This extends the persisted grammar with
   // the features from this fragment.
   void Import(const mx::Fragment &fragment);
+
+  // Determine the kind of an identifier based on its spelling
+  mx::TokenKind ClassifyIdent(std::string_view& spelling) const;
 };
 
 }  // namespace syntex

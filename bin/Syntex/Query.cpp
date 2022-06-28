@@ -7,30 +7,22 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
+#include <multiplier/Index.h>
 #include <sstream>
-#include <fstream>
+#include "Grammar.h"
 #include "Lexer.h"
 
 DECLARE_bool(help);
-DEFINE_string(file, "", "Read query from file");
+DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
+DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+DEFINE_string(index_dir, "", "Path to the directory where the SYNTEX index will be stored.");
 DEFINE_string(query, "", "Use argument value as query");
-
-static void DumpTokens(lexer::Lexer& lexer) {
-  for (;;) {
-    auto token = lexer.Next();
-    if (token.kind == lexer::TokenKind::EndFile)
-      break;
-    std::cout << "Span(" << token.span.begin << ", "
-      << token.span.end << "), " << token.spelling << ", "
-      << EnumeratorName(token.kind) << "\n";
-  }
-}
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--fragment_id ID | --file_id ID]\n";
+    << " [--host HOST] [--port PORT]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -41,23 +33,14 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  if (FLAGS_file != std::string("")) {
-    auto stream = std::fstream(FLAGS_file);
-    if (stream) {
-      lexer::Lexer lexer(stream);
-      DumpTokens(lexer);
-    } else {
-      std::cerr << "Failed to open file " << FLAGS_file << ": "
-                << strerror(errno) << std::endl;
-    }
-  } else if (FLAGS_query != std::string("")) {
-    auto stream = std::stringstream(FLAGS_query);
-    lexer::Lexer lexer(stream);
-    DumpTokens(lexer);
-  } else {
-    lexer::Lexer lexer(std::cin);
-    DumpTokens(lexer);
-  }
+  mx::Index index(mx::EntityProvider::from_remote(
+      FLAGS_host, FLAGS_port));
+
+  syntex::Grammar grammar(FLAGS_index_dir);
+
+  auto tokens = lexer::Tokenize(grammar, FLAGS_query);
+  for (auto& token : tokens)
+    std::cout << token << "\n";
 
   return EXIT_SUCCESS;
 }

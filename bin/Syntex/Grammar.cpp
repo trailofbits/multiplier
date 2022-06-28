@@ -339,4 +339,15 @@ void Grammar::Import(const mx::Fragment &fragment) {
   impl->features.Set(fragment.id(), fragment_features);
 }
 
+mx::TokenKind Grammar::ClassifyIdent(std::string_view& spelling) const {
+  // FIXME: this should really use some kind of heterogenous lookup instead of
+  // constructing a temporary string
+  Terminal terminal = { std::string(spelling) };
+  auto kind = impl->tokens.TryGet(terminal);
+  if (kind.has_value())
+    return kind.value();
+  else
+    return mx::TokenKind::IDENTIFIER;
+}
+
 }  // namespace syntex

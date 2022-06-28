@@ -26,6 +26,10 @@ add_executable("${PROJECT_NAME}::syntex-index" ALIAS "syntex-index")
 set_target_properties("syntex-index" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable("syntex-query"
+  "AST.cpp"
+  "AST.h"
+  "Grammar.cpp"
+  "Grammar.h"
   "Lexer.cpp"
   "Lexer.h"
   "Query.cpp"
