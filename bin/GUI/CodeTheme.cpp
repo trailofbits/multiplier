@@ -222,7 +222,7 @@ class PetersTheme final : public CodeTheme {
   }
 
   const QFont &Font(void) const final {
-    static QFont font("Menlo", 20);
+    static QFont font("Source Code Pro", 20);
     static bool initialized = false;
     if (!initialized) {
       font.setStyleHint(QFont::TypeWriter);

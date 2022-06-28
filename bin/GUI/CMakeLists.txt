@@ -12,13 +12,13 @@ find_package(${MX_QT} COMPONENTS Core Widgets REQUIRED)
 
 if(PLATFORM_MACOS)
   set(executable_type "MACOSX_BUNDLE")
-  set(MACOSX_BUNDLE_ICON_FILE "icon.ico")
+  set(MACOSX_BUNDLE_ICON_FILE "Logo.ico")
 endif()
 
 set(exe_name "multiplier")
 add_executable("${exe_name}" "${executable_type}"
 
-  resources/resources.qrc
+  Resources/resources.qrc
   
   Code.h
   
@@ -71,7 +71,7 @@ add_executable("${exe_name}" "${executable_type}"
 )
 
 if(PLATFORM_MACOS)
-  set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
+  set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons/Logo.ico")
 
   target_sources("${exe_name}" PRIVATE
     "${icon_path}"

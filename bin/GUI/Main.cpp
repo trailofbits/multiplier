@@ -11,6 +11,7 @@
 #include <memory>
 #include <multiplier/Index.h>
 #include <QApplication>
+#include <QFontDatabase>
 #include <QMetaType>
 #include <QPixmap>
 #include <QSplashScreen>
@@ -29,9 +30,26 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   QApplication application(argc, argv);
 
-  QSplashScreen splash_screen(QPixmap(":/icons/appicon"));
+  QSplashScreen splash_screen(QPixmap(":/Icons/appicon"));
   splash_screen.show();
   application.processEvents();
+
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Black.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-BlackItalic.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Bold.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-BoldItalic.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraBold.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraBoldItalic.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraLight.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraLightItalic.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Italic.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Light.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-LightItalic.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Medium.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-MediumItalic.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Regular.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-SemiBold.ttf");
+  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-SemiBoldItalic.ttf");
 
   mx::gui::Configuration config;
 
