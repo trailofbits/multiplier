@@ -19,7 +19,7 @@ DEFINE_uint64(file_id, 0, "ID of the file from which to print variable names");
 //DEFINE_bool(list_variables, false, "Should we list the variables inside of functions?");
 DEFINE_bool(show_locations, false, "Show the file locations of the variable?");
 
-std::unordered_map<mx::FileId, std::filesystem::path> file_paths;
+std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
 mx::FileLocationCache location_cache;
 
 static void PrintVariableNames(mx::Fragment fragment) {

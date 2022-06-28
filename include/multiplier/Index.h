@@ -49,7 +49,7 @@ using TypeUse = Use<TypeUseSelector>;
 using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
 using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
 
-using FilePathList = std::set<std::pair<std::filesystem::path, FileId>>;
+using FilePathList = std::set<std::pair<std::filesystem::path, RawEntityId>>;
 
 using NamedDeclList = std::vector<NamedDecl>;
 
@@ -130,16 +130,22 @@ class EntityProvider {
   virtual FilePathList ListFiles(const Ptr &) = 0;
 
   // Download a list of fragment IDs contained in a specific file.
-  virtual std::vector<FragmentId>
-  ListFragmentsInFile(const Ptr &, FileId id) = 0;
+  virtual std::vector<RawEntityId>
+  ListFragmentsInFile(const Ptr &, RawEntityId id) = 0;
 
   // Download a file by its unique ID.
+  //
+  // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
+  //            raw file id.
   virtual std::shared_ptr<const FileImpl>
-  FileFor(const Ptr &, FileId id) = 0;
+  FileFor(const Ptr &, RawEntityId id) = 0;
 
   // Download a fragment by its unique ID.
+  //
+  // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
+  //            raw fragment id.
   virtual std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, FragmentId id) = 0;
+  FragmentFor(const Ptr &, RawEntityId id) = 0;
 
   virtual std::shared_ptr<WeggliQueryResultImpl>
   Query(const Ptr &, const WeggliQuery &query) = 0;
@@ -155,13 +161,13 @@ class EntityProvider {
   // to analyze when looking for uses.
   virtual void FillUses(const Ptr &, RawEntityId eid,
                         std::vector<RawEntityId> &redecl_ids_out,
-                        std::vector<FragmentId> &fragment_ids_out) = 0;
+                        std::vector<RawEntityId> &fragment_ids_out) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for references.
   virtual void FillReferences(const Ptr &, RawEntityId eid,
                               std::vector<RawEntityId> &redecl_ids_out,
-                              std::vector<FragmentId> &fragment_ids_out) = 0;
+                              std::vector<RawEntityId> &fragment_ids_out) = 0;
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,
@@ -170,6 +176,9 @@ class EntityProvider {
 };
 
 class NotAnEntity {};
+
+using VariantEntity = std::variant<Decl, Stmt, Type, Token, TokenSubstitution,
+                                   Designator, Fragment, File, NotAnEntity>;
 
 // Access to the indexed code.
 class Index {
@@ -198,16 +207,17 @@ class Index {
 
   // Download a file by its unique ID.
   std::optional<File> file(FileId id) const;
+  std::optional<File> file(RawEntityId id) const;
 
   // Download a fragment by its unique ID.
   std::optional<Fragment> fragment(FragmentId id) const;
+  std::optional<Fragment> fragment(RawEntityId id) const;
 
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
 
   // Return an entity given its ID.
-  std::variant<Decl, Stmt, Type, Token, TokenSubstitution, NotAnEntity>
-  entity(EntityId) const;
+  VariantEntity entity(EntityId) const;
 
   // Return an entity given its ID.
   template <typename T>

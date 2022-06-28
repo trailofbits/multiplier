@@ -130,7 +130,7 @@ void InitReferenceHierarchyThread::run(void) {
   }
 
   UserLocations users;
-  FragmentId last_fragment_id = kInvalidEntityId;
+  RawEntityId last_fragment_id = kInvalidEntityId;
 
   for (Reference ref : root_decl->references()) {
     Stmt stmt = ref.statement();
@@ -169,7 +169,7 @@ void ExpandReferenceHierarchyThread::run(void) {
   }
 
   UserLocations users;
-  FragmentId last_fragment_id = kInvalidEntityId;
+  RawEntityId last_fragment_id = kInvalidEntityId;
 
   for (Reference ref : std::get<Decl>(entity).references()) {
     Stmt stmt = ref.statement();
@@ -251,7 +251,7 @@ struct ReferenceBrowserView::PrivateData {
   };
 
   std::unordered_map<QTreeWidgetItem *, ItemInfo> item_to_info;
-  std::unordered_map<FileId, std::filesystem::path> file_id_to_path;
+  std::unordered_map<RawEntityId, std::filesystem::path> file_id_to_path;
 
   inline PrivateData(Multiplier &multiplier_)
       : multiplier(multiplier_),
@@ -563,7 +563,7 @@ void ReferenceBrowserView::FillRow(
   // Show the line and column numbers.
   if (auto loc = use.nearest_location(d->multiplier.FileLocationCache())) {
     auto file = File::containing(use);
-    FileId file_id = file ? file->id() : kInvalidEntityId;
+    RawEntityId file_id = file ? file->id() : kInvalidEntityId;
 
     if (auto fp_it = d->file_id_to_path.find(file_id);
         fp_it != d->file_id_to_path.end()) {

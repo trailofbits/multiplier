@@ -3058,7 +3058,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "class ReferenceRange;\n"
       << "class StmtIterator;\n"
       << "class Token;\n"
-      << "class TokenContext;"
+      << "class TokenContext;\n"
       << "class TokenContextIterator;\n"
       << "class TokenRange;\n"
       << "class UseBase;\n\n";

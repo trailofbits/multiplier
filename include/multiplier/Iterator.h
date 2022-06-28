@@ -15,6 +15,7 @@ namespace mx {
 
 class CXXBaseSpecifier;
 class Decl;
+class Designator;
 class FragmentImpl;
 class Stmt;
 class TemplateArgument;
@@ -411,6 +412,9 @@ class TokenContext {
 
   // Return the type associated with this context, if any.
   std::optional<Type> as_type(void) const;
+
+  // Return the designator associated with the designated initializer, if any.
+  std::optional<Designator> as_designator(void) const;
 
   // Return the aliased context, if any.
   std::optional<TokenContext> aliasee(void) const;

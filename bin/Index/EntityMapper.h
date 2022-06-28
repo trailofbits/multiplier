@@ -29,7 +29,7 @@ class EntityMapper final {
         file_ids(file_ids_),
         fragment(fragment_) {}
 
-  mx::FileId FileId(const pasta::File &file);
+  mx::RawEntityId FileId(const pasta::File &file);
   mx::RawEntityId ParentDeclId(const pasta::Decl &entity);
   mx::RawEntityId ParentDeclId(const pasta::Stmt &entity);
   mx::RawEntityId ParentStmtId(const pasta::Decl &entity);
@@ -43,6 +43,7 @@ class EntityMapper final {
   uint32_t PseudoId(const pasta::TemplateArgument &pseudo);
   uint32_t PseudoId(const pasta::TemplateParameterList &pseudo);
   uint32_t PseudoId(const pasta::CXXBaseSpecifier &pseudo);
+  uint32_t PseudoId(const pasta::Designator &pseudo);
 };
 
 }  // namespace indexer

@@ -43,7 +43,7 @@ class CodeGenerator {
 // AST node and generate source ir for function decl found.
 
 std::string ConvertToSourceIR(
-    IndexingContext &context, mx::FragmentId code_id,
+    IndexingContext &context, mx::RawEntityId fragment_id,
     const std::vector<pasta::Decl> &decls);
 
 }  // namespace indexer

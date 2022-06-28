@@ -101,7 +101,7 @@ struct HistoryBrowserView::PrivateData {
   unsigned counter{1u};  // Version of this history view.
 
   std::unordered_map<QTreeWidgetItem *, EventLocation> item_to_loc;
-  std::unordered_map<FileId, std::filesystem::path> file_id_to_path;
+  std::unordered_map<RawEntityId, std::filesystem::path> file_id_to_path;
 
   inline PrivateData(Multiplier &multiplier_)
       : multiplier(multiplier_) {}
@@ -235,7 +235,7 @@ void HistoryBrowserView::FillRow(
   // Show the line and column numbers.
   if (auto loc = file_tok.nearest_location(d->multiplier.FileLocationCache())) {
     auto file = File::containing(file_tok);
-    FileId file_id = file ? file->id() : kInvalidEntityId;
+    RawEntityId file_id = file ? file->id() : kInvalidEntityId;
 
     if (auto fp_it = d->file_id_to_path.find(file_id);
         fp_it != d->file_id_to_path.end()) {
@@ -293,7 +293,6 @@ void HistoryBrowserView::AddDeclarationsUnderRoot(const EventLocations &locs) {
   }
 
   for (EventLocation loc : locs) {
-
     ScopeReferenceCounted suppress_event(d->event_suppress);
 
     QTreeWidgetItem *item = nullptr;

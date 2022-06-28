@@ -29,7 +29,7 @@ enum ConstraintType {
   Containing = 1 << 2
 };
 
-std::optional<mx::FragmentId> FragmentContaining(mx::EntityId id);
+std::optional<mx::RawEntityId> FragmentContaining(mx::EntityId id);
 
 template <typename T> struct FromEntityId;
 
@@ -124,6 +124,21 @@ template <> struct FromEntityId<mx::TemplateArgument> {
 
 template <> struct FromEntityId<mx::CXXBaseSpecifier> {
   std::optional<mx::CXXBaseSpecifier> get(mx::Index &index, mx::EntityId id) {
+    return std::nullopt;
+  }
+};
+
+template <> struct FromEntityId<mx::Designator> {
+  std::optional<mx::Designator> get(mx::Index &index, mx::EntityId id) {
+    auto vid{id.Unpack()};
+    if (!std::holds_alternative<mx::DesignatorId>(vid)) {
+      return std::nullopt;
+    }
+
+    auto variant{index.entity(id)};
+    if (std::holds_alternative<mx::Designator>(variant)) {
+      return std::get<mx::Designator>(variant);
+    }
     return std::nullopt;
   }
 };

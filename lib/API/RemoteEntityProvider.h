@@ -73,14 +73,15 @@ class RemoteEntityProvider final : public EntityProvider {
   FilePathList ListFiles(const Ptr &) final;
 
   // Get the current list of fragment IDs associated with a file.
-  std::vector<FragmentId> ListFragmentsInFile(const Ptr &, FileId id) final;
+  std::vector<RawEntityId> ListFragmentsInFile(
+      const Ptr &, RawEntityId id) final;
 
   // Download a file by its unique ID.
-  std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
+  std::shared_ptr<const FileImpl> FileFor(const Ptr &, RawEntityId id) final;
 
   // Download a fragment by its unique ID.
   std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, FragmentId id) final;
+  FragmentFor(const Ptr &, RawEntityId id) final;
 
   // Run a Weggli query over all files.
   std::shared_ptr<WeggliQueryResultImpl> Query(
@@ -97,13 +98,13 @@ class RemoteEntityProvider final : public EntityProvider {
   // to analyze when looking for uses.
   void FillUses(const Ptr &, RawEntityId eid,
                 std::vector<RawEntityId> &redecl_ids_out,
-                std::vector<FragmentId> &fragment_ids_out) final;
+                std::vector<RawEntityId> &fragment_ids_out) final;
 
   // Fill out `redecl_ids_out` and `fragmnet_ids_out` with the set of things
   // to analyze when looking for references.
   void FillReferences(const Ptr &, RawEntityId eid,
                       std::vector<RawEntityId> &redecl_ids_out,
-                      std::vector<FragmentId> &fragment_ids_out) final;
+                      std::vector<RawEntityId> &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
                   mx::DeclCategory category,

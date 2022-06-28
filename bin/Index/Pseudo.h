@@ -11,7 +11,8 @@
 #define PSEUDO_ENTITY_TYPES(p) \
     p(TemplateArgument) \
     p(TemplateParameterList) \
-    p(CXXBaseSpecifier)
+    p(CXXBaseSpecifier) \
+    p(Designator)
 
 #define PSEUDO_ENTITY_TYPE_ENUMERATOR(n) k ## n ,
 

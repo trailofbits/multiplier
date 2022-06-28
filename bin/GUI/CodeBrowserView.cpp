@@ -33,9 +33,9 @@ struct CodeBrowserView::PrivateData {
   QTabWidget *content{nullptr};
   OmniBoxView *omnibox{nullptr};
 
-  std::unordered_map<FileId, FileView *> file_id_to_view;
-  std::unordered_map<QWidget *, FileId> view_to_file_id;
-  std::unordered_map<FileId, std::filesystem::path> file_id_to_path;
+  std::unordered_map<RawEntityId, FileView *> file_id_to_view;
+  std::unordered_map<QWidget *, RawEntityId> view_to_file_id;
+  std::unordered_map<RawEntityId, std::filesystem::path> file_id_to_path;
 
   std::atomic<unsigned> counter;
 
@@ -47,7 +47,7 @@ struct LocateEntitiesThread::PrivateData {
   const Index index;
   const EventLocations locs;
   const unsigned counter;
-  std::vector<FileId> seen_file_ids;
+  std::vector<RawEntityId> seen_file_ids;
 
   inline PrivateData(const Index &index_, const EventLocations &ids_,
                      unsigned counter_)
@@ -63,7 +63,7 @@ LocateEntitiesThread::LocateEntitiesThread(
     : d(new PrivateData(index_, ids_, counter_)) {}
 
 void LocateEntitiesThread::RunOnToken(Token file_tok) {
-  FileId file_id = File::containing(file_tok)->id();
+  RawEntityId file_id = File::containing(file_tok)->id();
   if (std::find(d->seen_file_ids.begin(), d->seen_file_ids.end(), file_id) ==
       d->seen_file_ids.end()) {
     emit OpenEntityInFile(file_id, file_tok.id(), d->counter);
@@ -163,7 +163,7 @@ void CodeBrowserView::OnCloseFileViewTab(int index) {
   if (QWidget *view = d->content->widget(index); view && view != d->omnibox) {
     if (auto file_it = d->view_to_file_id.find(view);
         file_it != d->view_to_file_id.end()) {
-      const FileId file_id = file_it->second;
+      const RawEntityId file_id = file_it->second;
       assert(file_id != kInvalidEntityId);
 
       d->view_to_file_id.erase(view);
@@ -179,7 +179,7 @@ void CodeBrowserView::OnDownloadedFileList(FilePathList files) {
   d->file_id_to_path.clear();
   for (auto &[path_, file_id_] : files) {
     std::filesystem::path path = path_;
-    FileId file_id = file_id_;
+    RawEntityId file_id = file_id_;
     d->file_id_to_path.emplace(file_id, std::move(path));
   }
 }
@@ -188,7 +188,7 @@ void CodeBrowserView::OnDownloadedFileList(FilePathList files) {
 // then open it. If it is open but not the active view, then set it to the
 // active view.
 void CodeBrowserView::ScrollToTokenInFile(
-    FileId file_id, RawEntityId scroll_target, unsigned counter) {
+    RawEntityId file_id, RawEntityId scroll_target, unsigned counter) {
 
   std::filesystem::path path;
   auto path_it = d->file_id_to_path.find(file_id);
@@ -275,7 +275,8 @@ void CodeBrowserView::OpenEntitySearch(void) {
 // Open a file in a tab.
 //
 // NOTE(pag): This does not set the file to be the active widget.
-void CodeBrowserView::OpenFile(std::filesystem::path path, mx::FileId file_id,
+void CodeBrowserView::OpenFile(std::filesystem::path path,
+                               mx::RawEntityId file_id,
                                bool show) {
   FileView *&file_view = d->file_id_to_view[file_id];
   if (!file_view) {

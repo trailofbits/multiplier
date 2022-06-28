@@ -144,13 +144,13 @@ FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) try {
 
   FilePathList files;
   for (rpc::FileInfo::Reader entry : response.getFiles()) {
-    const FileId file_id = entry.getId();
+    const RawEntityId file_id = entry.getId();
     assert(file_id != kInvalidEntityId);
     assert(entry.hasPath());
     capnp::Text::Reader path = entry.getPath();
     assert(0u < path.size());
     std::filesystem::path p(path.cStr());
-    files.emplace(std::move(p), file_id);
+    files.emplace(std::move(p), EntityId(FileId(file_id)));
   }
 
   return files;
@@ -161,8 +161,8 @@ FilePathList RemoteEntityProvider::ListFiles(const Ptr &self) try {
 }
 
 // Get the current list of fragment IDs associated with a file.
-std::vector<FragmentId> RemoteEntityProvider::ListFragmentsInFile(
-    const Ptr &self, FileId id) try {
+std::vector<RawEntityId> RemoteEntityProvider::ListFragmentsInFile(
+    const Ptr &self, RawEntityId id) try {
   ClientConnection &cc = Connection(self);
   capnp::Request<mx::rpc::Multiplier::FindFileFragmentsParams,
                  mx::rpc::Multiplier::FindFileFragmentsResults>
@@ -175,9 +175,9 @@ std::vector<FragmentId> RemoteEntityProvider::ListFragmentsInFile(
   auto resp_version_number = response.getVersionNumber();
   MaybeUpdateVersionNumber(self, resp_version_number);
 
-  std::vector<FragmentId> fragments;
+  std::vector<RawEntityId> fragments;
   fragments.reserve(response.getFragmentIds().size());
-  for (FragmentId fragment_id : response.getFragmentIds()) {
+  for (RawEntityId fragment_id : response.getFragmentIds()) {
     fragments.push_back(fragment_id);
   }
 
@@ -189,7 +189,8 @@ std::vector<FragmentId> RemoteEntityProvider::ListFragmentsInFile(
 }
 
 // Download a file by its unique ID.
-FileImpl::Ptr RemoteEntityProvider::FileFor(const Ptr &self, FileId id) try {
+FileImpl::Ptr RemoteEntityProvider::FileFor(
+    const Ptr &self, RawEntityId id) try {
   ClientConnection &cc = Connection(self);
   capnp::Request<mx::rpc::Multiplier::DownloadFileParams,
                  mx::rpc::Multiplier::DownloadFileResults>
@@ -213,7 +214,7 @@ FileImpl::Ptr RemoteEntityProvider::FileFor(const Ptr &self, FileId id) try {
 
 // Download a fragment based off of an entity ID.
 FragmentImpl::Ptr RemoteEntityProvider::FragmentFor(
-    const Ptr &self, FragmentId id) try {
+    const Ptr &self, RawEntityId id) try {
 
   ClientConnection &cc = Connection(self);
   capnp::Request<mx::rpc::Multiplier::DownloadFragmentParams,
@@ -330,7 +331,7 @@ std::vector<RawEntityId> RemoteEntityProvider::Redeclarations(
 // to analyze when looking for uses.
 void RemoteEntityProvider::FillUses(
     const Ptr &self, RawEntityId eid, std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<FragmentId> &fragment_ids_out) try {
+    std::vector<RawEntityId> &fragment_ids_out) try {
 
   ClientConnection &cc = Connection(self);
 
@@ -385,7 +386,7 @@ void RemoteEntityProvider::FillUses(
 // to analyze when looking for references.
 void RemoteEntityProvider::FillReferences(
     const Ptr &self, RawEntityId eid, std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<FragmentId> &fragment_ids_out) try {
+    std::vector<RawEntityId> &fragment_ids_out) try {
 
   ClientConnection &cc = Connection(self);
 

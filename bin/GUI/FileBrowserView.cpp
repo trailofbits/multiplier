@@ -34,7 +34,7 @@ struct FileBrowserView::PrivateData final {
 
   std::unordered_map<
       QTreeWidgetItem *,
-      std::pair<std::filesystem::path, FileId>> file_infos;
+      std::pair<std::filesystem::path, RawEntityId>> file_infos;
 
   inline PrivateData(FileBrowserConfiguration &config_)
       : config(config_) {}

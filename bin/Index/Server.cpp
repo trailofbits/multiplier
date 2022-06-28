@@ -233,10 +233,10 @@ kj::Promise<void> Server::downloadFileList(
     DownloadFileListContext context) {
   unsigned version_number = d->server_context.version_number.load();
 
-  std::vector<std::pair<mx::FileId, std::string>> paths;
+  std::vector<std::pair<mx::RawEntityId, std::string>> paths;
   d->server_context.file_id_to_path.ScanPrefix(
       mx::Empty{},
-      [=, &paths] (mx::FileId file_id, std::string file_path) {
+      [=, &paths] (mx::RawEntityId file_id, std::string file_path) {
         DCHECK_NE(file_id, mx::kInvalidEntityId);
         DCHECK(!file_path.empty());
         paths.emplace_back(file_id, std::move(file_path));
@@ -265,7 +265,7 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
 
   unsigned version_number = d->server_context.version_number.load();
 
-  mx::FileId file_id = params.getId();
+  mx::RawEntityId file_id = params.getId();
   std::optional<std::string> maybe_contents =
       d->server_context.file_id_to_serialized_file.TryGet(file_id);
   if (!maybe_contents) {
@@ -277,8 +277,8 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
 
   // TODO(pag): This is a yolo-ducated of a guess.
   capnp::MessageSize size{
-    ((maybe_contents->size() + 7u / 8u)),
-    0u};
+      ((maybe_contents->size() + 7u / 8u)),
+      0u};
 
   mx::rpc::Multiplier::DownloadFileResults::Builder result =
       context.initResults(size);
@@ -298,7 +298,7 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
       context.getParams();
 
   std::stringstream err;
-  mx::FragmentId fragment_id = params.getId();
+  mx::RawEntityId fragment_id = params.getId();
 
   std::optional<std::string> maybe_contents =
       d->server_context.fragment_id_to_serialized_fragment.TryGet(fragment_id);
@@ -350,16 +350,25 @@ kj::Promise<void> Server::weggliQueryFragments(
   }
   executor.Wait();
 
-  std::set<mx::FragmentId> fragment_ids;
+  std::vector<mx::RawEntityId> fragment_ids;
+  fragment_ids.reserve(128u);
 
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
     d->server_context.file_fragment_lines.ScanPrefix(
-        prefix, [&fragment_ids] (mx::FileId, unsigned, mx::FragmentId id) {
-          fragment_ids.emplace(id);
+        prefix,
+        [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
+          if (fragment_ids.empty() || fragment_ids.back() != id) {
+            fragment_ids.push_back(id);
+          }
           return true;
         });
   }
+
+  // Keep only unique fragment ids.
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
 
   auto num_fragments = fragment_ids.size();
   std::stringstream err;
@@ -373,7 +382,7 @@ kj::Promise<void> Server::weggliQueryFragments(
 
   auto fragments = result.initFragmentIds(static_cast<unsigned>(num_fragments));
   auto index = 0u;
-  for (auto fragment_id : fragment_ids) {
+  for (mx::RawEntityId fragment_id : fragment_ids) {
     fragments.set(index++, fragment_id);
   }
 
@@ -407,18 +416,27 @@ kj::Promise<void> Server::regexQueryFragments(
   }
   executor.Wait();
 
-  std::set<mx::FragmentId> matches;
+  std::vector<mx::RawEntityId> fragment_ids;
+  fragment_ids.reserve(128u);
 
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
     d->server_context.file_fragment_lines.ScanPrefix(
-        prefix, [&matches] (mx::FileId, unsigned, mx::FragmentId frag_id) {
-      matches.emplace(frag_id);
-      return true;
-    });
+        prefix,
+        [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
+          if (fragment_ids.empty() || fragment_ids.back() != id) {
+            fragment_ids.push_back(id);
+          }
+          return true;
+        });
   }
 
-  auto num_fragments = matches.size();
+  // Keep only unique fragment ids.
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
+
+  auto num_fragments = fragment_ids.size();
   std::stringstream err;
   if (num_fragments >= std::numeric_limits<unsigned>::max()) {
     err << "Too many fragments found: " << num_fragments
@@ -431,7 +449,7 @@ kj::Promise<void> Server::regexQueryFragments(
   auto match_builder = result.initFragmentIds(
       static_cast<unsigned>(num_fragments));
   auto index = 0u;
-  for (mx::FragmentId frag_id : matches) {
+  for (mx::RawEntityId frag_id : fragment_ids) {
     match_builder.set(index++, frag_id);
   }
 
@@ -484,13 +502,13 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
 
   result.setVersionNumber(d->server_context.version_number.load());
 
-  std::vector<mx::FragmentId> fragment_ids;
+  std::vector<mx::RawEntityId> fragment_ids;
   fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
     d->server_context.entity_id_use_to_fragment_id.ScanPrefix(
         eid,
-        [&fragment_ids] (mx::RawEntityId, mx::FragmentId frag_id) {
+        [&fragment_ids] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids.push_back(frag_id);
           return true;
         });
@@ -511,7 +529,7 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
 
   auto fib = result.initFragmentIds(static_cast<unsigned>(num_fragments));
   auto i = 0u;
-  for (mx::FragmentId frag_id : fragment_ids) {
+  for (mx::RawEntityId frag_id : fragment_ids) {
     fib.set(i++, frag_id);
   }
 
@@ -530,13 +548,13 @@ kj::Promise<void> Server::findReferences(FindReferencesContext context) {
 
   result.setVersionNumber(d->server_context.version_number.load());
 
-  std::vector<mx::FragmentId> fragment_ids;
+  std::vector<mx::RawEntityId> fragment_ids;
   fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
     d->server_context.entity_id_reference.ScanPrefix(
         eid,
-        [&fragment_ids] (mx::RawEntityId, mx::FragmentId frag_id) {
+        [&fragment_ids] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids.push_back(frag_id);
           return true;
         });
@@ -557,7 +575,7 @@ kj::Promise<void> Server::findReferences(FindReferencesContext context) {
 
   auto fib = result.initFragmentIds(static_cast<unsigned>(num_fragments));
   auto i = 0u;
-  for (mx::FragmentId frag_id : fragment_ids) {
+  for (mx::RawEntityId frag_id : fragment_ids) {
     fib.set(i++, frag_id);
   }
 
@@ -574,16 +592,16 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
 
   result.setVersionNumber(d->server_context.version_number.load());
 
-  mx::FileId file_id = params.getFileId();
+  mx::RawEntityId file_id = params.getFileId();
 
-  std::vector<mx::FragmentId> fragment_ids;
+  std::vector<mx::RawEntityId> fragment_ids;
   fragment_ids.reserve(128u);
 
   // Collect the fragments associated with this file.
   d->server_context.file_fragment_ids.ScanPrefix(
       file_id,
-      [file_id, &fragment_ids] (mx::FileId found_file_id,
-                                mx::FragmentId fragment_id) {
+      [file_id, &fragment_ids] (mx::RawEntityId found_file_id,
+                                mx::RawEntityId fragment_id) {
         DCHECK_EQ(file_id, found_file_id);
         fragment_ids.push_back(fragment_id);
         return file_id == found_file_id;

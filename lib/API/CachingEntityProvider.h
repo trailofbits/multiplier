@@ -36,18 +36,18 @@ class CachingEntityProvider final : public EntityProvider {
   // cycles.
   std::vector<std::shared_ptr<const void>> entities;
 
-  std::unordered_map<FragmentId, FragmentImpl::WeakPtr> fragments;
-  std::unordered_map<FileId, FileImpl::WeakPtr> files;
+  std::unordered_map<RawEntityId, FragmentImpl::WeakPtr> fragments;
+  std::unordered_map<RawEntityId, FileImpl::WeakPtr> files;
 
   // Cached list of fragments inside of files.
-  std::unordered_map<FileId, std::vector<FragmentId>> file_fragments;
+  std::unordered_map<RawEntityId, std::vector<RawEntityId>> file_fragments;
 
   // Cached redeclarations/references/uses.
   std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
       redeclarations;
-  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<FragmentId>>>
+  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
       uses;
-  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<FragmentId>>>
+  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
       references;
 
   void ClearCacheLocked(unsigned new_version_number);
@@ -67,13 +67,15 @@ class CachingEntityProvider final : public EntityProvider {
 
   FilePathList ListFiles(const Ptr &) final;
 
-  std::vector<FragmentId> ListFragmentsInFile(const Ptr &, FileId id) final;
+  std::vector<RawEntityId> ListFragmentsInFile(
+      const Ptr &, RawEntityId id) final;
 
-  std::shared_ptr<const FileImpl> FileFor(const Ptr &, FileId id) final;
+  std::shared_ptr<const FileImpl> FileFor(
+      const Ptr &, RawEntityId id) final;
 
   // Download a fragment by its unique ID.
   std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, FragmentId id) final;
+  FragmentFor(const Ptr &, RawEntityId id) final;
 
   std::shared_ptr<WeggliQueryResultImpl>
   Query(const Ptr &, const WeggliQuery &) final;
@@ -85,11 +87,11 @@ class CachingEntityProvider final : public EntityProvider {
 
   void FillUses(const Ptr &, RawEntityId eid,
                 std::vector<RawEntityId> &redecl_ids_out,
-                std::vector<FragmentId> &fragment_ids_out) final;
+                std::vector<RawEntityId> &fragment_ids_out) final;
 
   void FillReferences(const Ptr &, RawEntityId eid,
                       std::vector<RawEntityId> &redecl_ids_out,
-                      std::vector<FragmentId> &fragment_ids_out) final;
+                      std::vector<RawEntityId> &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
                   mx::DeclCategory category,

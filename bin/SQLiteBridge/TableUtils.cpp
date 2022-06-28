@@ -4,24 +4,33 @@ SQLITE_EXTENSION_INIT3
 #include "TableUtils.h"
 
 namespace sqlite_bridge {
-std::optional<mx::FragmentId> FragmentContaining(mx::EntityId id) {
+std::optional<mx::RawEntityId> FragmentContaining(mx::EntityId id) {
   auto var{id.Unpack()};
+  mx::RawEntityId frag_id;
   if (std::holds_alternative<mx::DeclarationId>(var)) {
-    return std::get<mx::DeclarationId>(var).fragment_id;
+    frag_id = std::get<mx::DeclarationId>(var).fragment_id;
   } else if (std::holds_alternative<mx::StatementId>(var)) {
-    return std::get<mx::StatementId>(var).fragment_id;
+    frag_id = std::get<mx::StatementId>(var).fragment_id;
   } else if (std::holds_alternative<mx::TypeId>(var)) {
-    return std::get<mx::TypeId>(var).fragment_id;
+    frag_id = std::get<mx::TypeId>(var).fragment_id;
   } else if (std::holds_alternative<mx::FragmentTokenId>(var)) {
-    return std::get<mx::FragmentTokenId>(var).fragment_id;
+    frag_id = std::get<mx::FragmentTokenId>(var).fragment_id;
   } else if (std::holds_alternative<mx::FileTokenId>(var)) {
     return std::nullopt;
   } else if (std::holds_alternative<mx::TokenSubstitutionId>(var)) {
-    return std::get<mx::TokenSubstitutionId>(var).fragment_id;
+    frag_id = std::get<mx::TokenSubstitutionId>(var).fragment_id;
+  } else if (std::holds_alternative<mx::DesignatorId>(var)) {
+    frag_id = std::get<mx::DesignatorId>(var).fragment_id;
+  } else if (std::holds_alternative<mx::FragmentId>(var)) {
+    frag_id = std::get<mx::FragmentId>(var).fragment_id;
+  } else if (std::holds_alternative<mx::FileId>(var)) {
+    return std::nullopt;
   } else {
     assert(false);
     return std::nullopt;
   }
+
+  return mx::EntityId(mx::FragmentId(frag_id));
 }
 
 bool FalsePredicate(mx::Index &index, mx::EntityId ancestor_eid,

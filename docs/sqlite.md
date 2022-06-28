@@ -4793,6 +4793,7 @@ Available enumerations:
 * `TEMPLATE_ARGUMENT`
 * `TEMPLATE_PARAMETER_LIST`
 * `CXX_BASE_SPECIFIER`
+* `DESIGNATOR`
 
 </details>
 
@@ -4801,6 +4802,18 @@ Available enumerations:
 Every class exposed by the Multiplier API has a corresponding table for use with SQL queries.
 
 In addition to the fields listed in each entry's summary, every table also has `id` and `fragment_id` fields
+
+<!-- | `is_field_designator` | `INTEGER` | :heavy_check_mark: | |
+| `is_array_designator` | `INTEGER` | :heavy_check_mark: | |
+| `is_array_range_designator` | `INTEGER` | :heavy_check_mark: | |
+| `field` | `INTEGER` | :x: | [`FieldDecl`](#FieldDecl) |
+| `dot_token` | `INTEGER` | :heavy_check_mark: | |
+| `field_token` | `INTEGER` | :heavy_check_mark: | |
+| `left_bracket_token` | `INTEGER` | :heavy_check_mark: | |
+| `right_bracket_token` | `INTEGER` | :heavy_check_mark: | |
+| `ellipsis_token` | `INTEGER` | :heavy_check_mark: | |
+| `first_expression_index` | `INTEGER` | :x: | [`unsigned`](#unsigned) |
+ -->
 
 <!-- | `num_parameters` | `INTEGER` | :heavy_check_mark: | |
 | `num_required_parameters` | `INTEGER` | :heavy_check_mark: | |

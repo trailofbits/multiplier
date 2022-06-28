@@ -505,7 +505,7 @@ void Multiplier::OnOpenDock(QString title, QWidget *widget) {
 }
 
 void Multiplier::OnSourceFileDoubleClicked(
-    std::filesystem::path path, FileId file_id) {
+    std::filesystem::path path, RawEntityId file_id) {
   d->code_browser_view->OpenFile(std::move(path), file_id, true);
 }
 

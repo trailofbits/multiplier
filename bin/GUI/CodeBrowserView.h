@@ -40,7 +40,8 @@ class CodeBrowserView final : public QWidget {
   // Open a file in a tab.
   //
   // NOTE(pag): This does not set the file to be the active widget.
-  void OpenFile(std::filesystem::path path, FileId file_id, bool show=false);
+  void OpenFile(std::filesystem::path path, RawEntityId file_id,
+                bool show=false);
 
   // Request for one or more entities to be opened.
   void OpenEntities(const EventLocations &);
@@ -69,11 +70,11 @@ class CodeBrowserView final : public QWidget {
   // Scroll to a specific target location in a file. If the file isn't open yet
   // then open it. If it is open but not the active view, then set it to the
   // active view.
-  void ScrollToTokenInFile(FileId file_id, RawEntityId scroll_target,
+  void ScrollToTokenInFile(RawEntityId file_id, RawEntityId scroll_target,
                            unsigned counter);
 
  signals:
-  void CurrentFile(FileId file_id);
+  void CurrentFile(RawEntityId file_id);
 };
 
 // Thread that goes and downloads and structures the relevant code in the
@@ -97,7 +98,7 @@ class LocateEntitiesThread final : public QObject, public QRunnable {
                        unsigned counter);
 
  signals:
-  void OpenEntityInFile(FileId file_id, RawEntityId scroll_target,
+  void OpenEntityInFile(RawEntityId file_id, RawEntityId scroll_target,
                         unsigned counter);
 };
 

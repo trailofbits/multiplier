@@ -87,7 +87,7 @@ using TokenListBuilder =
 static void PersistTokenTree(EntityMapper &em,
                              SubstitutionListBuilder &subs_builder,
                              TokenListBuilder toks_builder,
-                             TokenTree tree, mx::FragmentId fragment_id,
+                             TokenTree tree, mx::RawEntityId fragment_id,
                              unsigned &next_sub_offset) {
   unsigned i =0;
   for (TokenTreeNode node : tree) {
@@ -193,7 +193,7 @@ static void PersistTokens(EntityMapper &em, const pasta::TokenRange &tokens,
 //            to go canonical->specific in the first place, and why a failure to
 //            do so results in `kInvalidEntityId` instead of just falling back
 //            on the ID of the canonical decl.
-static uint64_t IdOfRedeclInFragment(EntityMapper &em, mx::FragmentId frag_id,
+static uint64_t IdOfRedeclInFragment(EntityMapper &em, mx::RawEntityId frag_id,
                                      pasta::Decl canon_decl) {
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
     mx::EntityId eid = em.EntityId(redecl);
@@ -231,7 +231,7 @@ static uint64_t IdOfRedeclInFragment(EntityMapper &em, mx::FragmentId frag_id,
 // down the lists, and so that takes some special handling.
 static void PersistTokenContexts(
     EntityMapper &em, const pasta::TokenRange &tokens,
-    mx::FragmentId frag_id, uint64_t begin_index, uint64_t end_index,
+    mx::RawEntityId frag_id, uint64_t begin_index, uint64_t end_index,
     mx::rpc::Fragment::Builder &fb) {
 
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
@@ -424,7 +424,7 @@ static void PersistTokenContexts(
 // for every such query. Similarly, we often want to map from matches in files
 // to matches in fragments, and so we create and persist a mapping of file
 // offsets to line numbers here to help us with those translations later.
-void PersistFile(IndexingContext &context, mx::FileId file_id,
+void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
                  std::string file_hash, pasta::File file) {
   auto file_tokens = file.Tokens();
   auto maybe_file_data = file.Data();
@@ -537,7 +537,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
   // Serialize all discovered entities.
   frag.Serialize(em, fb);
 
-  const mx::FragmentId fragment_id = frag.fragment_id;
+  const mx::RawEntityId fragment_id = frag.fragment_id;
   const pasta::Decl &leader_decl = frag.decls[0];
   const uint64_t begin_index = frag.begin_index;
   const uint64_t end_index = frag.end_index;
@@ -570,7 +570,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
   pasta::FileToken max_token = file_tokens[0];
   FindFileRange(token_tree, file, &min_token, &max_token, num_substitutions);
 
-  mx::FileId file_id = em.FileId(file);
+  mx::RawEntityId file_id = em.FileId(file);
   fb.setId(fragment_id);
   fb.setFirstFileTokenId(em.EntityId(min_token));
   fb.setLastFileTokenId(em.EntityId(max_token));

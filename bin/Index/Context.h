@@ -112,13 +112,13 @@ class ServerContext {
 
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
-  std::atomic<mx::FileId> next_file_id;
+  std::atomic<mx::RawEntityId> next_file_id;
 
   // The next ID for a "small fragment." A small fragment has fewer than
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
   // are more common, and require fewer bits to encode token offsets inside of
   // the packed `mx::EntityId` for tokens.
-  std::atomic<mx::FragmentId> next_small_fragment_id;
+  std::atomic<mx::RawEntityId> next_small_fragment_id;
 
   // The next ID for a "big fragment." A big fragment has at least
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
@@ -128,29 +128,34 @@ class ServerContext {
   // but because we reserve the low ID space for big fragment IDs, we know that
   // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
   // bit for token offset bits.
-  std::atomic<mx::FragmentId> next_big_fragment_id;
+  std::atomic<mx::RawEntityId> next_big_fragment_id;
 
   // Maps file IDs to their absolute path, as well as to their token lists.
-  mx::PersistentSet<kFileIdToPath, mx::FileId, std::string> file_id_to_path;
+  mx::PersistentSet<kFileIdToPath, mx::RawEntityId, std::string>
+      file_id_to_path;
 
   // Maps file IDs to a serialized `rpc::File` data structure.
-  mx::PersistentMap<kFileIdToSerializedFile, mx::FileId, std::string>
+  mx::PersistentMap<kFileIdToSerializedFile, mx::RawEntityId, std::string>
       file_id_to_serialized_file;
 
   // A set of `(file_id, fragment_id)` pairs for mapping from files to the
   // fragments contained in those files.
-  mx::PersistentSet<kFileIdToFragmentId, mx::FileId, mx::FragmentId>
+  mx::PersistentSet<kFileIdToFragmentId,
+                    mx::RawEntityId  /* file id */,
+                    mx::RawEntityId  /* fragment id */>
       file_fragment_ids;
 
   // A set of `(file_id, line number, fragment_id)` triples for mapping from
   // search results to the fragments that might overlap with those search
   // results.
   mx::PersistentSet<kFileIdAndLineNumberToFragmentId,
-                    mx::FileId, unsigned, mx::FragmentId>
+                    mx::RawEntityId  /* file id */,
+                    unsigned  /* line number */,
+                    mx::RawEntityId  /* fragment id */>
       file_fragment_lines;
 
   // Maps a hash of a file's contents to an ID for that file.
-  mx::PersistentMap<kFileHashToFileId, std::string, mx::FileId>
+  mx::PersistentMap<kFileHashToFileId, std::string, mx::RawEntityId>
       file_hash_to_file_id;
 
   // Maps an aggregate key of the form
@@ -159,12 +164,12 @@ class ServerContext {
   //
   // to "fragment ids," that is, the ID of the serialized code containing one or
   // more top-level declarations.
-  mx::PersistentMap<kFragmentHashToFragmentId, std::string, mx::FragmentId>
+  mx::PersistentMap<kFragmentHashToFragmentId, std::string, mx::RawEntityId>
       code_hash_to_fragment_id;
 
   // Maps a fragment ID to the serialized `rpc::Fragment` data structure.
   mx::PersistentMap<kFragmentIdToSerializedFragment,
-                    mx::FragmentId, std::string>
+                    mx::RawEntityId, std::string>
       fragment_id_to_serialized_fragment;
 
   // Each time we come across a redeclarable declaration, we add in the TU-
@@ -186,12 +191,12 @@ class ServerContext {
       mangled_name_to_entity_id;
 
   // Maps uses of entities to the IDs of fragments that use the entities.
-  mx::PersistentSet<kEntityIdUseToFragmentId, mx::RawEntityId, mx::FragmentId>
+  mx::PersistentSet<kEntityIdUseToFragmentId, mx::RawEntityId, mx::RawEntityId>
       entity_id_use_to_fragment_id;
 
   // Keeps track of references, e.g. `DeclRefExpr`, the fields accessed by
   // `MemberExpr`, etc.
-  mx::PersistentSet<kEntityIdReference, mx::RawEntityId, mx::FragmentId>
+  mx::PersistentSet<kEntityIdReference, mx::RawEntityId, mx::RawEntityId>
       entity_id_reference;
 
   std::unique_ptr<Database> connection;
@@ -285,9 +290,9 @@ class IndexingContext {
   const unsigned version_number;
 
   // Worker-local next counters for IDs.
-  std::vector<NextId<mx::FileId>> local_next_file_id;
-  std::vector<NextId<mx::FragmentId>> local_next_small_fragment_id;
-  std::vector<NextId<mx::FragmentId>> local_next_big_fragment_id;
+  std::vector<NextId<mx::RawEntityId>> local_next_file_id;
+  std::vector<NextId<mx::RawEntityId>> local_next_small_fragment_id;
+  std::vector<NextId<mx::RawEntityId>> local_next_big_fragment_id;
 
   std::unique_ptr<CodeGenerator> codegen;
 
@@ -304,21 +309,21 @@ class IndexingContext {
 
   // Get or create a file ID for the file at `file_path` with contents
   // `contents_hash`.
-  std::pair<mx::FileId, bool> GetOrCreateFileId(
+  std::pair<mx::RawEntityId, bool> GetOrCreateFileId(
       mx::WorkerId worker_id, std::filesystem::path file_path,
       const std::string &contents_hash);
 
   // Get or create a code ID for the top-level declarations that hash to
   // `code_hash`.
-  std::pair<mx::FragmentId, bool> GetOrCreateFragmentId(
+  std::pair<mx::RawEntityId, bool> GetOrCreateFragmentId(
       mx::WorkerId worker_id, const std::string &code_hash,
       uint64_t num_tokens);
 
   // Save the serialized contents of a file as a token list.
-  void PutSerializedFile(mx::FileId file_id, std::string);
+  void PutSerializedFile(mx::RawEntityId file_id, std::string);
 
   // Save the serialized top-level entities and the parsed tokens.
-  void PutSerializedFragment(mx::FragmentId id, std::string);
+  void PutSerializedFragment(mx::RawEntityId id, std::string);
 
   // Link fragment declarations.
   void LinkDeclarations(mx::RawEntityId a, mx::RawEntityId b);
@@ -327,15 +332,16 @@ class IndexingContext {
   void LinkMangledName(const std::string &name, mx::RawEntityId eid);
 
   // Link an entity to the fragment that uses the entity.
-  void LinkUseInFragment(mx::RawEntityId use, mx::FragmentId user);
+  void LinkUseInFragment(mx::RawEntityId use, mx::RawEntityId user);
 
   // Link a direct reference to an entity from another entity.
-  void LinkReferenceInFragment(mx::RawEntityId use, mx::FragmentId user);
+  void LinkReferenceInFragment(mx::RawEntityId use, mx::RawEntityId user);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out
   // which fragments overlap which lines.
-  void PutFragmentLineCoverage(mx::FileId file_id, mx::FragmentId fragment_id,
+  void PutFragmentLineCoverage(mx::RawEntityId file_id,
+                               mx::RawEntityId fragment_id,
                                unsigned start_line, unsigned end_line);
 };
 
@@ -347,15 +353,15 @@ class SearchingContext {
   virtual ~SearchingContext(void);
 
   // Next file ID for any `SearchingAction` to look at.
-  std::atomic<mx::FileId> local_next_file_id;
+  std::atomic<mx::RawEntityId> local_next_file_id;
 
   // Set of `file_id:line_number` pairs where matches were approximately
   // found.
-  std::set<std::tuple<mx::FileId, unsigned>> line_results;
+  std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
   std::mutex line_results_lock;
 
   std::optional<std::string>
-  GetSerializedFile(mx::FileId file_id);
+  GetSerializedFile(mx::RawEntityId file_id);
 };
 
 }  // namespace indexer

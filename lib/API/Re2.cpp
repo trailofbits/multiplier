@@ -25,7 +25,7 @@ RegexQueryResultImpl::RegexQueryResultImpl(
   auto fragment_ids_reader = response.getFragmentIds();
   fragment_ids.reserve(fragment_ids_reader.size());
 
-  for (mx::FragmentId frag_id : fragment_ids_reader) {
+  for (RawEntityId frag_id : fragment_ids_reader) {
     fragment_ids.emplace_back(frag_id);
   }
 }
@@ -85,7 +85,7 @@ bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   return true;
 }
 
-bool RegexQueryResultImpl::InitForFragment(mx::FragmentId frag_id) {
+bool RegexQueryResultImpl::InitForFragment(RawEntityId frag_id) {
   return InitForFragment(ep->FragmentFor(ep, frag_id));
 }
 

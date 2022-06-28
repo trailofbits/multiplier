@@ -19,10 +19,10 @@ class FragmentListImpl {
   const EntityProvider::Ptr ep;
 
   // List of fragment IDs.
-  std::vector<FragmentId> fragment_ids;
+  std::vector<RawEntityId> fragment_ids;
 
   inline FragmentListImpl(EntityProvider::Ptr ep_,
-                          std::vector<FragmentId> fragment_ids_)
+                          std::vector<RawEntityId> fragment_ids_)
       : ep(std::move(ep_)),
         fragment_ids(std::move(fragment_ids_)) {}
 };
@@ -32,7 +32,9 @@ class FragmentImpl {
   using Ptr = std::shared_ptr<const FragmentImpl>;
   using WeakPtr = std::weak_ptr<const FragmentImpl>;
 
-  const FragmentId fragment_id;
+  // NOTE(pag): This is the fragment identifier without adornment. That is,
+  //            it is *NOT* a packed entity ID representation.
+  const RawEntityId fragment_id;
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
@@ -49,12 +51,14 @@ class FragmentImpl {
 
   virtual ~FragmentImpl(void) noexcept;
 
-  inline FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_)
+  inline FragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_)
       : fragment_id(id_),
         ep(std::move(ep_)) {}
 
   // Return the ID of the file containing the first token.
-  virtual FileId FileContaingFirstToken(void) const = 0;
+  //
+  // NOTE(pag): This returns the raw, unpacked file id.
+  virtual RawEntityId FileContaingFirstToken(void) const = 0;
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
@@ -107,11 +111,18 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
 
   virtual ~PackedFragmentImpl(void) noexcept;
 
-  PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
+  PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
                      Response response_);
 
+  inline PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
+                            Response response_)
+      : PackedFragmentImpl(id_.fragment_id, std::move(ep_),
+                           std::move(response_)) {}
+
   // Return the ID of the file containing the first token.
-  FileId FileContaingFirstToken(void) const final;
+  //
+  // NOTE(pag): This returns the raw, unpacked file id.
+  RawEntityId FileContaingFirstToken(void) const final;
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
@@ -133,7 +144,7 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
 
   // Return the token reader for another file.
   TokenReader::Ptr ReaderForFile(const TokenReader::Ptr &self,
-                                 mx::FileId id) const final;
+                                 RawEntityId id) const final;
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const final;

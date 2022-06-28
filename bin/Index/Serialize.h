@@ -413,6 +413,7 @@ class TokenRange;
 class CXXBaseSpecifier;
 class TemplateArgument;
 class TemplateParameterList;
+class Designator;
 class FileToken;
 enum class TokenRole : unsigned short;
 enum class DeclKind : unsigned;
@@ -1067,4 +1068,5 @@ void SerializeRecordType(EntityMapper &, mx::ast::Type::Builder, const pasta::Re
 void SerializeCXXBaseSpecifier(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::CXXBaseSpecifier &);
 void SerializeTemplateArgument(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::TemplateArgument &);
 void SerializeTemplateParameterList(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::TemplateParameterList &);
+void SerializeDesignator(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::Designator &);
 }  // namespace indexer

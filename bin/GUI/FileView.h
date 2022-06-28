@@ -31,7 +31,7 @@ class FileView final : public QWidget {
   virtual ~FileView(void);
 
   FileView(Multiplier &multiplier, std::filesystem::path file_path,
-           FileId file_id, QWidget *parent = nullptr);
+           RawEntityId file_id, QWidget *parent = nullptr);
 
   void ScrollToToken(RawEntityId eid) const;
 

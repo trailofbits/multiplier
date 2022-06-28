@@ -44,7 +44,7 @@ class RegexQueryResultImpl final {
   unsigned next_match_index{0};
 
   // List of fragments that might match.
-  std::vector<mx::FragmentId> fragment_ids;
+  std::vector<RawEntityId> fragment_ids;
 
   using Response =
       capnp::Response<mx::rpc::Multiplier::RegexQueryFragmentsResults>;
@@ -62,7 +62,7 @@ class RegexQueryResultImpl final {
   EntityId EntityContainingOffset(unsigned offset) const;
 
   bool InitForFragment(FragmentImpl::Ptr frag_);
-  bool InitForFragment(FragmentId frag_id);
+  bool InitForFragment(RawEntityId frag_id);
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);
 };

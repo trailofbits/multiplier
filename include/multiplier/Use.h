@@ -31,7 +31,8 @@ enum class UseKind : unsigned char {
   TYPE,
   CXX_BASE_SPECIFIER,
   TEMPLATE_ARGUMENT,
-  TEMPLATE_PARAMETER_LIST
+  TEMPLATE_PARAMETER_LIST,
+  DESIGNATOR
 };
 
 inline static const char *EnumerationName(UseKind) {

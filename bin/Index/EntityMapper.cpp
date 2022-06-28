@@ -84,7 +84,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
   }
 }
 
-mx::FileId EntityMapper::FileId(const pasta::File &file) {
+mx::RawEntityId EntityMapper::FileId(const pasta::File &file) {
   if (auto fit = file_ids.find(file); fit != file_ids.end()) {
     return fit->second;
   } else {
@@ -154,5 +154,14 @@ uint32_t EntityMapper::PseudoId(const pasta::CXXBaseSpecifier &pseudo) {
   }
 }
 
+uint32_t EntityMapper::PseudoId(const pasta::Designator &pseudo) {
+  if (auto it = fragment.pseudo_offsets.find(pseudo.RawDesignator());
+      it != fragment.pseudo_offsets.end()) {
+    return it->second;
+  } else {
+    assert(false);
+    return ~0u;
+  }
+}
 
 }  // namespace indexer

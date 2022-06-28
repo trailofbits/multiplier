@@ -63,12 +63,12 @@ int FragmentTable::BestIndex(sqlite3_index_info *info) {
 }
 
 class FragmentCursor : public VirtualTableCursor {
-private:
+ private:
   mx::Index index;
-  std::vector<mx::FragmentId> fragments;
+  std::vector<mx::RawEntityId> fragments;
   decltype(fragments)::iterator cur;
 
-public:
+ public:
   FragmentCursor(mx::EntityProvider::Ptr ep) : index(ep) {}
 
   virtual ~FragmentCursor() = default;

@@ -229,6 +229,10 @@ bool UseIteratorImpl::FindNextPseudo(UseIteratorBase &self) {
           self.use.kind = UseKind::TEMPLATE_PARAMETER_LIST;
           FindUses_TemplateParameterList(eid, self.use.selectors, reader, found);
           break;
+        case PseudoKind::DESIGNATOR:
+          self.use.kind = UseKind::DESIGNATOR;
+          FindUses_Designator(eid, self.use.selectors, reader, found);
+          break;
       }
     }
 
@@ -287,6 +291,7 @@ bool UseIteratorImpl::FindNext(UseIteratorBase &self) {
       case UseKind::CXX_BASE_SPECIFIER:
       case UseKind::TEMPLATE_ARGUMENT:
       case UseKind::TEMPLATE_PARAMETER_LIST:
+      case UseKind::DESIGNATOR:
         if (FindNextPseudo(self)) {
           return true;
 

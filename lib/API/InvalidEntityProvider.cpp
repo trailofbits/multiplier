@@ -22,16 +22,16 @@ FilePathList InvalidEntityProvider::ListFiles(const Ptr &) {
   return {};
 }
 
-std::vector<FragmentId> InvalidEntityProvider::ListFragmentsInFile(
-    const Ptr &, FileId) {
+std::vector<RawEntityId> InvalidEntityProvider::ListFragmentsInFile(
+    const Ptr &, RawEntityId) {
   return {};
 }
 
-FileImpl::Ptr InvalidEntityProvider::FileFor(const Ptr &, FileId) {
+FileImpl::Ptr InvalidEntityProvider::FileFor(const Ptr &, RawEntityId) {
   return {};
 }
 
-FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(const Ptr &, FragmentId) {
+FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(const Ptr &, RawEntityId) {
   return {};
 }
 
@@ -53,7 +53,7 @@ std::vector<RawEntityId> InvalidEntityProvider::Redeclarations(
 void InvalidEntityProvider::FillUses(
     const Ptr &, RawEntityId eid,
     std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<FragmentId> &fragment_ids_out) {
+    std::vector<RawEntityId> &fragment_ids_out) {
   redecl_ids_out.clear();
   fragment_ids_out.clear();
 }
@@ -61,7 +61,7 @@ void InvalidEntityProvider::FillUses(
 void InvalidEntityProvider::FillReferences(
     const Ptr &, RawEntityId eid,
     std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<FragmentId> &fragment_ids_out) {
+    std::vector<RawEntityId> &fragment_ids_out) {
   redecl_ids_out.clear();
   fragment_ids_out.clear();
 }

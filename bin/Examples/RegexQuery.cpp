@@ -20,7 +20,7 @@ DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the h
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment in which to perform the search");
 
-std::string GetFileContaining(mx::Index &index, mx::FileId file_id) {
+std::string GetFileContaining(mx::Index &index, mx::RawEntityId file_id) {
   for (auto [path, id] : index.file_paths()) {
     if (id == file_id) {
       return path.generic_string();

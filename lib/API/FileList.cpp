@@ -16,7 +16,7 @@ FileListImpl::FileListImpl(EntityProvider::Ptr ep_)
   auto file_paths = ep->ListFiles(ep);
   file_ids.reserve(file_paths.size());
   for (const auto &[path, file_id] : file_paths) {
-    file_ids.push_back(file_id);
+    file_ids.emplace_back(file_id);
   }
 
   std::sort(file_ids.begin(), file_ids.end());
@@ -27,9 +27,12 @@ FileListImpl::FileListImpl(EntityProvider::Ptr ep_)
 // Advance to the next valid file.
 void FileListIterator::Advance(void) {
   for (; index < num_files; ++index) {
-    file = impl->ep->FileFor(impl->ep, impl->file_ids[index]);
-    if (file) {
-      return;
+    VariantId vid = EntityId(impl->file_ids[index]).Unpack();
+    if (std::holds_alternative<FileId>(vid)) {
+      file = impl->ep->FileFor(impl->ep, std::get<FileId>(vid).file_id);
+      if (file) {
+        return;
+      }
     }
   }
 }

@@ -31,16 +31,34 @@ FilePathList Index::file_paths(void) const {
 }
 
 std::optional<File> Index::file(FileId id) const {
-  if (auto ptr = impl->FileFor(impl, id)) {
+  if (auto ptr = impl->FileFor(impl, id.file_id)) {
     return File(std::move(ptr));
   } else {
     return std::nullopt;
   }
 }
 
+std::optional<File> Index::file(RawEntityId id) const {
+  VariantId vid = EntityId(id).Unpack();
+  if (std::holds_alternative<FileId>(vid)) {
+    return file(std::get<FileId>(vid));
+  } else {
+    return std::nullopt;
+  }
+}
+
 std::optional<Fragment> Index::fragment(FragmentId id) const {
-  if (auto ptr = impl->FragmentFor(impl, id)) {
+  if (auto ptr = impl->FragmentFor(impl, id.fragment_id)) {
     return Fragment(std::move(ptr));
+  } else {
+    return std::nullopt;
+  }
+}
+
+std::optional<Fragment> Index::fragment(RawEntityId id) const {
+  VariantId vid = EntityId(id).Unpack();
+  if (std::holds_alternative<FragmentId>(vid)) {
+    return fragment(std::get<FragmentId>(vid));
   } else {
     return std::nullopt;
   }
@@ -50,7 +68,11 @@ std::optional<Fragment> Index::fragment(FragmentId id) const {
 std::optional<Fragment> Index::fragment_containing(EntityId id) const {
   mx::VariantId opt_id = id.Unpack();
   FragmentImpl::Ptr ptr;
-  if (std::holds_alternative<mx::DeclarationId>(opt_id)) {
+  if (std::holds_alternative<FragmentId>(opt_id)) {
+    ptr = impl->FragmentFor(
+        impl, std::get<mx::FragmentId>(opt_id).fragment_id);
+
+  } else if (std::holds_alternative<mx::DeclarationId>(opt_id)) {
     ptr = impl->FragmentFor(
         impl, std::get<mx::DeclarationId>(opt_id).fragment_id);
 
@@ -61,6 +83,14 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
   } else if (std::holds_alternative<mx::FragmentTokenId>(opt_id)) {
     ptr = impl->FragmentFor(
         impl, std::get<mx::FragmentTokenId>(opt_id).fragment_id);
+
+  } else if (std::holds_alternative<mx::DesignatorId>(opt_id)) {
+    ptr = impl->FragmentFor(
+        impl, std::get<mx::DesignatorId>(opt_id).fragment_id);
+
+  } else if (std::holds_alternative<mx::TokenSubstitutionId>(opt_id)) {
+    ptr = impl->FragmentFor(
+        impl, std::get<mx::TokenSubstitutionId>(opt_id).fragment_id);
   }
 
   if (ptr) {
@@ -71,8 +101,7 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
 }
 
 // Return an entity given its ID.
-std::variant<Decl, Stmt, Type, Token, TokenSubstitution, NotAnEntity>
-Index::entity(EntityId eid) const {
+VariantEntity Index::entity(EntityId eid) const {
 
   VariantId vid = eid.Unpack();
 
@@ -141,6 +170,8 @@ Index::entity(EntityId eid) const {
   } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
     TokenSubstitutionId id = std::get<TokenSubstitutionId>(vid);
     assert(id == EntityId(id));
+
+    // TODO(pag): Bounds check.
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
       return TokenSubstitution(frag_ptr, id.offset, id.kind);
     }
@@ -158,6 +189,25 @@ Index::entity(EntityId eid) const {
           assert(false);
         }
       }
+    }
+  
+  } else if (std::holds_alternative<DesignatorId>(vid)) {
+    DesignatorId id = std::get<DesignatorId>(vid);
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && id.offset < frag_ptr->num_pseudos) {
+      return Designator(std::move(frag_ptr), id.offset);
+    }
+ 
+  } else if (std::holds_alternative<FragmentId>(vid)) {
+    FragmentId id = std::get<FragmentId>(vid);
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
+      return Fragment(std::move(frag_ptr));
+    }
+
+  } else if (std::holds_alternative<FileId>(vid)) {
+    FileId id = std::get<FileId>(vid);
+    if (FileImpl::Ptr file_ptr = impl->FileFor(impl, id.file_id)) {
+      return File(std::move(file_ptr));
     }
   }
 

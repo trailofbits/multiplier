@@ -33,7 +33,7 @@ static void PrintUnparsedTokens(mx::TokenSubstitutionList nodes) {
   }
 }
 
-std::string GetFileContaining(mx::Index &index, mx::FileId file_id) {
+std::string GetFileContaining(mx::Index &index, mx::RawEntityId file_id) {
   for (auto [path, id] : index.file_paths()) {
     if (id == file_id) {
       return path.generic_string();

@@ -28,12 +28,14 @@
 namespace indexer {
 
 using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
-using FileIdMap = std::unordered_map<pasta::File, mx::FileId>;
+using FileIdMap = std::unordered_map<pasta::File, mx::RawEntityId>;
 using TypeKey = std::pair<const void *, uint32_t>;
 using TypeIdMap = std::map<TypeKey, mx::EntityId>;
 using PseudoOffsetMap = std::unordered_map<const void *, uint32_t>;
-using Pseudo = std::variant<pasta::TemplateArgument, pasta::CXXBaseSpecifier,
-                            pasta::TemplateParameterList>;
+using Pseudo = std::variant<pasta::TemplateArgument,
+                            pasta::CXXBaseSpecifier,
+                            pasta::TemplateParameterList,
+                            pasta::Designator>;
 
 class EntityMapper;
 class IndexingContext;
@@ -49,7 +51,7 @@ class NameMangler;
 struct PendingFragment {
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
-  mx::FragmentId fragment_id;
+  mx::RawEntityId fragment_id;
 
   // Top-level declarations. These are the roots of serialization.
   std::vector<pasta::Decl> decls;

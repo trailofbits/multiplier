@@ -623,23 +623,23 @@ EntityBaseOffsetPair GetFragmentOffset(RawEntityId id) {
   VariantId vid = EntityId(id).Unpack();
   if (std::holds_alternative<DeclarationId>(vid)) {
     auto eid = std::get<DeclarationId>(vid);
-    return {eid.fragment_id, eid.offset};
+    return {EntityId(FragmentId(eid.fragment_id)), eid.offset};
 
   } else if (std::holds_alternative<StatementId>(vid)) {
     auto eid = std::get<StatementId>(vid);
-    return {eid.fragment_id, eid.offset};
+    return {EntityId(FragmentId(eid.fragment_id)), eid.offset};
 
   } else if (std::holds_alternative<TypeId>(vid)) {
     auto eid = std::get<TypeId>(vid);
-    return {eid.fragment_id, eid.offset};
+    return {EntityId(FragmentId(eid.fragment_id)), eid.offset};
 
   } else if (std::holds_alternative<FragmentTokenId>(vid)) {
     auto eid = std::get<FragmentTokenId>(vid);
-    return {eid.fragment_id, eid.offset};
+    return {EntityId(FragmentId(eid.fragment_id)), eid.offset};
 
   } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
     auto eid = std::get<TokenSubstitutionId>(vid);
-    return {eid.fragment_id, eid.offset};
+    return {EntityId(FragmentId(eid.fragment_id)), eid.offset};
 
   } else {
     return {kInvalidEntityId, 0u};

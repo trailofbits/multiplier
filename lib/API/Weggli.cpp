@@ -16,7 +16,7 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(
     const WeggliQuery &query_, EntityProvider::Ptr ep_, Response response)
     : query(query_),
       ep(std::move(ep_)) {
-  for (FragmentId frag_id : response.getFragmentIds()) {
+  for (RawEntityId frag_id : response.getFragmentIds()) {
     fragments.emplace_back(frag_id);
   }
 }

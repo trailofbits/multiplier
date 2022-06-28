@@ -48,7 +48,7 @@ EntityId InvalidTokenReader::NthFileTokenId(unsigned token_index) const {
 
 // Return the token reader for another file.
 TokenReader::Ptr InvalidTokenReader::ReaderForFile(
-    const Ptr &self, mx::FileId id) const {
+    const Ptr &self, RawEntityId id) const {
   return {};
 }
 
@@ -277,7 +277,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     return *this;
   }
 
-  FileId file_id = kInvalidEntityId;
+  RawEntityId file_id = kInvalidEntityId;
 
   // Find the nearest file token for the first token.
   for (auto i = 0u; i <= index; ++i) {

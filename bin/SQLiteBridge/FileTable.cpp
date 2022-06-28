@@ -52,7 +52,7 @@ template <> struct TypeAdapter<mx::FilePathList::value_type> {
   }
 
   std::int64_t
-  GetRowId(const std::pair<const std::filesystem::path, mx::FileId> &obj) {
+  GetRowId(const std::pair<const std::filesystem::path, mx::RawEntityId> &obj) {
     return obj.second;
   }
 };

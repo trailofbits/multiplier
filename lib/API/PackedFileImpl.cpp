@@ -11,7 +11,7 @@ namespace mx {
 PackedFileImpl::~PackedFileImpl(void) noexcept {}
 
 PackedFileImpl::PackedFileImpl(
-    FileId id_, EntityProvider::Ptr ep_, Response response)
+    RawEntityId id_, EntityProvider::Ptr ep_, Response response)
     : FileImpl(id_, std::move(ep_)),
       package(response.getFile()),
       reader(package.Reader<rpc::File>()),
@@ -74,7 +74,7 @@ EntityId PackedFileImpl::NthFileTokenId(unsigned token_index) const {
 
 // Return the token reader for another file.
 TokenReader::Ptr PackedFileImpl::ReaderForFile(const TokenReader::Ptr &self,
-                                               mx::FileId fid) const {
+                                               RawEntityId fid) const {
   if (fid == file_id) {
     return self;
   } else if (FileImpl::Ptr ptr = ep->FileFor(ep, fid)) {

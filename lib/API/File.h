@@ -20,7 +20,7 @@ class FileLocationCacheImpl {
  public:
   std::mutex lock;
   const FileLocationConfiguration config;
-  std::unordered_map<FileId, FileLocationVector> cache;
+  std::unordered_map<RawEntityId, FileLocationVector> cache;
 
   inline FileLocationCacheImpl(const FileLocationConfiguration &config_)
       : config(config_) {}
@@ -32,7 +32,9 @@ class FileLocationCacheImpl {
 class FileListImpl {
  public:
   const EntityProvider::Ptr ep;
-  std::vector<mx::FileId> file_ids;
+
+  // NOTE(pag): These are `EntityId`-packed file ids.
+  std::vector<RawEntityId> file_ids;
 
   explicit FileListImpl(EntityProvider::Ptr ep_);
 };
@@ -43,7 +45,9 @@ class FileImpl {
   using Ptr = std::shared_ptr<const FileImpl>;
   using WeakPtr = std::weak_ptr<const FileImpl>;
 
-  const FileId file_id;
+  // NOTE(pag): This is *NOT* a packed file id / entity ID representation, it
+  //            is the raw ID that would go into a `FileId`.
+  const RawEntityId file_id;
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
@@ -51,9 +55,12 @@ class FileImpl {
 
   virtual ~FileImpl(void) noexcept;
 
-  inline FileImpl(FileId id_, EntityProvider::Ptr ep_)
+  inline FileImpl(RawEntityId id_, EntityProvider::Ptr ep_)
       : file_id(id_),
         ep(std::move(ep_)) {}
+
+  inline FileImpl(FileId id_, EntityProvider::Ptr ep_)
+      : FileImpl(id_.file_id, std::move(ep_)) {}
 
   // Return a reader for the tokens in the file.
   virtual std::shared_ptr<const class TokenReader> TokenReader(
@@ -74,7 +81,10 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
 
   virtual ~PackedFileImpl(void) noexcept;
 
-  PackedFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_);
+  PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_, Response response_);
+
+  inline PackedFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_)
+      : PackedFileImpl(id_.file_id, std::move(ep_), std::move(response_)) {}
 
   // Return the data of the file.
   std::string_view Data(void) const final;
@@ -98,7 +108,7 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
 
   // Return the token reader for another file.
   TokenReader::Ptr ReaderForFile(const TokenReader::Ptr &self,
-                                 mx::FileId id) const final;
+                                 RawEntityId id) const final;
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const final;

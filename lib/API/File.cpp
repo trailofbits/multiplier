@@ -200,8 +200,8 @@ FileList File::in(const Index &index) {
 }
 
 // Return the ID of this file.
-FileId File::id(void) const noexcept {
-  return impl->file_id;
+RawEntityId File::id(void) const noexcept {
+  return EntityId(FileId{impl->file_id});
 }
 
 // Return the file tokens for the file.

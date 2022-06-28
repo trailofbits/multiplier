@@ -279,7 +279,8 @@ class FileImpl;
 class ReferenceRange;
 class StmtIterator;
 class Token;
-class TokenContext;class TokenContextIterator;
+class TokenContext;
+class TokenContextIterator;
 class TokenRange;
 class UseBase;
 
@@ -6993,6 +6994,7 @@ enum class PseudoKind : unsigned char {
   TEMPLATE_ARGUMENT,
   TEMPLATE_PARAMETER_LIST,
   CXX_BASE_SPECIFIER,
+  DESIGNATOR,
 };
 
 PseudoKind FromPasta(pasta::PseudoKind pasta_val);
@@ -7002,7 +7004,7 @@ inline static const char *EnumerationName(PseudoKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(PseudoKind) {
-  return 3;
+  return 4;
 }
 
 const char *EnumeratorName(PseudoKind);
@@ -7012,6 +7014,7 @@ class TokenRange;
 class CXXBaseSpecifier;
 class TemplateArgument;
 class TemplateParameterList;
+class Designator;
 class FileToken;
 class Decl;
 class EmptyDecl;
@@ -7410,6 +7413,51 @@ class ObjCInterfaceType;
 class RValueReferenceType;
 class RecordType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
+class Designator {
+ protected:
+  friend class Decl;
+  friend class DeclIterator;
+  friend class File;
+  friend class Fragment;
+  friend class FragmentImpl;
+  friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
+  friend class Stmt;
+  friend class StmtIterator;
+  friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset;
+
+ public:
+  Designator(Designator &&) noexcept = default;
+  Designator(const Designator &) = default;
+  Designator &operator=(Designator &&) noexcept = default;
+  Designator &operator=(const Designator &) = default;
+
+  inline Designator(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+      : fragment(std::move(fragment_)),
+        offset(offset_) {}
+
+  bool is_field_designator(void) const;
+  bool is_array_designator(void) const;
+  bool is_array_range_designator(void) const;
+  std::optional<FieldDecl> field(void) const;
+  TokenRange tokens(void) const;
+  Token dot_token(void) const;
+  Token field_token(void) const;
+  Token left_bracket_token(void) const;
+  Token right_bracket_token(void) const;
+  Token ellipsis_token(void) const;
+  std::optional<unsigned> first_expression_index(void) const;
+};
+
 class TemplateParameterList {
  protected:
   friend class Decl;
@@ -17389,6 +17437,7 @@ class DesignatedInitExpr : public Expr {
     }
   }
 
+  std::vector<Designator> designators(void) const;
   TokenRange designators_source_range(void) const;
   Token equal_or_colon_token(void) const;
   Expr initializer(void) const;
@@ -35331,6 +35380,7 @@ enum class TokenUseSelector : unsigned short {
   DEFAULT_TOKEN,
   DESTROYED_TYPE_TOKEN,
   DO_TOKEN,
+  DOT_TOKEN,
   ELLIPSIS_TOKEN,
   ELSE_TOKEN,
   END_OF_DEFINITION_TOKEN,
@@ -35340,6 +35390,7 @@ enum class TokenUseSelector : unsigned short {
   EXPORT_TOKEN,
   EXPRESSION_TOKEN,
   EXTERN_TOKEN,
+  FIELD_TOKEN,
   FINALLY_TOKEN,
   FIRST_COLON_TOKEN,
   FIRST_INNER_TOKEN,
@@ -35364,6 +35415,7 @@ enum class TokenUseSelector : unsigned short {
   LEAVE_TOKEN,
   LEFT_ANGLE_TOKEN,
   LEFT_BRACE_TOKEN,
+  LEFT_BRACKET_TOKEN,
   LEFT_TOKEN,
   MEMBER_TOKEN,
   NAME_TOKEN,
@@ -35386,6 +35438,7 @@ enum class TokenUseSelector : unsigned short {
   RETURN_TOKEN,
   RIGHT_ANGLE_TOKEN,
   RIGHT_BRACE_TOKEN,
+  RIGHT_BRACKET_TOKEN,
   RIGHT_TOKEN,
   SECOND_COLON_TOKEN,
   SELECTOR_START_TOKEN,
@@ -35418,7 +35471,7 @@ inline static const char *EnumerationName(TokenUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenUseSelector) {
-  return 111;
+  return 115;
 }
 
 const char *EnumeratorName(TokenUseSelector);

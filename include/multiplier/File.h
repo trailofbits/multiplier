@@ -197,8 +197,8 @@ class File {
   // Return all files in a given index.
   static FileList in(const Index &index);
 
-  // Return the ID of this file.
-  FileId id(void) const noexcept;
+  // Return the entity ID of this file.
+  RawEntityId id(void) const noexcept;
 
   // Return the file tokens for the file.
   TokenList tokens(void) const noexcept;

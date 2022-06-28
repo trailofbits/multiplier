@@ -32,7 +32,7 @@ struct FileView::PrivateData {
 FileView::~FileView(void) {}
 
 FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
-                   FileId file_id, QWidget *parent)
+                   RawEntityId file_id, QWidget *parent)
     : QWidget(parent),
       d(std::make_unique<PrivateData>(multiplier.Configuration().file)) {
 

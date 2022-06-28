@@ -130,7 +130,7 @@ void CodeGenerator::GenerateSourceIRFromTLDs(
 // Generate source IR from the TLDs
 std::string ConvertToSourceIR(
     IndexingContext &context,
-    mx::FragmentId code_id, const std::vector<pasta::Decl> &decls) {
+    mx::RawEntityId fragment_id, const std::vector<pasta::Decl> &decls) {
 
   // Get the instance of code generator
   if (auto codegen = context.codegen.get()) {
@@ -138,7 +138,7 @@ std::string ConvertToSourceIR(
 
     try {
       codegen->GenerateSourceIRFromTLDs(
-          std::to_string(code_id), decls, ir_string);
+          std::to_string(fragment_id), decls, ir_string);
       if (!ir_string.empty()) {
         IndexingCounterRes ir_counter(context.stat, kStatSourceIRFragment);
       }
@@ -146,8 +146,8 @@ std::string ConvertToSourceIR(
 
     } catch (const std::exception &e) {
       LOG(ERROR) << "Failed to generate Source IR from the "
-                 << "top-level declaration with code id "
-                 << code_id << "\nerror " << e.what();
+                 << "top-level declaration with fragment id "
+                 << fragment_id << "\nerror " << e.what();
     }
   }
 
@@ -167,7 +167,7 @@ void CodeGenerator::GenerateSourceIRFromTLDs(
 // Generate source IR from the TLDs
 std::string ConvertToSourceIR(
     IndexingContext &,
-    mx::FragmentId, const std::vector<pasta::Decl> &) {
+    mx::RawEntityId, const std::vector<pasta::Decl> &) {
   return {};
 }
 #endif  // MX_DISABLE_SOURCEIR

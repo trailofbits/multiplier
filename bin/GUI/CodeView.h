@@ -48,9 +48,9 @@ class CodeView final : public QPlainTextEdit {
 
   // Change the underlying data of this view.
   void SetFile(const File &file);
-  void SetFile(const Index &index, FileId file_id);
+  void SetFile(const Index &index, RawEntityId file_id);
   void SetFragment(const Fragment &fragment);
-  void SetFragment(const Index &index, FragmentId fragment_id);
+  void SetFragment(const Index &index, RawEntityId fragment_id);
   void SetTokenRange(const Index &index, RawEntityId begin_tok_id,
                      RawEntityId end_tok_id);
 
@@ -95,11 +95,11 @@ class DownloadCodeThread final : public QObject, public QRunnable {
 
   static DownloadCodeThread *CreateFileDownloader(
       const Index &index_, const CodeTheme &theme_, uint64_t counter,
-      FileId file_id_);
+      RawEntityId file_id_);
 
   static DownloadCodeThread *CreateFragmentDownloader(
       const Index &index_, const CodeTheme &theme_, uint64_t counter,
-      FragmentId frag_id_);
+      RawEntityId frag_id_);
 
   static DownloadCodeThread *CreateTokenRangeDownloader(
       const Index &index_, const CodeTheme &theme_, uint64_t counter,

@@ -43,6 +43,7 @@ class FragmentBuilder {
   void Accept(const pasta::TemplateArgument &entity);
   void Accept(const pasta::CXXBaseSpecifier &entity);
   void Accept(const pasta::TemplateParameterList &entity);
+  void Accept(const pasta::Designator &entity);
 
   void MaybeVisitNext(const pasta::Token &) {}
 
@@ -53,6 +54,7 @@ class FragmentBuilder {
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo);
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo);
   void MaybeVisitNext(const pasta::TemplateParameterList &pseudo);
+  void MaybeVisitNext(const pasta::Designator &pseudo);
 };
 
 void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
@@ -146,6 +148,15 @@ void FragmentBuilder::MaybeVisitNext(
   auto offset = static_cast<uint32_t>(fragment.pseudos_to_serialize.size());
   if (fragment.pseudo_offsets.emplace(
           pseudo.RawTemplateParameterList(), offset).second) {
+    fragment.pseudos_to_serialize.emplace_back(pseudo);
+  }
+}
+
+void FragmentBuilder::MaybeVisitNext(
+    const pasta::Designator &pseudo) {
+  auto offset = static_cast<uint32_t>(fragment.pseudos_to_serialize.size());
+  if (fragment.pseudo_offsets.emplace(
+          pseudo.RawDesignator(), offset).second) {
     fragment.pseudos_to_serialize.emplace_back(pseudo);
   }
 }
@@ -310,6 +321,8 @@ void PendingFragment::Build(EntityIdMap &entity_ids, FileIdMap &file_ids,
         builder.VisitCXXBaseSpecifier(std::get<pasta::CXXBaseSpecifier>(pseudo));
       } else if (std::holds_alternative<pasta::TemplateParameterList>(pseudo)) {
         builder.VisitTemplateParameterList(std::get<pasta::TemplateParameterList>(pseudo));
+      } else if (std::holds_alternative<pasta::Designator>(pseudo)) {
+        builder.VisitDesignator(std::get<pasta::Designator>(pseudo));
       } else {
         assert(false);
       }

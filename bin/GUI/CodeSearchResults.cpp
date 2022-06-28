@@ -108,10 +108,10 @@ class CodeSearchResultsModelImpl {
   std::vector<std::pair<int, int>> capture_sub_ranges;
 
   std::vector<File> files;
-  std::unordered_map<FileId, unsigned> file_indexes;
+  std::unordered_map<RawEntityId, unsigned> file_indexes;
 
   std::vector<Fragment> fragments;
-  std::unordered_map<FragmentId, unsigned> fragment_indexes;
+  std::unordered_map<RawEntityId, unsigned> fragment_indexes;
 
   ModelMode mode{ModelMode::kNoData};
 

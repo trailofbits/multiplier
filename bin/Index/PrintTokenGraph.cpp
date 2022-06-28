@@ -98,6 +98,10 @@ void PrintTokenGraph(const pasta::TokenRange &tokens, uint64_t begin_index,
         bgcolor = " bgcolor=\"goldenrod1\"";
         kind_name = "Attr";
         break;
+      case pasta::TokenContextKind::kDesignator:
+        bgcolor = " bgcolor=\"teal\"";
+        kind_name = "Designator";
+        break;
       case pasta::TokenContextKind::kString:
         bgcolor = " bgcolor=\"gainsboro\"";
         kind_name = reinterpret_cast<const char *>(context.Data());

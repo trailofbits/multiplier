@@ -128,7 +128,7 @@ struct OmniBoxView::PrivateData {
   unsigned symbol_counter{0};
   unsigned regex_counter{0};
 
-  std::unordered_map<FileId, std::filesystem::path> file_id_to_path;
+  std::unordered_map<RawEntityId, std::filesystem::path> file_id_to_path;
 
   inline PrivateData(Multiplier &multiplier_)
       : multiplier(multiplier_) {}
@@ -517,7 +517,7 @@ void OmniBoxView::FillRow(QTreeWidgetItem *item, const NamedDecl &decl) const {
 
   // Show the line and column numbers.
   auto file = File::containing(tok);
-  FileId file_id = file ? file->id() : kInvalidEntityId;
+  RawEntityId file_id = file ? file->id() : kInvalidEntityId;
 
   if (auto fp_it = d->file_id_to_path.find(file_id);
       fp_it != d->file_id_to_path.end()) {

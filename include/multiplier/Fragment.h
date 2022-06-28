@@ -176,8 +176,8 @@ class Fragment {
   static Fragment containing(const UseBase &);
   static Fragment containing(const Reference &);
 
-  // Return the ID of this fragment.
-  FragmentId id(void) const noexcept;
+  // Return the entity ID of this fragment.
+  RawEntityId id(void) const noexcept;
 
   // The range of file tokens in this fragment.
   TokenRange file_tokens(void) const;

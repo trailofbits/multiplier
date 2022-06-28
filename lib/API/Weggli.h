@@ -32,7 +32,7 @@ class WeggliQueryResultImpl final {
   unsigned next_weggli_match{0};
 
   // List of fragments in this file.
-  std::vector<FragmentId> fragments;
+  std::vector<RawEntityId> fragments;
 
   using Response =
       capnp::Response<mx::rpc::Multiplier::WeggliQueryFragmentsResults>;

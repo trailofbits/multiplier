@@ -51,7 +51,7 @@ class FileBrowserView final : public QWidget {
   void OnFilterFileView(const QString &filter);
 
  signals:
-  void SourceFileDoubleClicked(std::filesystem::path, FileId file_id);
+  void SourceFileDoubleClicked(std::filesystem::path, RawEntityId file_id);
   void Connected(void);
 };
 

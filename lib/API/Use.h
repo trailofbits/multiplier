@@ -20,7 +20,7 @@ class BaseUseIteratorImpl {
  public:
   std::shared_ptr<EntityProvider> ep;
   std::vector<RawEntityId> search_ids;
-  std::vector<FragmentId> fragment_ids;
+  std::vector<RawEntityId> fragment_ids;
 
   inline BaseUseIteratorImpl(std::shared_ptr<EntityProvider> ep_)
       : ep(std::move(ep_)) {}

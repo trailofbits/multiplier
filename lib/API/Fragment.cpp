@@ -28,7 +28,7 @@ void FileFragmentListIterator::Advance(void) {
 FragmentList Fragment::in(const File &file) {
   auto &ep = file.impl->ep;
   auto list = std::make_shared<FragmentListImpl>(
-      ep, ep->ListFragmentsInFile(ep, file.id()));
+      ep, ep->ListFragmentsInFile(ep, file.impl->file_id));
   auto num_fragments = list->fragment_ids.size();
   return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
 }
@@ -77,8 +77,8 @@ Fragment Fragment::containing(const Reference &ref) {
 }
 
 // Return the ID of this fragment.
-FragmentId Fragment::id(void) const noexcept {
-  return impl->fragment_id;
+RawEntityId Fragment::id(void) const noexcept {
+  return EntityId(FragmentId{impl->fragment_id});
 }
 
 // The range of file tokens in this fragment.

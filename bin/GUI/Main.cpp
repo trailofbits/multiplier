@@ -199,8 +199,6 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType<mx::gui::UserLocationsPtr>("UserLocationsPtr");
   qRegisterMetaType<mx::gui::UserLocations>("UserLocations");
   qRegisterMetaType<mx::RawEntityId>("RawEntityId");
-  qRegisterMetaType<mx::FileId>("FileId");
-  qRegisterMetaType<mx::FragmentId>("FragmentId");
   qRegisterMetaType<mx::EntityId>("EntityId");
   qRegisterMetaType<mx::FilePathList>("FilePathList");
   qRegisterMetaType<mx::Token>("Token");

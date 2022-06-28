@@ -12,7 +12,7 @@ namespace mx {
 
 PackedFragmentImpl::~PackedFragmentImpl(void) noexcept {}
 
-PackedFragmentImpl::PackedFragmentImpl(FragmentId id_,
+PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
                                        EntityProvider::Ptr ep_,
                                        Response response)
     : FragmentImpl(id_, std::move(ep_)),
@@ -28,7 +28,9 @@ PackedFragmentImpl::PackedFragmentImpl(FragmentId id_,
 }
 
 // Return the ID of the file containing the first token.
-FileId PackedFragmentImpl::FileContaingFirstToken(void) const {
+//
+// NOTE(pag): This returns the raw, unpacked file id.
+RawEntityId PackedFragmentImpl::FileContaingFirstToken(void) const {
   EntityId id(reader.getFirstFileTokenId());
   if (VariantId unpacked_id = id.Unpack();
       std::holds_alternative<FileTokenId>(unpacked_id)) {
@@ -97,7 +99,7 @@ EntityId PackedFragmentImpl::NthFileTokenId(unsigned token_index) const {
 
 // Return the token reader for another file.
 TokenReader::Ptr PackedFragmentImpl::ReaderForFile(
-    const TokenReader::Ptr &self, mx::FileId file_id) const {
+    const TokenReader::Ptr &self, RawEntityId file_id) const {
   FileImpl::Ptr ptr = ep->FileFor(ep, file_id);
   if (ptr) {
     return ptr->TokenReader(ptr);

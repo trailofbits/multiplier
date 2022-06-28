@@ -67,7 +67,7 @@ class Multiplier final : public QMainWindow {
  public slots:
   void FocusOnHistory(bool);
   void OnConnected(void);
-  void OnSourceFileDoubleClicked(std::filesystem::path, FileId file_id);
+  void OnSourceFileDoubleClicked(std::filesystem::path, RawEntityId file_id);
   void OnOpenTab(QString title, QWidget *widget);
   void OnOpenDock(QString title, QWidget *widget);
 

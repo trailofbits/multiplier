@@ -78,8 +78,8 @@ struct DownloadCodeThread::PrivateData {
   const CodeTheme &theme;
   const uint64_t counter;
 
-  std::optional<FileId> file_id;
-  std::optional<FragmentId> fragment_id;
+  std::optional<RawEntityId> file_id;
+  std::optional<RawEntityId> fragment_id;
   std::optional<std::pair<RawEntityId, RawEntityId>> token_range;
 
   std::map<RawEntityId, std::vector<TokenList>> fragment_tokens;
@@ -105,7 +105,7 @@ DownloadCodeThread::~DownloadCodeThread(void) {}
 
 DownloadCodeThread *DownloadCodeThread::CreateFileDownloader(
     const Index &index_, const CodeTheme &theme_, uint64_t counter_,
-    FileId file_id_) {
+    RawEntityId file_id_) {
   auto d = new PrivateData(index_, theme_, counter_);
   d->file_id.emplace(file_id_);
   return new DownloadCodeThread(d);
@@ -113,7 +113,7 @@ DownloadCodeThread *DownloadCodeThread::CreateFileDownloader(
 
 DownloadCodeThread *DownloadCodeThread::CreateFragmentDownloader(
     const Index &index_, const CodeTheme &theme_, uint64_t counter_,
-    FragmentId frag_id_) {
+    RawEntityId frag_id_) {
   auto d = new PrivateData(index_, theme_, counter_);
   d->fragment_id.emplace(frag_id_);
   return new DownloadCodeThread(d);
@@ -206,7 +206,7 @@ bool DownloadCodeThread::PrivateData::DownloadRangeTokens(void) {
       return false;
     }
 
-    fragment_id.emplace(begin_fid.fragment_id);
+    fragment_id.emplace(EntityId(FragmentId(begin_fid.fragment_id)));
     if (!DownloadFragmentTokens()) {
       return false;
     }
@@ -479,7 +479,7 @@ void CodeView::SetFile(const File &file) {
   SetFile(Index::containing(file), file.id());
 }
 
-void CodeView::SetFile(const Index &index, FileId file_id) {
+void CodeView::SetFile(const Index &index, RawEntityId file_id) {
   d->state = CodeViewState::kDownloading;
   d->scroll_target_eid = kInvalidEntityId;
   auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
@@ -501,7 +501,7 @@ void CodeView::SetFragment(const Fragment &fragment) {
   SetFragment(Index::containing(fragment), fragment.id());
 }
 
-void CodeView::SetFragment(const Index &index, FragmentId fragment_id) {
+void CodeView::SetFragment(const Index &index, RawEntityId fragment_id) {
   d->state = CodeViewState::kDownloading;
   d->scroll_target_eid = kInvalidEntityId;
   auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
