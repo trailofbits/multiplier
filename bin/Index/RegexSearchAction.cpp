@@ -38,7 +38,7 @@ void RegexSearchAction::QueryExprInFile(mx::RawEntityId file_id) {
 
   WithUncompressedMessageImpl(
       "file", maybe_contents.value(),
-      [=] (capnp::MessageReader &reader) {
+      [=, this] (capnp::MessageReader &reader) {
     mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
     std::string_view file_contents(file.getData().cStr(),
                                    file.getData().size());
@@ -50,7 +50,7 @@ void RegexSearchAction::QueryExprInFile(mx::RawEntityId file_id) {
 
     regex.ForEachMatch(
         file_contents,
-        [=] (std::string_view, unsigned begin, unsigned end) -> bool {
+        [=, this] (std::string_view, unsigned begin, unsigned end) -> bool {
           unsigned prev_line = 0;
           for (auto i = begin; i < end; ++i) {
             auto line_it = offset_to_line_num.upper_bound(i);

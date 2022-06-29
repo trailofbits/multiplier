@@ -35,9 +35,11 @@ class TokenTreeNode {
 
  public:
   std::optional<pasta::FileToken> FileToken(void) const noexcept;
+  
   std::optional<pasta::Token> Token(void) const noexcept;
+  
   std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree, TokenTree>>
-  Substitution(void) const noexcept;
+  MaybeSubstitution(void) const noexcept;
 };
 
 class TokenTreeNodeIteratorEnd {};

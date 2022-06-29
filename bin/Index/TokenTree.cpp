@@ -1144,7 +1144,7 @@ std::optional<pasta::Token> TokenTreeNode::Token(void) const noexcept {
 }
 
 std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree, TokenTree>>
-TokenTreeNode::Substitution(void) const noexcept {
+TokenTreeNode::MaybeSubstitution(void) const noexcept {
   if (const auto &ent = impl->before[offset];
       std::holds_alternative<class Substitution *>(ent)) {
     auto lhs = std::get<class Substitution *>(ent);

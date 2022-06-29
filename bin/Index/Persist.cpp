@@ -38,7 +38,7 @@ namespace {
 // print out the "unparsed", i.e. original, code of a fragment).
 static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
   for (auto node : tt) {
-    if (auto sub = node.Substitution()) {
+    if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
       CountSubstitutions(std::move(lhs), num_subs);
       CountSubstitutions(std::move(rhs), num_subs);
@@ -67,7 +67,7 @@ static void FindFileRange(TokenTree tt, const pasta::File &file,
       if (ft->Index() > max->Index()) {
         *max = *ft;
       }
-    } else if (auto sub = node.Substitution()) {
+    } else if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
       FindFileRange(std::move(lhs), file, min, max, num_subs);
       CountSubstitutions(std::move(rhs), num_subs);
@@ -97,7 +97,7 @@ static void PersistTokenTree(EntityMapper &em,
     } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
       toks_builder.set(i++, em.EntityId(ft.value()));
 
-    } else if (auto sub = node.Substitution()) {
+    } else if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
       mx::TokenSubstitutionId sub_id;
       sub_id.fragment_id = fragment_id;

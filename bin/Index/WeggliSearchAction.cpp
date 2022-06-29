@@ -40,7 +40,7 @@ void WeggliSearchAction::QuerySyntaxInFile(mx::RawEntityId file_id) {
 
   WithUncompressedMessageImpl(
       "file", maybe_contents.value(),
-      [=] (capnp::MessageReader &reader) {
+      [=, this] (capnp::MessageReader &reader) {
     mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
     std::string_view file_contents(file.getData().cStr(),
                                    file.getData().size());
@@ -52,7 +52,7 @@ void WeggliSearchAction::QuerySyntaxInFile(mx::RawEntityId file_id) {
 
     query_tree.ForEachMatch(
         file_contents,
-        [=] (const mx::WeggliMatchData &match) -> bool {
+        [=, this] (const mx::WeggliMatchData &match) -> bool {
           unsigned prev_line = 0;
           for (auto i = match.begin_offset; i < match.end_offset; ++i) {
             auto line_it = eol_offset_to_line_num.upper_bound(i);
