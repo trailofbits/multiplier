@@ -319,7 +319,6 @@ using TokenSubstitutionEnty = std::variant<Token, TokenSubstitution>;
 class TokenSubstitutionListIterator {
  private:
   friend class TokenSubstitutionList;
-  friend class TokenSubstitutionListIterator;
 
   std::shared_ptr<const TokenSubstitutionListImpl> impl;
   unsigned index;

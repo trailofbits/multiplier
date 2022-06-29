@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <filesystem>
 #include <memory>
 #include <multiplier/Types.h>
 #include <optional>
@@ -14,6 +13,9 @@
 #include <vector>
 
 #include "Event.h"
+
+// NOTE(pag): Put last for Qt.
+#include <filesystem>
 
 namespace mx {
 class Index;
