@@ -18,7 +18,6 @@
 #include <atomic>
 #include <cassert>
 #include <cstdint>
-#include <filesystem>
 #include <map>
 #include <unordered_map>
 
@@ -28,7 +27,8 @@
 #include "Multiplier.h"
 #include "Util.h"
 
-#include <iostream>
+// NOTE(pag): Put last for Qt.
+#include <filesystem>
 
 namespace mx::gui {
 namespace {

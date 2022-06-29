@@ -12,7 +12,6 @@
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
 
-#include <filesystem>
 #include <map>
 #include <set>
 #include <unordered_map>

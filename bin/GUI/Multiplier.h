@@ -4,12 +4,14 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <filesystem>
 #include <memory>
 #include <multiplier/Types.h>
 #include <QMainWindow>
 
 #include "Event.h"
+
+// NOTE(pag): Put last for Qt.
+#include <filesystem>
 
 namespace mx {
 class FileLocationCache;

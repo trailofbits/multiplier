@@ -6,17 +6,10 @@
 
 #pragma once
 
-//
-// Swapping these two headers will cause the moc compiler to fail
-//
-
-// clang-format off
-#include <optional>
-#include <filesystem>
-// clang-format on
-
 #include <QDialog>
 #include <QUrl>
+
+#include <optional>
 
 namespace mx::gui {
 

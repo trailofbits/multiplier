@@ -9,10 +9,12 @@
 #include <QRunnable>
 #include <QWidget>
 
-#include <filesystem>
 #include <memory>
 #include <multiplier/Index.h>
 #include <vector>
+
+// NOTE(pag): Put last for Qt.
+#include <filesystem>
 
 namespace mx {
 class Index;
