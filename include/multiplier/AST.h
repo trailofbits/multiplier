@@ -7606,7 +7606,6 @@ class Type {
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
-  friend class Type;
   friend class TypeIterator;
   friend class UseBase;
   friend class UseIteratorImpl;
@@ -10747,7 +10746,6 @@ class Stmt {
   friend class Index;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
-  friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
@@ -27561,7 +27559,6 @@ using DeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>,
 
 class Decl {
  protected:
-  friend class Decl;
   friend class DeclIterator;
   friend class File;
   friend class Fragment;

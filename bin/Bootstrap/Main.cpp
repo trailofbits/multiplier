@@ -1458,6 +1458,24 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
         << ", " << nth_entity_reader << ")\n";
 }
 
+static const char *FriendOf(std::ostream &os, const std::string &cls,
+                            const char *friend_cls) {
+  if (cls == friend_cls) {
+    return "";
+  }
+  os << "  friend class " << friend_cls << ";";
+  return "\n";
+}
+
+static const char *FriendOf(std::ostream &os, const std::string &cls,
+                            const std::string &friend_cls) {
+  if (cls == friend_cls) {
+    return "";
+  }
+  os << "  friend class " << friend_cls << ";";
+  return "\n";
+}
+
 MethodListPtr CodeGenerator::RunOnClass(
     ClassHierarchy *cls, MethodListPtr parent_methods) {
   auto seen_methods = std::make_shared<MethodList>(*parent_methods);
@@ -1661,12 +1679,12 @@ MethodListPtr CodeGenerator::RunOnClass(
     include_h_os
         << " : public " << base_name << " {\n"
         << " private:\n"
-        << "  friend class FragmentImpl;\n";
+        << FriendOf(include_h_os, class_name, "FragmentImpl");
 
     // Derived classes are friends with all of their parents.
     for (auto parent = cls->base; parent; parent = parent->base) {
       include_h_os
-          << "  friend class " << parent->record.Name() << ";\n";
+          << FriendOf(include_h_os, class_name, parent->record.Name());
     }
 
     // Parent class serialization.
@@ -1760,21 +1778,21 @@ MethodListPtr CodeGenerator::RunOnClass(
     include_h_os
         << " {\n"
         << " protected:\n"
-        << "  friend class Decl;\n"
-        << "  friend class DeclIterator;\n"
-        << "  friend class File;\n"
-        << "  friend class Fragment;\n"
-        << "  friend class FragmentImpl;\n"
-        << "  friend class Index;\n"
-        << "  friend class ReferenceIterator;\n"
-        << "  friend class ReferenceIteratorImpl;\n"
-        << "  friend class Stmt;\n"
-        << "  friend class StmtIterator;\n"
-        << "  friend class TokenContext;\n"
-        << "  friend class Type;\n"
-        << "  friend class TypeIterator;\n"
-        << "  friend class UseBase;\n"
-        << "  friend class UseIteratorImpl;\n"
+        << FriendOf(include_h_os, class_name, "Decl")
+        << FriendOf(include_h_os, class_name, "DeclIterator")
+        << FriendOf(include_h_os, class_name, "File")
+        << FriendOf(include_h_os, class_name, "Fragment")
+        << FriendOf(include_h_os, class_name, "FragmentImpl")
+        << FriendOf(include_h_os, class_name, "Index")
+        << FriendOf(include_h_os, class_name, "ReferenceIterator")
+        << FriendOf(include_h_os, class_name, "ReferenceIteratorImpl")
+        << FriendOf(include_h_os, class_name, "Stmt")
+        << FriendOf(include_h_os, class_name, "StmtIterator")
+        << FriendOf(include_h_os, class_name, "TokenContext")
+        << FriendOf(include_h_os, class_name, "Type")
+        << FriendOf(include_h_os, class_name, "TypeIterator")
+        << FriendOf(include_h_os, class_name, "UseBase")
+        << FriendOf(include_h_os, class_name, "UseIteratorImpl")
         << "  template <typename> friend class UseIterator;\n\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset;\n\n"
