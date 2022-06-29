@@ -43,7 +43,7 @@ namespace sqlite_bridge {
 
 #define MX_VISIT_BASE(NAME, BASE, ...)                                         \
   template <>                                                                  \
-  static constexpr inline bool has_containing<mx::NAME> =                      \
+  constexpr inline bool has_containing<mx::NAME> =                      \
       has_containing<mx::BASE>;
 #include <multiplier/Visitor.inc.h>
 
