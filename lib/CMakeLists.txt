@@ -269,12 +269,12 @@ target_link_libraries("mx-util"
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:reproc++>
     RocksDB::rocksdb
-    SQLite::SQLite3
     ZLIB::ZLIB
   PUBLIC
     glog::glog
     gflags::gflags
     CapnProto::capnp-rpc
+    SQLite::SQLite3
     re2::re2
 )
 
