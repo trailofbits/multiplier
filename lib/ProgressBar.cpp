@@ -134,7 +134,7 @@ ProgressBar::Impl::Impl(const char *label_, std::chrono::seconds report_freq_)
       num_workers(1),
       has_work_sem(),
       progress_reporter_thread(
-          [=] (void) {
+          [this] (void) {
             auto [line_index, line_ptr] = AllocateLine();
             std::string next_line(1024ull, '\0');
 

@@ -21,7 +21,8 @@ macro(DownloadSQLite3)
   )
   target_include_directories(SQLite3
     PUBLIC
-      "${SQLite3_INCLUDE_DIRS}")
+      "${sqlite_SOURCE_DIR}")
+
   target_compile_definitions(SQLite3
     PRIVATE
       "-DSQLITE_ENABLE_FTS5"
