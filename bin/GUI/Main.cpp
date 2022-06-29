@@ -170,15 +170,15 @@ int main(int argc, char *argv[]) {
 
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "Meta-F should open the regex search.",
-    .match_sources = ~mx::gui::EventSources(),
     .match_key = Qt::Key_F,
+    .match_sources = ~mx::gui::EventSources(),
     .do_action = mx::gui::Action::kOpenRegexSearch,
   });
 
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "G should open the entity search.",
-    .match_sources = ~mx::gui::EventSources(),
     .match_key = Qt::Key_G,
+    .match_sources = ~mx::gui::EventSources(),
     .do_action = mx::gui::Action::kOpenEntitySearch,
   });
 
