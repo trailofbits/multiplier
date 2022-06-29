@@ -9,6 +9,7 @@
 #include <QDialog>
 #include <QUrl>
 
+#include <memory>
 #include <optional>
 
 namespace mx::gui {

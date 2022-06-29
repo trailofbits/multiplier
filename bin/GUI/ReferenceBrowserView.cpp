@@ -725,7 +725,7 @@ void ReferenceBrowserView::OnUsersOfLevel(
     return;
   }
 
-  auto add_user = [=] (QTreeWidgetItem *parent, Decl decl, TokenRange tokens) {
+  auto add_user = [=, this] (QTreeWidgetItem *parent, Decl decl, TokenRange tokens) {
     QTreeWidgetItem *user_item = new QTreeWidgetItem;
     if (tokens) {
       FillRow(user_item, decl, tokens[0]);
