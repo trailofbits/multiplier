@@ -198,12 +198,17 @@ struct Importer::PrivateData {
  public:
   // Commands, grouped by working directory.
   std::unordered_map<std::string, std::vector<Command>> commands;
+
+  std::filesystem::path cwd;
+
+  inline PrivateData(std::filesystem::path cwd_)
+      : cwd(std::move(cwd_)) {}
 };
 
 Importer::~Importer(void) {}
 
-Importer::Importer(void)
-    : d(std::make_unique<Importer::PrivateData>()) {}
+Importer::Importer(std::filesystem::path cwd_)
+    : d(std::make_unique<Importer::PrivateData>(std::move(cwd_))) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
 
@@ -241,8 +246,13 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
     }
   }
 
-  auto &command = d->commands[cwd->str()].emplace_back(args_vec);
-  command.working_dir = cwd->str();
+  auto cwd_str = cwd->str();
+  if (cwd_str.empty()) {
+    cwd_str = d->cwd.generic_string();
+  }
+
+  auto &command = d->commands[cwd_str].emplace_back(args_vec);
+  command.working_dir = cwd_str;
   command.compiler_hash = hash->str();
   command.env = std::move(envp);
   if (lang->equals_insensitive("c++") || lang->equals_insensitive("cxx")) {
@@ -259,7 +269,12 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
     return false;
   }
 
-  auto &commands = d->commands[cwd->str()];
+  auto cwd_str = cwd->str();
+  if (cwd_str.empty()) {
+    cwd_str = d->cwd.generic_string();
+  }
+
+  auto &commands = d->commands[cwd_str];
 
   // E.g. from CMake, Blight.
   if (auto commands_str = o.getString("command")) {
@@ -268,7 +283,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
     auto &command = commands.emplace_back(args_str);
     if (command.vec.Size()) {
       command.compiler_hash = std::move(args_str);
-      command.working_dir = cwd->str();
+      command.working_dir = cwd_str;
 
       // Guess at the language.
       if (commands_str->contains_insensitive("++") ||
@@ -317,7 +332,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
     auto &command = commands.emplace_back(args_vec);
     if (command.vec.Size()) {
       command.compiler_hash = ss.str();
-      command.working_dir = cwd->str();
+      command.working_dir = cwd_str;
       command.lang = lang;
       return true;
 

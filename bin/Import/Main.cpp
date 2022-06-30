@@ -65,8 +65,14 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+
+  std::filesystem::path path(FLAGS_path);
+
   if (FLAGS_path == "/dev/stdin") {
     FLAGS_path = "-";
+  
+  } else if (FLAGS_path == "-") {
+    path = "/dev/stdin";
   }
 
   if (FLAGS_path.empty()) {
@@ -84,7 +90,7 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   llvm::LLVMContext context;
-  importer::Importer importer;
+  importer::Importer importer(path.parent_path());
   importer::Parser parser(context, importer);
   if (!parser.Parse(*maybe_buff.get())) {
     std::cerr

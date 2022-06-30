@@ -4,6 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <filesystem>
 #include <memory>
 
 #include <multiplier/RPC.capnp.h>
@@ -17,13 +18,15 @@ namespace importer {
 
 class Importer {
  private:
-  struct PrivateData;
 
+  struct PrivateData;
   std::unique_ptr<PrivateData> d;
+
+  Importer(void) = delete;
 
  public:
   ~Importer(void);
-  Importer(void);
+  explicit Importer(std::filesystem::path cwd_);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o);
