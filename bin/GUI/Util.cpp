@@ -552,6 +552,68 @@ static std::optional<Decl> VisitType(const Type &type, const Token &token) {
 
 // Try to determine the declarations associated with this token.
 std::optional<Decl> DeclForToken(const Token &token) {
+  switch (token.kind()) {
+    default:
+    case TokenKind::BEGIN_OF_FILE_MARKER:
+    case TokenKind::END_OF_FILE_MARKER:
+    case TokenKind::BEGIN_OF_MACRO_EXPANSION_MARKER:
+    case TokenKind::END_OF_MACRO_EXPANSION_MARKER:
+      return std::nullopt;
+
+    case TokenKind::L_SQUARE:
+    case TokenKind::R_SQUARE:
+    case TokenKind::L_PARENTHESIS:
+    case TokenKind::R_PARENTHESIS:
+    case TokenKind::L_BRACE_TOKEN:
+    case TokenKind::R_BRACE_TOKEN:
+    case TokenKind::AMP:
+    case TokenKind::AMP_AMP:
+    case TokenKind::AMP_EQUAL:
+    case TokenKind::STAR:
+    case TokenKind::STAR_EQUAL:
+    case TokenKind::PLUS:
+    case TokenKind::PLUS_PLUS:
+    case TokenKind::PLUS_EQUAL:
+    case TokenKind::MINUS:
+    case TokenKind::ARROW:
+    case TokenKind::MINUS_MINUS:
+    case TokenKind::MINUS_EQUAL:
+    case TokenKind::TILDE:
+    case TokenKind::EXCLAIM:
+    case TokenKind::EXCLAIM_EQUAL:
+    case TokenKind::SLASH:
+    case TokenKind::SLASH_EQUAL:
+    case TokenKind::PERCENT:
+    case TokenKind::PERCENT_EQUAL:
+    case TokenKind::LESS:
+    case TokenKind::LESS_LESS:
+    case TokenKind::LESS_EQUAL:
+    case TokenKind::LESS_LESS_EQUAL:
+    case TokenKind::SPACESHIP:
+    case TokenKind::GREATER:
+    case TokenKind::GREATER_GREATER:
+    case TokenKind::GREATER_EQUAL:
+    case TokenKind::GREATER_GREATER_EQUAL:
+    case TokenKind::CARET:
+    case TokenKind::CARET_EQUAL:
+    case TokenKind::PIPE:
+    case TokenKind::PIPE_PIPE:
+    case TokenKind::PIPE_EQUAL:
+    case TokenKind::EQUAL:
+    case TokenKind::EQUAL_EQUAL:
+    case TokenKind::COMMA:
+    case TokenKind::PERIOD_STAR:
+    case TokenKind::ARROW_STAR:
+    case TokenKind::LESS_LESS_LESS:
+    case TokenKind::GREATER_GREATER_GREATER:
+    case TokenKind::CARETCARET:
+    case TokenKind::KEYWORD_DELETE:
+    case TokenKind::KEYWORD_NEW:
+    case TokenKind::KEYWORD_OPERATOR:
+    case TokenKind::IDENTIFIER:
+      break;
+  }
+
   for (auto context = TokenContext::of(token); context;
        context = context->parent()) {
 

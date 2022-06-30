@@ -298,6 +298,11 @@ void DownloadCodeThread::run(void) {
         fragment_tokens_it != d->fragment_tokens.end()) {
       for (const TokenList &parsed_toks : fragment_tokens_it->second) {
         for (Token parsed_tok : parsed_toks) {
+          if (parsed_tok.kind() == TokenKind::END_OF_FILE_MARKER ||
+              parsed_tok.kind() == TokenKind::END_OF_MACRO_EXPANSION_MARKER) {
+            continue;
+          }
+
           if (auto file_tok_of_parsed_tok = parsed_tok.file_token()) {
             file_to_frag_toks[file_tok_of_parsed_tok->id()].push_back(parsed_tok);
           }
