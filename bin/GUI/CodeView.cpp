@@ -888,7 +888,7 @@ int CodeView::LineNumberAreaWidth(void) {
     ++num_digits;
   }
 
-  QFontMetricsF metrics(d->theme.Font());
+  QFontMetricsF metrics(font());
   return static_cast<int>(ceil(
       3 + (metrics.horizontalAdvance(QLatin1Char('9')) * num_digits)));
 }
