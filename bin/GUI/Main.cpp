@@ -11,6 +11,7 @@
 #include <memory>
 #include <multiplier/Index.h>
 #include <QApplication>
+#include <QDebug>
 #include <QFontDatabase>
 #include <QMetaType>
 #include <QPixmap>
@@ -34,22 +35,29 @@ int main(int argc, char *argv[]) {
   splash_screen.show();
   application.processEvents();
 
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Black.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-BlackItalic.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Bold.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-BoldItalic.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraBold.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraBoldItalic.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraLight.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraLightItalic.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Italic.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Light.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-LightItalic.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Medium.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-MediumItalic.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-Regular.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-SemiBold.ttf");
-  QFontDatabase::addApplicationFont(":/Fonts/Source_Code_Pro/static/SourceCodePro-SemiBoldItalic.ttf");
+#define ADD_FONT(path) \
+    do { \
+      auto ret = QFontDatabase::addApplicationFont(path); \
+      assert(ret != -1); \
+      (void) ret; \
+    } while (0)
+
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-Black.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-BlackItalic.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-Bold.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-BoldItalic.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraBold.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraBoldItalic.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraLight.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-ExtraLightItalic.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-Italic.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-Light.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-LightItalic.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-Medium.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-MediumItalic.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-Regular.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-SemiBold.ttf");
+  ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-SemiBoldItalic.ttf");
 
   mx::gui::Configuration config;
 

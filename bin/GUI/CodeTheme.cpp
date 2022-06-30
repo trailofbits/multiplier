@@ -229,6 +229,7 @@ class PetersTheme final : public CodeTheme {
     static bool initialized = false;
     if (!initialized) {
       font.setStyleHint(QFont::TypeWriter);
+      assert(font.family() == "Source Code Pro");
     }
     return font;
   }
