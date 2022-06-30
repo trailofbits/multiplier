@@ -65,22 +65,24 @@ int main(int argc, char *argv[]) {
   //    There's a finite number of times that I'll be able to click in my life
   //    before I get arthritis, so I don't want to halve it.
 
-//  // Click to open something in the code browser view, or in the code preview
-//  // view of the reference browser, should open the thing in the code browser.
-//  config.actions.emplace_back(mx::gui::EventAction{
-//    .description = "A clicked token should be added to the linear history",
-//    .match_click = mx::gui::MouseClickKind::kLeftClick,
-//    .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource,
-//                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
-//                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
-//    .do_action = mx::gui::Action::kAddToLinearHistory,
-//  });
-
+  // Click to open something in the code browser view, or in the code preview
+  // view of the reference browser, should open the thing in the code browser.
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "A clicked token should be added to the linear history",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
-    .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource},
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource,
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
+                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
     .do_action = mx::gui::Action::kAddToLinearHistory,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "The code browser should show a clicked entity",
+    .match_click = mx::gui::MouseClickKind::kLeftClick,
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest,
+                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
+                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
+    .do_action = mx::gui::Action::kOpenCodeBrowser,
   });
 
 //  config.actions.emplace_back(mx::gui::EventAction{
@@ -109,19 +111,8 @@ int main(int argc, char *argv[]) {
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "A clicked declaration should be added to the visual history",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
-    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest,
-                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
-                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource},
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest},
     .do_action = mx::gui::Action::kAddToVisualHistoryUnderRoot,
-  });
-
-  config.actions.emplace_back(mx::gui::EventAction{
-    .description = "The code browser should show a clicked entity",
-    .match_click = mx::gui::MouseClickKind::kLeftClick,
-    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest,
-                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
-                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
-    .do_action = mx::gui::Action::kOpenCodeBrowser,
   });
 
   config.actions.emplace_back(mx::gui::EventAction{

@@ -84,14 +84,14 @@ Statement::Statement(Connection &conn, const std::string &stmt)
     }
 
     return std::shared_ptr<sqlite3_stmt>(
-        stmt, [](sqlite3_stmt* stmt) { sqlite3_finalize(stmt);});
+        stmt, [](sqlite3_stmt* stmt) { sqlite3_finalize(stmt); });
   };
 
   prepared_stmt = getPrepareStatement();
   num_params = sqlite3_bind_parameter_count(prepared_stmt.get());
 }
 
-Statement::~Statement(){}
+Statement::~Statement(void) {}
 
 sqlite3_stmt *Statement::prepareStatement(void){
   return prepared_stmt.get();

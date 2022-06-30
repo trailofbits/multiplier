@@ -232,6 +232,9 @@ struct EventAction {
 
   // Do this action.
   Action do_action{Action::kDoNothing};
+
+  // The last time this event was triggered.
+  mutable uint64_t last_triggered{0u};
 };
 
 }  // namespace mx::gui

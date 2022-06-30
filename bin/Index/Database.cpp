@@ -203,7 +203,6 @@ std::vector<mx::RawEntityId> Database::QueryEntities(
   // select_query
   //     << "select rowid from entities_fts_" << table_id
   //     << " where entities_fts" << table_id << " match ?1 || '*'";
-  std::string found_symbol;
   try {
     auto stmt = d->db.Prepare(select_query.str());
     if (!stmt) {
@@ -213,11 +212,9 @@ std::vector<mx::RawEntityId> Database::QueryEntities(
 
     stmt->BindValues(name);
     while (stmt->ExecuteStep()) {
-      found_symbol.clear();
       auto result = stmt->GetResult();
       mx::RawEntityId entity_id = mx::kInvalidEntityId;
-      result.Columns(entity_id, found_symbol);
-      LOG(ERROR) << "Found: " << entity_id << ": " << found_symbol; 
+      result.Columns(entity_id);
       entity_ids.push_back(entity_id);
     }
 

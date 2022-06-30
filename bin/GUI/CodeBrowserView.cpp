@@ -79,7 +79,6 @@ void LocateEntitiesThread::run(void) {
     auto entity = d->index.entity(loc.FileTokenId());
     if (std::holds_alternative<Token>(entity)) {
       if (auto file_tok = std::get<Token>(entity).nearest_file_token()) {
-
         RunOnToken(std::move(file_tok.value()));
         continue;
       }
@@ -100,6 +99,8 @@ void LocateEntitiesThread::run(void) {
         continue;
       }
     }
+
+    assert(false);  // Hrmm...
   }
 }
 
@@ -188,7 +189,7 @@ void CodeBrowserView::OnDownloadedFileList(FilePathList files) {
 // then open it. If it is open but not the active view, then set it to the
 // active view.
 void CodeBrowserView::ScrollToTokenInFile(
-    RawEntityId file_id, RawEntityId scroll_target, unsigned counter) {
+    RawEntityId file_id, RawEntityId file_token_id, unsigned counter) {
 
   std::filesystem::path path;
   auto path_it = d->file_id_to_path.find(file_id);
@@ -217,8 +218,8 @@ void CodeBrowserView::ScrollToTokenInFile(
   } else {
     d->content->setCurrentWidget(view_it->second);
 
-    if (scroll_target != kInvalidEntityId) {
-      view_it->second->ScrollToToken(scroll_target);
+    if (file_token_id != kInvalidEntityId) {
+      view_it->second->ScrollToToken(file_token_id);
     }
   }
 }

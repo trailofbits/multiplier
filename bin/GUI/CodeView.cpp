@@ -426,6 +426,7 @@ void CodeView::ScrollToFileToken(RawEntityId file_tok_id) {
 
   VariantId vid = EntityId(file_tok_id).Unpack();
   if (!std::holds_alternative<FileTokenId>(vid)) {
+    assert(false);
     return;
   }
 
@@ -680,6 +681,7 @@ void CodeView::EmitEventsForIndex(unsigned index) {
   EventLocation loc;
   RawEntityId file_tok_id = d->code->file_token_ids[index];
   assert(file_tok_id != kInvalidEntityId);
+  assert(std::holds_alternative<FileTokenId>(EntityId(file_tok_id).Unpack()));
   loc.SetFileTokenId(file_tok_id);
 
   if (auto num_locs = locs_end_index - locs_begin_index) {
@@ -702,6 +704,10 @@ void CodeView::EmitEventsForIndex(unsigned index) {
       }
       emit TokenPressEvent(locs);
     }
+
+  // No fragments / declarations associated with this token.
+  } else {
+    emit TokenPressEvent(loc);
   }
 }
 

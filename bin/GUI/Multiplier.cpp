@@ -97,6 +97,9 @@ struct Multiplier::PrivateData final {
   // The last-pressed locations.
   std::unordered_map<EventSource, EventLocations> last_locations;
 
+  // The last user-caused event, excluding physical events.
+  uint64_t last_event{0u};
+
   mx::Index index;
   mx::FileLocationCache line_cache;
 
@@ -196,23 +199,9 @@ void Multiplier::closeEvent(QCloseEvent *event) {
 
 bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
 
-//  std::cerr << "et=" << int(et) << '\n';
   switch (const QEvent::Type et = event->type(); et) {
-//    case QEvent::Enter:
-//      ++d->in_widget;
-//      std::cerr << "enter=" << d->in_widget << '\n';
-//      return false;
-//    case QEvent::Leave:
-//      d->in_widget = std::max(d->in_widget - 1, 0);
-//      std::cerr << "leave=" << d->in_widget << '\n';
-//      if (1 <= d->in_widget) {
-//        d->modifiers = {};
-//        d->click_kind = MouseClickKind::kNotClicked;
-//        d->key = Qt::Key_unknown;
-//        std::cerr << "outside of gui\n";
-//      }
-//      return false;
     case QEvent::KeyPress:
+      d->last_event += 1;
       d->key = Qt::Key_unknown;
       d->click_kind = MouseClickKind::kNotClicked;
       switch (auto key = dynamic_cast<QKeyEvent *>(event)->key(); key) {
@@ -236,6 +225,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
       break;
 
     case QEvent::KeyRelease:
+      d->last_event += 1;
       switch (auto key = dynamic_cast<QKeyEvent *>(event)->key(); key) {
         case Qt::Key_Meta:
           d->modifiers.setFlag(Qt::KeyboardModifier::ControlModifier, false);
@@ -261,6 +251,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
     case QEvent::MouseButtonPress:
     case QEvent::NonClientAreaMouseButtonPress:
     case QEvent::GraphicsSceneMousePress: {
+      d->last_event += 1;
       QMouseEvent *me = dynamic_cast<QMouseEvent *>(event);
       const Qt::MouseButton button = me->button();
       d->buttons.setFlag(button, true);
@@ -273,6 +264,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
     case QEvent::MouseButtonRelease:
     case QEvent::NonClientAreaMouseButtonRelease:
     case QEvent::GraphicsSceneMouseRelease: {
+      d->last_event += 1;
       QMouseEvent *me = dynamic_cast<QMouseEvent *>(event);
       const Qt::MouseButton button = me->button();
       d->click_kind = MouseClickKind::kNotClicked;
@@ -296,6 +288,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
     case QEvent::MouseButtonDblClick:
     case QEvent::NonClientAreaMouseButtonDblClick:
     case QEvent::GraphicsSceneMouseDoubleClick: {
+      d->last_event += 1;
       QMouseEvent *me = dynamic_cast<QMouseEvent *>(event);
       d->double_click_buttons.setFlag(me->button(), true);
       break;
@@ -462,9 +455,17 @@ void Multiplier::ClearLastLocations(void) {
 
   // Fill in with empty stuff. The way `EmitActions` works is that it relies
   // on the event sources being present.
-  for (auto i = 1u; i; i <<= 1u) {
-    (void) d->last_locations[static_cast<EventSource>(i)];
-  }
+  (void) d->last_locations[EventSource::kReferenceBrowserPreviewClickSource];
+  (void) d->last_locations[EventSource::kReferenceBrowserPreviewClickDest];
+  (void) d->last_locations[EventSource::kReferenceBrowser];
+  (void) d->last_locations[EventSource::kCodeBrowserClickSource];
+  (void) d->last_locations[EventSource::kCodeBrowserClickDest];
+  (void) d->last_locations[EventSource::kHistoryBrowserVisualItemSelected];
+  (void) d->last_locations[EventSource::kHistoryBrowserLinearItemChanged];
+  (void) d->last_locations[EventSource::kCodeSearchResult];
+  (void) d->last_locations[EventSource::kCodeSearchResultPreviewClickSource];
+  (void) d->last_locations[EventSource::kCodeSearchResultPreviewClickDest];
+  (void) d->last_locations[EventSource::kEntitySearchResult];
 }
 
 void Multiplier::OnConnectionStateChange(ConnectionState state) {
@@ -600,6 +601,10 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
     return false;
   }
 
+  if (ea.last_triggered >= d->last_event) {
+    return false;
+  }
+
   auto has_locs = !locs.IsEmpty();
 
   switch (ea.do_action) {
@@ -607,6 +612,7 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       break;
     case Action::kOpenCodeBrowser:
       if (has_locs) {
+        ea.last_triggered = d->last_event;
         d->code_browser_view->OpenEntities(locs);
         return true;
       } else {
@@ -614,6 +620,7 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kOpenReferenceBrowser:
       if (has_locs) {
+        ea.last_triggered = d->last_event;
         d->reference_browser_view->SetRoots(locs);
         if (d->reference_browser_dock->visibleRegion().isEmpty()) {
           d->reference_browser_dock->raise();
@@ -624,6 +631,7 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryAsChild:
       if (has_locs) {
+        ea.last_triggered = d->last_event;
         d->history_browser_view->AddChildDeclarations(locs);
         return true;
       } else {
@@ -631,6 +639,7 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryAsSibling:
       if (has_locs) {
+        ea.last_triggered = d->last_event;
         d->history_browser_view->AddSiblingDeclarations(locs);
         return true;
       } else {
@@ -638,6 +647,7 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryUnderRoot:
       if (has_locs) {
+        ea.last_triggered = d->last_event;
         d->history_browser_view->AddDeclarationsUnderRoot(locs);
         return true;
       } else {
@@ -645,6 +655,7 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToVisualHistoryAsRoots:
       if (has_locs) {
+        ea.last_triggered = d->last_event;
         d->history_browser_view->AddRootDeclarations(locs);
         return true;
       } else {
@@ -652,19 +663,23 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       }
     case Action::kAddToLinearHistory:
       if (has_locs) {
+        ea.last_triggered = d->last_event;
         d->history_browser_view->AddToLinearHistory(locs);
         return true;
       } else {
         return false;
       }
     case Action::kGoBackLinearHistory:
+      ea.last_triggered = d->last_event;
       return d->history_browser_view->GoBackInLinearHistory();
 
     case Action::kOpenRegexSearch:
+      ea.last_triggered = d->last_event;
       d->code_browser_view->OpenRegexSearch();
       return true;
 
     case Action::kOpenEntitySearch:
+      ea.last_triggered = d->last_event;
       d->code_browser_view->OpenEntitySearch();
       return true;
   }
@@ -698,24 +713,6 @@ bool Multiplier::EmitEvent(void) {
 }
 
 void Multiplier::ActOnTokenPressEvent(EventSource source, EventLocations locs) {
-//  for (const EventLocation &loc : locs) {
-//    std::cerr
-//        << "\nActOnTokenPressEvent"
-//        << "; decl_id=" << loc.DeclarationId()
-//        << "; file_tok_id=" << loc.FileTokenId()
-//        << "; frag_tok_id=" << loc.FragmentTokenId();
-//    switch (source) {
-//      case EventSource::kCodeBrowserClickSource: std::cerr << " (from code browser src)"; break;
-//      case EventSource::kCodeBrowserClickDest: std::cerr << " (from code browser dest)"; break;
-//      case EventSource::kReferenceBrowser: std::cerr << " (from ref browser)"; break;
-//      case EventSource::kReferenceBrowserPreviewClickSource: std::cerr << " (from ref code browser src)"; break;
-//      case EventSource::kReferenceBrowserPreviewClickDest: std::cerr << " (from ref code browser dest)"; break;
-//      case EventSource::kHistoryBrowserVisualItemSelected: std::cerr << " (from history browser item sel)"; break;
-//      case EventSource::kHistoryBrowserLinearItemChanged: std::cerr << " (from history browser linear change)"; break;
-//    }
-//    std::cerr << '\n';
-//  }
-
   d->last_locations[source] = std::move(locs);
 //  d->key = Qt::Key_unknown;
   d->click_kind = MouseClickKind::kNotClicked;

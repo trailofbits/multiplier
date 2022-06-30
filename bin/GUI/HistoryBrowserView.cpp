@@ -346,7 +346,6 @@ void HistoryBrowserView::AddDeclarationsUnderRoot(const EventLocations &locs) {
         loc.SetFileTokenId(file_tok.id());
       }
 
-
       item = new QTreeWidgetItem;
       FillRow(item, decl, frag_tok, file_tok);
 
