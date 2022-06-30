@@ -138,8 +138,8 @@ class EventLocations {
   // Constructs from a vector, for example.
   template <typename T>
   inline EventLocations(const T &range)
-      : EventLocations(std::addressof(*range.begin()),
-                       std::addressof(*range.end())) {}
+      : EventLocations(std::addressof(range.front()),
+                       std::addressof(range.back()) + 1u) {}
 
   EventLocations &operator=(EventLocations &&that_) noexcept;
   EventLocations &operator=(const EventLocations &that_);
@@ -151,6 +151,9 @@ class EventLocations {
   inline size_t Size(void) const & {
     return AsLoc()->is_present;
   }
+
+  const EventLocation &front(void) const &;
+  const EventLocation &back(void) const &;
 
   const EventLocation *begin(void) const &;
   const EventLocation *end(void) const &;

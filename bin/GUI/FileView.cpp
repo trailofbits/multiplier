@@ -42,7 +42,8 @@ FileView::FileView(Multiplier &multiplier, std::filesystem::path file_path,
   d->layout->setContentsMargins(0, 0, 0, 0);
   setLayout(d->layout);
 
-  d->content = new CodeView(multiplier.CodeTheme());
+  d->content = new CodeView(multiplier.CodeTheme(),
+                            multiplier.FileLocationCache());
   d->layout->addWidget(d->content);
   d->content->SetFile(multiplier.Index(), file_id);
   d->content->viewport()->installEventFilter(&multiplier);

@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <multiplier/Index.h>
+#include <tuple>
 #include <vector>
 
 #include "Configuration.h"
@@ -455,17 +456,17 @@ void Multiplier::ClearLastLocations(void) {
 
   // Fill in with empty stuff. The way `EmitActions` works is that it relies
   // on the event sources being present.
-  (void) d->last_locations[EventSource::kReferenceBrowserPreviewClickSource];
-  (void) d->last_locations[EventSource::kReferenceBrowserPreviewClickDest];
-  (void) d->last_locations[EventSource::kReferenceBrowser];
-  (void) d->last_locations[EventSource::kCodeBrowserClickSource];
-  (void) d->last_locations[EventSource::kCodeBrowserClickDest];
-  (void) d->last_locations[EventSource::kHistoryBrowserVisualItemSelected];
-  (void) d->last_locations[EventSource::kHistoryBrowserLinearItemChanged];
-  (void) d->last_locations[EventSource::kCodeSearchResult];
-  (void) d->last_locations[EventSource::kCodeSearchResultPreviewClickSource];
-  (void) d->last_locations[EventSource::kCodeSearchResultPreviewClickDest];
-  (void) d->last_locations[EventSource::kEntitySearchResult];
+  std::ignore =d->last_locations[EventSource::kReferenceBrowserPreviewClickSource];
+  std::ignore = d->last_locations[EventSource::kReferenceBrowserPreviewClickDest];
+  std::ignore = d->last_locations[EventSource::kReferenceBrowser];
+  std::ignore = d->last_locations[EventSource::kCodeBrowserClickSource];
+  std::ignore = d->last_locations[EventSource::kCodeBrowserClickDest];
+  std::ignore = d->last_locations[EventSource::kHistoryBrowserVisualItemSelected];
+  std::ignore = d->last_locations[EventSource::kHistoryBrowserLinearItemChanged];
+  std::ignore = d->last_locations[EventSource::kCodeSearchResult];
+  std::ignore = d->last_locations[EventSource::kCodeSearchResultPreviewClickSource];
+  std::ignore = d->last_locations[EventSource::kCodeSearchResultPreviewClickDest];
+  std::ignore = d->last_locations[EventSource::kEntitySearchResult];
 }
 
 void Multiplier::OnConnectionStateChange(ConnectionState state) {

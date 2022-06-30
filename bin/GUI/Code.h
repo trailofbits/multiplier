@@ -31,6 +31,12 @@ class Code {
   std::vector<std::pair<RawEntityId, RawEntityId>> tok_decl_ids;
   std::vector<unsigned> tok_decl_ids_begin;
 
+  // Line number of the first character of the first token.
+  unsigned first_line{0u};
+
+  // Line number of the last character of the last token.
+  unsigned last_line{0u};
+
 //  // Paint the tokens in the range `[begin_index, end_index)`.
 //  void PaintTokens(const QRectF &rect, QPainter *painter, unsigned begin_index,
 //                   unsigned end_index) const;

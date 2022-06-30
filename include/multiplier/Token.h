@@ -94,6 +94,11 @@ class Token {
   std::optional<std::pair<unsigned, unsigned>> location(
       const FileLocationCache &) const;
 
+  // Return the line and column number for what immediately follows this token,
+  // if any.
+  std::optional<std::pair<unsigned, unsigned>> next_location(
+      const FileLocationCache &) const;
+
   // Return the line and column number for the file token nearest to this token,
   // if any.
   inline std::optional<std::pair<unsigned, unsigned>> nearest_location(

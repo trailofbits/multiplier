@@ -809,7 +809,8 @@ void CodeSearchResultsView::InitializeWidgets(void) {
 
   // Create and connect the code preview.
   if (config.code_preview.visible) {
-    d->code = new CodeView(d->theme);
+    d->code = new CodeView(
+        d->theme, d->model_data->multiplier.FileLocationCache());
     d->code->viewport()->installEventFilter(&(d->model_data->multiplier));
     d->splitter->addWidget(d->code);
     d->code->hide();

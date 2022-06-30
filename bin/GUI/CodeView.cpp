@@ -18,11 +18,13 @@
 #include <QPlainTextDocumentLayout>
 #include <QString>
 #include <QStringRef>
+#include <QTextBlock>
 #include <QTextDocument>
 #include <QThreadPool>
 
 #include <atomic>
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <multiplier/Index.h>
@@ -60,6 +62,7 @@ struct CodeView::PrivateData {
   std::unique_ptr<Code> code;
 
   const CodeTheme &theme;
+  const FileLocationCache locs;
 
   // The entity id of a file token that we'll target for scrolling.
   RawEntityId scroll_target_eid{kInvalidEntityId};
@@ -69,13 +72,17 @@ struct CodeView::PrivateData {
   // line, then we don't want to have to scroll, as that can be jarring.
   int last_block{-1};
 
-  inline PrivateData(const CodeTheme &theme_)
-      : theme(theme_) {}
+  CodeViewLineNumberArea *line_area{nullptr};
+
+  inline PrivateData(const CodeTheme &theme_, const FileLocationCache &locs_)
+      : theme(theme_),
+        locs(locs_) {}
 };
 
 struct DownloadCodeThread::PrivateData {
   const Index index;
   const CodeTheme &theme;
+  const FileLocationCache locs;
   const uint64_t counter;
 
   std::optional<RawEntityId> file_id;
@@ -86,9 +93,11 @@ struct DownloadCodeThread::PrivateData {
   TokenRange file_tokens;
 
   inline explicit PrivateData(Index index_, const CodeTheme &theme_,
+                              const FileLocationCache &locs_,
                               uint64_t counter_)
       : index(std::move(index_)),
         theme(theme_),
+        locs(locs_),
         counter(counter_) {}
 
   bool DownloadFileTokens(void);
@@ -104,26 +113,29 @@ DownloadCodeThread::DownloadCodeThread(PrivateData *d_)
 DownloadCodeThread::~DownloadCodeThread(void) {}
 
 DownloadCodeThread *DownloadCodeThread::CreateFileDownloader(
-    const Index &index_, const CodeTheme &theme_, uint64_t counter_,
+    const Index &index_, const CodeTheme &theme_,
+    const FileLocationCache &locs_, uint64_t counter_,
     RawEntityId file_id_) {
-  auto d = new PrivateData(index_, theme_, counter_);
+  auto d = new PrivateData(index_, theme_, locs_, counter_);
   d->file_id.emplace(file_id_);
   return new DownloadCodeThread(d);
 }
 
 DownloadCodeThread *DownloadCodeThread::CreateFragmentDownloader(
-    const Index &index_, const CodeTheme &theme_, uint64_t counter_,
+    const Index &index_, const CodeTheme &theme_,
+    const FileLocationCache &locs_, uint64_t counter_,
     RawEntityId frag_id_) {
-  auto d = new PrivateData(index_, theme_, counter_);
+  auto d = new PrivateData(index_, theme_, locs_, counter_);
   d->fragment_id.emplace(frag_id_);
   return new DownloadCodeThread(d);
 }
 
 DownloadCodeThread *DownloadCodeThread::CreateTokenRangeDownloader(
-    const Index &index_, const CodeTheme &theme_, uint64_t counter_,
+    const Index &index_, const CodeTheme &theme_,
+    const FileLocationCache &locs_, uint64_t counter_,
     RawEntityId begin_tok_id, RawEntityId end_tok_id) {
 
-  auto d = new PrivateData(index_, theme_, counter_);
+  auto d = new PrivateData(index_, theme_, locs_, counter_);
   d->token_range.emplace(begin_tok_id, end_tok_id);
   return new DownloadCodeThread(d);
 }
@@ -258,6 +270,16 @@ void DownloadCodeThread::run(void) {
   code->file_token_ids.reserve(num_file_tokens);
   code->tok_decl_ids_begin.reserve(num_file_tokens + 1);
 
+  // Figure out min and max line numbers.
+  if (d->file_tokens) {
+    if (auto first_loc = d->file_tokens.front().location(d->locs)) {
+      code->first_line = first_loc->first;
+    }
+    if (auto last_loc = d->file_tokens.back().next_location(d->locs)) {
+      code->last_line = last_loc->first;
+    }
+  }
+
   std::map<RawEntityId, std::vector<Token>> file_to_frag_toks;
   std::vector<Decl> tok_decls;
 
@@ -332,6 +354,8 @@ void DownloadCodeThread::run(void) {
     DeclCategory category = DeclCategory::UNKNOWN;
     TokenClass file_tok_class = ClassifyToken(file_tok);
 
+    auto has_added_decl = false;
+
     // Try to find all declarations associated with this token. There could be
     // multiple if there are multiple fragments overlapping this specific piece
     // of code. However, just because there are multiple fragments, doesn't mean
@@ -342,8 +366,19 @@ void DownloadCodeThread::run(void) {
       for (const Token &frag_tok : frag_tok_it->second) {
 
         if (auto related_decl = DeclForToken(frag_tok)) {
+
+          // Don't repeat the same declarations.
+          //
+          // TODO(pag): Investigate this related to the diagnosis in
+          //            Issue #118.
+          if (has_added_decl &&
+              code->tok_decl_ids.back().second == related_decl->id()) {
+            continue;
+          }
+
           code->tok_decl_ids.emplace_back(frag_tok.id(), related_decl->id());
           tok_decls.emplace_back(related_decl.value());
+          has_added_decl = true;
 
           // Take the first category we get.
           if (category == DeclCategory::UNKNOWN) {
@@ -392,9 +427,10 @@ void DownloadCodeThread::run(void) {
 
 CodeView::~CodeView(void) {}
 
-CodeView::CodeView(const CodeTheme &theme_, QWidget *parent)
+CodeView::CodeView(const CodeTheme &theme_, const FileLocationCache &locs_,
+                   QWidget *parent)
     : QPlainTextEdit(parent),
-      d(std::make_unique<PrivateData>(theme_)) {
+      d(std::make_unique<PrivateData>(theme_, locs_)) {
   InitializeWidgets();
 }
 
@@ -421,6 +457,9 @@ void CodeView::ScrollToFileToken(RawEntityId file_tok_id) {
   }
 
   if (file_tok_id == kInvalidEntityId) {
+    moveCursor(QTextCursor::MoveOperation::Start);
+    ensureCursorVisible();
+    centerCursor();
     return;
   }
 
@@ -486,7 +525,7 @@ void CodeView::SetFile(const Index &index, RawEntityId file_id) {
   auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
 
   auto downloader = DownloadCodeThread::CreateFileDownloader(
-      index, d->theme, prev_counter + 1u, file_id);
+      index, d->theme, d->locs, prev_counter + 1u, file_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -508,7 +547,7 @@ void CodeView::SetFragment(const Index &index, RawEntityId fragment_id) {
   auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
 
   auto downloader = DownloadCodeThread::CreateFragmentDownloader(
-      index, d->theme, prev_counter + 1u, fragment_id);
+      index, d->theme, d->locs, prev_counter + 1u, fragment_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -527,7 +566,7 @@ void CodeView::SetTokenRange(const Index &index, RawEntityId begin_tok_id,
   auto prev_counter = d->counter.fetch_add(1u);  // Go to the next version.
 
   auto downloader = DownloadCodeThread::CreateTokenRangeDownloader(
-      index, d->theme, prev_counter + 1u, begin_tok_id, end_tok_id);
+      index, d->theme, d->locs, prev_counter + 1u, begin_tok_id, end_tok_id);
 
   connect(downloader, &DownloadCodeThread::DownloadFailed,
           this, &CodeView::OnDownloadFailed);
@@ -556,6 +595,13 @@ void CodeView::InitializeWidgets(void) {
   viewport()->setCursor(Qt::ArrowCursor);
   setFont(d->theme.Font());
 
+  d->line_area = new CodeViewLineNumberArea(this);
+  connect(this, &CodeView::updateRequest,
+          this, &CodeView::UpdateLineNumberArea);
+
+  connect(this, &CodeView::DataChanged,
+          this, &CodeView::UpdateLineNumberAreaWidth);
+
   QFontMetrics fm(font());
   setLineWrapMode(d->theme.LineWrap() ?
                   QPlainTextEdit::LineWrapMode::WidgetWidth :
@@ -572,6 +618,21 @@ void CodeView::InitializeWidgets(void) {
           this, &CodeView::OnHighlightLine);
 
   update();
+}
+
+void CodeView::UpdateLineNumberAreaWidth(void) {
+  setViewportMargins(LineNumberAreaWidth(), 0, 0, 0);
+}
+
+void CodeView::UpdateLineNumberArea(const QRect &rect, int dy) {
+  if (dy) {
+    d->line_area->scroll(0, dy);
+  } else {
+    d->line_area->update(0, rect.y(), d->line_area->width(), rect.height());
+  }
+  if (rect.contains(viewport()->rect())) {
+    UpdateLineNumberAreaWidth();
+  }
 }
 
 void CodeView::OnDownloadFailed(void) {
@@ -611,7 +672,34 @@ void CodeView::OnRenderCode(void *code_, uint64_t counter) {
   }
 
   d->code.swap(code);
-  setPlainText(d->code->data);
+
+  // Break the text into lines, so that each line is represented by a
+  // `QTextBlock` behind the scenes.
+  {
+    int last_line = 0;
+    int i = 0;
+    auto first = true;
+    auto append = [&, this] (void) {
+      QStringRef line(&(d->code->data), last_line, i - last_line);
+      if (first) {
+        setPlainText(line.toString());
+        first = false;
+      } else {
+        appendPlainText(line.toString());
+      }
+    };
+
+    for (QChar ch : d->code->data) {
+      if (QChar::LineSeparator == ch) {
+        append();
+        last_line = i + 1;
+      }
+      ++i;
+    }
+    if (last_line < i) {
+      append();
+    }
+  }
 
   QTextCharFormat format;
 
@@ -642,6 +730,8 @@ void CodeView::OnRenderCode(void *code_, uint64_t counter) {
   ScrollToFileToken(d->scroll_target_eid);
 
   assert(d->counter.load() == counter);
+
+  emit DataChanged();
   update();
 }
 
@@ -702,6 +792,7 @@ void CodeView::EmitEventsForIndex(unsigned index) {
         loc.SetReferencedDeclarationId(decl_id);
         locs[i - locs_begin_index] = loc;
       }
+
       emit TokenPressEvent(locs);
     }
 
@@ -720,6 +811,14 @@ void CodeView::mousePressEvent(QMouseEvent *event) {
     d->last_block = -1;
   }
   this->QPlainTextEdit::mousePressEvent(event);
+}
+
+void CodeView::resizeEvent(QResizeEvent *event) {
+  this->QPlainTextEdit::resizeEvent(event);
+
+  QRect cr = contentsRect();
+  d->line_area->setGeometry(QRect(cr.left(), cr.top(),
+                                  LineNumberAreaWidth(), cr.height()));
 }
 
 void CodeView::scrollContentsBy(int dx, int dy) {
@@ -773,5 +872,57 @@ void CodeView::paintEvent(QPaintEvent *event) {
 
   event->accept();
 }
+
+int CodeView::LineNumberAreaWidth(void) {
+  if (d->state != CodeViewState::kRendered) {
+    return 0;
+  }
+
+  if (!d->code->first_line || !d->code->last_line) {
+    return 0;
+  }
+  assert(d->code->first_line <= d->code->last_line);
+
+  auto num_digits = 0;
+  for (auto l = d->code->last_line; l; l /= 10) {
+    ++num_digits;
+  }
+
+  QFontMetricsF metrics(d->theme.Font());
+  return static_cast<int>(ceil(
+      3 + (metrics.horizontalAdvance(QLatin1Char('9')) * num_digits)));
+}
+
+void CodeView::LineNumberAreaPaintEvent(QPaintEvent *event) {
+  QPainter painter(d->line_area);
+  painter.fillRect(event->rect(), d->theme.LineNumberBackgroundColor());
+
+  QTextBlock block = firstVisibleBlock();
+  unsigned line_number = static_cast<unsigned>(block.blockNumber()) +
+                         d->code->first_line;
+  int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
+  int bottom = top + qRound(blockBoundingRect(block).height());
+
+  const QBrush &color = d->theme.LineNumberForegroundColor();
+  auto area_width = d->line_area->width();
+  auto font_height = fontMetrics().height();
+
+  for (; block.isValid() && top <= event->rect().bottom(); ++line_number) {
+    if (block.isVisible() && bottom >= event->rect().top()) {
+      QString number = QString::number(line_number);
+      painter.setPen(color.color());
+      painter.drawText(0, top, area_width, font_height,
+                       Qt::AlignRight, number);
+    }
+
+    block = block.next();
+    top = bottom;
+    bottom = top + qRound(blockBoundingRect(block).height());
+  }
+}
+
+CodeViewLineNumberArea::CodeViewLineNumberArea(CodeView *code_view_)
+    : QWidget(code_view_),
+      code_view(code_view_) {}
 
 }  // namespace mx::gui

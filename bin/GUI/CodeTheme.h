@@ -99,6 +99,12 @@ class CodeTheme {
   // The color to use as a highlight for the line containing the cursor.
   virtual QColor SelectedLineBackgroundColor(unsigned group=0) const = 0;
 
+  // Text color of line numbers.
+  virtual const QBrush &LineNumberForegroundColor(void) const = 0;
+
+  // Background color of line numbers.
+  virtual QColor LineNumberBackgroundColor(void) const = 0;
+
   // Background color for a specific token.
   //
   // NOTE(pag): The lifetime of the returned `QBrush` references must match or
@@ -145,6 +151,12 @@ class ProxyCodeTheme : public CodeTheme {
 
   // Whether or not to wrap lines.
   bool LineWrap(void) const override;
+
+  // Text color of line numbers.
+  const QBrush &LineNumberForegroundColor(void) const override;
+
+  // Background color of line numbers.
+  QColor LineNumberBackgroundColor(void) const override;
 
   // Background color of the code area.
   QColor BackgroundColor(void) const override;

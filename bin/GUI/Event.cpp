@@ -24,7 +24,7 @@ class EventLocationsImpl {
         end(&(begin[n])),
         length(n) {
     assert(1 < length);
-    for (auto i = 0u; b != e; ++b) {
+    for (auto i = 0u; b < e; ++b, ++i) {
       begin[i] = *b;
       assert(begin[i].IsSane());
     }
@@ -147,6 +147,22 @@ EventLocations &EventLocations::operator=(const EventLocations &that_) {
   memcpy(this, &that, sizeof(that));
   memset(&that, 0, sizeof(that));
   return *this;
+}
+
+const EventLocation &EventLocations::front(void) const & {
+  if (auto ls = AsList()) {
+    return *(ls->begin);
+  } else {
+    return *AsLoc();
+  }
+}
+
+const EventLocation &EventLocations::back(void) const & {
+  if (auto ls = AsList()) {
+    return *&(ls->end[-1]);
+  } else {
+    return *AsLoc();
+  }
 }
 
 const EventLocation *EventLocations::begin(void) const & {

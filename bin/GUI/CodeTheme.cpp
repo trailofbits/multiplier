@@ -42,6 +42,17 @@ class PetersTheme final : public CodeTheme {
     return false;
   }
 
+  // Text color of line numbers.
+  const QBrush &LineNumberForegroundColor(void) const final {
+    static const QBrush kColor(QColor::fromRgb(115, 139, 148));
+    return kColor;
+  }
+
+  // Background color of line numbers.
+  QColor LineNumberBackgroundColor(void) const final {
+    return QColor::fromRgb(30, 30, 30);
+  }
+
   const QBrush &TokenBackgroundColor(
       const Token &, const std::vector<Decl> &, TokenCategory) const final {
     static const QBrush kColor(BackgroundColor());
@@ -286,6 +297,16 @@ int ProxyCodeTheme::NumSpacesInTab(void) const {
 // Whether or not to wrap lines.
 bool ProxyCodeTheme::LineWrap(void) const {
   return next.LineWrap();
+}
+
+// Text color of line numbers.
+const QBrush &ProxyCodeTheme::LineNumberForegroundColor(void) const {
+  return next.LineNumberForegroundColor();
+}
+
+// Background color of line numbers.
+QColor ProxyCodeTheme::LineNumberBackgroundColor(void) const {
+  return next.LineNumberBackgroundColor();
 }
 
 // Background color of the code area.

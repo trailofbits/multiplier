@@ -16,6 +16,7 @@
 #include <QMetaType>
 #include <QPixmap>
 #include <QSplashScreen>
+#include <tuple>
 
 #include "CodeView.h"
 #include "Configuration.h"
@@ -39,7 +40,7 @@ int main(int argc, char *argv[]) {
     do { \
       auto ret = QFontDatabase::addApplicationFont(path); \
       assert(ret != -1); \
-      (void) ret; \
+      std::ignore = ret; \
     } while (0)
 
   ADD_FONT(":/Fonts/Fonts/Source_Code_Pro/static/SourceCodePro-Black.ttf");

@@ -29,7 +29,7 @@ const FileLocationVector &FileLocationCacheImpl::Add(File file) {
   }
 
   auto tokens = file.tokens();
-  vec.reserve(tokens.size());
+  vec.reserve(tokens.size() + 1u);
 
   auto curr_line = 1u;
   auto curr_col = 1u;
@@ -91,6 +91,8 @@ const FileLocationVector &FileLocationCacheImpl::Add(File file) {
     }
   }
 
+  vec.emplace_back(curr_line, curr_col);
+
   return vec;
 }
 
@@ -133,6 +135,32 @@ std::optional<std::pair<unsigned, unsigned>> Token::location(
   }
 
   return vec[maybe_file_token->offset];
+}
+
+// Return the line and column number for this token, if any.
+std::optional<std::pair<unsigned, unsigned>> Token::next_location(
+    const FileLocationCache &cache) const {
+
+  std::optional<Token> maybe_file_token = file_token();
+  if (!maybe_file_token) {
+    return std::nullopt;
+  }
+
+  const PackedFileImpl *file_ptr = dynamic_cast<const PackedFileImpl *>(
+      maybe_file_token->impl.get());
+  if (!file_ptr) {
+    return std::nullopt;
+  }
+
+  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token->impl),
+                                            file_ptr));
+  const FileLocationVector &vec = cache.impl->Add(std::move(file));
+
+  if ((maybe_file_token->offset + 1u) >= vec.size()) {
+    return std::nullopt;
+  }
+
+  return vec[maybe_file_token->offset + 1u];
 }
 
 FileImpl::~FileImpl(void) noexcept {}

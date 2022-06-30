@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QBrush>
 #include <QHeaderView>
+#include <QKeyEvent>
 #include <QSplitter>
 #include <QThreadPool>
 #include <QTreeWidget>
@@ -19,6 +20,7 @@
 #include <cassert>
 #include <cstdint>
 #include <map>
+#include <tuple>
 #include <unordered_map>
 
 #include "CodeTheme.h"
@@ -149,7 +151,7 @@ void InitReferenceHierarchyThread::run(void) {
 
       // Populate the cache in this background thread to not block the main
       // thread.
-      (void) decl->token().nearest_location(d->line_cache);
+      std::ignore = decl->token().nearest_location(d->line_cache);
 
       users.emplace_back(decl.value(), stmt.tokens());
       last_fragment_id = frag.id();
@@ -189,7 +191,7 @@ void ExpandReferenceHierarchyThread::run(void) {
 
       // Populate the cache in this background thread to not block the main
       // thread.
-      (void) decl->token().nearest_location(d->line_cache);
+      std::ignore = decl->token().nearest_location(d->line_cache);
 
       users.emplace_back(decl.value(), stmt.tokens());
       last_fragment_id = frag.id();
@@ -361,7 +363,7 @@ void ReferenceBrowserView::InitializeWidgets(void) {
 
   // Create and connect the code preview.
   if (config.code_preview.visible) {
-    d->code = new CodeView(d->theme);
+    d->code = new CodeView(d->theme, d->multiplier.FileLocationCache());
     d->code->viewport()->installEventFilter(&(d->multiplier));
     d->splitter->addWidget(d->code);
 
