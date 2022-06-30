@@ -158,8 +158,7 @@ class Statement : public std::enable_shared_from_this<Statement> {
   // prepared statement cached
   std::shared_ptr<sqlite3_stmt> prepared_stmt;
   std::string query;
-  int num_params;
-
+  unsigned num_params;
 };
 
 class Connection {

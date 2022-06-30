@@ -88,7 +88,8 @@ Statement::Statement(Connection &conn, const std::string &stmt)
   };
 
   prepared_stmt = getPrepareStatement();
-  num_params = sqlite3_bind_parameter_count(prepared_stmt.get());
+  num_params = static_cast<unsigned>(
+      sqlite3_bind_parameter_count(prepared_stmt.get()));
 }
 
 Statement::~Statement(void) {}
