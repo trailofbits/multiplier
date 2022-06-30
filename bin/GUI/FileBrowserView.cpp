@@ -55,6 +55,7 @@ FileBrowserView::~FileBrowserView(void) {}
 
 void FileBrowserView::Clear(void) {
   d->source_file_tree->clear();
+  d->file_infos.clear();
 }
 
 void FileBrowserView::Focus(void) {
