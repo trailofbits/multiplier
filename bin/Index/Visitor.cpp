@@ -335,6 +335,20 @@ void EntityVisitor::VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) {
   }
 }
 
+void EntityVisitor::VisitDesignatedInitExpr(const pasta::DesignatedInitExpr &stmt) {
+  if (EnterStmt(stmt)) {
+    // NOTE(pag): Don't need to enter the fields of the designators; they're
+    //            likely defined elsewhere.
+    // for (auto designator : stmt.Designators()) {
+    //   Accept(designator);
+    // }
+    for (auto sub_expr : stmt.SubExpressions()) {
+      Accept(sub_expr);
+    }
+    Accept(stmt.Initializer());
+  }
+}
+
 bool EntityVisitor::EnterDecl(const pasta::Decl &decl) {
   if (Enter(decl)) {
     if (auto ls = decl.DescribedTemplateParameters()) {

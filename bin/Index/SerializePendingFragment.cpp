@@ -122,6 +122,10 @@ void PendingFragment::Serialize(EntityMapper &em,
       SerializeTemplateParameterList(
           em, pseudo_builder[i++],
           std::get<pasta::TemplateParameterList>(pseudo));
+    } else if (std::holds_alternative<pasta::Designator>(pseudo)) {
+      SerializeDesignator(
+          em, pseudo_builder[i++],
+          std::get<pasta::Designator>(pseudo));
     } else {
       assert(false);
       ++i;
