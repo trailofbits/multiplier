@@ -142,8 +142,9 @@ extern "C" int main(int argc, char *argv[]) {
 //  options.storage_options.disable_async_writes = FLAGS_disable_async_writes;
 //  options.storage_options.path = options.workspace_dir / "mx-index.sqlite";
 
-  // Set up a server.
-  capnp::EzRpcServer server(kj::heap<indexer::Server>(options),
+  auto impl = indexer::Server::Build(options);
+
+  capnp::EzRpcServer server(kj::heap<indexer::Server>(impl),
                             FLAGS_host + ':' + FLAGS_port);
 
   // Write the port number to stdout, in case it was chosen automatically.
@@ -154,7 +155,9 @@ extern "C" int main(int argc, char *argv[]) {
     // in which case the port will be zero.
     LOG(INFO) << "Listening on Unix socket " << FLAGS_port;
   } else {
-    LOG(INFO) << "Listening on port " << FLAGS_port << " of " << FLAGS_host;
+    LOG(INFO)
+        << "Listening on port " << FLAGS_port
+        << " of " << FLAGS_host;
   }
 
   // Run forever, accepting connections and handling requests.

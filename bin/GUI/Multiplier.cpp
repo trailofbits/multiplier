@@ -216,7 +216,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
       d->key = Qt::Key_unknown;
       d->click_kind = MouseClickKind::kNotClicked;
       switch (auto key = dynamic_cast<QKeyEvent *>(event)->key(); key) {
-        case IF_APPLE_ELSE(Qt::Key_Meta, Qt::Key_Control):
+        case Qt::Key_Meta:
           d->modifiers.setFlag(Qt::KeyboardModifier::ControlModifier);
           break;
         case Qt::Key_Shift:
@@ -226,7 +226,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
         case Qt::Key_Option:
           d->modifiers.setFlag(Qt::KeyboardModifier::AltModifier);
           break;
-        case IF_APPLE_ELSE(Qt::Key_Control, Qt::Key_Meta):
+        case Qt::Key_Control:
           d->modifiers.setFlag(Qt::KeyboardModifier::MetaModifier);
           break;
         default:
@@ -237,7 +237,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
 
     case QEvent::KeyRelease:
       switch (auto key = dynamic_cast<QKeyEvent *>(event)->key(); key) {
-        case IF_APPLE_ELSE(Qt::Key_Meta, Qt::Key_Control):
+        case Qt::Key_Meta:
           d->modifiers.setFlag(Qt::KeyboardModifier::ControlModifier, false);
           break;
         case Qt::Key_Shift:
@@ -247,7 +247,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
         case Qt::Key_Option:
           d->modifiers.setFlag(Qt::KeyboardModifier::AltModifier, false);
           break;
-        case IF_APPLE_ELSE(Qt::Key_Control, Qt::Key_Meta):
+        case Qt::Key_Control:
           d->modifiers.setFlag(Qt::KeyboardModifier::MetaModifier, false);
           break;
         default:
@@ -266,7 +266,7 @@ bool Multiplier::eventFilter(QObject *watched, QEvent *event) {
       d->buttons.setFlag(button, true);
       d->double_click_buttons = {};
       d->click_kind = MouseClickKind::kNotClicked;
-      d->last_locations.clear();
+      ClearLastLocations();
       return false;
     }
 
@@ -452,8 +452,19 @@ void Multiplier::InitializeUI(void) {
 
   resize(rect.width(), rect.height());
 
+  ClearLastLocations();
   InitializeWidgets();
   InitializeMenus();
+}
+
+void Multiplier::ClearLastLocations(void) {
+  d->last_locations.clear();
+
+  // Fill in with empty stuff. The way `EmitActions` works is that it relies
+  // on the event sources being present.
+  for (auto i = 1u; i; i <<= 1u) {
+    (void) d->last_locations[static_cast<EventSource>(i)];
+  }
 }
 
 void Multiplier::OnConnectionStateChange(ConnectionState state) {
@@ -553,7 +564,7 @@ void Multiplier::OnFileDisconnectAction(void) {
   d->history_browser_view->Clear();
   d->code_browser_view->Clear();
   d->code_browser_view->Disconnected();
-  d->last_locations.clear();
+  ClearLastLocations();
   UpdateUI();
 }
 
@@ -662,49 +673,19 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
 }
 
 bool Multiplier::EmitEvent(void) {
-//  switch (d->click_kind) {
-//    case MouseClickKind::kLeftClick: std::cerr << "left "; break;
-//    case MouseClickKind::kLeftDoubleClick: std::cerr << "left-double "; break;
-//    case MouseClickKind::kRightClick: std::cerr << "right "; break;
-//    case MouseClickKind::kRightDoubleClick: std::cerr << "right-double "; break;
-//    default: break;
-//  }
-
-  if (d->modifiers) {
-//    std::cerr << "modifiers=" << std::hex << int(d->modifiers) << std::dec << ' ';
-  }
-
-  if (d->key != Qt::Key_unknown) {
-//    std::cerr << "key=" << int(d->key) << ' ';
-  }
-
-//  std::cerr << '\n';
-
   auto acted = false;
   for (const EventAction &ea : d->config.actions) {
     if (ea.match_modifiers != d->modifiers) {
-//      std::cerr << "failed on modifiers: " << ea.description << "\n";
       continue;
     }
 
     if (ea.match_key != d->key) {
-//      std::cerr << "failed on key: " << ea.description << "\n";
       continue;
     }
 
     if (ea.match_click != d->click_kind) {
-//      std::cerr << "failed on click kind: " << ea.description << "\n";
       continue;
     }
-
-//    for (const auto &loc : d->last_locations) {
-//      std::cerr
-//          << "EmitEvent"
-//          << "; decl_id=" << loc.DeclarationId()
-//          << "; file_tok_id=" << loc.FileTokenId()
-//          << "; frag_tok_id=" << loc.FragmentTokenId()
-//          << ": " << ea.description << '\n';
-//    }
 
     for (const auto &[source, locs] : d->last_locations) {
       if (DoActions(source, ea)) {

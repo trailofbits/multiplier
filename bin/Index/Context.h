@@ -22,6 +22,8 @@
 #include <iostream>
 #include <set>
 
+#include "Database.h"
+
 namespace mx {
 class Executor;
 class ProgressBar;
@@ -29,8 +31,6 @@ enum WorkerId : unsigned;
 enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
-
-class Database;
 
 enum : char {
   kMetaNameToId,
@@ -199,7 +199,8 @@ class ServerContext {
   mx::PersistentSet<kEntityIdReference, mx::RawEntityId, mx::RawEntityId>
       entity_id_reference;
 
-  std::unique_ptr<Database> connection;
+  // SQLite database. Used for things like symbol searches.
+  Database database;
 
   void Flush(void);
 
@@ -295,8 +296,6 @@ class IndexingContext {
   std::vector<NextId<mx::RawEntityId>> local_next_big_fragment_id;
 
   std::unique_ptr<CodeGenerator> codegen;
-
-  std::vector<std::unique_ptr<Database>> databases;
 
   explicit IndexingContext(ServerContext &server_context_,
                            const mx::Executor &exe_);

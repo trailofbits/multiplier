@@ -88,12 +88,12 @@ namespace {
 
 #define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_ENTITY
 
-//#define MX_VISIT_ENTITY_LIST(cls, api_name, storage, apply, \
-//                             pasta_name, type, nth_list) \
-//    if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) { \
-//      for (auto eid : reader.get()) { \
-//        entity_ids.insert(eid); \
-//      } \
+//#define MX_VISIT_ENTITY_LIST(cls, api_name, storage, apply,
+//                             pasta_name, type, nth_list)
+//    if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) {
+//      for (auto eid : reader.get()) {
+//        entity_ids.insert(eid);
+//      }
 //    }
 
 #include <multiplier/Visitor.inc.h>

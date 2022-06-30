@@ -4,22 +4,22 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <thread>
+#include <cassert>
 #include <iostream>
-#include <assert.h>
+#include <thread>
+#include <sqlite3.h>
 
 #include <multiplier/SQLiteStore.h>
 
 namespace sqlite {
 
-QueryResult::QueryResult(Connection& conn, const std::string& query)
-  : stmt(std::make_shared<Statement>(conn, query)){}
+QueryResult::QueryResult(Connection &conn, const std::string &query)
+    : stmt(std::make_shared<Statement>(conn, query)){}
 
 QueryResult::QueryResult(std::shared_ptr<Statement> stmt_)
-  : stmt(stmt_) {}
+    : stmt(stmt_) {}
 
-std::vector<std::string>
-QueryResult::GetColumnNames() {
+std::vector<std::string> QueryResult::GetColumnNames(void) {
   std::vector<std::string> result;
   auto col_size = NumColumns();
   auto prepared_stmt = stmt->prepareStatement();
@@ -31,7 +31,7 @@ QueryResult::GetColumnNames() {
   return result;
 }
 
-bool QueryResult::Columns(std::vector<std::string>& row) {
+bool QueryResult::Columns(std::vector<std::string> &row) {
   std::vector<std::string> ret;
   auto col_size = NumColumns();
   auto prepared_stmt = stmt->prepareStatement();
@@ -50,7 +50,7 @@ bool QueryResult::Columns(std::vector<std::string>& row) {
   return true;
 }
 
-uint32_t QueryResult::NumColumns() {
+uint32_t QueryResult::NumColumns(void) {
   auto prepared_stmt = stmt->prepareStatement();
   return sqlite3_column_count(prepared_stmt);
 }
@@ -67,9 +67,9 @@ std::string QueryResult::getText(int32_t idx) {
   return std::string(ptr, len);
 }
 
-Statement::Statement(Connection& conn, const std::string& stmt)
-    : db(conn), query(stmt)
-{
+Statement::Statement(Connection &conn, const std::string &stmt)
+    : db(conn),
+      query(stmt) {
   conn.stmts.emplace_back(this);
 
   auto getPrepareStatement = [this](void) -> std::shared_ptr<sqlite3_stmt> {
@@ -93,7 +93,7 @@ Statement::Statement(Connection& conn, const std::string& stmt)
 
 Statement::~Statement(){}
 
-sqlite3_stmt* Statement::prepareStatement(void){
+sqlite3_stmt *Statement::prepareStatement(void){
   return prepared_stmt.get();
 }
 
@@ -104,7 +104,7 @@ void Statement::Close() noexcept {
   }
 }
 
-void Statement::Execute(){
+void Statement::Execute(void) {
   auto ret = tryExecuteStep();
   if (SQLITE_DONE != ret) {
     if (SQLITE_ROW == ret) {
@@ -116,21 +116,24 @@ void Statement::Execute(){
       throw Error("Execute() failed with Error");
     }
   }
+  sqlite3_clear_bindings(prepared_stmt.get());
+  sqlite3_reset(prepared_stmt.get());
 }
 
-bool Statement::ExecuteStep() {
+bool Statement::ExecuteStep(void) {
   auto ret = tryExecuteStep();
   if ((SQLITE_ROW != ret) && (SQLITE_DONE != ret)) {
     if (ret == sqlite3_errcode(db.GetHandler())) {
       throw Error("ExecuteStep failed");
     } else {
+      sqlite3_clear_bindings(prepared_stmt.get());
       sqlite3_reset(prepared_stmt.get());
     }
   }
   return (ret == SQLITE_ROW);
 }
 
-QueryResult Statement::GetResult() {
+QueryResult Statement::GetResult(void) {
   return QueryResult(shared_from_this());
 }
 
@@ -174,12 +177,12 @@ void Statement::bind(const size_t i, const std::string &value) {
                     value.c_str(), value.size(), SQLITE_TRANSIENT);
 }
 
-Connection::Connection(const std::string &db_name,
+Connection::Connection(const std::filesystem::path &db_name,
                        const int busyTimeouts)
                       : dbFilename(db_name)
 {
   sqlite3* db_handle;
-  const int ret = sqlite3_open(db_name.c_str(), &db_handle);
+  const int ret = sqlite3_open(db_name.generic_string().c_str(), &db_handle);
 
   sqlite3_exec(db_handle, "pragma synchronous = off",
                nullptr, nullptr, nullptr);
@@ -260,7 +263,7 @@ void Connection::Execute(const std::string& query) {
   }
 }
 
-std::shared_ptr<Statement> Connection::Prepare(const std::string& query) {
+std::shared_ptr<Statement> Connection::Prepare(const std::string &query) {
   auto stmt = std::make_shared<Statement>(*this, query);
   return std::move(stmt);
 }
@@ -279,7 +282,7 @@ void Connection::Commit(void) {
 }
 
 void Connection::Begin(void) {
-  Execute("begin immediate transaction");
+  Execute("begin transaction");
 }
 
 } // namespace sqlite

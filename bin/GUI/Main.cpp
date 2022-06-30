@@ -65,31 +65,31 @@ int main(int argc, char *argv[]) {
   //    There's a finite number of times that I'll be able to click in my life
   //    before I get arthritis, so I don't want to halve it.
 
-  // Click to open something in the code browser view, or in the code preview
-  // view of the reference browser, should open the thing in the code browser.
+//  // Click to open something in the code browser view, or in the code preview
+//  // view of the reference browser, should open the thing in the code browser.
+//  config.actions.emplace_back(mx::gui::EventAction{
+//    .description = "A clicked token should be added to the linear history",
+//    .match_click = mx::gui::MouseClickKind::kLeftClick,
+//    .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource,
+//                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
+//                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
+//    .do_action = mx::gui::Action::kAddToLinearHistory,
+//  });
+
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "A clicked token should be added to the linear history",
     .match_click = mx::gui::MouseClickKind::kLeftClick,
-    .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource,
-                      mx::gui::EventSource::kReferenceBrowserPreviewClickSource,
-                      mx::gui::EventSource::kCodeSearchResultPreviewClickSource},
+    .match_sources = {mx::gui::EventSource::kCodeBrowserClickSource},
     .do_action = mx::gui::Action::kAddToLinearHistory,
   });
 
-  config.actions.emplace_back(mx::gui::EventAction{
-    .description = "A clicked declaration should be added to the linear history",
-    .match_click = mx::gui::MouseClickKind::kLeftClick,
-    .match_sources = {mx::gui::EventSource::kCodeBrowserClickDest},
-    .do_action = mx::gui::Action::kAddToLinearHistory,
-  });
-
-  config.actions.emplace_back(mx::gui::EventAction{
-    .description = "A double clicked declaration search result should be added "
-                   "to the linear history",
-    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
-    .match_sources = {mx::gui::EventSource::kEntitySearchResult},
-    .do_action = mx::gui::Action::kAddToLinearHistory,
-  });
+//  config.actions.emplace_back(mx::gui::EventAction{
+//    .description = "A double clicked declaration search result should be added "
+//                   "to the linear history",
+//    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+//    .match_sources = {mx::gui::EventSource::kEntitySearchResult},
+//    .do_action = mx::gui::Action::kAddToLinearHistory,
+//  });
 
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "A double clicked declaration search result should be added "
@@ -132,12 +132,12 @@ int main(int argc, char *argv[]) {
     .do_action = mx::gui::Action::kOpenReferenceBrowser,
   });
 
-  config.actions.emplace_back(mx::gui::EventAction{
-    .description = "A double click in the reference browser adds to the linear history",
-    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
-    .match_sources = {mx::gui::EventSource::kReferenceBrowser},
-    .do_action = mx::gui::Action::kAddToLinearHistory,
-  });
+//  config.actions.emplace_back(mx::gui::EventAction{
+//    .description = "A double click in the reference browser adds to the linear history",
+//    .match_click = mx::gui::MouseClickKind::kLeftDoubleClick,
+//    .match_sources = {mx::gui::EventSource::kReferenceBrowser},
+//    .do_action = mx::gui::Action::kAddToLinearHistory,
+//  });
 
   config.actions.emplace_back(mx::gui::EventAction{
     .description = "A double click in the reference browser adds to the visual history",
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
   });
 
   config.actions.emplace_back(mx::gui::EventAction{
-    .description = "Meta-F should open the regex search.",
+    .description = "F should open the regex search.",
     .match_key = Qt::Key_F,
     .match_sources = ~mx::gui::EventSources(),
     .do_action = mx::gui::Action::kOpenRegexSearch,

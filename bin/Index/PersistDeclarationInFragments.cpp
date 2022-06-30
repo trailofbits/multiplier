@@ -131,12 +131,10 @@ void PendingFragment::PersistDeclarationSymbols(
   for (const pasta::Decl &decl : decls_to_serialize) {
     if (auto nd = pasta::NamedDecl::From(decl);
         nd && ShouldGetSymbolName(decl)) {
-
-      std::string str = ContextualSymbolName(nd.value());
       
-      mx::RawEntityId id = em.EntityId(decl);
-      context.databases[worker_id]->StoreEntities(
-          id, str, mx::FromPasta(decl.Category()));
+      context.server_context.database.StoreSymbolName(
+          em.EntityId(decl), mx::FromPasta(decl.Category()),
+          ContextualSymbolName(nd.value()));
     }
   }
 }

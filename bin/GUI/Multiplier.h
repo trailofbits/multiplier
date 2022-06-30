@@ -65,6 +65,7 @@ class Multiplier final : public QMainWindow {
 
   bool DoActions(EventSource source, const EventAction &ea);
   bool EmitEvent(void);
+  void ClearLastLocations(void);
 
  public slots:
   void FocusOnHistory(bool);

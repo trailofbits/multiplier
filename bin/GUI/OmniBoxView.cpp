@@ -72,6 +72,7 @@ enum : int {
 
 static bool IsSearchableCategory(DeclCategory c) {
   switch (c) {
+    default:
     case DeclCategory::UNKNOWN:
     case DeclCategory::LOCAL_VARIABLE:
     case DeclCategory::THIS:
@@ -96,6 +97,7 @@ static bool IsSearchableCategory(DeclCategory c) {
     case DeclCategory::TYPE_ALIAS:
       return true;
   }
+  return false;
 }
 
 }  // namespace

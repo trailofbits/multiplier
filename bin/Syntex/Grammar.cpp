@@ -173,6 +173,7 @@ namespace {
 
 static NonTerminal NodeToNonTerminal(const ASTNode *node) {
   switch (node->kind) {
+    default:
     case ASTNode::kFragment:
       assert(false);
       abort();

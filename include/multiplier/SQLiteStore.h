@@ -16,8 +16,12 @@
 #include <iostream>
 #include <optional>
 
-#include <sqlite3.h>
-
+extern "C" {
+struct sqlite3;
+struct sqlite3_context;
+struct sqlite3_stmt;
+struct sqlite3_value;
+}  // extern C
 namespace sqlite {
 
 class Connection;
@@ -67,7 +71,7 @@ class QueryResult {
   friend class Statement;
   friend class Connection;
 
-  QueryResult(Connection& conn, const std::string& query);
+  QueryResult(Connection &conn, const std::string &query);
 
   QueryResult(std::shared_ptr<Statement> stmt_);
 
@@ -82,7 +86,7 @@ class Statement : public std::enable_shared_from_this<Statement> {
  public:
 
   // Compile and register a sqlite query with the database connection
-  Statement(Connection& conn, const std::string& stmt);
+  Statement(Connection &conn, const std::string &stmt);
 
   // non-copyable
   Statement(const Statement&) = delete;
@@ -146,7 +150,7 @@ class Statement : public std::enable_shared_from_this<Statement> {
   }
 
 
-  sqlite3_stmt* prepareStatement();
+  sqlite3_stmt *prepareStatement(void);
 
   // Database connection instance
   Connection &db;
@@ -162,26 +166,21 @@ class Connection {
  public:
 
   // Uses sqlite3_open to open the database at the specified path
-  Connection(const std::string &filename,
-             const int busyTimeouts = 0);
-
-  // Uses sqlite3_open to open the database at the specified path
   Connection(const std::filesystem::path &filename,
              const int busyTimeouts = 0);
 
   // non-copyable
-  Connection(const Connection&) = delete;
-  Connection& operator=(const Connection&) = delete;
+  Connection(const Connection &) = delete;
+  Connection& operator=(const Connection &) = delete;
 
   // Close the database connection and cleanup all cached statements
   ~Connection() = default;
 
   // Execute statements without results
-  void Execute(const std::string& query);
-
+  void Execute(const std::string &query);
 
   // Get prepared statements before executing to database
-  std::shared_ptr<Statement> Prepare(const std::string& stmt);
+  std::shared_ptr<Statement> Prepare(const std::string &stmt);
 
   // Begin transactions to the database
   void Begin(void);
@@ -190,7 +189,7 @@ class Connection {
   void Commit(void);
 
   // Execute a query and fetch the results
-  QueryResult ExecuteAndGet(const std::string& query);
+  QueryResult ExecuteAndGet(const std::string &query);
 
    // Set a busy timeout when the table is locked.
   void SetBusyTimeout(const int timeouts);
@@ -206,7 +205,7 @@ class Connection {
   void DeleteFunction(std::string func_name, unsigned n_args, unsigned flags);
 
    // Get the filename used to open the database
-  std::string GetFilename() const {
+  std::string GetFilename(void) const {
       return dbFilename;
   }
 
@@ -214,14 +213,14 @@ class Connection {
   void Close() noexcept;
 
   struct Deleter {
-    void operator()(sqlite3* db);
+    void operator()(sqlite3 *db);
   };
 
  private:
   friend class Statement;
 
    // Get the raw pointer to SQLite connection handler
-  sqlite3* GetHandler() const {
+  sqlite3 *GetHandler(void) const {
     return db.get();
   }
 

@@ -820,6 +820,35 @@ void CodeSearchResultsView::InitializeWidgets(void) {
 
   connect(d->model.get(), &CodeSearchResultsModel::AddedRows,
           this, &CodeSearchResultsView::OnRowsAdded);
+
+  connect(d->table->selectionModel(), &QItemSelectionModel::currentChanged,
+          this, &CodeSearchResultsView::OnCurrentChanged);
+}
+
+void CodeSearchResultsView::OnCurrentChanged(const QModelIndex &index,
+                                             const QModelIndex &) {
+  const QModelIndex real_index = d->proxy->mapToSource(index);
+  const int row = real_index.row();
+  const int col = real_index.column();
+  CodeSearchResultsModelImpl * const model_data = d->model_data;
+  if (0 > row || 0 > col || row >= model_data->num_rows ||
+      col >= model_data->num_columns) {
+    return;
+  }
+
+  auto &config = d->model_data->multiplier.Configuration().code_search_results;
+  if (!config.code_preview.visible || !d->code) {
+    return;
+  }
+
+  const RowData &result = d->model_data->rows[row];
+  const File &file = d->model_data->files[result.file_index];
+  TokenRange toks = file.tokens().slice(result.file_tokens_begin,
+                                        result.file_tokens_end);
+  d->code->show();
+  d->theme.HighlightFileTokenRange(toks);
+  d->code->SetFile(file);
+  d->code->ScrollToFileToken(toks.front().id());
 }
 
 void CodeSearchResultsView::ActOnTokenPressEvent(EventLocations locs) {
@@ -888,7 +917,7 @@ void CodeSearchResultsView::ClickedOnToken(unsigned row, unsigned index) {
       loc.SetFragmentTokenId(frag_tok_id);
       loc.SetReferencedDeclarationId(decl_id);
       emit TokenPressEvent(EventSource::kCodeSearchResult, loc);
-      ShowFragmentToken(row, file_tok_id, frag_tok_id);
+//      ShowFragmentToken(row, file_tok_id, frag_tok_id);
 
     } else {
       std::vector<EventLocation> locs(num_locs);
@@ -900,7 +929,7 @@ void CodeSearchResultsView::ClickedOnToken(unsigned row, unsigned index) {
         locs[i - locs_begin_index] = loc;
       }
       emit TokenPressEvent(EventSource::kCodeSearchResult, locs);
-      ShowFileToken(row, file_tok_id);
+//      ShowFileToken(row, file_tok_id);
     }
   }
 }

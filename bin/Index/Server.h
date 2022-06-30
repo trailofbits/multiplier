@@ -34,13 +34,16 @@ class ServerImpl;
 
 class Server final : public mx::rpc::Multiplier::Server {
  private:
-  std::unique_ptr<ServerImpl> d;
+  std::shared_ptr<ServerImpl> d;
 
  public:
   virtual ~Server(void);
 
+  static std::shared_ptr<ServerImpl> Build(ServerOptions &options_);
+
   // Initialize the server.
-  Server(ServerOptions &options_);
+  inline Server(std::shared_ptr<ServerImpl> d_)
+      : d(std::move(d_)) {}
 
   // Say hello to the server.
   kj::Promise<void> hello(HelloContext context) final;

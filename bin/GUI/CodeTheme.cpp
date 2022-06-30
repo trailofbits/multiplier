@@ -53,6 +53,9 @@ class PetersTheme final : public CodeTheme {
       TokenCategory kind) const final {
 
     switch (kind) {
+      default:
+        assert(false);
+        [[clang::fallthrough]];
       case TokenCategory::kUnknown: {
         static const QBrush kColor(QColor::fromRgb(20, 20, 20));
         return kColor;

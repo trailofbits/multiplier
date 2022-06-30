@@ -39,7 +39,8 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       entity_id_to_mangled_name(workspace_dir),
       mangled_name_to_entity_id(workspace_dir),
       entity_id_use_to_fragment_id(workspace_dir),
-      entity_id_reference(workspace_dir) {
+      entity_id_reference(workspace_dir),
+      database(workspace_dir) {
 
   // Clients all default-initialize their version numbers to `0`, so we default
   // the server to `1` so that clients are always out-of-date.
@@ -52,8 +53,6 @@ ServerContext::ServerContext(std::filesystem::path workspace_dir_)
       MetadataName::kNextSmallCodeId, mx::kMaxBigFragmentId));
   next_big_fragment_id.store(meta_to_value.GetOrSet(
       MetadataName::kNextBigCodeId, mx::kMinEntityIdIncrement));
-
-  connection = std::make_unique<Database>(Database::Name(workspace_dir));
 }
 
 ServerContext::~ServerContext(void) {
@@ -65,6 +64,7 @@ void ServerContext::Flush(void) {
   meta_to_value.Set(MetadataName::kNextFileId, next_file_id.load());
   meta_to_value.Set(MetadataName::kNextSmallCodeId, next_small_fragment_id.load());
   meta_to_value.Set(MetadataName::kNextBigCodeId, next_big_fragment_id.load());
+  database.Flush();
 }
 
 void IndexingCounter::ResetAll(void) {
@@ -97,12 +97,6 @@ IndexingContext::IndexingContext(ServerContext &server_context_,
 
   // Save the updated version number.
   server_context.Flush();
-
-  // Initialize database instance for each worker
-  for (auto i = 0U; i < num_workers; ++i) {
-    databases.emplace_back(new Database(
-        Database::Name(server_context_.workspace_dir)));
-  }
 }
 
 IndexingContext::~IndexingContext(void) {

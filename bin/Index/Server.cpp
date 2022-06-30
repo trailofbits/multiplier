@@ -126,9 +126,10 @@ Server::~Server(void) {
 }
 
 // Initialize the server.
-Server::Server(ServerOptions &options_)
-    : d(std::make_unique<ServerImpl>(options_)) {
-  d->executor.Start();
+std::shared_ptr<ServerImpl> Server::Build(ServerOptions &options_) {
+  auto ret = std::make_shared<ServerImpl>(options_);
+  ret->executor.Start();
+  return ret;
 }
 
 // Enqueue actions to index zero or more compile commands / jobs.
@@ -177,6 +178,7 @@ kj::Promise<void> Server::indexCompileCommands(
   auto which_cc = [&cc, &cxx] (mx::rpc::TargetLanguage tl) {
     switch (tl) {
       case mx::rpc::TargetLanguage::C: return cc;
+      default:
       case mx::rpc::TargetLanguage::CXX: return cxx;
     }
   };
@@ -636,7 +638,7 @@ kj::Promise<void> Server::findSymbols(FindSymbolsContext context) {
       params.getCategory());
 
   std::vector<mx::RawEntityId> entity_ids =
-      d->server_context.connection->QueryEntities(
+      d->server_context.database.QueryEntities(
           symbol, category);
 
   // Sort the redeclaration IDs to that they are always in the same order,

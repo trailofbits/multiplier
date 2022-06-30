@@ -108,6 +108,7 @@ class CodeSearchResultsView : public QWidget {
                                  QWidget *parent_=nullptr);
 
  private slots:
+  void OnCurrentChanged(const QModelIndex &index, const QModelIndex &);
   void ActOnTokenPressEvent(EventLocations locs);
   void OnRowsAdded(void);
 

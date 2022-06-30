@@ -25,39 +25,31 @@ class Statement;
 }  // namespace sqlite
 namespace indexer {
 
-class DatabaseWriterImpl;
-class DatabaseReaderImpl;
+class DatabaseImpl;
 
 // Database defines the interface for inserting/reading the symbol entries
 // from sqlite database. It creates a database reader for querying the
 // symbol. The database writer gets instantiated during storing the entities.
 class Database {
+ private:
+  std::shared_ptr<DatabaseImpl> d;
+
  public:
-  static std::filesystem::path Name(std::filesystem::path path) {
-    auto db_path = path.append("db.sqlite");
-    return db_path;
-  }
+  Database(std::filesystem::path workspace_dir);
 
-  Database(std::filesystem::path workspace);
-
-  Database(std::string workspace);
-
-  virtual ~Database(void);
+  ~Database(void);
 
   // non-copyable
   Database(const Database &) = delete;
   Database &operator=(const Database &) = delete;
 
-  void StoreEntities(mx::RawEntityId entity_id, const std::string &data,
-                     mx::DeclCategory category);
+  void StoreSymbolName(mx::RawEntityId entity_id, mx::DeclCategory category,
+                       std::string data);
 
   std::vector<mx::RawEntityId> QueryEntities(
-      const std::string &name, mx::DeclCategory table_id);
+      const std::string &name, mx::DeclCategory category);
 
- private:
-  std::unique_ptr<DatabaseReaderImpl> reader;
-
-  std::string database_path;
+  void Flush(void);
 };
 
 } // namespace indexer

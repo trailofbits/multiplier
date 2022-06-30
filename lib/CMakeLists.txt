@@ -216,6 +216,7 @@ set(util_headers
   "${source_include_dir}/Result.h"
   "${source_include_dir}/Signal.h"
   "${source_include_dir}/Serialize.h"
+  "${source_include_dir}/SQLiteStore.h"
   "${source_include_dir}/Subprocess.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/WorkerPool.h"
