@@ -521,7 +521,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         switch (static_cast<IdentifiedPseudo>(sub_kind)) {
           case IdentifiedPseudo::kDesignator: {
             DesignatorId id;
-            id.fragment_id = packed.small_entity.code_id;
+            id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
             id.offset = packed.small_entity.offset;
             return id;
           }

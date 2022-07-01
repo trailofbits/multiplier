@@ -153,7 +153,7 @@ struct DesignatorId {
  public:
   RawEntityId fragment_id;
 
-  // Offset of 
+  // Offset of the designator inside of the fragment.
   uint32_t offset;
 
   auto operator<=>(const DesignatorId &) const noexcept = default;

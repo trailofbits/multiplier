@@ -85,6 +85,18 @@ std::optional<Type> TokenContext::as_type(void) const {
   }
 }
 
+// Return the designator associated with the designated initializer, if any.
+std::optional<Designator> TokenContext::as_designator(void) const {
+  VariantId vid = EntityId(entity_id).Unpack();
+  if (impl && std::holds_alternative<DesignatorId>(vid)) {
+    DesignatorId did = std::get<DesignatorId>(vid);
+    if (did.offset < impl->num_pseudos) {
+      return Designator(impl, did.offset);
+    }
+  }
+  return std::nullopt;
+}
+
 // Return the aliased context.
 std::optional<TokenContext> TokenContext::aliasee(void) const {
   if (!impl || !alias_offset.has_value()) {

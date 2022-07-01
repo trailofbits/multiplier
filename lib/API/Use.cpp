@@ -403,6 +403,16 @@ UseBase::as_template_parameter_list(void) const {
   }
 }
 
+std::optional<Designator>
+UseBase::as_designator(void) const {
+  if (kind == UseKind::DESIGNATOR && fragment &&
+      offset < fragment->num_pseudos) {
+    return Designator(fragment, offset);
+  } else {
+    return std::nullopt;
+  }
+}
+
 ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {

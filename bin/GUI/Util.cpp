@@ -630,6 +630,12 @@ std::optional<Decl> DeclForToken(const Token &token) {
           named_decl && named_decl->name() == token.data()) {
         return CanonicalDecl(decl.value());
       }
+    } else if (auto designator = context->as_designator()) {
+      if (designator->field_token().id() == token.id()) {
+        if (auto field = designator->field()) {
+          return field.value();  // No redeclarations?
+        }
+      }
     }
   }
 
@@ -653,6 +659,13 @@ std::optional<Decl> DeclForToken(const Token &token) {
 
         } else if (auto decl = context->as_declaration()) {
           std::cerr << " -> " << EnumeratorName(decl->kind()) << "(" << decl->id() << ")";
+
+        } else if (auto designator = context->as_designator()) {
+          std::cerr << " -> DESIGNATOR(";
+          if (auto field = designator->field()) {
+            std::cerr << field->name();
+          }
+          std::cerr << ")";
         }
       }
       std::cerr << '\n';

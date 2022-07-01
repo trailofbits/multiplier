@@ -48,6 +48,7 @@ inline static constexpr unsigned NumEnumerators(UseKind) {
 class UseBase {
  private:
   friend class Decl;
+  friend class Designator;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Stmt;
@@ -78,6 +79,7 @@ class UseBase {
   std::optional<CXXBaseSpecifier> as_cxx_base_specifier(void) const;
   std::optional<TemplateArgument> as_template_argument(void) const;
   std::optional<TemplateParameterList> as_template_parameter_list(void) const;
+  std::optional<Designator> as_designator(void) const;
 };
 
 enum class DeclUseSelector : unsigned short;
