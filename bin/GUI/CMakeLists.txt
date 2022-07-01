@@ -15,7 +15,7 @@ if(PLATFORM_MACOS)
   set(MACOSX_BUNDLE_ICON_FILE "Logo.ico")
 endif()
 
-set(exe_name "multiplier")
+set(exe_name "Multiplier")
 add_executable("${exe_name}" "${executable_type}"
 
   Resources/resources.qrc
