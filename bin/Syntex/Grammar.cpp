@@ -8,13 +8,12 @@
 
 #include <cassert>
 #include <iostream>
+#include <unordered_set>
 
 #include <gflags/gflags.h>
 #include <multiplier/Index.h>
 #include <multiplier/Endian.h>
 #include <multiplier/PersistentMap.h>
-
-#include "AST.h"
 
 DEFINE_bool(print_asts, false, "Should DOT digraphs of the ASTs be printed to CERR?");
 
@@ -168,7 +167,9 @@ struct Serializer<Reader, Writer, SmallBloomFilter> {
 };
 
 }  // namespace mx
+
 namespace syntex {
+
 namespace {
 
 static NonTerminal NodeToNonTerminal(const ASTNode *node) {
@@ -219,6 +220,28 @@ NonTerminal::NonTerminal(mx::TokenKind k)
           mx::NumEnumerators(mx::StmtKind{}) +
           mx::NumEnumerators(mx::TypeKind{})) {}
 
+std::ostream& operator<<(std::ostream& os, const NonTerminal& nt) {
+  if (nt.val < mx::NumEnumerators(mx::DeclKind{})) {
+    os << "DeclKind::" << EnumeratorName(static_cast<mx::DeclKind>(nt.val));
+  } else if (nt.val < mx::NumEnumerators(mx::DeclKind{})
+                      + mx::NumEnumerators(mx::StmtKind{})) {
+    os << "StmtKind::" << EnumeratorName(static_cast<mx::StmtKind>(nt.val
+                                          - mx::NumEnumerators(mx::DeclKind{})));
+  } else if (nt.val < mx::NumEnumerators(mx::DeclKind{})
+                      + mx::NumEnumerators(mx::StmtKind{})
+                      + mx::NumEnumerators(mx::TypeKind{})) {
+    os << "TypeKind::" << EnumeratorName(static_cast<mx::TypeKind>(nt.val
+                                          - mx::NumEnumerators(mx::DeclKind{})
+                                          - mx::NumEnumerators(mx::StmtKind{})));
+  } else {
+    os << "TokenKind::" << EnumeratorName(static_cast<mx::TokenKind>(nt.val
+                                          - mx::NumEnumerators(mx::DeclKind{})
+                                          - mx::NumEnumerators(mx::StmtKind{})
+                                          - mx::NumEnumerators(mx::TypeKind{})));
+  }
+  return os;
+}
+
 Rule::~Rule(void) {
   if (begin) {
     delete[] begin;
@@ -237,6 +260,15 @@ uint64_t Rule::Hash(void) const {
     abort();  // TODO(pag): Make an endian-independent hash.
   }
   return 0;
+}
+
+std::ostream& operator<<(std::ostream& os, const Rule& rule) {
+  assert(rule.begin < rule.end);
+  for (NonTerminal *cur = rule.begin; cur < rule.end - 1; ++cur) {
+    os << *cur << " ";
+  }
+  os << "-> " << rule.end[-1];
+  return os;
 }
 
 class GrammarImpl {
@@ -269,6 +301,27 @@ Grammar::~Grammar(void) {}
 
 Grammar::Grammar(std::filesystem::path grammar_dir)
     : impl(std::make_shared<GrammarImpl>(std::move(grammar_dir))) {}
+
+mx::TokenKind Grammar::ClassifyIdent(std::string_view& spelling) const {
+  // FIXME: this should really use some kind of heterogenous lookup instead of
+  // constructing a temporary string
+  Terminal terminal = { std::string(spelling) };
+  auto kind = impl->tokens.TryGet(terminal);
+  if (kind.has_value())
+    return kind.value();
+  else
+    return mx::TokenKind::IDENTIFIER;
+}
+
+// Find all productions beginning with the specified non-terminal
+std::vector<Rule> Grammar::MatchProductions(const NonTerminal& start_nt) const {
+  std::vector<Rule> rules;
+  impl->productions.ScanPrefix(start_nt, [&] (Rule rule) -> bool {
+    rules.push_back(std::move(rule));
+    return true;
+  });
+  return rules;
+}
 
 // Import a fragment into the grammar.
 void Grammar::Import(const mx::Fragment &fragment) {
@@ -328,26 +381,161 @@ void Grammar::Import(const mx::Fragment &fragment) {
 
       rule.begin[num_children] = NodeToNonTerminal(node);  // Rule head.
 
-      // Add our rule feature to the fragment's feature set.
-      fragment_features.Add(rule.Hash());
+      // Avoid creating cyclic CFGs
+      bool allow_production = true;
+      if (num_children == 1) {
+        std::vector<NonTerminal> queue = { rule.Result() };
+        while (queue.size() > 0) {
+          auto nt = queue.back();
+          queue.pop_back();
+          // Check for cycle
+          if (nt == rule.begin[0]) {
+            allow_production = false;
+            break;
+          }
+          // Queue result of trivial productions
+          for (auto& cur : MatchProductions(nt))
+            if (cur.Count() == 1)
+              queue.push_back(cur.Result());
+        }
+      }
 
-      // Persist, i.e. "learn" our grammar rule.
-      impl->productions.Insert(std::move(rule));
+      if (allow_production) {
+        std::cout << rule << "\n";
+
+        // Add our rule feature to the fragment's feature set.
+        fragment_features.Add(rule.Hash());
+        // Persist, i.e. "learn" our grammar rule.
+        impl->productions.Insert(std::move(rule));
+      }
     }
   }
 
   impl->features.Set(fragment.id(), fragment_features);
 }
 
-mx::TokenKind Grammar::ClassifyIdent(std::string_view& spelling) const {
-  // FIXME: this should really use some kind of heterogenous lookup instead of
-  // constructing a temporary string
-  Terminal terminal = { std::string(spelling) };
-  auto kind = impl->tokens.TryGet(terminal);
-  if (kind.has_value())
-    return kind.value();
-  else
-    return mx::TokenKind::IDENTIFIER;
+//
+// Parser item
+//
+
+struct Item {
+  NonTerminal *cur, *end;
+
+  Item(const Rule& rule) : cur(rule.begin), end(rule.end - 1) {}
+  Item(NonTerminal *c, NonTerminal* e) : cur(c), end(e) {}
+
+  bool AtEnd() const {
+    return cur == end;
+  }
+
+  const NonTerminal& Cur() const {
+    return *cur;
+  }
+
+  Item Forward() {
+    assert(cur < end);
+    return Item(cur + 1, end);
+  }
+};
+
+//
+// Parsed fragment
+//
+
+struct Fragment {
+  NonTerminal non_terminal;
+  size_t next;
+
+  Fragment(NonTerminal nt, size_t n) : non_terminal(nt), next(n) {}
+};
+
+//
+// Wrapper around parsing functions
+//
+
+class Parser {
+private:
+  // Grammar to be processed
+  const Grammar& m_grammar;
+
+  // Input tokens
+  std::unordered_map<size_t, std::vector<Token>> m_tokens;
+
+  // Partial parses for each source location
+  // std::unordered_map<size_t, std::vector<Fragment>> m_parses;
+
+public:
+  Parser(const Grammar& grammar, const std::vector<Token>& tokens)
+    : m_grammar(grammar)
+  {
+    for (auto& token : tokens)
+      m_tokens[token.begin].push_back(token);
+  }
+
+  std::vector<Fragment> MatchRule(Item item, size_t position) const {
+    // Try to match the result as a new prefix
+    if (item.AtEnd())
+      return MatchPrefix(Fragment(item.Cur(), position));
+
+    // Otherwise see if we can move forward with this rule
+    std::vector<Fragment> result;
+    for (auto& frag : ParsesAtIndex(position))
+      if (frag.non_terminal == item.Cur()) {
+        auto matches = MatchRule(item.Forward(), frag.next);
+        result.insert(result.end(), matches.begin(), matches.end());
+      }
+    return result;
+  }
+
+  std::vector<Fragment> MatchPrefix(Fragment frag) const {
+    std::vector<Fragment> result;
+
+    for (auto& rule : m_grammar.MatchProductions(frag.non_terminal)) {
+      // Find all possible ways we can match this grammar rule
+      auto matches = MatchRule(Item(rule).Forward(), frag.next);
+      result.insert(result.end(), matches.begin(), matches.end());
+    }
+
+    // Add the input fragment itself
+    result.push_back(frag);
+
+    return result;
+  }
+
+  std::vector<Fragment> ParsesAtIndex(size_t index) const {
+    auto it = m_tokens.find(index);
+    if (it == m_tokens.end())
+      return {};
+
+    std::vector<Fragment> result;
+
+    for (auto& token : it->second) {
+      auto matches = MatchPrefix(Fragment(NonTerminal(token.kind), token.next));
+      result.insert(result.end(), matches.begin(), matches.end());
+    }
+
+    return result;
+  }
+
+  void Parse() {
+    //
+    // Start computing parses at index 0
+    //
+    auto fragments = ParsesAtIndex(0);
+
+    //
+    // Then print the result
+    //
+    std::cout << "-------------------\n";
+    for (auto& frag : fragments)
+      std::cout << "  " << frag.non_terminal << "\n";
+    std::cout << "-------------------\n";
+  }
+};
+
+void Parse(const Grammar& grammar, const std::vector<Token>& tokens) {
+  Parser parser(grammar, tokens);
+  parser.Parse();
 }
 
 }  // namespace syntex

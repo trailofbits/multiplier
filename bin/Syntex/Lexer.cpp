@@ -8,11 +8,11 @@
 #include "Grammar.h"
 #include "Lexer.h"
 
-namespace lexer {
+namespace syntex {
 
 std::ostream& operator<<(std::ostream& os, const Token& tok) {
-  return os << "Token(" << tok.begin << ", " << tok.end << ", "
-      << EnumeratorName(tok.kind) << ", " << tok.spelling << ")";
+  return os << "Token(" << tok.begin << ", " << tok.end << ", " << tok.next << ", "
+            << EnumeratorName(tok.kind) << ", " << tok.spelling << ")";
 }
 
 static const int EndFile = -1;
@@ -174,15 +174,21 @@ private:
   void AddIdent() {
     auto spelling = m_sv.substr(m_begin, m_end - m_begin);
     auto kind = m_grammar.ClassifyIdent(spelling);
-    m_tokens.emplace_back(m_begin, m_end, kind, spelling);
+    size_t next = m_end;
+    while (IsSpace(Look(next - m_end)))
+      ++next;
+    // Add as the TokenKind identified from the grammar terminals
+    m_tokens.emplace_back(m_begin, m_end, next, kind, spelling);
+    // And if that wasn't an IDENTIFIER, add that too as a posibility
+    if (kind != mx::TokenKind::IDENTIFIER)
+      m_tokens.emplace_back(m_begin, m_end, next, mx::TokenKind::IDENTIFIER, spelling);
   }
 
   void AddToken(size_t len, mx::TokenKind kind) {
-    m_tokens.emplace_back(
-      m_begin,
-      m_begin + len,
-      kind,
-      m_sv.substr(m_begin, len));
+    size_t next = m_begin + len;
+    while (IsSpace(Look(next - m_end)))
+      ++next;
+    m_tokens.emplace_back(m_begin, m_begin + len, next, kind, m_sv.substr(m_begin, len));
   }
 
 public:

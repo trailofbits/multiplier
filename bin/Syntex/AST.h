@@ -25,9 +25,11 @@ enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 }  // namespace mx
+
 namespace syntex {
 
 class AST;
+class Token;
 
 class ASTNode {
  private:

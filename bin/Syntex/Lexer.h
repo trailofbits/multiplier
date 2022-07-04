@@ -9,21 +9,26 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <unordered_map>
 #include <multiplier/AST.h>
+#include "Grammar.h"
 
-namespace lexer {
+namespace syntex {
+
+class Grammar;
 
 struct Token {
   size_t begin;
   size_t end;
+  size_t next;
   mx::TokenKind kind;
   std::string_view spelling;
-  Token(size_t b, size_t e, mx::TokenKind k, std::string_view sv)
-    : begin(b), end(e), kind(k), spelling(sv) {}
+  Token(size_t b, size_t e, size_t n, mx::TokenKind k, std::string_view sv)
+    : begin(b), end(e), next(n), kind(k), spelling(sv) {}
 };
 
 std::ostream& operator<<(std::ostream& os, const Token& tok);
 
-std::vector<Token> Tokenize(const syntex::Grammar& grammar, std::string_view sv);
+std::vector<Token> Tokenize(const Grammar& grammar, std::string_view sv);
 
 }  // namespace lexer

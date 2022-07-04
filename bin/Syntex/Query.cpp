@@ -9,6 +9,7 @@
 #include <iostream>
 #include <multiplier/Index.h>
 #include <sstream>
+#include "AST.h"
 #include "Grammar.h"
 #include "Lexer.h"
 
@@ -38,9 +39,13 @@ extern "C" int main(int argc, char *argv[]) {
 
   syntex::Grammar grammar(FLAGS_index_dir);
 
-  auto tokens = lexer::Tokenize(grammar, FLAGS_query);
+  // Tokenize
+  auto tokens = syntex::Tokenize(grammar, FLAGS_query);
   for (auto& token : tokens)
     std::cout << token << "\n";
+
+  // Parse
+  syntex::Parse(grammar, tokens);
 
   return EXIT_SUCCESS;
 }

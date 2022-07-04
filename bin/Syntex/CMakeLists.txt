@@ -11,6 +11,8 @@ add_executable("syntex-index"
   "AST.h"
   "Grammar.cpp"
   "Grammar.h"
+  "Lexer.cpp"
+  "Lexer.h"
   "Index.cpp"
 )
 

@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <string>
 #include <utility>
+#include "AST.h"
+#include "Lexer.h"
 
 namespace mx {
 class Fragment;
@@ -19,6 +21,7 @@ enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
 }  // namespace mx
+
 namespace syntex {
 
 class Grammar;
@@ -36,7 +39,13 @@ struct NonTerminal {
   NonTerminal(mx::StmtKind k);
   NonTerminal(mx::TypeKind k);
   NonTerminal(mx::TokenKind k);
+
+  bool operator==(const NonTerminal& other) const {
+    return val == other.val;
+  }
 };
+
+std::ostream& operator<<(std::ostream& os, const NonTerminal& nt);
 
 // Right-hand side / body of a production rule in a grammar, followed by the
 // head of the production. E.g. if a production is `A -> B C` then this stores
@@ -46,10 +55,14 @@ class Rule {
   friend class Grammar;
   friend class GrammarImpl;
 
-  Rule(const Rule &) = delete;
+  Rule(const Rule &that) = delete;
   Rule &operator=(const Rule &) = delete;
 
  public:
+  Rule()
+      : begin(nullptr),
+        end(nullptr) {}
+
   inline Rule(size_t size)
       : begin(new NonTerminal[size]),
         end(&(begin[size])) {}
@@ -70,11 +83,21 @@ class Rule {
     return *this;
   }
 
+  const size_t Count() const {
+    return end - begin - 1;
+  }
+
+  const NonTerminal& Result() const {
+    return end[-1];
+  }
+
   uint64_t Hash(void) const;
 
   NonTerminal *begin{nullptr};
   NonTerminal *end{nullptr};
 };
+
+std::ostream& operator<<(std::ostream& os, const Rule& rule);
 
 class Grammar {
  private:
@@ -87,12 +110,18 @@ class Grammar {
 
   explicit Grammar(std::filesystem::path grammar_dir);
 
+  // Determine the kind of an identifier based on its spelling
+  mx::TokenKind ClassifyIdent(std::string_view& spelling) const;
+
+  // Find all productions beginning with the specified non-terminal
+  std::vector<Rule> MatchProductions(const NonTerminal& start_nt) const;
+
   // Import a fragment into the grammar. This extends the persisted grammar with
   // the features from this fragment.
   void Import(const mx::Fragment &fragment);
-
-  // Determine the kind of an identifier based on its spelling
-  mx::TokenKind ClassifyIdent(std::string_view& spelling) const;
 };
+
+// Produce all possible parses given a grammar and a set of tokens
+void Parse(const Grammar& grammar, const std::vector<Token>& tokens);
 
 }  // namespace syntex
