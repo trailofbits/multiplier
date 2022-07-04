@@ -32,16 +32,20 @@ struct Terminal {
 };
 
 struct NonTerminal {
-  unsigned short val{0};
+  std::variant<std::monostate,
+                mx::DeclKind,
+                mx::StmtKind,
+                mx::TypeKind,
+                mx::TokenKind> data;
 
-  NonTerminal(void) = default;
-  NonTerminal(mx::DeclKind k);
-  NonTerminal(mx::StmtKind k);
-  NonTerminal(mx::TypeKind k);
-  NonTerminal(mx::TokenKind k);
+  NonTerminal() {}
+  NonTerminal(mx::DeclKind k) : data(k) {}
+  NonTerminal(mx::StmtKind k) : data(k) {}
+  NonTerminal(mx::TypeKind k) : data(k) {}
+  NonTerminal(mx::TokenKind k) : data(k) {}
 
   bool operator==(const NonTerminal& other) const {
-    return val == other.val;
+    return data == other.data;
   }
 };
 
@@ -50,51 +54,17 @@ std::ostream& operator<<(std::ostream& os, const NonTerminal& nt);
 // Right-hand side / body of a production rule in a grammar, followed by the
 // head of the production. E.g. if a production is `A -> B C` then this stores
 // `B C A`.
-class Rule {
- private:
-  friend class Grammar;
-  friend class GrammarImpl;
+struct Rule {
+  std::vector<NonTerminal> non_terminals;
 
-  Rule(const Rule &that) = delete;
-  Rule &operator=(const Rule &) = delete;
+  // For serialization
+  Rule() {}
 
- public:
-  Rule()
-      : begin(nullptr),
-        end(nullptr) {}
-
-  inline Rule(size_t size)
-      : begin(new NonTerminal[size]),
-        end(&(begin[size])) {}
-
-  ~Rule(void);
-
-  inline Rule(Rule &&that) noexcept
-      : begin(that.begin),
-        end(that.end) {
-    that.begin = nullptr;
-    that.end = nullptr;
-  }
-
-  inline Rule &operator=(Rule &&that) noexcept {
-    Rule self(std::forward<Rule>(that));
-    std::swap(begin, self.begin);
-    std::swap(end, self.end);
-    return *this;
-  }
-
-  const size_t Count() const {
-    return end - begin - 1;
-  }
-
-  const NonTerminal& Result() const {
-    return end[-1];
-  }
+  // Actual constructor
+  Rule(std::vector<NonTerminal> non_terminals_)
+      : non_terminals(non_terminals_) {}
 
   uint64_t Hash(void) const;
-
-  NonTerminal *begin{nullptr};
-  NonTerminal *end{nullptr};
 };
 
 std::ostream& operator<<(std::ostream& os, const Rule& rule);

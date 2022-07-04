@@ -93,12 +93,53 @@ struct Serializer<Reader, Writer, syntex::NonTerminal> {
 
   static constexpr bool kIsFixedSize = true;
 
+  // FIXME: maybe serialize the discriminant too instead of this encoding,
+  // the reason this is kept is to avoid breaking the serialization format.
+
   MX_FLATTEN static void Write(Writer &writer, syntex::NonTerminal nt) {
-    Serializer<NullReader, Writer, unsigned short>::Write(writer, nt.val);
+    unsigned short val;
+    if (std::holds_alternative<mx::DeclKind>(nt.data)) {
+      val = static_cast<unsigned short>(std::get<mx::DeclKind>(nt.data));
+    } else if (std::holds_alternative<mx::StmtKind>(nt.data)) {
+      val = static_cast<unsigned short>(std::get<mx::StmtKind>(nt.data))
+            + mx::NumEnumerators(mx::DeclKind{});
+    } else if (std::holds_alternative<mx::TypeKind>(nt.data)) {
+      val = static_cast<unsigned short>(std::get<mx::TypeKind>(nt.data))
+            + mx::NumEnumerators(mx::DeclKind{})
+            + mx::NumEnumerators(mx::StmtKind{});
+    } else {
+      assert(std::holds_alternative<mx::TokenKind>(nt.data));
+      val = static_cast<unsigned short>(std::get<mx::TokenKind>(nt.data))
+            + mx::NumEnumerators(mx::DeclKind{})
+            + mx::NumEnumerators(mx::StmtKind{})
+            + mx::NumEnumerators(mx::TypeKind{});
+    }
+    Serializer<NullReader, Writer, unsigned short>::Write(writer, val);
   }
 
   MX_FLATTEN static void Read(Reader &reader, syntex::NonTerminal &nt) {
-    Serializer<Reader, NullWriter, unsigned short>::Read(reader, nt.val);
+    unsigned short val;
+    Serializer<Reader, NullWriter, unsigned short>::Read(reader, val);
+
+    if (val < mx::NumEnumerators(mx::DeclKind{})) {
+      nt = syntex::NonTerminal(static_cast<mx::DeclKind>(val));
+    } else if (val < mx::NumEnumerators(mx::DeclKind{})
+                        + mx::NumEnumerators(mx::StmtKind{})) {
+      nt = syntex::NonTerminal(static_cast<mx::StmtKind>(val
+                        - mx::NumEnumerators(mx::DeclKind{})));
+    } else if (val < mx::NumEnumerators(mx::DeclKind{})
+                        + mx::NumEnumerators(mx::StmtKind{})
+                        + mx::NumEnumerators(mx::TypeKind{})) {
+      nt = syntex::NonTerminal(static_cast<mx::TypeKind>(val
+                        - mx::NumEnumerators(mx::DeclKind{})
+                        - mx::NumEnumerators(mx::StmtKind{})));
+
+    } else {
+      nt = syntex::NonTerminal(static_cast<mx::TokenKind>(val
+                        - mx::NumEnumerators(mx::DeclKind{})
+                        - mx::NumEnumerators(mx::StmtKind{})
+                        - mx::NumEnumerators(mx::TypeKind{})));
+    }
   }
 
   static constexpr uint32_t SizeInBytes(void) noexcept {
@@ -112,15 +153,13 @@ struct Serializer<Reader, Writer, syntex::Rule> {
 
   static constexpr bool kIsFixedSize = false;
 
-  MX_FLATTEN static void Write(
-      Writer &writer, const syntex::Rule &rule) {
-    const auto size = static_cast<uint32_t>(rule.end - rule.begin);
+  MX_FLATTEN static void Write(Writer &writer, const syntex::Rule &rule) {
+    const auto size = rule.non_terminals.size();
     assert(0 < size);
 
     writer.EnterVariableSizedComposite(size);
-    for (auto i = 0u; i < size; ++i) {
-      Serializer<NullReader, Writer, unsigned short>::Write(
-          writer, rule.begin[i].val);
+    for (auto& nt : rule.non_terminals) {
+      Serializer<NullReader, Writer, syntex::NonTerminal>::Write(writer, nt);
     }
     writer.ExitComposite();
   }
@@ -128,13 +167,12 @@ struct Serializer<Reader, Writer, syntex::Rule> {
   MX_FLATTEN static void Read(Reader &reader, syntex::Rule &out) {
     const auto size = reader.SizeLeft() / 2u;
     assert(0 < size);
-    assert(!out.begin);
 
-    out.begin = new syntex::NonTerminal[size];
-    out.end = &(out.begin[size]);
+    out.non_terminals.reserve(size);
     for (auto i = 0u; i < size; ++i) {
-      Serializer<Reader, NullWriter, unsigned short>::Read(
-          reader, out.begin[i].val);
+      syntex::NonTerminal nt;
+      Serializer<Reader, NullWriter, syntex::NonTerminal>::Read(reader, nt);
+      out.non_terminals.push_back(nt);
     }
   }
 
@@ -202,60 +240,27 @@ static bool NodeIsSemicolon(const ASTNode *node) {
 
 }  // namespace
 
-NonTerminal::NonTerminal(mx::DeclKind k)
-    : val(static_cast<unsigned short>(k)) {}
-
-NonTerminal::NonTerminal(mx::StmtKind k)
-    : val(static_cast<unsigned short>(k) +
-          mx::NumEnumerators(mx::DeclKind{})) {}
-
-NonTerminal::NonTerminal(mx::TypeKind k)
-    : val(static_cast<unsigned short>(k) +
-          mx::NumEnumerators(mx::DeclKind{}) +
-          mx::NumEnumerators(mx::StmtKind{})) {}
-
-NonTerminal::NonTerminal(mx::TokenKind k)
-    : val(static_cast<unsigned short>(k) +
-          mx::NumEnumerators(mx::DeclKind{}) +
-          mx::NumEnumerators(mx::StmtKind{}) +
-          mx::NumEnumerators(mx::TypeKind{})) {}
-
 std::ostream& operator<<(std::ostream& os, const NonTerminal& nt) {
-  if (nt.val < mx::NumEnumerators(mx::DeclKind{})) {
-    os << "DeclKind::" << EnumeratorName(static_cast<mx::DeclKind>(nt.val));
-  } else if (nt.val < mx::NumEnumerators(mx::DeclKind{})
-                      + mx::NumEnumerators(mx::StmtKind{})) {
-    os << "StmtKind::" << EnumeratorName(static_cast<mx::StmtKind>(nt.val
-                                          - mx::NumEnumerators(mx::DeclKind{})));
-  } else if (nt.val < mx::NumEnumerators(mx::DeclKind{})
-                      + mx::NumEnumerators(mx::StmtKind{})
-                      + mx::NumEnumerators(mx::TypeKind{})) {
-    os << "TypeKind::" << EnumeratorName(static_cast<mx::TypeKind>(nt.val
-                                          - mx::NumEnumerators(mx::DeclKind{})
-                                          - mx::NumEnumerators(mx::StmtKind{})));
+  if (std::holds_alternative<mx::DeclKind>(nt.data)) {
+    os << "DeclKind::" << EnumeratorName(std::get<mx::DeclKind>(nt.data));
+  } else if (std::holds_alternative<mx::StmtKind>(nt.data)) {
+    os << "StmtKind::" << EnumeratorName(std::get<mx::StmtKind>(nt.data));
+  } else if (std::holds_alternative<mx::TypeKind>(nt.data)) {
+    os << "TypeKind::" << EnumeratorName(std::get<mx::TypeKind>(nt.data));
   } else {
-    os << "TokenKind::" << EnumeratorName(static_cast<mx::TokenKind>(nt.val
-                                          - mx::NumEnumerators(mx::DeclKind{})
-                                          - mx::NumEnumerators(mx::StmtKind{})
-                                          - mx::NumEnumerators(mx::TypeKind{})));
+    assert(std::holds_alternative<mx::TokenKind>(nt.data));
+    os << "TokenKind::" << EnumeratorName(std::get<mx::TokenKind>(nt.data));
   }
   return os;
-}
-
-Rule::~Rule(void) {
-  if (begin) {
-    delete[] begin;
-  }
 }
 
 // Hash a rule. This hash should be stable regardless of big/little endian.
 uint64_t Rule::Hash(void) const {
   if MX_CONSTEXPR_ENDIAN (MX_LITTLE_ENDIAN) {
     std::string_view v(
-        reinterpret_cast<const char *>(begin),
-        static_cast<size_t>(end - begin) * sizeof(NonTerminal));
+        reinterpret_cast<const char *>(&non_terminals.front()),
+        static_cast<size_t>(non_terminals.size()) * sizeof(NonTerminal));
     return std::hash<std::string_view>{}(v);
-
   } else {
     abort();  // TODO(pag): Make an endian-independent hash.
   }
@@ -263,11 +268,10 @@ uint64_t Rule::Hash(void) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Rule& rule) {
-  assert(rule.begin < rule.end);
-  for (NonTerminal *cur = rule.begin; cur < rule.end - 1; ++cur) {
-    os << *cur << " ";
-  }
-  os << "-> " << rule.end[-1];
+  auto it = rule.non_terminals.begin();
+  while (it < rule.non_terminals.end() - 1)
+    os << *it++ << " ";
+  os << "-> " << *it;
   return os;
 }
 
@@ -374,35 +378,36 @@ void Grammar::Import(const mx::Fragment &fragment) {
         continue;
       }
 
-      Rule rule(num_children + 1u);
-      for (auto i = 0u; i < num_children; ++i) {
-        rule.begin[i] = NodeToNonTerminal(children[i]);
-      }
 
-      rule.begin[num_children] = NodeToNonTerminal(node);  // Rule head.
+      std::vector<NonTerminal> non_terminals;
+      non_terminals.reserve(num_children + 1);
+      // Rule body
+      for (auto i = 0u; i < num_children; ++i)
+        non_terminals.push_back(NodeToNonTerminal(children[i]));
+      // Rule head
+      non_terminals.push_back(NodeToNonTerminal(node));
 
       // Avoid creating cyclic CFGs
       bool allow_production = true;
       if (num_children == 1) {
-        std::vector<NonTerminal> queue = { rule.Result() };
+        std::vector<NonTerminal> queue = { non_terminals.back() };
         while (queue.size() > 0) {
           auto nt = queue.back();
           queue.pop_back();
           // Check for cycle
-          if (nt == rule.begin[0]) {
+          if (nt == non_terminals.front()) {
             allow_production = false;
             break;
           }
           // Queue result of trivial productions
           for (auto& cur : MatchProductions(nt))
-            if (cur.Count() == 1)
-              queue.push_back(cur.Result());
+            if (cur.non_terminals.size() == 2)
+              queue.push_back(cur.non_terminals.back());
         }
       }
 
       if (allow_production) {
-        std::cout << rule << "\n";
-
+        Rule rule(non_terminals);
         // Add our rule feature to the fragment's feature set.
         fragment_features.Add(rule.Hash());
         // Persist, i.e. "learn" our grammar rule.
@@ -419,10 +424,15 @@ void Grammar::Import(const mx::Fragment &fragment) {
 //
 
 struct Item {
-  NonTerminal *cur, *end;
+  const NonTerminal *cur, *end;
 
-  Item(const Rule& rule) : cur(rule.begin), end(rule.end - 1) {}
-  Item(NonTerminal *c, NonTerminal* e) : cur(c), end(e) {}
+  Item(const Rule& rule)
+    : cur(&rule.non_terminals.front()),
+      end(&rule.non_terminals.back()) {}
+
+  Item(const NonTerminal *cur_, const NonTerminal *end_)
+    : cur(cur_),
+      end(end_) {}
 
   bool AtEnd() const {
     return cur == end;
