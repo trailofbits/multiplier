@@ -49,7 +49,7 @@ class QueryResult {
     }
 
     int idx = 0;
-    auto column_dispatcher = [this, &idx] (auto &&arg, auto &self) {
+    auto column_dispatcher = [this, &idx] (auto &&arg) {
       using arg_t = std::decay_t<decltype(arg)>;
       if constexpr (std::is_integral_v<arg_t>) {
         arg = static_cast<arg_t>(getInt64(idx));
@@ -64,7 +64,7 @@ class QueryResult {
       idx++;
     };
 
-    (column_dispatcher(std::forward<Ts>(args), column_dispatcher), ...);
+    (column_dispatcher(std::forward<Ts>(args)), ...);
   }
 
  private:

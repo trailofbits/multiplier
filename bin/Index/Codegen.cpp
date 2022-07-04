@@ -6,170 +6,111 @@
 
 #include "Codegen.h"
 
-#ifndef MX_DISABLE_SOURCEIR
+#ifdef MX_ENABLE_SOURCEIR
+
+#include <vast/Util/Warnings.hpp>
+
+VAST_RELAX_WARNINGS
 #include <clang/AST/ASTContext.h>
 #include <clang/Tooling/Tooling.h>
+#include <llvm/Support/raw_ostream.h>
 #include <mlir/IR/Builders.h>
+#include <mlir/IR/Dialect.h>
+#include <mlir/IR/MLIRContext.h>
+#include <mlir/InitAllDialects.h>
+VAST_UNRELAX_WARNINGS
 
+#include <pasta/AST/Decl.h>
+
+#include <vast/Util/Common.hpp>
+#include <vast/Translation/Context.hpp>
+#include <vast/Translation/HighLevelVisitor.hpp>
+
+#include <vast/Dialect/Dialects.hpp>
 #include <vast/Translation/CodeGen.hpp>
-
-#include <glog/logging.h>
-#endif  // MX_DISABLE_SOURCEIR
+#endif  // MX_ENABLE_SOURCEIR
 
 #include "Context.h"
+#include "EntityMapper.h"
 
 namespace indexer {
 
-#ifndef MX_DISABLE_SOURCEIR
-class CodeGenVisitor final : public pasta::DeclVisitor {
+class CodeGeneratorImpl {
  public:
-  virtual ~CodeGenVisitor(void) = default;
+  bool disabled{false};
 
-  explicit CodeGenVisitor(vast::hl::module_owning_ref &mod_,
-                          vast::hl::high_level_codegen *gen_)
-      : mod(mod_), gen(gen_) {}
+#ifdef MX_ENABLE_SOURCEIR
+  mlir::DialectRegistry registry;
 
-  void VisitDeclContext(const pasta::DeclContext &dc) {
-    for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
-      Accept(decl);
-    }
-  }
-
-  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    gen->emit_module(mod, const_cast<clang::FunctionDecl*>(decl.RawDecl()));
-
-  }
-
-  void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitTagDecl(const pasta::TagDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
- private:
-  vast::hl::module_owning_ref &mod;
-  vast::hl::high_level_codegen *gen;
-};
-
-class CodeGenerator::Impl {
- public:
-  Impl(void) {
+  CodeGeneratorImpl(void) {
     registry.insert<vast::hl::HighLevelDialect,
                     mlir::StandardOpsDialect,
-                    mlir::DLTIDialect >();
-    ctx = std::make_unique<mlir::MLIRContext>(registry);
-    hl_codegen =  std::make_unique<vast::hl::high_level_codegen>(ctx.get());
+                    mlir::DLTIDialect>();
   }
-
-  virtual ~Impl(void){}
-
-  void SourceIRFromTLDs(
-      std::string mod_id, const std::vector<pasta::Decl> &decls,
-      std::string &ir_string) {
-
-    llvm::raw_string_ostream os(ir_string);
-    mlir::Builder bld(ctx.get());
-    auto loc = bld.getUnknownLoc();
-    vast::hl::module_owning_ref mod = vast::hl::module_t::create(
-        loc, llvm::StringRef(mod_id));
-
-    for (auto decl : decls) {
-      if (decl.Kind() == pasta::DeclKind::kFunction) {
-        hl_codegen->emit_module(mod, const_cast<clang::Decl*>(decl.RawDecl()));
-        if (mod.get()) mod->print(os);
-        continue;
-      }
-
-      // if top-level declaration is not function; there could
-      // be `FunctionDecl` inside top-level decl. Visit AST node
-      // and lower the function decl found;
-      CodeGenVisitor visitor(mod, hl_codegen.get());
-      visitor.Accept(decl);
-      if (mod.get()) mod->print(os);
-    }
-  }
-
- private:
-  mlir::DialectRegistry registry;
-  std::unique_ptr<mlir::MLIRContext> ctx;
-  std::unique_ptr<vast::hl::high_level_codegen> hl_codegen;
+#endif  // MX_ENABLE_SOURCEIR
 };
 
-CodeGenerator::CodeGenerator(void) {
-  impl = new Impl;
+CodeGenerator::CodeGenerator(void)
+    : impl(new CodeGeneratorImpl) {}
+
+void CodeGenerator::Disable(void) {
+  impl->disabled = true;
 }
-
-CodeGenerator::~CodeGenerator(void) {
-  delete impl;
-}
-
-void CodeGenerator::GenerateSourceIRFromTLDs(
-    std::string mod_id, const std::vector<pasta::Decl> &decls,
-    std::string &ir_string) {
-  impl->SourceIRFromTLDs(mod_id, decls, ir_string);
-}
-
-// Generate source IR from the TLDs
-std::string ConvertToSourceIR(
-    IndexingContext &context,
-    mx::RawEntityId fragment_id, const std::vector<pasta::Decl> &decls) {
-
-  // Get the instance of code generator
-  if (auto codegen = context.codegen.get()) {
-    std::string ir_string;
-
-    try {
-      codegen->GenerateSourceIRFromTLDs(
-          std::to_string(fragment_id), decls, ir_string);
-      if (!ir_string.empty()) {
-        IndexingCounterRes ir_counter(context.stat, kStatSourceIRFragment);
-      }
-      return ir_string;
-
-    } catch (const std::exception &e) {
-      LOG(ERROR) << "Failed to generate Source IR from the "
-                 << "top-level declaration with fragment id "
-                 << fragment_id << "\nerror " << e.what();
-    }
-  }
-
-  return {};
-}
-
-#else
-
-CodeGenerator::CodeGenerator(void) {}
 
 CodeGenerator::~CodeGenerator(void) {}
 
-void CodeGenerator::GenerateSourceIRFromTLDs(
-    std::string, const std::vector<pasta::Decl> &,
-    std::string &) {}
+std::string CodeGenerator::GenerateSourceIRFromTLDs(
+    mx::RawEntityId fragment_id,
+    const EntityMapper &em,
+    const std::vector<pasta::Decl> &decls) {
 
-// Generate source IR from the TLDs
-std::string ConvertToSourceIR(
-    IndexingContext &,
-    mx::RawEntityId, const std::vector<pasta::Decl> &) {
-  return {};
+  std::string ret;
+
+#ifdef MX_ENABLE_SOURCEIR
+  if (impl->disabled || decls.empty()) {
+    return ret;
+  }
+
+  mlir::MLIRContext context(impl->registry);
+  mlir::Builder builder(&context);
+
+  context.loadDialect<vast::hl::HighLevelDialect>();
+  context.loadDialect<mlir::StandardOpsDialect>();
+  context.loadDialect<mlir::DLTIDialect>();
+
+  clang::Decl *first_decl = const_cast<clang::Decl *>(decls[0].RawDecl());
+  clang::ASTContext &ast_context = first_decl->getASTContext();
+
+  mx::FragmentId id(fragment_id);
+  auto loc = mlir::OpaqueLoc::get(
+      reinterpret_cast<void *>(mx::EntityId(id).Pack()), &context);
+  vast::OwningModuleRef mod = {mlir::ModuleOp::create(loc)};
+  vast::hl::TranslationContext tctx(context, ast_context, mod);
+
+  llvm::ScopedHashTableScope type_def_scope(tctx.type_defs);
+  llvm::ScopedHashTableScope type_dec_scope(tctx.type_decls);
+  llvm::ScopedHashTableScope enum_dec_scope(tctx.enum_decls);
+  llvm::ScopedHashTableScope enum_constant_scope(tctx.enum_constants);
+  llvm::ScopedHashTableScope func_scope(tctx.functions);
+  llvm::ScopedHashTableScope glob_scope(tctx.vars);
+
+  vast::hl::CodeGenVisitor visitor(tctx);
+  for (const pasta::Decl &decl : decls) {
+    vast::ValueOrStmt hl_decl =
+        visitor.Visit(const_cast<clang::Decl *>(decl.RawDecl()));
+    if (std::holds_alternative<vast::Value>(hl_decl)) {
+      vast::Value val = std::get<vast::Value>(hl_decl);
+      if (mx::RawEntityId id = em.EntityId(decl)) {
+        val.setLoc(mlir::OpaqueLoc::get(reinterpret_cast<void *>(id), &context));
+      }
+    }
+  }
+
+  llvm::raw_string_ostream os(ret);
+  mod->print(os);
+#endif
+
+  return ret;
 }
-#endif  // MX_DISABLE_SOURCEIR
 
 } // namespace indexer

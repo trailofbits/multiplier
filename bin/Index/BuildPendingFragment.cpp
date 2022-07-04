@@ -195,7 +195,8 @@ void FragmentBuilder::MaybeVisitNext(
 #define MX_VISIT_OPTIONAL_PSEUDO_LIST MX_VISIT_OPTIONAL_ENTITY_LIST
 
 #define MX_BEGIN_VISIT_DECL(name) \
-    void FragmentBuilder::Visit ## name(const pasta::name &entity) {
+    void FragmentBuilder::Visit ## name(const pasta::name &entity) { \
+      (void) entity;
 
 #define MX_END_VISIT_DECL(name) }
 
@@ -261,7 +262,7 @@ void FragmentBuilder::Accept(const pasta::Type &entity) {
 
 }  // namespace
 
-void PendingFragment::Build(EntityIdMap &entity_ids, FileIdMap &file_ids,
+void PendingFragment::Build(EntityIdMap &entity_ids,
                             const pasta::TokenRange &tokens) {
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;

@@ -534,17 +534,18 @@ void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &mangler,
+void PersistFragment(IndexingContext &context, pasta::AST &ast,
+                     NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
                      const pasta::TokenRange &tokens,
-                     PendingFragment frag, mx::WorkerId worker_id) {
+                     PendingFragment frag) {
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  frag.Build(entity_ids, file_ids, tokens);
+  frag.Build(entity_ids, tokens);
 
   EntityMapper em(entity_ids, file_ids, frag);
 
@@ -563,8 +564,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
   mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
       tokens, frag.begin_index, frag.end_index);
   if (!maybe_tt.Succeeded()) {
-    auto main_file_path =
-        pasta::AST::From(leader_decl).MainFile().Path().generic_string();
+    auto main_file_path = ast.MainFile().Path().generic_string();
     LOG(ERROR)
         << maybe_tt.TakeError() << " for top-level declaration "
         << DeclToString(leader_decl)
@@ -594,7 +594,8 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
 
   // Generate source IR before saving the fragments to the persistent
   // storage.
-  fb.setMlir(ConvertToSourceIR(context, fragment_id, frag.decls));
+  fb.setMlir(context.codegen.GenerateSourceIRFromTLDs(
+      fragment_id, em, frag.decls));
 
   auto num_tlds = static_cast<unsigned>(frag.decls.size());
   auto tlds = fb.initTopLevelDeclarations(num_tlds);
@@ -629,7 +630,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast, NameMangler &man
   context.PutSerializedFragment(
       fragment_id, CompressedMessage("fragment", message));
 
-  frag.PersistDeclarationSymbols(context, em, ast, worker_id);
+  frag.PersistDeclarationSymbols(context, em);
 }
 
 }  // namespace indexer

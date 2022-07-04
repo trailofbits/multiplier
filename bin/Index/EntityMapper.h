@@ -29,21 +29,22 @@ class EntityMapper final {
         file_ids(file_ids_),
         fragment(fragment_) {}
 
-  mx::RawEntityId FileId(const pasta::File &file);
+  mx::RawEntityId FileId(const pasta::File &file) const;
   mx::RawEntityId ParentDeclId(const pasta::Decl &entity);
   mx::RawEntityId ParentDeclId(const pasta::Stmt &entity);
   mx::RawEntityId ParentStmtId(const pasta::Decl &entity);
   mx::RawEntityId ParentStmtId(const pasta::Stmt &entity);
-  mx::RawEntityId EntityId(const pasta::Decl &entity);
-  mx::RawEntityId EntityId(const pasta::Stmt &entity);
+  mx::RawEntityId EntityId(const void *entity) const;
+  mx::RawEntityId EntityId(const pasta::Decl &entity) const;
+  mx::RawEntityId EntityId(const pasta::Stmt &entity) const;
   mx::RawEntityId EntityId(const pasta::Token &entity);
   mx::RawEntityId EntityId(const pasta::FileToken &entity);
-  mx::RawEntityId EntityId(const pasta::Type &entity);
+  mx::RawEntityId EntityId(const pasta::Type &entity) const;
 
-  uint32_t PseudoId(const pasta::TemplateArgument &pseudo);
-  uint32_t PseudoId(const pasta::TemplateParameterList &pseudo);
-  uint32_t PseudoId(const pasta::CXXBaseSpecifier &pseudo);
-  uint32_t PseudoId(const pasta::Designator &pseudo);
+  uint32_t PseudoId(const pasta::TemplateArgument &pseudo) const;
+  uint32_t PseudoId(const pasta::TemplateParameterList &pseudo) const;
+  uint32_t PseudoId(const pasta::CXXBaseSpecifier &pseudo) const;
+  uint32_t PseudoId(const pasta::Designator &pseudo) const;
 };
 
 }  // namespace indexer

@@ -67,6 +67,10 @@ target_link_libraries("${exe_name}"
 )
 
 if(MX_ENABLE_VAST)
+  target_compile_definitions("${exe_name}"
+    PRIVATE
+      "MX_ENABLE_SOURCEIR"
+  )
   target_link_libraries("${exe_name}"
     PRIVATE
       ${MX_BEGIN_FORCE_LOAD_GROUP}
@@ -75,11 +79,6 @@ if(MX_ENABLE_VAST)
       MLIRStandard
       MLIRLLVMIR
       ${MX_END_FORCE_LOAD_GROUP}
-  )
-else()
-  target_compile_definitions("${exe_name}"
-    PRIVATE
-      "MX_DISABLE_SOURCEIR"
   )
 endif()
 

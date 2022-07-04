@@ -113,8 +113,8 @@ ServerImpl::GetOrCreateIndexingContext(void) {
     if (show_progress_bars) {
       ic->InitializeProgressBars();
     }
-    if (generate_sourceir) {
-      ic->InitializeCodeGenerator();
+    if (!generate_sourceir) {
+      ic->codegen.Disable();
     }
     indexing_context = ic;
     return ic;

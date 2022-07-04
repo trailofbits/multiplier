@@ -126,8 +126,7 @@ std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
 }  // namespace
 
 void PendingFragment::PersistDeclarationSymbols(
-    IndexingContext &context, EntityMapper &em, pasta::AST &ast,
-    mx::WorkerId worker_id) {
+    IndexingContext &context, EntityMapper &em) {
   for (const pasta::Decl &decl : decls_to_serialize) {
     if (auto nd = pasta::NamedDecl::From(decl);
         nd && ShouldGetSymbolName(decl)) {

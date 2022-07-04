@@ -60,22 +60,30 @@ namespace {
 #define MX_BEGIN_VISIT_DECL(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
-        const mx::ast::Decl::Reader &reader) {
+        const mx::ast::Decl::Reader &reader) { \
+      (void) entity_ids; \
+      (void) reader;
 
 #define MX_BEGIN_VISIT_STMT(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
-        const mx::ast::Stmt::Reader &reader) {
+        const mx::ast::Stmt::Reader &reader) { \
+      (void) entity_ids; \
+      (void) reader;
 
 #define MX_BEGIN_VISIT_TYPE(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
-        const mx::ast::Type::Reader &reader) {
+        const mx::ast::Type::Reader &reader) { \
+      (void) entity_ids; \
+      (void) reader;
 
 #define MX_BEGIN_VISIT_PSEUDO(name) \
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
-        const mx::ast::Pseudo::Reader &reader) {
+        const mx::ast::Pseudo::Reader &reader) { \
+      (void) entity_ids; \
+      (void) reader;
 
 #define MX_VISIT_BASE(name, base_name) \
     FindReferences_ ## base_name (entity_ids, reader);

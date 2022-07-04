@@ -271,6 +271,10 @@ class EntityId {
     return *this;
   }
 
+  inline RawEntityId Pack(void) const noexcept {
+    return opaque;
+  }
+
   inline operator RawEntityId(void) const noexcept {
     return opaque;
   }

@@ -92,8 +92,7 @@ IndexingContext::IndexingContext(ServerContext &server_context_,
           server_context.version_number.fetch_add(1u))),
       local_next_file_id(num_workers),
       local_next_small_fragment_id(num_workers),
-      local_next_big_fragment_id(num_workers),
-      codegen(nullptr) {
+      local_next_big_fragment_id(num_workers) {
 
   // Save the updated version number.
   server_context.Flush();
@@ -210,7 +209,7 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
 
       entity_redecls.ScanPrefix(
           new_id,
-          [&next_new_ids] (mx::RawEntityId new_id, mx::RawEntityId other_id) {
+          [&next_new_ids] (mx::RawEntityId, mx::RawEntityId other_id) {
             next_new_ids.push_back(other_id);
             return true;
           });
@@ -229,10 +228,6 @@ std::vector<mx::RawEntityId> ServerContext::FindRedeclarations(
       });
 
   return all_ids;
-}
-
-void IndexingContext::InitializeCodeGenerator(void) {
-  codegen = std::make_unique<CodeGenerator>();
 }
 
 // Get or create a file ID for the file at `file_path` with contents

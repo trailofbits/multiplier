@@ -99,8 +99,7 @@ struct PendingFragment {
   // Build the fragment. This fills out the decls/stmts/types to serialize.
   //
   // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-  void Build(EntityIdMap &entity_ids, FileIdMap &file_ids,
-             const pasta::TokenRange &tokens);
+  void Build(EntityIdMap &entity_ids, const pasta::TokenRange &tokens);
 
   // Label the parent entity ids.
   void LabelParents(EntityMapper &em);
@@ -125,8 +124,7 @@ struct PendingFragment {
   void LinkReferences(IndexingContext &context, EntityMapper &em);
 
   // Store serialized declaration fragments symbol to the persistent store
-  void PersistDeclarationSymbols(IndexingContext &context, EntityMapper &em,
-                                 pasta::AST &ast, mx::WorkerId worker_id);
+  void PersistDeclarationSymbols(IndexingContext &context, EntityMapper &em);
 };
 
 }  // namespace indexer

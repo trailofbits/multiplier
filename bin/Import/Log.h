@@ -10,13 +10,13 @@
 #include <string>
 #include <string_view>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wconversion"
-#pragma clang diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wshadow"
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/Error.h>
 #include <llvm/Support/raw_ostream.h>
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 inline static std::ostream &operator<<(std::ostream &os, llvm::Error val) {
   std::string out;

@@ -16,8 +16,8 @@
 # define __cpp_lib_string_view
 #endif
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu-redeclared-enum"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wgnu-redeclared-enum"
 #include <rocksdb/cache.h>
 #include <rocksdb/db.h>
 #include <rocksdb/comparator.h>
@@ -27,7 +27,7 @@
 #include <rocksdb/options.h>
 #include <rocksdb/slice_transform.h>
 #include <rocksdb/table.h>
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 namespace mx {
 namespace {

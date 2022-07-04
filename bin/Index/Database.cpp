@@ -9,12 +9,17 @@
 #include <glog/logging.h>
 
 #include <array>
-#include <variant>
 #include <cstdint>
 #include <deque>
-#include <variant>
-#include <thread>
+#include <multiplier/AST.h>
 #include <sstream>
+#include <thread>
+#include <variant>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#include <blockingconcurrentqueue.h>
+#pragma GCC diagnostic pop
 
 #include "Database.h"
 

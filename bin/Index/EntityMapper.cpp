@@ -52,20 +52,20 @@ mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) {
   }
 }
 
-mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) {
-  if (auto it = entity_ids.find(entity.RawDecl()); it != entity_ids.end()) {
-    return it->second;
-  } else {
-    return mx::kInvalidEntityId;
-  }
+mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
+  if (auto it = entity_ids.find(entity); it != entity_ids.end()) {
+      return it->second;
+    } else {
+      return mx::kInvalidEntityId;
+    }
 }
 
-mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) {
-  if (auto it = entity_ids.find(entity.RawStmt()); it != entity_ids.end()) {
-    return it->second;
-  } else {
-    return mx::kInvalidEntityId;
-  }
+mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) const {
+  return EntityId(entity.RawDecl());
+}
+
+mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
+  return EntityId(entity.RawStmt());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
@@ -84,7 +84,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
   }
 }
 
-mx::RawEntityId EntityMapper::FileId(const pasta::File &file) {
+mx::RawEntityId EntityMapper::FileId(const pasta::File &file) const {
   if (auto fit = file_ids.find(file); fit != file_ids.end()) {
     return fit->second;
   } else {
@@ -112,7 +112,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) {
   }
 }
 
-mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) {
+mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
   assert(type_key.first != nullptr);
   if (auto it = fragment.type_ids.find(type_key);
@@ -124,7 +124,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) {
   }
 }
 
-uint32_t EntityMapper::PseudoId(const pasta::TemplateArgument &pseudo) {
+uint32_t EntityMapper::PseudoId(const pasta::TemplateArgument &pseudo) const {
   if (auto it = fragment.pseudo_offsets.find(pseudo.RawTemplateArgument());
       it != fragment.pseudo_offsets.end()) {
     return it->second;
@@ -134,7 +134,7 @@ uint32_t EntityMapper::PseudoId(const pasta::TemplateArgument &pseudo) {
   }
 }
 
-uint32_t EntityMapper::PseudoId(const pasta::TemplateParameterList &pseudo) {
+uint32_t EntityMapper::PseudoId(const pasta::TemplateParameterList &pseudo) const {
   if (auto it = fragment.pseudo_offsets.find(pseudo.RawTemplateParameterList());
       it != fragment.pseudo_offsets.end()) {
     return it->second;
@@ -144,7 +144,7 @@ uint32_t EntityMapper::PseudoId(const pasta::TemplateParameterList &pseudo) {
   }
 }
 
-uint32_t EntityMapper::PseudoId(const pasta::CXXBaseSpecifier &pseudo) {
+uint32_t EntityMapper::PseudoId(const pasta::CXXBaseSpecifier &pseudo) const {
   if (auto it = fragment.pseudo_offsets.find(pseudo.RawCXXBaseSpecifier());
       it != fragment.pseudo_offsets.end()) {
     return it->second;
@@ -154,7 +154,7 @@ uint32_t EntityMapper::PseudoId(const pasta::CXXBaseSpecifier &pseudo) {
   }
 }
 
-uint32_t EntityMapper::PseudoId(const pasta::Designator &pseudo) {
+uint32_t EntityMapper::PseudoId(const pasta::Designator &pseudo) const {
   if (auto it = fragment.pseudo_offsets.find(pseudo.RawDesignator());
       it != fragment.pseudo_offsets.end()) {
     return it->second;

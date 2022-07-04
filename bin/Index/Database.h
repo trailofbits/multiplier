@@ -6,19 +6,16 @@
 
 #pragma once
 
-#include <multiplier/AST.h>
 #include <multiplier/Types.h>
 
 #include <filesystem>
-#include <functional>
 #include <memory>
-#include <optional>
-#include <string_view>
-#include <unordered_map>
+#include <string>
 #include <vector>
 
-#include <blockingconcurrentqueue.h>
-
+namespace mx {
+enum class DeclCategory : unsigned char;
+}  // namespace mx
 namespace sqlite {
 class Connection;
 class Statement;

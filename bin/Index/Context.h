@@ -22,6 +22,7 @@
 #include <iostream>
 #include <set>
 
+#include "Codegen.h"
 #include "Database.h"
 
 namespace mx {
@@ -295,7 +296,7 @@ class IndexingContext {
   std::vector<NextId<mx::RawEntityId>> local_next_small_fragment_id;
   std::vector<NextId<mx::RawEntityId>> local_next_big_fragment_id;
 
-  std::unique_ptr<CodeGenerator> codegen;
+  CodeGenerator codegen;
 
   explicit IndexingContext(ServerContext &server_context_,
                            const mx::Executor &exe_);
@@ -303,8 +304,6 @@ class IndexingContext {
   ~IndexingContext(void);
 
   void InitializeProgressBars(void);
-
-  void InitializeCodeGenerator(void);
 
   // Get or create a file ID for the file at `file_path` with contents
   // `contents_hash`.

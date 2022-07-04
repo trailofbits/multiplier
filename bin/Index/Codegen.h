@@ -15,35 +15,33 @@
 
 namespace indexer {
 
+class EntityMapper;
 class IndexingContext;
 
+class CodeGeneratorImpl;
 class CodeGenerator {
+ private:
+  std::unique_ptr<CodeGeneratorImpl> impl;
+
  public:
-  virtual ~CodeGenerator(void);
+  ~CodeGenerator(void);
 
   CodeGenerator(void);
 
-  void GenerateSourceIRFromTLDs(
-      std::string mod_id, const std::vector<pasta::Decl> &tlds,
-      std::string &sourceir);
+  void Disable(void);
 
- private:
-  class Impl;
+  // Generate Source IR from the top-level declarations. It uses vast
+  // emit_module API to lower the top-level declarations and save them
+  // to the persistent map with code ids.
 
-  Impl *impl;
+  // If there are more than one `FunctionDecl` in the list, the Source
+  // IR gets emitted to same module and saved with the same code ids. If
+  // the top-level declaration is not `FunctionDecl`, it will visit
+  // AST node and generate source ir for function decl found.
+  std::string GenerateSourceIRFromTLDs(
+      mx::RawEntityId frag_id,
+      const EntityMapper &em,
+      const std::vector<pasta::Decl> &tlds);
 };
-
-// Generate Source IR from the top-level declarations. It uses vast
-// emit_module API to lower the top-level declarations and save them
-// to the persistent map with code ids.
-
-// If there are more than one `FunctionDecl` in the list, the Source
-// IR gets emitted to same module and saved with the same code ids. If
-// the top-level declaration is not `FunctionDecl`, it will visit
-// AST node and generate source ir for function decl found.
-
-std::string ConvertToSourceIR(
-    IndexingContext &context, mx::RawEntityId fragment_id,
-    const std::vector<pasta::Decl> &decls);
 
 }  // namespace indexer
