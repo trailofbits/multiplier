@@ -462,7 +462,7 @@ private:
   std::unordered_map<size_t, std::vector<Token>> m_tokens;
 
   // Partial parses for each source location
-  // std::unordered_map<size_t, std::vector<Fragment>> m_parses;
+  std::unordered_map<size_t, std::vector<Fragment>> m_parses;
 
 public:
   Parser(const Grammar& grammar, const std::vector<Token>& tokens)
@@ -472,48 +472,38 @@ public:
       m_tokens[token.begin].push_back(token);
   }
 
-  std::vector<Fragment> MatchRule(Item item, size_t position) const {
-    // Try to match the result as a new prefix
+  void MatchRule(std::vector<Fragment>& result, Item item, size_t position) {
     if (item.AtEnd())
-      return MatchPrefix(Fragment(item.Cur(), position));
-
-    // Otherwise see if we can move forward with this rule
-    std::vector<Fragment> result;
-    for (auto& frag : ParsesAtIndex(position))
-      if (frag.non_terminal == item.Cur()) {
-        auto matches = MatchRule(item.Forward(), frag.next);
-        result.insert(result.end(), matches.begin(), matches.end());
-      }
-    return result;
+      // Try to match the result as a new prefix
+      MatchPrefix(result, Fragment(item.Cur(), position));
+    else
+      // Otherwise see if we can move forward with this rule
+      for (auto& frag : ParsesAtIndex(position))
+        if (frag.non_terminal == item.Cur())
+          MatchRule(result, item.Forward(), frag.next);
   }
 
-  std::vector<Fragment> MatchPrefix(Fragment frag) const {
-    std::vector<Fragment> result;
-
-    for (auto& rule : m_grammar.MatchProductions(frag.non_terminal)) {
+  void MatchPrefix(std::vector<Fragment>& result, Fragment frag) {
+    for (auto& rule : m_grammar.MatchProductions(frag.non_terminal))
       // Find all possible ways we can match this grammar rule
-      auto matches = MatchRule(Item(rule).Forward(), frag.next);
-      result.insert(result.end(), matches.begin(), matches.end());
-    }
+      MatchRule(result, Item(rule).Forward(), frag.next);
 
     // Add the input fragment itself
     result.push_back(frag);
-
-    return result;
   }
 
-  std::vector<Fragment> ParsesAtIndex(size_t index) const {
+  const std::vector<Fragment>& ParsesAtIndex(size_t index) {
+    // Lookup memoized parses at this index
+    auto parse = m_parses.find(index);
+    if (parse != m_parses.end())
+      return parse->second;
+
+    // And only do computation if the lookup found nothing
+    std::vector<Fragment>& result = m_parses[index];
     auto it = m_tokens.find(index);
-    if (it == m_tokens.end())
-      return {};
-
-    std::vector<Fragment> result;
-
-    for (auto& token : it->second) {
-      auto matches = MatchPrefix(Fragment(NonTerminal(token.kind), token.next));
-      result.insert(result.end(), matches.begin(), matches.end());
-    }
-
+    if (it != m_tokens.end())
+      for (auto& token : it->second)
+        MatchPrefix(result, Fragment(NonTerminal(token.kind), token.next));
     return result;
   }
 
