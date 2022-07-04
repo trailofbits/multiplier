@@ -37,6 +37,26 @@ ASTNode::ASTNode(const mx::Token &tok)
       kind_val(static_cast<unsigned short>(tok.kind())),
       data(std::string(tok.data().data(), tok.data().size())) {}
 
+ASTNode::ASTNode(mx::DeclKind k, ChildVector child_vector)
+    : kind(kDeclKind),
+      kind_val(static_cast<unsigned short>(k)),
+      data(std::move(child_vector)) {}
+
+ASTNode::ASTNode(mx::StmtKind k, ChildVector child_vector)
+    : kind(kStmtKind),
+      kind_val(static_cast<unsigned short>(k)),
+      data(std::move(child_vector)) {}
+
+ASTNode::ASTNode(mx::TypeKind k, ChildVector child_vector)
+    : kind(kTypeKind),
+      kind_val(static_cast<unsigned short>(k)),
+      data(std::move(child_vector)) {}
+
+ASTNode::ASTNode(mx::TokenKind k, std::string spelling)
+    : kind(kTokenKind),
+      kind_val(static_cast<unsigned short>(k)),
+      data(std::move(spelling)) {}
+
 bool ASTNode::operator==(const ASTNode &that) const noexcept {
 
   if (kind != that.kind || kind_val != that.kind_val) {
@@ -90,6 +110,48 @@ const ASTNode *AST::LastNodeOfKind(mx::TokenKind kind) {
                mx::NumEnumerators(mx::StmtKind{}) +
                mx::NumEnumerators(mx::TypeKind{}) +
                static_cast<unsigned>(kind)];
+}
+
+const ASTNode *AST::ConstructNode(mx::DeclKind k, ASTNode::ChildVector child_vector)
+{
+  ASTNode *ptr = &nodes.emplace_back(k, std::move(child_vector));
+  auto kind_val = static_cast<unsigned>(k);
+  ptr->prev_of_kind = index[kind_val];
+  index[kind_val] = ptr;
+  return ptr;
+}
+
+const ASTNode *AST::ConstructNode(mx::StmtKind k, ASTNode::ChildVector child_vector)
+{
+  ASTNode *ptr = &nodes.emplace_back(k, std::move(child_vector));
+  auto kind_val = mx::NumEnumerators(mx::DeclKind{}) +
+                  static_cast<unsigned>(k);
+  ptr->prev_of_kind = index[kind_val];
+  index[kind_val] = ptr;
+  return ptr;
+}
+
+const ASTNode *AST::ConstructNode(mx::TypeKind k, ASTNode::ChildVector child_vector)
+{
+  ASTNode *ptr = &nodes.emplace_back(k, std::move(child_vector));
+  auto kind_val = mx::NumEnumerators(mx::DeclKind{}) +
+                  mx::NumEnumerators(mx::StmtKind{}) +
+                  static_cast<unsigned>(k);
+  ptr->prev_of_kind = index[kind_val];
+  index[kind_val] = ptr;
+  return ptr;
+}
+
+const ASTNode *AST::ConstructNode(mx::TokenKind k, std::string spelling)
+{
+  ASTNode *ptr = &nodes.emplace_back(k, std::move(spelling));
+  auto kind_val = mx::NumEnumerators(mx::DeclKind{}) +
+                  mx::NumEnumerators(mx::StmtKind{}) +
+                  mx::NumEnumerators(mx::TypeKind{}) +
+                  static_cast<unsigned>(k);
+  ptr->prev_of_kind = index[kind_val];
+  index[kind_val] = ptr;
+  return ptr;
 }
 
 AST AST::Build(mx::Fragment fragment) {

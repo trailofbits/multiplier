@@ -29,7 +29,7 @@ enum class TypeKind : unsigned char;
 namespace syntex {
 
 class AST;
-class Token;
+class Parser;
 
 class ASTNode {
  private:
@@ -67,6 +67,11 @@ class ASTNode {
   ASTNode(const mx::Type &type);
   ASTNode(const mx::Token &token);
 
+  ASTNode(mx::DeclKind k, ChildVector child_vector);
+  ASTNode(mx::StmtKind k, ChildVector child_vector);
+  ASTNode(mx::TypeKind k, ChildVector child_vector);
+  ASTNode(mx::TokenKind k, std::string spelling);
+
   bool operator==(const ASTNode &that) const noexcept;
 };
 
@@ -74,6 +79,7 @@ class ASTNode {
 class AST {
  private:
   friend class ASTNode;
+  friend class Parser;
 
   std::deque<ASTNode> nodes;
   std::vector<const ASTNode *> index;
@@ -82,6 +88,11 @@ class AST {
 
  public:
   static AST Build(mx::Fragment fragment);
+
+  const ASTNode *ConstructNode(mx::DeclKind k, ASTNode::ChildVector child_vector);
+  const ASTNode *ConstructNode(mx::StmtKind k, ASTNode::ChildVector child_vector);
+  const ASTNode *ConstructNode(mx::TypeKind k, ASTNode::ChildVector child_vector);
+  const ASTNode *ConstructNode(mx::TokenKind k, std::string spelling);
 
   inline const ASTNode *Root(void) const noexcept {
     return &(nodes.front());

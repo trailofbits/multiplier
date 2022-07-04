@@ -423,16 +423,19 @@ void Grammar::Import(const mx::Fragment &fragment) {
 // Parser item
 //
 
-struct Item {
+class Item {
+ private:
+  Item(const NonTerminal *cur_, const NonTerminal *end_)
+    : cur(cur_),
+      end(end_) {}
+
+ public:
   const NonTerminal *cur, *end;
+  ASTNode::ChildVector child_vector;
 
   Item(const Rule& rule)
     : cur(&rule.non_terminals.front()),
       end(&rule.non_terminals.back()) {}
-
-  Item(const NonTerminal *cur_, const NonTerminal *end_)
-    : cur(cur_),
-      end(end_) {}
 
   bool AtEnd() const {
     return cur == end;
@@ -442,9 +445,27 @@ struct Item {
     return *cur;
   }
 
-  Item Forward() {
+  Item Forward(const ASTNode *child) {
     assert(cur < end);
-    return Item(cur + 1, end);
+    Item new_item(cur + 1, end);
+    new_item.child_vector.insert(
+      new_item.child_vector.end(),
+      child_vector.begin(),
+      child_vector.end());
+    new_item.child_vector.push_back(child);
+    return new_item;
+  }
+
+  const ASTNode *ResultingNode(AST& ast) {
+    if (std::holds_alternative<mx::DeclKind>(cur->data)) {
+      return ast.ConstructNode(std::get<mx::DeclKind>(cur->data), child_vector);
+    } else if (std::holds_alternative<mx::StmtKind>(cur->data)) {
+      return ast.ConstructNode(std::get<mx::StmtKind>(cur->data), child_vector);
+    } else if (std::holds_alternative<mx::TypeKind>(cur->data)) {
+      return ast.ConstructNode(std::get<mx::TypeKind>(cur->data), child_vector);
+    } else {
+      assert(false);
+    }
   }
 };
 
@@ -453,10 +474,11 @@ struct Item {
 //
 
 struct Fragment {
-  NonTerminal non_terminal;
+  const ASTNode *node;
   size_t next;
 
-  Fragment(NonTerminal nt, size_t n) : non_terminal(nt), next(n) {}
+  Fragment(const ASTNode *node_, size_t next_)
+    : node(node_), next(next_) {}
 };
 
 //
@@ -465,6 +487,9 @@ struct Fragment {
 
 class Parser {
 private:
+  // Resulting AST
+  AST m_ast;
+
   // Grammar to be processed
   const Grammar& m_grammar;
 
@@ -485,18 +510,18 @@ public:
   void MatchRule(std::vector<Fragment>& result, Item item, size_t position) {
     if (item.AtEnd())
       // Try to match the result as a new prefix
-      MatchPrefix(result, Fragment(item.Cur(), position));
+      MatchPrefix(result, Fragment(item.ResultingNode(m_ast), position));
     else
       // Otherwise see if we can move forward with this rule
       for (auto& frag : ParsesAtIndex(position))
-        if (frag.non_terminal == item.Cur())
-          MatchRule(result, item.Forward(), frag.next);
+        if (NodeToNonTerminal(frag.node) == item.Cur())
+          MatchRule(result, item.Forward(frag.node), frag.next);
   }
 
   void MatchPrefix(std::vector<Fragment>& result, Fragment frag) {
-    for (auto& rule : m_grammar.MatchProductions(frag.non_terminal))
+    for (auto& rule : m_grammar.MatchProductions(NodeToNonTerminal(frag.node)))
       // Find all possible ways we can match this grammar rule
-      MatchRule(result, Item(rule).Forward(), frag.next);
+      MatchRule(result, Item(rule).Forward(frag.node), frag.next);
 
     // Add the input fragment itself
     result.push_back(frag);
@@ -512,24 +537,25 @@ public:
     std::vector<Fragment>& result = m_parses[index];
     auto it = m_tokens.find(index);
     if (it != m_tokens.end())
-      for (auto& token : it->second)
-        MatchPrefix(result, Fragment(NonTerminal(token.kind), token.next));
+      for (auto& token : it->second) {
+        auto node = m_ast.ConstructNode(token.kind, std::string(token.spelling));
+        MatchPrefix(result, Fragment(node, token.next));
+      }
     return result;
   }
 
   void Parse() {
-    //
     // Start computing parses at index 0
-    //
     auto fragments = ParsesAtIndex(0);
 
-    //
-    // Then print the result
-    //
+    // Print fragments at index 0
     std::cout << "-------------------\n";
     for (auto& frag : fragments)
-      std::cout << "  " << frag.non_terminal << "\n";
+      std::cout << "  " << NodeToNonTerminal(frag.node) << "\n";
     std::cout << "-------------------\n";
+
+    // Print AST to cerr
+    m_ast.PrintDOT(std::cerr);
   }
 };
 
