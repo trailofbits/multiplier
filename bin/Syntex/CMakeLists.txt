@@ -6,20 +6,28 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-add_executable("syntex-index"
+add_library("mx-syntex"
   "AST.cpp"
   "AST.h"
   "Grammar.cpp"
   "Grammar.h"
   "Lexer.cpp"
   "Lexer.h"
-  "Index.cpp"
 )
+
+target_link_libraries("mx-syntex"
+  PRIVATE
+    "mx-api"
+    "mx-util"
+)
+
+add_executable("syntex-index" "Index.cpp")
 
 target_link_libraries("syntex-index"
   PRIVATE
     "mx-api"
     "mx-util"
+    "mx-syntex"
     glog::glog
     gflags::gflags
 )
@@ -27,20 +35,13 @@ target_link_libraries("syntex-index"
 add_executable("${PROJECT_NAME}::syntex-index" ALIAS "syntex-index")
 set_target_properties("syntex-index" PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable("syntex-query"
-  "AST.cpp"
-  "AST.h"
-  "Grammar.cpp"
-  "Grammar.h"
-  "Lexer.cpp"
-  "Lexer.h"
-  "Query.cpp"
-)
+add_executable("syntex-query" "Query.cpp")
 
 target_link_libraries("syntex-query"
   PRIVATE
     "mx-api"
     "mx-util"
+    "mx-syntex"
     glog::glog
     gflags::gflags
 )
