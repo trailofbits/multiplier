@@ -16,8 +16,8 @@
 
 DECLARE_bool(help);
 DEFINE_bool(c_plus_plus, false, "Should we interpret the query as C++ code?ß");
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+DECLARE_string(host);
+DECLARE_string(port);
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_bool(print_matches, false, "Print variable matches found for the syntax");
 
