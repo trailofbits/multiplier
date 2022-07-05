@@ -12,8 +12,8 @@
 #include "Index.h"
 
 DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+DECLARE_string(host);
+DECLARE_string(port);
 DEFINE_string(name, "", "Search for the symbol with name");
 
 extern "C" int main(int argc, char *argv[]) {

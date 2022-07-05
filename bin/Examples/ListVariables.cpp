@@ -12,15 +12,15 @@
 #include <sstream>
 
 DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+DECLARE_string(host);
+DECLARE_string(port);
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print variable names");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print variable names");
 //DEFINE_bool(list_variables, false, "Should we list the variables inside of functions?");
 DEFINE_bool(show_locations, false, "Show the file locations of the variable?");
 
-std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
-mx::FileLocationCache location_cache;
+extern std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
+extern mx::FileLocationCache location_cache;
 
 static void PrintVariableNames(mx::Fragment fragment) {
   for (mx::VarDecl var : mx::VarDecl::in(fragment)) {
