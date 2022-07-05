@@ -209,6 +209,558 @@ const char *EnumeratorName(DeclKind e) {
   }
 }
 
+AArch64VectorPcsAttrSpelling FromPasta(pasta::AArch64VectorPcsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AArch64VectorPcsAttrSpelling::GNU_AARCH64_VECTOR_PCS;
+    case 1: return AArch64VectorPcsAttrSpelling::CXX11_CLANG_AARCH64_VECTOR_PCS;
+    case 2: return AArch64VectorPcsAttrSpelling::C2_XCLANG_AARCH64_VECTOR_PCS;
+    case 15: return AArch64VectorPcsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AArch64VectorPcsAttrSpelling e) {
+  switch (e) {
+    case AArch64VectorPcsAttrSpelling::GNU_AARCH64_VECTOR_PCS: return "GNU_AARCH64_VECTOR_PCS";
+    case AArch64VectorPcsAttrSpelling::CXX11_CLANG_AARCH64_VECTOR_PCS: return "CXX11_CLANG_AARCH64_VECTOR_PCS";
+    case AArch64VectorPcsAttrSpelling::C2_XCLANG_AARCH64_VECTOR_PCS: return "C2_XCLANG_AARCH64_VECTOR_PCS";
+    case AArch64VectorPcsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AMDGPUFlatWorkGroupSizeAttrSpelling FromPasta(pasta::AMDGPUFlatWorkGroupSizeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AMDGPUFlatWorkGroupSizeAttrSpelling::GNU_AMDGPU_FLAT_WORK_GROUP_SIZE;
+    case 1: return AMDGPUFlatWorkGroupSizeAttrSpelling::CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE;
+    case 15: return AMDGPUFlatWorkGroupSizeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AMDGPUFlatWorkGroupSizeAttrSpelling e) {
+  switch (e) {
+    case AMDGPUFlatWorkGroupSizeAttrSpelling::GNU_AMDGPU_FLAT_WORK_GROUP_SIZE: return "GNU_AMDGPU_FLAT_WORK_GROUP_SIZE";
+    case AMDGPUFlatWorkGroupSizeAttrSpelling::CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE: return "CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE";
+    case AMDGPUFlatWorkGroupSizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AMDGPUNumSGPRAttrSpelling FromPasta(pasta::AMDGPUNumSGPRAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AMDGPUNumSGPRAttrSpelling::GNU_AMDGPU_NUM_SGPR;
+    case 1: return AMDGPUNumSGPRAttrSpelling::CXX11_CLANG_AMDGPU_NUM_SGPR;
+    case 15: return AMDGPUNumSGPRAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AMDGPUNumSGPRAttrSpelling e) {
+  switch (e) {
+    case AMDGPUNumSGPRAttrSpelling::GNU_AMDGPU_NUM_SGPR: return "GNU_AMDGPU_NUM_SGPR";
+    case AMDGPUNumSGPRAttrSpelling::CXX11_CLANG_AMDGPU_NUM_SGPR: return "CXX11_CLANG_AMDGPU_NUM_SGPR";
+    case AMDGPUNumSGPRAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AMDGPUNumVGPRAttrSpelling FromPasta(pasta::AMDGPUNumVGPRAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AMDGPUNumVGPRAttrSpelling::GNU_AMDGPU_NUM_VGPR;
+    case 1: return AMDGPUNumVGPRAttrSpelling::CXX11_CLANG_AMDGPU_NUM_VGPR;
+    case 15: return AMDGPUNumVGPRAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AMDGPUNumVGPRAttrSpelling e) {
+  switch (e) {
+    case AMDGPUNumVGPRAttrSpelling::GNU_AMDGPU_NUM_VGPR: return "GNU_AMDGPU_NUM_VGPR";
+    case AMDGPUNumVGPRAttrSpelling::CXX11_CLANG_AMDGPU_NUM_VGPR: return "CXX11_CLANG_AMDGPU_NUM_VGPR";
+    case AMDGPUNumVGPRAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AMDGPUWavesPerEUAttrSpelling FromPasta(pasta::AMDGPUWavesPerEUAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AMDGPUWavesPerEUAttrSpelling::GNU_AMDGPU_WAVES_PER_EU;
+    case 1: return AMDGPUWavesPerEUAttrSpelling::CXX11_CLANG_AMDGPU_WAVES_PER_EU;
+    case 15: return AMDGPUWavesPerEUAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AMDGPUWavesPerEUAttrSpelling e) {
+  switch (e) {
+    case AMDGPUWavesPerEUAttrSpelling::GNU_AMDGPU_WAVES_PER_EU: return "GNU_AMDGPU_WAVES_PER_EU";
+    case AMDGPUWavesPerEUAttrSpelling::CXX11_CLANG_AMDGPU_WAVES_PER_EU: return "CXX11_CLANG_AMDGPU_WAVES_PER_EU";
+    case AMDGPUWavesPerEUAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ARMInterruptAttrInterruptType FromPasta(pasta::ARMInterruptAttrInterruptType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ARMInterruptAttrInterruptType::IRQ;
+    case 1: return ARMInterruptAttrInterruptType::FIQ;
+    case 2: return ARMInterruptAttrInterruptType::SWI;
+    case 3: return ARMInterruptAttrInterruptType::ABORT;
+    case 4: return ARMInterruptAttrInterruptType::UNDEF;
+    case 5: return ARMInterruptAttrInterruptType::GENERIC;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ARMInterruptAttrInterruptType e) {
+  switch (e) {
+    case ARMInterruptAttrInterruptType::IRQ: return "IRQ";
+    case ARMInterruptAttrInterruptType::FIQ: return "FIQ";
+    case ARMInterruptAttrInterruptType::SWI: return "SWI";
+    case ARMInterruptAttrInterruptType::ABORT: return "ABORT";
+    case ARMInterruptAttrInterruptType::UNDEF: return "UNDEF";
+    case ARMInterruptAttrInterruptType::GENERIC: return "GENERIC";
+    default: return "<invalid>";
+  }
+}
+
+ARMInterruptAttrSpelling FromPasta(pasta::ARMInterruptAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ARMInterruptAttrSpelling::GNU_INTERRUPT;
+    case 1: return ARMInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
+    case 2: return ARMInterruptAttrSpelling::C2_XGNU_INTERRUPT;
+    case 15: return ARMInterruptAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ARMInterruptAttrSpelling e) {
+  switch (e) {
+    case ARMInterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
+    case ARMInterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
+    case ARMInterruptAttrSpelling::C2_XGNU_INTERRUPT: return "C2_XGNU_INTERRUPT";
+    case ARMInterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AVRInterruptAttrSpelling FromPasta(pasta::AVRInterruptAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AVRInterruptAttrSpelling::GNU_INTERRUPT;
+    case 1: return AVRInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
+    case 2: return AVRInterruptAttrSpelling::C2_XGNU_INTERRUPT;
+    case 15: return AVRInterruptAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AVRInterruptAttrSpelling e) {
+  switch (e) {
+    case AVRInterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
+    case AVRInterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
+    case AVRInterruptAttrSpelling::C2_XGNU_INTERRUPT: return "C2_XGNU_INTERRUPT";
+    case AVRInterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AVRSignalAttrSpelling FromPasta(pasta::AVRSignalAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AVRSignalAttrSpelling::GNU_SIGNAL;
+    case 1: return AVRSignalAttrSpelling::CXX11_GNU_SIGNAL;
+    case 2: return AVRSignalAttrSpelling::C2_XGNU_SIGNAL;
+    case 15: return AVRSignalAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AVRSignalAttrSpelling e) {
+  switch (e) {
+    case AVRSignalAttrSpelling::GNU_SIGNAL: return "GNU_SIGNAL";
+    case AVRSignalAttrSpelling::CXX11_GNU_SIGNAL: return "CXX11_GNU_SIGNAL";
+    case AVRSignalAttrSpelling::C2_XGNU_SIGNAL: return "C2_XGNU_SIGNAL";
+    case AVRSignalAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AbiTagAttrSpelling FromPasta(pasta::AbiTagAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AbiTagAttrSpelling::GNU_ABI_TAG;
+    case 1: return AbiTagAttrSpelling::CXX11_GNU_ABI_TAG;
+    case 15: return AbiTagAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AbiTagAttrSpelling e) {
+  switch (e) {
+    case AbiTagAttrSpelling::GNU_ABI_TAG: return "GNU_ABI_TAG";
+    case AbiTagAttrSpelling::CXX11_GNU_ABI_TAG: return "CXX11_GNU_ABI_TAG";
+    case AbiTagAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AcquireCapabilityAttrSpelling FromPasta(pasta::AcquireCapabilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AcquireCapabilityAttrSpelling::GNU_ACQUIRE_CAPABILITY;
+    case 1: return AcquireCapabilityAttrSpelling::CXX11_CLANG_ACQUIRE_CAPABILITY;
+    case 2: return AcquireCapabilityAttrSpelling::GNU_ACQUIRE_SHARED_CAPABILITY;
+    case 3: return AcquireCapabilityAttrSpelling::CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY;
+    case 4: return AcquireCapabilityAttrSpelling::GNU_EXCLUSIVE_LOCK_FUNCTION;
+    case 5: return AcquireCapabilityAttrSpelling::GNU_SHARED_LOCK_FUNCTION;
+    case 15: return AcquireCapabilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AcquireCapabilityAttrSpelling e) {
+  switch (e) {
+    case AcquireCapabilityAttrSpelling::GNU_ACQUIRE_CAPABILITY: return "GNU_ACQUIRE_CAPABILITY";
+    case AcquireCapabilityAttrSpelling::CXX11_CLANG_ACQUIRE_CAPABILITY: return "CXX11_CLANG_ACQUIRE_CAPABILITY";
+    case AcquireCapabilityAttrSpelling::GNU_ACQUIRE_SHARED_CAPABILITY: return "GNU_ACQUIRE_SHARED_CAPABILITY";
+    case AcquireCapabilityAttrSpelling::CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY: return "CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY";
+    case AcquireCapabilityAttrSpelling::GNU_EXCLUSIVE_LOCK_FUNCTION: return "GNU_EXCLUSIVE_LOCK_FUNCTION";
+    case AcquireCapabilityAttrSpelling::GNU_SHARED_LOCK_FUNCTION: return "GNU_SHARED_LOCK_FUNCTION";
+    case AcquireCapabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AcquireHandleAttrSpelling FromPasta(pasta::AcquireHandleAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AcquireHandleAttrSpelling::GNU_ACQUIRE_HANDLE;
+    case 1: return AcquireHandleAttrSpelling::CXX11_CLANG_ACQUIRE_HANDLE;
+    case 2: return AcquireHandleAttrSpelling::C2_XCLANG_ACQUIRE_HANDLE;
+    case 15: return AcquireHandleAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AcquireHandleAttrSpelling e) {
+  switch (e) {
+    case AcquireHandleAttrSpelling::GNU_ACQUIRE_HANDLE: return "GNU_ACQUIRE_HANDLE";
+    case AcquireHandleAttrSpelling::CXX11_CLANG_ACQUIRE_HANDLE: return "CXX11_CLANG_ACQUIRE_HANDLE";
+    case AcquireHandleAttrSpelling::C2_XCLANG_ACQUIRE_HANDLE: return "C2_XCLANG_ACQUIRE_HANDLE";
+    case AcquireHandleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AddressSpaceAttrSpelling FromPasta(pasta::AddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AddressSpaceAttrSpelling::GNU_ADDRESS_SPACE;
+    case 1: return AddressSpaceAttrSpelling::CXX11_CLANG_ADDRESS_SPACE;
+    case 2: return AddressSpaceAttrSpelling::C2_XCLANG_ADDRESS_SPACE;
+    case 15: return AddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AddressSpaceAttrSpelling e) {
+  switch (e) {
+    case AddressSpaceAttrSpelling::GNU_ADDRESS_SPACE: return "GNU_ADDRESS_SPACE";
+    case AddressSpaceAttrSpelling::CXX11_CLANG_ADDRESS_SPACE: return "CXX11_CLANG_ADDRESS_SPACE";
+    case AddressSpaceAttrSpelling::C2_XCLANG_ADDRESS_SPACE: return "C2_XCLANG_ADDRESS_SPACE";
+    case AddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AliasAttrSpelling FromPasta(pasta::AliasAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AliasAttrSpelling::GNU_ALIAS;
+    case 1: return AliasAttrSpelling::CXX11_GNU_ALIAS;
+    case 2: return AliasAttrSpelling::C2_XGNU_ALIAS;
+    case 15: return AliasAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AliasAttrSpelling e) {
+  switch (e) {
+    case AliasAttrSpelling::GNU_ALIAS: return "GNU_ALIAS";
+    case AliasAttrSpelling::CXX11_GNU_ALIAS: return "CXX11_GNU_ALIAS";
+    case AliasAttrSpelling::C2_XGNU_ALIAS: return "C2_XGNU_ALIAS";
+    case AliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AlignedAttrSpelling FromPasta(pasta::AlignedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AlignedAttrSpelling::GNU_ALIGNED;
+    case 1: return AlignedAttrSpelling::CXX11_GNU_ALIGNED;
+    case 2: return AlignedAttrSpelling::C2_XGNU_ALIGNED;
+    case 3: return AlignedAttrSpelling::DECLSPEC_ALIGN;
+    case 4: return AlignedAttrSpelling::KEYWORD_ALIGNAS;
+    case 5: return AlignedAttrSpelling::KEYWORD__ALIGNAS;
+    case 15: return AlignedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AlignedAttrSpelling e) {
+  switch (e) {
+    case AlignedAttrSpelling::GNU_ALIGNED: return "GNU_ALIGNED";
+    case AlignedAttrSpelling::CXX11_GNU_ALIGNED: return "CXX11_GNU_ALIGNED";
+    case AlignedAttrSpelling::C2_XGNU_ALIGNED: return "C2_XGNU_ALIGNED";
+    case AlignedAttrSpelling::DECLSPEC_ALIGN: return "DECLSPEC_ALIGN";
+    case AlignedAttrSpelling::KEYWORD_ALIGNAS: return "KEYWORD_ALIGNAS";
+    case AlignedAttrSpelling::KEYWORD__ALIGNAS: return "KEYWORD__ALIGNAS";
+    case AlignedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AllocAlignAttrSpelling FromPasta(pasta::AllocAlignAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AllocAlignAttrSpelling::GNU_ALLOC_ALIGN;
+    case 1: return AllocAlignAttrSpelling::CXX11_GNU_ALLOC_ALIGN;
+    case 2: return AllocAlignAttrSpelling::C2_XGNU_ALLOC_ALIGN;
+    case 15: return AllocAlignAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AllocAlignAttrSpelling e) {
+  switch (e) {
+    case AllocAlignAttrSpelling::GNU_ALLOC_ALIGN: return "GNU_ALLOC_ALIGN";
+    case AllocAlignAttrSpelling::CXX11_GNU_ALLOC_ALIGN: return "CXX11_GNU_ALLOC_ALIGN";
+    case AllocAlignAttrSpelling::C2_XGNU_ALLOC_ALIGN: return "C2_XGNU_ALLOC_ALIGN";
+    case AllocAlignAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AllocSizeAttrSpelling FromPasta(pasta::AllocSizeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AllocSizeAttrSpelling::GNU_ALLOC_SIZE;
+    case 1: return AllocSizeAttrSpelling::CXX11_GNU_ALLOC_SIZE;
+    case 2: return AllocSizeAttrSpelling::C2_XGNU_ALLOC_SIZE;
+    case 15: return AllocSizeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AllocSizeAttrSpelling e) {
+  switch (e) {
+    case AllocSizeAttrSpelling::GNU_ALLOC_SIZE: return "GNU_ALLOC_SIZE";
+    case AllocSizeAttrSpelling::CXX11_GNU_ALLOC_SIZE: return "CXX11_GNU_ALLOC_SIZE";
+    case AllocSizeAttrSpelling::C2_XGNU_ALLOC_SIZE: return "C2_XGNU_ALLOC_SIZE";
+    case AllocSizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AlwaysDestroyAttrSpelling FromPasta(pasta::AlwaysDestroyAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AlwaysDestroyAttrSpelling::GNU_ALWAYS_DESTROY;
+    case 1: return AlwaysDestroyAttrSpelling::CXX11_CLANG_ALWAYS_DESTROY;
+    case 15: return AlwaysDestroyAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AlwaysDestroyAttrSpelling e) {
+  switch (e) {
+    case AlwaysDestroyAttrSpelling::GNU_ALWAYS_DESTROY: return "GNU_ALWAYS_DESTROY";
+    case AlwaysDestroyAttrSpelling::CXX11_CLANG_ALWAYS_DESTROY: return "CXX11_CLANG_ALWAYS_DESTROY";
+    case AlwaysDestroyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AlwaysInlineAttrSpelling FromPasta(pasta::AlwaysInlineAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AlwaysInlineAttrSpelling::GNU_ALWAYS_INLINE;
+    case 1: return AlwaysInlineAttrSpelling::CXX11_GNU_ALWAYS_INLINE;
+    case 2: return AlwaysInlineAttrSpelling::C2_XGNU_ALWAYS_INLINE;
+    case 3: return AlwaysInlineAttrSpelling::KEYWORD_FORCEINLINE;
+    case 15: return AlwaysInlineAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AlwaysInlineAttrSpelling e) {
+  switch (e) {
+    case AlwaysInlineAttrSpelling::GNU_ALWAYS_INLINE: return "GNU_ALWAYS_INLINE";
+    case AlwaysInlineAttrSpelling::CXX11_GNU_ALWAYS_INLINE: return "CXX11_GNU_ALWAYS_INLINE";
+    case AlwaysInlineAttrSpelling::C2_XGNU_ALWAYS_INLINE: return "C2_XGNU_ALWAYS_INLINE";
+    case AlwaysInlineAttrSpelling::KEYWORD_FORCEINLINE: return "KEYWORD_FORCEINLINE";
+    case AlwaysInlineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AnnotateAttrSpelling FromPasta(pasta::AnnotateAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AnnotateAttrSpelling::GNU_ANNOTATE;
+    case 1: return AnnotateAttrSpelling::CXX11_CLANG_ANNOTATE;
+    case 2: return AnnotateAttrSpelling::C2_XCLANG_ANNOTATE;
+    case 15: return AnnotateAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AnnotateAttrSpelling e) {
+  switch (e) {
+    case AnnotateAttrSpelling::GNU_ANNOTATE: return "GNU_ANNOTATE";
+    case AnnotateAttrSpelling::CXX11_CLANG_ANNOTATE: return "CXX11_CLANG_ANNOTATE";
+    case AnnotateAttrSpelling::C2_XCLANG_ANNOTATE: return "C2_XCLANG_ANNOTATE";
+    case AnnotateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AnyX86InterruptAttrSpelling FromPasta(pasta::AnyX86InterruptAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AnyX86InterruptAttrSpelling::GNU_INTERRUPT;
+    case 1: return AnyX86InterruptAttrSpelling::CXX11_GNU_INTERRUPT;
+    case 2: return AnyX86InterruptAttrSpelling::C2_XGNU_INTERRUPT;
+    case 15: return AnyX86InterruptAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AnyX86InterruptAttrSpelling e) {
+  switch (e) {
+    case AnyX86InterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
+    case AnyX86InterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
+    case AnyX86InterruptAttrSpelling::C2_XGNU_INTERRUPT: return "C2_XGNU_INTERRUPT";
+    case AnyX86InterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AnyX86NoCallerSavedRegistersAttrSpelling FromPasta(pasta::AnyX86NoCallerSavedRegistersAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AnyX86NoCallerSavedRegistersAttrSpelling::GNU_NO_CALLER_SAVED_REGISTERS;
+    case 1: return AnyX86NoCallerSavedRegistersAttrSpelling::CXX11_GNU_NO_CALLER_SAVED_REGISTERS;
+    case 2: return AnyX86NoCallerSavedRegistersAttrSpelling::C2_XGNU_NO_CALLER_SAVED_REGISTERS;
+    case 15: return AnyX86NoCallerSavedRegistersAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AnyX86NoCallerSavedRegistersAttrSpelling e) {
+  switch (e) {
+    case AnyX86NoCallerSavedRegistersAttrSpelling::GNU_NO_CALLER_SAVED_REGISTERS: return "GNU_NO_CALLER_SAVED_REGISTERS";
+    case AnyX86NoCallerSavedRegistersAttrSpelling::CXX11_GNU_NO_CALLER_SAVED_REGISTERS: return "CXX11_GNU_NO_CALLER_SAVED_REGISTERS";
+    case AnyX86NoCallerSavedRegistersAttrSpelling::C2_XGNU_NO_CALLER_SAVED_REGISTERS: return "C2_XGNU_NO_CALLER_SAVED_REGISTERS";
+    case AnyX86NoCallerSavedRegistersAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AnyX86NoCfCheckAttrSpelling FromPasta(pasta::AnyX86NoCfCheckAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AnyX86NoCfCheckAttrSpelling::GNU_NOCF_CHECK;
+    case 1: return AnyX86NoCfCheckAttrSpelling::CXX11_GNU_NOCF_CHECK;
+    case 2: return AnyX86NoCfCheckAttrSpelling::C2_XGNU_NOCF_CHECK;
+    case 15: return AnyX86NoCfCheckAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AnyX86NoCfCheckAttrSpelling e) {
+  switch (e) {
+    case AnyX86NoCfCheckAttrSpelling::GNU_NOCF_CHECK: return "GNU_NOCF_CHECK";
+    case AnyX86NoCfCheckAttrSpelling::CXX11_GNU_NOCF_CHECK: return "CXX11_GNU_NOCF_CHECK";
+    case AnyX86NoCfCheckAttrSpelling::C2_XGNU_NOCF_CHECK: return "C2_XGNU_NOCF_CHECK";
+    case AnyX86NoCfCheckAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ArcWeakrefUnavailableAttrSpelling FromPasta(pasta::ArcWeakrefUnavailableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArcWeakrefUnavailableAttrSpelling::GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE;
+    case 1: return ArcWeakrefUnavailableAttrSpelling::CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE;
+    case 2: return ArcWeakrefUnavailableAttrSpelling::C2_XCLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE;
+    case 15: return ArcWeakrefUnavailableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ArcWeakrefUnavailableAttrSpelling e) {
+  switch (e) {
+    case ArcWeakrefUnavailableAttrSpelling::GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE: return "GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE";
+    case ArcWeakrefUnavailableAttrSpelling::CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE: return "CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE";
+    case ArcWeakrefUnavailableAttrSpelling::C2_XCLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE: return "C2_XCLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE";
+    case ArcWeakrefUnavailableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ArgumentWithTypeTagAttrSpelling FromPasta(pasta::ArgumentWithTypeTagAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArgumentWithTypeTagAttrSpelling::GNU_ARGUMENT_WITH_TYPE_TAG;
+    case 1: return ArgumentWithTypeTagAttrSpelling::CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG;
+    case 2: return ArgumentWithTypeTagAttrSpelling::C2_XCLANG_ARGUMENT_WITH_TYPE_TAG;
+    case 3: return ArgumentWithTypeTagAttrSpelling::GNU_POINTER_WITH_TYPE_TAG;
+    case 4: return ArgumentWithTypeTagAttrSpelling::CXX11_CLANG_POINTER_WITH_TYPE_TAG;
+    case 5: return ArgumentWithTypeTagAttrSpelling::C2_XCLANG_POINTER_WITH_TYPE_TAG;
+    case 15: return ArgumentWithTypeTagAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ArgumentWithTypeTagAttrSpelling e) {
+  switch (e) {
+    case ArgumentWithTypeTagAttrSpelling::GNU_ARGUMENT_WITH_TYPE_TAG: return "GNU_ARGUMENT_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG: return "CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::C2_XCLANG_ARGUMENT_WITH_TYPE_TAG: return "C2_XCLANG_ARGUMENT_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::GNU_POINTER_WITH_TYPE_TAG: return "GNU_POINTER_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::CXX11_CLANG_POINTER_WITH_TYPE_TAG: return "CXX11_CLANG_POINTER_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::C2_XCLANG_POINTER_WITH_TYPE_TAG: return "C2_XCLANG_POINTER_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ArmBuiltinAliasAttrSpelling FromPasta(pasta::ArmBuiltinAliasAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArmBuiltinAliasAttrSpelling::GNU_CLANG_ARM_BUILTIN_ALIAS;
+    case 1: return ArmBuiltinAliasAttrSpelling::CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS;
+    case 2: return ArmBuiltinAliasAttrSpelling::C2_XCLANG_CLANG_ARM_BUILTIN_ALIAS;
+    case 15: return ArmBuiltinAliasAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ArmBuiltinAliasAttrSpelling e) {
+  switch (e) {
+    case ArmBuiltinAliasAttrSpelling::GNU_CLANG_ARM_BUILTIN_ALIAS: return "GNU_CLANG_ARM_BUILTIN_ALIAS";
+    case ArmBuiltinAliasAttrSpelling::CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS: return "CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS";
+    case ArmBuiltinAliasAttrSpelling::C2_XCLANG_CLANG_ARM_BUILTIN_ALIAS: return "C2_XCLANG_CLANG_ARM_BUILTIN_ALIAS";
+    case ArmBuiltinAliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ArmMveStrictPolymorphismAttrSpelling FromPasta(pasta::ArmMveStrictPolymorphismAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArmMveStrictPolymorphismAttrSpelling::GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM;
+    case 1: return ArmMveStrictPolymorphismAttrSpelling::CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM;
+    case 2: return ArmMveStrictPolymorphismAttrSpelling::C2_XCLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM;
+    case 15: return ArmMveStrictPolymorphismAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ArmMveStrictPolymorphismAttrSpelling e) {
+  switch (e) {
+    case ArmMveStrictPolymorphismAttrSpelling::GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM: return "GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM";
+    case ArmMveStrictPolymorphismAttrSpelling::CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM: return "CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM";
+    case ArmMveStrictPolymorphismAttrSpelling::C2_XCLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM: return "C2_XCLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM";
+    case ArmMveStrictPolymorphismAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 ArrayTypeArraySizeModifier FromPasta(pasta::ArrayTypeArraySizeModifier e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return ArrayTypeArraySizeModifier::NORMAL;
@@ -223,6 +775,104 @@ const char *EnumeratorName(ArrayTypeArraySizeModifier e) {
     case ArrayTypeArraySizeModifier::NORMAL: return "NORMAL";
     case ArrayTypeArraySizeModifier::STATIC: return "STATIC";
     case ArrayTypeArraySizeModifier::STAR: return "STAR";
+    default: return "<invalid>";
+  }
+}
+
+ArtificialAttrSpelling FromPasta(pasta::ArtificialAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ArtificialAttrSpelling::GNU_ARTIFICIAL;
+    case 1: return ArtificialAttrSpelling::CXX11_GNU_ARTIFICIAL;
+    case 2: return ArtificialAttrSpelling::C2_XGNU_ARTIFICIAL;
+    case 15: return ArtificialAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ArtificialAttrSpelling e) {
+  switch (e) {
+    case ArtificialAttrSpelling::GNU_ARTIFICIAL: return "GNU_ARTIFICIAL";
+    case ArtificialAttrSpelling::CXX11_GNU_ARTIFICIAL: return "CXX11_GNU_ARTIFICIAL";
+    case ArtificialAttrSpelling::C2_XGNU_ARTIFICIAL: return "C2_XGNU_ARTIFICIAL";
+    case ArtificialAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AsmLabelAttrSpelling FromPasta(pasta::AsmLabelAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AsmLabelAttrSpelling::KEYWORD_ASSEMBLY;
+    case 15: return AsmLabelAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AsmLabelAttrSpelling e) {
+  switch (e) {
+    case AsmLabelAttrSpelling::KEYWORD_ASSEMBLY: return "KEYWORD_ASSEMBLY";
+    case AsmLabelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AssertCapabilityAttrSpelling FromPasta(pasta::AssertCapabilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AssertCapabilityAttrSpelling::GNU_ASSERT_CAPABILITY;
+    case 1: return AssertCapabilityAttrSpelling::CXX11_CLANG_ASSERT_CAPABILITY;
+    case 2: return AssertCapabilityAttrSpelling::GNU_ASSERT_SHARED_CAPABILITY;
+    case 3: return AssertCapabilityAttrSpelling::CXX11_CLANG_ASSERT_SHARED_CAPABILITY;
+    case 15: return AssertCapabilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AssertCapabilityAttrSpelling e) {
+  switch (e) {
+    case AssertCapabilityAttrSpelling::GNU_ASSERT_CAPABILITY: return "GNU_ASSERT_CAPABILITY";
+    case AssertCapabilityAttrSpelling::CXX11_CLANG_ASSERT_CAPABILITY: return "CXX11_CLANG_ASSERT_CAPABILITY";
+    case AssertCapabilityAttrSpelling::GNU_ASSERT_SHARED_CAPABILITY: return "GNU_ASSERT_SHARED_CAPABILITY";
+    case AssertCapabilityAttrSpelling::CXX11_CLANG_ASSERT_SHARED_CAPABILITY: return "CXX11_CLANG_ASSERT_SHARED_CAPABILITY";
+    case AssertCapabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AssumeAlignedAttrSpelling FromPasta(pasta::AssumeAlignedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AssumeAlignedAttrSpelling::GNU_ASSUME_ALIGNED;
+    case 1: return AssumeAlignedAttrSpelling::CXX11_GNU_ASSUME_ALIGNED;
+    case 2: return AssumeAlignedAttrSpelling::C2_XGNU_ASSUME_ALIGNED;
+    case 15: return AssumeAlignedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AssumeAlignedAttrSpelling e) {
+  switch (e) {
+    case AssumeAlignedAttrSpelling::GNU_ASSUME_ALIGNED: return "GNU_ASSUME_ALIGNED";
+    case AssumeAlignedAttrSpelling::CXX11_GNU_ASSUME_ALIGNED: return "CXX11_GNU_ASSUME_ALIGNED";
+    case AssumeAlignedAttrSpelling::C2_XGNU_ASSUME_ALIGNED: return "C2_XGNU_ASSUME_ALIGNED";
+    case AssumeAlignedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+AssumptionAttrSpelling FromPasta(pasta::AssumptionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AssumptionAttrSpelling::GNU_ASSUME;
+    case 1: return AssumptionAttrSpelling::CXX11_CLANG_ASSUME;
+    case 2: return AssumptionAttrSpelling::C2_XCLANG_ASSUME;
+    case 15: return AssumptionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AssumptionAttrSpelling e) {
+  switch (e) {
+    case AssumptionAttrSpelling::GNU_ASSUME: return "GNU_ASSUME";
+    case AssumptionAttrSpelling::CXX11_CLANG_ASSUME: return "CXX11_CLANG_ASSUME";
+    case AssumptionAttrSpelling::C2_XCLANG_ASSUME: return "C2_XCLANG_ASSUME";
+    case AssumptionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -359,6 +1009,140 @@ const char *EnumeratorName(AtomicExprAtomicOp e) {
     case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_XOR: return "HIP_ATOMIC_FETCH_XOR";
     case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_MIN: return "HIP_ATOMIC_FETCH_MIN";
     case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_MAX: return "HIP_ATOMIC_FETCH_MAX";
+    default: return "<invalid>";
+  }
+}
+
+AvailabilityAttrSpelling FromPasta(pasta::AvailabilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return AvailabilityAttrSpelling::GNU_AVAILABILITY;
+    case 1: return AvailabilityAttrSpelling::CXX11_CLANG_AVAILABILITY;
+    case 2: return AvailabilityAttrSpelling::C2_XCLANG_AVAILABILITY;
+    case 15: return AvailabilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(AvailabilityAttrSpelling e) {
+  switch (e) {
+    case AvailabilityAttrSpelling::GNU_AVAILABILITY: return "GNU_AVAILABILITY";
+    case AvailabilityAttrSpelling::CXX11_CLANG_AVAILABILITY: return "CXX11_CLANG_AVAILABILITY";
+    case AvailabilityAttrSpelling::C2_XCLANG_AVAILABILITY: return "C2_XCLANG_AVAILABILITY";
+    case AvailabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+BPFPreserveAccessIndexAttrSpelling FromPasta(pasta::BPFPreserveAccessIndexAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BPFPreserveAccessIndexAttrSpelling::GNU_PRESERVE_ACCESS_INDEX;
+    case 1: return BPFPreserveAccessIndexAttrSpelling::CXX11_CLANG_PRESERVE_ACCESS_INDEX;
+    case 2: return BPFPreserveAccessIndexAttrSpelling::C2_XCLANG_PRESERVE_ACCESS_INDEX;
+    case 15: return BPFPreserveAccessIndexAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(BPFPreserveAccessIndexAttrSpelling e) {
+  switch (e) {
+    case BPFPreserveAccessIndexAttrSpelling::GNU_PRESERVE_ACCESS_INDEX: return "GNU_PRESERVE_ACCESS_INDEX";
+    case BPFPreserveAccessIndexAttrSpelling::CXX11_CLANG_PRESERVE_ACCESS_INDEX: return "CXX11_CLANG_PRESERVE_ACCESS_INDEX";
+    case BPFPreserveAccessIndexAttrSpelling::C2_XCLANG_PRESERVE_ACCESS_INDEX: return "C2_XCLANG_PRESERVE_ACCESS_INDEX";
+    case BPFPreserveAccessIndexAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+BTFDeclTagAttrSpelling FromPasta(pasta::BTFDeclTagAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BTFDeclTagAttrSpelling::GNU_BTF_DECLARATION_TAG;
+    case 1: return BTFDeclTagAttrSpelling::CXX11_CLANG_BTF_DECLARATION_TAG;
+    case 2: return BTFDeclTagAttrSpelling::C2_XCLANG_BTF_DECLARATION_TAG;
+    case 15: return BTFDeclTagAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(BTFDeclTagAttrSpelling e) {
+  switch (e) {
+    case BTFDeclTagAttrSpelling::GNU_BTF_DECLARATION_TAG: return "GNU_BTF_DECLARATION_TAG";
+    case BTFDeclTagAttrSpelling::CXX11_CLANG_BTF_DECLARATION_TAG: return "CXX11_CLANG_BTF_DECLARATION_TAG";
+    case BTFDeclTagAttrSpelling::C2_XCLANG_BTF_DECLARATION_TAG: return "C2_XCLANG_BTF_DECLARATION_TAG";
+    case BTFDeclTagAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+BTFTypeTagAttrSpelling FromPasta(pasta::BTFTypeTagAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BTFTypeTagAttrSpelling::GNU_BTF_TYPE_TAG;
+    case 1: return BTFTypeTagAttrSpelling::CXX11_CLANG_BTF_TYPE_TAG;
+    case 2: return BTFTypeTagAttrSpelling::C2_XCLANG_BTF_TYPE_TAG;
+    case 15: return BTFTypeTagAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(BTFTypeTagAttrSpelling e) {
+  switch (e) {
+    case BTFTypeTagAttrSpelling::GNU_BTF_TYPE_TAG: return "GNU_BTF_TYPE_TAG";
+    case BTFTypeTagAttrSpelling::CXX11_CLANG_BTF_TYPE_TAG: return "CXX11_CLANG_BTF_TYPE_TAG";
+    case BTFTypeTagAttrSpelling::C2_XCLANG_BTF_TYPE_TAG: return "C2_XCLANG_BTF_TYPE_TAG";
+    case BTFTypeTagAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+BlocksAttrBlockType FromPasta(pasta::BlocksAttrBlockType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BlocksAttrBlockType::BY_REFERENCE;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(BlocksAttrBlockType e) {
+  switch (e) {
+    case BlocksAttrBlockType::BY_REFERENCE: return "BY_REFERENCE";
+    default: return "<invalid>";
+  }
+}
+
+BlocksAttrSpelling FromPasta(pasta::BlocksAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BlocksAttrSpelling::GNU_BLOCKS;
+    case 1: return BlocksAttrSpelling::CXX11_CLANG_BLOCKS;
+    case 2: return BlocksAttrSpelling::C2_XCLANG_BLOCKS;
+    case 15: return BlocksAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(BlocksAttrSpelling e) {
+  switch (e) {
+    case BlocksAttrSpelling::GNU_BLOCKS: return "GNU_BLOCKS";
+    case BlocksAttrSpelling::CXX11_CLANG_BLOCKS: return "CXX11_CLANG_BLOCKS";
+    case BlocksAttrSpelling::C2_XCLANG_BLOCKS: return "C2_XCLANG_BLOCKS";
+    case BlocksAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+BuiltinAliasAttrSpelling FromPasta(pasta::BuiltinAliasAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return BuiltinAliasAttrSpelling::CXX11_CLANG_BUILTIN_ALIAS;
+    case 1: return BuiltinAliasAttrSpelling::C2_XCLANG_BUILTIN_ALIAS;
+    case 2: return BuiltinAliasAttrSpelling::GNU_CLANG_BUILTIN_ALIAS;
+    case 15: return BuiltinAliasAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(BuiltinAliasAttrSpelling e) {
+  switch (e) {
+    case BuiltinAliasAttrSpelling::CXX11_CLANG_BUILTIN_ALIAS: return "CXX11_CLANG_BUILTIN_ALIAS";
+    case BuiltinAliasAttrSpelling::C2_XCLANG_BUILTIN_ALIAS: return "C2_XCLANG_BUILTIN_ALIAS";
+    case BuiltinAliasAttrSpelling::GNU_CLANG_BUILTIN_ALIAS: return "GNU_CLANG_BUILTIN_ALIAS";
+    case BuiltinAliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -851,6 +1635,350 @@ const char *EnumeratorName(BuiltinTypeKind e) {
   }
 }
 
+CDeclAttrSpelling FromPasta(pasta::CDeclAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CDeclAttrSpelling::GNU_CDECL;
+    case 1: return CDeclAttrSpelling::CXX11_GNU_CDECL;
+    case 2: return CDeclAttrSpelling::C2_XGNU_CDECL;
+    case 3: return CDeclAttrSpelling::KEYWORD_CDECL;
+    case 15: return CDeclAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CDeclAttrSpelling e) {
+  switch (e) {
+    case CDeclAttrSpelling::GNU_CDECL: return "GNU_CDECL";
+    case CDeclAttrSpelling::CXX11_GNU_CDECL: return "CXX11_GNU_CDECL";
+    case CDeclAttrSpelling::C2_XGNU_CDECL: return "C2_XGNU_CDECL";
+    case CDeclAttrSpelling::KEYWORD_CDECL: return "KEYWORD_CDECL";
+    case CDeclAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CFAuditedTransferAttrSpelling FromPasta(pasta::CFAuditedTransferAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CFAuditedTransferAttrSpelling::GNU_CF_AUDITED_TRANSFER;
+    case 1: return CFAuditedTransferAttrSpelling::CXX11_CLANG_CF_AUDITED_TRANSFER;
+    case 2: return CFAuditedTransferAttrSpelling::C2_XCLANG_CF_AUDITED_TRANSFER;
+    case 15: return CFAuditedTransferAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CFAuditedTransferAttrSpelling e) {
+  switch (e) {
+    case CFAuditedTransferAttrSpelling::GNU_CF_AUDITED_TRANSFER: return "GNU_CF_AUDITED_TRANSFER";
+    case CFAuditedTransferAttrSpelling::CXX11_CLANG_CF_AUDITED_TRANSFER: return "CXX11_CLANG_CF_AUDITED_TRANSFER";
+    case CFAuditedTransferAttrSpelling::C2_XCLANG_CF_AUDITED_TRANSFER: return "C2_XCLANG_CF_AUDITED_TRANSFER";
+    case CFAuditedTransferAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CFConsumedAttrSpelling FromPasta(pasta::CFConsumedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CFConsumedAttrSpelling::GNU_CF_CONSUMED;
+    case 1: return CFConsumedAttrSpelling::CXX11_CLANG_CF_CONSUMED;
+    case 2: return CFConsumedAttrSpelling::C2_XCLANG_CF_CONSUMED;
+    case 15: return CFConsumedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CFConsumedAttrSpelling e) {
+  switch (e) {
+    case CFConsumedAttrSpelling::GNU_CF_CONSUMED: return "GNU_CF_CONSUMED";
+    case CFConsumedAttrSpelling::CXX11_CLANG_CF_CONSUMED: return "CXX11_CLANG_CF_CONSUMED";
+    case CFConsumedAttrSpelling::C2_XCLANG_CF_CONSUMED: return "C2_XCLANG_CF_CONSUMED";
+    case CFConsumedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CFGuardAttrGuardArg FromPasta(pasta::CFGuardAttrGuardArg e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CFGuardAttrGuardArg::NOCF;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CFGuardAttrGuardArg e) {
+  switch (e) {
+    case CFGuardAttrGuardArg::NOCF: return "NOCF";
+    default: return "<invalid>";
+  }
+}
+
+CFICanonicalJumpTableAttrSpelling FromPasta(pasta::CFICanonicalJumpTableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CFICanonicalJumpTableAttrSpelling::GNU_CFI_CANONICAL_JUMP_TABLE;
+    case 1: return CFICanonicalJumpTableAttrSpelling::CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE;
+    case 2: return CFICanonicalJumpTableAttrSpelling::C2_XCLANG_CFI_CANONICAL_JUMP_TABLE;
+    case 15: return CFICanonicalJumpTableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CFICanonicalJumpTableAttrSpelling e) {
+  switch (e) {
+    case CFICanonicalJumpTableAttrSpelling::GNU_CFI_CANONICAL_JUMP_TABLE: return "GNU_CFI_CANONICAL_JUMP_TABLE";
+    case CFICanonicalJumpTableAttrSpelling::CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE: return "CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE";
+    case CFICanonicalJumpTableAttrSpelling::C2_XCLANG_CFI_CANONICAL_JUMP_TABLE: return "C2_XCLANG_CFI_CANONICAL_JUMP_TABLE";
+    case CFICanonicalJumpTableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CFReturnsNotRetainedAttrSpelling FromPasta(pasta::CFReturnsNotRetainedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CFReturnsNotRetainedAttrSpelling::GNU_CF_RETURNS_NOT_RETAINED;
+    case 1: return CFReturnsNotRetainedAttrSpelling::CXX11_CLANG_CF_RETURNS_NOT_RETAINED;
+    case 2: return CFReturnsNotRetainedAttrSpelling::C2_XCLANG_CF_RETURNS_NOT_RETAINED;
+    case 15: return CFReturnsNotRetainedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CFReturnsNotRetainedAttrSpelling e) {
+  switch (e) {
+    case CFReturnsNotRetainedAttrSpelling::GNU_CF_RETURNS_NOT_RETAINED: return "GNU_CF_RETURNS_NOT_RETAINED";
+    case CFReturnsNotRetainedAttrSpelling::CXX11_CLANG_CF_RETURNS_NOT_RETAINED: return "CXX11_CLANG_CF_RETURNS_NOT_RETAINED";
+    case CFReturnsNotRetainedAttrSpelling::C2_XCLANG_CF_RETURNS_NOT_RETAINED: return "C2_XCLANG_CF_RETURNS_NOT_RETAINED";
+    case CFReturnsNotRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CFReturnsRetainedAttrSpelling FromPasta(pasta::CFReturnsRetainedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CFReturnsRetainedAttrSpelling::GNU_CF_RETURNS_RETAINED;
+    case 1: return CFReturnsRetainedAttrSpelling::CXX11_CLANG_CF_RETURNS_RETAINED;
+    case 2: return CFReturnsRetainedAttrSpelling::C2_XCLANG_CF_RETURNS_RETAINED;
+    case 15: return CFReturnsRetainedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CFReturnsRetainedAttrSpelling e) {
+  switch (e) {
+    case CFReturnsRetainedAttrSpelling::GNU_CF_RETURNS_RETAINED: return "GNU_CF_RETURNS_RETAINED";
+    case CFReturnsRetainedAttrSpelling::CXX11_CLANG_CF_RETURNS_RETAINED: return "CXX11_CLANG_CF_RETURNS_RETAINED";
+    case CFReturnsRetainedAttrSpelling::C2_XCLANG_CF_RETURNS_RETAINED: return "C2_XCLANG_CF_RETURNS_RETAINED";
+    case CFReturnsRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CFUnknownTransferAttrSpelling FromPasta(pasta::CFUnknownTransferAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CFUnknownTransferAttrSpelling::GNU_CF_UNKNOWN_TRANSFER;
+    case 1: return CFUnknownTransferAttrSpelling::CXX11_CLANG_CF_UNKNOWN_TRANSFER;
+    case 2: return CFUnknownTransferAttrSpelling::C2_XCLANG_CF_UNKNOWN_TRANSFER;
+    case 15: return CFUnknownTransferAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CFUnknownTransferAttrSpelling e) {
+  switch (e) {
+    case CFUnknownTransferAttrSpelling::GNU_CF_UNKNOWN_TRANSFER: return "GNU_CF_UNKNOWN_TRANSFER";
+    case CFUnknownTransferAttrSpelling::CXX11_CLANG_CF_UNKNOWN_TRANSFER: return "CXX11_CLANG_CF_UNKNOWN_TRANSFER";
+    case CFUnknownTransferAttrSpelling::C2_XCLANG_CF_UNKNOWN_TRANSFER: return "C2_XCLANG_CF_UNKNOWN_TRANSFER";
+    case CFUnknownTransferAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CPUDispatchAttrSpelling FromPasta(pasta::CPUDispatchAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CPUDispatchAttrSpelling::GNU_CPU_DISPATCH;
+    case 1: return CPUDispatchAttrSpelling::CXX11_CLANG_CPU_DISPATCH;
+    case 2: return CPUDispatchAttrSpelling::C2_XCLANG_CPU_DISPATCH;
+    case 3: return CPUDispatchAttrSpelling::DECLSPEC_CPU_DISPATCH;
+    case 15: return CPUDispatchAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CPUDispatchAttrSpelling e) {
+  switch (e) {
+    case CPUDispatchAttrSpelling::GNU_CPU_DISPATCH: return "GNU_CPU_DISPATCH";
+    case CPUDispatchAttrSpelling::CXX11_CLANG_CPU_DISPATCH: return "CXX11_CLANG_CPU_DISPATCH";
+    case CPUDispatchAttrSpelling::C2_XCLANG_CPU_DISPATCH: return "C2_XCLANG_CPU_DISPATCH";
+    case CPUDispatchAttrSpelling::DECLSPEC_CPU_DISPATCH: return "DECLSPEC_CPU_DISPATCH";
+    case CPUDispatchAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CPUSpecificAttrSpelling FromPasta(pasta::CPUSpecificAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CPUSpecificAttrSpelling::GNU_CPU_SPECIFIC;
+    case 1: return CPUSpecificAttrSpelling::CXX11_CLANG_CPU_SPECIFIC;
+    case 2: return CPUSpecificAttrSpelling::C2_XCLANG_CPU_SPECIFIC;
+    case 3: return CPUSpecificAttrSpelling::DECLSPEC_CPU_SPECIFIC;
+    case 15: return CPUSpecificAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CPUSpecificAttrSpelling e) {
+  switch (e) {
+    case CPUSpecificAttrSpelling::GNU_CPU_SPECIFIC: return "GNU_CPU_SPECIFIC";
+    case CPUSpecificAttrSpelling::CXX11_CLANG_CPU_SPECIFIC: return "CXX11_CLANG_CPU_SPECIFIC";
+    case CPUSpecificAttrSpelling::C2_XCLANG_CPU_SPECIFIC: return "C2_XCLANG_CPU_SPECIFIC";
+    case CPUSpecificAttrSpelling::DECLSPEC_CPU_SPECIFIC: return "DECLSPEC_CPU_SPECIFIC";
+    case CPUSpecificAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDAConstantAttrSpelling FromPasta(pasta::CUDAConstantAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDAConstantAttrSpelling::GNU_CONSTANT;
+    case 1: return CUDAConstantAttrSpelling::DECLSPEC_CONSTANT;
+    case 15: return CUDAConstantAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDAConstantAttrSpelling e) {
+  switch (e) {
+    case CUDAConstantAttrSpelling::GNU_CONSTANT: return "GNU_CONSTANT";
+    case CUDAConstantAttrSpelling::DECLSPEC_CONSTANT: return "DECLSPEC_CONSTANT";
+    case CUDAConstantAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDADeviceAttrSpelling FromPasta(pasta::CUDADeviceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDADeviceAttrSpelling::GNU_DEVICE;
+    case 1: return CUDADeviceAttrSpelling::DECLSPEC_DEVICE;
+    case 15: return CUDADeviceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDADeviceAttrSpelling e) {
+  switch (e) {
+    case CUDADeviceAttrSpelling::GNU_DEVICE: return "GNU_DEVICE";
+    case CUDADeviceAttrSpelling::DECLSPEC_DEVICE: return "DECLSPEC_DEVICE";
+    case CUDADeviceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDADeviceBuiltinSurfaceTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinSurfaceTypeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDADeviceBuiltinSurfaceTypeAttrSpelling::GNU_DEVICE_BUILTIN_SURFACE_TYPE;
+    case 1: return CUDADeviceBuiltinSurfaceTypeAttrSpelling::DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE;
+    case 15: return CUDADeviceBuiltinSurfaceTypeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDADeviceBuiltinSurfaceTypeAttrSpelling e) {
+  switch (e) {
+    case CUDADeviceBuiltinSurfaceTypeAttrSpelling::GNU_DEVICE_BUILTIN_SURFACE_TYPE: return "GNU_DEVICE_BUILTIN_SURFACE_TYPE";
+    case CUDADeviceBuiltinSurfaceTypeAttrSpelling::DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE: return "DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE";
+    case CUDADeviceBuiltinSurfaceTypeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDADeviceBuiltinTextureTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinTextureTypeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDADeviceBuiltinTextureTypeAttrSpelling::GNU_DEVICE_BUILTIN_TEXTURE_TYPE;
+    case 1: return CUDADeviceBuiltinTextureTypeAttrSpelling::DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE;
+    case 15: return CUDADeviceBuiltinTextureTypeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDADeviceBuiltinTextureTypeAttrSpelling e) {
+  switch (e) {
+    case CUDADeviceBuiltinTextureTypeAttrSpelling::GNU_DEVICE_BUILTIN_TEXTURE_TYPE: return "GNU_DEVICE_BUILTIN_TEXTURE_TYPE";
+    case CUDADeviceBuiltinTextureTypeAttrSpelling::DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE: return "DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE";
+    case CUDADeviceBuiltinTextureTypeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDAGlobalAttrSpelling FromPasta(pasta::CUDAGlobalAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDAGlobalAttrSpelling::GNU_GLOBAL;
+    case 1: return CUDAGlobalAttrSpelling::DECLSPEC_GLOBAL;
+    case 15: return CUDAGlobalAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDAGlobalAttrSpelling e) {
+  switch (e) {
+    case CUDAGlobalAttrSpelling::GNU_GLOBAL: return "GNU_GLOBAL";
+    case CUDAGlobalAttrSpelling::DECLSPEC_GLOBAL: return "DECLSPEC_GLOBAL";
+    case CUDAGlobalAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDAHostAttrSpelling FromPasta(pasta::CUDAHostAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDAHostAttrSpelling::GNU_HOST;
+    case 1: return CUDAHostAttrSpelling::DECLSPEC_HOST;
+    case 15: return CUDAHostAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDAHostAttrSpelling e) {
+  switch (e) {
+    case CUDAHostAttrSpelling::GNU_HOST: return "GNU_HOST";
+    case CUDAHostAttrSpelling::DECLSPEC_HOST: return "DECLSPEC_HOST";
+    case CUDAHostAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDALaunchBoundsAttrSpelling FromPasta(pasta::CUDALaunchBoundsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDALaunchBoundsAttrSpelling::GNU_LAUNCH_BOUNDS;
+    case 1: return CUDALaunchBoundsAttrSpelling::DECLSPEC_LAUNCH_BOUNDS;
+    case 15: return CUDALaunchBoundsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDALaunchBoundsAttrSpelling e) {
+  switch (e) {
+    case CUDALaunchBoundsAttrSpelling::GNU_LAUNCH_BOUNDS: return "GNU_LAUNCH_BOUNDS";
+    case CUDALaunchBoundsAttrSpelling::DECLSPEC_LAUNCH_BOUNDS: return "DECLSPEC_LAUNCH_BOUNDS";
+    case CUDALaunchBoundsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CUDASharedAttrSpelling FromPasta(pasta::CUDASharedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CUDASharedAttrSpelling::GNU_SHARED;
+    case 1: return CUDASharedAttrSpelling::DECLSPEC_SHARED;
+    case 15: return CUDASharedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CUDASharedAttrSpelling e) {
+  switch (e) {
+    case CUDASharedAttrSpelling::GNU_SHARED: return "GNU_SHARED";
+    case CUDASharedAttrSpelling::DECLSPEC_SHARED: return "DECLSPEC_SHARED";
+    case CUDASharedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 CXXConstructExprConstructionKind FromPasta(pasta::CXXConstructExprConstructionKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return CXXConstructExprConstructionKind::COMPLETE;
@@ -905,6 +2033,104 @@ const char *EnumeratorName(CallExprADLCallKind e) {
   }
 }
 
+CallableWhenAttrConsumedState FromPasta(pasta::CallableWhenAttrConsumedState e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CallableWhenAttrConsumedState::UNKNOWN;
+    case 1: return CallableWhenAttrConsumedState::CONSUMED;
+    case 2: return CallableWhenAttrConsumedState::UNCONSUMED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CallableWhenAttrConsumedState e) {
+  switch (e) {
+    case CallableWhenAttrConsumedState::UNKNOWN: return "UNKNOWN";
+    case CallableWhenAttrConsumedState::CONSUMED: return "CONSUMED";
+    case CallableWhenAttrConsumedState::UNCONSUMED: return "UNCONSUMED";
+    default: return "<invalid>";
+  }
+}
+
+CallableWhenAttrSpelling FromPasta(pasta::CallableWhenAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CallableWhenAttrSpelling::GNU_CALLABLE_WHEN;
+    case 1: return CallableWhenAttrSpelling::CXX11_CLANG_CALLABLE_WHEN;
+    case 15: return CallableWhenAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CallableWhenAttrSpelling e) {
+  switch (e) {
+    case CallableWhenAttrSpelling::GNU_CALLABLE_WHEN: return "GNU_CALLABLE_WHEN";
+    case CallableWhenAttrSpelling::CXX11_CLANG_CALLABLE_WHEN: return "CXX11_CLANG_CALLABLE_WHEN";
+    case CallableWhenAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CallbackAttrSpelling FromPasta(pasta::CallbackAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CallbackAttrSpelling::GNU_CALLBACK;
+    case 1: return CallbackAttrSpelling::CXX11_CLANG_CALLBACK;
+    case 2: return CallbackAttrSpelling::C2_XCLANG_CALLBACK;
+    case 15: return CallbackAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CallbackAttrSpelling e) {
+  switch (e) {
+    case CallbackAttrSpelling::GNU_CALLBACK: return "GNU_CALLBACK";
+    case CallbackAttrSpelling::CXX11_CLANG_CALLBACK: return "CXX11_CLANG_CALLBACK";
+    case CallbackAttrSpelling::C2_XCLANG_CALLBACK: return "C2_XCLANG_CALLBACK";
+    case CallbackAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CalledOnceAttrSpelling FromPasta(pasta::CalledOnceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CalledOnceAttrSpelling::GNU_CALLED_ONCE;
+    case 1: return CalledOnceAttrSpelling::CXX11_CLANG_CALLED_ONCE;
+    case 2: return CalledOnceAttrSpelling::C2_XCLANG_CALLED_ONCE;
+    case 15: return CalledOnceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CalledOnceAttrSpelling e) {
+  switch (e) {
+    case CalledOnceAttrSpelling::GNU_CALLED_ONCE: return "GNU_CALLED_ONCE";
+    case CalledOnceAttrSpelling::CXX11_CLANG_CALLED_ONCE: return "CXX11_CLANG_CALLED_ONCE";
+    case CalledOnceAttrSpelling::C2_XCLANG_CALLED_ONCE: return "C2_XCLANG_CALLED_ONCE";
+    case CalledOnceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CapabilityAttrSpelling FromPasta(pasta::CapabilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CapabilityAttrSpelling::GNU_CAPABILITY;
+    case 1: return CapabilityAttrSpelling::CXX11_CLANG_CAPABILITY;
+    case 2: return CapabilityAttrSpelling::GNU_SHARED_CAPABILITY;
+    case 3: return CapabilityAttrSpelling::CXX11_CLANG_SHARED_CAPABILITY;
+    case 15: return CapabilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CapabilityAttrSpelling e) {
+  switch (e) {
+    case CapabilityAttrSpelling::GNU_CAPABILITY: return "GNU_CAPABILITY";
+    case CapabilityAttrSpelling::CXX11_CLANG_CAPABILITY: return "CXX11_CLANG_CAPABILITY";
+    case CapabilityAttrSpelling::GNU_SHARED_CAPABILITY: return "GNU_SHARED_CAPABILITY";
+    case CapabilityAttrSpelling::CXX11_CLANG_SHARED_CAPABILITY: return "CXX11_CLANG_SHARED_CAPABILITY";
+    case CapabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 CapturedStmtVariableCaptureKind FromPasta(pasta::CapturedStmtVariableCaptureKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return CapturedStmtVariableCaptureKind::THIS;
@@ -921,6 +2147,24 @@ const char *EnumeratorName(CapturedStmtVariableCaptureKind e) {
     case CapturedStmtVariableCaptureKind::BY_REFERENCE: return "BY_REFERENCE";
     case CapturedStmtVariableCaptureKind::BY_COPY: return "BY_COPY";
     case CapturedStmtVariableCaptureKind::VLA_TYPE: return "VLA_TYPE";
+    default: return "<invalid>";
+  }
+}
+
+CarriesDependencyAttrSpelling FromPasta(pasta::CarriesDependencyAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CarriesDependencyAttrSpelling::GNU_CARRIES_DEPENDENCY;
+    case 1: return CarriesDependencyAttrSpelling::CXX11_CARRIES_DEPENDENCY;
+    case 15: return CarriesDependencyAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CarriesDependencyAttrSpelling e) {
+  switch (e) {
+    case CarriesDependencyAttrSpelling::GNU_CARRIES_DEPENDENCY: return "GNU_CARRIES_DEPENDENCY";
+    case CarriesDependencyAttrSpelling::CXX11_CARRIES_DEPENDENCY: return "CXX11_CARRIES_DEPENDENCY";
+    case CarriesDependencyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -947,6 +2191,106 @@ const char *EnumeratorName(CharacterLiteralCharacterKind e) {
   }
 }
 
+CleanupAttrSpelling FromPasta(pasta::CleanupAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CleanupAttrSpelling::GNU_CLEANUP;
+    case 1: return CleanupAttrSpelling::CXX11_GNU_CLEANUP;
+    case 2: return CleanupAttrSpelling::C2_XGNU_CLEANUP;
+    case 15: return CleanupAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CleanupAttrSpelling e) {
+  switch (e) {
+    case CleanupAttrSpelling::GNU_CLEANUP: return "GNU_CLEANUP";
+    case CleanupAttrSpelling::CXX11_GNU_CLEANUP: return "CXX11_GNU_CLEANUP";
+    case CleanupAttrSpelling::C2_XGNU_CLEANUP: return "C2_XGNU_CLEANUP";
+    case CleanupAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ColdAttrSpelling FromPasta(pasta::ColdAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ColdAttrSpelling::GNU_COLD;
+    case 1: return ColdAttrSpelling::CXX11_GNU_COLD;
+    case 2: return ColdAttrSpelling::C2_XGNU_COLD;
+    case 15: return ColdAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ColdAttrSpelling e) {
+  switch (e) {
+    case ColdAttrSpelling::GNU_COLD: return "GNU_COLD";
+    case ColdAttrSpelling::CXX11_GNU_COLD: return "CXX11_GNU_COLD";
+    case ColdAttrSpelling::C2_XGNU_COLD: return "C2_XGNU_COLD";
+    case ColdAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+CommonAttrSpelling FromPasta(pasta::CommonAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return CommonAttrSpelling::GNU_COMMON;
+    case 1: return CommonAttrSpelling::CXX11_GNU_COMMON;
+    case 2: return CommonAttrSpelling::C2_XGNU_COMMON;
+    case 15: return CommonAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(CommonAttrSpelling e) {
+  switch (e) {
+    case CommonAttrSpelling::GNU_COMMON: return "GNU_COMMON";
+    case CommonAttrSpelling::CXX11_GNU_COMMON: return "CXX11_GNU_COMMON";
+    case CommonAttrSpelling::C2_XGNU_COMMON: return "C2_XGNU_COMMON";
+    case CommonAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ConstAttrSpelling FromPasta(pasta::ConstAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConstAttrSpelling::GNU_CONST;
+    case 1: return ConstAttrSpelling::CXX11_GNU_CONST;
+    case 2: return ConstAttrSpelling::C2_XGNU_CONST;
+    case 15: return ConstAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConstAttrSpelling e) {
+  switch (e) {
+    case ConstAttrSpelling::GNU_CONST: return "GNU_CONST";
+    case ConstAttrSpelling::CXX11_GNU_CONST: return "CXX11_GNU_CONST";
+    case ConstAttrSpelling::C2_XGNU_CONST: return "C2_XGNU_CONST";
+    case ConstAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ConstInitAttrSpelling FromPasta(pasta::ConstInitAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConstInitAttrSpelling::KEYWORD_CONSTINIT;
+    case 1: return ConstInitAttrSpelling::GNU_REQUIRE_CONSTANT_INITIALIZATION;
+    case 2: return ConstInitAttrSpelling::CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION;
+    case 15: return ConstInitAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConstInitAttrSpelling e) {
+  switch (e) {
+    case ConstInitAttrSpelling::KEYWORD_CONSTINIT: return "KEYWORD_CONSTINIT";
+    case ConstInitAttrSpelling::GNU_REQUIRE_CONSTANT_INITIALIZATION: return "GNU_REQUIRE_CONSTANT_INITIALIZATION";
+    case ConstInitAttrSpelling::CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION: return "CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION";
+    case ConstInitAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 ConstantExprResultStorageKind FromPasta(pasta::ConstantExprResultStorageKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return ConstantExprResultStorageKind::NONE;
@@ -961,6 +2305,162 @@ const char *EnumeratorName(ConstantExprResultStorageKind e) {
     case ConstantExprResultStorageKind::NONE: return "NONE";
     case ConstantExprResultStorageKind::INT64: return "INT64";
     case ConstantExprResultStorageKind::AP_VALUE: return "AP_VALUE";
+    default: return "<invalid>";
+  }
+}
+
+ConstructorAttrSpelling FromPasta(pasta::ConstructorAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConstructorAttrSpelling::GNU_CONSTRUCTOR;
+    case 1: return ConstructorAttrSpelling::CXX11_GNU_CONSTRUCTOR;
+    case 2: return ConstructorAttrSpelling::C2_XGNU_CONSTRUCTOR;
+    case 15: return ConstructorAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConstructorAttrSpelling e) {
+  switch (e) {
+    case ConstructorAttrSpelling::GNU_CONSTRUCTOR: return "GNU_CONSTRUCTOR";
+    case ConstructorAttrSpelling::CXX11_GNU_CONSTRUCTOR: return "CXX11_GNU_CONSTRUCTOR";
+    case ConstructorAttrSpelling::C2_XGNU_CONSTRUCTOR: return "C2_XGNU_CONSTRUCTOR";
+    case ConstructorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ConsumableAttrConsumedState FromPasta(pasta::ConsumableAttrConsumedState e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConsumableAttrConsumedState::UNKNOWN;
+    case 1: return ConsumableAttrConsumedState::CONSUMED;
+    case 2: return ConsumableAttrConsumedState::UNCONSUMED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConsumableAttrConsumedState e) {
+  switch (e) {
+    case ConsumableAttrConsumedState::UNKNOWN: return "UNKNOWN";
+    case ConsumableAttrConsumedState::CONSUMED: return "CONSUMED";
+    case ConsumableAttrConsumedState::UNCONSUMED: return "UNCONSUMED";
+    default: return "<invalid>";
+  }
+}
+
+ConsumableAttrSpelling FromPasta(pasta::ConsumableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConsumableAttrSpelling::GNU_CONSUMABLE;
+    case 1: return ConsumableAttrSpelling::CXX11_CLANG_CONSUMABLE;
+    case 15: return ConsumableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConsumableAttrSpelling e) {
+  switch (e) {
+    case ConsumableAttrSpelling::GNU_CONSUMABLE: return "GNU_CONSUMABLE";
+    case ConsumableAttrSpelling::CXX11_CLANG_CONSUMABLE: return "CXX11_CLANG_CONSUMABLE";
+    case ConsumableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ConsumableAutoCastAttrSpelling FromPasta(pasta::ConsumableAutoCastAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConsumableAutoCastAttrSpelling::GNU_CONSUMABLE_AUTO_CAST_STATE;
+    case 1: return ConsumableAutoCastAttrSpelling::CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE;
+    case 15: return ConsumableAutoCastAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConsumableAutoCastAttrSpelling e) {
+  switch (e) {
+    case ConsumableAutoCastAttrSpelling::GNU_CONSUMABLE_AUTO_CAST_STATE: return "GNU_CONSUMABLE_AUTO_CAST_STATE";
+    case ConsumableAutoCastAttrSpelling::CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE: return "CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE";
+    case ConsumableAutoCastAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ConsumableSetOnReadAttrSpelling FromPasta(pasta::ConsumableSetOnReadAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConsumableSetOnReadAttrSpelling::GNU_CONSUMABLE_STATE_ON_READ;
+    case 1: return ConsumableSetOnReadAttrSpelling::CXX11_CLANG_CONSUMABLE_STATE_ON_READ;
+    case 15: return ConsumableSetOnReadAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConsumableSetOnReadAttrSpelling e) {
+  switch (e) {
+    case ConsumableSetOnReadAttrSpelling::GNU_CONSUMABLE_STATE_ON_READ: return "GNU_CONSUMABLE_STATE_ON_READ";
+    case ConsumableSetOnReadAttrSpelling::CXX11_CLANG_CONSUMABLE_STATE_ON_READ: return "CXX11_CLANG_CONSUMABLE_STATE_ON_READ";
+    case ConsumableSetOnReadAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ConvergentAttrSpelling FromPasta(pasta::ConvergentAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ConvergentAttrSpelling::GNU_CONVERGENT;
+    case 1: return ConvergentAttrSpelling::CXX11_CLANG_CONVERGENT;
+    case 2: return ConvergentAttrSpelling::C2_XCLANG_CONVERGENT;
+    case 15: return ConvergentAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ConvergentAttrSpelling e) {
+  switch (e) {
+    case ConvergentAttrSpelling::GNU_CONVERGENT: return "GNU_CONVERGENT";
+    case ConvergentAttrSpelling::CXX11_CLANG_CONVERGENT: return "CXX11_CLANG_CONVERGENT";
+    case ConvergentAttrSpelling::C2_XCLANG_CONVERGENT: return "C2_XCLANG_CONVERGENT";
+    case ConvergentAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+DLLExportAttrSpelling FromPasta(pasta::DLLExportAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DLLExportAttrSpelling::DECLSPEC_DLLEXPORT;
+    case 1: return DLLExportAttrSpelling::GNU_DLLEXPORT;
+    case 2: return DLLExportAttrSpelling::CXX11_GNU_DLLEXPORT;
+    case 3: return DLLExportAttrSpelling::C2_XGNU_DLLEXPORT;
+    case 15: return DLLExportAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DLLExportAttrSpelling e) {
+  switch (e) {
+    case DLLExportAttrSpelling::DECLSPEC_DLLEXPORT: return "DECLSPEC_DLLEXPORT";
+    case DLLExportAttrSpelling::GNU_DLLEXPORT: return "GNU_DLLEXPORT";
+    case DLLExportAttrSpelling::CXX11_GNU_DLLEXPORT: return "CXX11_GNU_DLLEXPORT";
+    case DLLExportAttrSpelling::C2_XGNU_DLLEXPORT: return "C2_XGNU_DLLEXPORT";
+    case DLLExportAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+DLLImportAttrSpelling FromPasta(pasta::DLLImportAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DLLImportAttrSpelling::DECLSPEC_DLLIMPORT;
+    case 1: return DLLImportAttrSpelling::GNU_DLLIMPORT;
+    case 2: return DLLImportAttrSpelling::CXX11_GNU_DLLIMPORT;
+    case 3: return DLLImportAttrSpelling::C2_XGNU_DLLIMPORT;
+    case 15: return DLLImportAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DLLImportAttrSpelling e) {
+  switch (e) {
+    case DLLImportAttrSpelling::DECLSPEC_DLLIMPORT: return "DECLSPEC_DLLIMPORT";
+    case DLLImportAttrSpelling::GNU_DLLIMPORT: return "GNU_DLLIMPORT";
+    case DLLImportAttrSpelling::CXX11_GNU_DLLIMPORT: return "CXX11_GNU_DLLIMPORT";
+    case DLLImportAttrSpelling::C2_XGNU_DLLIMPORT: return "C2_XGNU_DLLIMPORT";
+    case DLLImportAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -1067,6 +2567,250 @@ const char *EnumeratorName(DeclObjCDeclQualifier e) {
     case DeclObjCDeclQualifier::BYREF: return "BYREF";
     case DeclObjCDeclQualifier::ONEWAY: return "ONEWAY";
     case DeclObjCDeclQualifier::CS_NULLABILITY: return "CS_NULLABILITY";
+    default: return "<invalid>";
+  }
+}
+
+DeprecatedAttrSpelling FromPasta(pasta::DeprecatedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DeprecatedAttrSpelling::GNU_DEPRECATED;
+    case 1: return DeprecatedAttrSpelling::CXX11_GNU_DEPRECATED;
+    case 2: return DeprecatedAttrSpelling::C2_XGNU_DEPRECATED;
+    case 3: return DeprecatedAttrSpelling::DECLSPEC_DEPRECATED;
+    case 4: return DeprecatedAttrSpelling::CXX11_DEPRECATED;
+    case 5: return DeprecatedAttrSpelling::C2_XDEPRECATED;
+    case 15: return DeprecatedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DeprecatedAttrSpelling e) {
+  switch (e) {
+    case DeprecatedAttrSpelling::GNU_DEPRECATED: return "GNU_DEPRECATED";
+    case DeprecatedAttrSpelling::CXX11_GNU_DEPRECATED: return "CXX11_GNU_DEPRECATED";
+    case DeprecatedAttrSpelling::C2_XGNU_DEPRECATED: return "C2_XGNU_DEPRECATED";
+    case DeprecatedAttrSpelling::DECLSPEC_DEPRECATED: return "DECLSPEC_DEPRECATED";
+    case DeprecatedAttrSpelling::CXX11_DEPRECATED: return "CXX11_DEPRECATED";
+    case DeprecatedAttrSpelling::C2_XDEPRECATED: return "C2_XDEPRECATED";
+    case DeprecatedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+DestructorAttrSpelling FromPasta(pasta::DestructorAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DestructorAttrSpelling::GNU_DESTRUCTOR;
+    case 1: return DestructorAttrSpelling::CXX11_GNU_DESTRUCTOR;
+    case 2: return DestructorAttrSpelling::C2_XGNU_DESTRUCTOR;
+    case 15: return DestructorAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DestructorAttrSpelling e) {
+  switch (e) {
+    case DestructorAttrSpelling::GNU_DESTRUCTOR: return "GNU_DESTRUCTOR";
+    case DestructorAttrSpelling::CXX11_GNU_DESTRUCTOR: return "CXX11_GNU_DESTRUCTOR";
+    case DestructorAttrSpelling::C2_XGNU_DESTRUCTOR: return "C2_XGNU_DESTRUCTOR";
+    case DestructorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+DiagnoseAsBuiltinAttrSpelling FromPasta(pasta::DiagnoseAsBuiltinAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DiagnoseAsBuiltinAttrSpelling::GNU_DIAGNOSE_AS_BUILTIN;
+    case 1: return DiagnoseAsBuiltinAttrSpelling::CXX11_CLANG_DIAGNOSE_AS_BUILTIN;
+    case 2: return DiagnoseAsBuiltinAttrSpelling::C2_XCLANG_DIAGNOSE_AS_BUILTIN;
+    case 15: return DiagnoseAsBuiltinAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DiagnoseAsBuiltinAttrSpelling e) {
+  switch (e) {
+    case DiagnoseAsBuiltinAttrSpelling::GNU_DIAGNOSE_AS_BUILTIN: return "GNU_DIAGNOSE_AS_BUILTIN";
+    case DiagnoseAsBuiltinAttrSpelling::CXX11_CLANG_DIAGNOSE_AS_BUILTIN: return "CXX11_CLANG_DIAGNOSE_AS_BUILTIN";
+    case DiagnoseAsBuiltinAttrSpelling::C2_XCLANG_DIAGNOSE_AS_BUILTIN: return "C2_XCLANG_DIAGNOSE_AS_BUILTIN";
+    case DiagnoseAsBuiltinAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+DiagnoseIfAttrDiagnosticType FromPasta(pasta::DiagnoseIfAttrDiagnosticType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DiagnoseIfAttrDiagnosticType::ERROR;
+    case 1: return DiagnoseIfAttrDiagnosticType::WARNING;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DiagnoseIfAttrDiagnosticType e) {
+  switch (e) {
+    case DiagnoseIfAttrDiagnosticType::ERROR: return "ERROR";
+    case DiagnoseIfAttrDiagnosticType::WARNING: return "WARNING";
+    default: return "<invalid>";
+  }
+}
+
+DisableSanitizerInstrumentationAttrSpelling FromPasta(pasta::DisableSanitizerInstrumentationAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DisableSanitizerInstrumentationAttrSpelling::GNU_DISABLE_SANITIZER_INSTRUMENTATION;
+    case 1: return DisableSanitizerInstrumentationAttrSpelling::CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION;
+    case 2: return DisableSanitizerInstrumentationAttrSpelling::C2_XCLANG_DISABLE_SANITIZER_INSTRUMENTATION;
+    case 15: return DisableSanitizerInstrumentationAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DisableSanitizerInstrumentationAttrSpelling e) {
+  switch (e) {
+    case DisableSanitizerInstrumentationAttrSpelling::GNU_DISABLE_SANITIZER_INSTRUMENTATION: return "GNU_DISABLE_SANITIZER_INSTRUMENTATION";
+    case DisableSanitizerInstrumentationAttrSpelling::CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION: return "CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION";
+    case DisableSanitizerInstrumentationAttrSpelling::C2_XCLANG_DISABLE_SANITIZER_INSTRUMENTATION: return "C2_XCLANG_DISABLE_SANITIZER_INSTRUMENTATION";
+    case DisableSanitizerInstrumentationAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+DisableTailCallsAttrSpelling FromPasta(pasta::DisableTailCallsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return DisableTailCallsAttrSpelling::GNU_DISABLE_TAIL_CALLS;
+    case 1: return DisableTailCallsAttrSpelling::CXX11_CLANG_DISABLE_TAIL_CALLS;
+    case 2: return DisableTailCallsAttrSpelling::C2_XCLANG_DISABLE_TAIL_CALLS;
+    case 15: return DisableTailCallsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(DisableTailCallsAttrSpelling e) {
+  switch (e) {
+    case DisableTailCallsAttrSpelling::GNU_DISABLE_TAIL_CALLS: return "GNU_DISABLE_TAIL_CALLS";
+    case DisableTailCallsAttrSpelling::CXX11_CLANG_DISABLE_TAIL_CALLS: return "CXX11_CLANG_DISABLE_TAIL_CALLS";
+    case DisableTailCallsAttrSpelling::C2_XCLANG_DISABLE_TAIL_CALLS: return "C2_XCLANG_DISABLE_TAIL_CALLS";
+    case DisableTailCallsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+EnforceTCBAttrSpelling FromPasta(pasta::EnforceTCBAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return EnforceTCBAttrSpelling::GNU_ENFORCE_TCB;
+    case 1: return EnforceTCBAttrSpelling::CXX11_CLANG_ENFORCE_TCB;
+    case 2: return EnforceTCBAttrSpelling::C2_XCLANG_ENFORCE_TCB;
+    case 15: return EnforceTCBAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(EnforceTCBAttrSpelling e) {
+  switch (e) {
+    case EnforceTCBAttrSpelling::GNU_ENFORCE_TCB: return "GNU_ENFORCE_TCB";
+    case EnforceTCBAttrSpelling::CXX11_CLANG_ENFORCE_TCB: return "CXX11_CLANG_ENFORCE_TCB";
+    case EnforceTCBAttrSpelling::C2_XCLANG_ENFORCE_TCB: return "C2_XCLANG_ENFORCE_TCB";
+    case EnforceTCBAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+EnforceTCBLeafAttrSpelling FromPasta(pasta::EnforceTCBLeafAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return EnforceTCBLeafAttrSpelling::GNU_ENFORCE_TCB_LEAF;
+    case 1: return EnforceTCBLeafAttrSpelling::CXX11_CLANG_ENFORCE_TCB_LEAF;
+    case 2: return EnforceTCBLeafAttrSpelling::C2_XCLANG_ENFORCE_TCB_LEAF;
+    case 15: return EnforceTCBLeafAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(EnforceTCBLeafAttrSpelling e) {
+  switch (e) {
+    case EnforceTCBLeafAttrSpelling::GNU_ENFORCE_TCB_LEAF: return "GNU_ENFORCE_TCB_LEAF";
+    case EnforceTCBLeafAttrSpelling::CXX11_CLANG_ENFORCE_TCB_LEAF: return "CXX11_CLANG_ENFORCE_TCB_LEAF";
+    case EnforceTCBLeafAttrSpelling::C2_XCLANG_ENFORCE_TCB_LEAF: return "C2_XCLANG_ENFORCE_TCB_LEAF";
+    case EnforceTCBLeafAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+EnumExtensibilityAttrKind FromPasta(pasta::EnumExtensibilityAttrKind e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return EnumExtensibilityAttrKind::CLOSED;
+    case 1: return EnumExtensibilityAttrKind::OPEN;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(EnumExtensibilityAttrKind e) {
+  switch (e) {
+    case EnumExtensibilityAttrKind::CLOSED: return "CLOSED";
+    case EnumExtensibilityAttrKind::OPEN: return "OPEN";
+    default: return "<invalid>";
+  }
+}
+
+EnumExtensibilityAttrSpelling FromPasta(pasta::EnumExtensibilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return EnumExtensibilityAttrSpelling::GNU_ENUM_EXTENSIBILITY;
+    case 1: return EnumExtensibilityAttrSpelling::CXX11_CLANG_ENUM_EXTENSIBILITY;
+    case 2: return EnumExtensibilityAttrSpelling::C2_XCLANG_ENUM_EXTENSIBILITY;
+    case 15: return EnumExtensibilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(EnumExtensibilityAttrSpelling e) {
+  switch (e) {
+    case EnumExtensibilityAttrSpelling::GNU_ENUM_EXTENSIBILITY: return "GNU_ENUM_EXTENSIBILITY";
+    case EnumExtensibilityAttrSpelling::CXX11_CLANG_ENUM_EXTENSIBILITY: return "CXX11_CLANG_ENUM_EXTENSIBILITY";
+    case EnumExtensibilityAttrSpelling::C2_XCLANG_ENUM_EXTENSIBILITY: return "C2_XCLANG_ENUM_EXTENSIBILITY";
+    case EnumExtensibilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ErrorAttrSpelling FromPasta(pasta::ErrorAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ErrorAttrSpelling::GNU_ERROR;
+    case 1: return ErrorAttrSpelling::CXX11_GNU_ERROR;
+    case 2: return ErrorAttrSpelling::C2_XGNU_ERROR;
+    case 3: return ErrorAttrSpelling::GNU_WARNING;
+    case 4: return ErrorAttrSpelling::CXX11_GNU_WARNING;
+    case 5: return ErrorAttrSpelling::C2_XGNU_WARNING;
+    case 15: return ErrorAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ErrorAttrSpelling e) {
+  switch (e) {
+    case ErrorAttrSpelling::GNU_ERROR: return "GNU_ERROR";
+    case ErrorAttrSpelling::CXX11_GNU_ERROR: return "CXX11_GNU_ERROR";
+    case ErrorAttrSpelling::C2_XGNU_ERROR: return "C2_XGNU_ERROR";
+    case ErrorAttrSpelling::GNU_WARNING: return "GNU_WARNING";
+    case ErrorAttrSpelling::CXX11_GNU_WARNING: return "CXX11_GNU_WARNING";
+    case ErrorAttrSpelling::C2_XGNU_WARNING: return "C2_XGNU_WARNING";
+    case ErrorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ExcludeFromExplicitInstantiationAttrSpelling FromPasta(pasta::ExcludeFromExplicitInstantiationAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExcludeFromExplicitInstantiationAttrSpelling::GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
+    case 1: return ExcludeFromExplicitInstantiationAttrSpelling::CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
+    case 2: return ExcludeFromExplicitInstantiationAttrSpelling::C2_XCLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
+    case 15: return ExcludeFromExplicitInstantiationAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ExcludeFromExplicitInstantiationAttrSpelling e) {
+  switch (e) {
+    case ExcludeFromExplicitInstantiationAttrSpelling::GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
+    case ExcludeFromExplicitInstantiationAttrSpelling::CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
+    case ExcludeFromExplicitInstantiationAttrSpelling::C2_XCLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "C2_XCLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
+    case ExcludeFromExplicitInstantiationAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -1227,6 +2971,172 @@ const char *EnumeratorName(ExprisModifiableLvalueResult e) {
   }
 }
 
+ExternalSourceSymbolAttrSpelling FromPasta(pasta::ExternalSourceSymbolAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ExternalSourceSymbolAttrSpelling::GNU_EXTERNAL_SOURCE_SYMBOL;
+    case 1: return ExternalSourceSymbolAttrSpelling::CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL;
+    case 2: return ExternalSourceSymbolAttrSpelling::C2_XCLANG_EXTERNAL_SOURCE_SYMBOL;
+    case 15: return ExternalSourceSymbolAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ExternalSourceSymbolAttrSpelling e) {
+  switch (e) {
+    case ExternalSourceSymbolAttrSpelling::GNU_EXTERNAL_SOURCE_SYMBOL: return "GNU_EXTERNAL_SOURCE_SYMBOL";
+    case ExternalSourceSymbolAttrSpelling::CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL: return "CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL";
+    case ExternalSourceSymbolAttrSpelling::C2_XCLANG_EXTERNAL_SOURCE_SYMBOL: return "C2_XCLANG_EXTERNAL_SOURCE_SYMBOL";
+    case ExternalSourceSymbolAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+FallThroughAttrSpelling FromPasta(pasta::FallThroughAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FallThroughAttrSpelling::CXX11_FALLTHROUGH;
+    case 1: return FallThroughAttrSpelling::C2_XFALLTHROUGH;
+    case 2: return FallThroughAttrSpelling::CXX11_CLANG_FALLTHROUGH;
+    case 3: return FallThroughAttrSpelling::GNU_FALLTHROUGH;
+    case 4: return FallThroughAttrSpelling::CXX11_GNU_FALLTHROUGH;
+    case 5: return FallThroughAttrSpelling::C2_XGNU_FALLTHROUGH;
+    case 15: return FallThroughAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(FallThroughAttrSpelling e) {
+  switch (e) {
+    case FallThroughAttrSpelling::CXX11_FALLTHROUGH: return "CXX11_FALLTHROUGH";
+    case FallThroughAttrSpelling::C2_XFALLTHROUGH: return "C2_XFALLTHROUGH";
+    case FallThroughAttrSpelling::CXX11_CLANG_FALLTHROUGH: return "CXX11_CLANG_FALLTHROUGH";
+    case FallThroughAttrSpelling::GNU_FALLTHROUGH: return "GNU_FALLTHROUGH";
+    case FallThroughAttrSpelling::CXX11_GNU_FALLTHROUGH: return "CXX11_GNU_FALLTHROUGH";
+    case FallThroughAttrSpelling::C2_XGNU_FALLTHROUGH: return "C2_XGNU_FALLTHROUGH";
+    case FallThroughAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+FastCallAttrSpelling FromPasta(pasta::FastCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FastCallAttrSpelling::GNU_FASTCALL;
+    case 1: return FastCallAttrSpelling::CXX11_GNU_FASTCALL;
+    case 2: return FastCallAttrSpelling::C2_XGNU_FASTCALL;
+    case 3: return FastCallAttrSpelling::KEYWORD_FASTCALL;
+    case 15: return FastCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(FastCallAttrSpelling e) {
+  switch (e) {
+    case FastCallAttrSpelling::GNU_FASTCALL: return "GNU_FASTCALL";
+    case FastCallAttrSpelling::CXX11_GNU_FASTCALL: return "CXX11_GNU_FASTCALL";
+    case FastCallAttrSpelling::C2_XGNU_FASTCALL: return "C2_XGNU_FASTCALL";
+    case FastCallAttrSpelling::KEYWORD_FASTCALL: return "KEYWORD_FASTCALL";
+    case FastCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+FinalAttrSpelling FromPasta(pasta::FinalAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FinalAttrSpelling::KEYWORD_FINAL;
+    case 1: return FinalAttrSpelling::KEYWORD_SEALED;
+    case 15: return FinalAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(FinalAttrSpelling e) {
+  switch (e) {
+    case FinalAttrSpelling::KEYWORD_FINAL: return "KEYWORD_FINAL";
+    case FinalAttrSpelling::KEYWORD_SEALED: return "KEYWORD_SEALED";
+    case FinalAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+FlagEnumAttrSpelling FromPasta(pasta::FlagEnumAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FlagEnumAttrSpelling::GNU_FLAG_ENUM;
+    case 1: return FlagEnumAttrSpelling::CXX11_CLANG_FLAG_ENUM;
+    case 2: return FlagEnumAttrSpelling::C2_XCLANG_FLAG_ENUM;
+    case 15: return FlagEnumAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(FlagEnumAttrSpelling e) {
+  switch (e) {
+    case FlagEnumAttrSpelling::GNU_FLAG_ENUM: return "GNU_FLAG_ENUM";
+    case FlagEnumAttrSpelling::CXX11_CLANG_FLAG_ENUM: return "CXX11_CLANG_FLAG_ENUM";
+    case FlagEnumAttrSpelling::C2_XCLANG_FLAG_ENUM: return "C2_XCLANG_FLAG_ENUM";
+    case FlagEnumAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+FlattenAttrSpelling FromPasta(pasta::FlattenAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FlattenAttrSpelling::GNU_FLATTEN;
+    case 1: return FlattenAttrSpelling::CXX11_GNU_FLATTEN;
+    case 2: return FlattenAttrSpelling::C2_XGNU_FLATTEN;
+    case 15: return FlattenAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(FlattenAttrSpelling e) {
+  switch (e) {
+    case FlattenAttrSpelling::GNU_FLATTEN: return "GNU_FLATTEN";
+    case FlattenAttrSpelling::CXX11_GNU_FLATTEN: return "CXX11_GNU_FLATTEN";
+    case FlattenAttrSpelling::C2_XGNU_FLATTEN: return "C2_XGNU_FLATTEN";
+    case FlattenAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+FormatArgAttrSpelling FromPasta(pasta::FormatArgAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FormatArgAttrSpelling::GNU_FORMAT_ARGUMENT;
+    case 1: return FormatArgAttrSpelling::CXX11_GNU_FORMAT_ARGUMENT;
+    case 2: return FormatArgAttrSpelling::C2_XGNU_FORMAT_ARGUMENT;
+    case 15: return FormatArgAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(FormatArgAttrSpelling e) {
+  switch (e) {
+    case FormatArgAttrSpelling::GNU_FORMAT_ARGUMENT: return "GNU_FORMAT_ARGUMENT";
+    case FormatArgAttrSpelling::CXX11_GNU_FORMAT_ARGUMENT: return "CXX11_GNU_FORMAT_ARGUMENT";
+    case FormatArgAttrSpelling::C2_XGNU_FORMAT_ARGUMENT: return "C2_XGNU_FORMAT_ARGUMENT";
+    case FormatArgAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+FormatAttrSpelling FromPasta(pasta::FormatAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return FormatAttrSpelling::GNU_FORMAT;
+    case 1: return FormatAttrSpelling::CXX11_GNU_FORMAT;
+    case 2: return FormatAttrSpelling::C2_XGNU_FORMAT;
+    case 15: return FormatAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(FormatAttrSpelling e) {
+  switch (e) {
+    case FormatAttrSpelling::GNU_FORMAT: return "GNU_FORMAT";
+    case FormatAttrSpelling::CXX11_GNU_FORMAT: return "CXX11_GNU_FORMAT";
+    case FormatAttrSpelling::C2_XGNU_FORMAT: return "C2_XGNU_FORMAT";
+    case FormatAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 FunctionDeclTemplatedKind FromPasta(pasta::FunctionDeclTemplatedKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return FunctionDeclTemplatedKind::NON_TEMPLATE;
@@ -1245,6 +3155,162 @@ const char *EnumeratorName(FunctionDeclTemplatedKind e) {
     case FunctionDeclTemplatedKind::MEMBER_SPECIALIZATION: return "MEMBER_SPECIALIZATION";
     case FunctionDeclTemplatedKind::FUNCTION_TEMPLATE_SPECIALIZATION: return "FUNCTION_TEMPLATE_SPECIALIZATION";
     case FunctionDeclTemplatedKind::DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION: return "DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION";
+    default: return "<invalid>";
+  }
+}
+
+GNUInlineAttrSpelling FromPasta(pasta::GNUInlineAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return GNUInlineAttrSpelling::GNU_GNU_INLINE;
+    case 1: return GNUInlineAttrSpelling::CXX11_GNU_GNU_INLINE;
+    case 2: return GNUInlineAttrSpelling::C2_XGNU_GNU_INLINE;
+    case 15: return GNUInlineAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(GNUInlineAttrSpelling e) {
+  switch (e) {
+    case GNUInlineAttrSpelling::GNU_GNU_INLINE: return "GNU_GNU_INLINE";
+    case GNUInlineAttrSpelling::CXX11_GNU_GNU_INLINE: return "CXX11_GNU_GNU_INLINE";
+    case GNUInlineAttrSpelling::C2_XGNU_GNU_INLINE: return "C2_XGNU_GNU_INLINE";
+    case GNUInlineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+GuardedVarAttrSpelling FromPasta(pasta::GuardedVarAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return GuardedVarAttrSpelling::GNU_GUARDED_VARIABLE;
+    case 1: return GuardedVarAttrSpelling::CXX11_CLANG_GUARDED_VARIABLE;
+    case 15: return GuardedVarAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(GuardedVarAttrSpelling e) {
+  switch (e) {
+    case GuardedVarAttrSpelling::GNU_GUARDED_VARIABLE: return "GNU_GUARDED_VARIABLE";
+    case GuardedVarAttrSpelling::CXX11_CLANG_GUARDED_VARIABLE: return "CXX11_CLANG_GUARDED_VARIABLE";
+    case GuardedVarAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+HIPManagedAttrSpelling FromPasta(pasta::HIPManagedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return HIPManagedAttrSpelling::GNU_MANAGED;
+    case 1: return HIPManagedAttrSpelling::DECLSPEC_MANAGED;
+    case 15: return HIPManagedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(HIPManagedAttrSpelling e) {
+  switch (e) {
+    case HIPManagedAttrSpelling::GNU_MANAGED: return "GNU_MANAGED";
+    case HIPManagedAttrSpelling::DECLSPEC_MANAGED: return "DECLSPEC_MANAGED";
+    case HIPManagedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+HotAttrSpelling FromPasta(pasta::HotAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return HotAttrSpelling::GNU_HOT;
+    case 1: return HotAttrSpelling::CXX11_GNU_HOT;
+    case 2: return HotAttrSpelling::C2_XGNU_HOT;
+    case 15: return HotAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(HotAttrSpelling e) {
+  switch (e) {
+    case HotAttrSpelling::GNU_HOT: return "GNU_HOT";
+    case HotAttrSpelling::CXX11_GNU_HOT: return "CXX11_GNU_HOT";
+    case HotAttrSpelling::C2_XGNU_HOT: return "C2_XGNU_HOT";
+    case HotAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+IBActionAttrSpelling FromPasta(pasta::IBActionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return IBActionAttrSpelling::GNU_IBACTION;
+    case 1: return IBActionAttrSpelling::CXX11_CLANG_IBACTION;
+    case 2: return IBActionAttrSpelling::C2_XCLANG_IBACTION;
+    case 15: return IBActionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(IBActionAttrSpelling e) {
+  switch (e) {
+    case IBActionAttrSpelling::GNU_IBACTION: return "GNU_IBACTION";
+    case IBActionAttrSpelling::CXX11_CLANG_IBACTION: return "CXX11_CLANG_IBACTION";
+    case IBActionAttrSpelling::C2_XCLANG_IBACTION: return "C2_XCLANG_IBACTION";
+    case IBActionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+IBOutletAttrSpelling FromPasta(pasta::IBOutletAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return IBOutletAttrSpelling::GNU_IBOUTLET;
+    case 1: return IBOutletAttrSpelling::CXX11_CLANG_IBOUTLET;
+    case 2: return IBOutletAttrSpelling::C2_XCLANG_IBOUTLET;
+    case 15: return IBOutletAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(IBOutletAttrSpelling e) {
+  switch (e) {
+    case IBOutletAttrSpelling::GNU_IBOUTLET: return "GNU_IBOUTLET";
+    case IBOutletAttrSpelling::CXX11_CLANG_IBOUTLET: return "CXX11_CLANG_IBOUTLET";
+    case IBOutletAttrSpelling::C2_XCLANG_IBOUTLET: return "C2_XCLANG_IBOUTLET";
+    case IBOutletAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+IBOutletCollectionAttrSpelling FromPasta(pasta::IBOutletCollectionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return IBOutletCollectionAttrSpelling::GNU_IBOUTLETCOLLECTION;
+    case 1: return IBOutletCollectionAttrSpelling::CXX11_CLANG_IBOUTLETCOLLECTION;
+    case 2: return IBOutletCollectionAttrSpelling::C2_XCLANG_IBOUTLETCOLLECTION;
+    case 15: return IBOutletCollectionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(IBOutletCollectionAttrSpelling e) {
+  switch (e) {
+    case IBOutletCollectionAttrSpelling::GNU_IBOUTLETCOLLECTION: return "GNU_IBOUTLETCOLLECTION";
+    case IBOutletCollectionAttrSpelling::CXX11_CLANG_IBOUTLETCOLLECTION: return "CXX11_CLANG_IBOUTLETCOLLECTION";
+    case IBOutletCollectionAttrSpelling::C2_XCLANG_IBOUTLETCOLLECTION: return "C2_XCLANG_IBOUTLETCOLLECTION";
+    case IBOutletCollectionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+IFuncAttrSpelling FromPasta(pasta::IFuncAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return IFuncAttrSpelling::GNU_IFUNC;
+    case 1: return IFuncAttrSpelling::CXX11_GNU_IFUNC;
+    case 2: return IFuncAttrSpelling::C2_XGNU_IFUNC;
+    case 15: return IFuncAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(IFuncAttrSpelling e) {
+  switch (e) {
+    case IFuncAttrSpelling::GNU_IFUNC: return "GNU_IFUNC";
+    case IFuncAttrSpelling::CXX11_GNU_IFUNC: return "CXX11_GNU_IFUNC";
+    case IFuncAttrSpelling::C2_XGNU_IFUNC: return "C2_XGNU_IFUNC";
+    case IFuncAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -1287,6 +3353,138 @@ const char *EnumeratorName(ImplicitParamDeclImplicitParamKind e) {
   }
 }
 
+InitPriorityAttrSpelling FromPasta(pasta::InitPriorityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return InitPriorityAttrSpelling::GNU_INITIALIZER_PRIORITY;
+    case 1: return InitPriorityAttrSpelling::CXX11_GNU_INITIALIZER_PRIORITY;
+    case 15: return InitPriorityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(InitPriorityAttrSpelling e) {
+  switch (e) {
+    case InitPriorityAttrSpelling::GNU_INITIALIZER_PRIORITY: return "GNU_INITIALIZER_PRIORITY";
+    case InitPriorityAttrSpelling::CXX11_GNU_INITIALIZER_PRIORITY: return "CXX11_GNU_INITIALIZER_PRIORITY";
+    case InitPriorityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+IntelOclBiccAttrSpelling FromPasta(pasta::IntelOclBiccAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return IntelOclBiccAttrSpelling::GNU_INTEL_OCL_BICC;
+    case 1: return IntelOclBiccAttrSpelling::CXX11_CLANG_INTEL_OCL_BICC;
+    case 15: return IntelOclBiccAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(IntelOclBiccAttrSpelling e) {
+  switch (e) {
+    case IntelOclBiccAttrSpelling::GNU_INTEL_OCL_BICC: return "GNU_INTEL_OCL_BICC";
+    case IntelOclBiccAttrSpelling::CXX11_CLANG_INTEL_OCL_BICC: return "CXX11_CLANG_INTEL_OCL_BICC";
+    case IntelOclBiccAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+InternalLinkageAttrSpelling FromPasta(pasta::InternalLinkageAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return InternalLinkageAttrSpelling::GNU_INTERNAL_LINKAGE;
+    case 1: return InternalLinkageAttrSpelling::CXX11_CLANG_INTERNAL_LINKAGE;
+    case 2: return InternalLinkageAttrSpelling::C2_XCLANG_INTERNAL_LINKAGE;
+    case 15: return InternalLinkageAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(InternalLinkageAttrSpelling e) {
+  switch (e) {
+    case InternalLinkageAttrSpelling::GNU_INTERNAL_LINKAGE: return "GNU_INTERNAL_LINKAGE";
+    case InternalLinkageAttrSpelling::CXX11_CLANG_INTERNAL_LINKAGE: return "CXX11_CLANG_INTERNAL_LINKAGE";
+    case InternalLinkageAttrSpelling::C2_XCLANG_INTERNAL_LINKAGE: return "C2_XCLANG_INTERNAL_LINKAGE";
+    case InternalLinkageAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+LTOVisibilityPublicAttrSpelling FromPasta(pasta::LTOVisibilityPublicAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LTOVisibilityPublicAttrSpelling::GNU_LTO_VISIBILITY_PUBLIC;
+    case 1: return LTOVisibilityPublicAttrSpelling::CXX11_CLANG_LTO_VISIBILITY_PUBLIC;
+    case 2: return LTOVisibilityPublicAttrSpelling::C2_XCLANG_LTO_VISIBILITY_PUBLIC;
+    case 15: return LTOVisibilityPublicAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LTOVisibilityPublicAttrSpelling e) {
+  switch (e) {
+    case LTOVisibilityPublicAttrSpelling::GNU_LTO_VISIBILITY_PUBLIC: return "GNU_LTO_VISIBILITY_PUBLIC";
+    case LTOVisibilityPublicAttrSpelling::CXX11_CLANG_LTO_VISIBILITY_PUBLIC: return "CXX11_CLANG_LTO_VISIBILITY_PUBLIC";
+    case LTOVisibilityPublicAttrSpelling::C2_XCLANG_LTO_VISIBILITY_PUBLIC: return "C2_XCLANG_LTO_VISIBILITY_PUBLIC";
+    case LTOVisibilityPublicAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+LeafAttrSpelling FromPasta(pasta::LeafAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LeafAttrSpelling::GNU_LEAF;
+    case 1: return LeafAttrSpelling::CXX11_GNU_LEAF;
+    case 2: return LeafAttrSpelling::C2_XGNU_LEAF;
+    case 15: return LeafAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LeafAttrSpelling e) {
+  switch (e) {
+    case LeafAttrSpelling::GNU_LEAF: return "GNU_LEAF";
+    case LeafAttrSpelling::CXX11_GNU_LEAF: return "CXX11_GNU_LEAF";
+    case LeafAttrSpelling::C2_XGNU_LEAF: return "C2_XGNU_LEAF";
+    case LeafAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+LifetimeBoundAttrSpelling FromPasta(pasta::LifetimeBoundAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LifetimeBoundAttrSpelling::GNU_LIFETIMEBOUND;
+    case 1: return LifetimeBoundAttrSpelling::CXX11_CLANG_LIFETIMEBOUND;
+    case 15: return LifetimeBoundAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LifetimeBoundAttrSpelling e) {
+  switch (e) {
+    case LifetimeBoundAttrSpelling::GNU_LIFETIMEBOUND: return "GNU_LIFETIMEBOUND";
+    case LifetimeBoundAttrSpelling::CXX11_CLANG_LIFETIMEBOUND: return "CXX11_CLANG_LIFETIMEBOUND";
+    case LifetimeBoundAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+LikelyAttrSpelling FromPasta(pasta::LikelyAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LikelyAttrSpelling::CXX11_LIKELY;
+    case 1: return LikelyAttrSpelling::C2_XCLANG_LIKELY;
+    case 15: return LikelyAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LikelyAttrSpelling e) {
+  switch (e) {
+    case LikelyAttrSpelling::CXX11_LIKELY: return "CXX11_LIKELY";
+    case LikelyAttrSpelling::C2_XCLANG_LIKELY: return "C2_XCLANG_LIKELY";
+    case LikelyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 LinkageSpecDeclLanguageIDs FromPasta(pasta::LinkageSpecDeclLanguageIDs e) {
   switch (static_cast<unsigned>(e)) {
     case 1: return LinkageSpecDeclLanguageIDs::C;
@@ -1299,6 +3497,578 @@ const char *EnumeratorName(LinkageSpecDeclLanguageIDs e) {
   switch (e) {
     case LinkageSpecDeclLanguageIDs::C: return "C";
     case LinkageSpecDeclLanguageIDs::CXX: return "CXX";
+    default: return "<invalid>";
+  }
+}
+
+LoaderUninitializedAttrSpelling FromPasta(pasta::LoaderUninitializedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LoaderUninitializedAttrSpelling::GNU_LOADER_UNINITIALIZED;
+    case 1: return LoaderUninitializedAttrSpelling::CXX11_CLANG_LOADER_UNINITIALIZED;
+    case 2: return LoaderUninitializedAttrSpelling::C2_XCLANG_LOADER_UNINITIALIZED;
+    case 15: return LoaderUninitializedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LoaderUninitializedAttrSpelling e) {
+  switch (e) {
+    case LoaderUninitializedAttrSpelling::GNU_LOADER_UNINITIALIZED: return "GNU_LOADER_UNINITIALIZED";
+    case LoaderUninitializedAttrSpelling::CXX11_CLANG_LOADER_UNINITIALIZED: return "CXX11_CLANG_LOADER_UNINITIALIZED";
+    case LoaderUninitializedAttrSpelling::C2_XCLANG_LOADER_UNINITIALIZED: return "C2_XCLANG_LOADER_UNINITIALIZED";
+    case LoaderUninitializedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+LoopHintAttrLoopHintState FromPasta(pasta::LoopHintAttrLoopHintState e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LoopHintAttrLoopHintState::ENABLE;
+    case 1: return LoopHintAttrLoopHintState::DISABLE;
+    case 2: return LoopHintAttrLoopHintState::NUMERIC;
+    case 3: return LoopHintAttrLoopHintState::FIXED_WIDTH;
+    case 4: return LoopHintAttrLoopHintState::SCALABLE_WIDTH;
+    case 5: return LoopHintAttrLoopHintState::ASSUME_SAFETY;
+    case 6: return LoopHintAttrLoopHintState::FULL;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LoopHintAttrLoopHintState e) {
+  switch (e) {
+    case LoopHintAttrLoopHintState::ENABLE: return "ENABLE";
+    case LoopHintAttrLoopHintState::DISABLE: return "DISABLE";
+    case LoopHintAttrLoopHintState::NUMERIC: return "NUMERIC";
+    case LoopHintAttrLoopHintState::FIXED_WIDTH: return "FIXED_WIDTH";
+    case LoopHintAttrLoopHintState::SCALABLE_WIDTH: return "SCALABLE_WIDTH";
+    case LoopHintAttrLoopHintState::ASSUME_SAFETY: return "ASSUME_SAFETY";
+    case LoopHintAttrLoopHintState::FULL: return "FULL";
+    default: return "<invalid>";
+  }
+}
+
+LoopHintAttrOptionType FromPasta(pasta::LoopHintAttrOptionType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LoopHintAttrOptionType::VECTORIZE;
+    case 1: return LoopHintAttrOptionType::VECTORIZE_WIDTH;
+    case 2: return LoopHintAttrOptionType::INTERLEAVE;
+    case 3: return LoopHintAttrOptionType::INTERLEAVE_COUNT;
+    case 4: return LoopHintAttrOptionType::UNROLL;
+    case 5: return LoopHintAttrOptionType::UNROLL_COUNT;
+    case 6: return LoopHintAttrOptionType::UNROLL_AND_JAM;
+    case 7: return LoopHintAttrOptionType::UNROLL_AND_JAM_COUNT;
+    case 8: return LoopHintAttrOptionType::PIPELINE_DISABLED;
+    case 9: return LoopHintAttrOptionType::PIPELINE_INITIATION_INTERVAL;
+    case 10: return LoopHintAttrOptionType::DISTRIBUTE;
+    case 11: return LoopHintAttrOptionType::VECTORIZE_PREDICATE;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LoopHintAttrOptionType e) {
+  switch (e) {
+    case LoopHintAttrOptionType::VECTORIZE: return "VECTORIZE";
+    case LoopHintAttrOptionType::VECTORIZE_WIDTH: return "VECTORIZE_WIDTH";
+    case LoopHintAttrOptionType::INTERLEAVE: return "INTERLEAVE";
+    case LoopHintAttrOptionType::INTERLEAVE_COUNT: return "INTERLEAVE_COUNT";
+    case LoopHintAttrOptionType::UNROLL: return "UNROLL";
+    case LoopHintAttrOptionType::UNROLL_COUNT: return "UNROLL_COUNT";
+    case LoopHintAttrOptionType::UNROLL_AND_JAM: return "UNROLL_AND_JAM";
+    case LoopHintAttrOptionType::UNROLL_AND_JAM_COUNT: return "UNROLL_AND_JAM_COUNT";
+    case LoopHintAttrOptionType::PIPELINE_DISABLED: return "PIPELINE_DISABLED";
+    case LoopHintAttrOptionType::PIPELINE_INITIATION_INTERVAL: return "PIPELINE_INITIATION_INTERVAL";
+    case LoopHintAttrOptionType::DISTRIBUTE: return "DISTRIBUTE";
+    case LoopHintAttrOptionType::VECTORIZE_PREDICATE: return "VECTORIZE_PREDICATE";
+    default: return "<invalid>";
+  }
+}
+
+LoopHintAttrSpelling FromPasta(pasta::LoopHintAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return LoopHintAttrSpelling::PRAGMA_CLANG_LOOP;
+    case 1: return LoopHintAttrSpelling::PRAGMA_UNROLL;
+    case 2: return LoopHintAttrSpelling::PRAGMA_NOUNROLL;
+    case 3: return LoopHintAttrSpelling::PRAGMA_UNROLL_AND_JAM;
+    case 4: return LoopHintAttrSpelling::PRAGMA_NOUNROLL_AND_JAM;
+    case 15: return LoopHintAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(LoopHintAttrSpelling e) {
+  switch (e) {
+    case LoopHintAttrSpelling::PRAGMA_CLANG_LOOP: return "PRAGMA_CLANG_LOOP";
+    case LoopHintAttrSpelling::PRAGMA_UNROLL: return "PRAGMA_UNROLL";
+    case LoopHintAttrSpelling::PRAGMA_NOUNROLL: return "PRAGMA_NOUNROLL";
+    case LoopHintAttrSpelling::PRAGMA_UNROLL_AND_JAM: return "PRAGMA_UNROLL_AND_JAM";
+    case LoopHintAttrSpelling::PRAGMA_NOUNROLL_AND_JAM: return "PRAGMA_NOUNROLL_AND_JAM";
+    case LoopHintAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MIGServerRoutineAttrSpelling FromPasta(pasta::MIGServerRoutineAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MIGServerRoutineAttrSpelling::GNU_MIG_SERVER_ROUTINE;
+    case 1: return MIGServerRoutineAttrSpelling::CXX11_CLANG_MIG_SERVER_ROUTINE;
+    case 2: return MIGServerRoutineAttrSpelling::C2_XCLANG_MIG_SERVER_ROUTINE;
+    case 15: return MIGServerRoutineAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MIGServerRoutineAttrSpelling e) {
+  switch (e) {
+    case MIGServerRoutineAttrSpelling::GNU_MIG_SERVER_ROUTINE: return "GNU_MIG_SERVER_ROUTINE";
+    case MIGServerRoutineAttrSpelling::CXX11_CLANG_MIG_SERVER_ROUTINE: return "CXX11_CLANG_MIG_SERVER_ROUTINE";
+    case MIGServerRoutineAttrSpelling::C2_XCLANG_MIG_SERVER_ROUTINE: return "C2_XCLANG_MIG_SERVER_ROUTINE";
+    case MIGServerRoutineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MSABIAttrSpelling FromPasta(pasta::MSABIAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MSABIAttrSpelling::GNU_MS_ABI;
+    case 1: return MSABIAttrSpelling::CXX11_GNU_MS_ABI;
+    case 2: return MSABIAttrSpelling::C2_XGNU_MS_ABI;
+    case 15: return MSABIAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MSABIAttrSpelling e) {
+  switch (e) {
+    case MSABIAttrSpelling::GNU_MS_ABI: return "GNU_MS_ABI";
+    case MSABIAttrSpelling::CXX11_GNU_MS_ABI: return "CXX11_GNU_MS_ABI";
+    case MSABIAttrSpelling::C2_XGNU_MS_ABI: return "C2_XGNU_MS_ABI";
+    case MSABIAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MSInheritanceAttrSpelling FromPasta(pasta::MSInheritanceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MSInheritanceAttrSpelling::KEYWORD_SINGLE_INHERITANCE;
+    case 1: return MSInheritanceAttrSpelling::KEYWORD_MULTIPLE_INHERITANCE;
+    case 2: return MSInheritanceAttrSpelling::KEYWORD_VIRTUAL_INHERITANCE;
+    case 3: return MSInheritanceAttrSpelling::KEYWORD_UNSPECIFIED_INHERITANCE;
+    case 15: return MSInheritanceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MSInheritanceAttrSpelling e) {
+  switch (e) {
+    case MSInheritanceAttrSpelling::KEYWORD_SINGLE_INHERITANCE: return "KEYWORD_SINGLE_INHERITANCE";
+    case MSInheritanceAttrSpelling::KEYWORD_MULTIPLE_INHERITANCE: return "KEYWORD_MULTIPLE_INHERITANCE";
+    case MSInheritanceAttrSpelling::KEYWORD_VIRTUAL_INHERITANCE: return "KEYWORD_VIRTUAL_INHERITANCE";
+    case MSInheritanceAttrSpelling::KEYWORD_UNSPECIFIED_INHERITANCE: return "KEYWORD_UNSPECIFIED_INHERITANCE";
+    case MSInheritanceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MSP430InterruptAttrSpelling FromPasta(pasta::MSP430InterruptAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MSP430InterruptAttrSpelling::GNU_INTERRUPT;
+    case 1: return MSP430InterruptAttrSpelling::CXX11_GNU_INTERRUPT;
+    case 2: return MSP430InterruptAttrSpelling::C2_XGNU_INTERRUPT;
+    case 15: return MSP430InterruptAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MSP430InterruptAttrSpelling e) {
+  switch (e) {
+    case MSP430InterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
+    case MSP430InterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
+    case MSP430InterruptAttrSpelling::C2_XGNU_INTERRUPT: return "C2_XGNU_INTERRUPT";
+    case MSP430InterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MSStructAttrSpelling FromPasta(pasta::MSStructAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MSStructAttrSpelling::GNU_MS_STRUCT;
+    case 1: return MSStructAttrSpelling::CXX11_GNU_MS_STRUCT;
+    case 2: return MSStructAttrSpelling::C2_XGNU_MS_STRUCT;
+    case 15: return MSStructAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MSStructAttrSpelling e) {
+  switch (e) {
+    case MSStructAttrSpelling::GNU_MS_STRUCT: return "GNU_MS_STRUCT";
+    case MSStructAttrSpelling::CXX11_GNU_MS_STRUCT: return "CXX11_GNU_MS_STRUCT";
+    case MSStructAttrSpelling::C2_XGNU_MS_STRUCT: return "C2_XGNU_MS_STRUCT";
+    case MSStructAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MayAliasAttrSpelling FromPasta(pasta::MayAliasAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MayAliasAttrSpelling::GNU_MAY_ALIAS;
+    case 1: return MayAliasAttrSpelling::CXX11_GNU_MAY_ALIAS;
+    case 2: return MayAliasAttrSpelling::C2_XGNU_MAY_ALIAS;
+    case 15: return MayAliasAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MayAliasAttrSpelling e) {
+  switch (e) {
+    case MayAliasAttrSpelling::GNU_MAY_ALIAS: return "GNU_MAY_ALIAS";
+    case MayAliasAttrSpelling::CXX11_GNU_MAY_ALIAS: return "CXX11_GNU_MAY_ALIAS";
+    case MayAliasAttrSpelling::C2_XGNU_MAY_ALIAS: return "C2_XGNU_MAY_ALIAS";
+    case MayAliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MicroMipsAttrSpelling FromPasta(pasta::MicroMipsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MicroMipsAttrSpelling::GNU_MICROMIPS;
+    case 1: return MicroMipsAttrSpelling::CXX11_GNU_MICROMIPS;
+    case 2: return MicroMipsAttrSpelling::C2_XGNU_MICROMIPS;
+    case 15: return MicroMipsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MicroMipsAttrSpelling e) {
+  switch (e) {
+    case MicroMipsAttrSpelling::GNU_MICROMIPS: return "GNU_MICROMIPS";
+    case MicroMipsAttrSpelling::CXX11_GNU_MICROMIPS: return "CXX11_GNU_MICROMIPS";
+    case MicroMipsAttrSpelling::C2_XGNU_MICROMIPS: return "C2_XGNU_MICROMIPS";
+    case MicroMipsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MinSizeAttrSpelling FromPasta(pasta::MinSizeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MinSizeAttrSpelling::GNU_MINSIZE;
+    case 1: return MinSizeAttrSpelling::CXX11_CLANG_MINSIZE;
+    case 2: return MinSizeAttrSpelling::C2_XCLANG_MINSIZE;
+    case 15: return MinSizeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MinSizeAttrSpelling e) {
+  switch (e) {
+    case MinSizeAttrSpelling::GNU_MINSIZE: return "GNU_MINSIZE";
+    case MinSizeAttrSpelling::CXX11_CLANG_MINSIZE: return "CXX11_CLANG_MINSIZE";
+    case MinSizeAttrSpelling::C2_XCLANG_MINSIZE: return "C2_XCLANG_MINSIZE";
+    case MinSizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MinVectorWidthAttrSpelling FromPasta(pasta::MinVectorWidthAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MinVectorWidthAttrSpelling::GNU_MIN_VECTOR_WIDTH;
+    case 1: return MinVectorWidthAttrSpelling::CXX11_CLANG_MIN_VECTOR_WIDTH;
+    case 2: return MinVectorWidthAttrSpelling::C2_XCLANG_MIN_VECTOR_WIDTH;
+    case 15: return MinVectorWidthAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MinVectorWidthAttrSpelling e) {
+  switch (e) {
+    case MinVectorWidthAttrSpelling::GNU_MIN_VECTOR_WIDTH: return "GNU_MIN_VECTOR_WIDTH";
+    case MinVectorWidthAttrSpelling::CXX11_CLANG_MIN_VECTOR_WIDTH: return "CXX11_CLANG_MIN_VECTOR_WIDTH";
+    case MinVectorWidthAttrSpelling::C2_XCLANG_MIN_VECTOR_WIDTH: return "C2_XCLANG_MIN_VECTOR_WIDTH";
+    case MinVectorWidthAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+Mips16AttrSpelling FromPasta(pasta::Mips16AttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return Mips16AttrSpelling::GNU_MIPS16;
+    case 1: return Mips16AttrSpelling::CXX11_GNU_MIPS16;
+    case 2: return Mips16AttrSpelling::C2_XGNU_MIPS16;
+    case 15: return Mips16AttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(Mips16AttrSpelling e) {
+  switch (e) {
+    case Mips16AttrSpelling::GNU_MIPS16: return "GNU_MIPS16";
+    case Mips16AttrSpelling::CXX11_GNU_MIPS16: return "CXX11_GNU_MIPS16";
+    case Mips16AttrSpelling::C2_XGNU_MIPS16: return "C2_XGNU_MIPS16";
+    case Mips16AttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MipsInterruptAttrInterruptType FromPasta(pasta::MipsInterruptAttrInterruptType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MipsInterruptAttrInterruptType::SW0;
+    case 1: return MipsInterruptAttrInterruptType::SW1;
+    case 2: return MipsInterruptAttrInterruptType::HW0;
+    case 3: return MipsInterruptAttrInterruptType::HW1;
+    case 4: return MipsInterruptAttrInterruptType::HW2;
+    case 5: return MipsInterruptAttrInterruptType::HW3;
+    case 6: return MipsInterruptAttrInterruptType::HW4;
+    case 7: return MipsInterruptAttrInterruptType::HW5;
+    case 8: return MipsInterruptAttrInterruptType::EIC;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MipsInterruptAttrInterruptType e) {
+  switch (e) {
+    case MipsInterruptAttrInterruptType::SW0: return "SW0";
+    case MipsInterruptAttrInterruptType::SW1: return "SW1";
+    case MipsInterruptAttrInterruptType::HW0: return "HW0";
+    case MipsInterruptAttrInterruptType::HW1: return "HW1";
+    case MipsInterruptAttrInterruptType::HW2: return "HW2";
+    case MipsInterruptAttrInterruptType::HW3: return "HW3";
+    case MipsInterruptAttrInterruptType::HW4: return "HW4";
+    case MipsInterruptAttrInterruptType::HW5: return "HW5";
+    case MipsInterruptAttrInterruptType::EIC: return "EIC";
+    default: return "<invalid>";
+  }
+}
+
+MipsInterruptAttrSpelling FromPasta(pasta::MipsInterruptAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MipsInterruptAttrSpelling::GNU_INTERRUPT;
+    case 1: return MipsInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
+    case 2: return MipsInterruptAttrSpelling::C2_XGNU_INTERRUPT;
+    case 15: return MipsInterruptAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MipsInterruptAttrSpelling e) {
+  switch (e) {
+    case MipsInterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
+    case MipsInterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
+    case MipsInterruptAttrSpelling::C2_XGNU_INTERRUPT: return "C2_XGNU_INTERRUPT";
+    case MipsInterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MipsLongCallAttrSpelling FromPasta(pasta::MipsLongCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MipsLongCallAttrSpelling::GNU_LONG_CALL;
+    case 1: return MipsLongCallAttrSpelling::CXX11_GNU_LONG_CALL;
+    case 2: return MipsLongCallAttrSpelling::C2_XGNU_LONG_CALL;
+    case 3: return MipsLongCallAttrSpelling::GNU_FAR;
+    case 4: return MipsLongCallAttrSpelling::CXX11_GNU_FAR;
+    case 5: return MipsLongCallAttrSpelling::C2_XGNU_FAR;
+    case 15: return MipsLongCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MipsLongCallAttrSpelling e) {
+  switch (e) {
+    case MipsLongCallAttrSpelling::GNU_LONG_CALL: return "GNU_LONG_CALL";
+    case MipsLongCallAttrSpelling::CXX11_GNU_LONG_CALL: return "CXX11_GNU_LONG_CALL";
+    case MipsLongCallAttrSpelling::C2_XGNU_LONG_CALL: return "C2_XGNU_LONG_CALL";
+    case MipsLongCallAttrSpelling::GNU_FAR: return "GNU_FAR";
+    case MipsLongCallAttrSpelling::CXX11_GNU_FAR: return "CXX11_GNU_FAR";
+    case MipsLongCallAttrSpelling::C2_XGNU_FAR: return "C2_XGNU_FAR";
+    case MipsLongCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MipsShortCallAttrSpelling FromPasta(pasta::MipsShortCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MipsShortCallAttrSpelling::GNU_SHORT_CALL;
+    case 1: return MipsShortCallAttrSpelling::CXX11_GNU_SHORT_CALL;
+    case 2: return MipsShortCallAttrSpelling::C2_XGNU_SHORT_CALL;
+    case 3: return MipsShortCallAttrSpelling::GNU_NEAR;
+    case 4: return MipsShortCallAttrSpelling::CXX11_GNU_NEAR;
+    case 5: return MipsShortCallAttrSpelling::C2_XGNU_NEAR;
+    case 15: return MipsShortCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MipsShortCallAttrSpelling e) {
+  switch (e) {
+    case MipsShortCallAttrSpelling::GNU_SHORT_CALL: return "GNU_SHORT_CALL";
+    case MipsShortCallAttrSpelling::CXX11_GNU_SHORT_CALL: return "CXX11_GNU_SHORT_CALL";
+    case MipsShortCallAttrSpelling::C2_XGNU_SHORT_CALL: return "C2_XGNU_SHORT_CALL";
+    case MipsShortCallAttrSpelling::GNU_NEAR: return "GNU_NEAR";
+    case MipsShortCallAttrSpelling::CXX11_GNU_NEAR: return "CXX11_GNU_NEAR";
+    case MipsShortCallAttrSpelling::C2_XGNU_NEAR: return "C2_XGNU_NEAR";
+    case MipsShortCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ModeAttrSpelling FromPasta(pasta::ModeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ModeAttrSpelling::GNU_MODE;
+    case 1: return ModeAttrSpelling::CXX11_GNU_MODE;
+    case 2: return ModeAttrSpelling::C2_XGNU_MODE;
+    case 15: return ModeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ModeAttrSpelling e) {
+  switch (e) {
+    case ModeAttrSpelling::GNU_MODE: return "GNU_MODE";
+    case ModeAttrSpelling::CXX11_GNU_MODE: return "CXX11_GNU_MODE";
+    case ModeAttrSpelling::C2_XGNU_MODE: return "C2_XGNU_MODE";
+    case ModeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+MustTailAttrSpelling FromPasta(pasta::MustTailAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return MustTailAttrSpelling::GNU_MUSTTAIL;
+    case 1: return MustTailAttrSpelling::CXX11_CLANG_MUSTTAIL;
+    case 2: return MustTailAttrSpelling::C2_XCLANG_MUSTTAIL;
+    case 15: return MustTailAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(MustTailAttrSpelling e) {
+  switch (e) {
+    case MustTailAttrSpelling::GNU_MUSTTAIL: return "GNU_MUSTTAIL";
+    case MustTailAttrSpelling::CXX11_CLANG_MUSTTAIL: return "CXX11_CLANG_MUSTTAIL";
+    case MustTailAttrSpelling::C2_XCLANG_MUSTTAIL: return "C2_XCLANG_MUSTTAIL";
+    case MustTailAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NSConsumedAttrSpelling FromPasta(pasta::NSConsumedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NSConsumedAttrSpelling::GNU_NS_CONSUMED;
+    case 1: return NSConsumedAttrSpelling::CXX11_CLANG_NS_CONSUMED;
+    case 2: return NSConsumedAttrSpelling::C2_XCLANG_NS_CONSUMED;
+    case 15: return NSConsumedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NSConsumedAttrSpelling e) {
+  switch (e) {
+    case NSConsumedAttrSpelling::GNU_NS_CONSUMED: return "GNU_NS_CONSUMED";
+    case NSConsumedAttrSpelling::CXX11_CLANG_NS_CONSUMED: return "CXX11_CLANG_NS_CONSUMED";
+    case NSConsumedAttrSpelling::C2_XCLANG_NS_CONSUMED: return "C2_XCLANG_NS_CONSUMED";
+    case NSConsumedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NSConsumesSelfAttrSpelling FromPasta(pasta::NSConsumesSelfAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NSConsumesSelfAttrSpelling::GNU_NS_CONSUMES_SELF;
+    case 1: return NSConsumesSelfAttrSpelling::CXX11_CLANG_NS_CONSUMES_SELF;
+    case 2: return NSConsumesSelfAttrSpelling::C2_XCLANG_NS_CONSUMES_SELF;
+    case 15: return NSConsumesSelfAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NSConsumesSelfAttrSpelling e) {
+  switch (e) {
+    case NSConsumesSelfAttrSpelling::GNU_NS_CONSUMES_SELF: return "GNU_NS_CONSUMES_SELF";
+    case NSConsumesSelfAttrSpelling::CXX11_CLANG_NS_CONSUMES_SELF: return "CXX11_CLANG_NS_CONSUMES_SELF";
+    case NSConsumesSelfAttrSpelling::C2_XCLANG_NS_CONSUMES_SELF: return "C2_XCLANG_NS_CONSUMES_SELF";
+    case NSConsumesSelfAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NSReturnsAutoreleasedAttrSpelling FromPasta(pasta::NSReturnsAutoreleasedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NSReturnsAutoreleasedAttrSpelling::GNU_NS_RETURNS_AUTORELEASED;
+    case 1: return NSReturnsAutoreleasedAttrSpelling::CXX11_CLANG_NS_RETURNS_AUTORELEASED;
+    case 2: return NSReturnsAutoreleasedAttrSpelling::C2_XCLANG_NS_RETURNS_AUTORELEASED;
+    case 15: return NSReturnsAutoreleasedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NSReturnsAutoreleasedAttrSpelling e) {
+  switch (e) {
+    case NSReturnsAutoreleasedAttrSpelling::GNU_NS_RETURNS_AUTORELEASED: return "GNU_NS_RETURNS_AUTORELEASED";
+    case NSReturnsAutoreleasedAttrSpelling::CXX11_CLANG_NS_RETURNS_AUTORELEASED: return "CXX11_CLANG_NS_RETURNS_AUTORELEASED";
+    case NSReturnsAutoreleasedAttrSpelling::C2_XCLANG_NS_RETURNS_AUTORELEASED: return "C2_XCLANG_NS_RETURNS_AUTORELEASED";
+    case NSReturnsAutoreleasedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NSReturnsNotRetainedAttrSpelling FromPasta(pasta::NSReturnsNotRetainedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NSReturnsNotRetainedAttrSpelling::GNU_NS_RETURNS_NOT_RETAINED;
+    case 1: return NSReturnsNotRetainedAttrSpelling::CXX11_CLANG_NS_RETURNS_NOT_RETAINED;
+    case 2: return NSReturnsNotRetainedAttrSpelling::C2_XCLANG_NS_RETURNS_NOT_RETAINED;
+    case 15: return NSReturnsNotRetainedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NSReturnsNotRetainedAttrSpelling e) {
+  switch (e) {
+    case NSReturnsNotRetainedAttrSpelling::GNU_NS_RETURNS_NOT_RETAINED: return "GNU_NS_RETURNS_NOT_RETAINED";
+    case NSReturnsNotRetainedAttrSpelling::CXX11_CLANG_NS_RETURNS_NOT_RETAINED: return "CXX11_CLANG_NS_RETURNS_NOT_RETAINED";
+    case NSReturnsNotRetainedAttrSpelling::C2_XCLANG_NS_RETURNS_NOT_RETAINED: return "C2_XCLANG_NS_RETURNS_NOT_RETAINED";
+    case NSReturnsNotRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NSReturnsRetainedAttrSpelling FromPasta(pasta::NSReturnsRetainedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NSReturnsRetainedAttrSpelling::GNU_NS_RETURNS_RETAINED;
+    case 1: return NSReturnsRetainedAttrSpelling::CXX11_CLANG_NS_RETURNS_RETAINED;
+    case 2: return NSReturnsRetainedAttrSpelling::C2_XCLANG_NS_RETURNS_RETAINED;
+    case 15: return NSReturnsRetainedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NSReturnsRetainedAttrSpelling e) {
+  switch (e) {
+    case NSReturnsRetainedAttrSpelling::GNU_NS_RETURNS_RETAINED: return "GNU_NS_RETURNS_RETAINED";
+    case NSReturnsRetainedAttrSpelling::CXX11_CLANG_NS_RETURNS_RETAINED: return "CXX11_CLANG_NS_RETURNS_RETAINED";
+    case NSReturnsRetainedAttrSpelling::C2_XCLANG_NS_RETURNS_RETAINED: return "C2_XCLANG_NS_RETURNS_RETAINED";
+    case NSReturnsRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NakedAttrSpelling FromPasta(pasta::NakedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NakedAttrSpelling::GNU_NAKED;
+    case 1: return NakedAttrSpelling::CXX11_GNU_NAKED;
+    case 2: return NakedAttrSpelling::C2_XGNU_NAKED;
+    case 3: return NakedAttrSpelling::DECLSPEC_NAKED;
+    case 15: return NakedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NakedAttrSpelling e) {
+  switch (e) {
+    case NakedAttrSpelling::GNU_NAKED: return "GNU_NAKED";
+    case NakedAttrSpelling::CXX11_GNU_NAKED: return "CXX11_GNU_NAKED";
+    case NakedAttrSpelling::C2_XGNU_NAKED: return "C2_XGNU_NAKED";
+    case NakedAttrSpelling::DECLSPEC_NAKED: return "DECLSPEC_NAKED";
+    case NakedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -1319,6 +4089,482 @@ const char *EnumeratorName(NamedDeclExplicitVisibilityKind e) {
   }
 }
 
+NoBuiltinAttrSpelling FromPasta(pasta::NoBuiltinAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoBuiltinAttrSpelling::GNU_NO_BUILTIN;
+    case 1: return NoBuiltinAttrSpelling::CXX11_CLANG_NO_BUILTIN;
+    case 2: return NoBuiltinAttrSpelling::C2_XCLANG_NO_BUILTIN;
+    case 15: return NoBuiltinAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoBuiltinAttrSpelling e) {
+  switch (e) {
+    case NoBuiltinAttrSpelling::GNU_NO_BUILTIN: return "GNU_NO_BUILTIN";
+    case NoBuiltinAttrSpelling::CXX11_CLANG_NO_BUILTIN: return "CXX11_CLANG_NO_BUILTIN";
+    case NoBuiltinAttrSpelling::C2_XCLANG_NO_BUILTIN: return "C2_XCLANG_NO_BUILTIN";
+    case NoBuiltinAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoCommonAttrSpelling FromPasta(pasta::NoCommonAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoCommonAttrSpelling::GNU_NOCOMMON;
+    case 1: return NoCommonAttrSpelling::CXX11_GNU_NOCOMMON;
+    case 2: return NoCommonAttrSpelling::C2_XGNU_NOCOMMON;
+    case 15: return NoCommonAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoCommonAttrSpelling e) {
+  switch (e) {
+    case NoCommonAttrSpelling::GNU_NOCOMMON: return "GNU_NOCOMMON";
+    case NoCommonAttrSpelling::CXX11_GNU_NOCOMMON: return "CXX11_GNU_NOCOMMON";
+    case NoCommonAttrSpelling::C2_XGNU_NOCOMMON: return "C2_XGNU_NOCOMMON";
+    case NoCommonAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoDebugAttrSpelling FromPasta(pasta::NoDebugAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoDebugAttrSpelling::GNU_NODEBUG;
+    case 1: return NoDebugAttrSpelling::CXX11_GNU_NODEBUG;
+    case 2: return NoDebugAttrSpelling::C2_XGNU_NODEBUG;
+    case 15: return NoDebugAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoDebugAttrSpelling e) {
+  switch (e) {
+    case NoDebugAttrSpelling::GNU_NODEBUG: return "GNU_NODEBUG";
+    case NoDebugAttrSpelling::CXX11_GNU_NODEBUG: return "CXX11_GNU_NODEBUG";
+    case NoDebugAttrSpelling::C2_XGNU_NODEBUG: return "C2_XGNU_NODEBUG";
+    case NoDebugAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoDerefAttrSpelling FromPasta(pasta::NoDerefAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoDerefAttrSpelling::GNU_NODEREF;
+    case 1: return NoDerefAttrSpelling::CXX11_CLANG_NODEREF;
+    case 2: return NoDerefAttrSpelling::C2_XCLANG_NODEREF;
+    case 15: return NoDerefAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoDerefAttrSpelling e) {
+  switch (e) {
+    case NoDerefAttrSpelling::GNU_NODEREF: return "GNU_NODEREF";
+    case NoDerefAttrSpelling::CXX11_CLANG_NODEREF: return "CXX11_CLANG_NODEREF";
+    case NoDerefAttrSpelling::C2_XCLANG_NODEREF: return "C2_XCLANG_NODEREF";
+    case NoDerefAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoDestroyAttrSpelling FromPasta(pasta::NoDestroyAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoDestroyAttrSpelling::GNU_NO_DESTROY;
+    case 1: return NoDestroyAttrSpelling::CXX11_CLANG_NO_DESTROY;
+    case 15: return NoDestroyAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoDestroyAttrSpelling e) {
+  switch (e) {
+    case NoDestroyAttrSpelling::GNU_NO_DESTROY: return "GNU_NO_DESTROY";
+    case NoDestroyAttrSpelling::CXX11_CLANG_NO_DESTROY: return "CXX11_CLANG_NO_DESTROY";
+    case NoDestroyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoDuplicateAttrSpelling FromPasta(pasta::NoDuplicateAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoDuplicateAttrSpelling::GNU_NODUPLICATE;
+    case 1: return NoDuplicateAttrSpelling::CXX11_CLANG_NODUPLICATE;
+    case 2: return NoDuplicateAttrSpelling::C2_XCLANG_NODUPLICATE;
+    case 15: return NoDuplicateAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoDuplicateAttrSpelling e) {
+  switch (e) {
+    case NoDuplicateAttrSpelling::GNU_NODUPLICATE: return "GNU_NODUPLICATE";
+    case NoDuplicateAttrSpelling::CXX11_CLANG_NODUPLICATE: return "CXX11_CLANG_NODUPLICATE";
+    case NoDuplicateAttrSpelling::C2_XCLANG_NODUPLICATE: return "C2_XCLANG_NODUPLICATE";
+    case NoDuplicateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoEscapeAttrSpelling FromPasta(pasta::NoEscapeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoEscapeAttrSpelling::GNU_NOESCAPE;
+    case 1: return NoEscapeAttrSpelling::CXX11_CLANG_NOESCAPE;
+    case 2: return NoEscapeAttrSpelling::C2_XCLANG_NOESCAPE;
+    case 15: return NoEscapeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoEscapeAttrSpelling e) {
+  switch (e) {
+    case NoEscapeAttrSpelling::GNU_NOESCAPE: return "GNU_NOESCAPE";
+    case NoEscapeAttrSpelling::CXX11_CLANG_NOESCAPE: return "CXX11_CLANG_NOESCAPE";
+    case NoEscapeAttrSpelling::C2_XCLANG_NOESCAPE: return "C2_XCLANG_NOESCAPE";
+    case NoEscapeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoInlineAttrSpelling FromPasta(pasta::NoInlineAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoInlineAttrSpelling::GNU_NOINLINE;
+    case 1: return NoInlineAttrSpelling::CXX11_GNU_NOINLINE;
+    case 2: return NoInlineAttrSpelling::C2_XGNU_NOINLINE;
+    case 3: return NoInlineAttrSpelling::DECLSPEC_NOINLINE;
+    case 15: return NoInlineAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoInlineAttrSpelling e) {
+  switch (e) {
+    case NoInlineAttrSpelling::GNU_NOINLINE: return "GNU_NOINLINE";
+    case NoInlineAttrSpelling::CXX11_GNU_NOINLINE: return "CXX11_GNU_NOINLINE";
+    case NoInlineAttrSpelling::C2_XGNU_NOINLINE: return "C2_XGNU_NOINLINE";
+    case NoInlineAttrSpelling::DECLSPEC_NOINLINE: return "DECLSPEC_NOINLINE";
+    case NoInlineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoInstrumentFunctionAttrSpelling FromPasta(pasta::NoInstrumentFunctionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoInstrumentFunctionAttrSpelling::GNU_NO_INSTRUMENT_FUNCTION;
+    case 1: return NoInstrumentFunctionAttrSpelling::CXX11_GNU_NO_INSTRUMENT_FUNCTION;
+    case 2: return NoInstrumentFunctionAttrSpelling::C2_XGNU_NO_INSTRUMENT_FUNCTION;
+    case 15: return NoInstrumentFunctionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoInstrumentFunctionAttrSpelling e) {
+  switch (e) {
+    case NoInstrumentFunctionAttrSpelling::GNU_NO_INSTRUMENT_FUNCTION: return "GNU_NO_INSTRUMENT_FUNCTION";
+    case NoInstrumentFunctionAttrSpelling::CXX11_GNU_NO_INSTRUMENT_FUNCTION: return "CXX11_GNU_NO_INSTRUMENT_FUNCTION";
+    case NoInstrumentFunctionAttrSpelling::C2_XGNU_NO_INSTRUMENT_FUNCTION: return "C2_XGNU_NO_INSTRUMENT_FUNCTION";
+    case NoInstrumentFunctionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoMergeAttrSpelling FromPasta(pasta::NoMergeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoMergeAttrSpelling::GNU_NOMERGE;
+    case 1: return NoMergeAttrSpelling::CXX11_CLANG_NOMERGE;
+    case 2: return NoMergeAttrSpelling::C2_XCLANG_NOMERGE;
+    case 15: return NoMergeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoMergeAttrSpelling e) {
+  switch (e) {
+    case NoMergeAttrSpelling::GNU_NOMERGE: return "GNU_NOMERGE";
+    case NoMergeAttrSpelling::CXX11_CLANG_NOMERGE: return "CXX11_CLANG_NOMERGE";
+    case NoMergeAttrSpelling::C2_XCLANG_NOMERGE: return "C2_XCLANG_NOMERGE";
+    case NoMergeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoMicroMipsAttrSpelling FromPasta(pasta::NoMicroMipsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoMicroMipsAttrSpelling::GNU_NOMICROMIPS;
+    case 1: return NoMicroMipsAttrSpelling::CXX11_GNU_NOMICROMIPS;
+    case 2: return NoMicroMipsAttrSpelling::C2_XGNU_NOMICROMIPS;
+    case 15: return NoMicroMipsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoMicroMipsAttrSpelling e) {
+  switch (e) {
+    case NoMicroMipsAttrSpelling::GNU_NOMICROMIPS: return "GNU_NOMICROMIPS";
+    case NoMicroMipsAttrSpelling::CXX11_GNU_NOMICROMIPS: return "CXX11_GNU_NOMICROMIPS";
+    case NoMicroMipsAttrSpelling::C2_XGNU_NOMICROMIPS: return "C2_XGNU_NOMICROMIPS";
+    case NoMicroMipsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoMips16AttrSpelling FromPasta(pasta::NoMips16AttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoMips16AttrSpelling::GNU_NOMIPS16;
+    case 1: return NoMips16AttrSpelling::CXX11_GNU_NOMIPS16;
+    case 2: return NoMips16AttrSpelling::C2_XGNU_NOMIPS16;
+    case 15: return NoMips16AttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoMips16AttrSpelling e) {
+  switch (e) {
+    case NoMips16AttrSpelling::GNU_NOMIPS16: return "GNU_NOMIPS16";
+    case NoMips16AttrSpelling::CXX11_GNU_NOMIPS16: return "CXX11_GNU_NOMIPS16";
+    case NoMips16AttrSpelling::C2_XGNU_NOMIPS16: return "C2_XGNU_NOMIPS16";
+    case NoMips16AttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoProfileFunctionAttrSpelling FromPasta(pasta::NoProfileFunctionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoProfileFunctionAttrSpelling::GNU_NO_PROFILE_INSTRUMENT_FUNCTION;
+    case 1: return NoProfileFunctionAttrSpelling::CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION;
+    case 2: return NoProfileFunctionAttrSpelling::C2_XGNU_NO_PROFILE_INSTRUMENT_FUNCTION;
+    case 15: return NoProfileFunctionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoProfileFunctionAttrSpelling e) {
+  switch (e) {
+    case NoProfileFunctionAttrSpelling::GNU_NO_PROFILE_INSTRUMENT_FUNCTION: return "GNU_NO_PROFILE_INSTRUMENT_FUNCTION";
+    case NoProfileFunctionAttrSpelling::CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION: return "CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION";
+    case NoProfileFunctionAttrSpelling::C2_XGNU_NO_PROFILE_INSTRUMENT_FUNCTION: return "C2_XGNU_NO_PROFILE_INSTRUMENT_FUNCTION";
+    case NoProfileFunctionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoReturnAttrSpelling FromPasta(pasta::NoReturnAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoReturnAttrSpelling::GNU_NORETURN;
+    case 1: return NoReturnAttrSpelling::CXX11_GNU_NORETURN;
+    case 2: return NoReturnAttrSpelling::C2_XGNU_NORETURN;
+    case 3: return NoReturnAttrSpelling::DECLSPEC_NORETURN;
+    case 15: return NoReturnAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoReturnAttrSpelling e) {
+  switch (e) {
+    case NoReturnAttrSpelling::GNU_NORETURN: return "GNU_NORETURN";
+    case NoReturnAttrSpelling::CXX11_GNU_NORETURN: return "CXX11_GNU_NORETURN";
+    case NoReturnAttrSpelling::C2_XGNU_NORETURN: return "C2_XGNU_NORETURN";
+    case NoReturnAttrSpelling::DECLSPEC_NORETURN: return "DECLSPEC_NORETURN";
+    case NoReturnAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoSanitizeAttrSpelling FromPasta(pasta::NoSanitizeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoSanitizeAttrSpelling::GNU_NO_SANITIZE;
+    case 1: return NoSanitizeAttrSpelling::CXX11_CLANG_NO_SANITIZE;
+    case 2: return NoSanitizeAttrSpelling::C2_XCLANG_NO_SANITIZE;
+    case 15: return NoSanitizeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoSanitizeAttrSpelling e) {
+  switch (e) {
+    case NoSanitizeAttrSpelling::GNU_NO_SANITIZE: return "GNU_NO_SANITIZE";
+    case NoSanitizeAttrSpelling::CXX11_CLANG_NO_SANITIZE: return "CXX11_CLANG_NO_SANITIZE";
+    case NoSanitizeAttrSpelling::C2_XCLANG_NO_SANITIZE: return "C2_XCLANG_NO_SANITIZE";
+    case NoSanitizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoSpeculativeLoadHardeningAttrSpelling FromPasta(pasta::NoSpeculativeLoadHardeningAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoSpeculativeLoadHardeningAttrSpelling::GNU_NO_SPECULATIVE_LOAD_HARDENING;
+    case 1: return NoSpeculativeLoadHardeningAttrSpelling::CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING;
+    case 2: return NoSpeculativeLoadHardeningAttrSpelling::C2_XCLANG_NO_SPECULATIVE_LOAD_HARDENING;
+    case 15: return NoSpeculativeLoadHardeningAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoSpeculativeLoadHardeningAttrSpelling e) {
+  switch (e) {
+    case NoSpeculativeLoadHardeningAttrSpelling::GNU_NO_SPECULATIVE_LOAD_HARDENING: return "GNU_NO_SPECULATIVE_LOAD_HARDENING";
+    case NoSpeculativeLoadHardeningAttrSpelling::CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING: return "CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING";
+    case NoSpeculativeLoadHardeningAttrSpelling::C2_XCLANG_NO_SPECULATIVE_LOAD_HARDENING: return "C2_XCLANG_NO_SPECULATIVE_LOAD_HARDENING";
+    case NoSpeculativeLoadHardeningAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoSplitStackAttrSpelling FromPasta(pasta::NoSplitStackAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoSplitStackAttrSpelling::GNU_NO_SPLIT_STACK;
+    case 1: return NoSplitStackAttrSpelling::CXX11_GNU_NO_SPLIT_STACK;
+    case 2: return NoSplitStackAttrSpelling::C2_XGNU_NO_SPLIT_STACK;
+    case 15: return NoSplitStackAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoSplitStackAttrSpelling e) {
+  switch (e) {
+    case NoSplitStackAttrSpelling::GNU_NO_SPLIT_STACK: return "GNU_NO_SPLIT_STACK";
+    case NoSplitStackAttrSpelling::CXX11_GNU_NO_SPLIT_STACK: return "CXX11_GNU_NO_SPLIT_STACK";
+    case NoSplitStackAttrSpelling::C2_XGNU_NO_SPLIT_STACK: return "C2_XGNU_NO_SPLIT_STACK";
+    case NoSplitStackAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoStackProtectorAttrSpelling FromPasta(pasta::NoStackProtectorAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoStackProtectorAttrSpelling::GNU_NO_STACK_PROTECTOR;
+    case 1: return NoStackProtectorAttrSpelling::CXX11_CLANG_NO_STACK_PROTECTOR;
+    case 2: return NoStackProtectorAttrSpelling::C2_XCLANG_NO_STACK_PROTECTOR;
+    case 15: return NoStackProtectorAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoStackProtectorAttrSpelling e) {
+  switch (e) {
+    case NoStackProtectorAttrSpelling::GNU_NO_STACK_PROTECTOR: return "GNU_NO_STACK_PROTECTOR";
+    case NoStackProtectorAttrSpelling::CXX11_CLANG_NO_STACK_PROTECTOR: return "CXX11_CLANG_NO_STACK_PROTECTOR";
+    case NoStackProtectorAttrSpelling::C2_XCLANG_NO_STACK_PROTECTOR: return "C2_XCLANG_NO_STACK_PROTECTOR";
+    case NoStackProtectorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoThreadSafetyAnalysisAttrSpelling FromPasta(pasta::NoThreadSafetyAnalysisAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoThreadSafetyAnalysisAttrSpelling::GNU_NO_THREAD_SAFETY_ANALYSIS;
+    case 1: return NoThreadSafetyAnalysisAttrSpelling::CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS;
+    case 2: return NoThreadSafetyAnalysisAttrSpelling::C2_XCLANG_NO_THREAD_SAFETY_ANALYSIS;
+    case 15: return NoThreadSafetyAnalysisAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoThreadSafetyAnalysisAttrSpelling e) {
+  switch (e) {
+    case NoThreadSafetyAnalysisAttrSpelling::GNU_NO_THREAD_SAFETY_ANALYSIS: return "GNU_NO_THREAD_SAFETY_ANALYSIS";
+    case NoThreadSafetyAnalysisAttrSpelling::CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS: return "CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS";
+    case NoThreadSafetyAnalysisAttrSpelling::C2_XCLANG_NO_THREAD_SAFETY_ANALYSIS: return "C2_XCLANG_NO_THREAD_SAFETY_ANALYSIS";
+    case NoThreadSafetyAnalysisAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NoThrowAttrSpelling FromPasta(pasta::NoThrowAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NoThrowAttrSpelling::GNU_NOTHROW;
+    case 1: return NoThrowAttrSpelling::CXX11_GNU_NOTHROW;
+    case 2: return NoThrowAttrSpelling::C2_XGNU_NOTHROW;
+    case 3: return NoThrowAttrSpelling::DECLSPEC_NOTHROW;
+    case 15: return NoThrowAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NoThrowAttrSpelling e) {
+  switch (e) {
+    case NoThrowAttrSpelling::GNU_NOTHROW: return "GNU_NOTHROW";
+    case NoThrowAttrSpelling::CXX11_GNU_NOTHROW: return "CXX11_GNU_NOTHROW";
+    case NoThrowAttrSpelling::C2_XGNU_NOTHROW: return "C2_XGNU_NOTHROW";
+    case NoThrowAttrSpelling::DECLSPEC_NOTHROW: return "DECLSPEC_NOTHROW";
+    case NoThrowAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NonNullAttrSpelling FromPasta(pasta::NonNullAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NonNullAttrSpelling::GNU_NONNULL;
+    case 1: return NonNullAttrSpelling::CXX11_GNU_NONNULL;
+    case 2: return NonNullAttrSpelling::C2_XGNU_NONNULL;
+    case 15: return NonNullAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NonNullAttrSpelling e) {
+  switch (e) {
+    case NonNullAttrSpelling::GNU_NONNULL: return "GNU_NONNULL";
+    case NonNullAttrSpelling::CXX11_GNU_NONNULL: return "CXX11_GNU_NONNULL";
+    case NonNullAttrSpelling::C2_XGNU_NONNULL: return "C2_XGNU_NONNULL";
+    case NonNullAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+NotTailCalledAttrSpelling FromPasta(pasta::NotTailCalledAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return NotTailCalledAttrSpelling::GNU_NOT_TAIL_CALLED;
+    case 1: return NotTailCalledAttrSpelling::CXX11_CLANG_NOT_TAIL_CALLED;
+    case 2: return NotTailCalledAttrSpelling::C2_XCLANG_NOT_TAIL_CALLED;
+    case 15: return NotTailCalledAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(NotTailCalledAttrSpelling e) {
+  switch (e) {
+    case NotTailCalledAttrSpelling::GNU_NOT_TAIL_CALLED: return "GNU_NOT_TAIL_CALLED";
+    case NotTailCalledAttrSpelling::CXX11_CLANG_NOT_TAIL_CALLED: return "CXX11_CLANG_NOT_TAIL_CALLED";
+    case NotTailCalledAttrSpelling::C2_XCLANG_NOT_TAIL_CALLED: return "C2_XCLANG_NOT_TAIL_CALLED";
+    case NotTailCalledAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OMPAllocateDeclAttrAllocatorTypeTy FromPasta(pasta::OMPAllocateDeclAttrAllocatorTypeTy e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_NULL_MEMORY_ALLOC;
+    case 1: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_DEFAULT_MEMORY_ALLOC;
+    case 2: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_LARGE_CAP_MEMORY_ALLOC;
+    case 3: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_CONST_MEMORY_ALLOC;
+    case 4: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_HIGH_BW_MEMORY_ALLOC;
+    case 5: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_LOW_LAT_MEMORY_ALLOC;
+    case 6: return OMPAllocateDeclAttrAllocatorTypeTy::OMPC_GROUP_MEMORY_ALLOC;
+    case 7: return OMPAllocateDeclAttrAllocatorTypeTy::OMPP_TEAM_MEMORY_ALLOC;
+    case 8: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_THREAD_MEMORY_ALLOC;
+    case 9: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_USER_DEFINED_MEMORY_ALLOC;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OMPAllocateDeclAttrAllocatorTypeTy e) {
+  switch (e) {
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_NULL_MEMORY_ALLOC: return "OMP_NULL_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_DEFAULT_MEMORY_ALLOC: return "OMP_DEFAULT_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_LARGE_CAP_MEMORY_ALLOC: return "OMP_LARGE_CAP_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_CONST_MEMORY_ALLOC: return "OMP_CONST_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_HIGH_BW_MEMORY_ALLOC: return "OMP_HIGH_BW_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_LOW_LAT_MEMORY_ALLOC: return "OMP_LOW_LAT_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMPC_GROUP_MEMORY_ALLOC: return "OMPC_GROUP_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMPP_TEAM_MEMORY_ALLOC: return "OMPP_TEAM_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_THREAD_MEMORY_ALLOC: return "OMP_THREAD_MEMORY_ALLOC";
+    case OMPAllocateDeclAttrAllocatorTypeTy::OMP_USER_DEFINED_MEMORY_ALLOC: return "OMP_USER_DEFINED_MEMORY_ALLOC";
+    default: return "<invalid>";
+  }
+}
+
 OMPDeclareReductionDeclInitKind FromPasta(pasta::OMPDeclareReductionDeclInitKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return OMPDeclareReductionDeclInitKind::CALL_INITIALIZER;
@@ -1333,6 +4579,456 @@ const char *EnumeratorName(OMPDeclareReductionDeclInitKind e) {
     case OMPDeclareReductionDeclInitKind::CALL_INITIALIZER: return "CALL_INITIALIZER";
     case OMPDeclareReductionDeclInitKind::DIRECT_INITIALIZER: return "DIRECT_INITIALIZER";
     case OMPDeclareReductionDeclInitKind::COPY_INITIALIZER: return "COPY_INITIALIZER";
+    default: return "<invalid>";
+  }
+}
+
+OMPDeclareSimdDeclAttrBranchStateTy FromPasta(pasta::OMPDeclareSimdDeclAttrBranchStateTy e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OMPDeclareSimdDeclAttrBranchStateTy::UNDEFINED;
+    case 1: return OMPDeclareSimdDeclAttrBranchStateTy::INBRANCH;
+    case 2: return OMPDeclareSimdDeclAttrBranchStateTy::NOTINBRANCH;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OMPDeclareSimdDeclAttrBranchStateTy e) {
+  switch (e) {
+    case OMPDeclareSimdDeclAttrBranchStateTy::UNDEFINED: return "UNDEFINED";
+    case OMPDeclareSimdDeclAttrBranchStateTy::INBRANCH: return "INBRANCH";
+    case OMPDeclareSimdDeclAttrBranchStateTy::NOTINBRANCH: return "NOTINBRANCH";
+    default: return "<invalid>";
+  }
+}
+
+OMPDeclareTargetDeclAttrDevTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrDevTypeTy e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OMPDeclareTargetDeclAttrDevTypeTy::HOST;
+    case 1: return OMPDeclareTargetDeclAttrDevTypeTy::NO_HOST;
+    case 2: return OMPDeclareTargetDeclAttrDevTypeTy::ANY;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OMPDeclareTargetDeclAttrDevTypeTy e) {
+  switch (e) {
+    case OMPDeclareTargetDeclAttrDevTypeTy::HOST: return "HOST";
+    case OMPDeclareTargetDeclAttrDevTypeTy::NO_HOST: return "NO_HOST";
+    case OMPDeclareTargetDeclAttrDevTypeTy::ANY: return "ANY";
+    default: return "<invalid>";
+  }
+}
+
+OMPDeclareTargetDeclAttrMapTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrMapTypeTy e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OMPDeclareTargetDeclAttrMapTypeTy::TO;
+    case 1: return OMPDeclareTargetDeclAttrMapTypeTy::LINK;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OMPDeclareTargetDeclAttrMapTypeTy e) {
+  switch (e) {
+    case OMPDeclareTargetDeclAttrMapTypeTy::TO: return "TO";
+    case OMPDeclareTargetDeclAttrMapTypeTy::LINK: return "LINK";
+    default: return "<invalid>";
+  }
+}
+
+OMPDeclareVariantAttrInteropType FromPasta(pasta::OMPDeclareVariantAttrInteropType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OMPDeclareVariantAttrInteropType::TARGET;
+    case 1: return OMPDeclareVariantAttrInteropType::TARGET_SYNC;
+    case 2: return OMPDeclareVariantAttrInteropType::TARGET_TARGET_SYNC;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OMPDeclareVariantAttrInteropType e) {
+  switch (e) {
+    case OMPDeclareVariantAttrInteropType::TARGET: return "TARGET";
+    case OMPDeclareVariantAttrInteropType::TARGET_SYNC: return "TARGET_SYNC";
+    case OMPDeclareVariantAttrInteropType::TARGET_TARGET_SYNC: return "TARGET_TARGET_SYNC";
+    default: return "<invalid>";
+  }
+}
+
+OSConsumedAttrSpelling FromPasta(pasta::OSConsumedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OSConsumedAttrSpelling::GNU_OS_CONSUMED;
+    case 1: return OSConsumedAttrSpelling::CXX11_CLANG_OS_CONSUMED;
+    case 2: return OSConsumedAttrSpelling::C2_XCLANG_OS_CONSUMED;
+    case 15: return OSConsumedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OSConsumedAttrSpelling e) {
+  switch (e) {
+    case OSConsumedAttrSpelling::GNU_OS_CONSUMED: return "GNU_OS_CONSUMED";
+    case OSConsumedAttrSpelling::CXX11_CLANG_OS_CONSUMED: return "CXX11_CLANG_OS_CONSUMED";
+    case OSConsumedAttrSpelling::C2_XCLANG_OS_CONSUMED: return "C2_XCLANG_OS_CONSUMED";
+    case OSConsumedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OSConsumesThisAttrSpelling FromPasta(pasta::OSConsumesThisAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OSConsumesThisAttrSpelling::GNU_OS_CONSUMES_THIS;
+    case 1: return OSConsumesThisAttrSpelling::CXX11_CLANG_OS_CONSUMES_THIS;
+    case 2: return OSConsumesThisAttrSpelling::C2_XCLANG_OS_CONSUMES_THIS;
+    case 15: return OSConsumesThisAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OSConsumesThisAttrSpelling e) {
+  switch (e) {
+    case OSConsumesThisAttrSpelling::GNU_OS_CONSUMES_THIS: return "GNU_OS_CONSUMES_THIS";
+    case OSConsumesThisAttrSpelling::CXX11_CLANG_OS_CONSUMES_THIS: return "CXX11_CLANG_OS_CONSUMES_THIS";
+    case OSConsumesThisAttrSpelling::C2_XCLANG_OS_CONSUMES_THIS: return "C2_XCLANG_OS_CONSUMES_THIS";
+    case OSConsumesThisAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OSReturnsNotRetainedAttrSpelling FromPasta(pasta::OSReturnsNotRetainedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OSReturnsNotRetainedAttrSpelling::GNU_OS_RETURNS_NOT_RETAINED;
+    case 1: return OSReturnsNotRetainedAttrSpelling::CXX11_CLANG_OS_RETURNS_NOT_RETAINED;
+    case 2: return OSReturnsNotRetainedAttrSpelling::C2_XCLANG_OS_RETURNS_NOT_RETAINED;
+    case 15: return OSReturnsNotRetainedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OSReturnsNotRetainedAttrSpelling e) {
+  switch (e) {
+    case OSReturnsNotRetainedAttrSpelling::GNU_OS_RETURNS_NOT_RETAINED: return "GNU_OS_RETURNS_NOT_RETAINED";
+    case OSReturnsNotRetainedAttrSpelling::CXX11_CLANG_OS_RETURNS_NOT_RETAINED: return "CXX11_CLANG_OS_RETURNS_NOT_RETAINED";
+    case OSReturnsNotRetainedAttrSpelling::C2_XCLANG_OS_RETURNS_NOT_RETAINED: return "C2_XCLANG_OS_RETURNS_NOT_RETAINED";
+    case OSReturnsNotRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OSReturnsRetainedAttrSpelling FromPasta(pasta::OSReturnsRetainedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OSReturnsRetainedAttrSpelling::GNU_OS_RETURNS_RETAINED;
+    case 1: return OSReturnsRetainedAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED;
+    case 2: return OSReturnsRetainedAttrSpelling::C2_XCLANG_OS_RETURNS_RETAINED;
+    case 15: return OSReturnsRetainedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OSReturnsRetainedAttrSpelling e) {
+  switch (e) {
+    case OSReturnsRetainedAttrSpelling::GNU_OS_RETURNS_RETAINED: return "GNU_OS_RETURNS_RETAINED";
+    case OSReturnsRetainedAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED: return "CXX11_CLANG_OS_RETURNS_RETAINED";
+    case OSReturnsRetainedAttrSpelling::C2_XCLANG_OS_RETURNS_RETAINED: return "C2_XCLANG_OS_RETURNS_RETAINED";
+    case OSReturnsRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OSReturnsRetainedOnNonZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnNonZeroAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OSReturnsRetainedOnNonZeroAttrSpelling::GNU_OS_RETURNS_RETAINED_ON_NON_ZERO;
+    case 1: return OSReturnsRetainedOnNonZeroAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO;
+    case 2: return OSReturnsRetainedOnNonZeroAttrSpelling::C2_XCLANG_OS_RETURNS_RETAINED_ON_NON_ZERO;
+    case 15: return OSReturnsRetainedOnNonZeroAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OSReturnsRetainedOnNonZeroAttrSpelling e) {
+  switch (e) {
+    case OSReturnsRetainedOnNonZeroAttrSpelling::GNU_OS_RETURNS_RETAINED_ON_NON_ZERO: return "GNU_OS_RETURNS_RETAINED_ON_NON_ZERO";
+    case OSReturnsRetainedOnNonZeroAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO: return "CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO";
+    case OSReturnsRetainedOnNonZeroAttrSpelling::C2_XCLANG_OS_RETURNS_RETAINED_ON_NON_ZERO: return "C2_XCLANG_OS_RETURNS_RETAINED_ON_NON_ZERO";
+    case OSReturnsRetainedOnNonZeroAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OSReturnsRetainedOnZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnZeroAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OSReturnsRetainedOnZeroAttrSpelling::GNU_OS_RETURNS_RETAINED_ON_ZERO;
+    case 1: return OSReturnsRetainedOnZeroAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO;
+    case 2: return OSReturnsRetainedOnZeroAttrSpelling::C2_XCLANG_OS_RETURNS_RETAINED_ON_ZERO;
+    case 15: return OSReturnsRetainedOnZeroAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OSReturnsRetainedOnZeroAttrSpelling e) {
+  switch (e) {
+    case OSReturnsRetainedOnZeroAttrSpelling::GNU_OS_RETURNS_RETAINED_ON_ZERO: return "GNU_OS_RETURNS_RETAINED_ON_ZERO";
+    case OSReturnsRetainedOnZeroAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO: return "CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO";
+    case OSReturnsRetainedOnZeroAttrSpelling::C2_XCLANG_OS_RETURNS_RETAINED_ON_ZERO: return "C2_XCLANG_OS_RETURNS_RETAINED_ON_ZERO";
+    case OSReturnsRetainedOnZeroAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCBoxableAttrSpelling FromPasta(pasta::ObjCBoxableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCBoxableAttrSpelling::GNU_OBJC_BOXABLE;
+    case 1: return ObjCBoxableAttrSpelling::CXX11_CLANG_OBJC_BOXABLE;
+    case 2: return ObjCBoxableAttrSpelling::C2_XCLANG_OBJC_BOXABLE;
+    case 15: return ObjCBoxableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCBoxableAttrSpelling e) {
+  switch (e) {
+    case ObjCBoxableAttrSpelling::GNU_OBJC_BOXABLE: return "GNU_OBJC_BOXABLE";
+    case ObjCBoxableAttrSpelling::CXX11_CLANG_OBJC_BOXABLE: return "CXX11_CLANG_OBJC_BOXABLE";
+    case ObjCBoxableAttrSpelling::C2_XCLANG_OBJC_BOXABLE: return "C2_XCLANG_OBJC_BOXABLE";
+    case ObjCBoxableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCBridgeAttrSpelling FromPasta(pasta::ObjCBridgeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCBridgeAttrSpelling::GNU_OBJC_BRIDGE;
+    case 1: return ObjCBridgeAttrSpelling::CXX11_CLANG_OBJC_BRIDGE;
+    case 2: return ObjCBridgeAttrSpelling::C2_XCLANG_OBJC_BRIDGE;
+    case 15: return ObjCBridgeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCBridgeAttrSpelling e) {
+  switch (e) {
+    case ObjCBridgeAttrSpelling::GNU_OBJC_BRIDGE: return "GNU_OBJC_BRIDGE";
+    case ObjCBridgeAttrSpelling::CXX11_CLANG_OBJC_BRIDGE: return "CXX11_CLANG_OBJC_BRIDGE";
+    case ObjCBridgeAttrSpelling::C2_XCLANG_OBJC_BRIDGE: return "C2_XCLANG_OBJC_BRIDGE";
+    case ObjCBridgeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCBridgeMutableAttrSpelling FromPasta(pasta::ObjCBridgeMutableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCBridgeMutableAttrSpelling::GNU_OBJC_BRIDGE_MUTABLE;
+    case 1: return ObjCBridgeMutableAttrSpelling::CXX11_CLANG_OBJC_BRIDGE_MUTABLE;
+    case 2: return ObjCBridgeMutableAttrSpelling::C2_XCLANG_OBJC_BRIDGE_MUTABLE;
+    case 15: return ObjCBridgeMutableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCBridgeMutableAttrSpelling e) {
+  switch (e) {
+    case ObjCBridgeMutableAttrSpelling::GNU_OBJC_BRIDGE_MUTABLE: return "GNU_OBJC_BRIDGE_MUTABLE";
+    case ObjCBridgeMutableAttrSpelling::CXX11_CLANG_OBJC_BRIDGE_MUTABLE: return "CXX11_CLANG_OBJC_BRIDGE_MUTABLE";
+    case ObjCBridgeMutableAttrSpelling::C2_XCLANG_OBJC_BRIDGE_MUTABLE: return "C2_XCLANG_OBJC_BRIDGE_MUTABLE";
+    case ObjCBridgeMutableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCBridgeRelatedAttrSpelling FromPasta(pasta::ObjCBridgeRelatedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCBridgeRelatedAttrSpelling::GNU_OBJC_BRIDGE_RELATED;
+    case 1: return ObjCBridgeRelatedAttrSpelling::CXX11_CLANG_OBJC_BRIDGE_RELATED;
+    case 2: return ObjCBridgeRelatedAttrSpelling::C2_XCLANG_OBJC_BRIDGE_RELATED;
+    case 15: return ObjCBridgeRelatedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCBridgeRelatedAttrSpelling e) {
+  switch (e) {
+    case ObjCBridgeRelatedAttrSpelling::GNU_OBJC_BRIDGE_RELATED: return "GNU_OBJC_BRIDGE_RELATED";
+    case ObjCBridgeRelatedAttrSpelling::CXX11_CLANG_OBJC_BRIDGE_RELATED: return "CXX11_CLANG_OBJC_BRIDGE_RELATED";
+    case ObjCBridgeRelatedAttrSpelling::C2_XCLANG_OBJC_BRIDGE_RELATED: return "C2_XCLANG_OBJC_BRIDGE_RELATED";
+    case ObjCBridgeRelatedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCClassStubAttrSpelling FromPasta(pasta::ObjCClassStubAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCClassStubAttrSpelling::GNU_OBJC_CLASS_STUB;
+    case 1: return ObjCClassStubAttrSpelling::CXX11_CLANG_OBJC_CLASS_STUB;
+    case 2: return ObjCClassStubAttrSpelling::C2_XCLANG_OBJC_CLASS_STUB;
+    case 15: return ObjCClassStubAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCClassStubAttrSpelling e) {
+  switch (e) {
+    case ObjCClassStubAttrSpelling::GNU_OBJC_CLASS_STUB: return "GNU_OBJC_CLASS_STUB";
+    case ObjCClassStubAttrSpelling::CXX11_CLANG_OBJC_CLASS_STUB: return "CXX11_CLANG_OBJC_CLASS_STUB";
+    case ObjCClassStubAttrSpelling::C2_XCLANG_OBJC_CLASS_STUB: return "C2_XCLANG_OBJC_CLASS_STUB";
+    case ObjCClassStubAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCDesignatedInitializerAttrSpelling FromPasta(pasta::ObjCDesignatedInitializerAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCDesignatedInitializerAttrSpelling::GNU_OBJC_DESIGNATED_INITIALIZER;
+    case 1: return ObjCDesignatedInitializerAttrSpelling::CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER;
+    case 2: return ObjCDesignatedInitializerAttrSpelling::C2_XCLANG_OBJC_DESIGNATED_INITIALIZER;
+    case 15: return ObjCDesignatedInitializerAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCDesignatedInitializerAttrSpelling e) {
+  switch (e) {
+    case ObjCDesignatedInitializerAttrSpelling::GNU_OBJC_DESIGNATED_INITIALIZER: return "GNU_OBJC_DESIGNATED_INITIALIZER";
+    case ObjCDesignatedInitializerAttrSpelling::CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER: return "CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER";
+    case ObjCDesignatedInitializerAttrSpelling::C2_XCLANG_OBJC_DESIGNATED_INITIALIZER: return "C2_XCLANG_OBJC_DESIGNATED_INITIALIZER";
+    case ObjCDesignatedInitializerAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCDirectAttrSpelling FromPasta(pasta::ObjCDirectAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCDirectAttrSpelling::GNU_OBJC_DIRECT;
+    case 1: return ObjCDirectAttrSpelling::CXX11_CLANG_OBJC_DIRECT;
+    case 2: return ObjCDirectAttrSpelling::C2_XCLANG_OBJC_DIRECT;
+    case 15: return ObjCDirectAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCDirectAttrSpelling e) {
+  switch (e) {
+    case ObjCDirectAttrSpelling::GNU_OBJC_DIRECT: return "GNU_OBJC_DIRECT";
+    case ObjCDirectAttrSpelling::CXX11_CLANG_OBJC_DIRECT: return "CXX11_CLANG_OBJC_DIRECT";
+    case ObjCDirectAttrSpelling::C2_XCLANG_OBJC_DIRECT: return "C2_XCLANG_OBJC_DIRECT";
+    case ObjCDirectAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCDirectMembersAttrSpelling FromPasta(pasta::ObjCDirectMembersAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCDirectMembersAttrSpelling::GNU_OBJC_DIRECT_MEMBERS;
+    case 1: return ObjCDirectMembersAttrSpelling::CXX11_CLANG_OBJC_DIRECT_MEMBERS;
+    case 2: return ObjCDirectMembersAttrSpelling::C2_XCLANG_OBJC_DIRECT_MEMBERS;
+    case 15: return ObjCDirectMembersAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCDirectMembersAttrSpelling e) {
+  switch (e) {
+    case ObjCDirectMembersAttrSpelling::GNU_OBJC_DIRECT_MEMBERS: return "GNU_OBJC_DIRECT_MEMBERS";
+    case ObjCDirectMembersAttrSpelling::CXX11_CLANG_OBJC_DIRECT_MEMBERS: return "CXX11_CLANG_OBJC_DIRECT_MEMBERS";
+    case ObjCDirectMembersAttrSpelling::C2_XCLANG_OBJC_DIRECT_MEMBERS: return "C2_XCLANG_OBJC_DIRECT_MEMBERS";
+    case ObjCDirectMembersAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCExceptionAttrSpelling FromPasta(pasta::ObjCExceptionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCExceptionAttrSpelling::GNU_OBJC_EXCEPTION;
+    case 1: return ObjCExceptionAttrSpelling::CXX11_CLANG_OBJC_EXCEPTION;
+    case 2: return ObjCExceptionAttrSpelling::C2_XCLANG_OBJC_EXCEPTION;
+    case 15: return ObjCExceptionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCExceptionAttrSpelling e) {
+  switch (e) {
+    case ObjCExceptionAttrSpelling::GNU_OBJC_EXCEPTION: return "GNU_OBJC_EXCEPTION";
+    case ObjCExceptionAttrSpelling::CXX11_CLANG_OBJC_EXCEPTION: return "CXX11_CLANG_OBJC_EXCEPTION";
+    case ObjCExceptionAttrSpelling::C2_XCLANG_OBJC_EXCEPTION: return "C2_XCLANG_OBJC_EXCEPTION";
+    case ObjCExceptionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCExplicitProtocolImplAttrSpelling FromPasta(pasta::ObjCExplicitProtocolImplAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCExplicitProtocolImplAttrSpelling::GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION;
+    case 1: return ObjCExplicitProtocolImplAttrSpelling::CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION;
+    case 2: return ObjCExplicitProtocolImplAttrSpelling::C2_XCLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION;
+    case 15: return ObjCExplicitProtocolImplAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCExplicitProtocolImplAttrSpelling e) {
+  switch (e) {
+    case ObjCExplicitProtocolImplAttrSpelling::GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION: return "GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION";
+    case ObjCExplicitProtocolImplAttrSpelling::CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION: return "CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION";
+    case ObjCExplicitProtocolImplAttrSpelling::C2_XCLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION: return "C2_XCLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION";
+    case ObjCExplicitProtocolImplAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCExternallyRetainedAttrSpelling FromPasta(pasta::ObjCExternallyRetainedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCExternallyRetainedAttrSpelling::GNU_OBJC_EXTERNALLY_RETAINED;
+    case 1: return ObjCExternallyRetainedAttrSpelling::CXX11_CLANG_OBJC_EXTERNALLY_RETAINED;
+    case 2: return ObjCExternallyRetainedAttrSpelling::C2_XCLANG_OBJC_EXTERNALLY_RETAINED;
+    case 15: return ObjCExternallyRetainedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCExternallyRetainedAttrSpelling e) {
+  switch (e) {
+    case ObjCExternallyRetainedAttrSpelling::GNU_OBJC_EXTERNALLY_RETAINED: return "GNU_OBJC_EXTERNALLY_RETAINED";
+    case ObjCExternallyRetainedAttrSpelling::CXX11_CLANG_OBJC_EXTERNALLY_RETAINED: return "CXX11_CLANG_OBJC_EXTERNALLY_RETAINED";
+    case ObjCExternallyRetainedAttrSpelling::C2_XCLANG_OBJC_EXTERNALLY_RETAINED: return "C2_XCLANG_OBJC_EXTERNALLY_RETAINED";
+    case ObjCExternallyRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCGCAttrSpelling FromPasta(pasta::ObjCGCAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCGCAttrSpelling::GNU_OBJC_GC;
+    case 1: return ObjCGCAttrSpelling::CXX11_CLANG_OBJC_GC;
+    case 2: return ObjCGCAttrSpelling::C2_XCLANG_OBJC_GC;
+    case 15: return ObjCGCAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCGCAttrSpelling e) {
+  switch (e) {
+    case ObjCGCAttrSpelling::GNU_OBJC_GC: return "GNU_OBJC_GC";
+    case ObjCGCAttrSpelling::CXX11_CLANG_OBJC_GC: return "CXX11_CLANG_OBJC_GC";
+    case ObjCGCAttrSpelling::C2_XCLANG_OBJC_GC: return "C2_XCLANG_OBJC_GC";
+    case ObjCGCAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCIndependentClassAttrSpelling FromPasta(pasta::ObjCIndependentClassAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCIndependentClassAttrSpelling::GNU_OBJC_INDEPENDENT_CLASS;
+    case 1: return ObjCIndependentClassAttrSpelling::CXX11_CLANG_OBJC_INDEPENDENT_CLASS;
+    case 2: return ObjCIndependentClassAttrSpelling::C2_XCLANG_OBJC_INDEPENDENT_CLASS;
+    case 15: return ObjCIndependentClassAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCIndependentClassAttrSpelling e) {
+  switch (e) {
+    case ObjCIndependentClassAttrSpelling::GNU_OBJC_INDEPENDENT_CLASS: return "GNU_OBJC_INDEPENDENT_CLASS";
+    case ObjCIndependentClassAttrSpelling::CXX11_CLANG_OBJC_INDEPENDENT_CLASS: return "CXX11_CLANG_OBJC_INDEPENDENT_CLASS";
+    case ObjCIndependentClassAttrSpelling::C2_XCLANG_OBJC_INDEPENDENT_CLASS: return "C2_XCLANG_OBJC_INDEPENDENT_CLASS";
+    case ObjCIndependentClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -1397,6 +5093,150 @@ const char *EnumeratorName(ObjCMethodDeclImplementationControl e) {
   }
 }
 
+ObjCMethodFamilyAttrFamilyKind FromPasta(pasta::ObjCMethodFamilyAttrFamilyKind e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCMethodFamilyAttrFamilyKind::NONE;
+    case 1: return ObjCMethodFamilyAttrFamilyKind::ALLOC;
+    case 2: return ObjCMethodFamilyAttrFamilyKind::COPY;
+    case 3: return ObjCMethodFamilyAttrFamilyKind::INITIALIZER;
+    case 4: return ObjCMethodFamilyAttrFamilyKind::MUTABLE_COPY;
+    case 5: return ObjCMethodFamilyAttrFamilyKind::NEW;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCMethodFamilyAttrFamilyKind e) {
+  switch (e) {
+    case ObjCMethodFamilyAttrFamilyKind::NONE: return "NONE";
+    case ObjCMethodFamilyAttrFamilyKind::ALLOC: return "ALLOC";
+    case ObjCMethodFamilyAttrFamilyKind::COPY: return "COPY";
+    case ObjCMethodFamilyAttrFamilyKind::INITIALIZER: return "INITIALIZER";
+    case ObjCMethodFamilyAttrFamilyKind::MUTABLE_COPY: return "MUTABLE_COPY";
+    case ObjCMethodFamilyAttrFamilyKind::NEW: return "NEW";
+    default: return "<invalid>";
+  }
+}
+
+ObjCMethodFamilyAttrSpelling FromPasta(pasta::ObjCMethodFamilyAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCMethodFamilyAttrSpelling::GNU_OBJC_METHOD_FAMILY;
+    case 1: return ObjCMethodFamilyAttrSpelling::CXX11_CLANG_OBJC_METHOD_FAMILY;
+    case 2: return ObjCMethodFamilyAttrSpelling::C2_XCLANG_OBJC_METHOD_FAMILY;
+    case 15: return ObjCMethodFamilyAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCMethodFamilyAttrSpelling e) {
+  switch (e) {
+    case ObjCMethodFamilyAttrSpelling::GNU_OBJC_METHOD_FAMILY: return "GNU_OBJC_METHOD_FAMILY";
+    case ObjCMethodFamilyAttrSpelling::CXX11_CLANG_OBJC_METHOD_FAMILY: return "CXX11_CLANG_OBJC_METHOD_FAMILY";
+    case ObjCMethodFamilyAttrSpelling::C2_XCLANG_OBJC_METHOD_FAMILY: return "C2_XCLANG_OBJC_METHOD_FAMILY";
+    case ObjCMethodFamilyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCNSObjectAttrSpelling FromPasta(pasta::ObjCNSObjectAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCNSObjectAttrSpelling::GNUNS_OBJECT;
+    case 1: return ObjCNSObjectAttrSpelling::CXX11_CLANG_NS_OBJECT;
+    case 2: return ObjCNSObjectAttrSpelling::C2_XCLANG_NS_OBJECT;
+    case 15: return ObjCNSObjectAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCNSObjectAttrSpelling e) {
+  switch (e) {
+    case ObjCNSObjectAttrSpelling::GNUNS_OBJECT: return "GNUNS_OBJECT";
+    case ObjCNSObjectAttrSpelling::CXX11_CLANG_NS_OBJECT: return "CXX11_CLANG_NS_OBJECT";
+    case ObjCNSObjectAttrSpelling::C2_XCLANG_NS_OBJECT: return "C2_XCLANG_NS_OBJECT";
+    case ObjCNSObjectAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCNonLazyClassAttrSpelling FromPasta(pasta::ObjCNonLazyClassAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCNonLazyClassAttrSpelling::GNU_OBJC_NONLAZY_CLASS;
+    case 1: return ObjCNonLazyClassAttrSpelling::CXX11_CLANG_OBJC_NONLAZY_CLASS;
+    case 2: return ObjCNonLazyClassAttrSpelling::C2_XCLANG_OBJC_NONLAZY_CLASS;
+    case 15: return ObjCNonLazyClassAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCNonLazyClassAttrSpelling e) {
+  switch (e) {
+    case ObjCNonLazyClassAttrSpelling::GNU_OBJC_NONLAZY_CLASS: return "GNU_OBJC_NONLAZY_CLASS";
+    case ObjCNonLazyClassAttrSpelling::CXX11_CLANG_OBJC_NONLAZY_CLASS: return "CXX11_CLANG_OBJC_NONLAZY_CLASS";
+    case ObjCNonLazyClassAttrSpelling::C2_XCLANG_OBJC_NONLAZY_CLASS: return "C2_XCLANG_OBJC_NONLAZY_CLASS";
+    case ObjCNonLazyClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCNonRuntimeProtocolAttrSpelling FromPasta(pasta::ObjCNonRuntimeProtocolAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCNonRuntimeProtocolAttrSpelling::GNU_OBJC_NON_RUNTIME_PROTOCOL;
+    case 1: return ObjCNonRuntimeProtocolAttrSpelling::CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL;
+    case 2: return ObjCNonRuntimeProtocolAttrSpelling::C2_XCLANG_OBJC_NON_RUNTIME_PROTOCOL;
+    case 15: return ObjCNonRuntimeProtocolAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCNonRuntimeProtocolAttrSpelling e) {
+  switch (e) {
+    case ObjCNonRuntimeProtocolAttrSpelling::GNU_OBJC_NON_RUNTIME_PROTOCOL: return "GNU_OBJC_NON_RUNTIME_PROTOCOL";
+    case ObjCNonRuntimeProtocolAttrSpelling::CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL: return "CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL";
+    case ObjCNonRuntimeProtocolAttrSpelling::C2_XCLANG_OBJC_NON_RUNTIME_PROTOCOL: return "C2_XCLANG_OBJC_NON_RUNTIME_PROTOCOL";
+    case ObjCNonRuntimeProtocolAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCOwnershipAttrSpelling FromPasta(pasta::ObjCOwnershipAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCOwnershipAttrSpelling::GNU_OBJC_OWNERSHIP;
+    case 1: return ObjCOwnershipAttrSpelling::CXX11_CLANG_OBJC_OWNERSHIP;
+    case 2: return ObjCOwnershipAttrSpelling::C2_XCLANG_OBJC_OWNERSHIP;
+    case 15: return ObjCOwnershipAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCOwnershipAttrSpelling e) {
+  switch (e) {
+    case ObjCOwnershipAttrSpelling::GNU_OBJC_OWNERSHIP: return "GNU_OBJC_OWNERSHIP";
+    case ObjCOwnershipAttrSpelling::CXX11_CLANG_OBJC_OWNERSHIP: return "CXX11_CLANG_OBJC_OWNERSHIP";
+    case ObjCOwnershipAttrSpelling::C2_XCLANG_OBJC_OWNERSHIP: return "C2_XCLANG_OBJC_OWNERSHIP";
+    case ObjCOwnershipAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCPreciseLifetimeAttrSpelling FromPasta(pasta::ObjCPreciseLifetimeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCPreciseLifetimeAttrSpelling::GNU_OBJC_PRECISE_LIFETIME;
+    case 1: return ObjCPreciseLifetimeAttrSpelling::CXX11_CLANG_OBJC_PRECISE_LIFETIME;
+    case 2: return ObjCPreciseLifetimeAttrSpelling::C2_XCLANG_OBJC_PRECISE_LIFETIME;
+    case 15: return ObjCPreciseLifetimeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCPreciseLifetimeAttrSpelling e) {
+  switch (e) {
+    case ObjCPreciseLifetimeAttrSpelling::GNU_OBJC_PRECISE_LIFETIME: return "GNU_OBJC_PRECISE_LIFETIME";
+    case ObjCPreciseLifetimeAttrSpelling::CXX11_CLANG_OBJC_PRECISE_LIFETIME: return "CXX11_CLANG_OBJC_PRECISE_LIFETIME";
+    case ObjCPreciseLifetimeAttrSpelling::C2_XCLANG_OBJC_PRECISE_LIFETIME: return "C2_XCLANG_OBJC_PRECISE_LIFETIME";
+    case ObjCPreciseLifetimeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 ObjCPropertyDeclPropertyControl FromPasta(pasta::ObjCPropertyDeclPropertyControl e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return ObjCPropertyDeclPropertyControl::NONE;
@@ -1451,6 +5291,582 @@ const char *EnumeratorName(ObjCPropertyImplDeclKind e) {
   }
 }
 
+ObjCRequiresPropertyDefsAttrSpelling FromPasta(pasta::ObjCRequiresPropertyDefsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCRequiresPropertyDefsAttrSpelling::GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS;
+    case 1: return ObjCRequiresPropertyDefsAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS;
+    case 2: return ObjCRequiresPropertyDefsAttrSpelling::C2_XCLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS;
+    case 15: return ObjCRequiresPropertyDefsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCRequiresPropertyDefsAttrSpelling e) {
+  switch (e) {
+    case ObjCRequiresPropertyDefsAttrSpelling::GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS: return "GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS";
+    case ObjCRequiresPropertyDefsAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS: return "CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS";
+    case ObjCRequiresPropertyDefsAttrSpelling::C2_XCLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS: return "C2_XCLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS";
+    case ObjCRequiresPropertyDefsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCRequiresSuperAttrSpelling FromPasta(pasta::ObjCRequiresSuperAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCRequiresSuperAttrSpelling::GNU_OBJC_REQUIRES_SUPER;
+    case 1: return ObjCRequiresSuperAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_SUPER;
+    case 2: return ObjCRequiresSuperAttrSpelling::C2_XCLANG_OBJC_REQUIRES_SUPER;
+    case 15: return ObjCRequiresSuperAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCRequiresSuperAttrSpelling e) {
+  switch (e) {
+    case ObjCRequiresSuperAttrSpelling::GNU_OBJC_REQUIRES_SUPER: return "GNU_OBJC_REQUIRES_SUPER";
+    case ObjCRequiresSuperAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_SUPER: return "CXX11_CLANG_OBJC_REQUIRES_SUPER";
+    case ObjCRequiresSuperAttrSpelling::C2_XCLANG_OBJC_REQUIRES_SUPER: return "C2_XCLANG_OBJC_REQUIRES_SUPER";
+    case ObjCRequiresSuperAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCReturnsInnerPointerAttrSpelling FromPasta(pasta::ObjCReturnsInnerPointerAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCReturnsInnerPointerAttrSpelling::GNU_OBJC_RETURNS_INNER_POINTER;
+    case 1: return ObjCReturnsInnerPointerAttrSpelling::CXX11_CLANG_OBJC_RETURNS_INNER_POINTER;
+    case 2: return ObjCReturnsInnerPointerAttrSpelling::C2_XCLANG_OBJC_RETURNS_INNER_POINTER;
+    case 15: return ObjCReturnsInnerPointerAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCReturnsInnerPointerAttrSpelling e) {
+  switch (e) {
+    case ObjCReturnsInnerPointerAttrSpelling::GNU_OBJC_RETURNS_INNER_POINTER: return "GNU_OBJC_RETURNS_INNER_POINTER";
+    case ObjCReturnsInnerPointerAttrSpelling::CXX11_CLANG_OBJC_RETURNS_INNER_POINTER: return "CXX11_CLANG_OBJC_RETURNS_INNER_POINTER";
+    case ObjCReturnsInnerPointerAttrSpelling::C2_XCLANG_OBJC_RETURNS_INNER_POINTER: return "C2_XCLANG_OBJC_RETURNS_INNER_POINTER";
+    case ObjCReturnsInnerPointerAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCRootClassAttrSpelling FromPasta(pasta::ObjCRootClassAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCRootClassAttrSpelling::GNU_OBJC_ROOT_CLASS;
+    case 1: return ObjCRootClassAttrSpelling::CXX11_CLANG_OBJC_ROOT_CLASS;
+    case 2: return ObjCRootClassAttrSpelling::C2_XCLANG_OBJC_ROOT_CLASS;
+    case 15: return ObjCRootClassAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCRootClassAttrSpelling e) {
+  switch (e) {
+    case ObjCRootClassAttrSpelling::GNU_OBJC_ROOT_CLASS: return "GNU_OBJC_ROOT_CLASS";
+    case ObjCRootClassAttrSpelling::CXX11_CLANG_OBJC_ROOT_CLASS: return "CXX11_CLANG_OBJC_ROOT_CLASS";
+    case ObjCRootClassAttrSpelling::C2_XCLANG_OBJC_ROOT_CLASS: return "C2_XCLANG_OBJC_ROOT_CLASS";
+    case ObjCRootClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCRuntimeNameAttrSpelling FromPasta(pasta::ObjCRuntimeNameAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCRuntimeNameAttrSpelling::GNU_OBJC_RUNTIME_NAME;
+    case 1: return ObjCRuntimeNameAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_NAME;
+    case 2: return ObjCRuntimeNameAttrSpelling::C2_XCLANG_OBJC_RUNTIME_NAME;
+    case 15: return ObjCRuntimeNameAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCRuntimeNameAttrSpelling e) {
+  switch (e) {
+    case ObjCRuntimeNameAttrSpelling::GNU_OBJC_RUNTIME_NAME: return "GNU_OBJC_RUNTIME_NAME";
+    case ObjCRuntimeNameAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_NAME: return "CXX11_CLANG_OBJC_RUNTIME_NAME";
+    case ObjCRuntimeNameAttrSpelling::C2_XCLANG_OBJC_RUNTIME_NAME: return "C2_XCLANG_OBJC_RUNTIME_NAME";
+    case ObjCRuntimeNameAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCRuntimeVisibleAttrSpelling FromPasta(pasta::ObjCRuntimeVisibleAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCRuntimeVisibleAttrSpelling::GNU_OBJC_RUNTIME_VISIBLE;
+    case 1: return ObjCRuntimeVisibleAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_VISIBLE;
+    case 2: return ObjCRuntimeVisibleAttrSpelling::C2_XCLANG_OBJC_RUNTIME_VISIBLE;
+    case 15: return ObjCRuntimeVisibleAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCRuntimeVisibleAttrSpelling e) {
+  switch (e) {
+    case ObjCRuntimeVisibleAttrSpelling::GNU_OBJC_RUNTIME_VISIBLE: return "GNU_OBJC_RUNTIME_VISIBLE";
+    case ObjCRuntimeVisibleAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_VISIBLE: return "CXX11_CLANG_OBJC_RUNTIME_VISIBLE";
+    case ObjCRuntimeVisibleAttrSpelling::C2_XCLANG_OBJC_RUNTIME_VISIBLE: return "C2_XCLANG_OBJC_RUNTIME_VISIBLE";
+    case ObjCRuntimeVisibleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ObjCSubclassingRestrictedAttrSpelling FromPasta(pasta::ObjCSubclassingRestrictedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ObjCSubclassingRestrictedAttrSpelling::GNU_OBJC_SUBCLASSING_RESTRICTED;
+    case 1: return ObjCSubclassingRestrictedAttrSpelling::CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED;
+    case 2: return ObjCSubclassingRestrictedAttrSpelling::C2_XCLANG_OBJC_SUBCLASSING_RESTRICTED;
+    case 15: return ObjCSubclassingRestrictedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ObjCSubclassingRestrictedAttrSpelling e) {
+  switch (e) {
+    case ObjCSubclassingRestrictedAttrSpelling::GNU_OBJC_SUBCLASSING_RESTRICTED: return "GNU_OBJC_SUBCLASSING_RESTRICTED";
+    case ObjCSubclassingRestrictedAttrSpelling::CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED: return "CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED";
+    case ObjCSubclassingRestrictedAttrSpelling::C2_XCLANG_OBJC_SUBCLASSING_RESTRICTED: return "C2_XCLANG_OBJC_SUBCLASSING_RESTRICTED";
+    case ObjCSubclassingRestrictedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLAccessAttrSpelling FromPasta(pasta::OpenCLAccessAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLAccessAttrSpelling::KEYWORD_READ_ONLY;
+    case 2: return OpenCLAccessAttrSpelling::KEYWORD_WRITE_ONLY;
+    case 4: return OpenCLAccessAttrSpelling::KEYWORD_READ_WRITE;
+    case 15: return OpenCLAccessAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLAccessAttrSpelling e) {
+  switch (e) {
+    case OpenCLAccessAttrSpelling::KEYWORD_READ_ONLY: return "KEYWORD_READ_ONLY";
+    case OpenCLAccessAttrSpelling::KEYWORD_WRITE_ONLY: return "KEYWORD_WRITE_ONLY";
+    case OpenCLAccessAttrSpelling::KEYWORD_READ_WRITE: return "KEYWORD_READ_WRITE";
+    case OpenCLAccessAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLConstantAddressSpaceAttrSpelling FromPasta(pasta::OpenCLConstantAddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLConstantAddressSpaceAttrSpelling::KEYWORD_CONSTANT;
+    case 2: return OpenCLConstantAddressSpaceAttrSpelling::GNU_OPENCL_CONSTANT;
+    case 3: return OpenCLConstantAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_CONSTANT;
+    case 4: return OpenCLConstantAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_CONSTANT;
+    case 15: return OpenCLConstantAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLConstantAddressSpaceAttrSpelling e) {
+  switch (e) {
+    case OpenCLConstantAddressSpaceAttrSpelling::KEYWORD_CONSTANT: return "KEYWORD_CONSTANT";
+    case OpenCLConstantAddressSpaceAttrSpelling::GNU_OPENCL_CONSTANT: return "GNU_OPENCL_CONSTANT";
+    case OpenCLConstantAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_CONSTANT: return "CXX11_CLANG_OPENCL_CONSTANT";
+    case OpenCLConstantAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_CONSTANT: return "C2_XCLANG_OPENCL_CONSTANT";
+    case OpenCLConstantAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLGenericAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGenericAddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLGenericAddressSpaceAttrSpelling::KEYWORD_GENERIC;
+    case 2: return OpenCLGenericAddressSpaceAttrSpelling::GNU_OPENCL_GENERIC;
+    case 3: return OpenCLGenericAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GENERIC;
+    case 4: return OpenCLGenericAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GENERIC;
+    case 15: return OpenCLGenericAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLGenericAddressSpaceAttrSpelling e) {
+  switch (e) {
+    case OpenCLGenericAddressSpaceAttrSpelling::KEYWORD_GENERIC: return "KEYWORD_GENERIC";
+    case OpenCLGenericAddressSpaceAttrSpelling::GNU_OPENCL_GENERIC: return "GNU_OPENCL_GENERIC";
+    case OpenCLGenericAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GENERIC: return "CXX11_CLANG_OPENCL_GENERIC";
+    case OpenCLGenericAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GENERIC: return "C2_XCLANG_OPENCL_GENERIC";
+    case OpenCLGenericAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLGlobalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalAddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLGlobalAddressSpaceAttrSpelling::KEYWORD_GLOBAL;
+    case 2: return OpenCLGlobalAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL;
+    case 3: return OpenCLGlobalAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL;
+    case 4: return OpenCLGlobalAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GLOBAL;
+    case 15: return OpenCLGlobalAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLGlobalAddressSpaceAttrSpelling e) {
+  switch (e) {
+    case OpenCLGlobalAddressSpaceAttrSpelling::KEYWORD_GLOBAL: return "KEYWORD_GLOBAL";
+    case OpenCLGlobalAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL: return "GNU_OPENCL_GLOBAL";
+    case OpenCLGlobalAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL: return "CXX11_CLANG_OPENCL_GLOBAL";
+    case OpenCLGlobalAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GLOBAL: return "C2_XCLANG_OPENCL_GLOBAL";
+    case OpenCLGlobalAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLGlobalDeviceAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalDeviceAddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLGlobalDeviceAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL_DEVICE;
+    case 1: return OpenCLGlobalDeviceAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL_DEVICE;
+    case 2: return OpenCLGlobalDeviceAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GLOBAL_DEVICE;
+    case 15: return OpenCLGlobalDeviceAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLGlobalDeviceAddressSpaceAttrSpelling e) {
+  switch (e) {
+    case OpenCLGlobalDeviceAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL_DEVICE: return "GNU_OPENCL_GLOBAL_DEVICE";
+    case OpenCLGlobalDeviceAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL_DEVICE: return "CXX11_CLANG_OPENCL_GLOBAL_DEVICE";
+    case OpenCLGlobalDeviceAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GLOBAL_DEVICE: return "C2_XCLANG_OPENCL_GLOBAL_DEVICE";
+    case OpenCLGlobalDeviceAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLGlobalHostAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalHostAddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLGlobalHostAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL_HOST;
+    case 1: return OpenCLGlobalHostAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL_HOST;
+    case 2: return OpenCLGlobalHostAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GLOBAL_HOST;
+    case 15: return OpenCLGlobalHostAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLGlobalHostAddressSpaceAttrSpelling e) {
+  switch (e) {
+    case OpenCLGlobalHostAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL_HOST: return "GNU_OPENCL_GLOBAL_HOST";
+    case OpenCLGlobalHostAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL_HOST: return "CXX11_CLANG_OPENCL_GLOBAL_HOST";
+    case OpenCLGlobalHostAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_GLOBAL_HOST: return "C2_XCLANG_OPENCL_GLOBAL_HOST";
+    case OpenCLGlobalHostAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLKernelAttrSpelling FromPasta(pasta::OpenCLKernelAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLKernelAttrSpelling::KEYWORD_KERNEL;
+    case 15: return OpenCLKernelAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLKernelAttrSpelling e) {
+  switch (e) {
+    case OpenCLKernelAttrSpelling::KEYWORD_KERNEL: return "KEYWORD_KERNEL";
+    case OpenCLKernelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLLocalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLLocalAddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLLocalAddressSpaceAttrSpelling::KEYWORD_LOCAL;
+    case 2: return OpenCLLocalAddressSpaceAttrSpelling::GNU_OPENCL_LOCAL;
+    case 3: return OpenCLLocalAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_LOCAL;
+    case 4: return OpenCLLocalAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_LOCAL;
+    case 15: return OpenCLLocalAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLLocalAddressSpaceAttrSpelling e) {
+  switch (e) {
+    case OpenCLLocalAddressSpaceAttrSpelling::KEYWORD_LOCAL: return "KEYWORD_LOCAL";
+    case OpenCLLocalAddressSpaceAttrSpelling::GNU_OPENCL_LOCAL: return "GNU_OPENCL_LOCAL";
+    case OpenCLLocalAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_LOCAL: return "CXX11_CLANG_OPENCL_LOCAL";
+    case OpenCLLocalAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_LOCAL: return "C2_XCLANG_OPENCL_LOCAL";
+    case OpenCLLocalAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OpenCLPrivateAddressSpaceAttrSpelling FromPasta(pasta::OpenCLPrivateAddressSpaceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OpenCLPrivateAddressSpaceAttrSpelling::KEYWORD_PRIVATE;
+    case 2: return OpenCLPrivateAddressSpaceAttrSpelling::GNU_OPENCL_PRIVATE;
+    case 3: return OpenCLPrivateAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_PRIVATE;
+    case 4: return OpenCLPrivateAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_PRIVATE;
+    case 15: return OpenCLPrivateAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OpenCLPrivateAddressSpaceAttrSpelling e) {
+  switch (e) {
+    case OpenCLPrivateAddressSpaceAttrSpelling::KEYWORD_PRIVATE: return "KEYWORD_PRIVATE";
+    case OpenCLPrivateAddressSpaceAttrSpelling::GNU_OPENCL_PRIVATE: return "GNU_OPENCL_PRIVATE";
+    case OpenCLPrivateAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_PRIVATE: return "CXX11_CLANG_OPENCL_PRIVATE";
+    case OpenCLPrivateAddressSpaceAttrSpelling::C2_XCLANG_OPENCL_PRIVATE: return "C2_XCLANG_OPENCL_PRIVATE";
+    case OpenCLPrivateAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OptimizeNoneAttrSpelling FromPasta(pasta::OptimizeNoneAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OptimizeNoneAttrSpelling::GNU_OPTNONE;
+    case 1: return OptimizeNoneAttrSpelling::CXX11_CLANG_OPTNONE;
+    case 2: return OptimizeNoneAttrSpelling::C2_XCLANG_OPTNONE;
+    case 15: return OptimizeNoneAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OptimizeNoneAttrSpelling e) {
+  switch (e) {
+    case OptimizeNoneAttrSpelling::GNU_OPTNONE: return "GNU_OPTNONE";
+    case OptimizeNoneAttrSpelling::CXX11_CLANG_OPTNONE: return "CXX11_CLANG_OPTNONE";
+    case OptimizeNoneAttrSpelling::C2_XCLANG_OPTNONE: return "C2_XCLANG_OPTNONE";
+    case OptimizeNoneAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OverloadableAttrSpelling FromPasta(pasta::OverloadableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OverloadableAttrSpelling::GNU_OVERLOADABLE;
+    case 1: return OverloadableAttrSpelling::CXX11_CLANG_OVERLOADABLE;
+    case 2: return OverloadableAttrSpelling::C2_XCLANG_OVERLOADABLE;
+    case 15: return OverloadableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OverloadableAttrSpelling e) {
+  switch (e) {
+    case OverloadableAttrSpelling::GNU_OVERLOADABLE: return "GNU_OVERLOADABLE";
+    case OverloadableAttrSpelling::CXX11_CLANG_OVERLOADABLE: return "CXX11_CLANG_OVERLOADABLE";
+    case OverloadableAttrSpelling::C2_XCLANG_OVERLOADABLE: return "C2_XCLANG_OVERLOADABLE";
+    case OverloadableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+OwnershipAttrOwnershipKind FromPasta(pasta::OwnershipAttrOwnershipKind e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OwnershipAttrOwnershipKind::HOLDS;
+    case 1: return OwnershipAttrOwnershipKind::RETURNS;
+    case 2: return OwnershipAttrOwnershipKind::TAKES;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OwnershipAttrOwnershipKind e) {
+  switch (e) {
+    case OwnershipAttrOwnershipKind::HOLDS: return "HOLDS";
+    case OwnershipAttrOwnershipKind::RETURNS: return "RETURNS";
+    case OwnershipAttrOwnershipKind::TAKES: return "TAKES";
+    default: return "<invalid>";
+  }
+}
+
+OwnershipAttrSpelling FromPasta(pasta::OwnershipAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return OwnershipAttrSpelling::GNU_OWNERSHIP_HOLDS;
+    case 1: return OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_HOLDS;
+    case 2: return OwnershipAttrSpelling::C2_XCLANG_OWNERSHIP_HOLDS;
+    case 3: return OwnershipAttrSpelling::GNU_OWNERSHIP_RETURNS;
+    case 4: return OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_RETURNS;
+    case 5: return OwnershipAttrSpelling::C2_XCLANG_OWNERSHIP_RETURNS;
+    case 6: return OwnershipAttrSpelling::GNU_OWNERSHIP_TAKES;
+    case 7: return OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_TAKES;
+    case 8: return OwnershipAttrSpelling::C2_XCLANG_OWNERSHIP_TAKES;
+    case 15: return OwnershipAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(OwnershipAttrSpelling e) {
+  switch (e) {
+    case OwnershipAttrSpelling::GNU_OWNERSHIP_HOLDS: return "GNU_OWNERSHIP_HOLDS";
+    case OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_HOLDS: return "CXX11_CLANG_OWNERSHIP_HOLDS";
+    case OwnershipAttrSpelling::C2_XCLANG_OWNERSHIP_HOLDS: return "C2_XCLANG_OWNERSHIP_HOLDS";
+    case OwnershipAttrSpelling::GNU_OWNERSHIP_RETURNS: return "GNU_OWNERSHIP_RETURNS";
+    case OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_RETURNS: return "CXX11_CLANG_OWNERSHIP_RETURNS";
+    case OwnershipAttrSpelling::C2_XCLANG_OWNERSHIP_RETURNS: return "C2_XCLANG_OWNERSHIP_RETURNS";
+    case OwnershipAttrSpelling::GNU_OWNERSHIP_TAKES: return "GNU_OWNERSHIP_TAKES";
+    case OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_TAKES: return "CXX11_CLANG_OWNERSHIP_TAKES";
+    case OwnershipAttrSpelling::C2_XCLANG_OWNERSHIP_TAKES: return "C2_XCLANG_OWNERSHIP_TAKES";
+    case OwnershipAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PackedAttrSpelling FromPasta(pasta::PackedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PackedAttrSpelling::GNU_PACKED;
+    case 1: return PackedAttrSpelling::CXX11_GNU_PACKED;
+    case 2: return PackedAttrSpelling::C2_XGNU_PACKED;
+    case 15: return PackedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PackedAttrSpelling e) {
+  switch (e) {
+    case PackedAttrSpelling::GNU_PACKED: return "GNU_PACKED";
+    case PackedAttrSpelling::CXX11_GNU_PACKED: return "CXX11_GNU_PACKED";
+    case PackedAttrSpelling::C2_XGNU_PACKED: return "C2_XGNU_PACKED";
+    case PackedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ParamTypestateAttrConsumedState FromPasta(pasta::ParamTypestateAttrConsumedState e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ParamTypestateAttrConsumedState::UNKNOWN;
+    case 1: return ParamTypestateAttrConsumedState::CONSUMED;
+    case 2: return ParamTypestateAttrConsumedState::UNCONSUMED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ParamTypestateAttrConsumedState e) {
+  switch (e) {
+    case ParamTypestateAttrConsumedState::UNKNOWN: return "UNKNOWN";
+    case ParamTypestateAttrConsumedState::CONSUMED: return "CONSUMED";
+    case ParamTypestateAttrConsumedState::UNCONSUMED: return "UNCONSUMED";
+    default: return "<invalid>";
+  }
+}
+
+ParamTypestateAttrSpelling FromPasta(pasta::ParamTypestateAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ParamTypestateAttrSpelling::GNU_PARAMETER_TYPESTATE;
+    case 1: return ParamTypestateAttrSpelling::CXX11_CLANG_PARAMETER_TYPESTATE;
+    case 15: return ParamTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ParamTypestateAttrSpelling e) {
+  switch (e) {
+    case ParamTypestateAttrSpelling::GNU_PARAMETER_TYPESTATE: return "GNU_PARAMETER_TYPESTATE";
+    case ParamTypestateAttrSpelling::CXX11_CLANG_PARAMETER_TYPESTATE: return "CXX11_CLANG_PARAMETER_TYPESTATE";
+    case ParamTypestateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PascalAttrSpelling FromPasta(pasta::PascalAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PascalAttrSpelling::GNU_PASCAL;
+    case 1: return PascalAttrSpelling::CXX11_CLANG_PASCAL;
+    case 2: return PascalAttrSpelling::C2_XCLANG_PASCAL;
+    case 3: return PascalAttrSpelling::KEYWORD_PASCAL;
+    case 15: return PascalAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PascalAttrSpelling e) {
+  switch (e) {
+    case PascalAttrSpelling::GNU_PASCAL: return "GNU_PASCAL";
+    case PascalAttrSpelling::CXX11_CLANG_PASCAL: return "CXX11_CLANG_PASCAL";
+    case PascalAttrSpelling::C2_XCLANG_PASCAL: return "C2_XCLANG_PASCAL";
+    case PascalAttrSpelling::KEYWORD_PASCAL: return "KEYWORD_PASCAL";
+    case PascalAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PassObjectSizeAttrSpelling FromPasta(pasta::PassObjectSizeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PassObjectSizeAttrSpelling::GNU_PASS_OBJECT_SIZE;
+    case 1: return PassObjectSizeAttrSpelling::CXX11_CLANG_PASS_OBJECT_SIZE;
+    case 2: return PassObjectSizeAttrSpelling::C2_XCLANG_PASS_OBJECT_SIZE;
+    case 3: return PassObjectSizeAttrSpelling::GNU_PASS_DYNAMIC_OBJECT_SIZE;
+    case 4: return PassObjectSizeAttrSpelling::CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE;
+    case 5: return PassObjectSizeAttrSpelling::C2_XCLANG_PASS_DYNAMIC_OBJECT_SIZE;
+    case 15: return PassObjectSizeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PassObjectSizeAttrSpelling e) {
+  switch (e) {
+    case PassObjectSizeAttrSpelling::GNU_PASS_OBJECT_SIZE: return "GNU_PASS_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::CXX11_CLANG_PASS_OBJECT_SIZE: return "CXX11_CLANG_PASS_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::C2_XCLANG_PASS_OBJECT_SIZE: return "C2_XCLANG_PASS_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::GNU_PASS_DYNAMIC_OBJECT_SIZE: return "GNU_PASS_DYNAMIC_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE: return "CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::C2_XCLANG_PASS_DYNAMIC_OBJECT_SIZE: return "C2_XCLANG_PASS_DYNAMIC_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PatchableFunctionEntryAttrSpelling FromPasta(pasta::PatchableFunctionEntryAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PatchableFunctionEntryAttrSpelling::GNU_PATCHABLE_FUNCTION_ENTRY;
+    case 1: return PatchableFunctionEntryAttrSpelling::CXX11_GNU_PATCHABLE_FUNCTION_ENTRY;
+    case 2: return PatchableFunctionEntryAttrSpelling::C2_XGNU_PATCHABLE_FUNCTION_ENTRY;
+    case 15: return PatchableFunctionEntryAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PatchableFunctionEntryAttrSpelling e) {
+  switch (e) {
+    case PatchableFunctionEntryAttrSpelling::GNU_PATCHABLE_FUNCTION_ENTRY: return "GNU_PATCHABLE_FUNCTION_ENTRY";
+    case PatchableFunctionEntryAttrSpelling::CXX11_GNU_PATCHABLE_FUNCTION_ENTRY: return "CXX11_GNU_PATCHABLE_FUNCTION_ENTRY";
+    case PatchableFunctionEntryAttrSpelling::C2_XGNU_PATCHABLE_FUNCTION_ENTRY: return "C2_XGNU_PATCHABLE_FUNCTION_ENTRY";
+    case PatchableFunctionEntryAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PcsAttrPCSType FromPasta(pasta::PcsAttrPCSType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PcsAttrPCSType::AAPCS;
+    case 1: return PcsAttrPCSType::VFP;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PcsAttrPCSType e) {
+  switch (e) {
+    case PcsAttrPCSType::AAPCS: return "AAPCS";
+    case PcsAttrPCSType::VFP: return "VFP";
+    default: return "<invalid>";
+  }
+}
+
+PcsAttrSpelling FromPasta(pasta::PcsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PcsAttrSpelling::GNU_PCS;
+    case 1: return PcsAttrSpelling::CXX11_GNU_PCS;
+    case 2: return PcsAttrSpelling::C2_XGNU_PCS;
+    case 15: return PcsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PcsAttrSpelling e) {
+  switch (e) {
+    case PcsAttrSpelling::GNU_PCS: return "GNU_PCS";
+    case PcsAttrSpelling::CXX11_GNU_PCS: return "CXX11_GNU_PCS";
+    case PcsAttrSpelling::C2_XGNU_PCS: return "C2_XGNU_PCS";
+    case PcsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 PredefinedExprIdentKind FromPasta(pasta::PredefinedExprIdentKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return PredefinedExprIdentKind::FUNC;
@@ -1475,6 +5891,102 @@ const char *EnumeratorName(PredefinedExprIdentKind e) {
     case PredefinedExprIdentKind::L_FUNC_SIG: return "L_FUNC_SIG";
     case PredefinedExprIdentKind::PRETTY_FUNCTION: return "PRETTY_FUNCTION";
     case PredefinedExprIdentKind::PRETTY_FUNCTION_NO_VIRTUAL: return "PRETTY_FUNCTION_NO_VIRTUAL";
+    default: return "<invalid>";
+  }
+}
+
+PreferredNameAttrSpelling FromPasta(pasta::PreferredNameAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PreferredNameAttrSpelling::GNU_PREFERRED_NAME;
+    case 1: return PreferredNameAttrSpelling::CXX11_CLANG_PREFERRED_NAME;
+    case 15: return PreferredNameAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PreferredNameAttrSpelling e) {
+  switch (e) {
+    case PreferredNameAttrSpelling::GNU_PREFERRED_NAME: return "GNU_PREFERRED_NAME";
+    case PreferredNameAttrSpelling::CXX11_CLANG_PREFERRED_NAME: return "CXX11_CLANG_PREFERRED_NAME";
+    case PreferredNameAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PreserveAllAttrSpelling FromPasta(pasta::PreserveAllAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PreserveAllAttrSpelling::GNU_PRESERVE_ALL;
+    case 1: return PreserveAllAttrSpelling::CXX11_CLANG_PRESERVE_ALL;
+    case 2: return PreserveAllAttrSpelling::C2_XCLANG_PRESERVE_ALL;
+    case 15: return PreserveAllAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PreserveAllAttrSpelling e) {
+  switch (e) {
+    case PreserveAllAttrSpelling::GNU_PRESERVE_ALL: return "GNU_PRESERVE_ALL";
+    case PreserveAllAttrSpelling::CXX11_CLANG_PRESERVE_ALL: return "CXX11_CLANG_PRESERVE_ALL";
+    case PreserveAllAttrSpelling::C2_XCLANG_PRESERVE_ALL: return "C2_XCLANG_PRESERVE_ALL";
+    case PreserveAllAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PreserveMostAttrSpelling FromPasta(pasta::PreserveMostAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PreserveMostAttrSpelling::GNU_PRESERVE_MOST;
+    case 1: return PreserveMostAttrSpelling::CXX11_CLANG_PRESERVE_MOST;
+    case 2: return PreserveMostAttrSpelling::C2_XCLANG_PRESERVE_MOST;
+    case 15: return PreserveMostAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PreserveMostAttrSpelling e) {
+  switch (e) {
+    case PreserveMostAttrSpelling::GNU_PRESERVE_MOST: return "GNU_PRESERVE_MOST";
+    case PreserveMostAttrSpelling::CXX11_CLANG_PRESERVE_MOST: return "CXX11_CLANG_PRESERVE_MOST";
+    case PreserveMostAttrSpelling::C2_XCLANG_PRESERVE_MOST: return "C2_XCLANG_PRESERVE_MOST";
+    case PreserveMostAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PtGuardedVarAttrSpelling FromPasta(pasta::PtGuardedVarAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PtGuardedVarAttrSpelling::GNU_PT_GUARDED_VARIABLE;
+    case 1: return PtGuardedVarAttrSpelling::CXX11_CLANG_PT_GUARDED_VARIABLE;
+    case 15: return PtGuardedVarAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PtGuardedVarAttrSpelling e) {
+  switch (e) {
+    case PtGuardedVarAttrSpelling::GNU_PT_GUARDED_VARIABLE: return "GNU_PT_GUARDED_VARIABLE";
+    case PtGuardedVarAttrSpelling::CXX11_CLANG_PT_GUARDED_VARIABLE: return "CXX11_CLANG_PT_GUARDED_VARIABLE";
+    case PtGuardedVarAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+PureAttrSpelling FromPasta(pasta::PureAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return PureAttrSpelling::GNU_PURE;
+    case 1: return PureAttrSpelling::CXX11_GNU_PURE;
+    case 2: return PureAttrSpelling::C2_XGNU_PURE;
+    case 15: return PureAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(PureAttrSpelling e) {
+  switch (e) {
+    case PureAttrSpelling::GNU_PURE: return "GNU_PURE";
+    case PureAttrSpelling::CXX11_GNU_PURE: return "CXX11_GNU_PURE";
+    case PureAttrSpelling::C2_XGNU_PURE: return "C2_XGNU_PURE";
+    case PureAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -1543,6 +6055,44 @@ const char *EnumeratorName(QualTypePrimitiveDefaultInitializeKind e) {
   }
 }
 
+RISCVInterruptAttrInterruptType FromPasta(pasta::RISCVInterruptAttrInterruptType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RISCVInterruptAttrInterruptType::USER;
+    case 1: return RISCVInterruptAttrInterruptType::SUPERVISOR;
+    case 2: return RISCVInterruptAttrInterruptType::MACHINE;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(RISCVInterruptAttrInterruptType e) {
+  switch (e) {
+    case RISCVInterruptAttrInterruptType::USER: return "USER";
+    case RISCVInterruptAttrInterruptType::SUPERVISOR: return "SUPERVISOR";
+    case RISCVInterruptAttrInterruptType::MACHINE: return "MACHINE";
+    default: return "<invalid>";
+  }
+}
+
+RISCVInterruptAttrSpelling FromPasta(pasta::RISCVInterruptAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RISCVInterruptAttrSpelling::GNU_INTERRUPT;
+    case 1: return RISCVInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
+    case 2: return RISCVInterruptAttrSpelling::C2_XGNU_INTERRUPT;
+    case 15: return RISCVInterruptAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(RISCVInterruptAttrSpelling e) {
+  switch (e) {
+    case RISCVInterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
+    case RISCVInterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
+    case RISCVInterruptAttrSpelling::C2_XGNU_INTERRUPT: return "C2_XGNU_INTERRUPT";
+    case RISCVInterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 RecordDeclArgPassingKind FromPasta(pasta::RecordDeclArgPassingKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return RecordDeclArgPassingKind::CAN_PASS_IN_REGS;
@@ -1557,6 +6107,402 @@ const char *EnumeratorName(RecordDeclArgPassingKind e) {
     case RecordDeclArgPassingKind::CAN_PASS_IN_REGS: return "CAN_PASS_IN_REGS";
     case RecordDeclArgPassingKind::CANNOT_PASS_IN_REGS: return "CANNOT_PASS_IN_REGS";
     case RecordDeclArgPassingKind::CAN_NEVER_PASS_IN_REGS: return "CAN_NEVER_PASS_IN_REGS";
+    default: return "<invalid>";
+  }
+}
+
+RegCallAttrSpelling FromPasta(pasta::RegCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RegCallAttrSpelling::GNU_REGCALL;
+    case 1: return RegCallAttrSpelling::CXX11_GNU_REGCALL;
+    case 2: return RegCallAttrSpelling::C2_XGNU_REGCALL;
+    case 3: return RegCallAttrSpelling::KEYWORD_REGCALL;
+    case 15: return RegCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(RegCallAttrSpelling e) {
+  switch (e) {
+    case RegCallAttrSpelling::GNU_REGCALL: return "GNU_REGCALL";
+    case RegCallAttrSpelling::CXX11_GNU_REGCALL: return "CXX11_GNU_REGCALL";
+    case RegCallAttrSpelling::C2_XGNU_REGCALL: return "C2_XGNU_REGCALL";
+    case RegCallAttrSpelling::KEYWORD_REGCALL: return "KEYWORD_REGCALL";
+    case RegCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ReinitializesAttrSpelling FromPasta(pasta::ReinitializesAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ReinitializesAttrSpelling::GNU_REINITIALIZES;
+    case 1: return ReinitializesAttrSpelling::CXX11_CLANG_REINITIALIZES;
+    case 15: return ReinitializesAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ReinitializesAttrSpelling e) {
+  switch (e) {
+    case ReinitializesAttrSpelling::GNU_REINITIALIZES: return "GNU_REINITIALIZES";
+    case ReinitializesAttrSpelling::CXX11_CLANG_REINITIALIZES: return "CXX11_CLANG_REINITIALIZES";
+    case ReinitializesAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ReleaseCapabilityAttrSpelling FromPasta(pasta::ReleaseCapabilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ReleaseCapabilityAttrSpelling::GNU_RELEASE_CAPABILITY;
+    case 1: return ReleaseCapabilityAttrSpelling::CXX11_CLANG_RELEASE_CAPABILITY;
+    case 2: return ReleaseCapabilityAttrSpelling::GNU_RELEASE_SHARED_CAPABILITY;
+    case 3: return ReleaseCapabilityAttrSpelling::CXX11_CLANG_RELEASE_SHARED_CAPABILITY;
+    case 4: return ReleaseCapabilityAttrSpelling::GNU_RELEASE_GENERIC_CAPABILITY;
+    case 5: return ReleaseCapabilityAttrSpelling::CXX11_CLANG_RELEASE_GENERIC_CAPABILITY;
+    case 6: return ReleaseCapabilityAttrSpelling::GNU_UNLOCK_FUNCTION;
+    case 7: return ReleaseCapabilityAttrSpelling::CXX11_CLANG_UNLOCK_FUNCTION;
+    case 15: return ReleaseCapabilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ReleaseCapabilityAttrSpelling e) {
+  switch (e) {
+    case ReleaseCapabilityAttrSpelling::GNU_RELEASE_CAPABILITY: return "GNU_RELEASE_CAPABILITY";
+    case ReleaseCapabilityAttrSpelling::CXX11_CLANG_RELEASE_CAPABILITY: return "CXX11_CLANG_RELEASE_CAPABILITY";
+    case ReleaseCapabilityAttrSpelling::GNU_RELEASE_SHARED_CAPABILITY: return "GNU_RELEASE_SHARED_CAPABILITY";
+    case ReleaseCapabilityAttrSpelling::CXX11_CLANG_RELEASE_SHARED_CAPABILITY: return "CXX11_CLANG_RELEASE_SHARED_CAPABILITY";
+    case ReleaseCapabilityAttrSpelling::GNU_RELEASE_GENERIC_CAPABILITY: return "GNU_RELEASE_GENERIC_CAPABILITY";
+    case ReleaseCapabilityAttrSpelling::CXX11_CLANG_RELEASE_GENERIC_CAPABILITY: return "CXX11_CLANG_RELEASE_GENERIC_CAPABILITY";
+    case ReleaseCapabilityAttrSpelling::GNU_UNLOCK_FUNCTION: return "GNU_UNLOCK_FUNCTION";
+    case ReleaseCapabilityAttrSpelling::CXX11_CLANG_UNLOCK_FUNCTION: return "CXX11_CLANG_UNLOCK_FUNCTION";
+    case ReleaseCapabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ReleaseHandleAttrSpelling FromPasta(pasta::ReleaseHandleAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ReleaseHandleAttrSpelling::GNU_RELEASE_HANDLE;
+    case 1: return ReleaseHandleAttrSpelling::CXX11_CLANG_RELEASE_HANDLE;
+    case 2: return ReleaseHandleAttrSpelling::C2_XCLANG_RELEASE_HANDLE;
+    case 15: return ReleaseHandleAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ReleaseHandleAttrSpelling e) {
+  switch (e) {
+    case ReleaseHandleAttrSpelling::GNU_RELEASE_HANDLE: return "GNU_RELEASE_HANDLE";
+    case ReleaseHandleAttrSpelling::CXX11_CLANG_RELEASE_HANDLE: return "CXX11_CLANG_RELEASE_HANDLE";
+    case ReleaseHandleAttrSpelling::C2_XCLANG_RELEASE_HANDLE: return "C2_XCLANG_RELEASE_HANDLE";
+    case ReleaseHandleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+RequiresCapabilityAttrSpelling FromPasta(pasta::RequiresCapabilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RequiresCapabilityAttrSpelling::GNU_REQUIRES_CAPABILITY;
+    case 1: return RequiresCapabilityAttrSpelling::CXX11_CLANG_REQUIRES_CAPABILITY;
+    case 2: return RequiresCapabilityAttrSpelling::GNU_EXCLUSIVE_LOCKS_REQUIRED;
+    case 3: return RequiresCapabilityAttrSpelling::CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED;
+    case 4: return RequiresCapabilityAttrSpelling::GNU_REQUIRES_SHARED_CAPABILITY;
+    case 5: return RequiresCapabilityAttrSpelling::CXX11_CLANG_REQUIRES_SHARED_CAPABILITY;
+    case 6: return RequiresCapabilityAttrSpelling::GNU_SHARED_LOCKS_REQUIRED;
+    case 7: return RequiresCapabilityAttrSpelling::CXX11_CLANG_SHARED_LOCKS_REQUIRED;
+    case 15: return RequiresCapabilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(RequiresCapabilityAttrSpelling e) {
+  switch (e) {
+    case RequiresCapabilityAttrSpelling::GNU_REQUIRES_CAPABILITY: return "GNU_REQUIRES_CAPABILITY";
+    case RequiresCapabilityAttrSpelling::CXX11_CLANG_REQUIRES_CAPABILITY: return "CXX11_CLANG_REQUIRES_CAPABILITY";
+    case RequiresCapabilityAttrSpelling::GNU_EXCLUSIVE_LOCKS_REQUIRED: return "GNU_EXCLUSIVE_LOCKS_REQUIRED";
+    case RequiresCapabilityAttrSpelling::CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED: return "CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED";
+    case RequiresCapabilityAttrSpelling::GNU_REQUIRES_SHARED_CAPABILITY: return "GNU_REQUIRES_SHARED_CAPABILITY";
+    case RequiresCapabilityAttrSpelling::CXX11_CLANG_REQUIRES_SHARED_CAPABILITY: return "CXX11_CLANG_REQUIRES_SHARED_CAPABILITY";
+    case RequiresCapabilityAttrSpelling::GNU_SHARED_LOCKS_REQUIRED: return "GNU_SHARED_LOCKS_REQUIRED";
+    case RequiresCapabilityAttrSpelling::CXX11_CLANG_SHARED_LOCKS_REQUIRED: return "CXX11_CLANG_SHARED_LOCKS_REQUIRED";
+    case RequiresCapabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+RestrictAttrSpelling FromPasta(pasta::RestrictAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RestrictAttrSpelling::DECLSPEC_RESTRICT;
+    case 1: return RestrictAttrSpelling::GNU_MALLOC;
+    case 2: return RestrictAttrSpelling::CXX11_GNU_MALLOC;
+    case 3: return RestrictAttrSpelling::C2_XGNU_MALLOC;
+    case 15: return RestrictAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(RestrictAttrSpelling e) {
+  switch (e) {
+    case RestrictAttrSpelling::DECLSPEC_RESTRICT: return "DECLSPEC_RESTRICT";
+    case RestrictAttrSpelling::GNU_MALLOC: return "GNU_MALLOC";
+    case RestrictAttrSpelling::CXX11_GNU_MALLOC: return "CXX11_GNU_MALLOC";
+    case RestrictAttrSpelling::C2_XGNU_MALLOC: return "C2_XGNU_MALLOC";
+    case RestrictAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+RetainAttrSpelling FromPasta(pasta::RetainAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return RetainAttrSpelling::GNU_RETAIN;
+    case 1: return RetainAttrSpelling::CXX11_GNU_RETAIN;
+    case 2: return RetainAttrSpelling::C2_XGNU_RETAIN;
+    case 15: return RetainAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(RetainAttrSpelling e) {
+  switch (e) {
+    case RetainAttrSpelling::GNU_RETAIN: return "GNU_RETAIN";
+    case RetainAttrSpelling::CXX11_GNU_RETAIN: return "CXX11_GNU_RETAIN";
+    case RetainAttrSpelling::C2_XGNU_RETAIN: return "C2_XGNU_RETAIN";
+    case RetainAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ReturnTypestateAttrConsumedState FromPasta(pasta::ReturnTypestateAttrConsumedState e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ReturnTypestateAttrConsumedState::UNKNOWN;
+    case 1: return ReturnTypestateAttrConsumedState::CONSUMED;
+    case 2: return ReturnTypestateAttrConsumedState::UNCONSUMED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ReturnTypestateAttrConsumedState e) {
+  switch (e) {
+    case ReturnTypestateAttrConsumedState::UNKNOWN: return "UNKNOWN";
+    case ReturnTypestateAttrConsumedState::CONSUMED: return "CONSUMED";
+    case ReturnTypestateAttrConsumedState::UNCONSUMED: return "UNCONSUMED";
+    default: return "<invalid>";
+  }
+}
+
+ReturnTypestateAttrSpelling FromPasta(pasta::ReturnTypestateAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ReturnTypestateAttrSpelling::GNU_RETURN_TYPESTATE;
+    case 1: return ReturnTypestateAttrSpelling::CXX11_CLANG_RETURN_TYPESTATE;
+    case 15: return ReturnTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ReturnTypestateAttrSpelling e) {
+  switch (e) {
+    case ReturnTypestateAttrSpelling::GNU_RETURN_TYPESTATE: return "GNU_RETURN_TYPESTATE";
+    case ReturnTypestateAttrSpelling::CXX11_CLANG_RETURN_TYPESTATE: return "CXX11_CLANG_RETURN_TYPESTATE";
+    case ReturnTypestateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ReturnsNonNullAttrSpelling FromPasta(pasta::ReturnsNonNullAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ReturnsNonNullAttrSpelling::GNU_RETURNS_NONNULL;
+    case 1: return ReturnsNonNullAttrSpelling::CXX11_GNU_RETURNS_NONNULL;
+    case 2: return ReturnsNonNullAttrSpelling::C2_XGNU_RETURNS_NONNULL;
+    case 15: return ReturnsNonNullAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ReturnsNonNullAttrSpelling e) {
+  switch (e) {
+    case ReturnsNonNullAttrSpelling::GNU_RETURNS_NONNULL: return "GNU_RETURNS_NONNULL";
+    case ReturnsNonNullAttrSpelling::CXX11_GNU_RETURNS_NONNULL: return "CXX11_GNU_RETURNS_NONNULL";
+    case ReturnsNonNullAttrSpelling::C2_XGNU_RETURNS_NONNULL: return "C2_XGNU_RETURNS_NONNULL";
+    case ReturnsNonNullAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ReturnsTwiceAttrSpelling FromPasta(pasta::ReturnsTwiceAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ReturnsTwiceAttrSpelling::GNU_RETURNS_TWICE;
+    case 1: return ReturnsTwiceAttrSpelling::CXX11_GNU_RETURNS_TWICE;
+    case 2: return ReturnsTwiceAttrSpelling::C2_XGNU_RETURNS_TWICE;
+    case 15: return ReturnsTwiceAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ReturnsTwiceAttrSpelling e) {
+  switch (e) {
+    case ReturnsTwiceAttrSpelling::GNU_RETURNS_TWICE: return "GNU_RETURNS_TWICE";
+    case ReturnsTwiceAttrSpelling::CXX11_GNU_RETURNS_TWICE: return "CXX11_GNU_RETURNS_TWICE";
+    case ReturnsTwiceAttrSpelling::C2_XGNU_RETURNS_TWICE: return "C2_XGNU_RETURNS_TWICE";
+    case ReturnsTwiceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SYCLKernelAttrSpelling FromPasta(pasta::SYCLKernelAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SYCLKernelAttrSpelling::GNU_SYCL_KERNEL;
+    case 1: return SYCLKernelAttrSpelling::CXX11_CLANG_SYCL_KERNEL;
+    case 2: return SYCLKernelAttrSpelling::C2_XCLANG_SYCL_KERNEL;
+    case 15: return SYCLKernelAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SYCLKernelAttrSpelling e) {
+  switch (e) {
+    case SYCLKernelAttrSpelling::GNU_SYCL_KERNEL: return "GNU_SYCL_KERNEL";
+    case SYCLKernelAttrSpelling::CXX11_CLANG_SYCL_KERNEL: return "CXX11_CLANG_SYCL_KERNEL";
+    case SYCLKernelAttrSpelling::C2_XCLANG_SYCL_KERNEL: return "C2_XCLANG_SYCL_KERNEL";
+    case SYCLKernelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SYCLSpecialClassAttrSpelling FromPasta(pasta::SYCLSpecialClassAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SYCLSpecialClassAttrSpelling::GNU_SYCL_SPECIAL_CLASS;
+    case 1: return SYCLSpecialClassAttrSpelling::CXX11_CLANG_SYCL_SPECIAL_CLASS;
+    case 2: return SYCLSpecialClassAttrSpelling::C2_XCLANG_SYCL_SPECIAL_CLASS;
+    case 15: return SYCLSpecialClassAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SYCLSpecialClassAttrSpelling e) {
+  switch (e) {
+    case SYCLSpecialClassAttrSpelling::GNU_SYCL_SPECIAL_CLASS: return "GNU_SYCL_SPECIAL_CLASS";
+    case SYCLSpecialClassAttrSpelling::CXX11_CLANG_SYCL_SPECIAL_CLASS: return "CXX11_CLANG_SYCL_SPECIAL_CLASS";
+    case SYCLSpecialClassAttrSpelling::C2_XCLANG_SYCL_SPECIAL_CLASS: return "C2_XCLANG_SYCL_SPECIAL_CLASS";
+    case SYCLSpecialClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ScopedLockableAttrSpelling FromPasta(pasta::ScopedLockableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ScopedLockableAttrSpelling::GNU_SCOPED_LOCKABLE;
+    case 1: return ScopedLockableAttrSpelling::CXX11_CLANG_SCOPED_LOCKABLE;
+    case 15: return ScopedLockableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ScopedLockableAttrSpelling e) {
+  switch (e) {
+    case ScopedLockableAttrSpelling::GNU_SCOPED_LOCKABLE: return "GNU_SCOPED_LOCKABLE";
+    case ScopedLockableAttrSpelling::CXX11_CLANG_SCOPED_LOCKABLE: return "CXX11_CLANG_SCOPED_LOCKABLE";
+    case ScopedLockableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SectionAttrSpelling FromPasta(pasta::SectionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SectionAttrSpelling::GNU_SECTION;
+    case 1: return SectionAttrSpelling::CXX11_GNU_SECTION;
+    case 2: return SectionAttrSpelling::C2_XGNU_SECTION;
+    case 3: return SectionAttrSpelling::DECLSPEC_ALLOCATE;
+    case 15: return SectionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SectionAttrSpelling e) {
+  switch (e) {
+    case SectionAttrSpelling::GNU_SECTION: return "GNU_SECTION";
+    case SectionAttrSpelling::CXX11_GNU_SECTION: return "CXX11_GNU_SECTION";
+    case SectionAttrSpelling::C2_XGNU_SECTION: return "C2_XGNU_SECTION";
+    case SectionAttrSpelling::DECLSPEC_ALLOCATE: return "DECLSPEC_ALLOCATE";
+    case SectionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SelectAnyAttrSpelling FromPasta(pasta::SelectAnyAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SelectAnyAttrSpelling::DECLSPEC_SELECTANY;
+    case 1: return SelectAnyAttrSpelling::GNU_SELECTANY;
+    case 2: return SelectAnyAttrSpelling::CXX11_GNU_SELECTANY;
+    case 3: return SelectAnyAttrSpelling::C2_XGNU_SELECTANY;
+    case 15: return SelectAnyAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SelectAnyAttrSpelling e) {
+  switch (e) {
+    case SelectAnyAttrSpelling::DECLSPEC_SELECTANY: return "DECLSPEC_SELECTANY";
+    case SelectAnyAttrSpelling::GNU_SELECTANY: return "GNU_SELECTANY";
+    case SelectAnyAttrSpelling::CXX11_GNU_SELECTANY: return "CXX11_GNU_SELECTANY";
+    case SelectAnyAttrSpelling::C2_XGNU_SELECTANY: return "C2_XGNU_SELECTANY";
+    case SelectAnyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SentinelAttrSpelling FromPasta(pasta::SentinelAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SentinelAttrSpelling::GNU_SENTINEL;
+    case 1: return SentinelAttrSpelling::CXX11_GNU_SENTINEL;
+    case 2: return SentinelAttrSpelling::C2_XGNU_SENTINEL;
+    case 15: return SentinelAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SentinelAttrSpelling e) {
+  switch (e) {
+    case SentinelAttrSpelling::GNU_SENTINEL: return "GNU_SENTINEL";
+    case SentinelAttrSpelling::CXX11_GNU_SENTINEL: return "CXX11_GNU_SENTINEL";
+    case SentinelAttrSpelling::C2_XGNU_SENTINEL: return "C2_XGNU_SENTINEL";
+    case SentinelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SetTypestateAttrConsumedState FromPasta(pasta::SetTypestateAttrConsumedState e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SetTypestateAttrConsumedState::UNKNOWN;
+    case 1: return SetTypestateAttrConsumedState::CONSUMED;
+    case 2: return SetTypestateAttrConsumedState::UNCONSUMED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SetTypestateAttrConsumedState e) {
+  switch (e) {
+    case SetTypestateAttrConsumedState::UNKNOWN: return "UNKNOWN";
+    case SetTypestateAttrConsumedState::CONSUMED: return "CONSUMED";
+    case SetTypestateAttrConsumedState::UNCONSUMED: return "UNCONSUMED";
+    default: return "<invalid>";
+  }
+}
+
+SetTypestateAttrSpelling FromPasta(pasta::SetTypestateAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SetTypestateAttrSpelling::GNU_TYPESTATE;
+    case 1: return SetTypestateAttrSpelling::CXX11_CLANG_TYPESTATE;
+    case 15: return SetTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SetTypestateAttrSpelling e) {
+  switch (e) {
+    case SetTypestateAttrSpelling::GNU_TYPESTATE: return "GNU_TYPESTATE";
+    case SetTypestateAttrSpelling::CXX11_CLANG_TYPESTATE: return "CXX11_CLANG_TYPESTATE";
+    case SetTypestateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -1577,6 +6523,66 @@ const char *EnumeratorName(SourceLocExprIdentKind e) {
     case SourceLocExprIdentKind::FILE: return "FILE";
     case SourceLocExprIdentKind::LINE: return "LINE";
     case SourceLocExprIdentKind::COLUMN: return "COLUMN";
+    default: return "<invalid>";
+  }
+}
+
+SpeculativeLoadHardeningAttrSpelling FromPasta(pasta::SpeculativeLoadHardeningAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SpeculativeLoadHardeningAttrSpelling::GNU_SPECULATIVE_LOAD_HARDENING;
+    case 1: return SpeculativeLoadHardeningAttrSpelling::CXX11_CLANG_SPECULATIVE_LOAD_HARDENING;
+    case 2: return SpeculativeLoadHardeningAttrSpelling::C2_XCLANG_SPECULATIVE_LOAD_HARDENING;
+    case 15: return SpeculativeLoadHardeningAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SpeculativeLoadHardeningAttrSpelling e) {
+  switch (e) {
+    case SpeculativeLoadHardeningAttrSpelling::GNU_SPECULATIVE_LOAD_HARDENING: return "GNU_SPECULATIVE_LOAD_HARDENING";
+    case SpeculativeLoadHardeningAttrSpelling::CXX11_CLANG_SPECULATIVE_LOAD_HARDENING: return "CXX11_CLANG_SPECULATIVE_LOAD_HARDENING";
+    case SpeculativeLoadHardeningAttrSpelling::C2_XCLANG_SPECULATIVE_LOAD_HARDENING: return "C2_XCLANG_SPECULATIVE_LOAD_HARDENING";
+    case SpeculativeLoadHardeningAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+StandaloneDebugAttrSpelling FromPasta(pasta::StandaloneDebugAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StandaloneDebugAttrSpelling::GNU_STANDALONE_DEBUG;
+    case 1: return StandaloneDebugAttrSpelling::CXX11_CLANG_STANDALONE_DEBUG;
+    case 15: return StandaloneDebugAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(StandaloneDebugAttrSpelling e) {
+  switch (e) {
+    case StandaloneDebugAttrSpelling::GNU_STANDALONE_DEBUG: return "GNU_STANDALONE_DEBUG";
+    case StandaloneDebugAttrSpelling::CXX11_CLANG_STANDALONE_DEBUG: return "CXX11_CLANG_STANDALONE_DEBUG";
+    case StandaloneDebugAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+StdCallAttrSpelling FromPasta(pasta::StdCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return StdCallAttrSpelling::GNU_STDCALL;
+    case 1: return StdCallAttrSpelling::CXX11_GNU_STDCALL;
+    case 2: return StdCallAttrSpelling::C2_XGNU_STDCALL;
+    case 3: return StdCallAttrSpelling::KEYWORD_STDCALL;
+    case 15: return StdCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(StdCallAttrSpelling e) {
+  switch (e) {
+    case StdCallAttrSpelling::GNU_STDCALL: return "GNU_STDCALL";
+    case StdCallAttrSpelling::CXX11_GNU_STDCALL: return "CXX11_GNU_STDCALL";
+    case StdCallAttrSpelling::C2_XGNU_STDCALL: return "C2_XGNU_STDCALL";
+    case StdCallAttrSpelling::KEYWORD_STDCALL: return "KEYWORD_STDCALL";
+    case StdCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -2077,6 +7083,340 @@ const char *EnumeratorName(StringLiteralStringKind e) {
   }
 }
 
+SwiftAsyncAttrKind FromPasta(pasta::SwiftAsyncAttrKind e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftAsyncAttrKind::NONE;
+    case 1: return SwiftAsyncAttrKind::SWIFT_PRIVATE;
+    case 2: return SwiftAsyncAttrKind::NOT_SWIFT_PRIVATE;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftAsyncAttrKind e) {
+  switch (e) {
+    case SwiftAsyncAttrKind::NONE: return "NONE";
+    case SwiftAsyncAttrKind::SWIFT_PRIVATE: return "SWIFT_PRIVATE";
+    case SwiftAsyncAttrKind::NOT_SWIFT_PRIVATE: return "NOT_SWIFT_PRIVATE";
+    default: return "<invalid>";
+  }
+}
+
+SwiftAsyncAttrSpelling FromPasta(pasta::SwiftAsyncAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftAsyncAttrSpelling::GNU_SWIFT_ASYNC;
+    case 1: return SwiftAsyncAttrSpelling::CXX11_CLANG_SWIFT_ASYNC;
+    case 2: return SwiftAsyncAttrSpelling::C2_XCLANG_SWIFT_ASYNC;
+    case 15: return SwiftAsyncAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftAsyncAttrSpelling e) {
+  switch (e) {
+    case SwiftAsyncAttrSpelling::GNU_SWIFT_ASYNC: return "GNU_SWIFT_ASYNC";
+    case SwiftAsyncAttrSpelling::CXX11_CLANG_SWIFT_ASYNC: return "CXX11_CLANG_SWIFT_ASYNC";
+    case SwiftAsyncAttrSpelling::C2_XCLANG_SWIFT_ASYNC: return "C2_XCLANG_SWIFT_ASYNC";
+    case SwiftAsyncAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftAsyncCallAttrSpelling FromPasta(pasta::SwiftAsyncCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftAsyncCallAttrSpelling::GNU_SWIFTASYNCCALL;
+    case 1: return SwiftAsyncCallAttrSpelling::CXX11_CLANG_SWIFTASYNCCALL;
+    case 2: return SwiftAsyncCallAttrSpelling::C2_XCLANG_SWIFTASYNCCALL;
+    case 15: return SwiftAsyncCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftAsyncCallAttrSpelling e) {
+  switch (e) {
+    case SwiftAsyncCallAttrSpelling::GNU_SWIFTASYNCCALL: return "GNU_SWIFTASYNCCALL";
+    case SwiftAsyncCallAttrSpelling::CXX11_CLANG_SWIFTASYNCCALL: return "CXX11_CLANG_SWIFTASYNCCALL";
+    case SwiftAsyncCallAttrSpelling::C2_XCLANG_SWIFTASYNCCALL: return "C2_XCLANG_SWIFTASYNCCALL";
+    case SwiftAsyncCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftAsyncContextAttrSpelling FromPasta(pasta::SwiftAsyncContextAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftAsyncContextAttrSpelling::GNU_SWIFT_ASYNC_CONTEXT;
+    case 1: return SwiftAsyncContextAttrSpelling::CXX11_CLANG_SWIFT_ASYNC_CONTEXT;
+    case 2: return SwiftAsyncContextAttrSpelling::C2_XCLANG_SWIFT_ASYNC_CONTEXT;
+    case 15: return SwiftAsyncContextAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftAsyncContextAttrSpelling e) {
+  switch (e) {
+    case SwiftAsyncContextAttrSpelling::GNU_SWIFT_ASYNC_CONTEXT: return "GNU_SWIFT_ASYNC_CONTEXT";
+    case SwiftAsyncContextAttrSpelling::CXX11_CLANG_SWIFT_ASYNC_CONTEXT: return "CXX11_CLANG_SWIFT_ASYNC_CONTEXT";
+    case SwiftAsyncContextAttrSpelling::C2_XCLANG_SWIFT_ASYNC_CONTEXT: return "C2_XCLANG_SWIFT_ASYNC_CONTEXT";
+    case SwiftAsyncContextAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftAsyncErrorAttrConventionKind FromPasta(pasta::SwiftAsyncErrorAttrConventionKind e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftAsyncErrorAttrConventionKind::NONE;
+    case 1: return SwiftAsyncErrorAttrConventionKind::NON_NULL_ERROR;
+    case 2: return SwiftAsyncErrorAttrConventionKind::ZERO_ARGUMENT;
+    case 3: return SwiftAsyncErrorAttrConventionKind::NON_ZERO_ARGUMENT;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftAsyncErrorAttrConventionKind e) {
+  switch (e) {
+    case SwiftAsyncErrorAttrConventionKind::NONE: return "NONE";
+    case SwiftAsyncErrorAttrConventionKind::NON_NULL_ERROR: return "NON_NULL_ERROR";
+    case SwiftAsyncErrorAttrConventionKind::ZERO_ARGUMENT: return "ZERO_ARGUMENT";
+    case SwiftAsyncErrorAttrConventionKind::NON_ZERO_ARGUMENT: return "NON_ZERO_ARGUMENT";
+    default: return "<invalid>";
+  }
+}
+
+SwiftAsyncErrorAttrSpelling FromPasta(pasta::SwiftAsyncErrorAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftAsyncErrorAttrSpelling::GNU_SWIFT_ASYNC_ERROR;
+    case 1: return SwiftAsyncErrorAttrSpelling::CXX11_CLANG_SWIFT_ASYNC_ERROR;
+    case 2: return SwiftAsyncErrorAttrSpelling::C2_XCLANG_SWIFT_ASYNC_ERROR;
+    case 15: return SwiftAsyncErrorAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftAsyncErrorAttrSpelling e) {
+  switch (e) {
+    case SwiftAsyncErrorAttrSpelling::GNU_SWIFT_ASYNC_ERROR: return "GNU_SWIFT_ASYNC_ERROR";
+    case SwiftAsyncErrorAttrSpelling::CXX11_CLANG_SWIFT_ASYNC_ERROR: return "CXX11_CLANG_SWIFT_ASYNC_ERROR";
+    case SwiftAsyncErrorAttrSpelling::C2_XCLANG_SWIFT_ASYNC_ERROR: return "C2_XCLANG_SWIFT_ASYNC_ERROR";
+    case SwiftAsyncErrorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftCallAttrSpelling FromPasta(pasta::SwiftCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftCallAttrSpelling::GNU_SWIFTCALL;
+    case 1: return SwiftCallAttrSpelling::CXX11_CLANG_SWIFTCALL;
+    case 2: return SwiftCallAttrSpelling::C2_XCLANG_SWIFTCALL;
+    case 15: return SwiftCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftCallAttrSpelling e) {
+  switch (e) {
+    case SwiftCallAttrSpelling::GNU_SWIFTCALL: return "GNU_SWIFTCALL";
+    case SwiftCallAttrSpelling::CXX11_CLANG_SWIFTCALL: return "CXX11_CLANG_SWIFTCALL";
+    case SwiftCallAttrSpelling::C2_XCLANG_SWIFTCALL: return "C2_XCLANG_SWIFTCALL";
+    case SwiftCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftContextAttrSpelling FromPasta(pasta::SwiftContextAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftContextAttrSpelling::GNU_SWIFT_CONTEXT;
+    case 1: return SwiftContextAttrSpelling::CXX11_CLANG_SWIFT_CONTEXT;
+    case 2: return SwiftContextAttrSpelling::C2_XCLANG_SWIFT_CONTEXT;
+    case 15: return SwiftContextAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftContextAttrSpelling e) {
+  switch (e) {
+    case SwiftContextAttrSpelling::GNU_SWIFT_CONTEXT: return "GNU_SWIFT_CONTEXT";
+    case SwiftContextAttrSpelling::CXX11_CLANG_SWIFT_CONTEXT: return "CXX11_CLANG_SWIFT_CONTEXT";
+    case SwiftContextAttrSpelling::C2_XCLANG_SWIFT_CONTEXT: return "C2_XCLANG_SWIFT_CONTEXT";
+    case SwiftContextAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftErrorAttrConventionKind FromPasta(pasta::SwiftErrorAttrConventionKind e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftErrorAttrConventionKind::NONE;
+    case 1: return SwiftErrorAttrConventionKind::NON_NULL_ERROR;
+    case 2: return SwiftErrorAttrConventionKind::NULL_RESULT;
+    case 3: return SwiftErrorAttrConventionKind::ZERO_RESULT;
+    case 4: return SwiftErrorAttrConventionKind::NON_ZERO_RESULT;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftErrorAttrConventionKind e) {
+  switch (e) {
+    case SwiftErrorAttrConventionKind::NONE: return "NONE";
+    case SwiftErrorAttrConventionKind::NON_NULL_ERROR: return "NON_NULL_ERROR";
+    case SwiftErrorAttrConventionKind::NULL_RESULT: return "NULL_RESULT";
+    case SwiftErrorAttrConventionKind::ZERO_RESULT: return "ZERO_RESULT";
+    case SwiftErrorAttrConventionKind::NON_ZERO_RESULT: return "NON_ZERO_RESULT";
+    default: return "<invalid>";
+  }
+}
+
+SwiftErrorResultAttrSpelling FromPasta(pasta::SwiftErrorResultAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftErrorResultAttrSpelling::GNU_SWIFT_ERROR_RESULT;
+    case 1: return SwiftErrorResultAttrSpelling::CXX11_CLANG_SWIFT_ERROR_RESULT;
+    case 2: return SwiftErrorResultAttrSpelling::C2_XCLANG_SWIFT_ERROR_RESULT;
+    case 15: return SwiftErrorResultAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftErrorResultAttrSpelling e) {
+  switch (e) {
+    case SwiftErrorResultAttrSpelling::GNU_SWIFT_ERROR_RESULT: return "GNU_SWIFT_ERROR_RESULT";
+    case SwiftErrorResultAttrSpelling::CXX11_CLANG_SWIFT_ERROR_RESULT: return "CXX11_CLANG_SWIFT_ERROR_RESULT";
+    case SwiftErrorResultAttrSpelling::C2_XCLANG_SWIFT_ERROR_RESULT: return "C2_XCLANG_SWIFT_ERROR_RESULT";
+    case SwiftErrorResultAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftIndirectResultAttrSpelling FromPasta(pasta::SwiftIndirectResultAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftIndirectResultAttrSpelling::GNU_SWIFT_INDIRECT_RESULT;
+    case 1: return SwiftIndirectResultAttrSpelling::CXX11_CLANG_SWIFT_INDIRECT_RESULT;
+    case 2: return SwiftIndirectResultAttrSpelling::C2_XCLANG_SWIFT_INDIRECT_RESULT;
+    case 15: return SwiftIndirectResultAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftIndirectResultAttrSpelling e) {
+  switch (e) {
+    case SwiftIndirectResultAttrSpelling::GNU_SWIFT_INDIRECT_RESULT: return "GNU_SWIFT_INDIRECT_RESULT";
+    case SwiftIndirectResultAttrSpelling::CXX11_CLANG_SWIFT_INDIRECT_RESULT: return "CXX11_CLANG_SWIFT_INDIRECT_RESULT";
+    case SwiftIndirectResultAttrSpelling::C2_XCLANG_SWIFT_INDIRECT_RESULT: return "C2_XCLANG_SWIFT_INDIRECT_RESULT";
+    case SwiftIndirectResultAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SwiftNewTypeAttrNewtypeKind FromPasta(pasta::SwiftNewTypeAttrNewtypeKind e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftNewTypeAttrNewtypeKind::STRUCT;
+    case 1: return SwiftNewTypeAttrNewtypeKind::ENUM;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftNewTypeAttrNewtypeKind e) {
+  switch (e) {
+    case SwiftNewTypeAttrNewtypeKind::STRUCT: return "STRUCT";
+    case SwiftNewTypeAttrNewtypeKind::ENUM: return "ENUM";
+    default: return "<invalid>";
+  }
+}
+
+SwiftNewTypeAttrSpelling FromPasta(pasta::SwiftNewTypeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SwiftNewTypeAttrSpelling::GNU_SWIFT_NEWTYPE;
+    case 1: return SwiftNewTypeAttrSpelling::GNU_SWIFT_WRAPPER;
+    case 15: return SwiftNewTypeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SwiftNewTypeAttrSpelling e) {
+  switch (e) {
+    case SwiftNewTypeAttrSpelling::GNU_SWIFT_NEWTYPE: return "GNU_SWIFT_NEWTYPE";
+    case SwiftNewTypeAttrSpelling::GNU_SWIFT_WRAPPER: return "GNU_SWIFT_WRAPPER";
+    case SwiftNewTypeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+SysVABIAttrSpelling FromPasta(pasta::SysVABIAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return SysVABIAttrSpelling::GNU_SYSV_ABI;
+    case 1: return SysVABIAttrSpelling::CXX11_GNU_SYSV_ABI;
+    case 2: return SysVABIAttrSpelling::C2_XGNU_SYSV_ABI;
+    case 15: return SysVABIAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(SysVABIAttrSpelling e) {
+  switch (e) {
+    case SysVABIAttrSpelling::GNU_SYSV_ABI: return "GNU_SYSV_ABI";
+    case SysVABIAttrSpelling::CXX11_GNU_SYSV_ABI: return "CXX11_GNU_SYSV_ABI";
+    case SysVABIAttrSpelling::C2_XGNU_SYSV_ABI: return "C2_XGNU_SYSV_ABI";
+    case SysVABIAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TLSModelAttrSpelling FromPasta(pasta::TLSModelAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TLSModelAttrSpelling::GNU_TLS_MODEL;
+    case 1: return TLSModelAttrSpelling::CXX11_GNU_TLS_MODEL;
+    case 2: return TLSModelAttrSpelling::C2_XGNU_TLS_MODEL;
+    case 15: return TLSModelAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TLSModelAttrSpelling e) {
+  switch (e) {
+    case TLSModelAttrSpelling::GNU_TLS_MODEL: return "GNU_TLS_MODEL";
+    case TLSModelAttrSpelling::CXX11_GNU_TLS_MODEL: return "CXX11_GNU_TLS_MODEL";
+    case TLSModelAttrSpelling::C2_XGNU_TLS_MODEL: return "C2_XGNU_TLS_MODEL";
+    case TLSModelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TargetAttrSpelling FromPasta(pasta::TargetAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TargetAttrSpelling::GNU_TARGET;
+    case 1: return TargetAttrSpelling::CXX11_GNU_TARGET;
+    case 2: return TargetAttrSpelling::C2_XGNU_TARGET;
+    case 15: return TargetAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TargetAttrSpelling e) {
+  switch (e) {
+    case TargetAttrSpelling::GNU_TARGET: return "GNU_TARGET";
+    case TargetAttrSpelling::CXX11_GNU_TARGET: return "CXX11_GNU_TARGET";
+    case TargetAttrSpelling::C2_XGNU_TARGET: return "C2_XGNU_TARGET";
+    case TargetAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TargetClonesAttrSpelling FromPasta(pasta::TargetClonesAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TargetClonesAttrSpelling::GNU_TARGET_CLONES;
+    case 1: return TargetClonesAttrSpelling::CXX11_GNU_TARGET_CLONES;
+    case 2: return TargetClonesAttrSpelling::C2_XGNU_TARGET_CLONES;
+    case 15: return TargetClonesAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TargetClonesAttrSpelling e) {
+  switch (e) {
+    case TargetClonesAttrSpelling::GNU_TARGET_CLONES: return "GNU_TARGET_CLONES";
+    case TargetClonesAttrSpelling::CXX11_GNU_TARGET_CLONES: return "CXX11_GNU_TARGET_CLONES";
+    case TargetClonesAttrSpelling::C2_XGNU_TARGET_CLONES: return "C2_XGNU_TARGET_CLONES";
+    case TargetClonesAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 TemplateArgumentKind FromPasta(pasta::TemplateArgumentKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return TemplateArgumentKind::EMPTY;
@@ -2103,6 +7443,122 @@ const char *EnumeratorName(TemplateArgumentKind e) {
     case TemplateArgumentKind::TEMPLATE_EXPANSION: return "TEMPLATE_EXPANSION";
     case TemplateArgumentKind::EXPRESSION: return "EXPRESSION";
     case TemplateArgumentKind::PACK: return "PACK";
+    default: return "<invalid>";
+  }
+}
+
+TestTypestateAttrConsumedState FromPasta(pasta::TestTypestateAttrConsumedState e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TestTypestateAttrConsumedState::CONSUMED;
+    case 1: return TestTypestateAttrConsumedState::UNCONSUMED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TestTypestateAttrConsumedState e) {
+  switch (e) {
+    case TestTypestateAttrConsumedState::CONSUMED: return "CONSUMED";
+    case TestTypestateAttrConsumedState::UNCONSUMED: return "UNCONSUMED";
+    default: return "<invalid>";
+  }
+}
+
+TestTypestateAttrSpelling FromPasta(pasta::TestTypestateAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TestTypestateAttrSpelling::GNU_TEST_TYPESTATE;
+    case 1: return TestTypestateAttrSpelling::CXX11_CLANG_TEST_TYPESTATE;
+    case 15: return TestTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TestTypestateAttrSpelling e) {
+  switch (e) {
+    case TestTypestateAttrSpelling::GNU_TEST_TYPESTATE: return "GNU_TEST_TYPESTATE";
+    case TestTypestateAttrSpelling::CXX11_CLANG_TEST_TYPESTATE: return "CXX11_CLANG_TEST_TYPESTATE";
+    case TestTypestateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+ThisCallAttrSpelling FromPasta(pasta::ThisCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return ThisCallAttrSpelling::GNU_THISCALL;
+    case 1: return ThisCallAttrSpelling::CXX11_GNU_THISCALL;
+    case 2: return ThisCallAttrSpelling::C2_XGNU_THISCALL;
+    case 3: return ThisCallAttrSpelling::KEYWORD_THISCALL;
+    case 15: return ThisCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(ThisCallAttrSpelling e) {
+  switch (e) {
+    case ThisCallAttrSpelling::GNU_THISCALL: return "GNU_THISCALL";
+    case ThisCallAttrSpelling::CXX11_GNU_THISCALL: return "CXX11_GNU_THISCALL";
+    case ThisCallAttrSpelling::C2_XGNU_THISCALL: return "C2_XGNU_THISCALL";
+    case ThisCallAttrSpelling::KEYWORD_THISCALL: return "KEYWORD_THISCALL";
+    case ThisCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TransparentUnionAttrSpelling FromPasta(pasta::TransparentUnionAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TransparentUnionAttrSpelling::GNU_TRANSPARENT_UNION;
+    case 1: return TransparentUnionAttrSpelling::CXX11_GNU_TRANSPARENT_UNION;
+    case 2: return TransparentUnionAttrSpelling::C2_XGNU_TRANSPARENT_UNION;
+    case 15: return TransparentUnionAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TransparentUnionAttrSpelling e) {
+  switch (e) {
+    case TransparentUnionAttrSpelling::GNU_TRANSPARENT_UNION: return "GNU_TRANSPARENT_UNION";
+    case TransparentUnionAttrSpelling::CXX11_GNU_TRANSPARENT_UNION: return "CXX11_GNU_TRANSPARENT_UNION";
+    case TransparentUnionAttrSpelling::C2_XGNU_TRANSPARENT_UNION: return "C2_XGNU_TRANSPARENT_UNION";
+    case TransparentUnionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TrivialABIAttrSpelling FromPasta(pasta::TrivialABIAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TrivialABIAttrSpelling::GNU_TRIVIAL_ABI;
+    case 1: return TrivialABIAttrSpelling::CXX11_CLANG_TRIVIAL_ABI;
+    case 15: return TrivialABIAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TrivialABIAttrSpelling e) {
+  switch (e) {
+    case TrivialABIAttrSpelling::GNU_TRIVIAL_ABI: return "GNU_TRIVIAL_ABI";
+    case TrivialABIAttrSpelling::CXX11_CLANG_TRIVIAL_ABI: return "CXX11_CLANG_TRIVIAL_ABI";
+    case TrivialABIAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TryAcquireCapabilityAttrSpelling FromPasta(pasta::TryAcquireCapabilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TryAcquireCapabilityAttrSpelling::GNU_TRY_ACQUIRE_CAPABILITY;
+    case 1: return TryAcquireCapabilityAttrSpelling::CXX11_CLANG_TRY_ACQUIRE_CAPABILITY;
+    case 2: return TryAcquireCapabilityAttrSpelling::GNU_TRY_ACQUIRE_SHARED_CAPABILITY;
+    case 3: return TryAcquireCapabilityAttrSpelling::CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY;
+    case 15: return TryAcquireCapabilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TryAcquireCapabilityAttrSpelling e) {
+  switch (e) {
+    case TryAcquireCapabilityAttrSpelling::GNU_TRY_ACQUIRE_CAPABILITY: return "GNU_TRY_ACQUIRE_CAPABILITY";
+    case TryAcquireCapabilityAttrSpelling::CXX11_CLANG_TRY_ACQUIRE_CAPABILITY: return "CXX11_CLANG_TRY_ACQUIRE_CAPABILITY";
+    case TryAcquireCapabilityAttrSpelling::GNU_TRY_ACQUIRE_SHARED_CAPABILITY: return "GNU_TRY_ACQUIRE_SHARED_CAPABILITY";
+    case TryAcquireCapabilityAttrSpelling::CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY: return "CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY";
+    case TryAcquireCapabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -2257,6 +7713,64 @@ const char *EnumeratorName(TypeKind e) {
   }
 }
 
+TypeTagForDatatypeAttrSpelling FromPasta(pasta::TypeTagForDatatypeAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeTagForDatatypeAttrSpelling::GNU_TYPE_TAG_FOR_DATATYPE;
+    case 1: return TypeTagForDatatypeAttrSpelling::CXX11_CLANG_TYPE_TAG_FOR_DATATYPE;
+    case 2: return TypeTagForDatatypeAttrSpelling::C2_XCLANG_TYPE_TAG_FOR_DATATYPE;
+    case 15: return TypeTagForDatatypeAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TypeTagForDatatypeAttrSpelling e) {
+  switch (e) {
+    case TypeTagForDatatypeAttrSpelling::GNU_TYPE_TAG_FOR_DATATYPE: return "GNU_TYPE_TAG_FOR_DATATYPE";
+    case TypeTagForDatatypeAttrSpelling::CXX11_CLANG_TYPE_TAG_FOR_DATATYPE: return "CXX11_CLANG_TYPE_TAG_FOR_DATATYPE";
+    case TypeTagForDatatypeAttrSpelling::C2_XCLANG_TYPE_TAG_FOR_DATATYPE: return "C2_XCLANG_TYPE_TAG_FOR_DATATYPE";
+    case TypeTagForDatatypeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TypeVisibilityAttrSpelling FromPasta(pasta::TypeVisibilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeVisibilityAttrSpelling::GNU_TYPE_VISIBILITY;
+    case 1: return TypeVisibilityAttrSpelling::CXX11_CLANG_TYPE_VISIBILITY;
+    case 2: return TypeVisibilityAttrSpelling::C2_XCLANG_TYPE_VISIBILITY;
+    case 15: return TypeVisibilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TypeVisibilityAttrSpelling e) {
+  switch (e) {
+    case TypeVisibilityAttrSpelling::GNU_TYPE_VISIBILITY: return "GNU_TYPE_VISIBILITY";
+    case TypeVisibilityAttrSpelling::CXX11_CLANG_TYPE_VISIBILITY: return "CXX11_CLANG_TYPE_VISIBILITY";
+    case TypeVisibilityAttrSpelling::C2_XCLANG_TYPE_VISIBILITY: return "C2_XCLANG_TYPE_VISIBILITY";
+    case TypeVisibilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+TypeVisibilityAttrVisibilityType FromPasta(pasta::TypeVisibilityAttrVisibilityType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return TypeVisibilityAttrVisibilityType::DEFAULT;
+    case 1: return TypeVisibilityAttrVisibilityType::HIDDEN;
+    case 2: return TypeVisibilityAttrVisibilityType::PROTECTED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(TypeVisibilityAttrVisibilityType e) {
+  switch (e) {
+    case TypeVisibilityAttrVisibilityType::DEFAULT: return "DEFAULT";
+    case TypeVisibilityAttrVisibilityType::HIDDEN: return "HIDDEN";
+    case TypeVisibilityAttrVisibilityType::PROTECTED: return "PROTECTED";
+    default: return "<invalid>";
+  }
+}
+
 UnaryTransformTypeUTTKind FromPasta(pasta::UnaryTransformTypeUTTKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return UnaryTransformTypeUTTKind::ENUM_UNDERLYING_TYPE;
@@ -2267,6 +7781,150 @@ UnaryTransformTypeUTTKind FromPasta(pasta::UnaryTransformTypeUTTKind e) {
 const char *EnumeratorName(UnaryTransformTypeUTTKind e) {
   switch (e) {
     case UnaryTransformTypeUTTKind::ENUM_UNDERLYING_TYPE: return "ENUM_UNDERLYING_TYPE";
+    default: return "<invalid>";
+  }
+}
+
+UnavailableAttrImplicitReason FromPasta(pasta::UnavailableAttrImplicitReason e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UnavailableAttrImplicitReason::NONE;
+    case 1: return UnavailableAttrImplicitReason::ARC_FORBIDDEN_TYPE;
+    case 2: return UnavailableAttrImplicitReason::FORBIDDEN_WEAK;
+    case 3: return UnavailableAttrImplicitReason::ARC_FORBIDDEN_CONVERSION;
+    case 4: return UnavailableAttrImplicitReason::ARC_INIT_RETURNS_UNRELATED;
+    case 5: return UnavailableAttrImplicitReason::ARC_FIELD_WITH_OWNERSHIP;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UnavailableAttrImplicitReason e) {
+  switch (e) {
+    case UnavailableAttrImplicitReason::NONE: return "NONE";
+    case UnavailableAttrImplicitReason::ARC_FORBIDDEN_TYPE: return "ARC_FORBIDDEN_TYPE";
+    case UnavailableAttrImplicitReason::FORBIDDEN_WEAK: return "FORBIDDEN_WEAK";
+    case UnavailableAttrImplicitReason::ARC_FORBIDDEN_CONVERSION: return "ARC_FORBIDDEN_CONVERSION";
+    case UnavailableAttrImplicitReason::ARC_INIT_RETURNS_UNRELATED: return "ARC_INIT_RETURNS_UNRELATED";
+    case UnavailableAttrImplicitReason::ARC_FIELD_WITH_OWNERSHIP: return "ARC_FIELD_WITH_OWNERSHIP";
+    default: return "<invalid>";
+  }
+}
+
+UnavailableAttrSpelling FromPasta(pasta::UnavailableAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UnavailableAttrSpelling::GNU_UNAVAILABLE;
+    case 1: return UnavailableAttrSpelling::CXX11_CLANG_UNAVAILABLE;
+    case 2: return UnavailableAttrSpelling::C2_XCLANG_UNAVAILABLE;
+    case 15: return UnavailableAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UnavailableAttrSpelling e) {
+  switch (e) {
+    case UnavailableAttrSpelling::GNU_UNAVAILABLE: return "GNU_UNAVAILABLE";
+    case UnavailableAttrSpelling::CXX11_CLANG_UNAVAILABLE: return "CXX11_CLANG_UNAVAILABLE";
+    case UnavailableAttrSpelling::C2_XCLANG_UNAVAILABLE: return "C2_XCLANG_UNAVAILABLE";
+    case UnavailableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+UninitializedAttrSpelling FromPasta(pasta::UninitializedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UninitializedAttrSpelling::GNU_UNINITIALIZED;
+    case 1: return UninitializedAttrSpelling::CXX11_CLANG_UNINITIALIZED;
+    case 15: return UninitializedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UninitializedAttrSpelling e) {
+  switch (e) {
+    case UninitializedAttrSpelling::GNU_UNINITIALIZED: return "GNU_UNINITIALIZED";
+    case UninitializedAttrSpelling::CXX11_CLANG_UNINITIALIZED: return "CXX11_CLANG_UNINITIALIZED";
+    case UninitializedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+UnlikelyAttrSpelling FromPasta(pasta::UnlikelyAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UnlikelyAttrSpelling::CXX11_UNLIKELY;
+    case 1: return UnlikelyAttrSpelling::C2_XCLANG_UNLIKELY;
+    case 15: return UnlikelyAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UnlikelyAttrSpelling e) {
+  switch (e) {
+    case UnlikelyAttrSpelling::CXX11_UNLIKELY: return "CXX11_UNLIKELY";
+    case UnlikelyAttrSpelling::C2_XCLANG_UNLIKELY: return "C2_XCLANG_UNLIKELY";
+    case UnlikelyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+UnusedAttrSpelling FromPasta(pasta::UnusedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UnusedAttrSpelling::CXX11_MAYBE_UNUSED;
+    case 1: return UnusedAttrSpelling::GNU_UNUSED;
+    case 2: return UnusedAttrSpelling::CXX11_GNU_UNUSED;
+    case 3: return UnusedAttrSpelling::C2_XGNU_UNUSED;
+    case 4: return UnusedAttrSpelling::C2_XMAYBE_UNUSED;
+    case 15: return UnusedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UnusedAttrSpelling e) {
+  switch (e) {
+    case UnusedAttrSpelling::CXX11_MAYBE_UNUSED: return "CXX11_MAYBE_UNUSED";
+    case UnusedAttrSpelling::GNU_UNUSED: return "GNU_UNUSED";
+    case UnusedAttrSpelling::CXX11_GNU_UNUSED: return "CXX11_GNU_UNUSED";
+    case UnusedAttrSpelling::C2_XGNU_UNUSED: return "C2_XGNU_UNUSED";
+    case UnusedAttrSpelling::C2_XMAYBE_UNUSED: return "C2_XMAYBE_UNUSED";
+    case UnusedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+UseHandleAttrSpelling FromPasta(pasta::UseHandleAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UseHandleAttrSpelling::GNU_USE_HANDLE;
+    case 1: return UseHandleAttrSpelling::CXX11_CLANG_USE_HANDLE;
+    case 2: return UseHandleAttrSpelling::C2_XCLANG_USE_HANDLE;
+    case 15: return UseHandleAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UseHandleAttrSpelling e) {
+  switch (e) {
+    case UseHandleAttrSpelling::GNU_USE_HANDLE: return "GNU_USE_HANDLE";
+    case UseHandleAttrSpelling::CXX11_CLANG_USE_HANDLE: return "CXX11_CLANG_USE_HANDLE";
+    case UseHandleAttrSpelling::C2_XCLANG_USE_HANDLE: return "C2_XCLANG_USE_HANDLE";
+    case UseHandleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+UsedAttrSpelling FromPasta(pasta::UsedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UsedAttrSpelling::GNU_USED;
+    case 1: return UsedAttrSpelling::CXX11_GNU_USED;
+    case 2: return UsedAttrSpelling::C2_XGNU_USED;
+    case 15: return UsedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UsedAttrSpelling e) {
+  switch (e) {
+    case UsedAttrSpelling::GNU_USED: return "GNU_USED";
+    case UsedAttrSpelling::CXX11_GNU_USED: return "CXX11_GNU_USED";
+    case UsedAttrSpelling::C2_XGNU_USED: return "C2_XGNU_USED";
+    case UsedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -2291,6 +7949,42 @@ const char *EnumeratorName(UserDefinedLiteralLiteralOperatorKind e) {
     case UserDefinedLiteralLiteralOperatorKind::FLOATING: return "FLOATING";
     case UserDefinedLiteralLiteralOperatorKind::STRING: return "STRING";
     case UserDefinedLiteralLiteralOperatorKind::CHARACTER: return "CHARACTER";
+    default: return "<invalid>";
+  }
+}
+
+UsingIfExistsAttrSpelling FromPasta(pasta::UsingIfExistsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UsingIfExistsAttrSpelling::GNU_USING_IF_EXISTS;
+    case 1: return UsingIfExistsAttrSpelling::CXX11_CLANG_USING_IF_EXISTS;
+    case 15: return UsingIfExistsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UsingIfExistsAttrSpelling e) {
+  switch (e) {
+    case UsingIfExistsAttrSpelling::GNU_USING_IF_EXISTS: return "GNU_USING_IF_EXISTS";
+    case UsingIfExistsAttrSpelling::CXX11_CLANG_USING_IF_EXISTS: return "CXX11_CLANG_USING_IF_EXISTS";
+    case UsingIfExistsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+UuidAttrSpelling FromPasta(pasta::UuidAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return UuidAttrSpelling::DECLSPEC_UUID;
+    case 1: return UuidAttrSpelling::MICROSOFT_UUID;
+    case 15: return UuidAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(UuidAttrSpelling e) {
+  switch (e) {
+    case UuidAttrSpelling::DECLSPEC_UUID: return "DECLSPEC_UUID";
+    case UuidAttrSpelling::MICROSOFT_UUID: return "MICROSOFT_UUID";
+    case UuidAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -2349,6 +8043,46 @@ const char *EnumeratorName(VarDeclTLSKind e) {
   }
 }
 
+VecReturnAttrSpelling FromPasta(pasta::VecReturnAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VecReturnAttrSpelling::GNU_VECRETURN;
+    case 1: return VecReturnAttrSpelling::CXX11_CLANG_VECRETURN;
+    case 15: return VecReturnAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(VecReturnAttrSpelling e) {
+  switch (e) {
+    case VecReturnAttrSpelling::GNU_VECRETURN: return "GNU_VECRETURN";
+    case VecReturnAttrSpelling::CXX11_CLANG_VECRETURN: return "CXX11_CLANG_VECRETURN";
+    case VecReturnAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+VectorCallAttrSpelling FromPasta(pasta::VectorCallAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VectorCallAttrSpelling::GNU_VECTORCALL;
+    case 1: return VectorCallAttrSpelling::CXX11_CLANG_VECTORCALL;
+    case 2: return VectorCallAttrSpelling::C2_XCLANG_VECTORCALL;
+    case 3: return VectorCallAttrSpelling::KEYWORD_VECTORCALL;
+    case 15: return VectorCallAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(VectorCallAttrSpelling e) {
+  switch (e) {
+    case VectorCallAttrSpelling::GNU_VECTORCALL: return "GNU_VECTORCALL";
+    case VectorCallAttrSpelling::CXX11_CLANG_VECTORCALL: return "CXX11_CLANG_VECTORCALL";
+    case VectorCallAttrSpelling::C2_XCLANG_VECTORCALL: return "C2_XCLANG_VECTORCALL";
+    case VectorCallAttrSpelling::KEYWORD_VECTORCALL: return "KEYWORD_VECTORCALL";
+    case VectorCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
 VectorTypeVectorKind FromPasta(pasta::VectorTypeVectorKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return VectorTypeVectorKind::GENERIC_VECTOR;
@@ -2373,6 +8107,276 @@ const char *EnumeratorName(VectorTypeVectorKind e) {
     case VectorTypeVectorKind::NEON_POLY_VECTOR: return "NEON_POLY_VECTOR";
     case VectorTypeVectorKind::SVE_FIXED_LENGTH_DATA_VECTOR: return "SVE_FIXED_LENGTH_DATA_VECTOR";
     case VectorTypeVectorKind::SVE_FIXED_LENGTH_PREDICATE_VECTOR: return "SVE_FIXED_LENGTH_PREDICATE_VECTOR";
+    default: return "<invalid>";
+  }
+}
+
+VisibilityAttrSpelling FromPasta(pasta::VisibilityAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VisibilityAttrSpelling::GNU_VISIBILITY;
+    case 1: return VisibilityAttrSpelling::CXX11_GNU_VISIBILITY;
+    case 2: return VisibilityAttrSpelling::C2_XGNU_VISIBILITY;
+    case 15: return VisibilityAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(VisibilityAttrSpelling e) {
+  switch (e) {
+    case VisibilityAttrSpelling::GNU_VISIBILITY: return "GNU_VISIBILITY";
+    case VisibilityAttrSpelling::CXX11_GNU_VISIBILITY: return "CXX11_GNU_VISIBILITY";
+    case VisibilityAttrSpelling::C2_XGNU_VISIBILITY: return "C2_XGNU_VISIBILITY";
+    case VisibilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+VisibilityAttrVisibilityType FromPasta(pasta::VisibilityAttrVisibilityType e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return VisibilityAttrVisibilityType::DEFAULT;
+    case 1: return VisibilityAttrVisibilityType::HIDDEN;
+    case 2: return VisibilityAttrVisibilityType::PROTECTED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(VisibilityAttrVisibilityType e) {
+  switch (e) {
+    case VisibilityAttrVisibilityType::DEFAULT: return "DEFAULT";
+    case VisibilityAttrVisibilityType::HIDDEN: return "HIDDEN";
+    case VisibilityAttrVisibilityType::PROTECTED: return "PROTECTED";
+    default: return "<invalid>";
+  }
+}
+
+WarnUnusedAttrSpelling FromPasta(pasta::WarnUnusedAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WarnUnusedAttrSpelling::GNU_WARN_UNUSED;
+    case 1: return WarnUnusedAttrSpelling::CXX11_GNU_WARN_UNUSED;
+    case 2: return WarnUnusedAttrSpelling::C2_XGNU_WARN_UNUSED;
+    case 15: return WarnUnusedAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WarnUnusedAttrSpelling e) {
+  switch (e) {
+    case WarnUnusedAttrSpelling::GNU_WARN_UNUSED: return "GNU_WARN_UNUSED";
+    case WarnUnusedAttrSpelling::CXX11_GNU_WARN_UNUSED: return "CXX11_GNU_WARN_UNUSED";
+    case WarnUnusedAttrSpelling::C2_XGNU_WARN_UNUSED: return "C2_XGNU_WARN_UNUSED";
+    case WarnUnusedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+WarnUnusedResultAttrSpelling FromPasta(pasta::WarnUnusedResultAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WarnUnusedResultAttrSpelling::CXX11_NODISCARD;
+    case 1: return WarnUnusedResultAttrSpelling::C2_XNODISCARD;
+    case 2: return WarnUnusedResultAttrSpelling::CXX11_CLANG_WARN_UNUSED_RESULT;
+    case 3: return WarnUnusedResultAttrSpelling::GNU_WARN_UNUSED_RESULT;
+    case 4: return WarnUnusedResultAttrSpelling::CXX11_GNU_WARN_UNUSED_RESULT;
+    case 5: return WarnUnusedResultAttrSpelling::C2_XGNU_WARN_UNUSED_RESULT;
+    case 15: return WarnUnusedResultAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WarnUnusedResultAttrSpelling e) {
+  switch (e) {
+    case WarnUnusedResultAttrSpelling::CXX11_NODISCARD: return "CXX11_NODISCARD";
+    case WarnUnusedResultAttrSpelling::C2_XNODISCARD: return "C2_XNODISCARD";
+    case WarnUnusedResultAttrSpelling::CXX11_CLANG_WARN_UNUSED_RESULT: return "CXX11_CLANG_WARN_UNUSED_RESULT";
+    case WarnUnusedResultAttrSpelling::GNU_WARN_UNUSED_RESULT: return "GNU_WARN_UNUSED_RESULT";
+    case WarnUnusedResultAttrSpelling::CXX11_GNU_WARN_UNUSED_RESULT: return "CXX11_GNU_WARN_UNUSED_RESULT";
+    case WarnUnusedResultAttrSpelling::C2_XGNU_WARN_UNUSED_RESULT: return "C2_XGNU_WARN_UNUSED_RESULT";
+    case WarnUnusedResultAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+WeakAttrSpelling FromPasta(pasta::WeakAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WeakAttrSpelling::GNU_WEAK;
+    case 1: return WeakAttrSpelling::CXX11_GNU_WEAK;
+    case 2: return WeakAttrSpelling::C2_XGNU_WEAK;
+    case 15: return WeakAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WeakAttrSpelling e) {
+  switch (e) {
+    case WeakAttrSpelling::GNU_WEAK: return "GNU_WEAK";
+    case WeakAttrSpelling::CXX11_GNU_WEAK: return "CXX11_GNU_WEAK";
+    case WeakAttrSpelling::C2_XGNU_WEAK: return "C2_XGNU_WEAK";
+    case WeakAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+WeakImportAttrSpelling FromPasta(pasta::WeakImportAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WeakImportAttrSpelling::GNU_WEAK_IMPORT;
+    case 1: return WeakImportAttrSpelling::CXX11_CLANG_WEAK_IMPORT;
+    case 2: return WeakImportAttrSpelling::C2_XCLANG_WEAK_IMPORT;
+    case 15: return WeakImportAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WeakImportAttrSpelling e) {
+  switch (e) {
+    case WeakImportAttrSpelling::GNU_WEAK_IMPORT: return "GNU_WEAK_IMPORT";
+    case WeakImportAttrSpelling::CXX11_CLANG_WEAK_IMPORT: return "CXX11_CLANG_WEAK_IMPORT";
+    case WeakImportAttrSpelling::C2_XCLANG_WEAK_IMPORT: return "C2_XCLANG_WEAK_IMPORT";
+    case WeakImportAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+WeakRefAttrSpelling FromPasta(pasta::WeakRefAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WeakRefAttrSpelling::GNU_WEAKREF;
+    case 1: return WeakRefAttrSpelling::CXX11_GNU_WEAKREF;
+    case 2: return WeakRefAttrSpelling::C2_XGNU_WEAKREF;
+    case 15: return WeakRefAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WeakRefAttrSpelling e) {
+  switch (e) {
+    case WeakRefAttrSpelling::GNU_WEAKREF: return "GNU_WEAKREF";
+    case WeakRefAttrSpelling::CXX11_GNU_WEAKREF: return "CXX11_GNU_WEAKREF";
+    case WeakRefAttrSpelling::C2_XGNU_WEAKREF: return "C2_XGNU_WEAKREF";
+    case WeakRefAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+WebAssemblyExportNameAttrSpelling FromPasta(pasta::WebAssemblyExportNameAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WebAssemblyExportNameAttrSpelling::GNU_EXPORT_NAME;
+    case 1: return WebAssemblyExportNameAttrSpelling::CXX11_CLANG_EXPORT_NAME;
+    case 2: return WebAssemblyExportNameAttrSpelling::C2_XCLANG_EXPORT_NAME;
+    case 15: return WebAssemblyExportNameAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WebAssemblyExportNameAttrSpelling e) {
+  switch (e) {
+    case WebAssemblyExportNameAttrSpelling::GNU_EXPORT_NAME: return "GNU_EXPORT_NAME";
+    case WebAssemblyExportNameAttrSpelling::CXX11_CLANG_EXPORT_NAME: return "CXX11_CLANG_EXPORT_NAME";
+    case WebAssemblyExportNameAttrSpelling::C2_XCLANG_EXPORT_NAME: return "C2_XCLANG_EXPORT_NAME";
+    case WebAssemblyExportNameAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+WebAssemblyImportModuleAttrSpelling FromPasta(pasta::WebAssemblyImportModuleAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WebAssemblyImportModuleAttrSpelling::GNU_IMPORT_MODULE;
+    case 1: return WebAssemblyImportModuleAttrSpelling::CXX11_CLANG_IMPORT_MODULE;
+    case 2: return WebAssemblyImportModuleAttrSpelling::C2_XCLANG_IMPORT_MODULE;
+    case 15: return WebAssemblyImportModuleAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WebAssemblyImportModuleAttrSpelling e) {
+  switch (e) {
+    case WebAssemblyImportModuleAttrSpelling::GNU_IMPORT_MODULE: return "GNU_IMPORT_MODULE";
+    case WebAssemblyImportModuleAttrSpelling::CXX11_CLANG_IMPORT_MODULE: return "CXX11_CLANG_IMPORT_MODULE";
+    case WebAssemblyImportModuleAttrSpelling::C2_XCLANG_IMPORT_MODULE: return "C2_XCLANG_IMPORT_MODULE";
+    case WebAssemblyImportModuleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+WebAssemblyImportNameAttrSpelling FromPasta(pasta::WebAssemblyImportNameAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return WebAssemblyImportNameAttrSpelling::GNU_IMPORT_NAME;
+    case 1: return WebAssemblyImportNameAttrSpelling::CXX11_CLANG_IMPORT_NAME;
+    case 2: return WebAssemblyImportNameAttrSpelling::C2_XCLANG_IMPORT_NAME;
+    case 15: return WebAssemblyImportNameAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(WebAssemblyImportNameAttrSpelling e) {
+  switch (e) {
+    case WebAssemblyImportNameAttrSpelling::GNU_IMPORT_NAME: return "GNU_IMPORT_NAME";
+    case WebAssemblyImportNameAttrSpelling::CXX11_CLANG_IMPORT_NAME: return "CXX11_CLANG_IMPORT_NAME";
+    case WebAssemblyImportNameAttrSpelling::C2_XCLANG_IMPORT_NAME: return "C2_XCLANG_IMPORT_NAME";
+    case WebAssemblyImportNameAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+X86ForceAlignArgPointerAttrSpelling FromPasta(pasta::X86ForceAlignArgPointerAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return X86ForceAlignArgPointerAttrSpelling::GNU_FORCE_ALIGN_ARGUMENT_POINTER;
+    case 1: return X86ForceAlignArgPointerAttrSpelling::CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER;
+    case 2: return X86ForceAlignArgPointerAttrSpelling::C2_XGNU_FORCE_ALIGN_ARGUMENT_POINTER;
+    case 15: return X86ForceAlignArgPointerAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(X86ForceAlignArgPointerAttrSpelling e) {
+  switch (e) {
+    case X86ForceAlignArgPointerAttrSpelling::GNU_FORCE_ALIGN_ARGUMENT_POINTER: return "GNU_FORCE_ALIGN_ARGUMENT_POINTER";
+    case X86ForceAlignArgPointerAttrSpelling::CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER: return "CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER";
+    case X86ForceAlignArgPointerAttrSpelling::C2_XGNU_FORCE_ALIGN_ARGUMENT_POINTER: return "C2_XGNU_FORCE_ALIGN_ARGUMENT_POINTER";
+    case X86ForceAlignArgPointerAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+XRayInstrumentAttrSpelling FromPasta(pasta::XRayInstrumentAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return XRayInstrumentAttrSpelling::GNU_XRAY_ALWAYS_INSTRUMENT;
+    case 1: return XRayInstrumentAttrSpelling::CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT;
+    case 2: return XRayInstrumentAttrSpelling::C2_XCLANG_XRAY_ALWAYS_INSTRUMENT;
+    case 3: return XRayInstrumentAttrSpelling::GNU_XRAY_NEVER_INSTRUMENT;
+    case 4: return XRayInstrumentAttrSpelling::CXX11_CLANG_XRAY_NEVER_INSTRUMENT;
+    case 5: return XRayInstrumentAttrSpelling::C2_XCLANG_XRAY_NEVER_INSTRUMENT;
+    case 15: return XRayInstrumentAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(XRayInstrumentAttrSpelling e) {
+  switch (e) {
+    case XRayInstrumentAttrSpelling::GNU_XRAY_ALWAYS_INSTRUMENT: return "GNU_XRAY_ALWAYS_INSTRUMENT";
+    case XRayInstrumentAttrSpelling::CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT: return "CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT";
+    case XRayInstrumentAttrSpelling::C2_XCLANG_XRAY_ALWAYS_INSTRUMENT: return "C2_XCLANG_XRAY_ALWAYS_INSTRUMENT";
+    case XRayInstrumentAttrSpelling::GNU_XRAY_NEVER_INSTRUMENT: return "GNU_XRAY_NEVER_INSTRUMENT";
+    case XRayInstrumentAttrSpelling::CXX11_CLANG_XRAY_NEVER_INSTRUMENT: return "CXX11_CLANG_XRAY_NEVER_INSTRUMENT";
+    case XRayInstrumentAttrSpelling::C2_XCLANG_XRAY_NEVER_INSTRUMENT: return "C2_XCLANG_XRAY_NEVER_INSTRUMENT";
+    case XRayInstrumentAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
+    default: return "<invalid>";
+  }
+}
+
+XRayLogArgsAttrSpelling FromPasta(pasta::XRayLogArgsAttrSpelling e) {
+  switch (static_cast<unsigned>(e)) {
+    case 0: return XRayLogArgsAttrSpelling::GNU_XRAY_LOG_ARGUMENTS;
+    case 1: return XRayLogArgsAttrSpelling::CXX11_CLANG_XRAY_LOG_ARGUMENTS;
+    case 2: return XRayLogArgsAttrSpelling::C2_XCLANG_XRAY_LOG_ARGUMENTS;
+    case 15: return XRayLogArgsAttrSpelling::SPELLING_NOT_CALCULATED;
+    default: __builtin_unreachable();
+  }
+}
+
+const char *EnumeratorName(XRayLogArgsAttrSpelling e) {
+  switch (e) {
+    case XRayLogArgsAttrSpelling::GNU_XRAY_LOG_ARGUMENTS: return "GNU_XRAY_LOG_ARGUMENTS";
+    case XRayLogArgsAttrSpelling::CXX11_CLANG_XRAY_LOG_ARGUMENTS: return "CXX11_CLANG_XRAY_LOG_ARGUMENTS";
+    case XRayLogArgsAttrSpelling::C2_XCLANG_XRAY_LOG_ARGUMENTS: return "C2_XCLANG_XRAY_LOG_ARGUMENTS";
+    case XRayLogArgsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -2447,38 +8451,6 @@ const char *EnumeratorName(AlignRequirementKind e) {
     case AlignRequirementKind::REQUIRED_BY_TYPEDEF: return "REQUIRED_BY_TYPEDEF";
     case AlignRequirementKind::REQUIRED_BY_RECORD: return "REQUIRED_BY_RECORD";
     case AlignRequirementKind::REQUIRED_BY_ENUM: return "REQUIRED_BY_ENUM";
-    default: return "<invalid>";
-  }
-}
-
-AllocatorTypeTy FromPasta(pasta::AllocatorTypeTy e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return AllocatorTypeTy::OMP_NULL_MEMORY_ALLOC;
-    case 1: return AllocatorTypeTy::OMP_DEFAULT_MEMORY_ALLOC;
-    case 2: return AllocatorTypeTy::OMP_LARGE_CAP_MEMORY_ALLOC;
-    case 3: return AllocatorTypeTy::OMP_CONST_MEMORY_ALLOC;
-    case 4: return AllocatorTypeTy::OMP_HIGH_BW_MEMORY_ALLOC;
-    case 5: return AllocatorTypeTy::OMP_LOW_LAT_MEMORY_ALLOC;
-    case 6: return AllocatorTypeTy::OMPC_GROUP_MEMORY_ALLOC;
-    case 7: return AllocatorTypeTy::OMPP_TEAM_MEMORY_ALLOC;
-    case 8: return AllocatorTypeTy::OMP_THREAD_MEMORY_ALLOC;
-    case 9: return AllocatorTypeTy::OMP_USER_DEFINED_MEMORY_ALLOC;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(AllocatorTypeTy e) {
-  switch (e) {
-    case AllocatorTypeTy::OMP_NULL_MEMORY_ALLOC: return "OMP_NULL_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMP_DEFAULT_MEMORY_ALLOC: return "OMP_DEFAULT_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMP_LARGE_CAP_MEMORY_ALLOC: return "OMP_LARGE_CAP_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMP_CONST_MEMORY_ALLOC: return "OMP_CONST_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMP_HIGH_BW_MEMORY_ALLOC: return "OMP_HIGH_BW_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMP_LOW_LAT_MEMORY_ALLOC: return "OMP_LOW_LAT_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMPC_GROUP_MEMORY_ALLOC: return "OMPC_GROUP_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMPP_TEAM_MEMORY_ALLOC: return "OMPP_TEAM_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMP_THREAD_MEMORY_ALLOC: return "OMP_THREAD_MEMORY_ALLOC";
-    case AllocatorTypeTy::OMP_USER_DEFINED_MEMORY_ALLOC: return "OMP_USER_DEFINED_MEMORY_ALLOC";
     default: return "<invalid>";
   }
 }
@@ -2577,710 +8549,710 @@ const char *EnumeratorName(AtomicScopeModelKind e) {
   }
 }
 
-AttributeKind FromPasta(pasta::AttributeKind e) {
+AttrKind FromPasta(pasta::AttrKind e) {
   switch (static_cast<unsigned>(e)) {
-    case 0: return AttributeKind::ADDRESS_SPACE;
-    case 1: return AttributeKind::ARM_MVE_STRICT_POLYMORPHISM;
-    case 2: return AttributeKind::BTF_TYPE_TAG;
-    case 3: return AttributeKind::CMSE_NS_CALL;
-    case 4: return AttributeKind::NO_DEREF;
-    case 5: return AttributeKind::OBJ_CGC;
-    case 6: return AttributeKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
-    case 7: return AttributeKind::OBJ_C_KIND_OF;
-    case 8: return AttributeKind::OPEN_CL_CONSTANT_ADDRESS_SPACE;
-    case 9: return AttributeKind::OPEN_CL_GENERIC_ADDRESS_SPACE;
-    case 10: return AttributeKind::OPEN_CL_GLOBAL_ADDRESS_SPACE;
-    case 11: return AttributeKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
-    case 12: return AttributeKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
-    case 13: return AttributeKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
-    case 14: return AttributeKind::OPEN_CL_PRIVATE_ADDRESS_SPACE;
-    case 15: return AttributeKind::PTR32;
-    case 16: return AttributeKind::PTR64;
-    case 17: return AttributeKind::S_PTR;
-    case 18: return AttributeKind::TYPE_NON_NULL;
-    case 19: return AttributeKind::TYPE_NULL_UNSPECIFIED;
-    case 20: return AttributeKind::TYPE_NULLABLE;
-    case 21: return AttributeKind::TYPE_NULLABLE_RESULT;
-    case 22: return AttributeKind::U_PTR;
-    case 23: return AttributeKind::FALL_THROUGH;
-    case 24: return AttributeKind::LIKELY;
-    case 25: return AttributeKind::MUST_TAIL;
-    case 26: return AttributeKind::OPEN_CL_UNROLL_HINT;
-    case 27: return AttributeKind::SUPPRESS;
-    case 28: return AttributeKind::UNLIKELY;
-    case 29: return AttributeKind::NO_MERGE;
-    case 30: return AttributeKind::A_ARCH64_VECTOR_PCS;
-    case 31: return AttributeKind::ACQUIRE_HANDLE;
-    case 32: return AttributeKind::ANY_X86_NO_CF_CHECK;
-    case 33: return AttributeKind::C_DECL;
-    case 34: return AttributeKind::FAST_CALL;
-    case 35: return AttributeKind::INTEL_OCL_BICC;
-    case 36: return AttributeKind::LIFETIME_BOUND;
-    case 37: return AttributeKind::MSABI;
-    case 38: return AttributeKind::NS_RETURNS_RETAINED;
-    case 39: return AttributeKind::OBJ_C_OWNERSHIP;
-    case 40: return AttributeKind::PASCAL;
-    case 41: return AttributeKind::PCS;
-    case 42: return AttributeKind::PRESERVE_ALL;
-    case 43: return AttributeKind::PRESERVE_MOST;
-    case 44: return AttributeKind::REG_CALL;
-    case 45: return AttributeKind::STD_CALL;
-    case 46: return AttributeKind::SWIFT_ASYNC_CALL;
-    case 47: return AttributeKind::SWIFT_CALL;
-    case 48: return AttributeKind::SYS_VABI;
-    case 49: return AttributeKind::THIS_CALL;
-    case 50: return AttributeKind::VECTOR_CALL;
-    case 51: return AttributeKind::SWIFT_ASYNC_CONTEXT;
-    case 52: return AttributeKind::SWIFT_CONTEXT;
-    case 53: return AttributeKind::SWIFT_ERROR_RESULT;
-    case 54: return AttributeKind::SWIFT_INDIRECT_RESULT;
-    case 55: return AttributeKind::ANNOTATE;
-    case 56: return AttributeKind::CF_CONSUMED;
-    case 57: return AttributeKind::CARRIES_DEPENDENCY;
-    case 58: return AttributeKind::NS_CONSUMED;
-    case 59: return AttributeKind::NON_NULL;
-    case 60: return AttributeKind::OS_CONSUMED;
-    case 61: return AttributeKind::PASS_OBJECT_SIZE;
-    case 62: return AttributeKind::RELEASE_HANDLE;
-    case 63: return AttributeKind::USE_HANDLE;
-    case 64: return AttributeKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
-    case 65: return AttributeKind::AMDGPU_NUM_SGPR;
-    case 66: return AttributeKind::AMDGPU_NUM_VGPR;
-    case 67: return AttributeKind::AMDGPU_WAVES_PER_EU;
-    case 68: return AttributeKind::ARM_INTERRUPT;
-    case 69: return AttributeKind::AVR_INTERRUPT;
-    case 70: return AttributeKind::AVR_SIGNAL;
-    case 71: return AttributeKind::ACQUIRE_CAPABILITY;
-    case 72: return AttributeKind::ACQUIRED_AFTER;
-    case 73: return AttributeKind::ACQUIRED_BEFORE;
-    case 74: return AttributeKind::ALIGN_MAC68_K;
-    case 75: return AttributeKind::ALIGN_NATURAL;
-    case 76: return AttributeKind::ALIGNED;
-    case 77: return AttributeKind::ALLOC_ALIGN;
-    case 78: return AttributeKind::ALLOC_SIZE;
-    case 79: return AttributeKind::ALWAYS_DESTROY;
-    case 80: return AttributeKind::ALWAYS_INLINE;
-    case 81: return AttributeKind::ANALYZER_NO_RETURN;
-    case 82: return AttributeKind::ANY_X86_INTERRUPT;
-    case 83: return AttributeKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
-    case 84: return AttributeKind::ARC_WEAKREF_UNAVAILABLE;
-    case 85: return AttributeKind::ARGUMENT_WITH_TYPE_TAG;
-    case 86: return AttributeKind::ARM_BUILTIN_ALIAS;
-    case 87: return AttributeKind::ARTIFICIAL;
-    case 88: return AttributeKind::ASSEMBLY_LABEL;
-    case 89: return AttributeKind::ASSERT_CAPABILITY;
-    case 90: return AttributeKind::ASSERT_EXCLUSIVE_LOCK;
-    case 91: return AttributeKind::ASSERT_SHARED_LOCK;
-    case 92: return AttributeKind::ASSUME_ALIGNED;
-    case 93: return AttributeKind::ASSUMPTION;
-    case 94: return AttributeKind::AVAILABILITY;
-    case 95: return AttributeKind::BPF_PRESERVE_ACCESS_INDEX;
-    case 96: return AttributeKind::BTF_DECL_TAG;
-    case 97: return AttributeKind::BLOCKS;
-    case 98: return AttributeKind::BUILTIN;
-    case 99: return AttributeKind::C11_NO_RETURN;
-    case 100: return AttributeKind::CF_AUDITED_TRANSFER;
-    case 101: return AttributeKind::CF_GUARD;
-    case 102: return AttributeKind::CFI_CANONICAL_JUMP_TABLE;
-    case 103: return AttributeKind::CF_RETURNS_NOT_RETAINED;
-    case 104: return AttributeKind::CF_RETURNS_RETAINED;
-    case 105: return AttributeKind::CF_UNKNOWN_TRANSFER;
-    case 106: return AttributeKind::CPU_DISPATCH;
-    case 107: return AttributeKind::CPU_SPECIFIC;
-    case 108: return AttributeKind::CUDA_CONSTANT;
-    case 109: return AttributeKind::CUDA_DEVICE;
-    case 110: return AttributeKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
-    case 111: return AttributeKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;
-    case 112: return AttributeKind::CUDA_GLOBAL;
-    case 113: return AttributeKind::CUDA_HOST;
-    case 114: return AttributeKind::CUDA_INVALID_TARGET;
-    case 115: return AttributeKind::CUDA_LAUNCH_BOUNDS;
-    case 116: return AttributeKind::CUDA_SHARED;
-    case 117: return AttributeKind::CXX11_NO_RETURN;
-    case 118: return AttributeKind::CALLABLE_WHEN;
-    case 119: return AttributeKind::CALLBACK;
-    case 120: return AttributeKind::CAPABILITY;
-    case 121: return AttributeKind::CAPTURED_RECORD;
-    case 122: return AttributeKind::CLEANUP;
-    case 123: return AttributeKind::CMSE_NS_ENTRY;
-    case 124: return AttributeKind::CODE_SEG;
-    case 125: return AttributeKind::COLD;
-    case 126: return AttributeKind::COMMON;
-    case 127: return AttributeKind::CONST;
-    case 128: return AttributeKind::CONST_INITIALIZER;
-    case 129: return AttributeKind::CONSTRUCTOR;
-    case 130: return AttributeKind::CONSUMABLE;
-    case 131: return AttributeKind::CONSUMABLE_AUTO_CAST;
-    case 132: return AttributeKind::CONSUMABLE_SET_ON_READ;
-    case 133: return AttributeKind::CONVERGENT;
-    case 134: return AttributeKind::DLL_EXPORT;
-    case 135: return AttributeKind::DLL_EXPORT_STATIC_LOCAL;
-    case 136: return AttributeKind::DLL_IMPORT;
-    case 137: return AttributeKind::DLL_IMPORT_STATIC_LOCAL;
-    case 138: return AttributeKind::DEPRECATED;
-    case 139: return AttributeKind::DESTRUCTOR;
-    case 140: return AttributeKind::DIAGNOSE_AS_BUILTIN;
-    case 141: return AttributeKind::DIAGNOSE_IF;
-    case 142: return AttributeKind::DISABLE_SANITIZER_INSTRUMENTATION;
-    case 143: return AttributeKind::DISABLE_TAIL_CALLS;
-    case 144: return AttributeKind::EMPTY_BASES;
-    case 145: return AttributeKind::ENABLE_IF;
-    case 146: return AttributeKind::ENFORCE_TCB;
-    case 147: return AttributeKind::ENFORCE_TCB_LEAF;
-    case 148: return AttributeKind::ENUM_EXTENSIBILITY;
-    case 149: return AttributeKind::ERROR;
-    case 150: return AttributeKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
-    case 151: return AttributeKind::EXCLUSIVE_TRYLOCK_FUNCTION;
-    case 152: return AttributeKind::EXTERNAL_SOURCE_SYMBOL;
-    case 153: return AttributeKind::FINAL;
-    case 154: return AttributeKind::FLAG_ENUM;
-    case 155: return AttributeKind::FLATTEN;
-    case 156: return AttributeKind::FORMAT;
-    case 157: return AttributeKind::FORMAT_ARGUMENT;
-    case 158: return AttributeKind::GNU_INLINE;
-    case 159: return AttributeKind::GUARDED_BY;
-    case 160: return AttributeKind::GUARDED_VARIABLE;
-    case 161: return AttributeKind::HIP_MANAGED;
-    case 162: return AttributeKind::HOT;
-    case 163: return AttributeKind::IB_ACTION;
-    case 164: return AttributeKind::IB_OUTLET;
-    case 165: return AttributeKind::IB_OUTLET_COLLECTION;
-    case 166: return AttributeKind::INITIALIZER_PRIORITY;
-    case 167: return AttributeKind::INTERNAL_LINKAGE;
-    case 168: return AttributeKind::LTO_VISIBILITY_PUBLIC;
-    case 169: return AttributeKind::LAYOUT_VERSION;
-    case 170: return AttributeKind::LEAF;
-    case 171: return AttributeKind::LOCK_RETURNED;
-    case 172: return AttributeKind::LOCKS_EXCLUDED;
-    case 173: return AttributeKind::M68_KINTERRUPT;
-    case 174: return AttributeKind::MIG_SERVER_ROUTINE__;
-    case 175: return AttributeKind::MS_ALLOCATOR;
-    case 176: return AttributeKind::MS_INHERITANCE;
-    case 177: return AttributeKind::MS_NO_V_TABLE;
-    case 178: return AttributeKind::MSP430_INTERRUPT;
-    case 179: return AttributeKind::MS_STRUCT;
-    case 180: return AttributeKind::MS_VTOR_DISP;
-    case 181: return AttributeKind::MAX_FIELD_ALIGNMENT;
-    case 182: return AttributeKind::MAY_ALIAS;
-    case 183: return AttributeKind::MICRO_MIPS;
-    case 184: return AttributeKind::MIN_SIZE;
-    case 185: return AttributeKind::MIN_VECTOR_WIDTH;
-    case 186: return AttributeKind::MIPS16;
-    case 187: return AttributeKind::MIPS_INTERRUPT;
-    case 188: return AttributeKind::MIPS_LONG_CALL;
-    case 189: return AttributeKind::MIPS_SHORT_CALL;
-    case 190: return AttributeKind::NS_CONSUMES_SELF;
-    case 191: return AttributeKind::NS_ERROR_DOMAIN;
-    case 192: return AttributeKind::NS_RETURNS_AUTORELEASED;
-    case 193: return AttributeKind::NS_RETURNS_NOT_RETAINED;
-    case 194: return AttributeKind::NAKED;
-    case 195: return AttributeKind::NO_ALIAS;
-    case 196: return AttributeKind::NO_COMMON;
-    case 197: return AttributeKind::NO_DEBUG;
-    case 198: return AttributeKind::NO_DESTROY;
-    case 199: return AttributeKind::NO_DUPLICATE;
-    case 200: return AttributeKind::NO_INLINE;
-    case 201: return AttributeKind::NO_INSTRUMENT_FUNCTION;
-    case 202: return AttributeKind::NO_MICRO_MIPS;
-    case 203: return AttributeKind::NO_MIPS16;
-    case 204: return AttributeKind::NO_PROFILE_FUNCTION;
-    case 205: return AttributeKind::NO_RETURN;
-    case 206: return AttributeKind::NO_SANITIZE;
-    case 207: return AttributeKind::NO_SPECULATIVE_LOAD_HARDENING;
-    case 208: return AttributeKind::NO_SPLIT_STACK;
-    case 209: return AttributeKind::NO_STACK_PROTECTOR;
-    case 210: return AttributeKind::NO_THREAD_SAFETY_ANALYSIS;
-    case 211: return AttributeKind::NO_THROW;
-    case 212: return AttributeKind::NO_UNIQUE_ADDRESS;
-    case 213: return AttributeKind::NOT_TAIL_CALLED;
-    case 214: return AttributeKind::OMP_ALLOCATE_DECLARATION;
-    case 215: return AttributeKind::OMP_CAPTURE_NO_INITIALIZER;
-    case 216: return AttributeKind::OMP_DECLARE_TARGET_DECLARATION;
-    case 217: return AttributeKind::OMP_DECLARE_VARIANT;
-    case 218: return AttributeKind::OMP_THREAD_PRIVATE_DECLARATION;
-    case 219: return AttributeKind::OS_CONSUMES_THIS;
-    case 220: return AttributeKind::OS_RETURNS_NOT_RETAINED;
-    case 221: return AttributeKind::OS_RETURNS_RETAINED;
-    case 222: return AttributeKind::OS_RETURNS_RETAINED_ON_NON_ZERO;
-    case 223: return AttributeKind::OS_RETURNS_RETAINED_ON_ZERO;
-    case 224: return AttributeKind::OBJ_C_BRIDGE;
-    case 225: return AttributeKind::OBJ_C_BRIDGE_MUTABLE;
-    case 226: return AttributeKind::OBJ_C_BRIDGE_RELATED;
-    case 227: return AttributeKind::OBJ_C_EXCEPTION;
-    case 228: return AttributeKind::OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION;
-    case 229: return AttributeKind::OBJ_C_EXTERNALLY_RETAINED;
-    case 230: return AttributeKind::OBJ_C_INDEPENDENT_CLASS;
-    case 231: return AttributeKind::OBJ_C_METHOD_FAMILY;
-    case 232: return AttributeKind::OBJ_CNS_OBJECT;
-    case 233: return AttributeKind::OBJ_C_PRECISE_LIFETIME;
-    case 234: return AttributeKind::OBJ_C_REQUIRES_PROPERTY_DEFINITIONS;
-    case 235: return AttributeKind::OBJ_C_REQUIRES_SUPER;
-    case 236: return AttributeKind::OBJ_C_RETURNS_INNER_POINTER;
-    case 237: return AttributeKind::OBJ_C_ROOT_CLASS;
-    case 238: return AttributeKind::OBJ_C_SUBCLASSING_RESTRICTED;
-    case 239: return AttributeKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
-    case 240: return AttributeKind::OPEN_CL_KERNEL;
-    case 241: return AttributeKind::OPTIMIZE_NONE;
-    case 242: return AttributeKind::OVERRIDE;
-    case 243: return AttributeKind::OWNER;
-    case 244: return AttributeKind::OWNERSHIP;
-    case 245: return AttributeKind::PACKED;
-    case 246: return AttributeKind::PARAMETER_TYPESTATE;
-    case 247: return AttributeKind::PATCHABLE_FUNCTION_ENTRY;
-    case 248: return AttributeKind::POINTER;
-    case 249: return AttributeKind::PRAGMA_CLANG_BSS_SECTION;
-    case 250: return AttributeKind::PRAGMA_CLANG_DATA_SECTION;
-    case 251: return AttributeKind::PRAGMA_CLANG_RELRO_SECTION;
-    case 252: return AttributeKind::PRAGMA_CLANG_RODATA_SECTION;
-    case 253: return AttributeKind::PRAGMA_CLANG_TEXT_SECTION;
-    case 254: return AttributeKind::PREFERRED_NAME;
-    case 255: return AttributeKind::PT_GUARDED_BY;
-    case 256: return AttributeKind::PT_GUARDED_VARIABLE;
-    case 257: return AttributeKind::PURE;
-    case 258: return AttributeKind::RISCV_INTERRUPT;
-    case 259: return AttributeKind::REINITIALIZES;
-    case 260: return AttributeKind::RELEASE_CAPABILITY;
-    case 261: return AttributeKind::REQD_WORK_GROUP_SIZE;
-    case 262: return AttributeKind::REQUIRES_CAPABILITY;
-    case 263: return AttributeKind::RESTRICT;
-    case 264: return AttributeKind::RETAIN;
-    case 265: return AttributeKind::RETURN_TYPESTATE;
-    case 266: return AttributeKind::RETURNS_NON_NULL;
-    case 267: return AttributeKind::RETURNS_TWICE;
-    case 268: return AttributeKind::SYCL_KERNEL;
-    case 269: return AttributeKind::SYCL_SPECIAL_CLASS;
-    case 270: return AttributeKind::SCOPED_LOCKABLE;
-    case 271: return AttributeKind::SECTION;
-    case 272: return AttributeKind::SELECT_ANY;
-    case 273: return AttributeKind::SENTINEL;
-    case 274: return AttributeKind::SET_TYPESTATE;
-    case 275: return AttributeKind::SHARED_TRYLOCK_FUNCTION;
-    case 276: return AttributeKind::SPECULATIVE_LOAD_HARDENING;
-    case 277: return AttributeKind::STANDALONE_DEBUG;
-    case 278: return AttributeKind::STRICT_FP;
-    case 279: return AttributeKind::SWIFT_ASYNC;
-    case 280: return AttributeKind::SWIFT_ASYNC_ERROR;
-    case 281: return AttributeKind::SWIFT_ASYNC_NAME;
-    case 282: return AttributeKind::SWIFT_ATTRIBUTE;
-    case 283: return AttributeKind::SWIFT_BRIDGE;
-    case 284: return AttributeKind::SWIFT_BRIDGED_TYPEDEF;
-    case 285: return AttributeKind::SWIFT_ERROR;
-    case 286: return AttributeKind::SWIFT_NAME;
-    case 287: return AttributeKind::SWIFT_NEW_TYPE;
-    case 288: return AttributeKind::SWIFT_PRIVATE;
-    case 289: return AttributeKind::TLS_MODEL;
-    case 290: return AttributeKind::TARGET;
-    case 291: return AttributeKind::TARGET_CLONES;
-    case 292: return AttributeKind::TEST_TYPESTATE;
-    case 293: return AttributeKind::TRANSPARENT_UNION;
-    case 294: return AttributeKind::TRIVIAL_ABI;
-    case 295: return AttributeKind::TRY_ACQUIRE_CAPABILITY;
-    case 296: return AttributeKind::TYPE_TAG_FOR_DATATYPE;
-    case 297: return AttributeKind::TYPE_VISIBILITY;
-    case 298: return AttributeKind::UNAVAILABLE;
-    case 299: return AttributeKind::UNINITIALIZED;
-    case 300: return AttributeKind::UNUSED;
-    case 301: return AttributeKind::USED;
-    case 302: return AttributeKind::USING_IF_EXISTS;
-    case 303: return AttributeKind::UUID;
-    case 304: return AttributeKind::VEC_RETURN;
-    case 305: return AttributeKind::VEC_TYPE_HINT;
-    case 306: return AttributeKind::VISIBILITY;
-    case 307: return AttributeKind::WARN_UNUSED;
-    case 308: return AttributeKind::WARN_UNUSED_RESULT;
-    case 309: return AttributeKind::WEAK;
-    case 310: return AttributeKind::WEAK_IMPORT;
-    case 311: return AttributeKind::WEAK_REFERENCE;
-    case 312: return AttributeKind::WEB_ASSEMBLY_EXPORT_NAME;
-    case 313: return AttributeKind::WEB_ASSEMBLY_IMPORT_MODULE;
-    case 314: return AttributeKind::WEB_ASSEMBLY_IMPORT_NAME;
-    case 315: return AttributeKind::WORK_GROUP_SIZE_HINT;
-    case 316: return AttributeKind::X86_FORCE_ALIGN_ARGUMENT_POINTER;
-    case 317: return AttributeKind::X_RAY_INSTRUMENT;
-    case 318: return AttributeKind::X_RAY_LOG_ARGUMENTS;
-    case 319: return AttributeKind::ABI_TAG;
-    case 320: return AttributeKind::ALIAS;
-    case 321: return AttributeKind::ALIGN_VALUE;
-    case 322: return AttributeKind::BUILTIN_ALIAS;
-    case 323: return AttributeKind::CALLED_ONCE;
-    case 324: return AttributeKind::I_FUNC;
-    case 325: return AttributeKind::INITIALIZER_SEG;
-    case 326: return AttributeKind::LOADER_UNINITIALIZED;
-    case 327: return AttributeKind::LOOP_HINT;
-    case 328: return AttributeKind::MODE;
-    case 329: return AttributeKind::NO_BUILTIN;
-    case 330: return AttributeKind::NO_ESCAPE;
-    case 331: return AttributeKind::OMP_CAPTURE_KIND;
-    case 332: return AttributeKind::OMP_DECLARE_SIMD_DECLARATION;
-    case 333: return AttributeKind::OMP_REFERENCED_VARIABLE;
-    case 334: return AttributeKind::OBJ_C_BOXABLE;
-    case 335: return AttributeKind::OBJ_C_CLASS_STUB;
-    case 336: return AttributeKind::OBJ_C_DESIGNATED_INITIALIZER;
-    case 337: return AttributeKind::OBJ_C_DIRECT;
-    case 338: return AttributeKind::OBJ_C_DIRECT_MEMBERS;
-    case 339: return AttributeKind::OBJ_C_NON_LAZY_CLASS;
-    case 340: return AttributeKind::OBJ_C_NON_RUNTIME_PROTOCOL;
-    case 341: return AttributeKind::OBJ_C_RUNTIME_NAME;
-    case 342: return AttributeKind::OBJ_C_RUNTIME_VISIBLE;
-    case 343: return AttributeKind::OPEN_CL_ACCESS;
-    case 344: return AttributeKind::OVERLOADABLE;
-    case 345: return AttributeKind::RENDER_SCRIPT_KERNEL;
-    case 346: return AttributeKind::SWIFT_OBJ_C_MEMBERS;
-    case 347: return AttributeKind::THREAD;
+    case 0: return AttrKind::ADDRESS_SPACE;
+    case 1: return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;
+    case 2: return AttrKind::BTF_TYPE_TAG;
+    case 3: return AttrKind::CMSE_NS_CALL;
+    case 4: return AttrKind::NO_DEREF;
+    case 5: return AttrKind::OBJ_CGC;
+    case 6: return AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
+    case 7: return AttrKind::OBJ_C_KIND_OF;
+    case 8: return AttrKind::OPEN_CL_CONSTANT_ADDRESS_SPACE;
+    case 9: return AttrKind::OPEN_CL_GENERIC_ADDRESS_SPACE;
+    case 10: return AttrKind::OPEN_CL_GLOBAL_ADDRESS_SPACE;
+    case 11: return AttrKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
+    case 12: return AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
+    case 13: return AttrKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
+    case 14: return AttrKind::OPEN_CL_PRIVATE_ADDRESS_SPACE;
+    case 15: return AttrKind::PTR32;
+    case 16: return AttrKind::PTR64;
+    case 17: return AttrKind::S_PTR;
+    case 18: return AttrKind::TYPE_NON_NULL;
+    case 19: return AttrKind::TYPE_NULL_UNSPECIFIED;
+    case 20: return AttrKind::TYPE_NULLABLE;
+    case 21: return AttrKind::TYPE_NULLABLE_RESULT;
+    case 22: return AttrKind::U_PTR;
+    case 23: return AttrKind::FALL_THROUGH;
+    case 24: return AttrKind::LIKELY;
+    case 25: return AttrKind::MUST_TAIL;
+    case 26: return AttrKind::OPEN_CL_UNROLL_HINT;
+    case 27: return AttrKind::SUPPRESS;
+    case 28: return AttrKind::UNLIKELY;
+    case 29: return AttrKind::NO_MERGE;
+    case 30: return AttrKind::A_ARCH64_VECTOR_PCS;
+    case 31: return AttrKind::ACQUIRE_HANDLE;
+    case 32: return AttrKind::ANY_X86_NO_CF_CHECK;
+    case 33: return AttrKind::C_DECL;
+    case 34: return AttrKind::FAST_CALL;
+    case 35: return AttrKind::INTEL_OCL_BICC;
+    case 36: return AttrKind::LIFETIME_BOUND;
+    case 37: return AttrKind::MSABI;
+    case 38: return AttrKind::NS_RETURNS_RETAINED;
+    case 39: return AttrKind::OBJ_C_OWNERSHIP;
+    case 40: return AttrKind::PASCAL;
+    case 41: return AttrKind::PCS;
+    case 42: return AttrKind::PRESERVE_ALL;
+    case 43: return AttrKind::PRESERVE_MOST;
+    case 44: return AttrKind::REG_CALL;
+    case 45: return AttrKind::STD_CALL;
+    case 46: return AttrKind::SWIFT_ASYNC_CALL;
+    case 47: return AttrKind::SWIFT_CALL;
+    case 48: return AttrKind::SYS_VABI;
+    case 49: return AttrKind::THIS_CALL;
+    case 50: return AttrKind::VECTOR_CALL;
+    case 51: return AttrKind::SWIFT_ASYNC_CONTEXT;
+    case 52: return AttrKind::SWIFT_CONTEXT;
+    case 53: return AttrKind::SWIFT_ERROR_RESULT;
+    case 54: return AttrKind::SWIFT_INDIRECT_RESULT;
+    case 55: return AttrKind::ANNOTATE;
+    case 56: return AttrKind::CF_CONSUMED;
+    case 57: return AttrKind::CARRIES_DEPENDENCY;
+    case 58: return AttrKind::NS_CONSUMED;
+    case 59: return AttrKind::NON_NULL;
+    case 60: return AttrKind::OS_CONSUMED;
+    case 61: return AttrKind::PASS_OBJECT_SIZE;
+    case 62: return AttrKind::RELEASE_HANDLE;
+    case 63: return AttrKind::USE_HANDLE;
+    case 64: return AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
+    case 65: return AttrKind::AMDGPU_NUM_SGPR;
+    case 66: return AttrKind::AMDGPU_NUM_VGPR;
+    case 67: return AttrKind::AMDGPU_WAVES_PER_EU;
+    case 68: return AttrKind::ARM_INTERRUPT;
+    case 69: return AttrKind::AVR_INTERRUPT;
+    case 70: return AttrKind::AVR_SIGNAL;
+    case 71: return AttrKind::ACQUIRE_CAPABILITY;
+    case 72: return AttrKind::ACQUIRED_AFTER;
+    case 73: return AttrKind::ACQUIRED_BEFORE;
+    case 74: return AttrKind::ALIGN_MAC68_K;
+    case 75: return AttrKind::ALIGN_NATURAL;
+    case 76: return AttrKind::ALIGNED;
+    case 77: return AttrKind::ALLOC_ALIGN;
+    case 78: return AttrKind::ALLOC_SIZE;
+    case 79: return AttrKind::ALWAYS_DESTROY;
+    case 80: return AttrKind::ALWAYS_INLINE;
+    case 81: return AttrKind::ANALYZER_NO_RETURN;
+    case 82: return AttrKind::ANY_X86_INTERRUPT;
+    case 83: return AttrKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
+    case 84: return AttrKind::ARC_WEAKREF_UNAVAILABLE;
+    case 85: return AttrKind::ARGUMENT_WITH_TYPE_TAG;
+    case 86: return AttrKind::ARM_BUILTIN_ALIAS;
+    case 87: return AttrKind::ARTIFICIAL;
+    case 88: return AttrKind::ASSEMBLY_LABEL;
+    case 89: return AttrKind::ASSERT_CAPABILITY;
+    case 90: return AttrKind::ASSERT_EXCLUSIVE_LOCK;
+    case 91: return AttrKind::ASSERT_SHARED_LOCK;
+    case 92: return AttrKind::ASSUME_ALIGNED;
+    case 93: return AttrKind::ASSUMPTION;
+    case 94: return AttrKind::AVAILABILITY;
+    case 95: return AttrKind::BPF_PRESERVE_ACCESS_INDEX;
+    case 96: return AttrKind::BTF_DECL_TAG;
+    case 97: return AttrKind::BLOCKS;
+    case 98: return AttrKind::BUILTIN;
+    case 99: return AttrKind::C11_NO_RETURN;
+    case 100: return AttrKind::CF_AUDITED_TRANSFER;
+    case 101: return AttrKind::CF_GUARD;
+    case 102: return AttrKind::CFI_CANONICAL_JUMP_TABLE;
+    case 103: return AttrKind::CF_RETURNS_NOT_RETAINED;
+    case 104: return AttrKind::CF_RETURNS_RETAINED;
+    case 105: return AttrKind::CF_UNKNOWN_TRANSFER;
+    case 106: return AttrKind::CPU_DISPATCH;
+    case 107: return AttrKind::CPU_SPECIFIC;
+    case 108: return AttrKind::CUDA_CONSTANT;
+    case 109: return AttrKind::CUDA_DEVICE;
+    case 110: return AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
+    case 111: return AttrKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;
+    case 112: return AttrKind::CUDA_GLOBAL;
+    case 113: return AttrKind::CUDA_HOST;
+    case 114: return AttrKind::CUDA_INVALID_TARGET;
+    case 115: return AttrKind::CUDA_LAUNCH_BOUNDS;
+    case 116: return AttrKind::CUDA_SHARED;
+    case 117: return AttrKind::CXX11_NO_RETURN;
+    case 118: return AttrKind::CALLABLE_WHEN;
+    case 119: return AttrKind::CALLBACK;
+    case 120: return AttrKind::CAPABILITY;
+    case 121: return AttrKind::CAPTURED_RECORD;
+    case 122: return AttrKind::CLEANUP;
+    case 123: return AttrKind::CMSE_NS_ENTRY;
+    case 124: return AttrKind::CODE_SEG;
+    case 125: return AttrKind::COLD;
+    case 126: return AttrKind::COMMON;
+    case 127: return AttrKind::CONST;
+    case 128: return AttrKind::CONST_INITIALIZER;
+    case 129: return AttrKind::CONSTRUCTOR;
+    case 130: return AttrKind::CONSUMABLE;
+    case 131: return AttrKind::CONSUMABLE_AUTO_CAST;
+    case 132: return AttrKind::CONSUMABLE_SET_ON_READ;
+    case 133: return AttrKind::CONVERGENT;
+    case 134: return AttrKind::DLL_EXPORT;
+    case 135: return AttrKind::DLL_EXPORT_STATIC_LOCAL;
+    case 136: return AttrKind::DLL_IMPORT;
+    case 137: return AttrKind::DLL_IMPORT_STATIC_LOCAL;
+    case 138: return AttrKind::DEPRECATED;
+    case 139: return AttrKind::DESTRUCTOR;
+    case 140: return AttrKind::DIAGNOSE_AS_BUILTIN;
+    case 141: return AttrKind::DIAGNOSE_IF;
+    case 142: return AttrKind::DISABLE_SANITIZER_INSTRUMENTATION;
+    case 143: return AttrKind::DISABLE_TAIL_CALLS;
+    case 144: return AttrKind::EMPTY_BASES;
+    case 145: return AttrKind::ENABLE_IF;
+    case 146: return AttrKind::ENFORCE_TCB;
+    case 147: return AttrKind::ENFORCE_TCB_LEAF;
+    case 148: return AttrKind::ENUM_EXTENSIBILITY;
+    case 149: return AttrKind::ERROR;
+    case 150: return AttrKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
+    case 151: return AttrKind::EXCLUSIVE_TRYLOCK_FUNCTION;
+    case 152: return AttrKind::EXTERNAL_SOURCE_SYMBOL;
+    case 153: return AttrKind::FINAL;
+    case 154: return AttrKind::FLAG_ENUM;
+    case 155: return AttrKind::FLATTEN;
+    case 156: return AttrKind::FORMAT;
+    case 157: return AttrKind::FORMAT_ARGUMENT;
+    case 158: return AttrKind::GNU_INLINE;
+    case 159: return AttrKind::GUARDED_BY;
+    case 160: return AttrKind::GUARDED_VARIABLE;
+    case 161: return AttrKind::HIP_MANAGED;
+    case 162: return AttrKind::HOT;
+    case 163: return AttrKind::IB_ACTION;
+    case 164: return AttrKind::IB_OUTLET;
+    case 165: return AttrKind::IB_OUTLET_COLLECTION;
+    case 166: return AttrKind::INITIALIZER_PRIORITY;
+    case 167: return AttrKind::INTERNAL_LINKAGE;
+    case 168: return AttrKind::LTO_VISIBILITY_PUBLIC;
+    case 169: return AttrKind::LAYOUT_VERSION;
+    case 170: return AttrKind::LEAF;
+    case 171: return AttrKind::LOCK_RETURNED;
+    case 172: return AttrKind::LOCKS_EXCLUDED;
+    case 173: return AttrKind::M68_KINTERRUPT;
+    case 174: return AttrKind::MIG_SERVER_ROUTINE;
+    case 175: return AttrKind::MS_ALLOCATOR;
+    case 176: return AttrKind::MS_INHERITANCE;
+    case 177: return AttrKind::MS_NO_V_TABLE;
+    case 178: return AttrKind::MSP430_INTERRUPT;
+    case 179: return AttrKind::MS_STRUCT;
+    case 180: return AttrKind::MS_VTOR_DISP;
+    case 181: return AttrKind::MAX_FIELD_ALIGNMENT;
+    case 182: return AttrKind::MAY_ALIAS;
+    case 183: return AttrKind::MICRO_MIPS;
+    case 184: return AttrKind::MIN_SIZE;
+    case 185: return AttrKind::MIN_VECTOR_WIDTH;
+    case 186: return AttrKind::MIPS16;
+    case 187: return AttrKind::MIPS_INTERRUPT;
+    case 188: return AttrKind::MIPS_LONG_CALL;
+    case 189: return AttrKind::MIPS_SHORT_CALL;
+    case 190: return AttrKind::NS_CONSUMES_SELF;
+    case 191: return AttrKind::NS_ERROR_DOMAIN;
+    case 192: return AttrKind::NS_RETURNS_AUTORELEASED;
+    case 193: return AttrKind::NS_RETURNS_NOT_RETAINED;
+    case 194: return AttrKind::NAKED;
+    case 195: return AttrKind::NO_ALIAS;
+    case 196: return AttrKind::NO_COMMON;
+    case 197: return AttrKind::NO_DEBUG;
+    case 198: return AttrKind::NO_DESTROY;
+    case 199: return AttrKind::NO_DUPLICATE;
+    case 200: return AttrKind::NO_INLINE;
+    case 201: return AttrKind::NO_INSTRUMENT_FUNCTION;
+    case 202: return AttrKind::NO_MICRO_MIPS;
+    case 203: return AttrKind::NO_MIPS16;
+    case 204: return AttrKind::NO_PROFILE_FUNCTION;
+    case 205: return AttrKind::NO_RETURN;
+    case 206: return AttrKind::NO_SANITIZE;
+    case 207: return AttrKind::NO_SPECULATIVE_LOAD_HARDENING;
+    case 208: return AttrKind::NO_SPLIT_STACK;
+    case 209: return AttrKind::NO_STACK_PROTECTOR;
+    case 210: return AttrKind::NO_THREAD_SAFETY_ANALYSIS;
+    case 211: return AttrKind::NO_THROW;
+    case 212: return AttrKind::NO_UNIQUE_ADDRESS;
+    case 213: return AttrKind::NOT_TAIL_CALLED;
+    case 214: return AttrKind::OMP_ALLOCATE_DECLARATION;
+    case 215: return AttrKind::OMP_CAPTURE_NO_INITIALIZER;
+    case 216: return AttrKind::OMP_DECLARE_TARGET_DECLARATION;
+    case 217: return AttrKind::OMP_DECLARE_VARIANT;
+    case 218: return AttrKind::OMP_THREAD_PRIVATE_DECLARATION;
+    case 219: return AttrKind::OS_CONSUMES_THIS;
+    case 220: return AttrKind::OS_RETURNS_NOT_RETAINED;
+    case 221: return AttrKind::OS_RETURNS_RETAINED;
+    case 222: return AttrKind::OS_RETURNS_RETAINED_ON_NON_ZERO;
+    case 223: return AttrKind::OS_RETURNS_RETAINED_ON_ZERO;
+    case 224: return AttrKind::OBJ_C_BRIDGE;
+    case 225: return AttrKind::OBJ_C_BRIDGE_MUTABLE;
+    case 226: return AttrKind::OBJ_C_BRIDGE_RELATED;
+    case 227: return AttrKind::OBJ_C_EXCEPTION;
+    case 228: return AttrKind::OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION;
+    case 229: return AttrKind::OBJ_C_EXTERNALLY_RETAINED;
+    case 230: return AttrKind::OBJ_C_INDEPENDENT_CLASS;
+    case 231: return AttrKind::OBJ_C_METHOD_FAMILY;
+    case 232: return AttrKind::OBJ_CNS_OBJECT;
+    case 233: return AttrKind::OBJ_C_PRECISE_LIFETIME;
+    case 234: return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFINITIONS;
+    case 235: return AttrKind::OBJ_C_REQUIRES_SUPER;
+    case 236: return AttrKind::OBJ_C_RETURNS_INNER_POINTER;
+    case 237: return AttrKind::OBJ_C_ROOT_CLASS;
+    case 238: return AttrKind::OBJ_C_SUBCLASSING_RESTRICTED;
+    case 239: return AttrKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
+    case 240: return AttrKind::OPEN_CL_KERNEL;
+    case 241: return AttrKind::OPTIMIZE_NONE;
+    case 242: return AttrKind::OVERRIDE;
+    case 243: return AttrKind::OWNER;
+    case 244: return AttrKind::OWNERSHIP;
+    case 245: return AttrKind::PACKED;
+    case 246: return AttrKind::PARAMETER_TYPESTATE;
+    case 247: return AttrKind::PATCHABLE_FUNCTION_ENTRY;
+    case 248: return AttrKind::POINTER;
+    case 249: return AttrKind::PRAGMA_CLANG_BSS_SECTION;
+    case 250: return AttrKind::PRAGMA_CLANG_DATA_SECTION;
+    case 251: return AttrKind::PRAGMA_CLANG_RELRO_SECTION;
+    case 252: return AttrKind::PRAGMA_CLANG_RODATA_SECTION;
+    case 253: return AttrKind::PRAGMA_CLANG_TEXT_SECTION;
+    case 254: return AttrKind::PREFERRED_NAME;
+    case 255: return AttrKind::PT_GUARDED_BY;
+    case 256: return AttrKind::PT_GUARDED_VARIABLE;
+    case 257: return AttrKind::PURE;
+    case 258: return AttrKind::RISCV_INTERRUPT;
+    case 259: return AttrKind::REINITIALIZES;
+    case 260: return AttrKind::RELEASE_CAPABILITY;
+    case 261: return AttrKind::REQD_WORK_GROUP_SIZE;
+    case 262: return AttrKind::REQUIRES_CAPABILITY;
+    case 263: return AttrKind::RESTRICT;
+    case 264: return AttrKind::RETAIN;
+    case 265: return AttrKind::RETURN_TYPESTATE;
+    case 266: return AttrKind::RETURNS_NON_NULL;
+    case 267: return AttrKind::RETURNS_TWICE;
+    case 268: return AttrKind::SYCL_KERNEL;
+    case 269: return AttrKind::SYCL_SPECIAL_CLASS;
+    case 270: return AttrKind::SCOPED_LOCKABLE;
+    case 271: return AttrKind::SECTION;
+    case 272: return AttrKind::SELECT_ANY;
+    case 273: return AttrKind::SENTINEL;
+    case 274: return AttrKind::SET_TYPESTATE;
+    case 275: return AttrKind::SHARED_TRYLOCK_FUNCTION;
+    case 276: return AttrKind::SPECULATIVE_LOAD_HARDENING;
+    case 277: return AttrKind::STANDALONE_DEBUG;
+    case 278: return AttrKind::STRICT_FP;
+    case 279: return AttrKind::SWIFT_ASYNC;
+    case 280: return AttrKind::SWIFT_ASYNC_ERROR;
+    case 281: return AttrKind::SWIFT_ASYNC_NAME;
+    case 282: return AttrKind::SWIFT_ATTRIBUTE;
+    case 283: return AttrKind::SWIFT_BRIDGE;
+    case 284: return AttrKind::SWIFT_BRIDGED_TYPEDEF;
+    case 285: return AttrKind::SWIFT_ERROR;
+    case 286: return AttrKind::SWIFT_NAME;
+    case 287: return AttrKind::SWIFT_NEW_TYPE;
+    case 288: return AttrKind::SWIFT_PRIVATE;
+    case 289: return AttrKind::TLS_MODEL;
+    case 290: return AttrKind::TARGET;
+    case 291: return AttrKind::TARGET_CLONES;
+    case 292: return AttrKind::TEST_TYPESTATE;
+    case 293: return AttrKind::TRANSPARENT_UNION;
+    case 294: return AttrKind::TRIVIAL_ABI;
+    case 295: return AttrKind::TRY_ACQUIRE_CAPABILITY;
+    case 296: return AttrKind::TYPE_TAG_FOR_DATATYPE;
+    case 297: return AttrKind::TYPE_VISIBILITY;
+    case 298: return AttrKind::UNAVAILABLE;
+    case 299: return AttrKind::UNINITIALIZED;
+    case 300: return AttrKind::UNUSED;
+    case 301: return AttrKind::USED;
+    case 302: return AttrKind::USING_IF_EXISTS;
+    case 303: return AttrKind::UUID;
+    case 304: return AttrKind::VEC_RETURN;
+    case 305: return AttrKind::VEC_TYPE_HINT;
+    case 306: return AttrKind::VISIBILITY;
+    case 307: return AttrKind::WARN_UNUSED;
+    case 308: return AttrKind::WARN_UNUSED_RESULT;
+    case 309: return AttrKind::WEAK;
+    case 310: return AttrKind::WEAK_IMPORT;
+    case 311: return AttrKind::WEAK_REFERENCE;
+    case 312: return AttrKind::WEB_ASSEMBLY_EXPORT_NAME;
+    case 313: return AttrKind::WEB_ASSEMBLY_IMPORT_MODULE;
+    case 314: return AttrKind::WEB_ASSEMBLY_IMPORT_NAME;
+    case 315: return AttrKind::WORK_GROUP_SIZE_HINT;
+    case 316: return AttrKind::X86_FORCE_ALIGN_ARGUMENT_POINTER;
+    case 317: return AttrKind::X_RAY_INSTRUMENT;
+    case 318: return AttrKind::X_RAY_LOG_ARGUMENTS;
+    case 319: return AttrKind::ABI_TAG;
+    case 320: return AttrKind::ALIAS;
+    case 321: return AttrKind::ALIGN_VALUE;
+    case 322: return AttrKind::BUILTIN_ALIAS;
+    case 323: return AttrKind::CALLED_ONCE;
+    case 324: return AttrKind::I_FUNC;
+    case 325: return AttrKind::INITIALIZER_SEG;
+    case 326: return AttrKind::LOADER_UNINITIALIZED;
+    case 327: return AttrKind::LOOP_HINT;
+    case 328: return AttrKind::MODE;
+    case 329: return AttrKind::NO_BUILTIN;
+    case 330: return AttrKind::NO_ESCAPE;
+    case 331: return AttrKind::OMP_CAPTURE_KIND;
+    case 332: return AttrKind::OMP_DECLARE_SIMD_DECLARATION;
+    case 333: return AttrKind::OMP_REFERENCED_VARIABLE;
+    case 334: return AttrKind::OBJ_C_BOXABLE;
+    case 335: return AttrKind::OBJ_C_CLASS_STUB;
+    case 336: return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;
+    case 337: return AttrKind::OBJ_C_DIRECT;
+    case 338: return AttrKind::OBJ_C_DIRECT_MEMBERS;
+    case 339: return AttrKind::OBJ_C_NON_LAZY_CLASS;
+    case 340: return AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL;
+    case 341: return AttrKind::OBJ_C_RUNTIME_NAME;
+    case 342: return AttrKind::OBJ_C_RUNTIME_VISIBLE;
+    case 343: return AttrKind::OPEN_CL_ACCESS;
+    case 344: return AttrKind::OVERLOADABLE;
+    case 345: return AttrKind::RENDER_SCRIPT_KERNEL;
+    case 346: return AttrKind::SWIFT_OBJ_C_MEMBERS;
+    case 347: return AttrKind::THREAD;
     default: __builtin_unreachable();
   }
 }
 
-const char *EnumeratorName(AttributeKind e) {
+const char *EnumeratorName(AttrKind e) {
   switch (e) {
-    case AttributeKind::ADDRESS_SPACE: return "ADDRESS_SPACE";
-    case AttributeKind::ARM_MVE_STRICT_POLYMORPHISM: return "ARM_MVE_STRICT_POLYMORPHISM";
-    case AttributeKind::BTF_TYPE_TAG: return "BTF_TYPE_TAG";
-    case AttributeKind::CMSE_NS_CALL: return "CMSE_NS_CALL";
-    case AttributeKind::NO_DEREF: return "NO_DEREF";
-    case AttributeKind::OBJ_CGC: return "OBJ_CGC";
-    case AttributeKind::OBJ_C_INERT_UNSAFE_UNRETAINED: return "OBJ_C_INERT_UNSAFE_UNRETAINED";
-    case AttributeKind::OBJ_C_KIND_OF: return "OBJ_C_KIND_OF";
-    case AttributeKind::OPEN_CL_CONSTANT_ADDRESS_SPACE: return "OPEN_CL_CONSTANT_ADDRESS_SPACE";
-    case AttributeKind::OPEN_CL_GENERIC_ADDRESS_SPACE: return "OPEN_CL_GENERIC_ADDRESS_SPACE";
-    case AttributeKind::OPEN_CL_GLOBAL_ADDRESS_SPACE: return "OPEN_CL_GLOBAL_ADDRESS_SPACE";
-    case AttributeKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE: return "OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE";
-    case AttributeKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE: return "OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE";
-    case AttributeKind::OPEN_CL_LOCAL_ADDRESS_SPACE: return "OPEN_CL_LOCAL_ADDRESS_SPACE";
-    case AttributeKind::OPEN_CL_PRIVATE_ADDRESS_SPACE: return "OPEN_CL_PRIVATE_ADDRESS_SPACE";
-    case AttributeKind::PTR32: return "PTR32";
-    case AttributeKind::PTR64: return "PTR64";
-    case AttributeKind::S_PTR: return "S_PTR";
-    case AttributeKind::TYPE_NON_NULL: return "TYPE_NON_NULL";
-    case AttributeKind::TYPE_NULL_UNSPECIFIED: return "TYPE_NULL_UNSPECIFIED";
-    case AttributeKind::TYPE_NULLABLE: return "TYPE_NULLABLE";
-    case AttributeKind::TYPE_NULLABLE_RESULT: return "TYPE_NULLABLE_RESULT";
-    case AttributeKind::U_PTR: return "U_PTR";
-    case AttributeKind::FALL_THROUGH: return "FALL_THROUGH";
-    case AttributeKind::LIKELY: return "LIKELY";
-    case AttributeKind::MUST_TAIL: return "MUST_TAIL";
-    case AttributeKind::OPEN_CL_UNROLL_HINT: return "OPEN_CL_UNROLL_HINT";
-    case AttributeKind::SUPPRESS: return "SUPPRESS";
-    case AttributeKind::UNLIKELY: return "UNLIKELY";
-    case AttributeKind::NO_MERGE: return "NO_MERGE";
-    case AttributeKind::A_ARCH64_VECTOR_PCS: return "A_ARCH64_VECTOR_PCS";
-    case AttributeKind::ACQUIRE_HANDLE: return "ACQUIRE_HANDLE";
-    case AttributeKind::ANY_X86_NO_CF_CHECK: return "ANY_X86_NO_CF_CHECK";
-    case AttributeKind::C_DECL: return "C_DECL";
-    case AttributeKind::FAST_CALL: return "FAST_CALL";
-    case AttributeKind::INTEL_OCL_BICC: return "INTEL_OCL_BICC";
-    case AttributeKind::LIFETIME_BOUND: return "LIFETIME_BOUND";
-    case AttributeKind::MSABI: return "MSABI";
-    case AttributeKind::NS_RETURNS_RETAINED: return "NS_RETURNS_RETAINED";
-    case AttributeKind::OBJ_C_OWNERSHIP: return "OBJ_C_OWNERSHIP";
-    case AttributeKind::PASCAL: return "PASCAL";
-    case AttributeKind::PCS: return "PCS";
-    case AttributeKind::PRESERVE_ALL: return "PRESERVE_ALL";
-    case AttributeKind::PRESERVE_MOST: return "PRESERVE_MOST";
-    case AttributeKind::REG_CALL: return "REG_CALL";
-    case AttributeKind::STD_CALL: return "STD_CALL";
-    case AttributeKind::SWIFT_ASYNC_CALL: return "SWIFT_ASYNC_CALL";
-    case AttributeKind::SWIFT_CALL: return "SWIFT_CALL";
-    case AttributeKind::SYS_VABI: return "SYS_VABI";
-    case AttributeKind::THIS_CALL: return "THIS_CALL";
-    case AttributeKind::VECTOR_CALL: return "VECTOR_CALL";
-    case AttributeKind::SWIFT_ASYNC_CONTEXT: return "SWIFT_ASYNC_CONTEXT";
-    case AttributeKind::SWIFT_CONTEXT: return "SWIFT_CONTEXT";
-    case AttributeKind::SWIFT_ERROR_RESULT: return "SWIFT_ERROR_RESULT";
-    case AttributeKind::SWIFT_INDIRECT_RESULT: return "SWIFT_INDIRECT_RESULT";
-    case AttributeKind::ANNOTATE: return "ANNOTATE";
-    case AttributeKind::CF_CONSUMED: return "CF_CONSUMED";
-    case AttributeKind::CARRIES_DEPENDENCY: return "CARRIES_DEPENDENCY";
-    case AttributeKind::NS_CONSUMED: return "NS_CONSUMED";
-    case AttributeKind::NON_NULL: return "NON_NULL";
-    case AttributeKind::OS_CONSUMED: return "OS_CONSUMED";
-    case AttributeKind::PASS_OBJECT_SIZE: return "PASS_OBJECT_SIZE";
-    case AttributeKind::RELEASE_HANDLE: return "RELEASE_HANDLE";
-    case AttributeKind::USE_HANDLE: return "USE_HANDLE";
-    case AttributeKind::AMDGPU_FLAT_WORK_GROUP_SIZE: return "AMDGPU_FLAT_WORK_GROUP_SIZE";
-    case AttributeKind::AMDGPU_NUM_SGPR: return "AMDGPU_NUM_SGPR";
-    case AttributeKind::AMDGPU_NUM_VGPR: return "AMDGPU_NUM_VGPR";
-    case AttributeKind::AMDGPU_WAVES_PER_EU: return "AMDGPU_WAVES_PER_EU";
-    case AttributeKind::ARM_INTERRUPT: return "ARM_INTERRUPT";
-    case AttributeKind::AVR_INTERRUPT: return "AVR_INTERRUPT";
-    case AttributeKind::AVR_SIGNAL: return "AVR_SIGNAL";
-    case AttributeKind::ACQUIRE_CAPABILITY: return "ACQUIRE_CAPABILITY";
-    case AttributeKind::ACQUIRED_AFTER: return "ACQUIRED_AFTER";
-    case AttributeKind::ACQUIRED_BEFORE: return "ACQUIRED_BEFORE";
-    case AttributeKind::ALIGN_MAC68_K: return "ALIGN_MAC68_K";
-    case AttributeKind::ALIGN_NATURAL: return "ALIGN_NATURAL";
-    case AttributeKind::ALIGNED: return "ALIGNED";
-    case AttributeKind::ALLOC_ALIGN: return "ALLOC_ALIGN";
-    case AttributeKind::ALLOC_SIZE: return "ALLOC_SIZE";
-    case AttributeKind::ALWAYS_DESTROY: return "ALWAYS_DESTROY";
-    case AttributeKind::ALWAYS_INLINE: return "ALWAYS_INLINE";
-    case AttributeKind::ANALYZER_NO_RETURN: return "ANALYZER_NO_RETURN";
-    case AttributeKind::ANY_X86_INTERRUPT: return "ANY_X86_INTERRUPT";
-    case AttributeKind::ANY_X86_NO_CALLER_SAVED_REGISTERS: return "ANY_X86_NO_CALLER_SAVED_REGISTERS";
-    case AttributeKind::ARC_WEAKREF_UNAVAILABLE: return "ARC_WEAKREF_UNAVAILABLE";
-    case AttributeKind::ARGUMENT_WITH_TYPE_TAG: return "ARGUMENT_WITH_TYPE_TAG";
-    case AttributeKind::ARM_BUILTIN_ALIAS: return "ARM_BUILTIN_ALIAS";
-    case AttributeKind::ARTIFICIAL: return "ARTIFICIAL";
-    case AttributeKind::ASSEMBLY_LABEL: return "ASSEMBLY_LABEL";
-    case AttributeKind::ASSERT_CAPABILITY: return "ASSERT_CAPABILITY";
-    case AttributeKind::ASSERT_EXCLUSIVE_LOCK: return "ASSERT_EXCLUSIVE_LOCK";
-    case AttributeKind::ASSERT_SHARED_LOCK: return "ASSERT_SHARED_LOCK";
-    case AttributeKind::ASSUME_ALIGNED: return "ASSUME_ALIGNED";
-    case AttributeKind::ASSUMPTION: return "ASSUMPTION";
-    case AttributeKind::AVAILABILITY: return "AVAILABILITY";
-    case AttributeKind::BPF_PRESERVE_ACCESS_INDEX: return "BPF_PRESERVE_ACCESS_INDEX";
-    case AttributeKind::BTF_DECL_TAG: return "BTF_DECL_TAG";
-    case AttributeKind::BLOCKS: return "BLOCKS";
-    case AttributeKind::BUILTIN: return "BUILTIN";
-    case AttributeKind::C11_NO_RETURN: return "C11_NO_RETURN";
-    case AttributeKind::CF_AUDITED_TRANSFER: return "CF_AUDITED_TRANSFER";
-    case AttributeKind::CF_GUARD: return "CF_GUARD";
-    case AttributeKind::CFI_CANONICAL_JUMP_TABLE: return "CFI_CANONICAL_JUMP_TABLE";
-    case AttributeKind::CF_RETURNS_NOT_RETAINED: return "CF_RETURNS_NOT_RETAINED";
-    case AttributeKind::CF_RETURNS_RETAINED: return "CF_RETURNS_RETAINED";
-    case AttributeKind::CF_UNKNOWN_TRANSFER: return "CF_UNKNOWN_TRANSFER";
-    case AttributeKind::CPU_DISPATCH: return "CPU_DISPATCH";
-    case AttributeKind::CPU_SPECIFIC: return "CPU_SPECIFIC";
-    case AttributeKind::CUDA_CONSTANT: return "CUDA_CONSTANT";
-    case AttributeKind::CUDA_DEVICE: return "CUDA_DEVICE";
-    case AttributeKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE: return "CUDA_DEVICE_BUILTIN_SURFACE_TYPE";
-    case AttributeKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE: return "CUDA_DEVICE_BUILTIN_TEXTURE_TYPE";
-    case AttributeKind::CUDA_GLOBAL: return "CUDA_GLOBAL";
-    case AttributeKind::CUDA_HOST: return "CUDA_HOST";
-    case AttributeKind::CUDA_INVALID_TARGET: return "CUDA_INVALID_TARGET";
-    case AttributeKind::CUDA_LAUNCH_BOUNDS: return "CUDA_LAUNCH_BOUNDS";
-    case AttributeKind::CUDA_SHARED: return "CUDA_SHARED";
-    case AttributeKind::CXX11_NO_RETURN: return "CXX11_NO_RETURN";
-    case AttributeKind::CALLABLE_WHEN: return "CALLABLE_WHEN";
-    case AttributeKind::CALLBACK: return "CALLBACK";
-    case AttributeKind::CAPABILITY: return "CAPABILITY";
-    case AttributeKind::CAPTURED_RECORD: return "CAPTURED_RECORD";
-    case AttributeKind::CLEANUP: return "CLEANUP";
-    case AttributeKind::CMSE_NS_ENTRY: return "CMSE_NS_ENTRY";
-    case AttributeKind::CODE_SEG: return "CODE_SEG";
-    case AttributeKind::COLD: return "COLD";
-    case AttributeKind::COMMON: return "COMMON";
-    case AttributeKind::CONST: return "CONST";
-    case AttributeKind::CONST_INITIALIZER: return "CONST_INITIALIZER";
-    case AttributeKind::CONSTRUCTOR: return "CONSTRUCTOR";
-    case AttributeKind::CONSUMABLE: return "CONSUMABLE";
-    case AttributeKind::CONSUMABLE_AUTO_CAST: return "CONSUMABLE_AUTO_CAST";
-    case AttributeKind::CONSUMABLE_SET_ON_READ: return "CONSUMABLE_SET_ON_READ";
-    case AttributeKind::CONVERGENT: return "CONVERGENT";
-    case AttributeKind::DLL_EXPORT: return "DLL_EXPORT";
-    case AttributeKind::DLL_EXPORT_STATIC_LOCAL: return "DLL_EXPORT_STATIC_LOCAL";
-    case AttributeKind::DLL_IMPORT: return "DLL_IMPORT";
-    case AttributeKind::DLL_IMPORT_STATIC_LOCAL: return "DLL_IMPORT_STATIC_LOCAL";
-    case AttributeKind::DEPRECATED: return "DEPRECATED";
-    case AttributeKind::DESTRUCTOR: return "DESTRUCTOR";
-    case AttributeKind::DIAGNOSE_AS_BUILTIN: return "DIAGNOSE_AS_BUILTIN";
-    case AttributeKind::DIAGNOSE_IF: return "DIAGNOSE_IF";
-    case AttributeKind::DISABLE_SANITIZER_INSTRUMENTATION: return "DISABLE_SANITIZER_INSTRUMENTATION";
-    case AttributeKind::DISABLE_TAIL_CALLS: return "DISABLE_TAIL_CALLS";
-    case AttributeKind::EMPTY_BASES: return "EMPTY_BASES";
-    case AttributeKind::ENABLE_IF: return "ENABLE_IF";
-    case AttributeKind::ENFORCE_TCB: return "ENFORCE_TCB";
-    case AttributeKind::ENFORCE_TCB_LEAF: return "ENFORCE_TCB_LEAF";
-    case AttributeKind::ENUM_EXTENSIBILITY: return "ENUM_EXTENSIBILITY";
-    case AttributeKind::ERROR: return "ERROR";
-    case AttributeKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
-    case AttributeKind::EXCLUSIVE_TRYLOCK_FUNCTION: return "EXCLUSIVE_TRYLOCK_FUNCTION";
-    case AttributeKind::EXTERNAL_SOURCE_SYMBOL: return "EXTERNAL_SOURCE_SYMBOL";
-    case AttributeKind::FINAL: return "FINAL";
-    case AttributeKind::FLAG_ENUM: return "FLAG_ENUM";
-    case AttributeKind::FLATTEN: return "FLATTEN";
-    case AttributeKind::FORMAT: return "FORMAT";
-    case AttributeKind::FORMAT_ARGUMENT: return "FORMAT_ARGUMENT";
-    case AttributeKind::GNU_INLINE: return "GNU_INLINE";
-    case AttributeKind::GUARDED_BY: return "GUARDED_BY";
-    case AttributeKind::GUARDED_VARIABLE: return "GUARDED_VARIABLE";
-    case AttributeKind::HIP_MANAGED: return "HIP_MANAGED";
-    case AttributeKind::HOT: return "HOT";
-    case AttributeKind::IB_ACTION: return "IB_ACTION";
-    case AttributeKind::IB_OUTLET: return "IB_OUTLET";
-    case AttributeKind::IB_OUTLET_COLLECTION: return "IB_OUTLET_COLLECTION";
-    case AttributeKind::INITIALIZER_PRIORITY: return "INITIALIZER_PRIORITY";
-    case AttributeKind::INTERNAL_LINKAGE: return "INTERNAL_LINKAGE";
-    case AttributeKind::LTO_VISIBILITY_PUBLIC: return "LTO_VISIBILITY_PUBLIC";
-    case AttributeKind::LAYOUT_VERSION: return "LAYOUT_VERSION";
-    case AttributeKind::LEAF: return "LEAF";
-    case AttributeKind::LOCK_RETURNED: return "LOCK_RETURNED";
-    case AttributeKind::LOCKS_EXCLUDED: return "LOCKS_EXCLUDED";
-    case AttributeKind::M68_KINTERRUPT: return "M68_KINTERRUPT";
-    case AttributeKind::MIG_SERVER_ROUTINE__: return "MIG_SERVER_ROUTINE__";
-    case AttributeKind::MS_ALLOCATOR: return "MS_ALLOCATOR";
-    case AttributeKind::MS_INHERITANCE: return "MS_INHERITANCE";
-    case AttributeKind::MS_NO_V_TABLE: return "MS_NO_V_TABLE";
-    case AttributeKind::MSP430_INTERRUPT: return "MSP430_INTERRUPT";
-    case AttributeKind::MS_STRUCT: return "MS_STRUCT";
-    case AttributeKind::MS_VTOR_DISP: return "MS_VTOR_DISP";
-    case AttributeKind::MAX_FIELD_ALIGNMENT: return "MAX_FIELD_ALIGNMENT";
-    case AttributeKind::MAY_ALIAS: return "MAY_ALIAS";
-    case AttributeKind::MICRO_MIPS: return "MICRO_MIPS";
-    case AttributeKind::MIN_SIZE: return "MIN_SIZE";
-    case AttributeKind::MIN_VECTOR_WIDTH: return "MIN_VECTOR_WIDTH";
-    case AttributeKind::MIPS16: return "MIPS16";
-    case AttributeKind::MIPS_INTERRUPT: return "MIPS_INTERRUPT";
-    case AttributeKind::MIPS_LONG_CALL: return "MIPS_LONG_CALL";
-    case AttributeKind::MIPS_SHORT_CALL: return "MIPS_SHORT_CALL";
-    case AttributeKind::NS_CONSUMES_SELF: return "NS_CONSUMES_SELF";
-    case AttributeKind::NS_ERROR_DOMAIN: return "NS_ERROR_DOMAIN";
-    case AttributeKind::NS_RETURNS_AUTORELEASED: return "NS_RETURNS_AUTORELEASED";
-    case AttributeKind::NS_RETURNS_NOT_RETAINED: return "NS_RETURNS_NOT_RETAINED";
-    case AttributeKind::NAKED: return "NAKED";
-    case AttributeKind::NO_ALIAS: return "NO_ALIAS";
-    case AttributeKind::NO_COMMON: return "NO_COMMON";
-    case AttributeKind::NO_DEBUG: return "NO_DEBUG";
-    case AttributeKind::NO_DESTROY: return "NO_DESTROY";
-    case AttributeKind::NO_DUPLICATE: return "NO_DUPLICATE";
-    case AttributeKind::NO_INLINE: return "NO_INLINE";
-    case AttributeKind::NO_INSTRUMENT_FUNCTION: return "NO_INSTRUMENT_FUNCTION";
-    case AttributeKind::NO_MICRO_MIPS: return "NO_MICRO_MIPS";
-    case AttributeKind::NO_MIPS16: return "NO_MIPS16";
-    case AttributeKind::NO_PROFILE_FUNCTION: return "NO_PROFILE_FUNCTION";
-    case AttributeKind::NO_RETURN: return "NO_RETURN";
-    case AttributeKind::NO_SANITIZE: return "NO_SANITIZE";
-    case AttributeKind::NO_SPECULATIVE_LOAD_HARDENING: return "NO_SPECULATIVE_LOAD_HARDENING";
-    case AttributeKind::NO_SPLIT_STACK: return "NO_SPLIT_STACK";
-    case AttributeKind::NO_STACK_PROTECTOR: return "NO_STACK_PROTECTOR";
-    case AttributeKind::NO_THREAD_SAFETY_ANALYSIS: return "NO_THREAD_SAFETY_ANALYSIS";
-    case AttributeKind::NO_THROW: return "NO_THROW";
-    case AttributeKind::NO_UNIQUE_ADDRESS: return "NO_UNIQUE_ADDRESS";
-    case AttributeKind::NOT_TAIL_CALLED: return "NOT_TAIL_CALLED";
-    case AttributeKind::OMP_ALLOCATE_DECLARATION: return "OMP_ALLOCATE_DECLARATION";
-    case AttributeKind::OMP_CAPTURE_NO_INITIALIZER: return "OMP_CAPTURE_NO_INITIALIZER";
-    case AttributeKind::OMP_DECLARE_TARGET_DECLARATION: return "OMP_DECLARE_TARGET_DECLARATION";
-    case AttributeKind::OMP_DECLARE_VARIANT: return "OMP_DECLARE_VARIANT";
-    case AttributeKind::OMP_THREAD_PRIVATE_DECLARATION: return "OMP_THREAD_PRIVATE_DECLARATION";
-    case AttributeKind::OS_CONSUMES_THIS: return "OS_CONSUMES_THIS";
-    case AttributeKind::OS_RETURNS_NOT_RETAINED: return "OS_RETURNS_NOT_RETAINED";
-    case AttributeKind::OS_RETURNS_RETAINED: return "OS_RETURNS_RETAINED";
-    case AttributeKind::OS_RETURNS_RETAINED_ON_NON_ZERO: return "OS_RETURNS_RETAINED_ON_NON_ZERO";
-    case AttributeKind::OS_RETURNS_RETAINED_ON_ZERO: return "OS_RETURNS_RETAINED_ON_ZERO";
-    case AttributeKind::OBJ_C_BRIDGE: return "OBJ_C_BRIDGE";
-    case AttributeKind::OBJ_C_BRIDGE_MUTABLE: return "OBJ_C_BRIDGE_MUTABLE";
-    case AttributeKind::OBJ_C_BRIDGE_RELATED: return "OBJ_C_BRIDGE_RELATED";
-    case AttributeKind::OBJ_C_EXCEPTION: return "OBJ_C_EXCEPTION";
-    case AttributeKind::OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION: return "OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION";
-    case AttributeKind::OBJ_C_EXTERNALLY_RETAINED: return "OBJ_C_EXTERNALLY_RETAINED";
-    case AttributeKind::OBJ_C_INDEPENDENT_CLASS: return "OBJ_C_INDEPENDENT_CLASS";
-    case AttributeKind::OBJ_C_METHOD_FAMILY: return "OBJ_C_METHOD_FAMILY";
-    case AttributeKind::OBJ_CNS_OBJECT: return "OBJ_CNS_OBJECT";
-    case AttributeKind::OBJ_C_PRECISE_LIFETIME: return "OBJ_C_PRECISE_LIFETIME";
-    case AttributeKind::OBJ_C_REQUIRES_PROPERTY_DEFINITIONS: return "OBJ_C_REQUIRES_PROPERTY_DEFINITIONS";
-    case AttributeKind::OBJ_C_REQUIRES_SUPER: return "OBJ_C_REQUIRES_SUPER";
-    case AttributeKind::OBJ_C_RETURNS_INNER_POINTER: return "OBJ_C_RETURNS_INNER_POINTER";
-    case AttributeKind::OBJ_C_ROOT_CLASS: return "OBJ_C_ROOT_CLASS";
-    case AttributeKind::OBJ_C_SUBCLASSING_RESTRICTED: return "OBJ_C_SUBCLASSING_RESTRICTED";
-    case AttributeKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE: return "OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE";
-    case AttributeKind::OPEN_CL_KERNEL: return "OPEN_CL_KERNEL";
-    case AttributeKind::OPTIMIZE_NONE: return "OPTIMIZE_NONE";
-    case AttributeKind::OVERRIDE: return "OVERRIDE";
-    case AttributeKind::OWNER: return "OWNER";
-    case AttributeKind::OWNERSHIP: return "OWNERSHIP";
-    case AttributeKind::PACKED: return "PACKED";
-    case AttributeKind::PARAMETER_TYPESTATE: return "PARAMETER_TYPESTATE";
-    case AttributeKind::PATCHABLE_FUNCTION_ENTRY: return "PATCHABLE_FUNCTION_ENTRY";
-    case AttributeKind::POINTER: return "POINTER";
-    case AttributeKind::PRAGMA_CLANG_BSS_SECTION: return "PRAGMA_CLANG_BSS_SECTION";
-    case AttributeKind::PRAGMA_CLANG_DATA_SECTION: return "PRAGMA_CLANG_DATA_SECTION";
-    case AttributeKind::PRAGMA_CLANG_RELRO_SECTION: return "PRAGMA_CLANG_RELRO_SECTION";
-    case AttributeKind::PRAGMA_CLANG_RODATA_SECTION: return "PRAGMA_CLANG_RODATA_SECTION";
-    case AttributeKind::PRAGMA_CLANG_TEXT_SECTION: return "PRAGMA_CLANG_TEXT_SECTION";
-    case AttributeKind::PREFERRED_NAME: return "PREFERRED_NAME";
-    case AttributeKind::PT_GUARDED_BY: return "PT_GUARDED_BY";
-    case AttributeKind::PT_GUARDED_VARIABLE: return "PT_GUARDED_VARIABLE";
-    case AttributeKind::PURE: return "PURE";
-    case AttributeKind::RISCV_INTERRUPT: return "RISCV_INTERRUPT";
-    case AttributeKind::REINITIALIZES: return "REINITIALIZES";
-    case AttributeKind::RELEASE_CAPABILITY: return "RELEASE_CAPABILITY";
-    case AttributeKind::REQD_WORK_GROUP_SIZE: return "REQD_WORK_GROUP_SIZE";
-    case AttributeKind::REQUIRES_CAPABILITY: return "REQUIRES_CAPABILITY";
-    case AttributeKind::RESTRICT: return "RESTRICT";
-    case AttributeKind::RETAIN: return "RETAIN";
-    case AttributeKind::RETURN_TYPESTATE: return "RETURN_TYPESTATE";
-    case AttributeKind::RETURNS_NON_NULL: return "RETURNS_NON_NULL";
-    case AttributeKind::RETURNS_TWICE: return "RETURNS_TWICE";
-    case AttributeKind::SYCL_KERNEL: return "SYCL_KERNEL";
-    case AttributeKind::SYCL_SPECIAL_CLASS: return "SYCL_SPECIAL_CLASS";
-    case AttributeKind::SCOPED_LOCKABLE: return "SCOPED_LOCKABLE";
-    case AttributeKind::SECTION: return "SECTION";
-    case AttributeKind::SELECT_ANY: return "SELECT_ANY";
-    case AttributeKind::SENTINEL: return "SENTINEL";
-    case AttributeKind::SET_TYPESTATE: return "SET_TYPESTATE";
-    case AttributeKind::SHARED_TRYLOCK_FUNCTION: return "SHARED_TRYLOCK_FUNCTION";
-    case AttributeKind::SPECULATIVE_LOAD_HARDENING: return "SPECULATIVE_LOAD_HARDENING";
-    case AttributeKind::STANDALONE_DEBUG: return "STANDALONE_DEBUG";
-    case AttributeKind::STRICT_FP: return "STRICT_FP";
-    case AttributeKind::SWIFT_ASYNC: return "SWIFT_ASYNC";
-    case AttributeKind::SWIFT_ASYNC_ERROR: return "SWIFT_ASYNC_ERROR";
-    case AttributeKind::SWIFT_ASYNC_NAME: return "SWIFT_ASYNC_NAME";
-    case AttributeKind::SWIFT_ATTRIBUTE: return "SWIFT_ATTRIBUTE";
-    case AttributeKind::SWIFT_BRIDGE: return "SWIFT_BRIDGE";
-    case AttributeKind::SWIFT_BRIDGED_TYPEDEF: return "SWIFT_BRIDGED_TYPEDEF";
-    case AttributeKind::SWIFT_ERROR: return "SWIFT_ERROR";
-    case AttributeKind::SWIFT_NAME: return "SWIFT_NAME";
-    case AttributeKind::SWIFT_NEW_TYPE: return "SWIFT_NEW_TYPE";
-    case AttributeKind::SWIFT_PRIVATE: return "SWIFT_PRIVATE";
-    case AttributeKind::TLS_MODEL: return "TLS_MODEL";
-    case AttributeKind::TARGET: return "TARGET";
-    case AttributeKind::TARGET_CLONES: return "TARGET_CLONES";
-    case AttributeKind::TEST_TYPESTATE: return "TEST_TYPESTATE";
-    case AttributeKind::TRANSPARENT_UNION: return "TRANSPARENT_UNION";
-    case AttributeKind::TRIVIAL_ABI: return "TRIVIAL_ABI";
-    case AttributeKind::TRY_ACQUIRE_CAPABILITY: return "TRY_ACQUIRE_CAPABILITY";
-    case AttributeKind::TYPE_TAG_FOR_DATATYPE: return "TYPE_TAG_FOR_DATATYPE";
-    case AttributeKind::TYPE_VISIBILITY: return "TYPE_VISIBILITY";
-    case AttributeKind::UNAVAILABLE: return "UNAVAILABLE";
-    case AttributeKind::UNINITIALIZED: return "UNINITIALIZED";
-    case AttributeKind::UNUSED: return "UNUSED";
-    case AttributeKind::USED: return "USED";
-    case AttributeKind::USING_IF_EXISTS: return "USING_IF_EXISTS";
-    case AttributeKind::UUID: return "UUID";
-    case AttributeKind::VEC_RETURN: return "VEC_RETURN";
-    case AttributeKind::VEC_TYPE_HINT: return "VEC_TYPE_HINT";
-    case AttributeKind::VISIBILITY: return "VISIBILITY";
-    case AttributeKind::WARN_UNUSED: return "WARN_UNUSED";
-    case AttributeKind::WARN_UNUSED_RESULT: return "WARN_UNUSED_RESULT";
-    case AttributeKind::WEAK: return "WEAK";
-    case AttributeKind::WEAK_IMPORT: return "WEAK_IMPORT";
-    case AttributeKind::WEAK_REFERENCE: return "WEAK_REFERENCE";
-    case AttributeKind::WEB_ASSEMBLY_EXPORT_NAME: return "WEB_ASSEMBLY_EXPORT_NAME";
-    case AttributeKind::WEB_ASSEMBLY_IMPORT_MODULE: return "WEB_ASSEMBLY_IMPORT_MODULE";
-    case AttributeKind::WEB_ASSEMBLY_IMPORT_NAME: return "WEB_ASSEMBLY_IMPORT_NAME";
-    case AttributeKind::WORK_GROUP_SIZE_HINT: return "WORK_GROUP_SIZE_HINT";
-    case AttributeKind::X86_FORCE_ALIGN_ARGUMENT_POINTER: return "X86_FORCE_ALIGN_ARGUMENT_POINTER";
-    case AttributeKind::X_RAY_INSTRUMENT: return "X_RAY_INSTRUMENT";
-    case AttributeKind::X_RAY_LOG_ARGUMENTS: return "X_RAY_LOG_ARGUMENTS";
-    case AttributeKind::ABI_TAG: return "ABI_TAG";
-    case AttributeKind::ALIAS: return "ALIAS";
-    case AttributeKind::ALIGN_VALUE: return "ALIGN_VALUE";
-    case AttributeKind::BUILTIN_ALIAS: return "BUILTIN_ALIAS";
-    case AttributeKind::CALLED_ONCE: return "CALLED_ONCE";
-    case AttributeKind::I_FUNC: return "I_FUNC";
-    case AttributeKind::INITIALIZER_SEG: return "INITIALIZER_SEG";
-    case AttributeKind::LOADER_UNINITIALIZED: return "LOADER_UNINITIALIZED";
-    case AttributeKind::LOOP_HINT: return "LOOP_HINT";
-    case AttributeKind::MODE: return "MODE";
-    case AttributeKind::NO_BUILTIN: return "NO_BUILTIN";
-    case AttributeKind::NO_ESCAPE: return "NO_ESCAPE";
-    case AttributeKind::OMP_CAPTURE_KIND: return "OMP_CAPTURE_KIND";
-    case AttributeKind::OMP_DECLARE_SIMD_DECLARATION: return "OMP_DECLARE_SIMD_DECLARATION";
-    case AttributeKind::OMP_REFERENCED_VARIABLE: return "OMP_REFERENCED_VARIABLE";
-    case AttributeKind::OBJ_C_BOXABLE: return "OBJ_C_BOXABLE";
-    case AttributeKind::OBJ_C_CLASS_STUB: return "OBJ_C_CLASS_STUB";
-    case AttributeKind::OBJ_C_DESIGNATED_INITIALIZER: return "OBJ_C_DESIGNATED_INITIALIZER";
-    case AttributeKind::OBJ_C_DIRECT: return "OBJ_C_DIRECT";
-    case AttributeKind::OBJ_C_DIRECT_MEMBERS: return "OBJ_C_DIRECT_MEMBERS";
-    case AttributeKind::OBJ_C_NON_LAZY_CLASS: return "OBJ_C_NON_LAZY_CLASS";
-    case AttributeKind::OBJ_C_NON_RUNTIME_PROTOCOL: return "OBJ_C_NON_RUNTIME_PROTOCOL";
-    case AttributeKind::OBJ_C_RUNTIME_NAME: return "OBJ_C_RUNTIME_NAME";
-    case AttributeKind::OBJ_C_RUNTIME_VISIBLE: return "OBJ_C_RUNTIME_VISIBLE";
-    case AttributeKind::OPEN_CL_ACCESS: return "OPEN_CL_ACCESS";
-    case AttributeKind::OVERLOADABLE: return "OVERLOADABLE";
-    case AttributeKind::RENDER_SCRIPT_KERNEL: return "RENDER_SCRIPT_KERNEL";
-    case AttributeKind::SWIFT_OBJ_C_MEMBERS: return "SWIFT_OBJ_C_MEMBERS";
-    case AttributeKind::THREAD: return "THREAD";
+    case AttrKind::ADDRESS_SPACE: return "ADDRESS_SPACE";
+    case AttrKind::ARM_MVE_STRICT_POLYMORPHISM: return "ARM_MVE_STRICT_POLYMORPHISM";
+    case AttrKind::BTF_TYPE_TAG: return "BTF_TYPE_TAG";
+    case AttrKind::CMSE_NS_CALL: return "CMSE_NS_CALL";
+    case AttrKind::NO_DEREF: return "NO_DEREF";
+    case AttrKind::OBJ_CGC: return "OBJ_CGC";
+    case AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED: return "OBJ_C_INERT_UNSAFE_UNRETAINED";
+    case AttrKind::OBJ_C_KIND_OF: return "OBJ_C_KIND_OF";
+    case AttrKind::OPEN_CL_CONSTANT_ADDRESS_SPACE: return "OPEN_CL_CONSTANT_ADDRESS_SPACE";
+    case AttrKind::OPEN_CL_GENERIC_ADDRESS_SPACE: return "OPEN_CL_GENERIC_ADDRESS_SPACE";
+    case AttrKind::OPEN_CL_GLOBAL_ADDRESS_SPACE: return "OPEN_CL_GLOBAL_ADDRESS_SPACE";
+    case AttrKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE: return "OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE";
+    case AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE: return "OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE";
+    case AttrKind::OPEN_CL_LOCAL_ADDRESS_SPACE: return "OPEN_CL_LOCAL_ADDRESS_SPACE";
+    case AttrKind::OPEN_CL_PRIVATE_ADDRESS_SPACE: return "OPEN_CL_PRIVATE_ADDRESS_SPACE";
+    case AttrKind::PTR32: return "PTR32";
+    case AttrKind::PTR64: return "PTR64";
+    case AttrKind::S_PTR: return "S_PTR";
+    case AttrKind::TYPE_NON_NULL: return "TYPE_NON_NULL";
+    case AttrKind::TYPE_NULL_UNSPECIFIED: return "TYPE_NULL_UNSPECIFIED";
+    case AttrKind::TYPE_NULLABLE: return "TYPE_NULLABLE";
+    case AttrKind::TYPE_NULLABLE_RESULT: return "TYPE_NULLABLE_RESULT";
+    case AttrKind::U_PTR: return "U_PTR";
+    case AttrKind::FALL_THROUGH: return "FALL_THROUGH";
+    case AttrKind::LIKELY: return "LIKELY";
+    case AttrKind::MUST_TAIL: return "MUST_TAIL";
+    case AttrKind::OPEN_CL_UNROLL_HINT: return "OPEN_CL_UNROLL_HINT";
+    case AttrKind::SUPPRESS: return "SUPPRESS";
+    case AttrKind::UNLIKELY: return "UNLIKELY";
+    case AttrKind::NO_MERGE: return "NO_MERGE";
+    case AttrKind::A_ARCH64_VECTOR_PCS: return "A_ARCH64_VECTOR_PCS";
+    case AttrKind::ACQUIRE_HANDLE: return "ACQUIRE_HANDLE";
+    case AttrKind::ANY_X86_NO_CF_CHECK: return "ANY_X86_NO_CF_CHECK";
+    case AttrKind::C_DECL: return "C_DECL";
+    case AttrKind::FAST_CALL: return "FAST_CALL";
+    case AttrKind::INTEL_OCL_BICC: return "INTEL_OCL_BICC";
+    case AttrKind::LIFETIME_BOUND: return "LIFETIME_BOUND";
+    case AttrKind::MSABI: return "MSABI";
+    case AttrKind::NS_RETURNS_RETAINED: return "NS_RETURNS_RETAINED";
+    case AttrKind::OBJ_C_OWNERSHIP: return "OBJ_C_OWNERSHIP";
+    case AttrKind::PASCAL: return "PASCAL";
+    case AttrKind::PCS: return "PCS";
+    case AttrKind::PRESERVE_ALL: return "PRESERVE_ALL";
+    case AttrKind::PRESERVE_MOST: return "PRESERVE_MOST";
+    case AttrKind::REG_CALL: return "REG_CALL";
+    case AttrKind::STD_CALL: return "STD_CALL";
+    case AttrKind::SWIFT_ASYNC_CALL: return "SWIFT_ASYNC_CALL";
+    case AttrKind::SWIFT_CALL: return "SWIFT_CALL";
+    case AttrKind::SYS_VABI: return "SYS_VABI";
+    case AttrKind::THIS_CALL: return "THIS_CALL";
+    case AttrKind::VECTOR_CALL: return "VECTOR_CALL";
+    case AttrKind::SWIFT_ASYNC_CONTEXT: return "SWIFT_ASYNC_CONTEXT";
+    case AttrKind::SWIFT_CONTEXT: return "SWIFT_CONTEXT";
+    case AttrKind::SWIFT_ERROR_RESULT: return "SWIFT_ERROR_RESULT";
+    case AttrKind::SWIFT_INDIRECT_RESULT: return "SWIFT_INDIRECT_RESULT";
+    case AttrKind::ANNOTATE: return "ANNOTATE";
+    case AttrKind::CF_CONSUMED: return "CF_CONSUMED";
+    case AttrKind::CARRIES_DEPENDENCY: return "CARRIES_DEPENDENCY";
+    case AttrKind::NS_CONSUMED: return "NS_CONSUMED";
+    case AttrKind::NON_NULL: return "NON_NULL";
+    case AttrKind::OS_CONSUMED: return "OS_CONSUMED";
+    case AttrKind::PASS_OBJECT_SIZE: return "PASS_OBJECT_SIZE";
+    case AttrKind::RELEASE_HANDLE: return "RELEASE_HANDLE";
+    case AttrKind::USE_HANDLE: return "USE_HANDLE";
+    case AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE: return "AMDGPU_FLAT_WORK_GROUP_SIZE";
+    case AttrKind::AMDGPU_NUM_SGPR: return "AMDGPU_NUM_SGPR";
+    case AttrKind::AMDGPU_NUM_VGPR: return "AMDGPU_NUM_VGPR";
+    case AttrKind::AMDGPU_WAVES_PER_EU: return "AMDGPU_WAVES_PER_EU";
+    case AttrKind::ARM_INTERRUPT: return "ARM_INTERRUPT";
+    case AttrKind::AVR_INTERRUPT: return "AVR_INTERRUPT";
+    case AttrKind::AVR_SIGNAL: return "AVR_SIGNAL";
+    case AttrKind::ACQUIRE_CAPABILITY: return "ACQUIRE_CAPABILITY";
+    case AttrKind::ACQUIRED_AFTER: return "ACQUIRED_AFTER";
+    case AttrKind::ACQUIRED_BEFORE: return "ACQUIRED_BEFORE";
+    case AttrKind::ALIGN_MAC68_K: return "ALIGN_MAC68_K";
+    case AttrKind::ALIGN_NATURAL: return "ALIGN_NATURAL";
+    case AttrKind::ALIGNED: return "ALIGNED";
+    case AttrKind::ALLOC_ALIGN: return "ALLOC_ALIGN";
+    case AttrKind::ALLOC_SIZE: return "ALLOC_SIZE";
+    case AttrKind::ALWAYS_DESTROY: return "ALWAYS_DESTROY";
+    case AttrKind::ALWAYS_INLINE: return "ALWAYS_INLINE";
+    case AttrKind::ANALYZER_NO_RETURN: return "ANALYZER_NO_RETURN";
+    case AttrKind::ANY_X86_INTERRUPT: return "ANY_X86_INTERRUPT";
+    case AttrKind::ANY_X86_NO_CALLER_SAVED_REGISTERS: return "ANY_X86_NO_CALLER_SAVED_REGISTERS";
+    case AttrKind::ARC_WEAKREF_UNAVAILABLE: return "ARC_WEAKREF_UNAVAILABLE";
+    case AttrKind::ARGUMENT_WITH_TYPE_TAG: return "ARGUMENT_WITH_TYPE_TAG";
+    case AttrKind::ARM_BUILTIN_ALIAS: return "ARM_BUILTIN_ALIAS";
+    case AttrKind::ARTIFICIAL: return "ARTIFICIAL";
+    case AttrKind::ASSEMBLY_LABEL: return "ASSEMBLY_LABEL";
+    case AttrKind::ASSERT_CAPABILITY: return "ASSERT_CAPABILITY";
+    case AttrKind::ASSERT_EXCLUSIVE_LOCK: return "ASSERT_EXCLUSIVE_LOCK";
+    case AttrKind::ASSERT_SHARED_LOCK: return "ASSERT_SHARED_LOCK";
+    case AttrKind::ASSUME_ALIGNED: return "ASSUME_ALIGNED";
+    case AttrKind::ASSUMPTION: return "ASSUMPTION";
+    case AttrKind::AVAILABILITY: return "AVAILABILITY";
+    case AttrKind::BPF_PRESERVE_ACCESS_INDEX: return "BPF_PRESERVE_ACCESS_INDEX";
+    case AttrKind::BTF_DECL_TAG: return "BTF_DECL_TAG";
+    case AttrKind::BLOCKS: return "BLOCKS";
+    case AttrKind::BUILTIN: return "BUILTIN";
+    case AttrKind::C11_NO_RETURN: return "C11_NO_RETURN";
+    case AttrKind::CF_AUDITED_TRANSFER: return "CF_AUDITED_TRANSFER";
+    case AttrKind::CF_GUARD: return "CF_GUARD";
+    case AttrKind::CFI_CANONICAL_JUMP_TABLE: return "CFI_CANONICAL_JUMP_TABLE";
+    case AttrKind::CF_RETURNS_NOT_RETAINED: return "CF_RETURNS_NOT_RETAINED";
+    case AttrKind::CF_RETURNS_RETAINED: return "CF_RETURNS_RETAINED";
+    case AttrKind::CF_UNKNOWN_TRANSFER: return "CF_UNKNOWN_TRANSFER";
+    case AttrKind::CPU_DISPATCH: return "CPU_DISPATCH";
+    case AttrKind::CPU_SPECIFIC: return "CPU_SPECIFIC";
+    case AttrKind::CUDA_CONSTANT: return "CUDA_CONSTANT";
+    case AttrKind::CUDA_DEVICE: return "CUDA_DEVICE";
+    case AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE: return "CUDA_DEVICE_BUILTIN_SURFACE_TYPE";
+    case AttrKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE: return "CUDA_DEVICE_BUILTIN_TEXTURE_TYPE";
+    case AttrKind::CUDA_GLOBAL: return "CUDA_GLOBAL";
+    case AttrKind::CUDA_HOST: return "CUDA_HOST";
+    case AttrKind::CUDA_INVALID_TARGET: return "CUDA_INVALID_TARGET";
+    case AttrKind::CUDA_LAUNCH_BOUNDS: return "CUDA_LAUNCH_BOUNDS";
+    case AttrKind::CUDA_SHARED: return "CUDA_SHARED";
+    case AttrKind::CXX11_NO_RETURN: return "CXX11_NO_RETURN";
+    case AttrKind::CALLABLE_WHEN: return "CALLABLE_WHEN";
+    case AttrKind::CALLBACK: return "CALLBACK";
+    case AttrKind::CAPABILITY: return "CAPABILITY";
+    case AttrKind::CAPTURED_RECORD: return "CAPTURED_RECORD";
+    case AttrKind::CLEANUP: return "CLEANUP";
+    case AttrKind::CMSE_NS_ENTRY: return "CMSE_NS_ENTRY";
+    case AttrKind::CODE_SEG: return "CODE_SEG";
+    case AttrKind::COLD: return "COLD";
+    case AttrKind::COMMON: return "COMMON";
+    case AttrKind::CONST: return "CONST";
+    case AttrKind::CONST_INITIALIZER: return "CONST_INITIALIZER";
+    case AttrKind::CONSTRUCTOR: return "CONSTRUCTOR";
+    case AttrKind::CONSUMABLE: return "CONSUMABLE";
+    case AttrKind::CONSUMABLE_AUTO_CAST: return "CONSUMABLE_AUTO_CAST";
+    case AttrKind::CONSUMABLE_SET_ON_READ: return "CONSUMABLE_SET_ON_READ";
+    case AttrKind::CONVERGENT: return "CONVERGENT";
+    case AttrKind::DLL_EXPORT: return "DLL_EXPORT";
+    case AttrKind::DLL_EXPORT_STATIC_LOCAL: return "DLL_EXPORT_STATIC_LOCAL";
+    case AttrKind::DLL_IMPORT: return "DLL_IMPORT";
+    case AttrKind::DLL_IMPORT_STATIC_LOCAL: return "DLL_IMPORT_STATIC_LOCAL";
+    case AttrKind::DEPRECATED: return "DEPRECATED";
+    case AttrKind::DESTRUCTOR: return "DESTRUCTOR";
+    case AttrKind::DIAGNOSE_AS_BUILTIN: return "DIAGNOSE_AS_BUILTIN";
+    case AttrKind::DIAGNOSE_IF: return "DIAGNOSE_IF";
+    case AttrKind::DISABLE_SANITIZER_INSTRUMENTATION: return "DISABLE_SANITIZER_INSTRUMENTATION";
+    case AttrKind::DISABLE_TAIL_CALLS: return "DISABLE_TAIL_CALLS";
+    case AttrKind::EMPTY_BASES: return "EMPTY_BASES";
+    case AttrKind::ENABLE_IF: return "ENABLE_IF";
+    case AttrKind::ENFORCE_TCB: return "ENFORCE_TCB";
+    case AttrKind::ENFORCE_TCB_LEAF: return "ENFORCE_TCB_LEAF";
+    case AttrKind::ENUM_EXTENSIBILITY: return "ENUM_EXTENSIBILITY";
+    case AttrKind::ERROR: return "ERROR";
+    case AttrKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
+    case AttrKind::EXCLUSIVE_TRYLOCK_FUNCTION: return "EXCLUSIVE_TRYLOCK_FUNCTION";
+    case AttrKind::EXTERNAL_SOURCE_SYMBOL: return "EXTERNAL_SOURCE_SYMBOL";
+    case AttrKind::FINAL: return "FINAL";
+    case AttrKind::FLAG_ENUM: return "FLAG_ENUM";
+    case AttrKind::FLATTEN: return "FLATTEN";
+    case AttrKind::FORMAT: return "FORMAT";
+    case AttrKind::FORMAT_ARGUMENT: return "FORMAT_ARGUMENT";
+    case AttrKind::GNU_INLINE: return "GNU_INLINE";
+    case AttrKind::GUARDED_BY: return "GUARDED_BY";
+    case AttrKind::GUARDED_VARIABLE: return "GUARDED_VARIABLE";
+    case AttrKind::HIP_MANAGED: return "HIP_MANAGED";
+    case AttrKind::HOT: return "HOT";
+    case AttrKind::IB_ACTION: return "IB_ACTION";
+    case AttrKind::IB_OUTLET: return "IB_OUTLET";
+    case AttrKind::IB_OUTLET_COLLECTION: return "IB_OUTLET_COLLECTION";
+    case AttrKind::INITIALIZER_PRIORITY: return "INITIALIZER_PRIORITY";
+    case AttrKind::INTERNAL_LINKAGE: return "INTERNAL_LINKAGE";
+    case AttrKind::LTO_VISIBILITY_PUBLIC: return "LTO_VISIBILITY_PUBLIC";
+    case AttrKind::LAYOUT_VERSION: return "LAYOUT_VERSION";
+    case AttrKind::LEAF: return "LEAF";
+    case AttrKind::LOCK_RETURNED: return "LOCK_RETURNED";
+    case AttrKind::LOCKS_EXCLUDED: return "LOCKS_EXCLUDED";
+    case AttrKind::M68_KINTERRUPT: return "M68_KINTERRUPT";
+    case AttrKind::MIG_SERVER_ROUTINE: return "MIG_SERVER_ROUTINE";
+    case AttrKind::MS_ALLOCATOR: return "MS_ALLOCATOR";
+    case AttrKind::MS_INHERITANCE: return "MS_INHERITANCE";
+    case AttrKind::MS_NO_V_TABLE: return "MS_NO_V_TABLE";
+    case AttrKind::MSP430_INTERRUPT: return "MSP430_INTERRUPT";
+    case AttrKind::MS_STRUCT: return "MS_STRUCT";
+    case AttrKind::MS_VTOR_DISP: return "MS_VTOR_DISP";
+    case AttrKind::MAX_FIELD_ALIGNMENT: return "MAX_FIELD_ALIGNMENT";
+    case AttrKind::MAY_ALIAS: return "MAY_ALIAS";
+    case AttrKind::MICRO_MIPS: return "MICRO_MIPS";
+    case AttrKind::MIN_SIZE: return "MIN_SIZE";
+    case AttrKind::MIN_VECTOR_WIDTH: return "MIN_VECTOR_WIDTH";
+    case AttrKind::MIPS16: return "MIPS16";
+    case AttrKind::MIPS_INTERRUPT: return "MIPS_INTERRUPT";
+    case AttrKind::MIPS_LONG_CALL: return "MIPS_LONG_CALL";
+    case AttrKind::MIPS_SHORT_CALL: return "MIPS_SHORT_CALL";
+    case AttrKind::NS_CONSUMES_SELF: return "NS_CONSUMES_SELF";
+    case AttrKind::NS_ERROR_DOMAIN: return "NS_ERROR_DOMAIN";
+    case AttrKind::NS_RETURNS_AUTORELEASED: return "NS_RETURNS_AUTORELEASED";
+    case AttrKind::NS_RETURNS_NOT_RETAINED: return "NS_RETURNS_NOT_RETAINED";
+    case AttrKind::NAKED: return "NAKED";
+    case AttrKind::NO_ALIAS: return "NO_ALIAS";
+    case AttrKind::NO_COMMON: return "NO_COMMON";
+    case AttrKind::NO_DEBUG: return "NO_DEBUG";
+    case AttrKind::NO_DESTROY: return "NO_DESTROY";
+    case AttrKind::NO_DUPLICATE: return "NO_DUPLICATE";
+    case AttrKind::NO_INLINE: return "NO_INLINE";
+    case AttrKind::NO_INSTRUMENT_FUNCTION: return "NO_INSTRUMENT_FUNCTION";
+    case AttrKind::NO_MICRO_MIPS: return "NO_MICRO_MIPS";
+    case AttrKind::NO_MIPS16: return "NO_MIPS16";
+    case AttrKind::NO_PROFILE_FUNCTION: return "NO_PROFILE_FUNCTION";
+    case AttrKind::NO_RETURN: return "NO_RETURN";
+    case AttrKind::NO_SANITIZE: return "NO_SANITIZE";
+    case AttrKind::NO_SPECULATIVE_LOAD_HARDENING: return "NO_SPECULATIVE_LOAD_HARDENING";
+    case AttrKind::NO_SPLIT_STACK: return "NO_SPLIT_STACK";
+    case AttrKind::NO_STACK_PROTECTOR: return "NO_STACK_PROTECTOR";
+    case AttrKind::NO_THREAD_SAFETY_ANALYSIS: return "NO_THREAD_SAFETY_ANALYSIS";
+    case AttrKind::NO_THROW: return "NO_THROW";
+    case AttrKind::NO_UNIQUE_ADDRESS: return "NO_UNIQUE_ADDRESS";
+    case AttrKind::NOT_TAIL_CALLED: return "NOT_TAIL_CALLED";
+    case AttrKind::OMP_ALLOCATE_DECLARATION: return "OMP_ALLOCATE_DECLARATION";
+    case AttrKind::OMP_CAPTURE_NO_INITIALIZER: return "OMP_CAPTURE_NO_INITIALIZER";
+    case AttrKind::OMP_DECLARE_TARGET_DECLARATION: return "OMP_DECLARE_TARGET_DECLARATION";
+    case AttrKind::OMP_DECLARE_VARIANT: return "OMP_DECLARE_VARIANT";
+    case AttrKind::OMP_THREAD_PRIVATE_DECLARATION: return "OMP_THREAD_PRIVATE_DECLARATION";
+    case AttrKind::OS_CONSUMES_THIS: return "OS_CONSUMES_THIS";
+    case AttrKind::OS_RETURNS_NOT_RETAINED: return "OS_RETURNS_NOT_RETAINED";
+    case AttrKind::OS_RETURNS_RETAINED: return "OS_RETURNS_RETAINED";
+    case AttrKind::OS_RETURNS_RETAINED_ON_NON_ZERO: return "OS_RETURNS_RETAINED_ON_NON_ZERO";
+    case AttrKind::OS_RETURNS_RETAINED_ON_ZERO: return "OS_RETURNS_RETAINED_ON_ZERO";
+    case AttrKind::OBJ_C_BRIDGE: return "OBJ_C_BRIDGE";
+    case AttrKind::OBJ_C_BRIDGE_MUTABLE: return "OBJ_C_BRIDGE_MUTABLE";
+    case AttrKind::OBJ_C_BRIDGE_RELATED: return "OBJ_C_BRIDGE_RELATED";
+    case AttrKind::OBJ_C_EXCEPTION: return "OBJ_C_EXCEPTION";
+    case AttrKind::OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION: return "OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION";
+    case AttrKind::OBJ_C_EXTERNALLY_RETAINED: return "OBJ_C_EXTERNALLY_RETAINED";
+    case AttrKind::OBJ_C_INDEPENDENT_CLASS: return "OBJ_C_INDEPENDENT_CLASS";
+    case AttrKind::OBJ_C_METHOD_FAMILY: return "OBJ_C_METHOD_FAMILY";
+    case AttrKind::OBJ_CNS_OBJECT: return "OBJ_CNS_OBJECT";
+    case AttrKind::OBJ_C_PRECISE_LIFETIME: return "OBJ_C_PRECISE_LIFETIME";
+    case AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFINITIONS: return "OBJ_C_REQUIRES_PROPERTY_DEFINITIONS";
+    case AttrKind::OBJ_C_REQUIRES_SUPER: return "OBJ_C_REQUIRES_SUPER";
+    case AttrKind::OBJ_C_RETURNS_INNER_POINTER: return "OBJ_C_RETURNS_INNER_POINTER";
+    case AttrKind::OBJ_C_ROOT_CLASS: return "OBJ_C_ROOT_CLASS";
+    case AttrKind::OBJ_C_SUBCLASSING_RESTRICTED: return "OBJ_C_SUBCLASSING_RESTRICTED";
+    case AttrKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE: return "OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE";
+    case AttrKind::OPEN_CL_KERNEL: return "OPEN_CL_KERNEL";
+    case AttrKind::OPTIMIZE_NONE: return "OPTIMIZE_NONE";
+    case AttrKind::OVERRIDE: return "OVERRIDE";
+    case AttrKind::OWNER: return "OWNER";
+    case AttrKind::OWNERSHIP: return "OWNERSHIP";
+    case AttrKind::PACKED: return "PACKED";
+    case AttrKind::PARAMETER_TYPESTATE: return "PARAMETER_TYPESTATE";
+    case AttrKind::PATCHABLE_FUNCTION_ENTRY: return "PATCHABLE_FUNCTION_ENTRY";
+    case AttrKind::POINTER: return "POINTER";
+    case AttrKind::PRAGMA_CLANG_BSS_SECTION: return "PRAGMA_CLANG_BSS_SECTION";
+    case AttrKind::PRAGMA_CLANG_DATA_SECTION: return "PRAGMA_CLANG_DATA_SECTION";
+    case AttrKind::PRAGMA_CLANG_RELRO_SECTION: return "PRAGMA_CLANG_RELRO_SECTION";
+    case AttrKind::PRAGMA_CLANG_RODATA_SECTION: return "PRAGMA_CLANG_RODATA_SECTION";
+    case AttrKind::PRAGMA_CLANG_TEXT_SECTION: return "PRAGMA_CLANG_TEXT_SECTION";
+    case AttrKind::PREFERRED_NAME: return "PREFERRED_NAME";
+    case AttrKind::PT_GUARDED_BY: return "PT_GUARDED_BY";
+    case AttrKind::PT_GUARDED_VARIABLE: return "PT_GUARDED_VARIABLE";
+    case AttrKind::PURE: return "PURE";
+    case AttrKind::RISCV_INTERRUPT: return "RISCV_INTERRUPT";
+    case AttrKind::REINITIALIZES: return "REINITIALIZES";
+    case AttrKind::RELEASE_CAPABILITY: return "RELEASE_CAPABILITY";
+    case AttrKind::REQD_WORK_GROUP_SIZE: return "REQD_WORK_GROUP_SIZE";
+    case AttrKind::REQUIRES_CAPABILITY: return "REQUIRES_CAPABILITY";
+    case AttrKind::RESTRICT: return "RESTRICT";
+    case AttrKind::RETAIN: return "RETAIN";
+    case AttrKind::RETURN_TYPESTATE: return "RETURN_TYPESTATE";
+    case AttrKind::RETURNS_NON_NULL: return "RETURNS_NON_NULL";
+    case AttrKind::RETURNS_TWICE: return "RETURNS_TWICE";
+    case AttrKind::SYCL_KERNEL: return "SYCL_KERNEL";
+    case AttrKind::SYCL_SPECIAL_CLASS: return "SYCL_SPECIAL_CLASS";
+    case AttrKind::SCOPED_LOCKABLE: return "SCOPED_LOCKABLE";
+    case AttrKind::SECTION: return "SECTION";
+    case AttrKind::SELECT_ANY: return "SELECT_ANY";
+    case AttrKind::SENTINEL: return "SENTINEL";
+    case AttrKind::SET_TYPESTATE: return "SET_TYPESTATE";
+    case AttrKind::SHARED_TRYLOCK_FUNCTION: return "SHARED_TRYLOCK_FUNCTION";
+    case AttrKind::SPECULATIVE_LOAD_HARDENING: return "SPECULATIVE_LOAD_HARDENING";
+    case AttrKind::STANDALONE_DEBUG: return "STANDALONE_DEBUG";
+    case AttrKind::STRICT_FP: return "STRICT_FP";
+    case AttrKind::SWIFT_ASYNC: return "SWIFT_ASYNC";
+    case AttrKind::SWIFT_ASYNC_ERROR: return "SWIFT_ASYNC_ERROR";
+    case AttrKind::SWIFT_ASYNC_NAME: return "SWIFT_ASYNC_NAME";
+    case AttrKind::SWIFT_ATTRIBUTE: return "SWIFT_ATTRIBUTE";
+    case AttrKind::SWIFT_BRIDGE: return "SWIFT_BRIDGE";
+    case AttrKind::SWIFT_BRIDGED_TYPEDEF: return "SWIFT_BRIDGED_TYPEDEF";
+    case AttrKind::SWIFT_ERROR: return "SWIFT_ERROR";
+    case AttrKind::SWIFT_NAME: return "SWIFT_NAME";
+    case AttrKind::SWIFT_NEW_TYPE: return "SWIFT_NEW_TYPE";
+    case AttrKind::SWIFT_PRIVATE: return "SWIFT_PRIVATE";
+    case AttrKind::TLS_MODEL: return "TLS_MODEL";
+    case AttrKind::TARGET: return "TARGET";
+    case AttrKind::TARGET_CLONES: return "TARGET_CLONES";
+    case AttrKind::TEST_TYPESTATE: return "TEST_TYPESTATE";
+    case AttrKind::TRANSPARENT_UNION: return "TRANSPARENT_UNION";
+    case AttrKind::TRIVIAL_ABI: return "TRIVIAL_ABI";
+    case AttrKind::TRY_ACQUIRE_CAPABILITY: return "TRY_ACQUIRE_CAPABILITY";
+    case AttrKind::TYPE_TAG_FOR_DATATYPE: return "TYPE_TAG_FOR_DATATYPE";
+    case AttrKind::TYPE_VISIBILITY: return "TYPE_VISIBILITY";
+    case AttrKind::UNAVAILABLE: return "UNAVAILABLE";
+    case AttrKind::UNINITIALIZED: return "UNINITIALIZED";
+    case AttrKind::UNUSED: return "UNUSED";
+    case AttrKind::USED: return "USED";
+    case AttrKind::USING_IF_EXISTS: return "USING_IF_EXISTS";
+    case AttrKind::UUID: return "UUID";
+    case AttrKind::VEC_RETURN: return "VEC_RETURN";
+    case AttrKind::VEC_TYPE_HINT: return "VEC_TYPE_HINT";
+    case AttrKind::VISIBILITY: return "VISIBILITY";
+    case AttrKind::WARN_UNUSED: return "WARN_UNUSED";
+    case AttrKind::WARN_UNUSED_RESULT: return "WARN_UNUSED_RESULT";
+    case AttrKind::WEAK: return "WEAK";
+    case AttrKind::WEAK_IMPORT: return "WEAK_IMPORT";
+    case AttrKind::WEAK_REFERENCE: return "WEAK_REFERENCE";
+    case AttrKind::WEB_ASSEMBLY_EXPORT_NAME: return "WEB_ASSEMBLY_EXPORT_NAME";
+    case AttrKind::WEB_ASSEMBLY_IMPORT_MODULE: return "WEB_ASSEMBLY_IMPORT_MODULE";
+    case AttrKind::WEB_ASSEMBLY_IMPORT_NAME: return "WEB_ASSEMBLY_IMPORT_NAME";
+    case AttrKind::WORK_GROUP_SIZE_HINT: return "WORK_GROUP_SIZE_HINT";
+    case AttrKind::X86_FORCE_ALIGN_ARGUMENT_POINTER: return "X86_FORCE_ALIGN_ARGUMENT_POINTER";
+    case AttrKind::X_RAY_INSTRUMENT: return "X_RAY_INSTRUMENT";
+    case AttrKind::X_RAY_LOG_ARGUMENTS: return "X_RAY_LOG_ARGUMENTS";
+    case AttrKind::ABI_TAG: return "ABI_TAG";
+    case AttrKind::ALIAS: return "ALIAS";
+    case AttrKind::ALIGN_VALUE: return "ALIGN_VALUE";
+    case AttrKind::BUILTIN_ALIAS: return "BUILTIN_ALIAS";
+    case AttrKind::CALLED_ONCE: return "CALLED_ONCE";
+    case AttrKind::I_FUNC: return "I_FUNC";
+    case AttrKind::INITIALIZER_SEG: return "INITIALIZER_SEG";
+    case AttrKind::LOADER_UNINITIALIZED: return "LOADER_UNINITIALIZED";
+    case AttrKind::LOOP_HINT: return "LOOP_HINT";
+    case AttrKind::MODE: return "MODE";
+    case AttrKind::NO_BUILTIN: return "NO_BUILTIN";
+    case AttrKind::NO_ESCAPE: return "NO_ESCAPE";
+    case AttrKind::OMP_CAPTURE_KIND: return "OMP_CAPTURE_KIND";
+    case AttrKind::OMP_DECLARE_SIMD_DECLARATION: return "OMP_DECLARE_SIMD_DECLARATION";
+    case AttrKind::OMP_REFERENCED_VARIABLE: return "OMP_REFERENCED_VARIABLE";
+    case AttrKind::OBJ_C_BOXABLE: return "OBJ_C_BOXABLE";
+    case AttrKind::OBJ_C_CLASS_STUB: return "OBJ_C_CLASS_STUB";
+    case AttrKind::OBJ_C_DESIGNATED_INITIALIZER: return "OBJ_C_DESIGNATED_INITIALIZER";
+    case AttrKind::OBJ_C_DIRECT: return "OBJ_C_DIRECT";
+    case AttrKind::OBJ_C_DIRECT_MEMBERS: return "OBJ_C_DIRECT_MEMBERS";
+    case AttrKind::OBJ_C_NON_LAZY_CLASS: return "OBJ_C_NON_LAZY_CLASS";
+    case AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL: return "OBJ_C_NON_RUNTIME_PROTOCOL";
+    case AttrKind::OBJ_C_RUNTIME_NAME: return "OBJ_C_RUNTIME_NAME";
+    case AttrKind::OBJ_C_RUNTIME_VISIBLE: return "OBJ_C_RUNTIME_VISIBLE";
+    case AttrKind::OPEN_CL_ACCESS: return "OPEN_CL_ACCESS";
+    case AttrKind::OVERLOADABLE: return "OVERLOADABLE";
+    case AttrKind::RENDER_SCRIPT_KERNEL: return "RENDER_SCRIPT_KERNEL";
+    case AttrKind::SWIFT_OBJ_C_MEMBERS: return "SWIFT_OBJ_C_MEMBERS";
+    case AttrKind::THREAD: return "THREAD";
     default: return "<invalid>";
   }
 }
@@ -3427,38 +9399,6 @@ const char *EnumeratorName(Bits e) {
     case Bits::ERROR: return "ERROR";
     case Bits::VARIABLY_MODIFIED: return "VARIABLY_MODIFIED";
     case Bits::SYNTACTIC: return "SYNTACTIC";
-    default: return "<invalid>";
-  }
-}
-
-BlockType FromPasta(pasta::BlockType e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return BlockType::BY_REFERENCE;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(BlockType e) {
-  switch (e) {
-    case BlockType::BY_REFERENCE: return "BY_REFERENCE";
-    default: return "<invalid>";
-  }
-}
-
-BranchStateTy FromPasta(pasta::BranchStateTy e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return BranchStateTy::UNDEFINED;
-    case 1: return BranchStateTy::INBRANCH;
-    case 2: return BranchStateTy::NOTINBRANCH;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(BranchStateTy e) {
-  switch (e) {
-    case BranchStateTy::UNDEFINED: return "UNDEFINED";
-    case BranchStateTy::INBRANCH: return "INBRANCH";
-    case BranchStateTy::NOTINBRANCH: return "NOTINBRANCH";
     default: return "<invalid>";
   }
 }
@@ -3827,44 +9767,6 @@ const char *EnumeratorName(ConstexprSpecKind e) {
   }
 }
 
-ConsumedState FromPasta(pasta::ConsumedState e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return ConsumedState::UNKNOWN;
-    case 1: return ConsumedState::CONSUMED;
-    case 2: return ConsumedState::UNCONSUMED;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(ConsumedState e) {
-  switch (e) {
-    case ConsumedState::UNKNOWN: return "UNKNOWN";
-    case ConsumedState::CONSUMED: return "CONSUMED";
-    case ConsumedState::UNCONSUMED: return "UNCONSUMED";
-    default: return "<invalid>";
-  }
-}
-
-ConventionKind FromPasta(pasta::ConventionKind e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return ConventionKind::NONE;
-    case 1: return ConventionKind::NON_NULL_ERROR;
-    case 2: return ConventionKind::ZERO_ARGUMENT;
-    case 3: return ConventionKind::NON_ZERO_ARGUMENT;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(ConventionKind e) {
-  switch (e) {
-    case ConventionKind::NONE: return "NONE";
-    case ConventionKind::NON_NULL_ERROR: return "NON_NULL_ERROR";
-    case ConventionKind::ZERO_ARGUMENT: return "ZERO_ARGUMENT";
-    case ConventionKind::NON_ZERO_ARGUMENT: return "NON_ZERO_ARGUMENT";
-    default: return "<invalid>";
-  }
-}
-
 CoreFoundationABI FromPasta(pasta::CoreFoundationABI e) {
   switch (static_cast<int>(e)) {
     case 0: return CoreFoundationABI::UNSPECIFIED;
@@ -3955,24 +9857,6 @@ const char *EnumeratorName(DefaultCallingConvention e) {
   }
 }
 
-DevTypeTy FromPasta(pasta::DevTypeTy e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return DevTypeTy::HOST;
-    case 1: return DevTypeTy::NO_HOST;
-    case 2: return DevTypeTy::ANY;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(DevTypeTy e) {
-  switch (e) {
-    case DevTypeTy::HOST: return "HOST";
-    case DevTypeTy::NO_HOST: return "NO_HOST";
-    case DevTypeTy::ANY: return "ANY";
-    default: return "<invalid>";
-  }
-}
-
 DiagnosticLevelMask FromPasta(pasta::DiagnosticLevelMask e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return DiagnosticLevelMask::NONE;
@@ -3993,22 +9877,6 @@ const char *EnumeratorName(DiagnosticLevelMask e) {
     case DiagnosticLevelMask::WARNING: return "WARNING";
     case DiagnosticLevelMask::ERROR: return "ERROR";
     case DiagnosticLevelMask::ALL: return "ALL";
-    default: return "<invalid>";
-  }
-}
-
-DiagnosticType FromPasta(pasta::DiagnosticType e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return DiagnosticType::ERROR;
-    case 1: return DiagnosticType::WARNING;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(DiagnosticType e) {
-  switch (e) {
-    case DiagnosticType::ERROR: return "ERROR";
-    case DiagnosticType::WARNING: return "WARNING";
     default: return "<invalid>";
   }
 }
@@ -4319,30 +10187,6 @@ const char *EnumeratorName(FPModeKind e) {
   }
 }
 
-FamilyKind FromPasta(pasta::FamilyKind e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return FamilyKind::NONE;
-    case 1: return FamilyKind::ALLOC;
-    case 2: return FamilyKind::COPY;
-    case 3: return FamilyKind::INITIALIZER;
-    case 4: return FamilyKind::MUTABLE_COPY;
-    case 5: return FamilyKind::NEW;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(FamilyKind e) {
-  switch (e) {
-    case FamilyKind::NONE: return "NONE";
-    case FamilyKind::ALLOC: return "ALLOC";
-    case FamilyKind::COPY: return "COPY";
-    case FamilyKind::INITIALIZER: return "INITIALIZER";
-    case FamilyKind::MUTABLE_COPY: return "MUTABLE_COPY";
-    case FamilyKind::NEW: return "NEW";
-    default: return "<invalid>";
-  }
-}
-
 FiniteLoopsKind FromPasta(pasta::FiniteLoopsKind e) {
   switch (static_cast<unsigned>(e)) {
     case 0: return FiniteLoopsKind::LANGUAGE;
@@ -4459,20 +10303,6 @@ const char *EnumeratorName(GetBuiltinTypeError e) {
   }
 }
 
-GuardArg FromPasta(pasta::GuardArg e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return GuardArg::NOCF;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(GuardArg e) {
-  switch (e) {
-    case GuardArg::NOCF: return "NOCF";
-    default: return "<invalid>";
-  }
-}
-
 ID FromPasta(pasta::ID e) {
   switch (static_cast<unsigned>(e)) {
     case 1: return ID::WORK_GROUP;
@@ -4547,30 +10377,6 @@ const char *EnumeratorName(ImbueAttribute e) {
     case ImbueAttribute::ALWAYS: return "ALWAYS";
     case ImbueAttribute::NEVER: return "NEVER";
     case ImbueAttribute::ALWAYSARG1: return "ALWAYSARG1";
-    default: return "<invalid>";
-  }
-}
-
-ImplicitReason FromPasta(pasta::ImplicitReason e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return ImplicitReason::NONE;
-    case 1: return ImplicitReason::ARC_FORBIDDEN_TYPE;
-    case 2: return ImplicitReason::FORBIDDEN_WEAK;
-    case 3: return ImplicitReason::ARC_FORBIDDEN_CONVERSION;
-    case 4: return ImplicitReason::ARC_INIT_RETURNS_UNRELATED;
-    case 5: return ImplicitReason::ARC_FIELD_WITH_OWNERSHIP;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(ImplicitReason e) {
-  switch (e) {
-    case ImplicitReason::NONE: return "NONE";
-    case ImplicitReason::ARC_FORBIDDEN_TYPE: return "ARC_FORBIDDEN_TYPE";
-    case ImplicitReason::FORBIDDEN_WEAK: return "FORBIDDEN_WEAK";
-    case ImplicitReason::ARC_FORBIDDEN_CONVERSION: return "ARC_FORBIDDEN_CONVERSION";
-    case ImplicitReason::ARC_INIT_RETURNS_UNRELATED: return "ARC_INIT_RETURNS_UNRELATED";
-    case ImplicitReason::ARC_FIELD_WITH_OWNERSHIP: return "ARC_FIELD_WITH_OWNERSHIP";
     default: return "<invalid>";
   }
 }
@@ -4681,48 +10487,6 @@ const char *EnumeratorName(InliningMethod e) {
     case InliningMethod::NORMAL_INLINING: return "NORMAL_INLINING";
     case InliningMethod::ONLY_HINT_INLINING: return "ONLY_HINT_INLINING";
     case InliningMethod::ONLY_ALWAYS_INLINING: return "ONLY_ALWAYS_INLINING";
-    default: return "<invalid>";
-  }
-}
-
-InteropType FromPasta(pasta::InteropType e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return InteropType::TARGET;
-    case 1: return InteropType::TARGET_SYNC;
-    case 2: return InteropType::TARGET_TARGET_SYNC;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(InteropType e) {
-  switch (e) {
-    case InteropType::TARGET: return "TARGET";
-    case InteropType::TARGET_SYNC: return "TARGET_SYNC";
-    case InteropType::TARGET_TARGET_SYNC: return "TARGET_TARGET_SYNC";
-    default: return "<invalid>";
-  }
-}
-
-InterruptType FromPasta(pasta::InterruptType e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return InterruptType::IRQ;
-    case 1: return InterruptType::FIQ;
-    case 2: return InterruptType::SWI;
-    case 3: return InterruptType::ABORT;
-    case 4: return InterruptType::UNDEF;
-    case 5: return InterruptType::GENERIC;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(InterruptType e) {
-  switch (e) {
-    case InterruptType::IRQ: return "IRQ";
-    case InterruptType::FIQ: return "FIQ";
-    case InterruptType::SWI: return "SWI";
-    case InterruptType::ABORT: return "ABORT";
-    case InterruptType::UNDEF: return "UNDEF";
-    case InterruptType::GENERIC: return "GENERIC";
     default: return "<invalid>";
   }
 }
@@ -5019,32 +10783,6 @@ const char *EnumeratorName(Linkage e) {
   }
 }
 
-LoopHintState FromPasta(pasta::LoopHintState e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return LoopHintState::ENABLE;
-    case 1: return LoopHintState::DISABLE;
-    case 2: return LoopHintState::NUMERIC;
-    case 3: return LoopHintState::FIXED_WIDTH;
-    case 4: return LoopHintState::SCALABLE_WIDTH;
-    case 5: return LoopHintState::ASSUME_SAFETY;
-    case 6: return LoopHintState::FULL;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(LoopHintState e) {
-  switch (e) {
-    case LoopHintState::ENABLE: return "ENABLE";
-    case LoopHintState::DISABLE: return "DISABLE";
-    case LoopHintState::NUMERIC: return "NUMERIC";
-    case LoopHintState::FIXED_WIDTH: return "FIXED_WIDTH";
-    case LoopHintState::SCALABLE_WIDTH: return "SCALABLE_WIDTH";
-    case LoopHintState::ASSUME_SAFETY: return "ASSUME_SAFETY";
-    case LoopHintState::FULL: return "FULL";
-    default: return "<invalid>";
-  }
-}
-
 MSInheritanceModel FromPasta(pasta::MSInheritanceModel e) {
   switch (static_cast<int>(e)) {
     case 0: return MSInheritanceModel::SINGLE;
@@ -5111,22 +10849,6 @@ const char *EnumeratorName(MSVtorDispMode e) {
     case MSVtorDispMode::NEVER: return "NEVER";
     case MSVtorDispMode::FOR_VIRTUAL_BASE_OVERRIDE: return "FOR_VIRTUAL_BASE_OVERRIDE";
     case MSVtorDispMode::FOR_VF_TABLE: return "FOR_VF_TABLE";
-    default: return "<invalid>";
-  }
-}
-
-MapTypeTy FromPasta(pasta::MapTypeTy e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return MapTypeTy::TO;
-    case 1: return MapTypeTy::LINK;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(MapTypeTy e) {
-  switch (e) {
-    case MapTypeTy::TO: return "TO";
-    case MapTypeTy::LINK: return "LINK";
     default: return "<invalid>";
   }
 }
@@ -5267,22 +10989,6 @@ const char *EnumeratorName(NestedNameSpecifierDependence e) {
     case NestedNameSpecifierDependence::NONE: return "NONE";
     case NestedNameSpecifierDependence::DEPENDENT_INSTANTIATION: return "DEPENDENT_INSTANTIATION";
     case NestedNameSpecifierDependence::ALL: return "ALL";
-    default: return "<invalid>";
-  }
-}
-
-NewtypeKind FromPasta(pasta::NewtypeKind e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return NewtypeKind::STRUCT;
-    case 1: return NewtypeKind::ENUM;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(NewtypeKind e) {
-  switch (e) {
-    case NewtypeKind::STRUCT: return "STRUCT";
-    case NewtypeKind::ENUM: return "ENUM";
     default: return "<invalid>";
   }
 }
@@ -5945,42 +11651,6 @@ const char *EnumeratorName(OpenMPScheduleClauseModifier e) {
   }
 }
 
-OptionType FromPasta(pasta::OptionType e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return OptionType::VECTORIZE;
-    case 1: return OptionType::VECTORIZE_WIDTH;
-    case 2: return OptionType::INTERLEAVE;
-    case 3: return OptionType::INTERLEAVE_COUNT;
-    case 4: return OptionType::UNROLL;
-    case 5: return OptionType::UNROLL_COUNT;
-    case 6: return OptionType::UNROLL_AND_JAM;
-    case 7: return OptionType::UNROLL_AND_JAM_COUNT;
-    case 8: return OptionType::PIPELINE_DISABLED;
-    case 9: return OptionType::PIPELINE_INITIATION_INTERVAL;
-    case 10: return OptionType::DISTRIBUTE;
-    case 11: return OptionType::VECTORIZE_PREDICATE;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(OptionType e) {
-  switch (e) {
-    case OptionType::VECTORIZE: return "VECTORIZE";
-    case OptionType::VECTORIZE_WIDTH: return "VECTORIZE_WIDTH";
-    case OptionType::INTERLEAVE: return "INTERLEAVE";
-    case OptionType::INTERLEAVE_COUNT: return "INTERLEAVE_COUNT";
-    case OptionType::UNROLL: return "UNROLL";
-    case OptionType::UNROLL_COUNT: return "UNROLL_COUNT";
-    case OptionType::UNROLL_AND_JAM: return "UNROLL_AND_JAM";
-    case OptionType::UNROLL_AND_JAM_COUNT: return "UNROLL_AND_JAM_COUNT";
-    case OptionType::PIPELINE_DISABLED: return "PIPELINE_DISABLED";
-    case OptionType::PIPELINE_INITIATION_INTERVAL: return "PIPELINE_INITIATION_INTERVAL";
-    case OptionType::DISTRIBUTE: return "DISTRIBUTE";
-    case OptionType::VECTORIZE_PREDICATE: return "VECTORIZE_PREDICATE";
-    default: return "<invalid>";
-  }
-}
-
 OverloadedOperatorKind FromPasta(pasta::OverloadedOperatorKind e) {
   switch (static_cast<int>(e)) {
     case 0: return OverloadedOperatorKind::NONE;
@@ -6097,40 +11767,6 @@ const char *EnumeratorName(OverloadsShown e) {
   switch (e) {
     case OverloadsShown::ALL: return "ALL";
     case OverloadsShown::BEST: return "BEST";
-    default: return "<invalid>";
-  }
-}
-
-OwnershipKind FromPasta(pasta::OwnershipKind e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return OwnershipKind::HOLDS;
-    case 1: return OwnershipKind::RETURNS;
-    case 2: return OwnershipKind::TAKES;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(OwnershipKind e) {
-  switch (e) {
-    case OwnershipKind::HOLDS: return "HOLDS";
-    case OwnershipKind::RETURNS: return "RETURNS";
-    case OwnershipKind::TAKES: return "TAKES";
-    default: return "<invalid>";
-  }
-}
-
-PCSType FromPasta(pasta::PCSType e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return PCSType::AAPCS;
-    case 1: return PCSType::VFP;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(PCSType e) {
-  switch (e) {
-    case PCSType::AAPCS: return "AAPCS";
-    case PCSType::VFP: return "VFP";
     default: return "<invalid>";
   }
 }
@@ -6731,26 +12367,6 @@ const char *EnumeratorName(SpecifierKind e) {
     case SpecifierKind::TYPE_SPEC_WITH_TEMPLATE: return "TYPE_SPEC_WITH_TEMPLATE";
     case SpecifierKind::GLOBAL: return "GLOBAL";
     case SpecifierKind::SUPER: return "SUPER";
-    default: return "<invalid>";
-  }
-}
-
-Spelling FromPasta(pasta::Spelling e) {
-  switch (static_cast<unsigned>(e)) {
-    case 0: return Spelling::GNU_AARCH64_VECTOR_PCS;
-    case 1: return Spelling::CXX11_CLANG_AARCH64_VECTOR_PCS;
-    case 2: return Spelling::C2_XCLANG_AARCH64_VECTOR_PCS;
-    case 15: return Spelling::SPELLING_NOT_CALCULATED;
-    default: __builtin_unreachable();
-  }
-}
-
-const char *EnumeratorName(Spelling e) {
-  switch (e) {
-    case Spelling::GNU_AARCH64_VECTOR_PCS: return "GNU_AARCH64_VECTOR_PCS";
-    case Spelling::CXX11_CLANG_AARCH64_VECTOR_PCS: return "CXX11_CLANG_AARCH64_VECTOR_PCS";
-    case Spelling::C2_XCLANG_AARCH64_VECTOR_PCS: return "C2_XCLANG_AARCH64_VECTOR_PCS";
-    case Spelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
 }
@@ -8734,20 +14350,30 @@ const char *EnumeratorName(Visibility e) {
   }
 }
 
-VisibilityType FromPasta(pasta::VisibilityType e) {
+AttributeSyntax FromPasta(pasta::AttributeSyntax e) {
   switch (static_cast<unsigned>(e)) {
-    case 0: return VisibilityType::DEFAULT;
-    case 1: return VisibilityType::HIDDEN;
-    case 2: return VisibilityType::PROTECTED;
+    case 0: return AttributeSyntax::GNU;
+    case 1: return AttributeSyntax::CXX11;
+    case 2: return AttributeSyntax::C2_X;
+    case 3: return AttributeSyntax::DECLSPEC;
+    case 4: return AttributeSyntax::MICROSOFT;
+    case 5: return AttributeSyntax::KEYWORD;
+    case 6: return AttributeSyntax::PRAGMA;
+    case 7: return AttributeSyntax::CONTEXT_SENSITIVE_KEYWORD;
     default: __builtin_unreachable();
   }
 }
 
-const char *EnumeratorName(VisibilityType e) {
+const char *EnumeratorName(AttributeSyntax e) {
   switch (e) {
-    case VisibilityType::DEFAULT: return "DEFAULT";
-    case VisibilityType::HIDDEN: return "HIDDEN";
-    case VisibilityType::PROTECTED: return "PROTECTED";
+    case AttributeSyntax::GNU: return "GNU";
+    case AttributeSyntax::CXX11: return "CXX11";
+    case AttributeSyntax::C2_X: return "C2_X";
+    case AttributeSyntax::DECLSPEC: return "DECLSPEC";
+    case AttributeSyntax::MICROSOFT: return "MICROSOFT";
+    case AttributeSyntax::KEYWORD: return "KEYWORD";
+    case AttributeSyntax::PRAGMA: return "PRAGMA";
+    case AttributeSyntax::CONTEXT_SENSITIVE_KEYWORD: return "CONTEXT_SENSITIVE_KEYWORD";
     default: return "<invalid>";
   }
 }
@@ -12497,9 +18123,9 @@ Type AttributedType::desugar(void) const {
   return fragment->TypeFor(fragment, id, false).value();
 }
 
-AttributeKind AttributedType::attribute_kind(void) const {
+AttrKind AttributedType::attribute_kind(void) const {
   auto self = fragment->NthType(offset);
-  return static_cast<AttributeKind>(self.getVal347());
+  return static_cast<AttrKind>(self.getVal347());
 }
 
 Type AttributedType::equivalent_type(void) const {

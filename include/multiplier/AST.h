@@ -21,71 +21,365 @@
 namespace pasta {
 enum class TokenRole : unsigned short;
 enum class DeclKind : unsigned;
+enum class AArch64VectorPcsAttrSpelling : unsigned;
+enum class AMDGPUFlatWorkGroupSizeAttrSpelling : unsigned;
+enum class AMDGPUNumSGPRAttrSpelling : unsigned;
+enum class AMDGPUNumVGPRAttrSpelling : unsigned;
+enum class AMDGPUWavesPerEUAttrSpelling : unsigned;
+enum class ARMInterruptAttrInterruptType : unsigned;
+enum class ARMInterruptAttrSpelling : unsigned;
+enum class AVRInterruptAttrSpelling : unsigned;
+enum class AVRSignalAttrSpelling : unsigned;
+enum class AbiTagAttrSpelling : unsigned;
+enum class AcquireCapabilityAttrSpelling : unsigned;
+enum class AcquireHandleAttrSpelling : unsigned;
+enum class AddressSpaceAttrSpelling : unsigned;
+enum class AliasAttrSpelling : unsigned;
+enum class AlignedAttrSpelling : unsigned;
+enum class AllocAlignAttrSpelling : unsigned;
+enum class AllocSizeAttrSpelling : unsigned;
+enum class AlwaysDestroyAttrSpelling : unsigned;
+enum class AlwaysInlineAttrSpelling : unsigned;
+enum class AnnotateAttrSpelling : unsigned;
+enum class AnyX86InterruptAttrSpelling : unsigned;
+enum class AnyX86NoCallerSavedRegistersAttrSpelling : unsigned;
+enum class AnyX86NoCfCheckAttrSpelling : unsigned;
+enum class ArcWeakrefUnavailableAttrSpelling : unsigned;
+enum class ArgumentWithTypeTagAttrSpelling : unsigned;
+enum class ArmBuiltinAliasAttrSpelling : unsigned;
+enum class ArmMveStrictPolymorphismAttrSpelling : unsigned;
 enum class ArrayTypeArraySizeModifier : unsigned;
+enum class ArtificialAttrSpelling : unsigned;
+enum class AsmLabelAttrSpelling : unsigned;
+enum class AssertCapabilityAttrSpelling : unsigned;
+enum class AssumeAlignedAttrSpelling : unsigned;
+enum class AssumptionAttrSpelling : unsigned;
 enum class AtomicExprAtomicOp : unsigned;
+enum class AvailabilityAttrSpelling : unsigned;
+enum class BPFPreserveAccessIndexAttrSpelling : unsigned;
+enum class BTFDeclTagAttrSpelling : unsigned;
+enum class BTFTypeTagAttrSpelling : unsigned;
+enum class BlocksAttrBlockType : unsigned;
+enum class BlocksAttrSpelling : unsigned;
+enum class BuiltinAliasAttrSpelling : unsigned;
 enum class BuiltinTypeKind : unsigned;
+enum class CDeclAttrSpelling : unsigned;
+enum class CFAuditedTransferAttrSpelling : unsigned;
+enum class CFConsumedAttrSpelling : unsigned;
+enum class CFGuardAttrGuardArg : unsigned;
+enum class CFICanonicalJumpTableAttrSpelling : unsigned;
+enum class CFReturnsNotRetainedAttrSpelling : unsigned;
+enum class CFReturnsRetainedAttrSpelling : unsigned;
+enum class CFUnknownTransferAttrSpelling : unsigned;
+enum class CPUDispatchAttrSpelling : unsigned;
+enum class CPUSpecificAttrSpelling : unsigned;
+enum class CUDAConstantAttrSpelling : unsigned;
+enum class CUDADeviceAttrSpelling : unsigned;
+enum class CUDADeviceBuiltinSurfaceTypeAttrSpelling : unsigned;
+enum class CUDADeviceBuiltinTextureTypeAttrSpelling : unsigned;
+enum class CUDAGlobalAttrSpelling : unsigned;
+enum class CUDAHostAttrSpelling : unsigned;
+enum class CUDALaunchBoundsAttrSpelling : unsigned;
+enum class CUDASharedAttrSpelling : unsigned;
 enum class CXXConstructExprConstructionKind : unsigned;
 enum class CXXNewExprInitializationStyle : unsigned;
 enum class CallExprADLCallKind : bool;
+enum class CallableWhenAttrConsumedState : unsigned;
+enum class CallableWhenAttrSpelling : unsigned;
+enum class CallbackAttrSpelling : unsigned;
+enum class CalledOnceAttrSpelling : unsigned;
+enum class CapabilityAttrSpelling : unsigned;
 enum class CapturedStmtVariableCaptureKind : unsigned;
+enum class CarriesDependencyAttrSpelling : unsigned;
 enum class CharacterLiteralCharacterKind : unsigned;
+enum class CleanupAttrSpelling : unsigned;
+enum class ColdAttrSpelling : unsigned;
+enum class CommonAttrSpelling : unsigned;
+enum class ConstAttrSpelling : unsigned;
+enum class ConstInitAttrSpelling : unsigned;
 enum class ConstantExprResultStorageKind : unsigned;
+enum class ConstructorAttrSpelling : unsigned;
+enum class ConsumableAttrConsumedState : unsigned;
+enum class ConsumableAttrSpelling : unsigned;
+enum class ConsumableAutoCastAttrSpelling : unsigned;
+enum class ConsumableSetOnReadAttrSpelling : unsigned;
+enum class ConvergentAttrSpelling : unsigned;
+enum class DLLExportAttrSpelling : unsigned;
+enum class DLLImportAttrSpelling : unsigned;
 enum class DeclFriendObjectKind : unsigned;
 enum class DeclIdentifierNamespace : unsigned;
 enum class DeclModuleOwnershipKind : unsigned;
 enum class DeclObjCDeclQualifier : unsigned;
+enum class DeprecatedAttrSpelling : unsigned;
+enum class DestructorAttrSpelling : unsigned;
+enum class DiagnoseAsBuiltinAttrSpelling : unsigned;
+enum class DiagnoseIfAttrDiagnosticType : unsigned;
+enum class DisableSanitizerInstrumentationAttrSpelling : unsigned;
+enum class DisableTailCallsAttrSpelling : unsigned;
+enum class EnforceTCBAttrSpelling : unsigned;
+enum class EnforceTCBLeafAttrSpelling : unsigned;
+enum class EnumExtensibilityAttrKind : unsigned;
+enum class EnumExtensibilityAttrSpelling : unsigned;
+enum class ErrorAttrSpelling : unsigned;
+enum class ExcludeFromExplicitInstantiationAttrSpelling : unsigned;
 enum class ExprConstantExprKind : int;
 enum class ExprLValueClassification : unsigned;
 enum class ExprNullPointerConstantKind : unsigned;
 enum class ExprNullPointerConstantValueDependence : unsigned;
 enum class ExprSideEffectsKind : unsigned;
 enum class ExprisModifiableLvalueResult : unsigned;
+enum class ExternalSourceSymbolAttrSpelling : unsigned;
+enum class FallThroughAttrSpelling : unsigned;
+enum class FastCallAttrSpelling : unsigned;
+enum class FinalAttrSpelling : unsigned;
+enum class FlagEnumAttrSpelling : unsigned;
+enum class FlattenAttrSpelling : unsigned;
+enum class FormatArgAttrSpelling : unsigned;
+enum class FormatAttrSpelling : unsigned;
 enum class FunctionDeclTemplatedKind : unsigned;
+enum class GNUInlineAttrSpelling : unsigned;
+enum class GuardedVarAttrSpelling : unsigned;
+enum class HIPManagedAttrSpelling : unsigned;
+enum class HotAttrSpelling : unsigned;
+enum class IBActionAttrSpelling : unsigned;
+enum class IBOutletAttrSpelling : unsigned;
+enum class IBOutletCollectionAttrSpelling : unsigned;
+enum class IFuncAttrSpelling : unsigned;
 enum class ImplicitCastExprOnStack : unsigned;
 enum class ImplicitParamDeclImplicitParamKind : unsigned;
+enum class InitPriorityAttrSpelling : unsigned;
+enum class IntelOclBiccAttrSpelling : unsigned;
+enum class InternalLinkageAttrSpelling : unsigned;
+enum class LTOVisibilityPublicAttrSpelling : unsigned;
+enum class LeafAttrSpelling : unsigned;
+enum class LifetimeBoundAttrSpelling : unsigned;
+enum class LikelyAttrSpelling : unsigned;
 enum class LinkageSpecDeclLanguageIDs : unsigned;
+enum class LoaderUninitializedAttrSpelling : unsigned;
+enum class LoopHintAttrLoopHintState : unsigned;
+enum class LoopHintAttrOptionType : unsigned;
+enum class LoopHintAttrSpelling : unsigned;
+enum class MIGServerRoutineAttrSpelling : unsigned;
+enum class MSABIAttrSpelling : unsigned;
+enum class MSInheritanceAttrSpelling : unsigned;
+enum class MSP430InterruptAttrSpelling : unsigned;
+enum class MSStructAttrSpelling : unsigned;
+enum class MayAliasAttrSpelling : unsigned;
+enum class MicroMipsAttrSpelling : unsigned;
+enum class MinSizeAttrSpelling : unsigned;
+enum class MinVectorWidthAttrSpelling : unsigned;
+enum class Mips16AttrSpelling : unsigned;
+enum class MipsInterruptAttrInterruptType : unsigned;
+enum class MipsInterruptAttrSpelling : unsigned;
+enum class MipsLongCallAttrSpelling : unsigned;
+enum class MipsShortCallAttrSpelling : unsigned;
+enum class ModeAttrSpelling : unsigned;
+enum class MustTailAttrSpelling : unsigned;
+enum class NSConsumedAttrSpelling : unsigned;
+enum class NSConsumesSelfAttrSpelling : unsigned;
+enum class NSReturnsAutoreleasedAttrSpelling : unsigned;
+enum class NSReturnsNotRetainedAttrSpelling : unsigned;
+enum class NSReturnsRetainedAttrSpelling : unsigned;
+enum class NakedAttrSpelling : unsigned;
 enum class NamedDeclExplicitVisibilityKind : unsigned;
+enum class NoBuiltinAttrSpelling : unsigned;
+enum class NoCommonAttrSpelling : unsigned;
+enum class NoDebugAttrSpelling : unsigned;
+enum class NoDerefAttrSpelling : unsigned;
+enum class NoDestroyAttrSpelling : unsigned;
+enum class NoDuplicateAttrSpelling : unsigned;
+enum class NoEscapeAttrSpelling : unsigned;
+enum class NoInlineAttrSpelling : unsigned;
+enum class NoInstrumentFunctionAttrSpelling : unsigned;
+enum class NoMergeAttrSpelling : unsigned;
+enum class NoMicroMipsAttrSpelling : unsigned;
+enum class NoMips16AttrSpelling : unsigned;
+enum class NoProfileFunctionAttrSpelling : unsigned;
+enum class NoReturnAttrSpelling : unsigned;
+enum class NoSanitizeAttrSpelling : unsigned;
+enum class NoSpeculativeLoadHardeningAttrSpelling : unsigned;
+enum class NoSplitStackAttrSpelling : unsigned;
+enum class NoStackProtectorAttrSpelling : unsigned;
+enum class NoThreadSafetyAnalysisAttrSpelling : unsigned;
+enum class NoThrowAttrSpelling : unsigned;
+enum class NonNullAttrSpelling : unsigned;
+enum class NotTailCalledAttrSpelling : unsigned;
+enum class OMPAllocateDeclAttrAllocatorTypeTy : unsigned;
 enum class OMPDeclareReductionDeclInitKind : unsigned;
+enum class OMPDeclareSimdDeclAttrBranchStateTy : unsigned;
+enum class OMPDeclareTargetDeclAttrDevTypeTy : unsigned;
+enum class OMPDeclareTargetDeclAttrMapTypeTy : unsigned;
+enum class OMPDeclareVariantAttrInteropType : unsigned;
+enum class OSConsumedAttrSpelling : unsigned;
+enum class OSConsumesThisAttrSpelling : unsigned;
+enum class OSReturnsNotRetainedAttrSpelling : unsigned;
+enum class OSReturnsRetainedAttrSpelling : unsigned;
+enum class OSReturnsRetainedOnNonZeroAttrSpelling : unsigned;
+enum class OSReturnsRetainedOnZeroAttrSpelling : unsigned;
+enum class ObjCBoxableAttrSpelling : unsigned;
+enum class ObjCBridgeAttrSpelling : unsigned;
+enum class ObjCBridgeMutableAttrSpelling : unsigned;
+enum class ObjCBridgeRelatedAttrSpelling : unsigned;
+enum class ObjCClassStubAttrSpelling : unsigned;
+enum class ObjCDesignatedInitializerAttrSpelling : unsigned;
+enum class ObjCDirectAttrSpelling : unsigned;
+enum class ObjCDirectMembersAttrSpelling : unsigned;
+enum class ObjCExceptionAttrSpelling : unsigned;
+enum class ObjCExplicitProtocolImplAttrSpelling : unsigned;
+enum class ObjCExternallyRetainedAttrSpelling : unsigned;
+enum class ObjCGCAttrSpelling : unsigned;
+enum class ObjCIndependentClassAttrSpelling : unsigned;
 enum class ObjCIvarDeclAccessControl : unsigned;
 enum class ObjCMessageExprReceiverKind : unsigned;
 enum class ObjCMethodDeclImplementationControl : unsigned;
+enum class ObjCMethodFamilyAttrFamilyKind : unsigned;
+enum class ObjCMethodFamilyAttrSpelling : unsigned;
+enum class ObjCNSObjectAttrSpelling : unsigned;
+enum class ObjCNonLazyClassAttrSpelling : unsigned;
+enum class ObjCNonRuntimeProtocolAttrSpelling : unsigned;
+enum class ObjCOwnershipAttrSpelling : unsigned;
+enum class ObjCPreciseLifetimeAttrSpelling : unsigned;
 enum class ObjCPropertyDeclPropertyControl : unsigned;
 enum class ObjCPropertyDeclSetterKind : unsigned;
 enum class ObjCPropertyImplDeclKind : unsigned;
+enum class ObjCRequiresPropertyDefsAttrSpelling : unsigned;
+enum class ObjCRequiresSuperAttrSpelling : unsigned;
+enum class ObjCReturnsInnerPointerAttrSpelling : unsigned;
+enum class ObjCRootClassAttrSpelling : unsigned;
+enum class ObjCRuntimeNameAttrSpelling : unsigned;
+enum class ObjCRuntimeVisibleAttrSpelling : unsigned;
+enum class ObjCSubclassingRestrictedAttrSpelling : unsigned;
+enum class OpenCLAccessAttrSpelling : unsigned;
+enum class OpenCLConstantAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGenericAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGlobalAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGlobalDeviceAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGlobalHostAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLKernelAttrSpelling : unsigned;
+enum class OpenCLLocalAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLPrivateAddressSpaceAttrSpelling : unsigned;
+enum class OptimizeNoneAttrSpelling : unsigned;
+enum class OverloadableAttrSpelling : unsigned;
+enum class OwnershipAttrOwnershipKind : unsigned;
+enum class OwnershipAttrSpelling : unsigned;
+enum class PackedAttrSpelling : unsigned;
+enum class ParamTypestateAttrConsumedState : unsigned;
+enum class ParamTypestateAttrSpelling : unsigned;
+enum class PascalAttrSpelling : unsigned;
+enum class PassObjectSizeAttrSpelling : unsigned;
+enum class PatchableFunctionEntryAttrSpelling : unsigned;
+enum class PcsAttrPCSType : unsigned;
+enum class PcsAttrSpelling : unsigned;
 enum class PredefinedExprIdentKind : unsigned;
+enum class PreferredNameAttrSpelling : unsigned;
+enum class PreserveAllAttrSpelling : unsigned;
+enum class PreserveMostAttrSpelling : unsigned;
+enum class PtGuardedVarAttrSpelling : unsigned;
+enum class PureAttrSpelling : unsigned;
 enum class QualTypeDestructionKind : unsigned;
 enum class QualTypePrimitiveCopyKind : unsigned;
 enum class QualTypePrimitiveDefaultInitializeKind : unsigned;
+enum class RISCVInterruptAttrInterruptType : unsigned;
+enum class RISCVInterruptAttrSpelling : unsigned;
 enum class RecordDeclArgPassingKind : unsigned;
+enum class RegCallAttrSpelling : unsigned;
+enum class ReinitializesAttrSpelling : unsigned;
+enum class ReleaseCapabilityAttrSpelling : unsigned;
+enum class ReleaseHandleAttrSpelling : unsigned;
+enum class RequiresCapabilityAttrSpelling : unsigned;
+enum class RestrictAttrSpelling : unsigned;
+enum class RetainAttrSpelling : unsigned;
+enum class ReturnTypestateAttrConsumedState : unsigned;
+enum class ReturnTypestateAttrSpelling : unsigned;
+enum class ReturnsNonNullAttrSpelling : unsigned;
+enum class ReturnsTwiceAttrSpelling : unsigned;
+enum class SYCLKernelAttrSpelling : unsigned;
+enum class SYCLSpecialClassAttrSpelling : unsigned;
+enum class ScopedLockableAttrSpelling : unsigned;
+enum class SectionAttrSpelling : unsigned;
+enum class SelectAnyAttrSpelling : unsigned;
+enum class SentinelAttrSpelling : unsigned;
+enum class SetTypestateAttrConsumedState : unsigned;
+enum class SetTypestateAttrSpelling : unsigned;
 enum class SourceLocExprIdentKind : unsigned;
+enum class SpeculativeLoadHardeningAttrSpelling : unsigned;
+enum class StandaloneDebugAttrSpelling : unsigned;
+enum class StdCallAttrSpelling : unsigned;
 enum class StmtLikelihood : int;
 enum class StmtKind : unsigned;
 enum class StringLiteralStringKind : unsigned;
+enum class SwiftAsyncAttrKind : unsigned;
+enum class SwiftAsyncAttrSpelling : unsigned;
+enum class SwiftAsyncCallAttrSpelling : unsigned;
+enum class SwiftAsyncContextAttrSpelling : unsigned;
+enum class SwiftAsyncErrorAttrConventionKind : unsigned;
+enum class SwiftAsyncErrorAttrSpelling : unsigned;
+enum class SwiftCallAttrSpelling : unsigned;
+enum class SwiftContextAttrSpelling : unsigned;
+enum class SwiftErrorAttrConventionKind : unsigned;
+enum class SwiftErrorResultAttrSpelling : unsigned;
+enum class SwiftIndirectResultAttrSpelling : unsigned;
+enum class SwiftNewTypeAttrNewtypeKind : unsigned;
+enum class SwiftNewTypeAttrSpelling : unsigned;
+enum class SysVABIAttrSpelling : unsigned;
+enum class TLSModelAttrSpelling : unsigned;
+enum class TargetAttrSpelling : unsigned;
+enum class TargetClonesAttrSpelling : unsigned;
 enum class TemplateArgumentKind : unsigned;
+enum class TestTypestateAttrConsumedState : unsigned;
+enum class TestTypestateAttrSpelling : unsigned;
+enum class ThisCallAttrSpelling : unsigned;
+enum class TransparentUnionAttrSpelling : unsigned;
+enum class TrivialABIAttrSpelling : unsigned;
+enum class TryAcquireCapabilityAttrSpelling : unsigned;
 enum class TypeScalarTypeKind : unsigned;
 enum class TypeKind : unsigned;
+enum class TypeTagForDatatypeAttrSpelling : unsigned;
+enum class TypeVisibilityAttrSpelling : unsigned;
+enum class TypeVisibilityAttrVisibilityType : unsigned;
 enum class UnaryTransformTypeUTTKind : unsigned;
+enum class UnavailableAttrImplicitReason : unsigned;
+enum class UnavailableAttrSpelling : unsigned;
+enum class UninitializedAttrSpelling : unsigned;
+enum class UnlikelyAttrSpelling : unsigned;
+enum class UnusedAttrSpelling : unsigned;
+enum class UseHandleAttrSpelling : unsigned;
+enum class UsedAttrSpelling : unsigned;
 enum class UserDefinedLiteralLiteralOperatorKind : unsigned;
+enum class UsingIfExistsAttrSpelling : unsigned;
+enum class UuidAttrSpelling : unsigned;
 enum class VarDeclDefinitionKind : unsigned;
 enum class VarDeclInitializationStyle : unsigned;
 enum class VarDeclTLSKind : unsigned;
+enum class VecReturnAttrSpelling : unsigned;
+enum class VectorCallAttrSpelling : unsigned;
 enum class VectorTypeVectorKind : unsigned;
+enum class VisibilityAttrSpelling : unsigned;
+enum class VisibilityAttrVisibilityType : unsigned;
+enum class WarnUnusedAttrSpelling : unsigned;
+enum class WarnUnusedResultAttrSpelling : unsigned;
+enum class WeakAttrSpelling : unsigned;
+enum class WeakImportAttrSpelling : unsigned;
+enum class WeakRefAttrSpelling : unsigned;
+enum class WebAssemblyExportNameAttrSpelling : unsigned;
+enum class WebAssemblyImportModuleAttrSpelling : unsigned;
+enum class WebAssemblyImportNameAttrSpelling : unsigned;
+enum class X86ForceAlignArgPointerAttrSpelling : unsigned;
+enum class XRayInstrumentAttrSpelling : unsigned;
+enum class XRayLogArgsAttrSpelling : unsigned;
 enum class ASTDumpOutputFormat : unsigned;
 enum class AccessSpecifier : unsigned;
 enum class AddrSpaceMapMangling : unsigned;
 enum class AlignRequirementKind : int;
-enum class AllocatorTypeTy : unsigned;
 enum class AltivecSrcCompatKind : int;
 enum class ArgumentKind : unsigned;
 enum class ArrayTypeTrait : unsigned;
 enum class AtomicScopeModelKind : int;
-enum class AttributeKind : unsigned;
+enum class AttrKind : unsigned;
 enum class AutoTypeKeyword : int;
 enum class AvailabilityResult : unsigned;
 enum class BinaryOperatorKind : unsigned;
 enum class Bits : unsigned char;
-enum class BlockType : unsigned;
-enum class BranchStateTy : unsigned;
 enum class CallingConv : unsigned;
 enum class CanThrowResult : unsigned;
 enum class CapturedRegionKind : unsigned;
@@ -96,15 +390,11 @@ enum class ComparisonCategoryResult : unsigned char;
 enum class ComparisonCategoryType : unsigned char;
 enum class CompilingModuleKind : unsigned;
 enum class ConstexprSpecKind : int;
-enum class ConsumedState : unsigned;
-enum class ConventionKind : unsigned;
 enum class CoreFoundationABI : int;
 enum class DataPositionTy : unsigned long;
 enum class DefaultArgKind : unsigned;
 enum class DefaultCallingConvention : unsigned;
-enum class DevTypeTy : unsigned;
 enum class DiagnosticLevelMask : unsigned;
-enum class DiagnosticType : unsigned;
 enum class ElaboratedTypeKeyword : unsigned;
 enum class EmbedBitcodeKind : unsigned;
 enum class ExceptionHandlingKind : int;
@@ -119,27 +409,22 @@ enum class ExtKind : unsigned;
 enum class ExtendArgsKind : int;
 enum class FPExceptionModeKind : unsigned;
 enum class FPModeKind : unsigned;
-enum class FamilyKind : unsigned;
 enum class FiniteLoopsKind : unsigned;
 enum class FramePointerKind : int;
 enum class GC : unsigned;
 enum class GCMode : unsigned;
 enum class GVALinkage : unsigned;
 enum class GetBuiltinTypeError : unsigned;
-enum class GuardArg : unsigned;
 enum class ID : unsigned;
 enum class IdentifierInfoFlag : unsigned;
 enum class IfStatementKind : unsigned;
 enum class ImbueAttribute : int;
-enum class ImplicitReason : unsigned;
 enum class InClassInitStyle : unsigned;
 enum class InheritedDesignatedInitializersState : unsigned;
 enum class InitStorageKind : unsigned;
 enum class InlineAsmDialectKind : unsigned;
 enum class InlineVariableDefinitionKind : int;
 enum class InliningMethod : unsigned;
-enum class InteropType : unsigned;
-enum class InterruptType : unsigned;
 enum class Kinds : unsigned;
 enum class LambdaCaptureDefault : unsigned;
 enum class LambdaCaptureKind : unsigned;
@@ -150,18 +435,15 @@ enum class LanguageLinkage : unsigned;
 enum class LaxVectorConversionKind : int;
 enum class Level : unsigned;
 enum class Linkage : unsigned char;
-enum class LoopHintState : unsigned;
 enum class MSInheritanceModel : int;
 enum class MSVCMajorVersion : unsigned;
 enum class MSVtorDispMode : int;
-enum class MapTypeTy : unsigned;
 enum class MethodRefFlags : unsigned;
 enum class ModifiableType : unsigned;
 enum class MultiVersionKind : int;
 enum class NameKind : unsigned;
 enum class NeedExtraManglingDecl : unsigned;
 enum class NestedNameSpecifierDependence : unsigned char;
-enum class NewtypeKind : unsigned;
 enum class NonOdrUseReason : unsigned;
 enum class NonceObjCInterface : unsigned;
 enum class NullabilityKind : unsigned char;
@@ -195,11 +477,8 @@ enum class OpenMPOrderClauseKind : unsigned;
 enum class OpenMPReductionClauseModifier : unsigned;
 enum class OpenMPScheduleClauseKind : unsigned;
 enum class OpenMPScheduleClauseModifier : unsigned;
-enum class OptionType : unsigned;
 enum class OverloadedOperatorKind : int;
 enum class OverloadsShown : unsigned;
-enum class OwnershipKind : unsigned;
-enum class PCSType : unsigned;
 enum class PPKeywordKind : unsigned;
 enum class ParameterABI : int;
 enum class ParenLocsOffsets : int;
@@ -224,7 +503,6 @@ enum class SignReturnAddressScopeKind : int;
 enum class SignedOverflowBehaviorTy : unsigned;
 enum class SpecialMemberFlags : unsigned;
 enum class SpecifierKind : unsigned;
-enum class Spelling : unsigned;
 enum class StackProtectorMode : unsigned;
 enum class StorageClass : unsigned;
 enum class StorageDuration : unsigned;
@@ -262,7 +540,7 @@ enum class UnaryOperatorKind : unsigned;
 enum class APValueKind : unsigned;
 enum class VectorLibrary : unsigned;
 enum class Visibility : unsigned;
-enum class VisibilityType : unsigned;
+enum class AttributeSyntax : unsigned;
 enum class DeclCategory : unsigned;
 enum class PathKind : signed char;
 enum class FileType : signed char;
@@ -393,6 +671,525 @@ inline static constexpr unsigned NumEnumerators(DeclKind) {
 
 const char *EnumeratorName(DeclKind);
 
+enum class AArch64VectorPcsAttrSpelling : unsigned char {
+  GNU_AARCH64_VECTOR_PCS,
+  CXX11_CLANG_AARCH64_VECTOR_PCS,
+  C2_XCLANG_AARCH64_VECTOR_PCS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AArch64VectorPcsAttrSpelling FromPasta(pasta::AArch64VectorPcsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AArch64VectorPcsAttrSpelling) {
+  return "AArch64VectorPcsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AArch64VectorPcsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AArch64VectorPcsAttrSpelling);
+
+enum class AMDGPUFlatWorkGroupSizeAttrSpelling : unsigned char {
+  GNU_AMDGPU_FLAT_WORK_GROUP_SIZE,
+  CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUFlatWorkGroupSizeAttrSpelling FromPasta(pasta::AMDGPUFlatWorkGroupSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUFlatWorkGroupSizeAttrSpelling) {
+  return "AMDGPUFlatWorkGroupSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUFlatWorkGroupSizeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUFlatWorkGroupSizeAttrSpelling);
+
+enum class AMDGPUNumSGPRAttrSpelling : unsigned char {
+  GNU_AMDGPU_NUM_SGPR,
+  CXX11_CLANG_AMDGPU_NUM_SGPR,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUNumSGPRAttrSpelling FromPasta(pasta::AMDGPUNumSGPRAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUNumSGPRAttrSpelling) {
+  return "AMDGPUNumSGPRAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUNumSGPRAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUNumSGPRAttrSpelling);
+
+enum class AMDGPUNumVGPRAttrSpelling : unsigned char {
+  GNU_AMDGPU_NUM_VGPR,
+  CXX11_CLANG_AMDGPU_NUM_VGPR,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUNumVGPRAttrSpelling FromPasta(pasta::AMDGPUNumVGPRAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUNumVGPRAttrSpelling) {
+  return "AMDGPUNumVGPRAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUNumVGPRAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUNumVGPRAttrSpelling);
+
+enum class AMDGPUWavesPerEUAttrSpelling : unsigned char {
+  GNU_AMDGPU_WAVES_PER_EU,
+  CXX11_CLANG_AMDGPU_WAVES_PER_EU,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUWavesPerEUAttrSpelling FromPasta(pasta::AMDGPUWavesPerEUAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUWavesPerEUAttrSpelling) {
+  return "AMDGPUWavesPerEUAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUWavesPerEUAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUWavesPerEUAttrSpelling);
+
+enum class ARMInterruptAttrInterruptType : unsigned char {
+  IRQ,
+  FIQ,
+  SWI,
+  ABORT,
+  UNDEF,
+  GENERIC,
+};
+
+ARMInterruptAttrInterruptType FromPasta(pasta::ARMInterruptAttrInterruptType pasta_val);
+
+inline static const char *EnumerationName(ARMInterruptAttrInterruptType) {
+  return "ARMInterruptAttrInterruptType";
+}
+
+inline static constexpr unsigned NumEnumerators(ARMInterruptAttrInterruptType) {
+  return 6;
+}
+
+const char *EnumeratorName(ARMInterruptAttrInterruptType);
+
+enum class ARMInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2_XGNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ARMInterruptAttrSpelling FromPasta(pasta::ARMInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ARMInterruptAttrSpelling) {
+  return "ARMInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ARMInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ARMInterruptAttrSpelling);
+
+enum class AVRInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2_XGNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+AVRInterruptAttrSpelling FromPasta(pasta::AVRInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AVRInterruptAttrSpelling) {
+  return "AVRInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AVRInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AVRInterruptAttrSpelling);
+
+enum class AVRSignalAttrSpelling : unsigned char {
+  GNU_SIGNAL,
+  CXX11_GNU_SIGNAL,
+  C2_XGNU_SIGNAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+AVRSignalAttrSpelling FromPasta(pasta::AVRSignalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AVRSignalAttrSpelling) {
+  return "AVRSignalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AVRSignalAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AVRSignalAttrSpelling);
+
+enum class AbiTagAttrSpelling : unsigned char {
+  GNU_ABI_TAG,
+  CXX11_GNU_ABI_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+AbiTagAttrSpelling FromPasta(pasta::AbiTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AbiTagAttrSpelling) {
+  return "AbiTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AbiTagAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AbiTagAttrSpelling);
+
+enum class AcquireCapabilityAttrSpelling : unsigned char {
+  GNU_ACQUIRE_CAPABILITY,
+  CXX11_CLANG_ACQUIRE_CAPABILITY,
+  GNU_ACQUIRE_SHARED_CAPABILITY,
+  CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY,
+  GNU_EXCLUSIVE_LOCK_FUNCTION,
+  GNU_SHARED_LOCK_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+AcquireCapabilityAttrSpelling FromPasta(pasta::AcquireCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AcquireCapabilityAttrSpelling) {
+  return "AcquireCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AcquireCapabilityAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(AcquireCapabilityAttrSpelling);
+
+enum class AcquireHandleAttrSpelling : unsigned char {
+  GNU_ACQUIRE_HANDLE,
+  CXX11_CLANG_ACQUIRE_HANDLE,
+  C2_XCLANG_ACQUIRE_HANDLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AcquireHandleAttrSpelling FromPasta(pasta::AcquireHandleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AcquireHandleAttrSpelling) {
+  return "AcquireHandleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AcquireHandleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AcquireHandleAttrSpelling);
+
+enum class AddressSpaceAttrSpelling : unsigned char {
+  GNU_ADDRESS_SPACE,
+  CXX11_CLANG_ADDRESS_SPACE,
+  C2_XCLANG_ADDRESS_SPACE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AddressSpaceAttrSpelling FromPasta(pasta::AddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AddressSpaceAttrSpelling) {
+  return "AddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AddressSpaceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AddressSpaceAttrSpelling);
+
+enum class AliasAttrSpelling : unsigned char {
+  GNU_ALIAS,
+  CXX11_GNU_ALIAS,
+  C2_XGNU_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AliasAttrSpelling FromPasta(pasta::AliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AliasAttrSpelling) {
+  return "AliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AliasAttrSpelling);
+
+enum class AlignedAttrSpelling : unsigned char {
+  GNU_ALIGNED,
+  CXX11_GNU_ALIGNED,
+  C2_XGNU_ALIGNED,
+  DECLSPEC_ALIGN,
+  KEYWORD_ALIGNAS,
+  KEYWORD__ALIGNAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AlignedAttrSpelling FromPasta(pasta::AlignedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AlignedAttrSpelling) {
+  return "AlignedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AlignedAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(AlignedAttrSpelling);
+
+enum class AllocAlignAttrSpelling : unsigned char {
+  GNU_ALLOC_ALIGN,
+  CXX11_GNU_ALLOC_ALIGN,
+  C2_XGNU_ALLOC_ALIGN,
+  SPELLING_NOT_CALCULATED,
+};
+
+AllocAlignAttrSpelling FromPasta(pasta::AllocAlignAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AllocAlignAttrSpelling) {
+  return "AllocAlignAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AllocAlignAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AllocAlignAttrSpelling);
+
+enum class AllocSizeAttrSpelling : unsigned char {
+  GNU_ALLOC_SIZE,
+  CXX11_GNU_ALLOC_SIZE,
+  C2_XGNU_ALLOC_SIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AllocSizeAttrSpelling FromPasta(pasta::AllocSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AllocSizeAttrSpelling) {
+  return "AllocSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AllocSizeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AllocSizeAttrSpelling);
+
+enum class AlwaysDestroyAttrSpelling : unsigned char {
+  GNU_ALWAYS_DESTROY,
+  CXX11_CLANG_ALWAYS_DESTROY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AlwaysDestroyAttrSpelling FromPasta(pasta::AlwaysDestroyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AlwaysDestroyAttrSpelling) {
+  return "AlwaysDestroyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AlwaysDestroyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AlwaysDestroyAttrSpelling);
+
+enum class AlwaysInlineAttrSpelling : unsigned char {
+  GNU_ALWAYS_INLINE,
+  CXX11_GNU_ALWAYS_INLINE,
+  C2_XGNU_ALWAYS_INLINE,
+  KEYWORD_FORCEINLINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AlwaysInlineAttrSpelling FromPasta(pasta::AlwaysInlineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AlwaysInlineAttrSpelling) {
+  return "AlwaysInlineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AlwaysInlineAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(AlwaysInlineAttrSpelling);
+
+enum class AnnotateAttrSpelling : unsigned char {
+  GNU_ANNOTATE,
+  CXX11_CLANG_ANNOTATE,
+  C2_XCLANG_ANNOTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnnotateAttrSpelling FromPasta(pasta::AnnotateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnnotateAttrSpelling) {
+  return "AnnotateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnnotateAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnnotateAttrSpelling);
+
+enum class AnyX86InterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2_XGNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnyX86InterruptAttrSpelling FromPasta(pasta::AnyX86InterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnyX86InterruptAttrSpelling) {
+  return "AnyX86InterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnyX86InterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnyX86InterruptAttrSpelling);
+
+enum class AnyX86NoCallerSavedRegistersAttrSpelling : unsigned char {
+  GNU_NO_CALLER_SAVED_REGISTERS,
+  CXX11_GNU_NO_CALLER_SAVED_REGISTERS,
+  C2_XGNU_NO_CALLER_SAVED_REGISTERS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnyX86NoCallerSavedRegistersAttrSpelling FromPasta(pasta::AnyX86NoCallerSavedRegistersAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnyX86NoCallerSavedRegistersAttrSpelling) {
+  return "AnyX86NoCallerSavedRegistersAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnyX86NoCallerSavedRegistersAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnyX86NoCallerSavedRegistersAttrSpelling);
+
+enum class AnyX86NoCfCheckAttrSpelling : unsigned char {
+  GNU_NOCF_CHECK,
+  CXX11_GNU_NOCF_CHECK,
+  C2_XGNU_NOCF_CHECK,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnyX86NoCfCheckAttrSpelling FromPasta(pasta::AnyX86NoCfCheckAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnyX86NoCfCheckAttrSpelling) {
+  return "AnyX86NoCfCheckAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnyX86NoCfCheckAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnyX86NoCfCheckAttrSpelling);
+
+enum class ArcWeakrefUnavailableAttrSpelling : unsigned char {
+  GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE,
+  CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE,
+  C2_XCLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArcWeakrefUnavailableAttrSpelling FromPasta(pasta::ArcWeakrefUnavailableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArcWeakrefUnavailableAttrSpelling) {
+  return "ArcWeakrefUnavailableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArcWeakrefUnavailableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArcWeakrefUnavailableAttrSpelling);
+
+enum class ArgumentWithTypeTagAttrSpelling : unsigned char {
+  GNU_ARGUMENT_WITH_TYPE_TAG,
+  CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG,
+  C2_XCLANG_ARGUMENT_WITH_TYPE_TAG,
+  GNU_POINTER_WITH_TYPE_TAG,
+  CXX11_CLANG_POINTER_WITH_TYPE_TAG,
+  C2_XCLANG_POINTER_WITH_TYPE_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArgumentWithTypeTagAttrSpelling FromPasta(pasta::ArgumentWithTypeTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArgumentWithTypeTagAttrSpelling) {
+  return "ArgumentWithTypeTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArgumentWithTypeTagAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(ArgumentWithTypeTagAttrSpelling);
+
+enum class ArmBuiltinAliasAttrSpelling : unsigned char {
+  GNU_CLANG_ARM_BUILTIN_ALIAS,
+  CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS,
+  C2_XCLANG_CLANG_ARM_BUILTIN_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArmBuiltinAliasAttrSpelling FromPasta(pasta::ArmBuiltinAliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArmBuiltinAliasAttrSpelling) {
+  return "ArmBuiltinAliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArmBuiltinAliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArmBuiltinAliasAttrSpelling);
+
+enum class ArmMveStrictPolymorphismAttrSpelling : unsigned char {
+  GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM,
+  CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM,
+  C2_XCLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArmMveStrictPolymorphismAttrSpelling FromPasta(pasta::ArmMveStrictPolymorphismAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArmMveStrictPolymorphismAttrSpelling) {
+  return "ArmMveStrictPolymorphismAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArmMveStrictPolymorphismAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArmMveStrictPolymorphismAttrSpelling);
+
 enum class ArrayTypeArraySizeModifier : unsigned char {
   NORMAL,
   STATIC,
@@ -410,6 +1207,100 @@ inline static constexpr unsigned NumEnumerators(ArrayTypeArraySizeModifier) {
 }
 
 const char *EnumeratorName(ArrayTypeArraySizeModifier);
+
+enum class ArtificialAttrSpelling : unsigned char {
+  GNU_ARTIFICIAL,
+  CXX11_GNU_ARTIFICIAL,
+  C2_XGNU_ARTIFICIAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArtificialAttrSpelling FromPasta(pasta::ArtificialAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArtificialAttrSpelling) {
+  return "ArtificialAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArtificialAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArtificialAttrSpelling);
+
+enum class AsmLabelAttrSpelling : unsigned char {
+  KEYWORD_ASSEMBLY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AsmLabelAttrSpelling FromPasta(pasta::AsmLabelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AsmLabelAttrSpelling) {
+  return "AsmLabelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AsmLabelAttrSpelling) {
+  return 2;
+}
+
+const char *EnumeratorName(AsmLabelAttrSpelling);
+
+enum class AssertCapabilityAttrSpelling : unsigned char {
+  GNU_ASSERT_CAPABILITY,
+  CXX11_CLANG_ASSERT_CAPABILITY,
+  GNU_ASSERT_SHARED_CAPABILITY,
+  CXX11_CLANG_ASSERT_SHARED_CAPABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AssertCapabilityAttrSpelling FromPasta(pasta::AssertCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AssertCapabilityAttrSpelling) {
+  return "AssertCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AssertCapabilityAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(AssertCapabilityAttrSpelling);
+
+enum class AssumeAlignedAttrSpelling : unsigned char {
+  GNU_ASSUME_ALIGNED,
+  CXX11_GNU_ASSUME_ALIGNED,
+  C2_XGNU_ASSUME_ALIGNED,
+  SPELLING_NOT_CALCULATED,
+};
+
+AssumeAlignedAttrSpelling FromPasta(pasta::AssumeAlignedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AssumeAlignedAttrSpelling) {
+  return "AssumeAlignedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AssumeAlignedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AssumeAlignedAttrSpelling);
+
+enum class AssumptionAttrSpelling : unsigned char {
+  GNU_ASSUME,
+  CXX11_CLANG_ASSUME,
+  C2_XCLANG_ASSUME,
+  SPELLING_NOT_CALCULATED,
+};
+
+AssumptionAttrSpelling FromPasta(pasta::AssumptionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AssumptionAttrSpelling) {
+  return "AssumptionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AssumptionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AssumptionAttrSpelling);
 
 enum class AtomicExprAtomicOp : unsigned char {
   C11_ATOMIC_INITIALIZER,
@@ -487,6 +1378,136 @@ inline static constexpr unsigned NumEnumerators(AtomicExprAtomicOp) {
 }
 
 const char *EnumeratorName(AtomicExprAtomicOp);
+
+enum class AvailabilityAttrSpelling : unsigned char {
+  GNU_AVAILABILITY,
+  CXX11_CLANG_AVAILABILITY,
+  C2_XCLANG_AVAILABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AvailabilityAttrSpelling FromPasta(pasta::AvailabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AvailabilityAttrSpelling) {
+  return "AvailabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AvailabilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AvailabilityAttrSpelling);
+
+enum class BPFPreserveAccessIndexAttrSpelling : unsigned char {
+  GNU_PRESERVE_ACCESS_INDEX,
+  CXX11_CLANG_PRESERVE_ACCESS_INDEX,
+  C2_XCLANG_PRESERVE_ACCESS_INDEX,
+  SPELLING_NOT_CALCULATED,
+};
+
+BPFPreserveAccessIndexAttrSpelling FromPasta(pasta::BPFPreserveAccessIndexAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BPFPreserveAccessIndexAttrSpelling) {
+  return "BPFPreserveAccessIndexAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BPFPreserveAccessIndexAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BPFPreserveAccessIndexAttrSpelling);
+
+enum class BTFDeclTagAttrSpelling : unsigned char {
+  GNU_BTF_DECLARATION_TAG,
+  CXX11_CLANG_BTF_DECLARATION_TAG,
+  C2_XCLANG_BTF_DECLARATION_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+BTFDeclTagAttrSpelling FromPasta(pasta::BTFDeclTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BTFDeclTagAttrSpelling) {
+  return "BTFDeclTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BTFDeclTagAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BTFDeclTagAttrSpelling);
+
+enum class BTFTypeTagAttrSpelling : unsigned char {
+  GNU_BTF_TYPE_TAG,
+  CXX11_CLANG_BTF_TYPE_TAG,
+  C2_XCLANG_BTF_TYPE_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+BTFTypeTagAttrSpelling FromPasta(pasta::BTFTypeTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BTFTypeTagAttrSpelling) {
+  return "BTFTypeTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BTFTypeTagAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BTFTypeTagAttrSpelling);
+
+enum class BlocksAttrBlockType : unsigned char {
+  BY_REFERENCE,
+};
+
+BlocksAttrBlockType FromPasta(pasta::BlocksAttrBlockType pasta_val);
+
+inline static const char *EnumerationName(BlocksAttrBlockType) {
+  return "BlocksAttrBlockType";
+}
+
+inline static constexpr unsigned NumEnumerators(BlocksAttrBlockType) {
+  return 1;
+}
+
+const char *EnumeratorName(BlocksAttrBlockType);
+
+enum class BlocksAttrSpelling : unsigned char {
+  GNU_BLOCKS,
+  CXX11_CLANG_BLOCKS,
+  C2_XCLANG_BLOCKS,
+  SPELLING_NOT_CALCULATED,
+};
+
+BlocksAttrSpelling FromPasta(pasta::BlocksAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BlocksAttrSpelling) {
+  return "BlocksAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BlocksAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BlocksAttrSpelling);
+
+enum class BuiltinAliasAttrSpelling : unsigned char {
+  CXX11_CLANG_BUILTIN_ALIAS,
+  C2_XCLANG_BUILTIN_ALIAS,
+  GNU_CLANG_BUILTIN_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+BuiltinAliasAttrSpelling FromPasta(pasta::BuiltinAliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BuiltinAliasAttrSpelling) {
+  return "BuiltinAliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BuiltinAliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BuiltinAliasAttrSpelling);
 
 enum class BuiltinTypeKind : unsigned char {
   OCL_IMAGE1_DRO,
@@ -741,6 +1762,340 @@ inline static constexpr unsigned NumEnumerators(BuiltinTypeKind) {
 
 const char *EnumeratorName(BuiltinTypeKind);
 
+enum class CDeclAttrSpelling : unsigned char {
+  GNU_CDECL,
+  CXX11_GNU_CDECL,
+  C2_XGNU_CDECL,
+  KEYWORD_CDECL,
+  SPELLING_NOT_CALCULATED,
+};
+
+CDeclAttrSpelling FromPasta(pasta::CDeclAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CDeclAttrSpelling) {
+  return "CDeclAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CDeclAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CDeclAttrSpelling);
+
+enum class CFAuditedTransferAttrSpelling : unsigned char {
+  GNU_CF_AUDITED_TRANSFER,
+  CXX11_CLANG_CF_AUDITED_TRANSFER,
+  C2_XCLANG_CF_AUDITED_TRANSFER,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFAuditedTransferAttrSpelling FromPasta(pasta::CFAuditedTransferAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFAuditedTransferAttrSpelling) {
+  return "CFAuditedTransferAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFAuditedTransferAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFAuditedTransferAttrSpelling);
+
+enum class CFConsumedAttrSpelling : unsigned char {
+  GNU_CF_CONSUMED,
+  CXX11_CLANG_CF_CONSUMED,
+  C2_XCLANG_CF_CONSUMED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFConsumedAttrSpelling FromPasta(pasta::CFConsumedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFConsumedAttrSpelling) {
+  return "CFConsumedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFConsumedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFConsumedAttrSpelling);
+
+enum class CFGuardAttrGuardArg : unsigned char {
+  NOCF,
+};
+
+CFGuardAttrGuardArg FromPasta(pasta::CFGuardAttrGuardArg pasta_val);
+
+inline static const char *EnumerationName(CFGuardAttrGuardArg) {
+  return "CFGuardAttrGuardArg";
+}
+
+inline static constexpr unsigned NumEnumerators(CFGuardAttrGuardArg) {
+  return 1;
+}
+
+const char *EnumeratorName(CFGuardAttrGuardArg);
+
+enum class CFICanonicalJumpTableAttrSpelling : unsigned char {
+  GNU_CFI_CANONICAL_JUMP_TABLE,
+  CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE,
+  C2_XCLANG_CFI_CANONICAL_JUMP_TABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFICanonicalJumpTableAttrSpelling FromPasta(pasta::CFICanonicalJumpTableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFICanonicalJumpTableAttrSpelling) {
+  return "CFICanonicalJumpTableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFICanonicalJumpTableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFICanonicalJumpTableAttrSpelling);
+
+enum class CFReturnsNotRetainedAttrSpelling : unsigned char {
+  GNU_CF_RETURNS_NOT_RETAINED,
+  CXX11_CLANG_CF_RETURNS_NOT_RETAINED,
+  C2_XCLANG_CF_RETURNS_NOT_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFReturnsNotRetainedAttrSpelling FromPasta(pasta::CFReturnsNotRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFReturnsNotRetainedAttrSpelling) {
+  return "CFReturnsNotRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFReturnsNotRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFReturnsNotRetainedAttrSpelling);
+
+enum class CFReturnsRetainedAttrSpelling : unsigned char {
+  GNU_CF_RETURNS_RETAINED,
+  CXX11_CLANG_CF_RETURNS_RETAINED,
+  C2_XCLANG_CF_RETURNS_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFReturnsRetainedAttrSpelling FromPasta(pasta::CFReturnsRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFReturnsRetainedAttrSpelling) {
+  return "CFReturnsRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFReturnsRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFReturnsRetainedAttrSpelling);
+
+enum class CFUnknownTransferAttrSpelling : unsigned char {
+  GNU_CF_UNKNOWN_TRANSFER,
+  CXX11_CLANG_CF_UNKNOWN_TRANSFER,
+  C2_XCLANG_CF_UNKNOWN_TRANSFER,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFUnknownTransferAttrSpelling FromPasta(pasta::CFUnknownTransferAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFUnknownTransferAttrSpelling) {
+  return "CFUnknownTransferAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFUnknownTransferAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFUnknownTransferAttrSpelling);
+
+enum class CPUDispatchAttrSpelling : unsigned char {
+  GNU_CPU_DISPATCH,
+  CXX11_CLANG_CPU_DISPATCH,
+  C2_XCLANG_CPU_DISPATCH,
+  DECLSPEC_CPU_DISPATCH,
+  SPELLING_NOT_CALCULATED,
+};
+
+CPUDispatchAttrSpelling FromPasta(pasta::CPUDispatchAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CPUDispatchAttrSpelling) {
+  return "CPUDispatchAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CPUDispatchAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CPUDispatchAttrSpelling);
+
+enum class CPUSpecificAttrSpelling : unsigned char {
+  GNU_CPU_SPECIFIC,
+  CXX11_CLANG_CPU_SPECIFIC,
+  C2_XCLANG_CPU_SPECIFIC,
+  DECLSPEC_CPU_SPECIFIC,
+  SPELLING_NOT_CALCULATED,
+};
+
+CPUSpecificAttrSpelling FromPasta(pasta::CPUSpecificAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CPUSpecificAttrSpelling) {
+  return "CPUSpecificAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CPUSpecificAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CPUSpecificAttrSpelling);
+
+enum class CUDAConstantAttrSpelling : unsigned char {
+  GNU_CONSTANT,
+  DECLSPEC_CONSTANT,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDAConstantAttrSpelling FromPasta(pasta::CUDAConstantAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDAConstantAttrSpelling) {
+  return "CUDAConstantAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDAConstantAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDAConstantAttrSpelling);
+
+enum class CUDADeviceAttrSpelling : unsigned char {
+  GNU_DEVICE,
+  DECLSPEC_DEVICE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDADeviceAttrSpelling FromPasta(pasta::CUDADeviceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDADeviceAttrSpelling) {
+  return "CUDADeviceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDADeviceAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDADeviceAttrSpelling);
+
+enum class CUDADeviceBuiltinSurfaceTypeAttrSpelling : unsigned char {
+  GNU_DEVICE_BUILTIN_SURFACE_TYPE,
+  DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDADeviceBuiltinSurfaceTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinSurfaceTypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDADeviceBuiltinSurfaceTypeAttrSpelling) {
+  return "CUDADeviceBuiltinSurfaceTypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDADeviceBuiltinSurfaceTypeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDADeviceBuiltinSurfaceTypeAttrSpelling);
+
+enum class CUDADeviceBuiltinTextureTypeAttrSpelling : unsigned char {
+  GNU_DEVICE_BUILTIN_TEXTURE_TYPE,
+  DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDADeviceBuiltinTextureTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinTextureTypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDADeviceBuiltinTextureTypeAttrSpelling) {
+  return "CUDADeviceBuiltinTextureTypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDADeviceBuiltinTextureTypeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDADeviceBuiltinTextureTypeAttrSpelling);
+
+enum class CUDAGlobalAttrSpelling : unsigned char {
+  GNU_GLOBAL,
+  DECLSPEC_GLOBAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDAGlobalAttrSpelling FromPasta(pasta::CUDAGlobalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDAGlobalAttrSpelling) {
+  return "CUDAGlobalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDAGlobalAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDAGlobalAttrSpelling);
+
+enum class CUDAHostAttrSpelling : unsigned char {
+  GNU_HOST,
+  DECLSPEC_HOST,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDAHostAttrSpelling FromPasta(pasta::CUDAHostAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDAHostAttrSpelling) {
+  return "CUDAHostAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDAHostAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDAHostAttrSpelling);
+
+enum class CUDALaunchBoundsAttrSpelling : unsigned char {
+  GNU_LAUNCH_BOUNDS,
+  DECLSPEC_LAUNCH_BOUNDS,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDALaunchBoundsAttrSpelling FromPasta(pasta::CUDALaunchBoundsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDALaunchBoundsAttrSpelling) {
+  return "CUDALaunchBoundsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDALaunchBoundsAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDALaunchBoundsAttrSpelling);
+
+enum class CUDASharedAttrSpelling : unsigned char {
+  GNU_SHARED,
+  DECLSPEC_SHARED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDASharedAttrSpelling FromPasta(pasta::CUDASharedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDASharedAttrSpelling) {
+  return "CUDASharedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDASharedAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDASharedAttrSpelling);
+
 enum class CXXConstructExprConstructionKind : unsigned char {
   COMPLETE,
   NON_VIRTUAL_BASE,
@@ -795,6 +2150,100 @@ inline static constexpr unsigned NumEnumerators(CallExprADLCallKind) {
 
 const char *EnumeratorName(CallExprADLCallKind);
 
+enum class CallableWhenAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+CallableWhenAttrConsumedState FromPasta(pasta::CallableWhenAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(CallableWhenAttrConsumedState) {
+  return "CallableWhenAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(CallableWhenAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(CallableWhenAttrConsumedState);
+
+enum class CallableWhenAttrSpelling : unsigned char {
+  GNU_CALLABLE_WHEN,
+  CXX11_CLANG_CALLABLE_WHEN,
+  SPELLING_NOT_CALCULATED,
+};
+
+CallableWhenAttrSpelling FromPasta(pasta::CallableWhenAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CallableWhenAttrSpelling) {
+  return "CallableWhenAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CallableWhenAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CallableWhenAttrSpelling);
+
+enum class CallbackAttrSpelling : unsigned char {
+  GNU_CALLBACK,
+  CXX11_CLANG_CALLBACK,
+  C2_XCLANG_CALLBACK,
+  SPELLING_NOT_CALCULATED,
+};
+
+CallbackAttrSpelling FromPasta(pasta::CallbackAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CallbackAttrSpelling) {
+  return "CallbackAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CallbackAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CallbackAttrSpelling);
+
+enum class CalledOnceAttrSpelling : unsigned char {
+  GNU_CALLED_ONCE,
+  CXX11_CLANG_CALLED_ONCE,
+  C2_XCLANG_CALLED_ONCE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CalledOnceAttrSpelling FromPasta(pasta::CalledOnceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CalledOnceAttrSpelling) {
+  return "CalledOnceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CalledOnceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CalledOnceAttrSpelling);
+
+enum class CapabilityAttrSpelling : unsigned char {
+  GNU_CAPABILITY,
+  CXX11_CLANG_CAPABILITY,
+  GNU_SHARED_CAPABILITY,
+  CXX11_CLANG_SHARED_CAPABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+CapabilityAttrSpelling FromPasta(pasta::CapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CapabilityAttrSpelling) {
+  return "CapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CapabilityAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CapabilityAttrSpelling);
+
 enum class CapturedStmtVariableCaptureKind : unsigned char {
   THIS,
   BY_REFERENCE,
@@ -813,6 +2262,24 @@ inline static constexpr unsigned NumEnumerators(CapturedStmtVariableCaptureKind)
 }
 
 const char *EnumeratorName(CapturedStmtVariableCaptureKind);
+
+enum class CarriesDependencyAttrSpelling : unsigned char {
+  GNU_CARRIES_DEPENDENCY,
+  CXX11_CARRIES_DEPENDENCY,
+  SPELLING_NOT_CALCULATED,
+};
+
+CarriesDependencyAttrSpelling FromPasta(pasta::CarriesDependencyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CarriesDependencyAttrSpelling) {
+  return "CarriesDependencyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CarriesDependencyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CarriesDependencyAttrSpelling);
 
 enum class CharacterLiteralCharacterKind : unsigned char {
   ASCII,
@@ -834,6 +2301,101 @@ inline static constexpr unsigned NumEnumerators(CharacterLiteralCharacterKind) {
 
 const char *EnumeratorName(CharacterLiteralCharacterKind);
 
+enum class CleanupAttrSpelling : unsigned char {
+  GNU_CLEANUP,
+  CXX11_GNU_CLEANUP,
+  C2_XGNU_CLEANUP,
+  SPELLING_NOT_CALCULATED,
+};
+
+CleanupAttrSpelling FromPasta(pasta::CleanupAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CleanupAttrSpelling) {
+  return "CleanupAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CleanupAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CleanupAttrSpelling);
+
+enum class ColdAttrSpelling : unsigned char {
+  GNU_COLD,
+  CXX11_GNU_COLD,
+  C2_XGNU_COLD,
+  SPELLING_NOT_CALCULATED,
+};
+
+ColdAttrSpelling FromPasta(pasta::ColdAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ColdAttrSpelling) {
+  return "ColdAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ColdAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ColdAttrSpelling);
+
+enum class CommonAttrSpelling : unsigned char {
+  GNU_COMMON,
+  CXX11_GNU_COMMON,
+  C2_XGNU_COMMON,
+  SPELLING_NOT_CALCULATED,
+};
+
+CommonAttrSpelling FromPasta(pasta::CommonAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CommonAttrSpelling) {
+  return "CommonAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CommonAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CommonAttrSpelling);
+
+enum class ConstAttrSpelling : unsigned char {
+  GNU_CONST,
+  CXX11_GNU_CONST,
+  C2_XGNU_CONST,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConstAttrSpelling FromPasta(pasta::ConstAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConstAttrSpelling) {
+  return "ConstAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConstAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConstAttrSpelling);
+
+enum class ConstInitAttrSpelling : unsigned char {
+  KEYWORD_CONSTINIT,
+  GNU_REQUIRE_CONSTANT_INITIALIZATION,
+  CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConstInitAttrSpelling FromPasta(pasta::ConstInitAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConstInitAttrSpelling) {
+  return "ConstInitAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConstInitAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConstInitAttrSpelling);
+
 enum class ConstantExprResultStorageKind : unsigned char {
   NONE,
   INT64,
@@ -851,6 +2413,156 @@ inline static constexpr unsigned NumEnumerators(ConstantExprResultStorageKind) {
 }
 
 const char *EnumeratorName(ConstantExprResultStorageKind);
+
+enum class ConstructorAttrSpelling : unsigned char {
+  GNU_CONSTRUCTOR,
+  CXX11_GNU_CONSTRUCTOR,
+  C2_XGNU_CONSTRUCTOR,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConstructorAttrSpelling FromPasta(pasta::ConstructorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConstructorAttrSpelling) {
+  return "ConstructorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConstructorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConstructorAttrSpelling);
+
+enum class ConsumableAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+ConsumableAttrConsumedState FromPasta(pasta::ConsumableAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(ConsumableAttrConsumedState) {
+  return "ConsumableAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableAttrConsumedState);
+
+enum class ConsumableAttrSpelling : unsigned char {
+  GNU_CONSUMABLE,
+  CXX11_CLANG_CONSUMABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConsumableAttrSpelling FromPasta(pasta::ConsumableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConsumableAttrSpelling) {
+  return "ConsumableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableAttrSpelling);
+
+enum class ConsumableAutoCastAttrSpelling : unsigned char {
+  GNU_CONSUMABLE_AUTO_CAST_STATE,
+  CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConsumableAutoCastAttrSpelling FromPasta(pasta::ConsumableAutoCastAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConsumableAutoCastAttrSpelling) {
+  return "ConsumableAutoCastAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableAutoCastAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableAutoCastAttrSpelling);
+
+enum class ConsumableSetOnReadAttrSpelling : unsigned char {
+  GNU_CONSUMABLE_STATE_ON_READ,
+  CXX11_CLANG_CONSUMABLE_STATE_ON_READ,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConsumableSetOnReadAttrSpelling FromPasta(pasta::ConsumableSetOnReadAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConsumableSetOnReadAttrSpelling) {
+  return "ConsumableSetOnReadAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableSetOnReadAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableSetOnReadAttrSpelling);
+
+enum class ConvergentAttrSpelling : unsigned char {
+  GNU_CONVERGENT,
+  CXX11_CLANG_CONVERGENT,
+  C2_XCLANG_CONVERGENT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConvergentAttrSpelling FromPasta(pasta::ConvergentAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConvergentAttrSpelling) {
+  return "ConvergentAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConvergentAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConvergentAttrSpelling);
+
+enum class DLLExportAttrSpelling : unsigned char {
+  DECLSPEC_DLLEXPORT,
+  GNU_DLLEXPORT,
+  CXX11_GNU_DLLEXPORT,
+  C2_XGNU_DLLEXPORT,
+  SPELLING_NOT_CALCULATED,
+};
+
+DLLExportAttrSpelling FromPasta(pasta::DLLExportAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DLLExportAttrSpelling) {
+  return "DLLExportAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DLLExportAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(DLLExportAttrSpelling);
+
+enum class DLLImportAttrSpelling : unsigned char {
+  DECLSPEC_DLLIMPORT,
+  GNU_DLLIMPORT,
+  CXX11_GNU_DLLIMPORT,
+  C2_XGNU_DLLIMPORT,
+  SPELLING_NOT_CALCULATED,
+};
+
+DLLImportAttrSpelling FromPasta(pasta::DLLImportAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DLLImportAttrSpelling) {
+  return "DLLImportAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DLLImportAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(DLLImportAttrSpelling);
 
 enum class DeclFriendObjectKind : unsigned char {
   NONE,
@@ -940,6 +2652,236 @@ inline static constexpr unsigned NumEnumerators(DeclObjCDeclQualifier) {
 }
 
 const char *EnumeratorName(DeclObjCDeclQualifier);
+
+enum class DeprecatedAttrSpelling : unsigned char {
+  GNU_DEPRECATED,
+  CXX11_GNU_DEPRECATED,
+  C2_XGNU_DEPRECATED,
+  DECLSPEC_DEPRECATED,
+  CXX11_DEPRECATED,
+  C2_XDEPRECATED,
+  SPELLING_NOT_CALCULATED,
+};
+
+DeprecatedAttrSpelling FromPasta(pasta::DeprecatedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DeprecatedAttrSpelling) {
+  return "DeprecatedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DeprecatedAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(DeprecatedAttrSpelling);
+
+enum class DestructorAttrSpelling : unsigned char {
+  GNU_DESTRUCTOR,
+  CXX11_GNU_DESTRUCTOR,
+  C2_XGNU_DESTRUCTOR,
+  SPELLING_NOT_CALCULATED,
+};
+
+DestructorAttrSpelling FromPasta(pasta::DestructorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DestructorAttrSpelling) {
+  return "DestructorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DestructorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DestructorAttrSpelling);
+
+enum class DiagnoseAsBuiltinAttrSpelling : unsigned char {
+  GNU_DIAGNOSE_AS_BUILTIN,
+  CXX11_CLANG_DIAGNOSE_AS_BUILTIN,
+  C2_XCLANG_DIAGNOSE_AS_BUILTIN,
+  SPELLING_NOT_CALCULATED,
+};
+
+DiagnoseAsBuiltinAttrSpelling FromPasta(pasta::DiagnoseAsBuiltinAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DiagnoseAsBuiltinAttrSpelling) {
+  return "DiagnoseAsBuiltinAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DiagnoseAsBuiltinAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DiagnoseAsBuiltinAttrSpelling);
+
+enum class DiagnoseIfAttrDiagnosticType : unsigned char {
+  ERROR,
+  WARNING,
+};
+
+DiagnoseIfAttrDiagnosticType FromPasta(pasta::DiagnoseIfAttrDiagnosticType pasta_val);
+
+inline static const char *EnumerationName(DiagnoseIfAttrDiagnosticType) {
+  return "DiagnoseIfAttrDiagnosticType";
+}
+
+inline static constexpr unsigned NumEnumerators(DiagnoseIfAttrDiagnosticType) {
+  return 2;
+}
+
+const char *EnumeratorName(DiagnoseIfAttrDiagnosticType);
+
+enum class DisableSanitizerInstrumentationAttrSpelling : unsigned char {
+  GNU_DISABLE_SANITIZER_INSTRUMENTATION,
+  CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION,
+  C2_XCLANG_DISABLE_SANITIZER_INSTRUMENTATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+DisableSanitizerInstrumentationAttrSpelling FromPasta(pasta::DisableSanitizerInstrumentationAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DisableSanitizerInstrumentationAttrSpelling) {
+  return "DisableSanitizerInstrumentationAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DisableSanitizerInstrumentationAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DisableSanitizerInstrumentationAttrSpelling);
+
+enum class DisableTailCallsAttrSpelling : unsigned char {
+  GNU_DISABLE_TAIL_CALLS,
+  CXX11_CLANG_DISABLE_TAIL_CALLS,
+  C2_XCLANG_DISABLE_TAIL_CALLS,
+  SPELLING_NOT_CALCULATED,
+};
+
+DisableTailCallsAttrSpelling FromPasta(pasta::DisableTailCallsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DisableTailCallsAttrSpelling) {
+  return "DisableTailCallsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DisableTailCallsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DisableTailCallsAttrSpelling);
+
+enum class EnforceTCBAttrSpelling : unsigned char {
+  GNU_ENFORCE_TCB,
+  CXX11_CLANG_ENFORCE_TCB,
+  C2_XCLANG_ENFORCE_TCB,
+  SPELLING_NOT_CALCULATED,
+};
+
+EnforceTCBAttrSpelling FromPasta(pasta::EnforceTCBAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(EnforceTCBAttrSpelling) {
+  return "EnforceTCBAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(EnforceTCBAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(EnforceTCBAttrSpelling);
+
+enum class EnforceTCBLeafAttrSpelling : unsigned char {
+  GNU_ENFORCE_TCB_LEAF,
+  CXX11_CLANG_ENFORCE_TCB_LEAF,
+  C2_XCLANG_ENFORCE_TCB_LEAF,
+  SPELLING_NOT_CALCULATED,
+};
+
+EnforceTCBLeafAttrSpelling FromPasta(pasta::EnforceTCBLeafAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(EnforceTCBLeafAttrSpelling) {
+  return "EnforceTCBLeafAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(EnforceTCBLeafAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(EnforceTCBLeafAttrSpelling);
+
+enum class EnumExtensibilityAttrKind : unsigned char {
+  CLOSED,
+  OPEN,
+};
+
+EnumExtensibilityAttrKind FromPasta(pasta::EnumExtensibilityAttrKind pasta_val);
+
+inline static const char *EnumerationName(EnumExtensibilityAttrKind) {
+  return "EnumExtensibilityAttrKind";
+}
+
+inline static constexpr unsigned NumEnumerators(EnumExtensibilityAttrKind) {
+  return 2;
+}
+
+const char *EnumeratorName(EnumExtensibilityAttrKind);
+
+enum class EnumExtensibilityAttrSpelling : unsigned char {
+  GNU_ENUM_EXTENSIBILITY,
+  CXX11_CLANG_ENUM_EXTENSIBILITY,
+  C2_XCLANG_ENUM_EXTENSIBILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+EnumExtensibilityAttrSpelling FromPasta(pasta::EnumExtensibilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(EnumExtensibilityAttrSpelling) {
+  return "EnumExtensibilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(EnumExtensibilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(EnumExtensibilityAttrSpelling);
+
+enum class ErrorAttrSpelling : unsigned char {
+  GNU_ERROR,
+  CXX11_GNU_ERROR,
+  C2_XGNU_ERROR,
+  GNU_WARNING,
+  CXX11_GNU_WARNING,
+  C2_XGNU_WARNING,
+  SPELLING_NOT_CALCULATED,
+};
+
+ErrorAttrSpelling FromPasta(pasta::ErrorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ErrorAttrSpelling) {
+  return "ErrorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ErrorAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(ErrorAttrSpelling);
+
+enum class ExcludeFromExplicitInstantiationAttrSpelling : unsigned char {
+  GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
+  CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
+  C2_XCLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ExcludeFromExplicitInstantiationAttrSpelling FromPasta(pasta::ExcludeFromExplicitInstantiationAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ExcludeFromExplicitInstantiationAttrSpelling) {
+  return "ExcludeFromExplicitInstantiationAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ExcludeFromExplicitInstantiationAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ExcludeFromExplicitInstantiationAttrSpelling);
 
 enum class ExprConstantExprKind : unsigned char {
   NORMAL,
@@ -1073,6 +3015,161 @@ inline static constexpr unsigned NumEnumerators(ExprisModifiableLvalueResult) {
 
 const char *EnumeratorName(ExprisModifiableLvalueResult);
 
+enum class ExternalSourceSymbolAttrSpelling : unsigned char {
+  GNU_EXTERNAL_SOURCE_SYMBOL,
+  CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL,
+  C2_XCLANG_EXTERNAL_SOURCE_SYMBOL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ExternalSourceSymbolAttrSpelling FromPasta(pasta::ExternalSourceSymbolAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ExternalSourceSymbolAttrSpelling) {
+  return "ExternalSourceSymbolAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ExternalSourceSymbolAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ExternalSourceSymbolAttrSpelling);
+
+enum class FallThroughAttrSpelling : unsigned char {
+  CXX11_FALLTHROUGH,
+  C2_XFALLTHROUGH,
+  CXX11_CLANG_FALLTHROUGH,
+  GNU_FALLTHROUGH,
+  CXX11_GNU_FALLTHROUGH,
+  C2_XGNU_FALLTHROUGH,
+  SPELLING_NOT_CALCULATED,
+};
+
+FallThroughAttrSpelling FromPasta(pasta::FallThroughAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FallThroughAttrSpelling) {
+  return "FallThroughAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FallThroughAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(FallThroughAttrSpelling);
+
+enum class FastCallAttrSpelling : unsigned char {
+  GNU_FASTCALL,
+  CXX11_GNU_FASTCALL,
+  C2_XGNU_FASTCALL,
+  KEYWORD_FASTCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+FastCallAttrSpelling FromPasta(pasta::FastCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FastCallAttrSpelling) {
+  return "FastCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FastCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(FastCallAttrSpelling);
+
+enum class FinalAttrSpelling : unsigned char {
+  KEYWORD_FINAL,
+  KEYWORD_SEALED,
+  SPELLING_NOT_CALCULATED,
+};
+
+FinalAttrSpelling FromPasta(pasta::FinalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FinalAttrSpelling) {
+  return "FinalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FinalAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(FinalAttrSpelling);
+
+enum class FlagEnumAttrSpelling : unsigned char {
+  GNU_FLAG_ENUM,
+  CXX11_CLANG_FLAG_ENUM,
+  C2_XCLANG_FLAG_ENUM,
+  SPELLING_NOT_CALCULATED,
+};
+
+FlagEnumAttrSpelling FromPasta(pasta::FlagEnumAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FlagEnumAttrSpelling) {
+  return "FlagEnumAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FlagEnumAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FlagEnumAttrSpelling);
+
+enum class FlattenAttrSpelling : unsigned char {
+  GNU_FLATTEN,
+  CXX11_GNU_FLATTEN,
+  C2_XGNU_FLATTEN,
+  SPELLING_NOT_CALCULATED,
+};
+
+FlattenAttrSpelling FromPasta(pasta::FlattenAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FlattenAttrSpelling) {
+  return "FlattenAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FlattenAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FlattenAttrSpelling);
+
+enum class FormatArgAttrSpelling : unsigned char {
+  GNU_FORMAT_ARGUMENT,
+  CXX11_GNU_FORMAT_ARGUMENT,
+  C2_XGNU_FORMAT_ARGUMENT,
+  SPELLING_NOT_CALCULATED,
+};
+
+FormatArgAttrSpelling FromPasta(pasta::FormatArgAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FormatArgAttrSpelling) {
+  return "FormatArgAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FormatArgAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FormatArgAttrSpelling);
+
+enum class FormatAttrSpelling : unsigned char {
+  GNU_FORMAT,
+  CXX11_GNU_FORMAT,
+  C2_XGNU_FORMAT,
+  SPELLING_NOT_CALCULATED,
+};
+
+FormatAttrSpelling FromPasta(pasta::FormatAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FormatAttrSpelling) {
+  return "FormatAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FormatAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FormatAttrSpelling);
+
 enum class FunctionDeclTemplatedKind : unsigned char {
   NON_TEMPLATE,
   FUNCTION_TEMPLATE,
@@ -1092,6 +3189,156 @@ inline static constexpr unsigned NumEnumerators(FunctionDeclTemplatedKind) {
 }
 
 const char *EnumeratorName(FunctionDeclTemplatedKind);
+
+enum class GNUInlineAttrSpelling : unsigned char {
+  GNU_GNU_INLINE,
+  CXX11_GNU_GNU_INLINE,
+  C2_XGNU_GNU_INLINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+GNUInlineAttrSpelling FromPasta(pasta::GNUInlineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(GNUInlineAttrSpelling) {
+  return "GNUInlineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(GNUInlineAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(GNUInlineAttrSpelling);
+
+enum class GuardedVarAttrSpelling : unsigned char {
+  GNU_GUARDED_VARIABLE,
+  CXX11_CLANG_GUARDED_VARIABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+GuardedVarAttrSpelling FromPasta(pasta::GuardedVarAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(GuardedVarAttrSpelling) {
+  return "GuardedVarAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(GuardedVarAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(GuardedVarAttrSpelling);
+
+enum class HIPManagedAttrSpelling : unsigned char {
+  GNU_MANAGED,
+  DECLSPEC_MANAGED,
+  SPELLING_NOT_CALCULATED,
+};
+
+HIPManagedAttrSpelling FromPasta(pasta::HIPManagedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(HIPManagedAttrSpelling) {
+  return "HIPManagedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(HIPManagedAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(HIPManagedAttrSpelling);
+
+enum class HotAttrSpelling : unsigned char {
+  GNU_HOT,
+  CXX11_GNU_HOT,
+  C2_XGNU_HOT,
+  SPELLING_NOT_CALCULATED,
+};
+
+HotAttrSpelling FromPasta(pasta::HotAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(HotAttrSpelling) {
+  return "HotAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(HotAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(HotAttrSpelling);
+
+enum class IBActionAttrSpelling : unsigned char {
+  GNU_IBACTION,
+  CXX11_CLANG_IBACTION,
+  C2_XCLANG_IBACTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+IBActionAttrSpelling FromPasta(pasta::IBActionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IBActionAttrSpelling) {
+  return "IBActionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IBActionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IBActionAttrSpelling);
+
+enum class IBOutletAttrSpelling : unsigned char {
+  GNU_IBOUTLET,
+  CXX11_CLANG_IBOUTLET,
+  C2_XCLANG_IBOUTLET,
+  SPELLING_NOT_CALCULATED,
+};
+
+IBOutletAttrSpelling FromPasta(pasta::IBOutletAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IBOutletAttrSpelling) {
+  return "IBOutletAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IBOutletAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IBOutletAttrSpelling);
+
+enum class IBOutletCollectionAttrSpelling : unsigned char {
+  GNU_IBOUTLETCOLLECTION,
+  CXX11_CLANG_IBOUTLETCOLLECTION,
+  C2_XCLANG_IBOUTLETCOLLECTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+IBOutletCollectionAttrSpelling FromPasta(pasta::IBOutletCollectionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IBOutletCollectionAttrSpelling) {
+  return "IBOutletCollectionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IBOutletCollectionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IBOutletCollectionAttrSpelling);
+
+enum class IFuncAttrSpelling : unsigned char {
+  GNU_IFUNC,
+  CXX11_GNU_IFUNC,
+  C2_XGNU_IFUNC,
+  SPELLING_NOT_CALCULATED,
+};
+
+IFuncAttrSpelling FromPasta(pasta::IFuncAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IFuncAttrSpelling) {
+  return "IFuncAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IFuncAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IFuncAttrSpelling);
 
 enum class ImplicitCastExprOnStack : unsigned char {
   ON_STACK,
@@ -1130,6 +3377,135 @@ inline static constexpr unsigned NumEnumerators(ImplicitParamDeclImplicitParamKi
 
 const char *EnumeratorName(ImplicitParamDeclImplicitParamKind);
 
+enum class InitPriorityAttrSpelling : unsigned char {
+  GNU_INITIALIZER_PRIORITY,
+  CXX11_GNU_INITIALIZER_PRIORITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+InitPriorityAttrSpelling FromPasta(pasta::InitPriorityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(InitPriorityAttrSpelling) {
+  return "InitPriorityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(InitPriorityAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(InitPriorityAttrSpelling);
+
+enum class IntelOclBiccAttrSpelling : unsigned char {
+  GNU_INTEL_OCL_BICC,
+  CXX11_CLANG_INTEL_OCL_BICC,
+  SPELLING_NOT_CALCULATED,
+};
+
+IntelOclBiccAttrSpelling FromPasta(pasta::IntelOclBiccAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IntelOclBiccAttrSpelling) {
+  return "IntelOclBiccAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IntelOclBiccAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(IntelOclBiccAttrSpelling);
+
+enum class InternalLinkageAttrSpelling : unsigned char {
+  GNU_INTERNAL_LINKAGE,
+  CXX11_CLANG_INTERNAL_LINKAGE,
+  C2_XCLANG_INTERNAL_LINKAGE,
+  SPELLING_NOT_CALCULATED,
+};
+
+InternalLinkageAttrSpelling FromPasta(pasta::InternalLinkageAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(InternalLinkageAttrSpelling) {
+  return "InternalLinkageAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(InternalLinkageAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(InternalLinkageAttrSpelling);
+
+enum class LTOVisibilityPublicAttrSpelling : unsigned char {
+  GNU_LTO_VISIBILITY_PUBLIC,
+  CXX11_CLANG_LTO_VISIBILITY_PUBLIC,
+  C2_XCLANG_LTO_VISIBILITY_PUBLIC,
+  SPELLING_NOT_CALCULATED,
+};
+
+LTOVisibilityPublicAttrSpelling FromPasta(pasta::LTOVisibilityPublicAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LTOVisibilityPublicAttrSpelling) {
+  return "LTOVisibilityPublicAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LTOVisibilityPublicAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(LTOVisibilityPublicAttrSpelling);
+
+enum class LeafAttrSpelling : unsigned char {
+  GNU_LEAF,
+  CXX11_GNU_LEAF,
+  C2_XGNU_LEAF,
+  SPELLING_NOT_CALCULATED,
+};
+
+LeafAttrSpelling FromPasta(pasta::LeafAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LeafAttrSpelling) {
+  return "LeafAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LeafAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(LeafAttrSpelling);
+
+enum class LifetimeBoundAttrSpelling : unsigned char {
+  GNU_LIFETIMEBOUND,
+  CXX11_CLANG_LIFETIMEBOUND,
+  SPELLING_NOT_CALCULATED,
+};
+
+LifetimeBoundAttrSpelling FromPasta(pasta::LifetimeBoundAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LifetimeBoundAttrSpelling) {
+  return "LifetimeBoundAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LifetimeBoundAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(LifetimeBoundAttrSpelling);
+
+enum class LikelyAttrSpelling : unsigned char {
+  CXX11_LIKELY,
+  C2_XCLANG_LIKELY,
+  SPELLING_NOT_CALCULATED,
+};
+
+LikelyAttrSpelling FromPasta(pasta::LikelyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LikelyAttrSpelling) {
+  return "LikelyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LikelyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(LikelyAttrSpelling);
+
 enum class LinkageSpecDeclLanguageIDs : unsigned char {
   C,
   CXX,
@@ -1146,6 +3522,526 @@ inline static constexpr unsigned NumEnumerators(LinkageSpecDeclLanguageIDs) {
 }
 
 const char *EnumeratorName(LinkageSpecDeclLanguageIDs);
+
+enum class LoaderUninitializedAttrSpelling : unsigned char {
+  GNU_LOADER_UNINITIALIZED,
+  CXX11_CLANG_LOADER_UNINITIALIZED,
+  C2_XCLANG_LOADER_UNINITIALIZED,
+  SPELLING_NOT_CALCULATED,
+};
+
+LoaderUninitializedAttrSpelling FromPasta(pasta::LoaderUninitializedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LoaderUninitializedAttrSpelling) {
+  return "LoaderUninitializedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LoaderUninitializedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(LoaderUninitializedAttrSpelling);
+
+enum class LoopHintAttrLoopHintState : unsigned char {
+  ENABLE,
+  DISABLE,
+  NUMERIC,
+  FIXED_WIDTH,
+  SCALABLE_WIDTH,
+  ASSUME_SAFETY,
+  FULL,
+};
+
+LoopHintAttrLoopHintState FromPasta(pasta::LoopHintAttrLoopHintState pasta_val);
+
+inline static const char *EnumerationName(LoopHintAttrLoopHintState) {
+  return "LoopHintAttrLoopHintState";
+}
+
+inline static constexpr unsigned NumEnumerators(LoopHintAttrLoopHintState) {
+  return 7;
+}
+
+const char *EnumeratorName(LoopHintAttrLoopHintState);
+
+enum class LoopHintAttrOptionType : unsigned char {
+  VECTORIZE,
+  VECTORIZE_WIDTH,
+  INTERLEAVE,
+  INTERLEAVE_COUNT,
+  UNROLL,
+  UNROLL_COUNT,
+  UNROLL_AND_JAM,
+  UNROLL_AND_JAM_COUNT,
+  PIPELINE_DISABLED,
+  PIPELINE_INITIATION_INTERVAL,
+  DISTRIBUTE,
+  VECTORIZE_PREDICATE,
+};
+
+LoopHintAttrOptionType FromPasta(pasta::LoopHintAttrOptionType pasta_val);
+
+inline static const char *EnumerationName(LoopHintAttrOptionType) {
+  return "LoopHintAttrOptionType";
+}
+
+inline static constexpr unsigned NumEnumerators(LoopHintAttrOptionType) {
+  return 12;
+}
+
+const char *EnumeratorName(LoopHintAttrOptionType);
+
+enum class LoopHintAttrSpelling : unsigned char {
+  PRAGMA_CLANG_LOOP,
+  PRAGMA_UNROLL,
+  PRAGMA_NOUNROLL,
+  PRAGMA_UNROLL_AND_JAM,
+  PRAGMA_NOUNROLL_AND_JAM,
+  SPELLING_NOT_CALCULATED,
+};
+
+LoopHintAttrSpelling FromPasta(pasta::LoopHintAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LoopHintAttrSpelling) {
+  return "LoopHintAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LoopHintAttrSpelling) {
+  return 6;
+}
+
+const char *EnumeratorName(LoopHintAttrSpelling);
+
+enum class MIGServerRoutineAttrSpelling : unsigned char {
+  GNU_MIG_SERVER_ROUTINE,
+  CXX11_CLANG_MIG_SERVER_ROUTINE,
+  C2_XCLANG_MIG_SERVER_ROUTINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+MIGServerRoutineAttrSpelling FromPasta(pasta::MIGServerRoutineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MIGServerRoutineAttrSpelling) {
+  return "MIGServerRoutineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MIGServerRoutineAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MIGServerRoutineAttrSpelling);
+
+enum class MSABIAttrSpelling : unsigned char {
+  GNU_MS_ABI,
+  CXX11_GNU_MS_ABI,
+  C2_XGNU_MS_ABI,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSABIAttrSpelling FromPasta(pasta::MSABIAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSABIAttrSpelling) {
+  return "MSABIAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSABIAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MSABIAttrSpelling);
+
+enum class MSInheritanceAttrSpelling : unsigned char {
+  KEYWORD_SINGLE_INHERITANCE,
+  KEYWORD_MULTIPLE_INHERITANCE,
+  KEYWORD_VIRTUAL_INHERITANCE,
+  KEYWORD_UNSPECIFIED_INHERITANCE,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSInheritanceAttrSpelling FromPasta(pasta::MSInheritanceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSInheritanceAttrSpelling) {
+  return "MSInheritanceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSInheritanceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(MSInheritanceAttrSpelling);
+
+enum class MSP430InterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2_XGNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSP430InterruptAttrSpelling FromPasta(pasta::MSP430InterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSP430InterruptAttrSpelling) {
+  return "MSP430InterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSP430InterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MSP430InterruptAttrSpelling);
+
+enum class MSStructAttrSpelling : unsigned char {
+  GNU_MS_STRUCT,
+  CXX11_GNU_MS_STRUCT,
+  C2_XGNU_MS_STRUCT,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSStructAttrSpelling FromPasta(pasta::MSStructAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSStructAttrSpelling) {
+  return "MSStructAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSStructAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MSStructAttrSpelling);
+
+enum class MayAliasAttrSpelling : unsigned char {
+  GNU_MAY_ALIAS,
+  CXX11_GNU_MAY_ALIAS,
+  C2_XGNU_MAY_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+MayAliasAttrSpelling FromPasta(pasta::MayAliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MayAliasAttrSpelling) {
+  return "MayAliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MayAliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MayAliasAttrSpelling);
+
+enum class MicroMipsAttrSpelling : unsigned char {
+  GNU_MICROMIPS,
+  CXX11_GNU_MICROMIPS,
+  C2_XGNU_MICROMIPS,
+  SPELLING_NOT_CALCULATED,
+};
+
+MicroMipsAttrSpelling FromPasta(pasta::MicroMipsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MicroMipsAttrSpelling) {
+  return "MicroMipsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MicroMipsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MicroMipsAttrSpelling);
+
+enum class MinSizeAttrSpelling : unsigned char {
+  GNU_MINSIZE,
+  CXX11_CLANG_MINSIZE,
+  C2_XCLANG_MINSIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+MinSizeAttrSpelling FromPasta(pasta::MinSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MinSizeAttrSpelling) {
+  return "MinSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MinSizeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MinSizeAttrSpelling);
+
+enum class MinVectorWidthAttrSpelling : unsigned char {
+  GNU_MIN_VECTOR_WIDTH,
+  CXX11_CLANG_MIN_VECTOR_WIDTH,
+  C2_XCLANG_MIN_VECTOR_WIDTH,
+  SPELLING_NOT_CALCULATED,
+};
+
+MinVectorWidthAttrSpelling FromPasta(pasta::MinVectorWidthAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MinVectorWidthAttrSpelling) {
+  return "MinVectorWidthAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MinVectorWidthAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MinVectorWidthAttrSpelling);
+
+enum class Mips16AttrSpelling : unsigned char {
+  GNU_MIPS16,
+  CXX11_GNU_MIPS16,
+  C2_XGNU_MIPS16,
+  SPELLING_NOT_CALCULATED,
+};
+
+Mips16AttrSpelling FromPasta(pasta::Mips16AttrSpelling pasta_val);
+
+inline static const char *EnumerationName(Mips16AttrSpelling) {
+  return "Mips16AttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(Mips16AttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(Mips16AttrSpelling);
+
+enum class MipsInterruptAttrInterruptType : unsigned char {
+  SW0,
+  SW1,
+  HW0,
+  HW1,
+  HW2,
+  HW3,
+  HW4,
+  HW5,
+  EIC,
+};
+
+MipsInterruptAttrInterruptType FromPasta(pasta::MipsInterruptAttrInterruptType pasta_val);
+
+inline static const char *EnumerationName(MipsInterruptAttrInterruptType) {
+  return "MipsInterruptAttrInterruptType";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsInterruptAttrInterruptType) {
+  return 9;
+}
+
+const char *EnumeratorName(MipsInterruptAttrInterruptType);
+
+enum class MipsInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2_XGNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+MipsInterruptAttrSpelling FromPasta(pasta::MipsInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MipsInterruptAttrSpelling) {
+  return "MipsInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MipsInterruptAttrSpelling);
+
+enum class MipsLongCallAttrSpelling : unsigned char {
+  GNU_LONG_CALL,
+  CXX11_GNU_LONG_CALL,
+  C2_XGNU_LONG_CALL,
+  GNU_FAR,
+  CXX11_GNU_FAR,
+  C2_XGNU_FAR,
+  SPELLING_NOT_CALCULATED,
+};
+
+MipsLongCallAttrSpelling FromPasta(pasta::MipsLongCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MipsLongCallAttrSpelling) {
+  return "MipsLongCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsLongCallAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(MipsLongCallAttrSpelling);
+
+enum class MipsShortCallAttrSpelling : unsigned char {
+  GNU_SHORT_CALL,
+  CXX11_GNU_SHORT_CALL,
+  C2_XGNU_SHORT_CALL,
+  GNU_NEAR,
+  CXX11_GNU_NEAR,
+  C2_XGNU_NEAR,
+  SPELLING_NOT_CALCULATED,
+};
+
+MipsShortCallAttrSpelling FromPasta(pasta::MipsShortCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MipsShortCallAttrSpelling) {
+  return "MipsShortCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsShortCallAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(MipsShortCallAttrSpelling);
+
+enum class ModeAttrSpelling : unsigned char {
+  GNU_MODE,
+  CXX11_GNU_MODE,
+  C2_XGNU_MODE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ModeAttrSpelling FromPasta(pasta::ModeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ModeAttrSpelling) {
+  return "ModeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ModeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ModeAttrSpelling);
+
+enum class MustTailAttrSpelling : unsigned char {
+  GNU_MUSTTAIL,
+  CXX11_CLANG_MUSTTAIL,
+  C2_XCLANG_MUSTTAIL,
+  SPELLING_NOT_CALCULATED,
+};
+
+MustTailAttrSpelling FromPasta(pasta::MustTailAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MustTailAttrSpelling) {
+  return "MustTailAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MustTailAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MustTailAttrSpelling);
+
+enum class NSConsumedAttrSpelling : unsigned char {
+  GNU_NS_CONSUMED,
+  CXX11_CLANG_NS_CONSUMED,
+  C2_XCLANG_NS_CONSUMED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSConsumedAttrSpelling FromPasta(pasta::NSConsumedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSConsumedAttrSpelling) {
+  return "NSConsumedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSConsumedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSConsumedAttrSpelling);
+
+enum class NSConsumesSelfAttrSpelling : unsigned char {
+  GNU_NS_CONSUMES_SELF,
+  CXX11_CLANG_NS_CONSUMES_SELF,
+  C2_XCLANG_NS_CONSUMES_SELF,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSConsumesSelfAttrSpelling FromPasta(pasta::NSConsumesSelfAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSConsumesSelfAttrSpelling) {
+  return "NSConsumesSelfAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSConsumesSelfAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSConsumesSelfAttrSpelling);
+
+enum class NSReturnsAutoreleasedAttrSpelling : unsigned char {
+  GNU_NS_RETURNS_AUTORELEASED,
+  CXX11_CLANG_NS_RETURNS_AUTORELEASED,
+  C2_XCLANG_NS_RETURNS_AUTORELEASED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSReturnsAutoreleasedAttrSpelling FromPasta(pasta::NSReturnsAutoreleasedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSReturnsAutoreleasedAttrSpelling) {
+  return "NSReturnsAutoreleasedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSReturnsAutoreleasedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSReturnsAutoreleasedAttrSpelling);
+
+enum class NSReturnsNotRetainedAttrSpelling : unsigned char {
+  GNU_NS_RETURNS_NOT_RETAINED,
+  CXX11_CLANG_NS_RETURNS_NOT_RETAINED,
+  C2_XCLANG_NS_RETURNS_NOT_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSReturnsNotRetainedAttrSpelling FromPasta(pasta::NSReturnsNotRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSReturnsNotRetainedAttrSpelling) {
+  return "NSReturnsNotRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSReturnsNotRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSReturnsNotRetainedAttrSpelling);
+
+enum class NSReturnsRetainedAttrSpelling : unsigned char {
+  GNU_NS_RETURNS_RETAINED,
+  CXX11_CLANG_NS_RETURNS_RETAINED,
+  C2_XCLANG_NS_RETURNS_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSReturnsRetainedAttrSpelling FromPasta(pasta::NSReturnsRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSReturnsRetainedAttrSpelling) {
+  return "NSReturnsRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSReturnsRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSReturnsRetainedAttrSpelling);
+
+enum class NakedAttrSpelling : unsigned char {
+  GNU_NAKED,
+  CXX11_GNU_NAKED,
+  C2_XGNU_NAKED,
+  DECLSPEC_NAKED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NakedAttrSpelling FromPasta(pasta::NakedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NakedAttrSpelling) {
+  return "NakedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NakedAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NakedAttrSpelling);
 
 enum class NamedDeclExplicitVisibilityKind : unsigned char {
   VISIBILITY_FOR_TYPE,
@@ -1164,6 +4060,451 @@ inline static constexpr unsigned NumEnumerators(NamedDeclExplicitVisibilityKind)
 
 const char *EnumeratorName(NamedDeclExplicitVisibilityKind);
 
+enum class NoBuiltinAttrSpelling : unsigned char {
+  GNU_NO_BUILTIN,
+  CXX11_CLANG_NO_BUILTIN,
+  C2_XCLANG_NO_BUILTIN,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoBuiltinAttrSpelling FromPasta(pasta::NoBuiltinAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoBuiltinAttrSpelling) {
+  return "NoBuiltinAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoBuiltinAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoBuiltinAttrSpelling);
+
+enum class NoCommonAttrSpelling : unsigned char {
+  GNU_NOCOMMON,
+  CXX11_GNU_NOCOMMON,
+  C2_XGNU_NOCOMMON,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoCommonAttrSpelling FromPasta(pasta::NoCommonAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoCommonAttrSpelling) {
+  return "NoCommonAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoCommonAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoCommonAttrSpelling);
+
+enum class NoDebugAttrSpelling : unsigned char {
+  GNU_NODEBUG,
+  CXX11_GNU_NODEBUG,
+  C2_XGNU_NODEBUG,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDebugAttrSpelling FromPasta(pasta::NoDebugAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDebugAttrSpelling) {
+  return "NoDebugAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDebugAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoDebugAttrSpelling);
+
+enum class NoDerefAttrSpelling : unsigned char {
+  GNU_NODEREF,
+  CXX11_CLANG_NODEREF,
+  C2_XCLANG_NODEREF,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDerefAttrSpelling FromPasta(pasta::NoDerefAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDerefAttrSpelling) {
+  return "NoDerefAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDerefAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoDerefAttrSpelling);
+
+enum class NoDestroyAttrSpelling : unsigned char {
+  GNU_NO_DESTROY,
+  CXX11_CLANG_NO_DESTROY,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDestroyAttrSpelling FromPasta(pasta::NoDestroyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDestroyAttrSpelling) {
+  return "NoDestroyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDestroyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(NoDestroyAttrSpelling);
+
+enum class NoDuplicateAttrSpelling : unsigned char {
+  GNU_NODUPLICATE,
+  CXX11_CLANG_NODUPLICATE,
+  C2_XCLANG_NODUPLICATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDuplicateAttrSpelling FromPasta(pasta::NoDuplicateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDuplicateAttrSpelling) {
+  return "NoDuplicateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDuplicateAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoDuplicateAttrSpelling);
+
+enum class NoEscapeAttrSpelling : unsigned char {
+  GNU_NOESCAPE,
+  CXX11_CLANG_NOESCAPE,
+  C2_XCLANG_NOESCAPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoEscapeAttrSpelling FromPasta(pasta::NoEscapeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoEscapeAttrSpelling) {
+  return "NoEscapeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoEscapeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoEscapeAttrSpelling);
+
+enum class NoInlineAttrSpelling : unsigned char {
+  GNU_NOINLINE,
+  CXX11_GNU_NOINLINE,
+  C2_XGNU_NOINLINE,
+  DECLSPEC_NOINLINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoInlineAttrSpelling FromPasta(pasta::NoInlineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoInlineAttrSpelling) {
+  return "NoInlineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoInlineAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NoInlineAttrSpelling);
+
+enum class NoInstrumentFunctionAttrSpelling : unsigned char {
+  GNU_NO_INSTRUMENT_FUNCTION,
+  CXX11_GNU_NO_INSTRUMENT_FUNCTION,
+  C2_XGNU_NO_INSTRUMENT_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoInstrumentFunctionAttrSpelling FromPasta(pasta::NoInstrumentFunctionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoInstrumentFunctionAttrSpelling) {
+  return "NoInstrumentFunctionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoInstrumentFunctionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoInstrumentFunctionAttrSpelling);
+
+enum class NoMergeAttrSpelling : unsigned char {
+  GNU_NOMERGE,
+  CXX11_CLANG_NOMERGE,
+  C2_XCLANG_NOMERGE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoMergeAttrSpelling FromPasta(pasta::NoMergeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoMergeAttrSpelling) {
+  return "NoMergeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoMergeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoMergeAttrSpelling);
+
+enum class NoMicroMipsAttrSpelling : unsigned char {
+  GNU_NOMICROMIPS,
+  CXX11_GNU_NOMICROMIPS,
+  C2_XGNU_NOMICROMIPS,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoMicroMipsAttrSpelling FromPasta(pasta::NoMicroMipsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoMicroMipsAttrSpelling) {
+  return "NoMicroMipsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoMicroMipsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoMicroMipsAttrSpelling);
+
+enum class NoMips16AttrSpelling : unsigned char {
+  GNU_NOMIPS16,
+  CXX11_GNU_NOMIPS16,
+  C2_XGNU_NOMIPS16,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoMips16AttrSpelling FromPasta(pasta::NoMips16AttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoMips16AttrSpelling) {
+  return "NoMips16AttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoMips16AttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoMips16AttrSpelling);
+
+enum class NoProfileFunctionAttrSpelling : unsigned char {
+  GNU_NO_PROFILE_INSTRUMENT_FUNCTION,
+  CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION,
+  C2_XGNU_NO_PROFILE_INSTRUMENT_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoProfileFunctionAttrSpelling FromPasta(pasta::NoProfileFunctionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoProfileFunctionAttrSpelling) {
+  return "NoProfileFunctionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoProfileFunctionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoProfileFunctionAttrSpelling);
+
+enum class NoReturnAttrSpelling : unsigned char {
+  GNU_NORETURN,
+  CXX11_GNU_NORETURN,
+  C2_XGNU_NORETURN,
+  DECLSPEC_NORETURN,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoReturnAttrSpelling FromPasta(pasta::NoReturnAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoReturnAttrSpelling) {
+  return "NoReturnAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoReturnAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NoReturnAttrSpelling);
+
+enum class NoSanitizeAttrSpelling : unsigned char {
+  GNU_NO_SANITIZE,
+  CXX11_CLANG_NO_SANITIZE,
+  C2_XCLANG_NO_SANITIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoSanitizeAttrSpelling FromPasta(pasta::NoSanitizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoSanitizeAttrSpelling) {
+  return "NoSanitizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoSanitizeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoSanitizeAttrSpelling);
+
+enum class NoSpeculativeLoadHardeningAttrSpelling : unsigned char {
+  GNU_NO_SPECULATIVE_LOAD_HARDENING,
+  CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING,
+  C2_XCLANG_NO_SPECULATIVE_LOAD_HARDENING,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoSpeculativeLoadHardeningAttrSpelling FromPasta(pasta::NoSpeculativeLoadHardeningAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoSpeculativeLoadHardeningAttrSpelling) {
+  return "NoSpeculativeLoadHardeningAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoSpeculativeLoadHardeningAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoSpeculativeLoadHardeningAttrSpelling);
+
+enum class NoSplitStackAttrSpelling : unsigned char {
+  GNU_NO_SPLIT_STACK,
+  CXX11_GNU_NO_SPLIT_STACK,
+  C2_XGNU_NO_SPLIT_STACK,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoSplitStackAttrSpelling FromPasta(pasta::NoSplitStackAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoSplitStackAttrSpelling) {
+  return "NoSplitStackAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoSplitStackAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoSplitStackAttrSpelling);
+
+enum class NoStackProtectorAttrSpelling : unsigned char {
+  GNU_NO_STACK_PROTECTOR,
+  CXX11_CLANG_NO_STACK_PROTECTOR,
+  C2_XCLANG_NO_STACK_PROTECTOR,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoStackProtectorAttrSpelling FromPasta(pasta::NoStackProtectorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoStackProtectorAttrSpelling) {
+  return "NoStackProtectorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoStackProtectorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoStackProtectorAttrSpelling);
+
+enum class NoThreadSafetyAnalysisAttrSpelling : unsigned char {
+  GNU_NO_THREAD_SAFETY_ANALYSIS,
+  CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS,
+  C2_XCLANG_NO_THREAD_SAFETY_ANALYSIS,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoThreadSafetyAnalysisAttrSpelling FromPasta(pasta::NoThreadSafetyAnalysisAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoThreadSafetyAnalysisAttrSpelling) {
+  return "NoThreadSafetyAnalysisAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoThreadSafetyAnalysisAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoThreadSafetyAnalysisAttrSpelling);
+
+enum class NoThrowAttrSpelling : unsigned char {
+  GNU_NOTHROW,
+  CXX11_GNU_NOTHROW,
+  C2_XGNU_NOTHROW,
+  DECLSPEC_NOTHROW,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoThrowAttrSpelling FromPasta(pasta::NoThrowAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoThrowAttrSpelling) {
+  return "NoThrowAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoThrowAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NoThrowAttrSpelling);
+
+enum class NonNullAttrSpelling : unsigned char {
+  GNU_NONNULL,
+  CXX11_GNU_NONNULL,
+  C2_XGNU_NONNULL,
+  SPELLING_NOT_CALCULATED,
+};
+
+NonNullAttrSpelling FromPasta(pasta::NonNullAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NonNullAttrSpelling) {
+  return "NonNullAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NonNullAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NonNullAttrSpelling);
+
+enum class NotTailCalledAttrSpelling : unsigned char {
+  GNU_NOT_TAIL_CALLED,
+  CXX11_CLANG_NOT_TAIL_CALLED,
+  C2_XCLANG_NOT_TAIL_CALLED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NotTailCalledAttrSpelling FromPasta(pasta::NotTailCalledAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NotTailCalledAttrSpelling) {
+  return "NotTailCalledAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NotTailCalledAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NotTailCalledAttrSpelling);
+
+enum class OMPAllocateDeclAttrAllocatorTypeTy : unsigned char {
+  OMP_NULL_MEMORY_ALLOC,
+  OMP_DEFAULT_MEMORY_ALLOC,
+  OMP_LARGE_CAP_MEMORY_ALLOC,
+  OMP_CONST_MEMORY_ALLOC,
+  OMP_HIGH_BW_MEMORY_ALLOC,
+  OMP_LOW_LAT_MEMORY_ALLOC,
+  OMPC_GROUP_MEMORY_ALLOC,
+  OMPP_TEAM_MEMORY_ALLOC,
+  OMP_THREAD_MEMORY_ALLOC,
+  OMP_USER_DEFINED_MEMORY_ALLOC,
+};
+
+OMPAllocateDeclAttrAllocatorTypeTy FromPasta(pasta::OMPAllocateDeclAttrAllocatorTypeTy pasta_val);
+
+inline static const char *EnumerationName(OMPAllocateDeclAttrAllocatorTypeTy) {
+  return "OMPAllocateDeclAttrAllocatorTypeTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPAllocateDeclAttrAllocatorTypeTy) {
+  return 10;
+}
+
+const char *EnumeratorName(OMPAllocateDeclAttrAllocatorTypeTy);
+
 enum class OMPDeclareReductionDeclInitKind : unsigned char {
   CALL_INITIALIZER,
   DIRECT_INITIALIZER,
@@ -1181,6 +4522,438 @@ inline static constexpr unsigned NumEnumerators(OMPDeclareReductionDeclInitKind)
 }
 
 const char *EnumeratorName(OMPDeclareReductionDeclInitKind);
+
+enum class OMPDeclareSimdDeclAttrBranchStateTy : unsigned char {
+  UNDEFINED,
+  INBRANCH,
+  NOTINBRANCH,
+};
+
+OMPDeclareSimdDeclAttrBranchStateTy FromPasta(pasta::OMPDeclareSimdDeclAttrBranchStateTy pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareSimdDeclAttrBranchStateTy) {
+  return "OMPDeclareSimdDeclAttrBranchStateTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareSimdDeclAttrBranchStateTy) {
+  return 3;
+}
+
+const char *EnumeratorName(OMPDeclareSimdDeclAttrBranchStateTy);
+
+enum class OMPDeclareTargetDeclAttrDevTypeTy : unsigned char {
+  HOST,
+  NO_HOST,
+  ANY,
+};
+
+OMPDeclareTargetDeclAttrDevTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrDevTypeTy pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareTargetDeclAttrDevTypeTy) {
+  return "OMPDeclareTargetDeclAttrDevTypeTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareTargetDeclAttrDevTypeTy) {
+  return 3;
+}
+
+const char *EnumeratorName(OMPDeclareTargetDeclAttrDevTypeTy);
+
+enum class OMPDeclareTargetDeclAttrMapTypeTy : unsigned char {
+  TO,
+  LINK,
+};
+
+OMPDeclareTargetDeclAttrMapTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrMapTypeTy pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareTargetDeclAttrMapTypeTy) {
+  return "OMPDeclareTargetDeclAttrMapTypeTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareTargetDeclAttrMapTypeTy) {
+  return 2;
+}
+
+const char *EnumeratorName(OMPDeclareTargetDeclAttrMapTypeTy);
+
+enum class OMPDeclareVariantAttrInteropType : unsigned char {
+  TARGET,
+  TARGET_SYNC,
+  TARGET_TARGET_SYNC,
+};
+
+OMPDeclareVariantAttrInteropType FromPasta(pasta::OMPDeclareVariantAttrInteropType pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareVariantAttrInteropType) {
+  return "OMPDeclareVariantAttrInteropType";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareVariantAttrInteropType) {
+  return 3;
+}
+
+const char *EnumeratorName(OMPDeclareVariantAttrInteropType);
+
+enum class OSConsumedAttrSpelling : unsigned char {
+  GNU_OS_CONSUMED,
+  CXX11_CLANG_OS_CONSUMED,
+  C2_XCLANG_OS_CONSUMED,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSConsumedAttrSpelling FromPasta(pasta::OSConsumedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSConsumedAttrSpelling) {
+  return "OSConsumedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSConsumedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSConsumedAttrSpelling);
+
+enum class OSConsumesThisAttrSpelling : unsigned char {
+  GNU_OS_CONSUMES_THIS,
+  CXX11_CLANG_OS_CONSUMES_THIS,
+  C2_XCLANG_OS_CONSUMES_THIS,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSConsumesThisAttrSpelling FromPasta(pasta::OSConsumesThisAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSConsumesThisAttrSpelling) {
+  return "OSConsumesThisAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSConsumesThisAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSConsumesThisAttrSpelling);
+
+enum class OSReturnsNotRetainedAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_NOT_RETAINED,
+  CXX11_CLANG_OS_RETURNS_NOT_RETAINED,
+  C2_XCLANG_OS_RETURNS_NOT_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsNotRetainedAttrSpelling FromPasta(pasta::OSReturnsNotRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsNotRetainedAttrSpelling) {
+  return "OSReturnsNotRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsNotRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsNotRetainedAttrSpelling);
+
+enum class OSReturnsRetainedAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_RETAINED,
+  CXX11_CLANG_OS_RETURNS_RETAINED,
+  C2_XCLANG_OS_RETURNS_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsRetainedAttrSpelling FromPasta(pasta::OSReturnsRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsRetainedAttrSpelling) {
+  return "OSReturnsRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsRetainedAttrSpelling);
+
+enum class OSReturnsRetainedOnNonZeroAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_RETAINED_ON_NON_ZERO,
+  CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO,
+  C2_XCLANG_OS_RETURNS_RETAINED_ON_NON_ZERO,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsRetainedOnNonZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnNonZeroAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsRetainedOnNonZeroAttrSpelling) {
+  return "OSReturnsRetainedOnNonZeroAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsRetainedOnNonZeroAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsRetainedOnNonZeroAttrSpelling);
+
+enum class OSReturnsRetainedOnZeroAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_RETAINED_ON_ZERO,
+  CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO,
+  C2_XCLANG_OS_RETURNS_RETAINED_ON_ZERO,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsRetainedOnZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnZeroAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsRetainedOnZeroAttrSpelling) {
+  return "OSReturnsRetainedOnZeroAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsRetainedOnZeroAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsRetainedOnZeroAttrSpelling);
+
+enum class ObjCBoxableAttrSpelling : unsigned char {
+  GNU_OBJC_BOXABLE,
+  CXX11_CLANG_OBJC_BOXABLE,
+  C2_XCLANG_OBJC_BOXABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBoxableAttrSpelling FromPasta(pasta::ObjCBoxableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBoxableAttrSpelling) {
+  return "ObjCBoxableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBoxableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBoxableAttrSpelling);
+
+enum class ObjCBridgeAttrSpelling : unsigned char {
+  GNU_OBJC_BRIDGE,
+  CXX11_CLANG_OBJC_BRIDGE,
+  C2_XCLANG_OBJC_BRIDGE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBridgeAttrSpelling FromPasta(pasta::ObjCBridgeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBridgeAttrSpelling) {
+  return "ObjCBridgeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBridgeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBridgeAttrSpelling);
+
+enum class ObjCBridgeMutableAttrSpelling : unsigned char {
+  GNU_OBJC_BRIDGE_MUTABLE,
+  CXX11_CLANG_OBJC_BRIDGE_MUTABLE,
+  C2_XCLANG_OBJC_BRIDGE_MUTABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBridgeMutableAttrSpelling FromPasta(pasta::ObjCBridgeMutableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBridgeMutableAttrSpelling) {
+  return "ObjCBridgeMutableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBridgeMutableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBridgeMutableAttrSpelling);
+
+enum class ObjCBridgeRelatedAttrSpelling : unsigned char {
+  GNU_OBJC_BRIDGE_RELATED,
+  CXX11_CLANG_OBJC_BRIDGE_RELATED,
+  C2_XCLANG_OBJC_BRIDGE_RELATED,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBridgeRelatedAttrSpelling FromPasta(pasta::ObjCBridgeRelatedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBridgeRelatedAttrSpelling) {
+  return "ObjCBridgeRelatedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBridgeRelatedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBridgeRelatedAttrSpelling);
+
+enum class ObjCClassStubAttrSpelling : unsigned char {
+  GNU_OBJC_CLASS_STUB,
+  CXX11_CLANG_OBJC_CLASS_STUB,
+  C2_XCLANG_OBJC_CLASS_STUB,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCClassStubAttrSpelling FromPasta(pasta::ObjCClassStubAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCClassStubAttrSpelling) {
+  return "ObjCClassStubAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCClassStubAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCClassStubAttrSpelling);
+
+enum class ObjCDesignatedInitializerAttrSpelling : unsigned char {
+  GNU_OBJC_DESIGNATED_INITIALIZER,
+  CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER,
+  C2_XCLANG_OBJC_DESIGNATED_INITIALIZER,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCDesignatedInitializerAttrSpelling FromPasta(pasta::ObjCDesignatedInitializerAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCDesignatedInitializerAttrSpelling) {
+  return "ObjCDesignatedInitializerAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCDesignatedInitializerAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCDesignatedInitializerAttrSpelling);
+
+enum class ObjCDirectAttrSpelling : unsigned char {
+  GNU_OBJC_DIRECT,
+  CXX11_CLANG_OBJC_DIRECT,
+  C2_XCLANG_OBJC_DIRECT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCDirectAttrSpelling FromPasta(pasta::ObjCDirectAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCDirectAttrSpelling) {
+  return "ObjCDirectAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCDirectAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCDirectAttrSpelling);
+
+enum class ObjCDirectMembersAttrSpelling : unsigned char {
+  GNU_OBJC_DIRECT_MEMBERS,
+  CXX11_CLANG_OBJC_DIRECT_MEMBERS,
+  C2_XCLANG_OBJC_DIRECT_MEMBERS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCDirectMembersAttrSpelling FromPasta(pasta::ObjCDirectMembersAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCDirectMembersAttrSpelling) {
+  return "ObjCDirectMembersAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCDirectMembersAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCDirectMembersAttrSpelling);
+
+enum class ObjCExceptionAttrSpelling : unsigned char {
+  GNU_OBJC_EXCEPTION,
+  CXX11_CLANG_OBJC_EXCEPTION,
+  C2_XCLANG_OBJC_EXCEPTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCExceptionAttrSpelling FromPasta(pasta::ObjCExceptionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCExceptionAttrSpelling) {
+  return "ObjCExceptionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCExceptionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCExceptionAttrSpelling);
+
+enum class ObjCExplicitProtocolImplAttrSpelling : unsigned char {
+  GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION,
+  CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION,
+  C2_XCLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCExplicitProtocolImplAttrSpelling FromPasta(pasta::ObjCExplicitProtocolImplAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCExplicitProtocolImplAttrSpelling) {
+  return "ObjCExplicitProtocolImplAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCExplicitProtocolImplAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCExplicitProtocolImplAttrSpelling);
+
+enum class ObjCExternallyRetainedAttrSpelling : unsigned char {
+  GNU_OBJC_EXTERNALLY_RETAINED,
+  CXX11_CLANG_OBJC_EXTERNALLY_RETAINED,
+  C2_XCLANG_OBJC_EXTERNALLY_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCExternallyRetainedAttrSpelling FromPasta(pasta::ObjCExternallyRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCExternallyRetainedAttrSpelling) {
+  return "ObjCExternallyRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCExternallyRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCExternallyRetainedAttrSpelling);
+
+enum class ObjCGCAttrSpelling : unsigned char {
+  GNU_OBJC_GC,
+  CXX11_CLANG_OBJC_GC,
+  C2_XCLANG_OBJC_GC,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCGCAttrSpelling FromPasta(pasta::ObjCGCAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCGCAttrSpelling) {
+  return "ObjCGCAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCGCAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCGCAttrSpelling);
+
+enum class ObjCIndependentClassAttrSpelling : unsigned char {
+  GNU_OBJC_INDEPENDENT_CLASS,
+  CXX11_CLANG_OBJC_INDEPENDENT_CLASS,
+  C2_XCLANG_OBJC_INDEPENDENT_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCIndependentClassAttrSpelling FromPasta(pasta::ObjCIndependentClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCIndependentClassAttrSpelling) {
+  return "ObjCIndependentClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCIndependentClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCIndependentClassAttrSpelling);
 
 enum class ObjCIvarDeclAccessControl : unsigned char {
   NONE,
@@ -1239,6 +5012,141 @@ inline static constexpr unsigned NumEnumerators(ObjCMethodDeclImplementationCont
 
 const char *EnumeratorName(ObjCMethodDeclImplementationControl);
 
+enum class ObjCMethodFamilyAttrFamilyKind : unsigned char {
+  NONE,
+  ALLOC,
+  COPY,
+  INITIALIZER,
+  MUTABLE_COPY,
+  NEW,
+};
+
+ObjCMethodFamilyAttrFamilyKind FromPasta(pasta::ObjCMethodFamilyAttrFamilyKind pasta_val);
+
+inline static const char *EnumerationName(ObjCMethodFamilyAttrFamilyKind) {
+  return "ObjCMethodFamilyAttrFamilyKind";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCMethodFamilyAttrFamilyKind) {
+  return 6;
+}
+
+const char *EnumeratorName(ObjCMethodFamilyAttrFamilyKind);
+
+enum class ObjCMethodFamilyAttrSpelling : unsigned char {
+  GNU_OBJC_METHOD_FAMILY,
+  CXX11_CLANG_OBJC_METHOD_FAMILY,
+  C2_XCLANG_OBJC_METHOD_FAMILY,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCMethodFamilyAttrSpelling FromPasta(pasta::ObjCMethodFamilyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCMethodFamilyAttrSpelling) {
+  return "ObjCMethodFamilyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCMethodFamilyAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCMethodFamilyAttrSpelling);
+
+enum class ObjCNSObjectAttrSpelling : unsigned char {
+  GNUNS_OBJECT,
+  CXX11_CLANG_NS_OBJECT,
+  C2_XCLANG_NS_OBJECT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCNSObjectAttrSpelling FromPasta(pasta::ObjCNSObjectAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCNSObjectAttrSpelling) {
+  return "ObjCNSObjectAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCNSObjectAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCNSObjectAttrSpelling);
+
+enum class ObjCNonLazyClassAttrSpelling : unsigned char {
+  GNU_OBJC_NONLAZY_CLASS,
+  CXX11_CLANG_OBJC_NONLAZY_CLASS,
+  C2_XCLANG_OBJC_NONLAZY_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCNonLazyClassAttrSpelling FromPasta(pasta::ObjCNonLazyClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCNonLazyClassAttrSpelling) {
+  return "ObjCNonLazyClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCNonLazyClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCNonLazyClassAttrSpelling);
+
+enum class ObjCNonRuntimeProtocolAttrSpelling : unsigned char {
+  GNU_OBJC_NON_RUNTIME_PROTOCOL,
+  CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL,
+  C2_XCLANG_OBJC_NON_RUNTIME_PROTOCOL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCNonRuntimeProtocolAttrSpelling FromPasta(pasta::ObjCNonRuntimeProtocolAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCNonRuntimeProtocolAttrSpelling) {
+  return "ObjCNonRuntimeProtocolAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCNonRuntimeProtocolAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCNonRuntimeProtocolAttrSpelling);
+
+enum class ObjCOwnershipAttrSpelling : unsigned char {
+  GNU_OBJC_OWNERSHIP,
+  CXX11_CLANG_OBJC_OWNERSHIP,
+  C2_XCLANG_OBJC_OWNERSHIP,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCOwnershipAttrSpelling FromPasta(pasta::ObjCOwnershipAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCOwnershipAttrSpelling) {
+  return "ObjCOwnershipAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCOwnershipAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCOwnershipAttrSpelling);
+
+enum class ObjCPreciseLifetimeAttrSpelling : unsigned char {
+  GNU_OBJC_PRECISE_LIFETIME,
+  CXX11_CLANG_OBJC_PRECISE_LIFETIME,
+  C2_XCLANG_OBJC_PRECISE_LIFETIME,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCPreciseLifetimeAttrSpelling FromPasta(pasta::ObjCPreciseLifetimeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCPreciseLifetimeAttrSpelling) {
+  return "ObjCPreciseLifetimeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCPreciseLifetimeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCPreciseLifetimeAttrSpelling);
+
 enum class ObjCPropertyDeclPropertyControl : unsigned char {
   NONE,
   REQUIRED,
@@ -1293,6 +5201,546 @@ inline static constexpr unsigned NumEnumerators(ObjCPropertyImplDeclKind) {
 
 const char *EnumeratorName(ObjCPropertyImplDeclKind);
 
+enum class ObjCRequiresPropertyDefsAttrSpelling : unsigned char {
+  GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS,
+  CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS,
+  C2_XCLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRequiresPropertyDefsAttrSpelling FromPasta(pasta::ObjCRequiresPropertyDefsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRequiresPropertyDefsAttrSpelling) {
+  return "ObjCRequiresPropertyDefsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRequiresPropertyDefsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRequiresPropertyDefsAttrSpelling);
+
+enum class ObjCRequiresSuperAttrSpelling : unsigned char {
+  GNU_OBJC_REQUIRES_SUPER,
+  CXX11_CLANG_OBJC_REQUIRES_SUPER,
+  C2_XCLANG_OBJC_REQUIRES_SUPER,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRequiresSuperAttrSpelling FromPasta(pasta::ObjCRequiresSuperAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRequiresSuperAttrSpelling) {
+  return "ObjCRequiresSuperAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRequiresSuperAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRequiresSuperAttrSpelling);
+
+enum class ObjCReturnsInnerPointerAttrSpelling : unsigned char {
+  GNU_OBJC_RETURNS_INNER_POINTER,
+  CXX11_CLANG_OBJC_RETURNS_INNER_POINTER,
+  C2_XCLANG_OBJC_RETURNS_INNER_POINTER,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCReturnsInnerPointerAttrSpelling FromPasta(pasta::ObjCReturnsInnerPointerAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCReturnsInnerPointerAttrSpelling) {
+  return "ObjCReturnsInnerPointerAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCReturnsInnerPointerAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCReturnsInnerPointerAttrSpelling);
+
+enum class ObjCRootClassAttrSpelling : unsigned char {
+  GNU_OBJC_ROOT_CLASS,
+  CXX11_CLANG_OBJC_ROOT_CLASS,
+  C2_XCLANG_OBJC_ROOT_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRootClassAttrSpelling FromPasta(pasta::ObjCRootClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRootClassAttrSpelling) {
+  return "ObjCRootClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRootClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRootClassAttrSpelling);
+
+enum class ObjCRuntimeNameAttrSpelling : unsigned char {
+  GNU_OBJC_RUNTIME_NAME,
+  CXX11_CLANG_OBJC_RUNTIME_NAME,
+  C2_XCLANG_OBJC_RUNTIME_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRuntimeNameAttrSpelling FromPasta(pasta::ObjCRuntimeNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRuntimeNameAttrSpelling) {
+  return "ObjCRuntimeNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRuntimeNameAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRuntimeNameAttrSpelling);
+
+enum class ObjCRuntimeVisibleAttrSpelling : unsigned char {
+  GNU_OBJC_RUNTIME_VISIBLE,
+  CXX11_CLANG_OBJC_RUNTIME_VISIBLE,
+  C2_XCLANG_OBJC_RUNTIME_VISIBLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRuntimeVisibleAttrSpelling FromPasta(pasta::ObjCRuntimeVisibleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRuntimeVisibleAttrSpelling) {
+  return "ObjCRuntimeVisibleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRuntimeVisibleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRuntimeVisibleAttrSpelling);
+
+enum class ObjCSubclassingRestrictedAttrSpelling : unsigned char {
+  GNU_OBJC_SUBCLASSING_RESTRICTED,
+  CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED,
+  C2_XCLANG_OBJC_SUBCLASSING_RESTRICTED,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCSubclassingRestrictedAttrSpelling FromPasta(pasta::ObjCSubclassingRestrictedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCSubclassingRestrictedAttrSpelling) {
+  return "ObjCSubclassingRestrictedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCSubclassingRestrictedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCSubclassingRestrictedAttrSpelling);
+
+enum class OpenCLAccessAttrSpelling : unsigned char {
+  KEYWORD_READ_ONLY,
+  KEYWORD_WRITE_ONLY,
+  KEYWORD_READ_WRITE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLAccessAttrSpelling FromPasta(pasta::OpenCLAccessAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLAccessAttrSpelling) {
+  return "OpenCLAccessAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLAccessAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OpenCLAccessAttrSpelling);
+
+enum class OpenCLConstantAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_CONSTANT,
+  GNU_OPENCL_CONSTANT,
+  CXX11_CLANG_OPENCL_CONSTANT,
+  C2_XCLANG_OPENCL_CONSTANT,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLConstantAddressSpaceAttrSpelling FromPasta(pasta::OpenCLConstantAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLConstantAddressSpaceAttrSpelling) {
+  return "OpenCLConstantAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLConstantAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLConstantAddressSpaceAttrSpelling);
+
+enum class OpenCLGenericAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_GENERIC,
+  GNU_OPENCL_GENERIC,
+  CXX11_CLANG_OPENCL_GENERIC,
+  C2_XCLANG_OPENCL_GENERIC,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGenericAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGenericAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGenericAddressSpaceAttrSpelling) {
+  return "OpenCLGenericAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGenericAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLGenericAddressSpaceAttrSpelling);
+
+enum class OpenCLGlobalAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_GLOBAL,
+  GNU_OPENCL_GLOBAL,
+  CXX11_CLANG_OPENCL_GLOBAL,
+  C2_XCLANG_OPENCL_GLOBAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGlobalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGlobalAddressSpaceAttrSpelling) {
+  return "OpenCLGlobalAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGlobalAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLGlobalAddressSpaceAttrSpelling);
+
+enum class OpenCLGlobalDeviceAddressSpaceAttrSpelling : unsigned char {
+  GNU_OPENCL_GLOBAL_DEVICE,
+  CXX11_CLANG_OPENCL_GLOBAL_DEVICE,
+  C2_XCLANG_OPENCL_GLOBAL_DEVICE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGlobalDeviceAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalDeviceAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGlobalDeviceAddressSpaceAttrSpelling) {
+  return "OpenCLGlobalDeviceAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGlobalDeviceAddressSpaceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OpenCLGlobalDeviceAddressSpaceAttrSpelling);
+
+enum class OpenCLGlobalHostAddressSpaceAttrSpelling : unsigned char {
+  GNU_OPENCL_GLOBAL_HOST,
+  CXX11_CLANG_OPENCL_GLOBAL_HOST,
+  C2_XCLANG_OPENCL_GLOBAL_HOST,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGlobalHostAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalHostAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGlobalHostAddressSpaceAttrSpelling) {
+  return "OpenCLGlobalHostAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGlobalHostAddressSpaceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OpenCLGlobalHostAddressSpaceAttrSpelling);
+
+enum class OpenCLKernelAttrSpelling : unsigned char {
+  KEYWORD_KERNEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLKernelAttrSpelling FromPasta(pasta::OpenCLKernelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLKernelAttrSpelling) {
+  return "OpenCLKernelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLKernelAttrSpelling) {
+  return 2;
+}
+
+const char *EnumeratorName(OpenCLKernelAttrSpelling);
+
+enum class OpenCLLocalAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_LOCAL,
+  GNU_OPENCL_LOCAL,
+  CXX11_CLANG_OPENCL_LOCAL,
+  C2_XCLANG_OPENCL_LOCAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLLocalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLLocalAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLLocalAddressSpaceAttrSpelling) {
+  return "OpenCLLocalAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLLocalAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLLocalAddressSpaceAttrSpelling);
+
+enum class OpenCLPrivateAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_PRIVATE,
+  GNU_OPENCL_PRIVATE,
+  CXX11_CLANG_OPENCL_PRIVATE,
+  C2_XCLANG_OPENCL_PRIVATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLPrivateAddressSpaceAttrSpelling FromPasta(pasta::OpenCLPrivateAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLPrivateAddressSpaceAttrSpelling) {
+  return "OpenCLPrivateAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLPrivateAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLPrivateAddressSpaceAttrSpelling);
+
+enum class OptimizeNoneAttrSpelling : unsigned char {
+  GNU_OPTNONE,
+  CXX11_CLANG_OPTNONE,
+  C2_XCLANG_OPTNONE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OptimizeNoneAttrSpelling FromPasta(pasta::OptimizeNoneAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OptimizeNoneAttrSpelling) {
+  return "OptimizeNoneAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OptimizeNoneAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OptimizeNoneAttrSpelling);
+
+enum class OverloadableAttrSpelling : unsigned char {
+  GNU_OVERLOADABLE,
+  CXX11_CLANG_OVERLOADABLE,
+  C2_XCLANG_OVERLOADABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OverloadableAttrSpelling FromPasta(pasta::OverloadableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OverloadableAttrSpelling) {
+  return "OverloadableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OverloadableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OverloadableAttrSpelling);
+
+enum class OwnershipAttrOwnershipKind : unsigned char {
+  HOLDS,
+  RETURNS,
+  TAKES,
+};
+
+OwnershipAttrOwnershipKind FromPasta(pasta::OwnershipAttrOwnershipKind pasta_val);
+
+inline static const char *EnumerationName(OwnershipAttrOwnershipKind) {
+  return "OwnershipAttrOwnershipKind";
+}
+
+inline static constexpr unsigned NumEnumerators(OwnershipAttrOwnershipKind) {
+  return 3;
+}
+
+const char *EnumeratorName(OwnershipAttrOwnershipKind);
+
+enum class OwnershipAttrSpelling : unsigned char {
+  GNU_OWNERSHIP_HOLDS,
+  CXX11_CLANG_OWNERSHIP_HOLDS,
+  C2_XCLANG_OWNERSHIP_HOLDS,
+  GNU_OWNERSHIP_RETURNS,
+  CXX11_CLANG_OWNERSHIP_RETURNS,
+  C2_XCLANG_OWNERSHIP_RETURNS,
+  GNU_OWNERSHIP_TAKES,
+  CXX11_CLANG_OWNERSHIP_TAKES,
+  C2_XCLANG_OWNERSHIP_TAKES,
+  SPELLING_NOT_CALCULATED,
+};
+
+OwnershipAttrSpelling FromPasta(pasta::OwnershipAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OwnershipAttrSpelling) {
+  return "OwnershipAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OwnershipAttrSpelling) {
+  return 10;
+}
+
+const char *EnumeratorName(OwnershipAttrSpelling);
+
+enum class PackedAttrSpelling : unsigned char {
+  GNU_PACKED,
+  CXX11_GNU_PACKED,
+  C2_XGNU_PACKED,
+  SPELLING_NOT_CALCULATED,
+};
+
+PackedAttrSpelling FromPasta(pasta::PackedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PackedAttrSpelling) {
+  return "PackedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PackedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PackedAttrSpelling);
+
+enum class ParamTypestateAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+ParamTypestateAttrConsumedState FromPasta(pasta::ParamTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(ParamTypestateAttrConsumedState) {
+  return "ParamTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(ParamTypestateAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(ParamTypestateAttrConsumedState);
+
+enum class ParamTypestateAttrSpelling : unsigned char {
+  GNU_PARAMETER_TYPESTATE,
+  CXX11_CLANG_PARAMETER_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ParamTypestateAttrSpelling FromPasta(pasta::ParamTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ParamTypestateAttrSpelling) {
+  return "ParamTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ParamTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ParamTypestateAttrSpelling);
+
+enum class PascalAttrSpelling : unsigned char {
+  GNU_PASCAL,
+  CXX11_CLANG_PASCAL,
+  C2_XCLANG_PASCAL,
+  KEYWORD_PASCAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+PascalAttrSpelling FromPasta(pasta::PascalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PascalAttrSpelling) {
+  return "PascalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PascalAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(PascalAttrSpelling);
+
+enum class PassObjectSizeAttrSpelling : unsigned char {
+  GNU_PASS_OBJECT_SIZE,
+  CXX11_CLANG_PASS_OBJECT_SIZE,
+  C2_XCLANG_PASS_OBJECT_SIZE,
+  GNU_PASS_DYNAMIC_OBJECT_SIZE,
+  CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE,
+  C2_XCLANG_PASS_DYNAMIC_OBJECT_SIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+PassObjectSizeAttrSpelling FromPasta(pasta::PassObjectSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PassObjectSizeAttrSpelling) {
+  return "PassObjectSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PassObjectSizeAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(PassObjectSizeAttrSpelling);
+
+enum class PatchableFunctionEntryAttrSpelling : unsigned char {
+  GNU_PATCHABLE_FUNCTION_ENTRY,
+  CXX11_GNU_PATCHABLE_FUNCTION_ENTRY,
+  C2_XGNU_PATCHABLE_FUNCTION_ENTRY,
+  SPELLING_NOT_CALCULATED,
+};
+
+PatchableFunctionEntryAttrSpelling FromPasta(pasta::PatchableFunctionEntryAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PatchableFunctionEntryAttrSpelling) {
+  return "PatchableFunctionEntryAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PatchableFunctionEntryAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PatchableFunctionEntryAttrSpelling);
+
+enum class PcsAttrPCSType : unsigned char {
+  AAPCS,
+  VFP,
+};
+
+PcsAttrPCSType FromPasta(pasta::PcsAttrPCSType pasta_val);
+
+inline static const char *EnumerationName(PcsAttrPCSType) {
+  return "PcsAttrPCSType";
+}
+
+inline static constexpr unsigned NumEnumerators(PcsAttrPCSType) {
+  return 2;
+}
+
+const char *EnumeratorName(PcsAttrPCSType);
+
+enum class PcsAttrSpelling : unsigned char {
+  GNU_PCS,
+  CXX11_GNU_PCS,
+  C2_XGNU_PCS,
+  SPELLING_NOT_CALCULATED,
+};
+
+PcsAttrSpelling FromPasta(pasta::PcsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PcsAttrSpelling) {
+  return "PcsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PcsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PcsAttrSpelling);
+
 enum class PredefinedExprIdentKind : unsigned char {
   FUNC,
   FUNCTION,
@@ -1315,6 +5763,99 @@ inline static constexpr unsigned NumEnumerators(PredefinedExprIdentKind) {
 }
 
 const char *EnumeratorName(PredefinedExprIdentKind);
+
+enum class PreferredNameAttrSpelling : unsigned char {
+  GNU_PREFERRED_NAME,
+  CXX11_CLANG_PREFERRED_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+PreferredNameAttrSpelling FromPasta(pasta::PreferredNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PreferredNameAttrSpelling) {
+  return "PreferredNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PreferredNameAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(PreferredNameAttrSpelling);
+
+enum class PreserveAllAttrSpelling : unsigned char {
+  GNU_PRESERVE_ALL,
+  CXX11_CLANG_PRESERVE_ALL,
+  C2_XCLANG_PRESERVE_ALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+PreserveAllAttrSpelling FromPasta(pasta::PreserveAllAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PreserveAllAttrSpelling) {
+  return "PreserveAllAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PreserveAllAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PreserveAllAttrSpelling);
+
+enum class PreserveMostAttrSpelling : unsigned char {
+  GNU_PRESERVE_MOST,
+  CXX11_CLANG_PRESERVE_MOST,
+  C2_XCLANG_PRESERVE_MOST,
+  SPELLING_NOT_CALCULATED,
+};
+
+PreserveMostAttrSpelling FromPasta(pasta::PreserveMostAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PreserveMostAttrSpelling) {
+  return "PreserveMostAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PreserveMostAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PreserveMostAttrSpelling);
+
+enum class PtGuardedVarAttrSpelling : unsigned char {
+  GNU_PT_GUARDED_VARIABLE,
+  CXX11_CLANG_PT_GUARDED_VARIABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+PtGuardedVarAttrSpelling FromPasta(pasta::PtGuardedVarAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PtGuardedVarAttrSpelling) {
+  return "PtGuardedVarAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PtGuardedVarAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(PtGuardedVarAttrSpelling);
+
+enum class PureAttrSpelling : unsigned char {
+  GNU_PURE,
+  CXX11_GNU_PURE,
+  C2_XGNU_PURE,
+  SPELLING_NOT_CALCULATED,
+};
+
+PureAttrSpelling FromPasta(pasta::PureAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PureAttrSpelling) {
+  return "PureAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PureAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PureAttrSpelling);
 
 enum class QualTypeDestructionKind : unsigned char {
   NONE,
@@ -1375,6 +5916,43 @@ inline static constexpr unsigned NumEnumerators(QualTypePrimitiveDefaultInitiali
 
 const char *EnumeratorName(QualTypePrimitiveDefaultInitializeKind);
 
+enum class RISCVInterruptAttrInterruptType : unsigned char {
+  USER,
+  SUPERVISOR,
+  MACHINE,
+};
+
+RISCVInterruptAttrInterruptType FromPasta(pasta::RISCVInterruptAttrInterruptType pasta_val);
+
+inline static const char *EnumerationName(RISCVInterruptAttrInterruptType) {
+  return "RISCVInterruptAttrInterruptType";
+}
+
+inline static constexpr unsigned NumEnumerators(RISCVInterruptAttrInterruptType) {
+  return 3;
+}
+
+const char *EnumeratorName(RISCVInterruptAttrInterruptType);
+
+enum class RISCVInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2_XGNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+RISCVInterruptAttrSpelling FromPasta(pasta::RISCVInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RISCVInterruptAttrSpelling) {
+  return "RISCVInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RISCVInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(RISCVInterruptAttrSpelling);
+
 enum class RecordDeclArgPassingKind : unsigned char {
   CAN_PASS_IN_REGS,
   CANNOT_PASS_IN_REGS,
@@ -1392,6 +5970,375 @@ inline static constexpr unsigned NumEnumerators(RecordDeclArgPassingKind) {
 }
 
 const char *EnumeratorName(RecordDeclArgPassingKind);
+
+enum class RegCallAttrSpelling : unsigned char {
+  GNU_REGCALL,
+  CXX11_GNU_REGCALL,
+  C2_XGNU_REGCALL,
+  KEYWORD_REGCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+RegCallAttrSpelling FromPasta(pasta::RegCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RegCallAttrSpelling) {
+  return "RegCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RegCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(RegCallAttrSpelling);
+
+enum class ReinitializesAttrSpelling : unsigned char {
+  GNU_REINITIALIZES,
+  CXX11_CLANG_REINITIALIZES,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReinitializesAttrSpelling FromPasta(pasta::ReinitializesAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReinitializesAttrSpelling) {
+  return "ReinitializesAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReinitializesAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ReinitializesAttrSpelling);
+
+enum class ReleaseCapabilityAttrSpelling : unsigned char {
+  GNU_RELEASE_CAPABILITY,
+  CXX11_CLANG_RELEASE_CAPABILITY,
+  GNU_RELEASE_SHARED_CAPABILITY,
+  CXX11_CLANG_RELEASE_SHARED_CAPABILITY,
+  GNU_RELEASE_GENERIC_CAPABILITY,
+  CXX11_CLANG_RELEASE_GENERIC_CAPABILITY,
+  GNU_UNLOCK_FUNCTION,
+  CXX11_CLANG_UNLOCK_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReleaseCapabilityAttrSpelling FromPasta(pasta::ReleaseCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReleaseCapabilityAttrSpelling) {
+  return "ReleaseCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReleaseCapabilityAttrSpelling) {
+  return 9;
+}
+
+const char *EnumeratorName(ReleaseCapabilityAttrSpelling);
+
+enum class ReleaseHandleAttrSpelling : unsigned char {
+  GNU_RELEASE_HANDLE,
+  CXX11_CLANG_RELEASE_HANDLE,
+  C2_XCLANG_RELEASE_HANDLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReleaseHandleAttrSpelling FromPasta(pasta::ReleaseHandleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReleaseHandleAttrSpelling) {
+  return "ReleaseHandleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReleaseHandleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ReleaseHandleAttrSpelling);
+
+enum class RequiresCapabilityAttrSpelling : unsigned char {
+  GNU_REQUIRES_CAPABILITY,
+  CXX11_CLANG_REQUIRES_CAPABILITY,
+  GNU_EXCLUSIVE_LOCKS_REQUIRED,
+  CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED,
+  GNU_REQUIRES_SHARED_CAPABILITY,
+  CXX11_CLANG_REQUIRES_SHARED_CAPABILITY,
+  GNU_SHARED_LOCKS_REQUIRED,
+  CXX11_CLANG_SHARED_LOCKS_REQUIRED,
+  SPELLING_NOT_CALCULATED,
+};
+
+RequiresCapabilityAttrSpelling FromPasta(pasta::RequiresCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RequiresCapabilityAttrSpelling) {
+  return "RequiresCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RequiresCapabilityAttrSpelling) {
+  return 9;
+}
+
+const char *EnumeratorName(RequiresCapabilityAttrSpelling);
+
+enum class RestrictAttrSpelling : unsigned char {
+  DECLSPEC_RESTRICT,
+  GNU_MALLOC,
+  CXX11_GNU_MALLOC,
+  C2_XGNU_MALLOC,
+  SPELLING_NOT_CALCULATED,
+};
+
+RestrictAttrSpelling FromPasta(pasta::RestrictAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RestrictAttrSpelling) {
+  return "RestrictAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RestrictAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(RestrictAttrSpelling);
+
+enum class RetainAttrSpelling : unsigned char {
+  GNU_RETAIN,
+  CXX11_GNU_RETAIN,
+  C2_XGNU_RETAIN,
+  SPELLING_NOT_CALCULATED,
+};
+
+RetainAttrSpelling FromPasta(pasta::RetainAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RetainAttrSpelling) {
+  return "RetainAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RetainAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(RetainAttrSpelling);
+
+enum class ReturnTypestateAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+ReturnTypestateAttrConsumedState FromPasta(pasta::ReturnTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(ReturnTypestateAttrConsumedState) {
+  return "ReturnTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnTypestateAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(ReturnTypestateAttrConsumedState);
+
+enum class ReturnTypestateAttrSpelling : unsigned char {
+  GNU_RETURN_TYPESTATE,
+  CXX11_CLANG_RETURN_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReturnTypestateAttrSpelling FromPasta(pasta::ReturnTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReturnTypestateAttrSpelling) {
+  return "ReturnTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ReturnTypestateAttrSpelling);
+
+enum class ReturnsNonNullAttrSpelling : unsigned char {
+  GNU_RETURNS_NONNULL,
+  CXX11_GNU_RETURNS_NONNULL,
+  C2_XGNU_RETURNS_NONNULL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReturnsNonNullAttrSpelling FromPasta(pasta::ReturnsNonNullAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReturnsNonNullAttrSpelling) {
+  return "ReturnsNonNullAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnsNonNullAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ReturnsNonNullAttrSpelling);
+
+enum class ReturnsTwiceAttrSpelling : unsigned char {
+  GNU_RETURNS_TWICE,
+  CXX11_GNU_RETURNS_TWICE,
+  C2_XGNU_RETURNS_TWICE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReturnsTwiceAttrSpelling FromPasta(pasta::ReturnsTwiceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReturnsTwiceAttrSpelling) {
+  return "ReturnsTwiceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnsTwiceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ReturnsTwiceAttrSpelling);
+
+enum class SYCLKernelAttrSpelling : unsigned char {
+  GNU_SYCL_KERNEL,
+  CXX11_CLANG_SYCL_KERNEL,
+  C2_XCLANG_SYCL_KERNEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SYCLKernelAttrSpelling FromPasta(pasta::SYCLKernelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SYCLKernelAttrSpelling) {
+  return "SYCLKernelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SYCLKernelAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SYCLKernelAttrSpelling);
+
+enum class SYCLSpecialClassAttrSpelling : unsigned char {
+  GNU_SYCL_SPECIAL_CLASS,
+  CXX11_CLANG_SYCL_SPECIAL_CLASS,
+  C2_XCLANG_SYCL_SPECIAL_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+SYCLSpecialClassAttrSpelling FromPasta(pasta::SYCLSpecialClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SYCLSpecialClassAttrSpelling) {
+  return "SYCLSpecialClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SYCLSpecialClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SYCLSpecialClassAttrSpelling);
+
+enum class ScopedLockableAttrSpelling : unsigned char {
+  GNU_SCOPED_LOCKABLE,
+  CXX11_CLANG_SCOPED_LOCKABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ScopedLockableAttrSpelling FromPasta(pasta::ScopedLockableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ScopedLockableAttrSpelling) {
+  return "ScopedLockableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ScopedLockableAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ScopedLockableAttrSpelling);
+
+enum class SectionAttrSpelling : unsigned char {
+  GNU_SECTION,
+  CXX11_GNU_SECTION,
+  C2_XGNU_SECTION,
+  DECLSPEC_ALLOCATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+SectionAttrSpelling FromPasta(pasta::SectionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SectionAttrSpelling) {
+  return "SectionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SectionAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(SectionAttrSpelling);
+
+enum class SelectAnyAttrSpelling : unsigned char {
+  DECLSPEC_SELECTANY,
+  GNU_SELECTANY,
+  CXX11_GNU_SELECTANY,
+  C2_XGNU_SELECTANY,
+  SPELLING_NOT_CALCULATED,
+};
+
+SelectAnyAttrSpelling FromPasta(pasta::SelectAnyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SelectAnyAttrSpelling) {
+  return "SelectAnyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SelectAnyAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(SelectAnyAttrSpelling);
+
+enum class SentinelAttrSpelling : unsigned char {
+  GNU_SENTINEL,
+  CXX11_GNU_SENTINEL,
+  C2_XGNU_SENTINEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SentinelAttrSpelling FromPasta(pasta::SentinelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SentinelAttrSpelling) {
+  return "SentinelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SentinelAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SentinelAttrSpelling);
+
+enum class SetTypestateAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+SetTypestateAttrConsumedState FromPasta(pasta::SetTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(SetTypestateAttrConsumedState) {
+  return "SetTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(SetTypestateAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(SetTypestateAttrConsumedState);
+
+enum class SetTypestateAttrSpelling : unsigned char {
+  GNU_TYPESTATE,
+  CXX11_CLANG_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+SetTypestateAttrSpelling FromPasta(pasta::SetTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SetTypestateAttrSpelling) {
+  return "SetTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SetTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(SetTypestateAttrSpelling);
 
 enum class SourceLocExprIdentKind : unsigned char {
   FUNCTION,
@@ -1411,6 +6358,63 @@ inline static constexpr unsigned NumEnumerators(SourceLocExprIdentKind) {
 }
 
 const char *EnumeratorName(SourceLocExprIdentKind);
+
+enum class SpeculativeLoadHardeningAttrSpelling : unsigned char {
+  GNU_SPECULATIVE_LOAD_HARDENING,
+  CXX11_CLANG_SPECULATIVE_LOAD_HARDENING,
+  C2_XCLANG_SPECULATIVE_LOAD_HARDENING,
+  SPELLING_NOT_CALCULATED,
+};
+
+SpeculativeLoadHardeningAttrSpelling FromPasta(pasta::SpeculativeLoadHardeningAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SpeculativeLoadHardeningAttrSpelling) {
+  return "SpeculativeLoadHardeningAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SpeculativeLoadHardeningAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SpeculativeLoadHardeningAttrSpelling);
+
+enum class StandaloneDebugAttrSpelling : unsigned char {
+  GNU_STANDALONE_DEBUG,
+  CXX11_CLANG_STANDALONE_DEBUG,
+  SPELLING_NOT_CALCULATED,
+};
+
+StandaloneDebugAttrSpelling FromPasta(pasta::StandaloneDebugAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(StandaloneDebugAttrSpelling) {
+  return "StandaloneDebugAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(StandaloneDebugAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(StandaloneDebugAttrSpelling);
+
+enum class StdCallAttrSpelling : unsigned char {
+  GNU_STDCALL,
+  CXX11_GNU_STDCALL,
+  C2_XGNU_STDCALL,
+  KEYWORD_STDCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+StdCallAttrSpelling FromPasta(pasta::StdCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(StdCallAttrSpelling) {
+  return "StdCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(StdCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(StdCallAttrSpelling);
 
 enum class StmtLikelihood : unsigned char {
   UNLIKELY,
@@ -1687,6 +6691,326 @@ inline static constexpr unsigned NumEnumerators(StringLiteralStringKind) {
 
 const char *EnumeratorName(StringLiteralStringKind);
 
+enum class SwiftAsyncAttrKind : unsigned char {
+  NONE,
+  SWIFT_PRIVATE,
+  NOT_SWIFT_PRIVATE,
+};
+
+SwiftAsyncAttrKind FromPasta(pasta::SwiftAsyncAttrKind pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncAttrKind) {
+  return "SwiftAsyncAttrKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncAttrKind) {
+  return 3;
+}
+
+const char *EnumeratorName(SwiftAsyncAttrKind);
+
+enum class SwiftAsyncAttrSpelling : unsigned char {
+  GNU_SWIFT_ASYNC,
+  CXX11_CLANG_SWIFT_ASYNC,
+  C2_XCLANG_SWIFT_ASYNC,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncAttrSpelling FromPasta(pasta::SwiftAsyncAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncAttrSpelling) {
+  return "SwiftAsyncAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncAttrSpelling);
+
+enum class SwiftAsyncCallAttrSpelling : unsigned char {
+  GNU_SWIFTASYNCCALL,
+  CXX11_CLANG_SWIFTASYNCCALL,
+  C2_XCLANG_SWIFTASYNCCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncCallAttrSpelling FromPasta(pasta::SwiftAsyncCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncCallAttrSpelling) {
+  return "SwiftAsyncCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncCallAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncCallAttrSpelling);
+
+enum class SwiftAsyncContextAttrSpelling : unsigned char {
+  GNU_SWIFT_ASYNC_CONTEXT,
+  CXX11_CLANG_SWIFT_ASYNC_CONTEXT,
+  C2_XCLANG_SWIFT_ASYNC_CONTEXT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncContextAttrSpelling FromPasta(pasta::SwiftAsyncContextAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncContextAttrSpelling) {
+  return "SwiftAsyncContextAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncContextAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncContextAttrSpelling);
+
+enum class SwiftAsyncErrorAttrConventionKind : unsigned char {
+  NONE,
+  NON_NULL_ERROR,
+  ZERO_ARGUMENT,
+  NON_ZERO_ARGUMENT,
+};
+
+SwiftAsyncErrorAttrConventionKind FromPasta(pasta::SwiftAsyncErrorAttrConventionKind pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncErrorAttrConventionKind) {
+  return "SwiftAsyncErrorAttrConventionKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncErrorAttrConventionKind) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncErrorAttrConventionKind);
+
+enum class SwiftAsyncErrorAttrSpelling : unsigned char {
+  GNU_SWIFT_ASYNC_ERROR,
+  CXX11_CLANG_SWIFT_ASYNC_ERROR,
+  C2_XCLANG_SWIFT_ASYNC_ERROR,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncErrorAttrSpelling FromPasta(pasta::SwiftAsyncErrorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncErrorAttrSpelling) {
+  return "SwiftAsyncErrorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncErrorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncErrorAttrSpelling);
+
+enum class SwiftCallAttrSpelling : unsigned char {
+  GNU_SWIFTCALL,
+  CXX11_CLANG_SWIFTCALL,
+  C2_XCLANG_SWIFTCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftCallAttrSpelling FromPasta(pasta::SwiftCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftCallAttrSpelling) {
+  return "SwiftCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftCallAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftCallAttrSpelling);
+
+enum class SwiftContextAttrSpelling : unsigned char {
+  GNU_SWIFT_CONTEXT,
+  CXX11_CLANG_SWIFT_CONTEXT,
+  C2_XCLANG_SWIFT_CONTEXT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftContextAttrSpelling FromPasta(pasta::SwiftContextAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftContextAttrSpelling) {
+  return "SwiftContextAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftContextAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftContextAttrSpelling);
+
+enum class SwiftErrorAttrConventionKind : unsigned char {
+  NONE,
+  NON_NULL_ERROR,
+  NULL_RESULT,
+  ZERO_RESULT,
+  NON_ZERO_RESULT,
+};
+
+SwiftErrorAttrConventionKind FromPasta(pasta::SwiftErrorAttrConventionKind pasta_val);
+
+inline static const char *EnumerationName(SwiftErrorAttrConventionKind) {
+  return "SwiftErrorAttrConventionKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftErrorAttrConventionKind) {
+  return 5;
+}
+
+const char *EnumeratorName(SwiftErrorAttrConventionKind);
+
+enum class SwiftErrorResultAttrSpelling : unsigned char {
+  GNU_SWIFT_ERROR_RESULT,
+  CXX11_CLANG_SWIFT_ERROR_RESULT,
+  C2_XCLANG_SWIFT_ERROR_RESULT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftErrorResultAttrSpelling FromPasta(pasta::SwiftErrorResultAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftErrorResultAttrSpelling) {
+  return "SwiftErrorResultAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftErrorResultAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftErrorResultAttrSpelling);
+
+enum class SwiftIndirectResultAttrSpelling : unsigned char {
+  GNU_SWIFT_INDIRECT_RESULT,
+  CXX11_CLANG_SWIFT_INDIRECT_RESULT,
+  C2_XCLANG_SWIFT_INDIRECT_RESULT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftIndirectResultAttrSpelling FromPasta(pasta::SwiftIndirectResultAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftIndirectResultAttrSpelling) {
+  return "SwiftIndirectResultAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftIndirectResultAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftIndirectResultAttrSpelling);
+
+enum class SwiftNewTypeAttrNewtypeKind : unsigned char {
+  STRUCT,
+  ENUM,
+};
+
+SwiftNewTypeAttrNewtypeKind FromPasta(pasta::SwiftNewTypeAttrNewtypeKind pasta_val);
+
+inline static const char *EnumerationName(SwiftNewTypeAttrNewtypeKind) {
+  return "SwiftNewTypeAttrNewtypeKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftNewTypeAttrNewtypeKind) {
+  return 2;
+}
+
+const char *EnumeratorName(SwiftNewTypeAttrNewtypeKind);
+
+enum class SwiftNewTypeAttrSpelling : unsigned char {
+  GNU_SWIFT_NEWTYPE,
+  GNU_SWIFT_WRAPPER,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftNewTypeAttrSpelling FromPasta(pasta::SwiftNewTypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftNewTypeAttrSpelling) {
+  return "SwiftNewTypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftNewTypeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(SwiftNewTypeAttrSpelling);
+
+enum class SysVABIAttrSpelling : unsigned char {
+  GNU_SYSV_ABI,
+  CXX11_GNU_SYSV_ABI,
+  C2_XGNU_SYSV_ABI,
+  SPELLING_NOT_CALCULATED,
+};
+
+SysVABIAttrSpelling FromPasta(pasta::SysVABIAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SysVABIAttrSpelling) {
+  return "SysVABIAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SysVABIAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SysVABIAttrSpelling);
+
+enum class TLSModelAttrSpelling : unsigned char {
+  GNU_TLS_MODEL,
+  CXX11_GNU_TLS_MODEL,
+  C2_XGNU_TLS_MODEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+TLSModelAttrSpelling FromPasta(pasta::TLSModelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TLSModelAttrSpelling) {
+  return "TLSModelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TLSModelAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TLSModelAttrSpelling);
+
+enum class TargetAttrSpelling : unsigned char {
+  GNU_TARGET,
+  CXX11_GNU_TARGET,
+  C2_XGNU_TARGET,
+  SPELLING_NOT_CALCULATED,
+};
+
+TargetAttrSpelling FromPasta(pasta::TargetAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TargetAttrSpelling) {
+  return "TargetAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TargetAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TargetAttrSpelling);
+
+enum class TargetClonesAttrSpelling : unsigned char {
+  GNU_TARGET_CLONES,
+  CXX11_GNU_TARGET_CLONES,
+  C2_XGNU_TARGET_CLONES,
+  SPELLING_NOT_CALCULATED,
+};
+
+TargetClonesAttrSpelling FromPasta(pasta::TargetClonesAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TargetClonesAttrSpelling) {
+  return "TargetClonesAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TargetClonesAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TargetClonesAttrSpelling);
+
 enum class TemplateArgumentKind : unsigned char {
   EMPTY,
   TYPE,
@@ -1710,6 +7034,118 @@ inline static constexpr unsigned NumEnumerators(TemplateArgumentKind) {
 }
 
 const char *EnumeratorName(TemplateArgumentKind);
+
+enum class TestTypestateAttrConsumedState : unsigned char {
+  CONSUMED,
+  UNCONSUMED,
+};
+
+TestTypestateAttrConsumedState FromPasta(pasta::TestTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(TestTypestateAttrConsumedState) {
+  return "TestTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(TestTypestateAttrConsumedState) {
+  return 2;
+}
+
+const char *EnumeratorName(TestTypestateAttrConsumedState);
+
+enum class TestTypestateAttrSpelling : unsigned char {
+  GNU_TEST_TYPESTATE,
+  CXX11_CLANG_TEST_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+TestTypestateAttrSpelling FromPasta(pasta::TestTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TestTypestateAttrSpelling) {
+  return "TestTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TestTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(TestTypestateAttrSpelling);
+
+enum class ThisCallAttrSpelling : unsigned char {
+  GNU_THISCALL,
+  CXX11_GNU_THISCALL,
+  C2_XGNU_THISCALL,
+  KEYWORD_THISCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ThisCallAttrSpelling FromPasta(pasta::ThisCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ThisCallAttrSpelling) {
+  return "ThisCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ThisCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(ThisCallAttrSpelling);
+
+enum class TransparentUnionAttrSpelling : unsigned char {
+  GNU_TRANSPARENT_UNION,
+  CXX11_GNU_TRANSPARENT_UNION,
+  C2_XGNU_TRANSPARENT_UNION,
+  SPELLING_NOT_CALCULATED,
+};
+
+TransparentUnionAttrSpelling FromPasta(pasta::TransparentUnionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TransparentUnionAttrSpelling) {
+  return "TransparentUnionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TransparentUnionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TransparentUnionAttrSpelling);
+
+enum class TrivialABIAttrSpelling : unsigned char {
+  GNU_TRIVIAL_ABI,
+  CXX11_CLANG_TRIVIAL_ABI,
+  SPELLING_NOT_CALCULATED,
+};
+
+TrivialABIAttrSpelling FromPasta(pasta::TrivialABIAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TrivialABIAttrSpelling) {
+  return "TrivialABIAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TrivialABIAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(TrivialABIAttrSpelling);
+
+enum class TryAcquireCapabilityAttrSpelling : unsigned char {
+  GNU_TRY_ACQUIRE_CAPABILITY,
+  CXX11_CLANG_TRY_ACQUIRE_CAPABILITY,
+  GNU_TRY_ACQUIRE_SHARED_CAPABILITY,
+  CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+TryAcquireCapabilityAttrSpelling FromPasta(pasta::TryAcquireCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TryAcquireCapabilityAttrSpelling) {
+  return "TryAcquireCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TryAcquireCapabilityAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(TryAcquireCapabilityAttrSpelling);
 
 enum class TypeScalarTypeKind : unsigned char {
   C_POINTER,
@@ -1804,6 +7240,62 @@ inline static constexpr unsigned NumEnumerators(TypeKind) {
 
 const char *EnumeratorName(TypeKind);
 
+enum class TypeTagForDatatypeAttrSpelling : unsigned char {
+  GNU_TYPE_TAG_FOR_DATATYPE,
+  CXX11_CLANG_TYPE_TAG_FOR_DATATYPE,
+  C2_XCLANG_TYPE_TAG_FOR_DATATYPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+TypeTagForDatatypeAttrSpelling FromPasta(pasta::TypeTagForDatatypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TypeTagForDatatypeAttrSpelling) {
+  return "TypeTagForDatatypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TypeTagForDatatypeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TypeTagForDatatypeAttrSpelling);
+
+enum class TypeVisibilityAttrSpelling : unsigned char {
+  GNU_TYPE_VISIBILITY,
+  CXX11_CLANG_TYPE_VISIBILITY,
+  C2_XCLANG_TYPE_VISIBILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+TypeVisibilityAttrSpelling FromPasta(pasta::TypeVisibilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TypeVisibilityAttrSpelling) {
+  return "TypeVisibilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TypeVisibilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TypeVisibilityAttrSpelling);
+
+enum class TypeVisibilityAttrVisibilityType : unsigned char {
+  DEFAULT,
+  HIDDEN,
+  PROTECTED,
+};
+
+TypeVisibilityAttrVisibilityType FromPasta(pasta::TypeVisibilityAttrVisibilityType pasta_val);
+
+inline static const char *EnumerationName(TypeVisibilityAttrVisibilityType) {
+  return "TypeVisibilityAttrVisibilityType";
+}
+
+inline static constexpr unsigned NumEnumerators(TypeVisibilityAttrVisibilityType) {
+  return 3;
+}
+
+const char *EnumeratorName(TypeVisibilityAttrVisibilityType);
+
 enum class UnaryTransformTypeUTTKind : unsigned char {
   ENUM_UNDERLYING_TYPE,
 };
@@ -1819,6 +7311,141 @@ inline static constexpr unsigned NumEnumerators(UnaryTransformTypeUTTKind) {
 }
 
 const char *EnumeratorName(UnaryTransformTypeUTTKind);
+
+enum class UnavailableAttrImplicitReason : unsigned char {
+  NONE,
+  ARC_FORBIDDEN_TYPE,
+  FORBIDDEN_WEAK,
+  ARC_FORBIDDEN_CONVERSION,
+  ARC_INIT_RETURNS_UNRELATED,
+  ARC_FIELD_WITH_OWNERSHIP,
+};
+
+UnavailableAttrImplicitReason FromPasta(pasta::UnavailableAttrImplicitReason pasta_val);
+
+inline static const char *EnumerationName(UnavailableAttrImplicitReason) {
+  return "UnavailableAttrImplicitReason";
+}
+
+inline static constexpr unsigned NumEnumerators(UnavailableAttrImplicitReason) {
+  return 6;
+}
+
+const char *EnumeratorName(UnavailableAttrImplicitReason);
+
+enum class UnavailableAttrSpelling : unsigned char {
+  GNU_UNAVAILABLE,
+  CXX11_CLANG_UNAVAILABLE,
+  C2_XCLANG_UNAVAILABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+UnavailableAttrSpelling FromPasta(pasta::UnavailableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UnavailableAttrSpelling) {
+  return "UnavailableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UnavailableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(UnavailableAttrSpelling);
+
+enum class UninitializedAttrSpelling : unsigned char {
+  GNU_UNINITIALIZED,
+  CXX11_CLANG_UNINITIALIZED,
+  SPELLING_NOT_CALCULATED,
+};
+
+UninitializedAttrSpelling FromPasta(pasta::UninitializedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UninitializedAttrSpelling) {
+  return "UninitializedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UninitializedAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UninitializedAttrSpelling);
+
+enum class UnlikelyAttrSpelling : unsigned char {
+  CXX11_UNLIKELY,
+  C2_XCLANG_UNLIKELY,
+  SPELLING_NOT_CALCULATED,
+};
+
+UnlikelyAttrSpelling FromPasta(pasta::UnlikelyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UnlikelyAttrSpelling) {
+  return "UnlikelyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UnlikelyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UnlikelyAttrSpelling);
+
+enum class UnusedAttrSpelling : unsigned char {
+  CXX11_MAYBE_UNUSED,
+  GNU_UNUSED,
+  CXX11_GNU_UNUSED,
+  C2_XGNU_UNUSED,
+  C2_XMAYBE_UNUSED,
+  SPELLING_NOT_CALCULATED,
+};
+
+UnusedAttrSpelling FromPasta(pasta::UnusedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UnusedAttrSpelling) {
+  return "UnusedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UnusedAttrSpelling) {
+  return 6;
+}
+
+const char *EnumeratorName(UnusedAttrSpelling);
+
+enum class UseHandleAttrSpelling : unsigned char {
+  GNU_USE_HANDLE,
+  CXX11_CLANG_USE_HANDLE,
+  C2_XCLANG_USE_HANDLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+UseHandleAttrSpelling FromPasta(pasta::UseHandleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UseHandleAttrSpelling) {
+  return "UseHandleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UseHandleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(UseHandleAttrSpelling);
+
+enum class UsedAttrSpelling : unsigned char {
+  GNU_USED,
+  CXX11_GNU_USED,
+  C2_XGNU_USED,
+  SPELLING_NOT_CALCULATED,
+};
+
+UsedAttrSpelling FromPasta(pasta::UsedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UsedAttrSpelling) {
+  return "UsedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UsedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(UsedAttrSpelling);
 
 enum class UserDefinedLiteralLiteralOperatorKind : unsigned char {
   RAW,
@@ -1840,6 +7467,42 @@ inline static constexpr unsigned NumEnumerators(UserDefinedLiteralLiteralOperato
 }
 
 const char *EnumeratorName(UserDefinedLiteralLiteralOperatorKind);
+
+enum class UsingIfExistsAttrSpelling : unsigned char {
+  GNU_USING_IF_EXISTS,
+  CXX11_CLANG_USING_IF_EXISTS,
+  SPELLING_NOT_CALCULATED,
+};
+
+UsingIfExistsAttrSpelling FromPasta(pasta::UsingIfExistsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UsingIfExistsAttrSpelling) {
+  return "UsingIfExistsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UsingIfExistsAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UsingIfExistsAttrSpelling);
+
+enum class UuidAttrSpelling : unsigned char {
+  DECLSPEC_UUID,
+  MICROSOFT_UUID,
+  SPELLING_NOT_CALCULATED,
+};
+
+UuidAttrSpelling FromPasta(pasta::UuidAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UuidAttrSpelling) {
+  return "UuidAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UuidAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UuidAttrSpelling);
 
 enum class VarDeclDefinitionKind : unsigned char {
   DECLARATION_ONLY,
@@ -1895,6 +7558,44 @@ inline static constexpr unsigned NumEnumerators(VarDeclTLSKind) {
 
 const char *EnumeratorName(VarDeclTLSKind);
 
+enum class VecReturnAttrSpelling : unsigned char {
+  GNU_VECRETURN,
+  CXX11_CLANG_VECRETURN,
+  SPELLING_NOT_CALCULATED,
+};
+
+VecReturnAttrSpelling FromPasta(pasta::VecReturnAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(VecReturnAttrSpelling) {
+  return "VecReturnAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(VecReturnAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(VecReturnAttrSpelling);
+
+enum class VectorCallAttrSpelling : unsigned char {
+  GNU_VECTORCALL,
+  CXX11_CLANG_VECTORCALL,
+  C2_XCLANG_VECTORCALL,
+  KEYWORD_VECTORCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+VectorCallAttrSpelling FromPasta(pasta::VectorCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(VectorCallAttrSpelling) {
+  return "VectorCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(VectorCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(VectorCallAttrSpelling);
+
 enum class VectorTypeVectorKind : unsigned char {
   GENERIC_VECTOR,
   ALTI_VEC_VECTOR,
@@ -1917,6 +7618,258 @@ inline static constexpr unsigned NumEnumerators(VectorTypeVectorKind) {
 }
 
 const char *EnumeratorName(VectorTypeVectorKind);
+
+enum class VisibilityAttrSpelling : unsigned char {
+  GNU_VISIBILITY,
+  CXX11_GNU_VISIBILITY,
+  C2_XGNU_VISIBILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+VisibilityAttrSpelling FromPasta(pasta::VisibilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(VisibilityAttrSpelling) {
+  return "VisibilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(VisibilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(VisibilityAttrSpelling);
+
+enum class VisibilityAttrVisibilityType : unsigned char {
+  DEFAULT,
+  HIDDEN,
+  PROTECTED,
+};
+
+VisibilityAttrVisibilityType FromPasta(pasta::VisibilityAttrVisibilityType pasta_val);
+
+inline static const char *EnumerationName(VisibilityAttrVisibilityType) {
+  return "VisibilityAttrVisibilityType";
+}
+
+inline static constexpr unsigned NumEnumerators(VisibilityAttrVisibilityType) {
+  return 3;
+}
+
+const char *EnumeratorName(VisibilityAttrVisibilityType);
+
+enum class WarnUnusedAttrSpelling : unsigned char {
+  GNU_WARN_UNUSED,
+  CXX11_GNU_WARN_UNUSED,
+  C2_XGNU_WARN_UNUSED,
+  SPELLING_NOT_CALCULATED,
+};
+
+WarnUnusedAttrSpelling FromPasta(pasta::WarnUnusedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WarnUnusedAttrSpelling) {
+  return "WarnUnusedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WarnUnusedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WarnUnusedAttrSpelling);
+
+enum class WarnUnusedResultAttrSpelling : unsigned char {
+  CXX11_NODISCARD,
+  C2_XNODISCARD,
+  CXX11_CLANG_WARN_UNUSED_RESULT,
+  GNU_WARN_UNUSED_RESULT,
+  CXX11_GNU_WARN_UNUSED_RESULT,
+  C2_XGNU_WARN_UNUSED_RESULT,
+  SPELLING_NOT_CALCULATED,
+};
+
+WarnUnusedResultAttrSpelling FromPasta(pasta::WarnUnusedResultAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WarnUnusedResultAttrSpelling) {
+  return "WarnUnusedResultAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WarnUnusedResultAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(WarnUnusedResultAttrSpelling);
+
+enum class WeakAttrSpelling : unsigned char {
+  GNU_WEAK,
+  CXX11_GNU_WEAK,
+  C2_XGNU_WEAK,
+  SPELLING_NOT_CALCULATED,
+};
+
+WeakAttrSpelling FromPasta(pasta::WeakAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WeakAttrSpelling) {
+  return "WeakAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WeakAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WeakAttrSpelling);
+
+enum class WeakImportAttrSpelling : unsigned char {
+  GNU_WEAK_IMPORT,
+  CXX11_CLANG_WEAK_IMPORT,
+  C2_XCLANG_WEAK_IMPORT,
+  SPELLING_NOT_CALCULATED,
+};
+
+WeakImportAttrSpelling FromPasta(pasta::WeakImportAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WeakImportAttrSpelling) {
+  return "WeakImportAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WeakImportAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WeakImportAttrSpelling);
+
+enum class WeakRefAttrSpelling : unsigned char {
+  GNU_WEAKREF,
+  CXX11_GNU_WEAKREF,
+  C2_XGNU_WEAKREF,
+  SPELLING_NOT_CALCULATED,
+};
+
+WeakRefAttrSpelling FromPasta(pasta::WeakRefAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WeakRefAttrSpelling) {
+  return "WeakRefAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WeakRefAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WeakRefAttrSpelling);
+
+enum class WebAssemblyExportNameAttrSpelling : unsigned char {
+  GNU_EXPORT_NAME,
+  CXX11_CLANG_EXPORT_NAME,
+  C2_XCLANG_EXPORT_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+WebAssemblyExportNameAttrSpelling FromPasta(pasta::WebAssemblyExportNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WebAssemblyExportNameAttrSpelling) {
+  return "WebAssemblyExportNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WebAssemblyExportNameAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WebAssemblyExportNameAttrSpelling);
+
+enum class WebAssemblyImportModuleAttrSpelling : unsigned char {
+  GNU_IMPORT_MODULE,
+  CXX11_CLANG_IMPORT_MODULE,
+  C2_XCLANG_IMPORT_MODULE,
+  SPELLING_NOT_CALCULATED,
+};
+
+WebAssemblyImportModuleAttrSpelling FromPasta(pasta::WebAssemblyImportModuleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WebAssemblyImportModuleAttrSpelling) {
+  return "WebAssemblyImportModuleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WebAssemblyImportModuleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WebAssemblyImportModuleAttrSpelling);
+
+enum class WebAssemblyImportNameAttrSpelling : unsigned char {
+  GNU_IMPORT_NAME,
+  CXX11_CLANG_IMPORT_NAME,
+  C2_XCLANG_IMPORT_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+WebAssemblyImportNameAttrSpelling FromPasta(pasta::WebAssemblyImportNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WebAssemblyImportNameAttrSpelling) {
+  return "WebAssemblyImportNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WebAssemblyImportNameAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WebAssemblyImportNameAttrSpelling);
+
+enum class X86ForceAlignArgPointerAttrSpelling : unsigned char {
+  GNU_FORCE_ALIGN_ARGUMENT_POINTER,
+  CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER,
+  C2_XGNU_FORCE_ALIGN_ARGUMENT_POINTER,
+  SPELLING_NOT_CALCULATED,
+};
+
+X86ForceAlignArgPointerAttrSpelling FromPasta(pasta::X86ForceAlignArgPointerAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(X86ForceAlignArgPointerAttrSpelling) {
+  return "X86ForceAlignArgPointerAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(X86ForceAlignArgPointerAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(X86ForceAlignArgPointerAttrSpelling);
+
+enum class XRayInstrumentAttrSpelling : unsigned char {
+  GNU_XRAY_ALWAYS_INSTRUMENT,
+  CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT,
+  C2_XCLANG_XRAY_ALWAYS_INSTRUMENT,
+  GNU_XRAY_NEVER_INSTRUMENT,
+  CXX11_CLANG_XRAY_NEVER_INSTRUMENT,
+  C2_XCLANG_XRAY_NEVER_INSTRUMENT,
+  SPELLING_NOT_CALCULATED,
+};
+
+XRayInstrumentAttrSpelling FromPasta(pasta::XRayInstrumentAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(XRayInstrumentAttrSpelling) {
+  return "XRayInstrumentAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(XRayInstrumentAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(XRayInstrumentAttrSpelling);
+
+enum class XRayLogArgsAttrSpelling : unsigned char {
+  GNU_XRAY_LOG_ARGUMENTS,
+  CXX11_CLANG_XRAY_LOG_ARGUMENTS,
+  C2_XCLANG_XRAY_LOG_ARGUMENTS,
+  SPELLING_NOT_CALCULATED,
+};
+
+XRayLogArgsAttrSpelling FromPasta(pasta::XRayLogArgsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(XRayLogArgsAttrSpelling) {
+  return "XRayLogArgsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(XRayLogArgsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(XRayLogArgsAttrSpelling);
 
 enum class ASTDumpOutputFormat : unsigned char {
   DEFAULT,
@@ -1990,31 +7943,6 @@ inline static constexpr unsigned NumEnumerators(AlignRequirementKind) {
 }
 
 const char *EnumeratorName(AlignRequirementKind);
-
-enum class AllocatorTypeTy : unsigned char {
-  OMP_NULL_MEMORY_ALLOC,
-  OMP_DEFAULT_MEMORY_ALLOC,
-  OMP_LARGE_CAP_MEMORY_ALLOC,
-  OMP_CONST_MEMORY_ALLOC,
-  OMP_HIGH_BW_MEMORY_ALLOC,
-  OMP_LOW_LAT_MEMORY_ALLOC,
-  OMPC_GROUP_MEMORY_ALLOC,
-  OMPP_TEAM_MEMORY_ALLOC,
-  OMP_THREAD_MEMORY_ALLOC,
-  OMP_USER_DEFINED_MEMORY_ALLOC,
-};
-
-AllocatorTypeTy FromPasta(pasta::AllocatorTypeTy pasta_val);
-
-inline static const char *EnumerationName(AllocatorTypeTy) {
-  return "AllocatorTypeTy";
-}
-
-inline static constexpr unsigned NumEnumerators(AllocatorTypeTy) {
-  return 10;
-}
-
-const char *EnumeratorName(AllocatorTypeTy);
 
 enum class AltivecSrcCompatKind : unsigned char {
   MIXED,
@@ -2100,7 +8028,7 @@ inline static constexpr unsigned NumEnumerators(AtomicScopeModelKind) {
 
 const char *EnumeratorName(AtomicScopeModelKind);
 
-enum class AttributeKind : unsigned short {
+enum class AttrKind : unsigned short {
   ADDRESS_SPACE,
   ARM_MVE_STRICT_POLYMORPHISM,
   BTF_TYPE_TAG,
@@ -2275,7 +8203,7 @@ enum class AttributeKind : unsigned short {
   LOCK_RETURNED,
   LOCKS_EXCLUDED,
   M68_KINTERRUPT,
-  MIG_SERVER_ROUTINE__,
+  MIG_SERVER_ROUTINE,
   MS_ALLOCATOR,
   MS_INHERITANCE,
   MS_NO_V_TABLE,
@@ -2451,17 +8379,17 @@ enum class AttributeKind : unsigned short {
   THREAD,
 };
 
-AttributeKind FromPasta(pasta::AttributeKind pasta_val);
+AttrKind FromPasta(pasta::AttrKind pasta_val);
 
-inline static const char *EnumerationName(AttributeKind) {
-  return "AttributeKind";
+inline static const char *EnumerationName(AttrKind) {
+  return "AttrKind";
 }
 
-inline static constexpr unsigned NumEnumerators(AttributeKind) {
+inline static constexpr unsigned NumEnumerators(AttrKind) {
   return 348;
 }
 
-const char *EnumeratorName(AttributeKind);
+const char *EnumeratorName(AttrKind);
 
 enum class AutoTypeKeyword : unsigned char {
   AUTO,
@@ -2571,40 +8499,6 @@ inline static constexpr unsigned NumEnumerators(Bits) {
 }
 
 const char *EnumeratorName(Bits);
-
-enum class BlockType : unsigned char {
-  BY_REFERENCE,
-};
-
-BlockType FromPasta(pasta::BlockType pasta_val);
-
-inline static const char *EnumerationName(BlockType) {
-  return "BlockType";
-}
-
-inline static constexpr unsigned NumEnumerators(BlockType) {
-  return 1;
-}
-
-const char *EnumeratorName(BlockType);
-
-enum class BranchStateTy : unsigned char {
-  UNDEFINED,
-  INBRANCH,
-  NOTINBRANCH,
-};
-
-BranchStateTy FromPasta(pasta::BranchStateTy pasta_val);
-
-inline static const char *EnumerationName(BranchStateTy) {
-  return "BranchStateTy";
-}
-
-inline static constexpr unsigned NumEnumerators(BranchStateTy) {
-  return 3;
-}
-
-const char *EnumeratorName(BranchStateTy);
 
 enum class CallingConv : unsigned char {
   C,
@@ -2878,43 +8772,6 @@ inline static constexpr unsigned NumEnumerators(ConstexprSpecKind) {
 
 const char *EnumeratorName(ConstexprSpecKind);
 
-enum class ConsumedState : unsigned char {
-  UNKNOWN,
-  CONSUMED,
-  UNCONSUMED,
-};
-
-ConsumedState FromPasta(pasta::ConsumedState pasta_val);
-
-inline static const char *EnumerationName(ConsumedState) {
-  return "ConsumedState";
-}
-
-inline static constexpr unsigned NumEnumerators(ConsumedState) {
-  return 3;
-}
-
-const char *EnumeratorName(ConsumedState);
-
-enum class ConventionKind : unsigned char {
-  NONE,
-  NON_NULL_ERROR,
-  ZERO_ARGUMENT,
-  NON_ZERO_ARGUMENT,
-};
-
-ConventionKind FromPasta(pasta::ConventionKind pasta_val);
-
-inline static const char *EnumerationName(ConventionKind) {
-  return "ConventionKind";
-}
-
-inline static constexpr unsigned NumEnumerators(ConventionKind) {
-  return 4;
-}
-
-const char *EnumeratorName(ConventionKind);
-
 enum class CoreFoundationABI : unsigned char {
   UNSPECIFIED,
   STANDALONE,
@@ -2996,24 +8853,6 @@ inline static constexpr unsigned NumEnumerators(DefaultCallingConvention) {
 
 const char *EnumeratorName(DefaultCallingConvention);
 
-enum class DevTypeTy : unsigned char {
-  HOST,
-  NO_HOST,
-  ANY,
-};
-
-DevTypeTy FromPasta(pasta::DevTypeTy pasta_val);
-
-inline static const char *EnumerationName(DevTypeTy) {
-  return "DevTypeTy";
-}
-
-inline static constexpr unsigned NumEnumerators(DevTypeTy) {
-  return 3;
-}
-
-const char *EnumeratorName(DevTypeTy);
-
 enum class DiagnosticLevelMask : unsigned char {
   NONE,
   NOTE,
@@ -3034,23 +8873,6 @@ inline static constexpr unsigned NumEnumerators(DiagnosticLevelMask) {
 }
 
 const char *EnumeratorName(DiagnosticLevelMask);
-
-enum class DiagnosticType : unsigned char {
-  ERROR,
-  WARNING,
-};
-
-DiagnosticType FromPasta(pasta::DiagnosticType pasta_val);
-
-inline static const char *EnumerationName(DiagnosticType) {
-  return "DiagnosticType";
-}
-
-inline static constexpr unsigned NumEnumerators(DiagnosticType) {
-  return 2;
-}
-
-const char *EnumeratorName(DiagnosticType);
 
 enum class ElaboratedTypeKeyword : unsigned char {
   STRUCT,
@@ -3331,27 +9153,6 @@ inline static constexpr unsigned NumEnumerators(FPModeKind) {
 
 const char *EnumeratorName(FPModeKind);
 
-enum class FamilyKind : unsigned char {
-  NONE,
-  ALLOC,
-  COPY,
-  INITIALIZER,
-  MUTABLE_COPY,
-  NEW,
-};
-
-FamilyKind FromPasta(pasta::FamilyKind pasta_val);
-
-inline static const char *EnumerationName(FamilyKind) {
-  return "FamilyKind";
-}
-
-inline static constexpr unsigned NumEnumerators(FamilyKind) {
-  return 6;
-}
-
-const char *EnumeratorName(FamilyKind);
-
 enum class FiniteLoopsKind : unsigned char {
   LANGUAGE,
   ALWAYS,
@@ -3464,22 +9265,6 @@ inline static constexpr unsigned NumEnumerators(GetBuiltinTypeError) {
 
 const char *EnumeratorName(GetBuiltinTypeError);
 
-enum class GuardArg : unsigned char {
-  NOCF,
-};
-
-GuardArg FromPasta(pasta::GuardArg pasta_val);
-
-inline static const char *EnumerationName(GuardArg) {
-  return "GuardArg";
-}
-
-inline static constexpr unsigned NumEnumerators(GuardArg) {
-  return 1;
-}
-
-const char *EnumeratorName(GuardArg);
-
 enum class ID : unsigned char {
   WORK_GROUP,
   DEVICE,
@@ -3555,27 +9340,6 @@ inline static constexpr unsigned NumEnumerators(ImbueAttribute) {
 }
 
 const char *EnumeratorName(ImbueAttribute);
-
-enum class ImplicitReason : unsigned char {
-  NONE,
-  ARC_FORBIDDEN_TYPE,
-  FORBIDDEN_WEAK,
-  ARC_FORBIDDEN_CONVERSION,
-  ARC_INIT_RETURNS_UNRELATED,
-  ARC_FIELD_WITH_OWNERSHIP,
-};
-
-ImplicitReason FromPasta(pasta::ImplicitReason pasta_val);
-
-inline static const char *EnumerationName(ImplicitReason) {
-  return "ImplicitReason";
-}
-
-inline static constexpr unsigned NumEnumerators(ImplicitReason) {
-  return 6;
-}
-
-const char *EnumeratorName(ImplicitReason);
 
 enum class InClassInitStyle : unsigned char {
   NO_INITIALIZER,
@@ -3685,45 +9449,6 @@ inline static constexpr unsigned NumEnumerators(InliningMethod) {
 }
 
 const char *EnumeratorName(InliningMethod);
-
-enum class InteropType : unsigned char {
-  TARGET,
-  TARGET_SYNC,
-  TARGET_TARGET_SYNC,
-};
-
-InteropType FromPasta(pasta::InteropType pasta_val);
-
-inline static const char *EnumerationName(InteropType) {
-  return "InteropType";
-}
-
-inline static constexpr unsigned NumEnumerators(InteropType) {
-  return 3;
-}
-
-const char *EnumeratorName(InteropType);
-
-enum class InterruptType : unsigned char {
-  IRQ,
-  FIQ,
-  SWI,
-  ABORT,
-  UNDEF,
-  GENERIC,
-};
-
-InterruptType FromPasta(pasta::InterruptType pasta_val);
-
-inline static const char *EnumerationName(InterruptType) {
-  return "InterruptType";
-}
-
-inline static constexpr unsigned NumEnumerators(InterruptType) {
-  return 6;
-}
-
-const char *EnumeratorName(InterruptType);
 
 enum class Kinds : unsigned char {
   L_VALUE,
@@ -3961,28 +9686,6 @@ inline static constexpr unsigned NumEnumerators(Linkage) {
 
 const char *EnumeratorName(Linkage);
 
-enum class LoopHintState : unsigned char {
-  ENABLE,
-  DISABLE,
-  NUMERIC,
-  FIXED_WIDTH,
-  SCALABLE_WIDTH,
-  ASSUME_SAFETY,
-  FULL,
-};
-
-LoopHintState FromPasta(pasta::LoopHintState pasta_val);
-
-inline static const char *EnumerationName(LoopHintState) {
-  return "LoopHintState";
-}
-
-inline static constexpr unsigned NumEnumerators(LoopHintState) {
-  return 7;
-}
-
-const char *EnumeratorName(LoopHintState);
-
 enum class MSInheritanceModel : unsigned char {
   SINGLE,
   MULTIPLE,
@@ -4044,23 +9747,6 @@ inline static constexpr unsigned NumEnumerators(MSVtorDispMode) {
 }
 
 const char *EnumeratorName(MSVtorDispMode);
-
-enum class MapTypeTy : unsigned char {
-  TO,
-  LINK,
-};
-
-MapTypeTy FromPasta(pasta::MapTypeTy pasta_val);
-
-inline static const char *EnumerationName(MapTypeTy) {
-  return "MapTypeTy";
-}
-
-inline static constexpr unsigned NumEnumerators(MapTypeTy) {
-  return 2;
-}
-
-const char *EnumeratorName(MapTypeTy);
 
 enum class MethodRefFlags : unsigned char {
   METHOD_REFERENCE_NONE,
@@ -4185,23 +9871,6 @@ inline static constexpr unsigned NumEnumerators(NestedNameSpecifierDependence) {
 }
 
 const char *EnumeratorName(NestedNameSpecifierDependence);
-
-enum class NewtypeKind : unsigned char {
-  STRUCT,
-  ENUM,
-};
-
-NewtypeKind FromPasta(pasta::NewtypeKind pasta_val);
-
-inline static const char *EnumerationName(NewtypeKind) {
-  return "NewtypeKind";
-}
-
-inline static constexpr unsigned NumEnumerators(NewtypeKind) {
-  return 2;
-}
-
-const char *EnumeratorName(NewtypeKind);
 
 enum class NonOdrUseReason : unsigned char {
   NONE,
@@ -4820,33 +10489,6 @@ inline static constexpr unsigned NumEnumerators(OpenMPScheduleClauseModifier) {
 
 const char *EnumeratorName(OpenMPScheduleClauseModifier);
 
-enum class OptionType : unsigned char {
-  VECTORIZE,
-  VECTORIZE_WIDTH,
-  INTERLEAVE,
-  INTERLEAVE_COUNT,
-  UNROLL,
-  UNROLL_COUNT,
-  UNROLL_AND_JAM,
-  UNROLL_AND_JAM_COUNT,
-  PIPELINE_DISABLED,
-  PIPELINE_INITIATION_INTERVAL,
-  DISTRIBUTE,
-  VECTORIZE_PREDICATE,
-};
-
-OptionType FromPasta(pasta::OptionType pasta_val);
-
-inline static const char *EnumerationName(OptionType) {
-  return "OptionType";
-}
-
-inline static constexpr unsigned NumEnumerators(OptionType) {
-  return 12;
-}
-
-const char *EnumeratorName(OptionType);
-
 enum class OverloadedOperatorKind : unsigned char {
   NONE,
   NEW,
@@ -4924,41 +10566,6 @@ inline static constexpr unsigned NumEnumerators(OverloadsShown) {
 }
 
 const char *EnumeratorName(OverloadsShown);
-
-enum class OwnershipKind : unsigned char {
-  HOLDS,
-  RETURNS,
-  TAKES,
-};
-
-OwnershipKind FromPasta(pasta::OwnershipKind pasta_val);
-
-inline static const char *EnumerationName(OwnershipKind) {
-  return "OwnershipKind";
-}
-
-inline static constexpr unsigned NumEnumerators(OwnershipKind) {
-  return 3;
-}
-
-const char *EnumeratorName(OwnershipKind);
-
-enum class PCSType : unsigned char {
-  AAPCS,
-  VFP,
-};
-
-PCSType FromPasta(pasta::PCSType pasta_val);
-
-inline static const char *EnumerationName(PCSType) {
-  return "PCSType";
-}
-
-inline static constexpr unsigned NumEnumerators(PCSType) {
-  return 2;
-}
-
-const char *EnumeratorName(PCSType);
 
 enum class ParameterABI : unsigned char {
   ORDINARY,
@@ -5467,25 +11074,6 @@ inline static constexpr unsigned NumEnumerators(SpecifierKind) {
 }
 
 const char *EnumeratorName(SpecifierKind);
-
-enum class Spelling : unsigned char {
-  GNU_AARCH64_VECTOR_PCS,
-  CXX11_CLANG_AARCH64_VECTOR_PCS,
-  C2_XCLANG_AARCH64_VECTOR_PCS,
-  SPELLING_NOT_CALCULATED,
-};
-
-Spelling FromPasta(pasta::Spelling pasta_val);
-
-inline static const char *EnumerationName(Spelling) {
-  return "Spelling";
-}
-
-inline static constexpr unsigned NumEnumerators(Spelling) {
-  return 4;
-}
-
-const char *EnumeratorName(Spelling);
 
 enum class StackProtectorMode : unsigned char {
   OFF,
@@ -6839,23 +12427,28 @@ inline static constexpr unsigned NumEnumerators(Visibility) {
 
 const char *EnumeratorName(Visibility);
 
-enum class VisibilityType : unsigned char {
-  DEFAULT,
-  HIDDEN,
-  PROTECTED,
+enum class AttributeSyntax : unsigned char {
+  GNU,
+  CXX11,
+  C2_X,
+  DECLSPEC,
+  MICROSOFT,
+  KEYWORD,
+  PRAGMA,
+  CONTEXT_SENSITIVE_KEYWORD,
 };
 
-VisibilityType FromPasta(pasta::VisibilityType pasta_val);
+AttributeSyntax FromPasta(pasta::AttributeSyntax pasta_val);
 
-inline static const char *EnumerationName(VisibilityType) {
-  return "VisibilityType";
+inline static const char *EnumerationName(AttributeSyntax) {
+  return "AttributeSyntax";
 }
 
-inline static constexpr unsigned NumEnumerators(VisibilityType) {
-  return 3;
+inline static constexpr unsigned NumEnumerators(AttributeSyntax) {
+  return 8;
 }
 
-const char *EnumeratorName(VisibilityType);
+const char *EnumeratorName(AttributeSyntax);
 
 enum class DeclCategory : unsigned char {
   UNKNOWN,
@@ -9790,7 +15383,7 @@ class AttributedType : public Type {
   }
 
   Type desugar(void) const;
-  AttributeKind attribute_kind(void) const;
+  AttrKind attribute_kind(void) const;
   Type equivalent_type(void) const;
   std::optional<NullabilityKind> immediate_nullability(void) const;
   Type modified_type(void) const;

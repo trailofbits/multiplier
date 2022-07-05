@@ -162,6 +162,309 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="AArch64VectorPcsAttrSpelling"></a>AArch64VectorPcsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AARCH64_VECTOR_PCS`
+* `CXX11_CLANG_AARCH64_VECTOR_PCS`
+* `C2_XCLANG_AARCH64_VECTOR_PCS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUFlatWorkGroupSizeAttrSpelling"></a>AMDGPUFlatWorkGroupSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_FLAT_WORK_GROUP_SIZE`
+* `CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUNumSGPRAttrSpelling"></a>AMDGPUNumSGPRAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_NUM_SGPR`
+* `CXX11_CLANG_AMDGPU_NUM_SGPR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUNumVGPRAttrSpelling"></a>AMDGPUNumVGPRAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_NUM_VGPR`
+* `CXX11_CLANG_AMDGPU_NUM_VGPR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUWavesPerEUAttrSpelling"></a>AMDGPUWavesPerEUAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_WAVES_PER_EU`
+* `CXX11_CLANG_AMDGPU_WAVES_PER_EU`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ARMInterruptAttrInterruptType"></a>ARMInterruptAttrInterruptType</summary>
+
+Available enumerations:
+
+* `IRQ`
+* `FIQ`
+* `SWI`
+* `ABORT`
+* `UNDEF`
+* `GENERIC`
+
+</details>
+
+<details><summary><a name="ARMInterruptAttrSpelling"></a>ARMInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2_XGNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AVRInterruptAttrSpelling"></a>AVRInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2_XGNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AVRSignalAttrSpelling"></a>AVRSignalAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SIGNAL`
+* `CXX11_GNU_SIGNAL`
+* `C2_XGNU_SIGNAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AbiTagAttrSpelling"></a>AbiTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ABI_TAG`
+* `CXX11_GNU_ABI_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AcquireCapabilityAttrSpelling"></a>AcquireCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ACQUIRE_CAPABILITY`
+* `CXX11_CLANG_ACQUIRE_CAPABILITY`
+* `GNU_ACQUIRE_SHARED_CAPABILITY`
+* `CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY`
+* `GNU_EXCLUSIVE_LOCK_FUNCTION`
+* `GNU_SHARED_LOCK_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AcquireHandleAttrSpelling"></a>AcquireHandleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ACQUIRE_HANDLE`
+* `CXX11_CLANG_ACQUIRE_HANDLE`
+* `C2_XCLANG_ACQUIRE_HANDLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AddressSpaceAttrSpelling"></a>AddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ADDRESS_SPACE`
+* `CXX11_CLANG_ADDRESS_SPACE`
+* `C2_XCLANG_ADDRESS_SPACE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AliasAttrSpelling"></a>AliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALIAS`
+* `CXX11_GNU_ALIAS`
+* `C2_XGNU_ALIAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AlignedAttrSpelling"></a>AlignedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALIGNED`
+* `CXX11_GNU_ALIGNED`
+* `C2_XGNU_ALIGNED`
+* `DECLSPEC_ALIGN`
+* `KEYWORD_ALIGNAS`
+* `KEYWORD__ALIGNAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AllocAlignAttrSpelling"></a>AllocAlignAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALLOC_ALIGN`
+* `CXX11_GNU_ALLOC_ALIGN`
+* `C2_XGNU_ALLOC_ALIGN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AllocSizeAttrSpelling"></a>AllocSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALLOC_SIZE`
+* `CXX11_GNU_ALLOC_SIZE`
+* `C2_XGNU_ALLOC_SIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AlwaysDestroyAttrSpelling"></a>AlwaysDestroyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALWAYS_DESTROY`
+* `CXX11_CLANG_ALWAYS_DESTROY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AlwaysInlineAttrSpelling"></a>AlwaysInlineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALWAYS_INLINE`
+* `CXX11_GNU_ALWAYS_INLINE`
+* `C2_XGNU_ALWAYS_INLINE`
+* `KEYWORD_FORCEINLINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnnotateAttrSpelling"></a>AnnotateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ANNOTATE`
+* `CXX11_CLANG_ANNOTATE`
+* `C2_XCLANG_ANNOTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnyX86InterruptAttrSpelling"></a>AnyX86InterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2_XGNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnyX86NoCallerSavedRegistersAttrSpelling"></a>AnyX86NoCallerSavedRegistersAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_CALLER_SAVED_REGISTERS`
+* `CXX11_GNU_NO_CALLER_SAVED_REGISTERS`
+* `C2_XGNU_NO_CALLER_SAVED_REGISTERS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnyX86NoCfCheckAttrSpelling"></a>AnyX86NoCfCheckAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOCF_CHECK`
+* `CXX11_GNU_NOCF_CHECK`
+* `C2_XGNU_NOCF_CHECK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArcWeakrefUnavailableAttrSpelling"></a>ArcWeakrefUnavailableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE`
+* `CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE`
+* `C2_XCLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArgumentWithTypeTagAttrSpelling"></a>ArgumentWithTypeTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ARGUMENT_WITH_TYPE_TAG`
+* `CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG`
+* `C2_XCLANG_ARGUMENT_WITH_TYPE_TAG`
+* `GNU_POINTER_WITH_TYPE_TAG`
+* `CXX11_CLANG_POINTER_WITH_TYPE_TAG`
+* `C2_XCLANG_POINTER_WITH_TYPE_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArmBuiltinAliasAttrSpelling"></a>ArmBuiltinAliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CLANG_ARM_BUILTIN_ALIAS`
+* `CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS`
+* `C2_XCLANG_CLANG_ARM_BUILTIN_ALIAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArmMveStrictPolymorphismAttrSpelling"></a>ArmMveStrictPolymorphismAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM`
+* `CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM`
+* `C2_XCLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="ArrayTypeArraySizeModifier"></a>ArrayTypeArraySizeModifier</summary>
 
 Available enumerations:
@@ -169,6 +472,60 @@ Available enumerations:
 * `NORMAL`
 * `STATIC`
 * `STAR`
+
+</details>
+
+<details><summary><a name="ArtificialAttrSpelling"></a>ArtificialAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ARTIFICIAL`
+* `CXX11_GNU_ARTIFICIAL`
+* `C2_XGNU_ARTIFICIAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AsmLabelAttrSpelling"></a>AsmLabelAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_ASSEMBLY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AssertCapabilityAttrSpelling"></a>AssertCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ASSERT_CAPABILITY`
+* `CXX11_CLANG_ASSERT_CAPABILITY`
+* `GNU_ASSERT_SHARED_CAPABILITY`
+* `CXX11_CLANG_ASSERT_SHARED_CAPABILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AssumeAlignedAttrSpelling"></a>AssumeAlignedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ASSUME_ALIGNED`
+* `CXX11_GNU_ASSUME_ALIGNED`
+* `C2_XGNU_ASSUME_ALIGNED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AssumptionAttrSpelling"></a>AssumptionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ASSUME`
+* `CXX11_CLANG_ASSUME`
+* `C2_XCLANG_ASSUME`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -238,6 +595,80 @@ Available enumerations:
 * `HIP_ATOMIC_FETCH_XOR`
 * `HIP_ATOMIC_FETCH_MIN`
 * `HIP_ATOMIC_FETCH_MAX`
+
+</details>
+
+<details><summary><a name="AvailabilityAttrSpelling"></a>AvailabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AVAILABILITY`
+* `CXX11_CLANG_AVAILABILITY`
+* `C2_XCLANG_AVAILABILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BPFPreserveAccessIndexAttrSpelling"></a>BPFPreserveAccessIndexAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PRESERVE_ACCESS_INDEX`
+* `CXX11_CLANG_PRESERVE_ACCESS_INDEX`
+* `C2_XCLANG_PRESERVE_ACCESS_INDEX`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BTFDeclTagAttrSpelling"></a>BTFDeclTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_BTF_DECLARATION_TAG`
+* `CXX11_CLANG_BTF_DECLARATION_TAG`
+* `C2_XCLANG_BTF_DECLARATION_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BTFTypeTagAttrSpelling"></a>BTFTypeTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_BTF_TYPE_TAG`
+* `CXX11_CLANG_BTF_TYPE_TAG`
+* `C2_XCLANG_BTF_TYPE_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BlocksAttrBlockType"></a>BlocksAttrBlockType</summary>
+
+Available enumerations:
+
+* `BY_REFERENCE`
+
+</details>
+
+<details><summary><a name="BlocksAttrSpelling"></a>BlocksAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_BLOCKS`
+* `CXX11_CLANG_BLOCKS`
+* `C2_XCLANG_BLOCKS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BuiltinAliasAttrSpelling"></a>BuiltinAliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_CLANG_BUILTIN_ALIAS`
+* `C2_XCLANG_BUILTIN_ALIAS`
+* `GNU_CLANG_BUILTIN_ALIAS`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -486,6 +917,196 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="CDeclAttrSpelling"></a>CDeclAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CDECL`
+* `CXX11_GNU_CDECL`
+* `C2_XGNU_CDECL`
+* `KEYWORD_CDECL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFAuditedTransferAttrSpelling"></a>CFAuditedTransferAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_AUDITED_TRANSFER`
+* `CXX11_CLANG_CF_AUDITED_TRANSFER`
+* `C2_XCLANG_CF_AUDITED_TRANSFER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFConsumedAttrSpelling"></a>CFConsumedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_CONSUMED`
+* `CXX11_CLANG_CF_CONSUMED`
+* `C2_XCLANG_CF_CONSUMED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFGuardAttrGuardArg"></a>CFGuardAttrGuardArg</summary>
+
+Available enumerations:
+
+* `NOCF`
+
+</details>
+
+<details><summary><a name="CFICanonicalJumpTableAttrSpelling"></a>CFICanonicalJumpTableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CFI_CANONICAL_JUMP_TABLE`
+* `CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE`
+* `C2_XCLANG_CFI_CANONICAL_JUMP_TABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFReturnsNotRetainedAttrSpelling"></a>CFReturnsNotRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_RETURNS_NOT_RETAINED`
+* `CXX11_CLANG_CF_RETURNS_NOT_RETAINED`
+* `C2_XCLANG_CF_RETURNS_NOT_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFReturnsRetainedAttrSpelling"></a>CFReturnsRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_RETURNS_RETAINED`
+* `CXX11_CLANG_CF_RETURNS_RETAINED`
+* `C2_XCLANG_CF_RETURNS_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFUnknownTransferAttrSpelling"></a>CFUnknownTransferAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_UNKNOWN_TRANSFER`
+* `CXX11_CLANG_CF_UNKNOWN_TRANSFER`
+* `C2_XCLANG_CF_UNKNOWN_TRANSFER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CPUDispatchAttrSpelling"></a>CPUDispatchAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CPU_DISPATCH`
+* `CXX11_CLANG_CPU_DISPATCH`
+* `C2_XCLANG_CPU_DISPATCH`
+* `DECLSPEC_CPU_DISPATCH`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CPUSpecificAttrSpelling"></a>CPUSpecificAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CPU_SPECIFIC`
+* `CXX11_CLANG_CPU_SPECIFIC`
+* `C2_XCLANG_CPU_SPECIFIC`
+* `DECLSPEC_CPU_SPECIFIC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDAConstantAttrSpelling"></a>CUDAConstantAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSTANT`
+* `DECLSPEC_CONSTANT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDADeviceAttrSpelling"></a>CUDADeviceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEVICE`
+* `DECLSPEC_DEVICE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDADeviceBuiltinSurfaceTypeAttrSpelling"></a>CUDADeviceBuiltinSurfaceTypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEVICE_BUILTIN_SURFACE_TYPE`
+* `DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDADeviceBuiltinTextureTypeAttrSpelling"></a>CUDADeviceBuiltinTextureTypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEVICE_BUILTIN_TEXTURE_TYPE`
+* `DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDAGlobalAttrSpelling"></a>CUDAGlobalAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_GLOBAL`
+* `DECLSPEC_GLOBAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDAHostAttrSpelling"></a>CUDAHostAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_HOST`
+* `DECLSPEC_HOST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDALaunchBoundsAttrSpelling"></a>CUDALaunchBoundsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LAUNCH_BOUNDS`
+* `DECLSPEC_LAUNCH_BOUNDS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDASharedAttrSpelling"></a>CUDASharedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SHARED`
+* `DECLSPEC_SHARED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="CXXConstructExprConstructionKind"></a>CXXConstructExprConstructionKind</summary>
 
 Available enumerations:
@@ -516,6 +1137,60 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="CallableWhenAttrConsumedState"></a>CallableWhenAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="CallableWhenAttrSpelling"></a>CallableWhenAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CALLABLE_WHEN`
+* `CXX11_CLANG_CALLABLE_WHEN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CallbackAttrSpelling"></a>CallbackAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CALLBACK`
+* `CXX11_CLANG_CALLBACK`
+* `C2_XCLANG_CALLBACK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CalledOnceAttrSpelling"></a>CalledOnceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CALLED_ONCE`
+* `CXX11_CLANG_CALLED_ONCE`
+* `C2_XCLANG_CALLED_ONCE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CapabilityAttrSpelling"></a>CapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CAPABILITY`
+* `CXX11_CLANG_CAPABILITY`
+* `GNU_SHARED_CAPABILITY`
+* `CXX11_CLANG_SHARED_CAPABILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="CapturedStmtVariableCaptureKind"></a>CapturedStmtVariableCaptureKind</summary>
 
 Available enumerations:
@@ -524,6 +1199,16 @@ Available enumerations:
 * `BY_REFERENCE`
 * `BY_COPY`
 * `VLA_TYPE`
+
+</details>
+
+<details><summary><a name="CarriesDependencyAttrSpelling"></a>CarriesDependencyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CARRIES_DEPENDENCY`
+* `CXX11_CARRIES_DEPENDENCY`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -539,6 +1224,61 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="CleanupAttrSpelling"></a>CleanupAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CLEANUP`
+* `CXX11_GNU_CLEANUP`
+* `C2_XGNU_CLEANUP`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ColdAttrSpelling"></a>ColdAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_COLD`
+* `CXX11_GNU_COLD`
+* `C2_XGNU_COLD`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CommonAttrSpelling"></a>CommonAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_COMMON`
+* `CXX11_GNU_COMMON`
+* `C2_XGNU_COMMON`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConstAttrSpelling"></a>ConstAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONST`
+* `CXX11_GNU_CONST`
+* `C2_XGNU_CONST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConstInitAttrSpelling"></a>ConstInitAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_CONSTINIT`
+* `GNU_REQUIRE_CONSTANT_INITIALIZATION`
+* `CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="ConstantExprResultStorageKind"></a>ConstantExprResultStorageKind</summary>
 
 Available enumerations:
@@ -546,6 +1286,92 @@ Available enumerations:
 * `NONE`
 * `INT64`
 * `AP_VALUE`
+
+</details>
+
+<details><summary><a name="ConstructorAttrSpelling"></a>ConstructorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSTRUCTOR`
+* `CXX11_GNU_CONSTRUCTOR`
+* `C2_XGNU_CONSTRUCTOR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConsumableAttrConsumedState"></a>ConsumableAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="ConsumableAttrSpelling"></a>ConsumableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSUMABLE`
+* `CXX11_CLANG_CONSUMABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConsumableAutoCastAttrSpelling"></a>ConsumableAutoCastAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSUMABLE_AUTO_CAST_STATE`
+* `CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConsumableSetOnReadAttrSpelling"></a>ConsumableSetOnReadAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSUMABLE_STATE_ON_READ`
+* `CXX11_CLANG_CONSUMABLE_STATE_ON_READ`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConvergentAttrSpelling"></a>ConvergentAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONVERGENT`
+* `CXX11_CLANG_CONVERGENT`
+* `C2_XCLANG_CONVERGENT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DLLExportAttrSpelling"></a>DLLExportAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_DLLEXPORT`
+* `GNU_DLLEXPORT`
+* `CXX11_GNU_DLLEXPORT`
+* `C2_XGNU_DLLEXPORT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DLLImportAttrSpelling"></a>DLLImportAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_DLLIMPORT`
+* `GNU_DLLIMPORT`
+* `CXX11_GNU_DLLIMPORT`
+* `C2_XGNU_DLLIMPORT`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -603,6 +1429,140 @@ Available enumerations:
 * `BYREF`
 * `ONEWAY`
 * `CS_NULLABILITY`
+
+</details>
+
+<details><summary><a name="DeprecatedAttrSpelling"></a>DeprecatedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEPRECATED`
+* `CXX11_GNU_DEPRECATED`
+* `C2_XGNU_DEPRECATED`
+* `DECLSPEC_DEPRECATED`
+* `CXX11_DEPRECATED`
+* `C2_XDEPRECATED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DestructorAttrSpelling"></a>DestructorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DESTRUCTOR`
+* `CXX11_GNU_DESTRUCTOR`
+* `C2_XGNU_DESTRUCTOR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DiagnoseAsBuiltinAttrSpelling"></a>DiagnoseAsBuiltinAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DIAGNOSE_AS_BUILTIN`
+* `CXX11_CLANG_DIAGNOSE_AS_BUILTIN`
+* `C2_XCLANG_DIAGNOSE_AS_BUILTIN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DiagnoseIfAttrDiagnosticType"></a>DiagnoseIfAttrDiagnosticType</summary>
+
+Available enumerations:
+
+* `ERROR`
+* `WARNING`
+
+</details>
+
+<details><summary><a name="DisableSanitizerInstrumentationAttrSpelling"></a>DisableSanitizerInstrumentationAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DISABLE_SANITIZER_INSTRUMENTATION`
+* `CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION`
+* `C2_XCLANG_DISABLE_SANITIZER_INSTRUMENTATION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DisableTailCallsAttrSpelling"></a>DisableTailCallsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DISABLE_TAIL_CALLS`
+* `CXX11_CLANG_DISABLE_TAIL_CALLS`
+* `C2_XCLANG_DISABLE_TAIL_CALLS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="EnforceTCBAttrSpelling"></a>EnforceTCBAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ENFORCE_TCB`
+* `CXX11_CLANG_ENFORCE_TCB`
+* `C2_XCLANG_ENFORCE_TCB`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="EnforceTCBLeafAttrSpelling"></a>EnforceTCBLeafAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ENFORCE_TCB_LEAF`
+* `CXX11_CLANG_ENFORCE_TCB_LEAF`
+* `C2_XCLANG_ENFORCE_TCB_LEAF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="EnumExtensibilityAttrKind"></a>EnumExtensibilityAttrKind</summary>
+
+Available enumerations:
+
+* `CLOSED`
+* `OPEN`
+
+</details>
+
+<details><summary><a name="EnumExtensibilityAttrSpelling"></a>EnumExtensibilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ENUM_EXTENSIBILITY`
+* `CXX11_CLANG_ENUM_EXTENSIBILITY`
+* `C2_XCLANG_ENUM_EXTENSIBILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ErrorAttrSpelling"></a>ErrorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ERROR`
+* `CXX11_GNU_ERROR`
+* `C2_XGNU_ERROR`
+* `GNU_WARNING`
+* `CXX11_GNU_WARNING`
+* `C2_XGNU_WARNING`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ExcludeFromExplicitInstantiationAttrSpelling"></a>ExcludeFromExplicitInstantiationAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
+* `CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
+* `C2_XCLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -690,6 +1650,97 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="ExternalSourceSymbolAttrSpelling"></a>ExternalSourceSymbolAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_EXTERNAL_SOURCE_SYMBOL`
+* `CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL`
+* `C2_XCLANG_EXTERNAL_SOURCE_SYMBOL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FallThroughAttrSpelling"></a>FallThroughAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_FALLTHROUGH`
+* `C2_XFALLTHROUGH`
+* `CXX11_CLANG_FALLTHROUGH`
+* `GNU_FALLTHROUGH`
+* `CXX11_GNU_FALLTHROUGH`
+* `C2_XGNU_FALLTHROUGH`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FastCallAttrSpelling"></a>FastCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FASTCALL`
+* `CXX11_GNU_FASTCALL`
+* `C2_XGNU_FASTCALL`
+* `KEYWORD_FASTCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FinalAttrSpelling"></a>FinalAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_FINAL`
+* `KEYWORD_SEALED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FlagEnumAttrSpelling"></a>FlagEnumAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FLAG_ENUM`
+* `CXX11_CLANG_FLAG_ENUM`
+* `C2_XCLANG_FLAG_ENUM`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FlattenAttrSpelling"></a>FlattenAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FLATTEN`
+* `CXX11_GNU_FLATTEN`
+* `C2_XGNU_FLATTEN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FormatArgAttrSpelling"></a>FormatArgAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FORMAT_ARGUMENT`
+* `CXX11_GNU_FORMAT_ARGUMENT`
+* `C2_XGNU_FORMAT_ARGUMENT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FormatAttrSpelling"></a>FormatAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FORMAT`
+* `CXX11_GNU_FORMAT`
+* `C2_XGNU_FORMAT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="FunctionDeclTemplatedKind"></a>FunctionDeclTemplatedKind</summary>
 
 Available enumerations:
@@ -699,6 +1750,92 @@ Available enumerations:
 * `MEMBER_SPECIALIZATION`
 * `FUNCTION_TEMPLATE_SPECIALIZATION`
 * `DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION`
+
+</details>
+
+<details><summary><a name="GNUInlineAttrSpelling"></a>GNUInlineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_GNU_INLINE`
+* `CXX11_GNU_GNU_INLINE`
+* `C2_XGNU_GNU_INLINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="GuardedVarAttrSpelling"></a>GuardedVarAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_GUARDED_VARIABLE`
+* `CXX11_CLANG_GUARDED_VARIABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="HIPManagedAttrSpelling"></a>HIPManagedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MANAGED`
+* `DECLSPEC_MANAGED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="HotAttrSpelling"></a>HotAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_HOT`
+* `CXX11_GNU_HOT`
+* `C2_XGNU_HOT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IBActionAttrSpelling"></a>IBActionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IBACTION`
+* `CXX11_CLANG_IBACTION`
+* `C2_XCLANG_IBACTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IBOutletAttrSpelling"></a>IBOutletAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IBOUTLET`
+* `CXX11_CLANG_IBOUTLET`
+* `C2_XCLANG_IBOUTLET`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IBOutletCollectionAttrSpelling"></a>IBOutletCollectionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IBOUTLETCOLLECTION`
+* `CXX11_CLANG_IBOUTLETCOLLECTION`
+* `C2_XCLANG_IBOUTLETCOLLECTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IFuncAttrSpelling"></a>IFuncAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IFUNC`
+* `CXX11_GNU_IFUNC`
+* `C2_XGNU_IFUNC`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -723,12 +1860,397 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="InitPriorityAttrSpelling"></a>InitPriorityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INITIALIZER_PRIORITY`
+* `CXX11_GNU_INITIALIZER_PRIORITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IntelOclBiccAttrSpelling"></a>IntelOclBiccAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTEL_OCL_BICC`
+* `CXX11_CLANG_INTEL_OCL_BICC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="InternalLinkageAttrSpelling"></a>InternalLinkageAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERNAL_LINKAGE`
+* `CXX11_CLANG_INTERNAL_LINKAGE`
+* `C2_XCLANG_INTERNAL_LINKAGE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LTOVisibilityPublicAttrSpelling"></a>LTOVisibilityPublicAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LTO_VISIBILITY_PUBLIC`
+* `CXX11_CLANG_LTO_VISIBILITY_PUBLIC`
+* `C2_XCLANG_LTO_VISIBILITY_PUBLIC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LeafAttrSpelling"></a>LeafAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LEAF`
+* `CXX11_GNU_LEAF`
+* `C2_XGNU_LEAF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LifetimeBoundAttrSpelling"></a>LifetimeBoundAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LIFETIMEBOUND`
+* `CXX11_CLANG_LIFETIMEBOUND`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LikelyAttrSpelling"></a>LikelyAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_LIKELY`
+* `C2_XCLANG_LIKELY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="LinkageSpecDeclLanguageIDs"></a>LinkageSpecDeclLanguageIDs</summary>
 
 Available enumerations:
 
 * `C`
 * `CXX`
+
+</details>
+
+<details><summary><a name="LoaderUninitializedAttrSpelling"></a>LoaderUninitializedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LOADER_UNINITIALIZED`
+* `CXX11_CLANG_LOADER_UNINITIALIZED`
+* `C2_XCLANG_LOADER_UNINITIALIZED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LoopHintAttrLoopHintState"></a>LoopHintAttrLoopHintState</summary>
+
+Available enumerations:
+
+* `ENABLE`
+* `DISABLE`
+* `NUMERIC`
+* `FIXED_WIDTH`
+* `SCALABLE_WIDTH`
+* `ASSUME_SAFETY`
+* `FULL`
+
+</details>
+
+<details><summary><a name="LoopHintAttrOptionType"></a>LoopHintAttrOptionType</summary>
+
+Available enumerations:
+
+* `VECTORIZE`
+* `VECTORIZE_WIDTH`
+* `INTERLEAVE`
+* `INTERLEAVE_COUNT`
+* `UNROLL`
+* `UNROLL_COUNT`
+* `UNROLL_AND_JAM`
+* `UNROLL_AND_JAM_COUNT`
+* `PIPELINE_DISABLED`
+* `PIPELINE_INITIATION_INTERVAL`
+* `DISTRIBUTE`
+* `VECTORIZE_PREDICATE`
+
+</details>
+
+<details><summary><a name="LoopHintAttrSpelling"></a>LoopHintAttrSpelling</summary>
+
+Available enumerations:
+
+* `PRAGMA_CLANG_LOOP`
+* `PRAGMA_UNROLL`
+* `PRAGMA_NOUNROLL`
+* `PRAGMA_UNROLL_AND_JAM`
+* `PRAGMA_NOUNROLL_AND_JAM`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MIGServerRoutineAttrSpelling"></a>MIGServerRoutineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MIG_SERVER_ROUTINE`
+* `CXX11_CLANG_MIG_SERVER_ROUTINE`
+* `C2_XCLANG_MIG_SERVER_ROUTINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSABIAttrSpelling"></a>MSABIAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MS_ABI`
+* `CXX11_GNU_MS_ABI`
+* `C2_XGNU_MS_ABI`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSInheritanceAttrSpelling"></a>MSInheritanceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_SINGLE_INHERITANCE`
+* `KEYWORD_MULTIPLE_INHERITANCE`
+* `KEYWORD_VIRTUAL_INHERITANCE`
+* `KEYWORD_UNSPECIFIED_INHERITANCE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSP430InterruptAttrSpelling"></a>MSP430InterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2_XGNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSStructAttrSpelling"></a>MSStructAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MS_STRUCT`
+* `CXX11_GNU_MS_STRUCT`
+* `C2_XGNU_MS_STRUCT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MayAliasAttrSpelling"></a>MayAliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MAY_ALIAS`
+* `CXX11_GNU_MAY_ALIAS`
+* `C2_XGNU_MAY_ALIAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MicroMipsAttrSpelling"></a>MicroMipsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MICROMIPS`
+* `CXX11_GNU_MICROMIPS`
+* `C2_XGNU_MICROMIPS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MinSizeAttrSpelling"></a>MinSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MINSIZE`
+* `CXX11_CLANG_MINSIZE`
+* `C2_XCLANG_MINSIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MinVectorWidthAttrSpelling"></a>MinVectorWidthAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MIN_VECTOR_WIDTH`
+* `CXX11_CLANG_MIN_VECTOR_WIDTH`
+* `C2_XCLANG_MIN_VECTOR_WIDTH`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="Mips16AttrSpelling"></a>Mips16AttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MIPS16`
+* `CXX11_GNU_MIPS16`
+* `C2_XGNU_MIPS16`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MipsInterruptAttrInterruptType"></a>MipsInterruptAttrInterruptType</summary>
+
+Available enumerations:
+
+* `SW0`
+* `SW1`
+* `HW0`
+* `HW1`
+* `HW2`
+* `HW3`
+* `HW4`
+* `HW5`
+* `EIC`
+
+</details>
+
+<details><summary><a name="MipsInterruptAttrSpelling"></a>MipsInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2_XGNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MipsLongCallAttrSpelling"></a>MipsLongCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LONG_CALL`
+* `CXX11_GNU_LONG_CALL`
+* `C2_XGNU_LONG_CALL`
+* `GNU_FAR`
+* `CXX11_GNU_FAR`
+* `C2_XGNU_FAR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MipsShortCallAttrSpelling"></a>MipsShortCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SHORT_CALL`
+* `CXX11_GNU_SHORT_CALL`
+* `C2_XGNU_SHORT_CALL`
+* `GNU_NEAR`
+* `CXX11_GNU_NEAR`
+* `C2_XGNU_NEAR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ModeAttrSpelling"></a>ModeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MODE`
+* `CXX11_GNU_MODE`
+* `C2_XGNU_MODE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MustTailAttrSpelling"></a>MustTailAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MUSTTAIL`
+* `CXX11_CLANG_MUSTTAIL`
+* `C2_XCLANG_MUSTTAIL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSConsumedAttrSpelling"></a>NSConsumedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_CONSUMED`
+* `CXX11_CLANG_NS_CONSUMED`
+* `C2_XCLANG_NS_CONSUMED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSConsumesSelfAttrSpelling"></a>NSConsumesSelfAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_CONSUMES_SELF`
+* `CXX11_CLANG_NS_CONSUMES_SELF`
+* `C2_XCLANG_NS_CONSUMES_SELF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSReturnsAutoreleasedAttrSpelling"></a>NSReturnsAutoreleasedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_RETURNS_AUTORELEASED`
+* `CXX11_CLANG_NS_RETURNS_AUTORELEASED`
+* `C2_XCLANG_NS_RETURNS_AUTORELEASED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSReturnsNotRetainedAttrSpelling"></a>NSReturnsNotRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_RETURNS_NOT_RETAINED`
+* `CXX11_CLANG_NS_RETURNS_NOT_RETAINED`
+* `C2_XCLANG_NS_RETURNS_NOT_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSReturnsRetainedAttrSpelling"></a>NSReturnsRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_RETURNS_RETAINED`
+* `CXX11_CLANG_NS_RETURNS_RETAINED`
+* `C2_XCLANG_NS_RETURNS_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NakedAttrSpelling"></a>NakedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NAKED`
+* `CXX11_GNU_NAKED`
+* `C2_XGNU_NAKED`
+* `DECLSPEC_NAKED`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -741,6 +2263,267 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="NoBuiltinAttrSpelling"></a>NoBuiltinAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_BUILTIN`
+* `CXX11_CLANG_NO_BUILTIN`
+* `C2_XCLANG_NO_BUILTIN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoCommonAttrSpelling"></a>NoCommonAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOCOMMON`
+* `CXX11_GNU_NOCOMMON`
+* `C2_XGNU_NOCOMMON`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDebugAttrSpelling"></a>NoDebugAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NODEBUG`
+* `CXX11_GNU_NODEBUG`
+* `C2_XGNU_NODEBUG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDerefAttrSpelling"></a>NoDerefAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NODEREF`
+* `CXX11_CLANG_NODEREF`
+* `C2_XCLANG_NODEREF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDestroyAttrSpelling"></a>NoDestroyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_DESTROY`
+* `CXX11_CLANG_NO_DESTROY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDuplicateAttrSpelling"></a>NoDuplicateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NODUPLICATE`
+* `CXX11_CLANG_NODUPLICATE`
+* `C2_XCLANG_NODUPLICATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoEscapeAttrSpelling"></a>NoEscapeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOESCAPE`
+* `CXX11_CLANG_NOESCAPE`
+* `C2_XCLANG_NOESCAPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoInlineAttrSpelling"></a>NoInlineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOINLINE`
+* `CXX11_GNU_NOINLINE`
+* `C2_XGNU_NOINLINE`
+* `DECLSPEC_NOINLINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoInstrumentFunctionAttrSpelling"></a>NoInstrumentFunctionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_INSTRUMENT_FUNCTION`
+* `CXX11_GNU_NO_INSTRUMENT_FUNCTION`
+* `C2_XGNU_NO_INSTRUMENT_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoMergeAttrSpelling"></a>NoMergeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOMERGE`
+* `CXX11_CLANG_NOMERGE`
+* `C2_XCLANG_NOMERGE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoMicroMipsAttrSpelling"></a>NoMicroMipsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOMICROMIPS`
+* `CXX11_GNU_NOMICROMIPS`
+* `C2_XGNU_NOMICROMIPS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoMips16AttrSpelling"></a>NoMips16AttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOMIPS16`
+* `CXX11_GNU_NOMIPS16`
+* `C2_XGNU_NOMIPS16`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoProfileFunctionAttrSpelling"></a>NoProfileFunctionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_PROFILE_INSTRUMENT_FUNCTION`
+* `CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION`
+* `C2_XGNU_NO_PROFILE_INSTRUMENT_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoReturnAttrSpelling"></a>NoReturnAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NORETURN`
+* `CXX11_GNU_NORETURN`
+* `C2_XGNU_NORETURN`
+* `DECLSPEC_NORETURN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoSanitizeAttrSpelling"></a>NoSanitizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_SANITIZE`
+* `CXX11_CLANG_NO_SANITIZE`
+* `C2_XCLANG_NO_SANITIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoSpeculativeLoadHardeningAttrSpelling"></a>NoSpeculativeLoadHardeningAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_SPECULATIVE_LOAD_HARDENING`
+* `CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING`
+* `C2_XCLANG_NO_SPECULATIVE_LOAD_HARDENING`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoSplitStackAttrSpelling"></a>NoSplitStackAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_SPLIT_STACK`
+* `CXX11_GNU_NO_SPLIT_STACK`
+* `C2_XGNU_NO_SPLIT_STACK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoStackProtectorAttrSpelling"></a>NoStackProtectorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_STACK_PROTECTOR`
+* `CXX11_CLANG_NO_STACK_PROTECTOR`
+* `C2_XCLANG_NO_STACK_PROTECTOR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoThreadSafetyAnalysisAttrSpelling"></a>NoThreadSafetyAnalysisAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_THREAD_SAFETY_ANALYSIS`
+* `CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS`
+* `C2_XCLANG_NO_THREAD_SAFETY_ANALYSIS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoThrowAttrSpelling"></a>NoThrowAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOTHROW`
+* `CXX11_GNU_NOTHROW`
+* `C2_XGNU_NOTHROW`
+* `DECLSPEC_NOTHROW`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NonNullAttrSpelling"></a>NonNullAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NONNULL`
+* `CXX11_GNU_NONNULL`
+* `C2_XGNU_NONNULL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NotTailCalledAttrSpelling"></a>NotTailCalledAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOT_TAIL_CALLED`
+* `CXX11_CLANG_NOT_TAIL_CALLED`
+* `C2_XCLANG_NOT_TAIL_CALLED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OMPAllocateDeclAttrAllocatorTypeTy"></a>OMPAllocateDeclAttrAllocatorTypeTy</summary>
+
+Available enumerations:
+
+* `OMP_NULL_MEMORY_ALLOC`
+* `OMP_DEFAULT_MEMORY_ALLOC`
+* `OMP_LARGE_CAP_MEMORY_ALLOC`
+* `OMP_CONST_MEMORY_ALLOC`
+* `OMP_HIGH_BW_MEMORY_ALLOC`
+* `OMP_LOW_LAT_MEMORY_ALLOC`
+* `OMPC_GROUP_MEMORY_ALLOC`
+* `OMPP_TEAM_MEMORY_ALLOC`
+* `OMP_THREAD_MEMORY_ALLOC`
+* `OMP_USER_DEFINED_MEMORY_ALLOC`
+
+</details>
+
 <details><summary><a name="OMPDeclareReductionDeclInitKind"></a>OMPDeclareReductionDeclInitKind</summary>
 
 Available enumerations:
@@ -748,6 +2531,254 @@ Available enumerations:
 * `CALL_INITIALIZER`
 * `DIRECT_INITIALIZER`
 * `COPY_INITIALIZER`
+
+</details>
+
+<details><summary><a name="OMPDeclareSimdDeclAttrBranchStateTy"></a>OMPDeclareSimdDeclAttrBranchStateTy</summary>
+
+Available enumerations:
+
+* `UNDEFINED`
+* `INBRANCH`
+* `NOTINBRANCH`
+
+</details>
+
+<details><summary><a name="OMPDeclareTargetDeclAttrDevTypeTy"></a>OMPDeclareTargetDeclAttrDevTypeTy</summary>
+
+Available enumerations:
+
+* `HOST`
+* `NO_HOST`
+* `ANY`
+
+</details>
+
+<details><summary><a name="OMPDeclareTargetDeclAttrMapTypeTy"></a>OMPDeclareTargetDeclAttrMapTypeTy</summary>
+
+Available enumerations:
+
+* `TO`
+* `LINK`
+
+</details>
+
+<details><summary><a name="OMPDeclareVariantAttrInteropType"></a>OMPDeclareVariantAttrInteropType</summary>
+
+Available enumerations:
+
+* `TARGET`
+* `TARGET_SYNC`
+* `TARGET_TARGET_SYNC`
+
+</details>
+
+<details><summary><a name="OSConsumedAttrSpelling"></a>OSConsumedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_CONSUMED`
+* `CXX11_CLANG_OS_CONSUMED`
+* `C2_XCLANG_OS_CONSUMED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSConsumesThisAttrSpelling"></a>OSConsumesThisAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_CONSUMES_THIS`
+* `CXX11_CLANG_OS_CONSUMES_THIS`
+* `C2_XCLANG_OS_CONSUMES_THIS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsNotRetainedAttrSpelling"></a>OSReturnsNotRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_NOT_RETAINED`
+* `CXX11_CLANG_OS_RETURNS_NOT_RETAINED`
+* `C2_XCLANG_OS_RETURNS_NOT_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedAttrSpelling"></a>OSReturnsRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_RETAINED`
+* `CXX11_CLANG_OS_RETURNS_RETAINED`
+* `C2_XCLANG_OS_RETURNS_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedOnNonZeroAttrSpelling"></a>OSReturnsRetainedOnNonZeroAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_RETAINED_ON_NON_ZERO`
+* `CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO`
+* `C2_XCLANG_OS_RETURNS_RETAINED_ON_NON_ZERO`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedOnZeroAttrSpelling"></a>OSReturnsRetainedOnZeroAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_RETAINED_ON_ZERO`
+* `CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO`
+* `C2_XCLANG_OS_RETURNS_RETAINED_ON_ZERO`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBoxableAttrSpelling"></a>ObjCBoxableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BOXABLE`
+* `CXX11_CLANG_OBJC_BOXABLE`
+* `C2_XCLANG_OBJC_BOXABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBridgeAttrSpelling"></a>ObjCBridgeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BRIDGE`
+* `CXX11_CLANG_OBJC_BRIDGE`
+* `C2_XCLANG_OBJC_BRIDGE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBridgeMutableAttrSpelling"></a>ObjCBridgeMutableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BRIDGE_MUTABLE`
+* `CXX11_CLANG_OBJC_BRIDGE_MUTABLE`
+* `C2_XCLANG_OBJC_BRIDGE_MUTABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBridgeRelatedAttrSpelling"></a>ObjCBridgeRelatedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BRIDGE_RELATED`
+* `CXX11_CLANG_OBJC_BRIDGE_RELATED`
+* `C2_XCLANG_OBJC_BRIDGE_RELATED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCClassStubAttrSpelling"></a>ObjCClassStubAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_CLASS_STUB`
+* `CXX11_CLANG_OBJC_CLASS_STUB`
+* `C2_XCLANG_OBJC_CLASS_STUB`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCDesignatedInitializerAttrSpelling"></a>ObjCDesignatedInitializerAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_DESIGNATED_INITIALIZER`
+* `CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER`
+* `C2_XCLANG_OBJC_DESIGNATED_INITIALIZER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCDirectAttrSpelling"></a>ObjCDirectAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_DIRECT`
+* `CXX11_CLANG_OBJC_DIRECT`
+* `C2_XCLANG_OBJC_DIRECT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCDirectMembersAttrSpelling"></a>ObjCDirectMembersAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_DIRECT_MEMBERS`
+* `CXX11_CLANG_OBJC_DIRECT_MEMBERS`
+* `C2_XCLANG_OBJC_DIRECT_MEMBERS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCExceptionAttrSpelling"></a>ObjCExceptionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_EXCEPTION`
+* `CXX11_CLANG_OBJC_EXCEPTION`
+* `C2_XCLANG_OBJC_EXCEPTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCExplicitProtocolImplAttrSpelling"></a>ObjCExplicitProtocolImplAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION`
+* `CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION`
+* `C2_XCLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCExternallyRetainedAttrSpelling"></a>ObjCExternallyRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_EXTERNALLY_RETAINED`
+* `CXX11_CLANG_OBJC_EXTERNALLY_RETAINED`
+* `C2_XCLANG_OBJC_EXTERNALLY_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCGCAttrSpelling"></a>ObjCGCAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_GC`
+* `CXX11_CLANG_OBJC_GC`
+* `C2_XCLANG_OBJC_GC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCIndependentClassAttrSpelling"></a>ObjCIndependentClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_INDEPENDENT_CLASS`
+* `CXX11_CLANG_OBJC_INDEPENDENT_CLASS`
+* `C2_XCLANG_OBJC_INDEPENDENT_CLASS`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -784,6 +2815,85 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="ObjCMethodFamilyAttrFamilyKind"></a>ObjCMethodFamilyAttrFamilyKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `ALLOC`
+* `COPY`
+* `INITIALIZER`
+* `MUTABLE_COPY`
+* `NEW`
+
+</details>
+
+<details><summary><a name="ObjCMethodFamilyAttrSpelling"></a>ObjCMethodFamilyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_METHOD_FAMILY`
+* `CXX11_CLANG_OBJC_METHOD_FAMILY`
+* `C2_XCLANG_OBJC_METHOD_FAMILY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCNSObjectAttrSpelling"></a>ObjCNSObjectAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNUNS_OBJECT`
+* `CXX11_CLANG_NS_OBJECT`
+* `C2_XCLANG_NS_OBJECT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCNonLazyClassAttrSpelling"></a>ObjCNonLazyClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_NONLAZY_CLASS`
+* `CXX11_CLANG_OBJC_NONLAZY_CLASS`
+* `C2_XCLANG_OBJC_NONLAZY_CLASS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCNonRuntimeProtocolAttrSpelling"></a>ObjCNonRuntimeProtocolAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_NON_RUNTIME_PROTOCOL`
+* `CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL`
+* `C2_XCLANG_OBJC_NON_RUNTIME_PROTOCOL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCOwnershipAttrSpelling"></a>ObjCOwnershipAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_OWNERSHIP`
+* `CXX11_CLANG_OBJC_OWNERSHIP`
+* `C2_XCLANG_OBJC_OWNERSHIP`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCPreciseLifetimeAttrSpelling"></a>ObjCPreciseLifetimeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_PRECISE_LIFETIME`
+* `CXX11_CLANG_OBJC_PRECISE_LIFETIME`
+* `C2_XCLANG_OBJC_PRECISE_LIFETIME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="ObjCPropertyDeclPropertyControl"></a>ObjCPropertyDeclPropertyControl</summary>
 
 Available enumerations:
@@ -814,6 +2924,322 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="ObjCRequiresPropertyDefsAttrSpelling"></a>ObjCRequiresPropertyDefsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS`
+* `CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS`
+* `C2_XCLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRequiresSuperAttrSpelling"></a>ObjCRequiresSuperAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_REQUIRES_SUPER`
+* `CXX11_CLANG_OBJC_REQUIRES_SUPER`
+* `C2_XCLANG_OBJC_REQUIRES_SUPER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCReturnsInnerPointerAttrSpelling"></a>ObjCReturnsInnerPointerAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_RETURNS_INNER_POINTER`
+* `CXX11_CLANG_OBJC_RETURNS_INNER_POINTER`
+* `C2_XCLANG_OBJC_RETURNS_INNER_POINTER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRootClassAttrSpelling"></a>ObjCRootClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_ROOT_CLASS`
+* `CXX11_CLANG_OBJC_ROOT_CLASS`
+* `C2_XCLANG_OBJC_ROOT_CLASS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRuntimeNameAttrSpelling"></a>ObjCRuntimeNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_RUNTIME_NAME`
+* `CXX11_CLANG_OBJC_RUNTIME_NAME`
+* `C2_XCLANG_OBJC_RUNTIME_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRuntimeVisibleAttrSpelling"></a>ObjCRuntimeVisibleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_RUNTIME_VISIBLE`
+* `CXX11_CLANG_OBJC_RUNTIME_VISIBLE`
+* `C2_XCLANG_OBJC_RUNTIME_VISIBLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCSubclassingRestrictedAttrSpelling"></a>ObjCSubclassingRestrictedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_SUBCLASSING_RESTRICTED`
+* `CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED`
+* `C2_XCLANG_OBJC_SUBCLASSING_RESTRICTED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLAccessAttrSpelling"></a>OpenCLAccessAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_READ_ONLY`
+* `KEYWORD_WRITE_ONLY`
+* `KEYWORD_READ_WRITE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLConstantAddressSpaceAttrSpelling"></a>OpenCLConstantAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_CONSTANT`
+* `GNU_OPENCL_CONSTANT`
+* `CXX11_CLANG_OPENCL_CONSTANT`
+* `C2_XCLANG_OPENCL_CONSTANT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGenericAddressSpaceAttrSpelling"></a>OpenCLGenericAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_GENERIC`
+* `GNU_OPENCL_GENERIC`
+* `CXX11_CLANG_OPENCL_GENERIC`
+* `C2_XCLANG_OPENCL_GENERIC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGlobalAddressSpaceAttrSpelling"></a>OpenCLGlobalAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_GLOBAL`
+* `GNU_OPENCL_GLOBAL`
+* `CXX11_CLANG_OPENCL_GLOBAL`
+* `C2_XCLANG_OPENCL_GLOBAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGlobalDeviceAddressSpaceAttrSpelling"></a>OpenCLGlobalDeviceAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OPENCL_GLOBAL_DEVICE`
+* `CXX11_CLANG_OPENCL_GLOBAL_DEVICE`
+* `C2_XCLANG_OPENCL_GLOBAL_DEVICE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGlobalHostAddressSpaceAttrSpelling"></a>OpenCLGlobalHostAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OPENCL_GLOBAL_HOST`
+* `CXX11_CLANG_OPENCL_GLOBAL_HOST`
+* `C2_XCLANG_OPENCL_GLOBAL_HOST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLKernelAttrSpelling"></a>OpenCLKernelAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_KERNEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLLocalAddressSpaceAttrSpelling"></a>OpenCLLocalAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_LOCAL`
+* `GNU_OPENCL_LOCAL`
+* `CXX11_CLANG_OPENCL_LOCAL`
+* `C2_XCLANG_OPENCL_LOCAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLPrivateAddressSpaceAttrSpelling"></a>OpenCLPrivateAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_PRIVATE`
+* `GNU_OPENCL_PRIVATE`
+* `CXX11_CLANG_OPENCL_PRIVATE`
+* `C2_XCLANG_OPENCL_PRIVATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OptimizeNoneAttrSpelling"></a>OptimizeNoneAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OPTNONE`
+* `CXX11_CLANG_OPTNONE`
+* `C2_XCLANG_OPTNONE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OverloadableAttrSpelling"></a>OverloadableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OVERLOADABLE`
+* `CXX11_CLANG_OVERLOADABLE`
+* `C2_XCLANG_OVERLOADABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OwnershipAttrOwnershipKind"></a>OwnershipAttrOwnershipKind</summary>
+
+Available enumerations:
+
+* `HOLDS`
+* `RETURNS`
+* `TAKES`
+
+</details>
+
+<details><summary><a name="OwnershipAttrSpelling"></a>OwnershipAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OWNERSHIP_HOLDS`
+* `CXX11_CLANG_OWNERSHIP_HOLDS`
+* `C2_XCLANG_OWNERSHIP_HOLDS`
+* `GNU_OWNERSHIP_RETURNS`
+* `CXX11_CLANG_OWNERSHIP_RETURNS`
+* `C2_XCLANG_OWNERSHIP_RETURNS`
+* `GNU_OWNERSHIP_TAKES`
+* `CXX11_CLANG_OWNERSHIP_TAKES`
+* `C2_XCLANG_OWNERSHIP_TAKES`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PackedAttrSpelling"></a>PackedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PACKED`
+* `CXX11_GNU_PACKED`
+* `C2_XGNU_PACKED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ParamTypestateAttrConsumedState"></a>ParamTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="ParamTypestateAttrSpelling"></a>ParamTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PARAMETER_TYPESTATE`
+* `CXX11_CLANG_PARAMETER_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PascalAttrSpelling"></a>PascalAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PASCAL`
+* `CXX11_CLANG_PASCAL`
+* `C2_XCLANG_PASCAL`
+* `KEYWORD_PASCAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PassObjectSizeAttrSpelling"></a>PassObjectSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PASS_OBJECT_SIZE`
+* `CXX11_CLANG_PASS_OBJECT_SIZE`
+* `C2_XCLANG_PASS_OBJECT_SIZE`
+* `GNU_PASS_DYNAMIC_OBJECT_SIZE`
+* `CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE`
+* `C2_XCLANG_PASS_DYNAMIC_OBJECT_SIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PatchableFunctionEntryAttrSpelling"></a>PatchableFunctionEntryAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PATCHABLE_FUNCTION_ENTRY`
+* `CXX11_GNU_PATCHABLE_FUNCTION_ENTRY`
+* `C2_XGNU_PATCHABLE_FUNCTION_ENTRY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PcsAttrPCSType"></a>PcsAttrPCSType</summary>
+
+Available enumerations:
+
+* `AAPCS`
+* `VFP`
+
+</details>
+
+<details><summary><a name="PcsAttrSpelling"></a>PcsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PCS`
+* `CXX11_GNU_PCS`
+* `C2_XGNU_PCS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="PredefinedExprIdentKind"></a>PredefinedExprIdentKind</summary>
 
 Available enumerations:
@@ -826,6 +3252,59 @@ Available enumerations:
 * `L_FUNC_SIG`
 * `PRETTY_FUNCTION`
 * `PRETTY_FUNCTION_NO_VIRTUAL`
+
+</details>
+
+<details><summary><a name="PreferredNameAttrSpelling"></a>PreferredNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PREFERRED_NAME`
+* `CXX11_CLANG_PREFERRED_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PreserveAllAttrSpelling"></a>PreserveAllAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PRESERVE_ALL`
+* `CXX11_CLANG_PRESERVE_ALL`
+* `C2_XCLANG_PRESERVE_ALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PreserveMostAttrSpelling"></a>PreserveMostAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PRESERVE_MOST`
+* `CXX11_CLANG_PRESERVE_MOST`
+* `C2_XCLANG_PRESERVE_MOST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PtGuardedVarAttrSpelling"></a>PtGuardedVarAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PT_GUARDED_VARIABLE`
+* `CXX11_CLANG_PT_GUARDED_VARIABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PureAttrSpelling"></a>PureAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PURE`
+* `CXX11_GNU_PURE`
+* `C2_XGNU_PURE`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -864,6 +3343,27 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="RISCVInterruptAttrInterruptType"></a>RISCVInterruptAttrInterruptType</summary>
+
+Available enumerations:
+
+* `USER`
+* `SUPERVISOR`
+* `MACHINE`
+
+</details>
+
+<details><summary><a name="RISCVInterruptAttrSpelling"></a>RISCVInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2_XGNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="RecordDeclArgPassingKind"></a>RecordDeclArgPassingKind</summary>
 
 Available enumerations:
@@ -871,6 +3371,223 @@ Available enumerations:
 * `CAN_PASS_IN_REGS`
 * `CANNOT_PASS_IN_REGS`
 * `CAN_NEVER_PASS_IN_REGS`
+
+</details>
+
+<details><summary><a name="RegCallAttrSpelling"></a>RegCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_REGCALL`
+* `CXX11_GNU_REGCALL`
+* `C2_XGNU_REGCALL`
+* `KEYWORD_REGCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReinitializesAttrSpelling"></a>ReinitializesAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_REINITIALIZES`
+* `CXX11_CLANG_REINITIALIZES`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReleaseCapabilityAttrSpelling"></a>ReleaseCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RELEASE_CAPABILITY`
+* `CXX11_CLANG_RELEASE_CAPABILITY`
+* `GNU_RELEASE_SHARED_CAPABILITY`
+* `CXX11_CLANG_RELEASE_SHARED_CAPABILITY`
+* `GNU_RELEASE_GENERIC_CAPABILITY`
+* `CXX11_CLANG_RELEASE_GENERIC_CAPABILITY`
+* `GNU_UNLOCK_FUNCTION`
+* `CXX11_CLANG_UNLOCK_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReleaseHandleAttrSpelling"></a>ReleaseHandleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RELEASE_HANDLE`
+* `CXX11_CLANG_RELEASE_HANDLE`
+* `C2_XCLANG_RELEASE_HANDLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="RequiresCapabilityAttrSpelling"></a>RequiresCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_REQUIRES_CAPABILITY`
+* `CXX11_CLANG_REQUIRES_CAPABILITY`
+* `GNU_EXCLUSIVE_LOCKS_REQUIRED`
+* `CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED`
+* `GNU_REQUIRES_SHARED_CAPABILITY`
+* `CXX11_CLANG_REQUIRES_SHARED_CAPABILITY`
+* `GNU_SHARED_LOCKS_REQUIRED`
+* `CXX11_CLANG_SHARED_LOCKS_REQUIRED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="RestrictAttrSpelling"></a>RestrictAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_RESTRICT`
+* `GNU_MALLOC`
+* `CXX11_GNU_MALLOC`
+* `C2_XGNU_MALLOC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="RetainAttrSpelling"></a>RetainAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETAIN`
+* `CXX11_GNU_RETAIN`
+* `C2_XGNU_RETAIN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReturnTypestateAttrConsumedState"></a>ReturnTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="ReturnTypestateAttrSpelling"></a>ReturnTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETURN_TYPESTATE`
+* `CXX11_CLANG_RETURN_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReturnsNonNullAttrSpelling"></a>ReturnsNonNullAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETURNS_NONNULL`
+* `CXX11_GNU_RETURNS_NONNULL`
+* `C2_XGNU_RETURNS_NONNULL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReturnsTwiceAttrSpelling"></a>ReturnsTwiceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETURNS_TWICE`
+* `CXX11_GNU_RETURNS_TWICE`
+* `C2_XGNU_RETURNS_TWICE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SYCLKernelAttrSpelling"></a>SYCLKernelAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SYCL_KERNEL`
+* `CXX11_CLANG_SYCL_KERNEL`
+* `C2_XCLANG_SYCL_KERNEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SYCLSpecialClassAttrSpelling"></a>SYCLSpecialClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SYCL_SPECIAL_CLASS`
+* `CXX11_CLANG_SYCL_SPECIAL_CLASS`
+* `C2_XCLANG_SYCL_SPECIAL_CLASS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ScopedLockableAttrSpelling"></a>ScopedLockableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SCOPED_LOCKABLE`
+* `CXX11_CLANG_SCOPED_LOCKABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SectionAttrSpelling"></a>SectionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SECTION`
+* `CXX11_GNU_SECTION`
+* `C2_XGNU_SECTION`
+* `DECLSPEC_ALLOCATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SelectAnyAttrSpelling"></a>SelectAnyAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_SELECTANY`
+* `GNU_SELECTANY`
+* `CXX11_GNU_SELECTANY`
+* `C2_XGNU_SELECTANY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SentinelAttrSpelling"></a>SentinelAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SENTINEL`
+* `CXX11_GNU_SENTINEL`
+* `C2_XGNU_SENTINEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SetTypestateAttrConsumedState"></a>SetTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="SetTypestateAttrSpelling"></a>SetTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TYPESTATE`
+* `CXX11_CLANG_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -882,6 +3599,39 @@ Available enumerations:
 * `FILE`
 * `LINE`
 * `COLUMN`
+
+</details>
+
+<details><summary><a name="SpeculativeLoadHardeningAttrSpelling"></a>SpeculativeLoadHardeningAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SPECULATIVE_LOAD_HARDENING`
+* `CXX11_CLANG_SPECULATIVE_LOAD_HARDENING`
+* `C2_XCLANG_SPECULATIVE_LOAD_HARDENING`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="StandaloneDebugAttrSpelling"></a>StandaloneDebugAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_STANDALONE_DEBUG`
+* `CXX11_CLANG_STANDALONE_DEBUG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="StdCallAttrSpelling"></a>StdCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_STDCALL`
+* `CXX11_GNU_STDCALL`
+* `C2_XGNU_STDCALL`
+* `KEYWORD_STDCALL`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1136,6 +3886,190 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="SwiftAsyncAttrKind"></a>SwiftAsyncAttrKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `SWIFT_PRIVATE`
+* `NOT_SWIFT_PRIVATE`
+
+</details>
+
+<details><summary><a name="SwiftAsyncAttrSpelling"></a>SwiftAsyncAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ASYNC`
+* `CXX11_CLANG_SWIFT_ASYNC`
+* `C2_XCLANG_SWIFT_ASYNC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftAsyncCallAttrSpelling"></a>SwiftAsyncCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFTASYNCCALL`
+* `CXX11_CLANG_SWIFTASYNCCALL`
+* `C2_XCLANG_SWIFTASYNCCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftAsyncContextAttrSpelling"></a>SwiftAsyncContextAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ASYNC_CONTEXT`
+* `CXX11_CLANG_SWIFT_ASYNC_CONTEXT`
+* `C2_XCLANG_SWIFT_ASYNC_CONTEXT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftAsyncErrorAttrConventionKind"></a>SwiftAsyncErrorAttrConventionKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `NON_NULL_ERROR`
+* `ZERO_ARGUMENT`
+* `NON_ZERO_ARGUMENT`
+
+</details>
+
+<details><summary><a name="SwiftAsyncErrorAttrSpelling"></a>SwiftAsyncErrorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ASYNC_ERROR`
+* `CXX11_CLANG_SWIFT_ASYNC_ERROR`
+* `C2_XCLANG_SWIFT_ASYNC_ERROR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftCallAttrSpelling"></a>SwiftCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFTCALL`
+* `CXX11_CLANG_SWIFTCALL`
+* `C2_XCLANG_SWIFTCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftContextAttrSpelling"></a>SwiftContextAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_CONTEXT`
+* `CXX11_CLANG_SWIFT_CONTEXT`
+* `C2_XCLANG_SWIFT_CONTEXT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftErrorAttrConventionKind"></a>SwiftErrorAttrConventionKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `NON_NULL_ERROR`
+* `NULL_RESULT`
+* `ZERO_RESULT`
+* `NON_ZERO_RESULT`
+
+</details>
+
+<details><summary><a name="SwiftErrorResultAttrSpelling"></a>SwiftErrorResultAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ERROR_RESULT`
+* `CXX11_CLANG_SWIFT_ERROR_RESULT`
+* `C2_XCLANG_SWIFT_ERROR_RESULT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftIndirectResultAttrSpelling"></a>SwiftIndirectResultAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_INDIRECT_RESULT`
+* `CXX11_CLANG_SWIFT_INDIRECT_RESULT`
+* `C2_XCLANG_SWIFT_INDIRECT_RESULT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftNewTypeAttrNewtypeKind"></a>SwiftNewTypeAttrNewtypeKind</summary>
+
+Available enumerations:
+
+* `STRUCT`
+* `ENUM`
+
+</details>
+
+<details><summary><a name="SwiftNewTypeAttrSpelling"></a>SwiftNewTypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_NEWTYPE`
+* `GNU_SWIFT_WRAPPER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SysVABIAttrSpelling"></a>SysVABIAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SYSV_ABI`
+* `CXX11_GNU_SYSV_ABI`
+* `C2_XGNU_SYSV_ABI`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TLSModelAttrSpelling"></a>TLSModelAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TLS_MODEL`
+* `CXX11_GNU_TLS_MODEL`
+* `C2_XGNU_TLS_MODEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TargetAttrSpelling"></a>TargetAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TARGET`
+* `CXX11_GNU_TARGET`
+* `C2_XGNU_TARGET`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TargetClonesAttrSpelling"></a>TargetClonesAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TARGET_CLONES`
+* `CXX11_GNU_TARGET_CLONES`
+* `C2_XGNU_TARGET_CLONES`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="TemplateArgumentKind"></a>TemplateArgumentKind</summary>
 
 Available enumerations:
@@ -1149,6 +4083,70 @@ Available enumerations:
 * `TEMPLATE_EXPANSION`
 * `EXPRESSION`
 * `PACK`
+
+</details>
+
+<details><summary><a name="TestTypestateAttrConsumedState"></a>TestTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="TestTypestateAttrSpelling"></a>TestTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TEST_TYPESTATE`
+* `CXX11_CLANG_TEST_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ThisCallAttrSpelling"></a>ThisCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_THISCALL`
+* `CXX11_GNU_THISCALL`
+* `C2_XGNU_THISCALL`
+* `KEYWORD_THISCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TransparentUnionAttrSpelling"></a>TransparentUnionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TRANSPARENT_UNION`
+* `CXX11_GNU_TRANSPARENT_UNION`
+* `C2_XGNU_TRANSPARENT_UNION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TrivialABIAttrSpelling"></a>TrivialABIAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TRIVIAL_ABI`
+* `CXX11_CLANG_TRIVIAL_ABI`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TryAcquireCapabilityAttrSpelling"></a>TryAcquireCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TRY_ACQUIRE_CAPABILITY`
+* `CXX11_CLANG_TRY_ACQUIRE_CAPABILITY`
+* `GNU_TRY_ACQUIRE_SHARED_CAPABILITY`
+* `CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1229,11 +4227,122 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="TypeTagForDatatypeAttrSpelling"></a>TypeTagForDatatypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TYPE_TAG_FOR_DATATYPE`
+* `CXX11_CLANG_TYPE_TAG_FOR_DATATYPE`
+* `C2_XCLANG_TYPE_TAG_FOR_DATATYPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TypeVisibilityAttrSpelling"></a>TypeVisibilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TYPE_VISIBILITY`
+* `CXX11_CLANG_TYPE_VISIBILITY`
+* `C2_XCLANG_TYPE_VISIBILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TypeVisibilityAttrVisibilityType"></a>TypeVisibilityAttrVisibilityType</summary>
+
+Available enumerations:
+
+* `DEFAULT`
+* `HIDDEN`
+* `PROTECTED`
+
+</details>
+
 <details><summary><a name="UnaryTransformTypeUTTKind"></a>UnaryTransformTypeUTTKind</summary>
 
 Available enumerations:
 
 * `ENUM_UNDERLYING_TYPE`
+
+</details>
+
+<details><summary><a name="UnavailableAttrImplicitReason"></a>UnavailableAttrImplicitReason</summary>
+
+Available enumerations:
+
+* `NONE`
+* `ARC_FORBIDDEN_TYPE`
+* `FORBIDDEN_WEAK`
+* `ARC_FORBIDDEN_CONVERSION`
+* `ARC_INIT_RETURNS_UNRELATED`
+* `ARC_FIELD_WITH_OWNERSHIP`
+
+</details>
+
+<details><summary><a name="UnavailableAttrSpelling"></a>UnavailableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_UNAVAILABLE`
+* `CXX11_CLANG_UNAVAILABLE`
+* `C2_XCLANG_UNAVAILABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UninitializedAttrSpelling"></a>UninitializedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_UNINITIALIZED`
+* `CXX11_CLANG_UNINITIALIZED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UnlikelyAttrSpelling"></a>UnlikelyAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_UNLIKELY`
+* `C2_XCLANG_UNLIKELY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UnusedAttrSpelling"></a>UnusedAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_MAYBE_UNUSED`
+* `GNU_UNUSED`
+* `CXX11_GNU_UNUSED`
+* `C2_XGNU_UNUSED`
+* `C2_XMAYBE_UNUSED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UseHandleAttrSpelling"></a>UseHandleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_USE_HANDLE`
+* `CXX11_CLANG_USE_HANDLE`
+* `C2_XCLANG_USE_HANDLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UsedAttrSpelling"></a>UsedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_USED`
+* `CXX11_GNU_USED`
+* `C2_XGNU_USED`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1247,6 +4356,26 @@ Available enumerations:
 * `FLOATING`
 * `STRING`
 * `CHARACTER`
+
+</details>
+
+<details><summary><a name="UsingIfExistsAttrSpelling"></a>UsingIfExistsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_USING_IF_EXISTS`
+* `CXX11_CLANG_USING_IF_EXISTS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UuidAttrSpelling"></a>UuidAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_UUID`
+* `MICROSOFT_UUID`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1280,6 +4409,28 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="VecReturnAttrSpelling"></a>VecReturnAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_VECRETURN`
+* `CXX11_CLANG_VECRETURN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="VectorCallAttrSpelling"></a>VectorCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_VECTORCALL`
+* `CXX11_CLANG_VECTORCALL`
+* `C2_XCLANG_VECTORCALL`
+* `KEYWORD_VECTORCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="VectorTypeVectorKind"></a>VectorTypeVectorKind</summary>
 
 Available enumerations:
@@ -1292,6 +4443,154 @@ Available enumerations:
 * `NEON_POLY_VECTOR`
 * `SVE_FIXED_LENGTH_DATA_VECTOR`
 * `SVE_FIXED_LENGTH_PREDICATE_VECTOR`
+
+</details>
+
+<details><summary><a name="VisibilityAttrSpelling"></a>VisibilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_VISIBILITY`
+* `CXX11_GNU_VISIBILITY`
+* `C2_XGNU_VISIBILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="VisibilityAttrVisibilityType"></a>VisibilityAttrVisibilityType</summary>
+
+Available enumerations:
+
+* `DEFAULT`
+* `HIDDEN`
+* `PROTECTED`
+
+</details>
+
+<details><summary><a name="WarnUnusedAttrSpelling"></a>WarnUnusedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WARN_UNUSED`
+* `CXX11_GNU_WARN_UNUSED`
+* `C2_XGNU_WARN_UNUSED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WarnUnusedResultAttrSpelling"></a>WarnUnusedResultAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_NODISCARD`
+* `C2_XNODISCARD`
+* `CXX11_CLANG_WARN_UNUSED_RESULT`
+* `GNU_WARN_UNUSED_RESULT`
+* `CXX11_GNU_WARN_UNUSED_RESULT`
+* `C2_XGNU_WARN_UNUSED_RESULT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WeakAttrSpelling"></a>WeakAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WEAK`
+* `CXX11_GNU_WEAK`
+* `C2_XGNU_WEAK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WeakImportAttrSpelling"></a>WeakImportAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WEAK_IMPORT`
+* `CXX11_CLANG_WEAK_IMPORT`
+* `C2_XCLANG_WEAK_IMPORT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WeakRefAttrSpelling"></a>WeakRefAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WEAKREF`
+* `CXX11_GNU_WEAKREF`
+* `C2_XGNU_WEAKREF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WebAssemblyExportNameAttrSpelling"></a>WebAssemblyExportNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_EXPORT_NAME`
+* `CXX11_CLANG_EXPORT_NAME`
+* `C2_XCLANG_EXPORT_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WebAssemblyImportModuleAttrSpelling"></a>WebAssemblyImportModuleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IMPORT_MODULE`
+* `CXX11_CLANG_IMPORT_MODULE`
+* `C2_XCLANG_IMPORT_MODULE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WebAssemblyImportNameAttrSpelling"></a>WebAssemblyImportNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IMPORT_NAME`
+* `CXX11_CLANG_IMPORT_NAME`
+* `C2_XCLANG_IMPORT_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="X86ForceAlignArgPointerAttrSpelling"></a>X86ForceAlignArgPointerAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FORCE_ALIGN_ARGUMENT_POINTER`
+* `CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER`
+* `C2_XGNU_FORCE_ALIGN_ARGUMENT_POINTER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="XRayInstrumentAttrSpelling"></a>XRayInstrumentAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_XRAY_ALWAYS_INSTRUMENT`
+* `CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT`
+* `C2_XCLANG_XRAY_ALWAYS_INSTRUMENT`
+* `GNU_XRAY_NEVER_INSTRUMENT`
+* `CXX11_CLANG_XRAY_NEVER_INSTRUMENT`
+* `C2_XCLANG_XRAY_NEVER_INSTRUMENT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="XRayLogArgsAttrSpelling"></a>XRayLogArgsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_XRAY_LOG_ARGUMENTS`
+* `CXX11_CLANG_XRAY_LOG_ARGUMENTS`
+* `C2_XCLANG_XRAY_LOG_ARGUMENTS`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1333,23 +4632,6 @@ Available enumerations:
 * `REQUIRED_BY_TYPEDEF`
 * `REQUIRED_BY_RECORD`
 * `REQUIRED_BY_ENUM`
-
-</details>
-
-<details><summary><a name="AllocatorTypeTy"></a>AllocatorTypeTy</summary>
-
-Available enumerations:
-
-* `OMP_NULL_MEMORY_ALLOC`
-* `OMP_DEFAULT_MEMORY_ALLOC`
-* `OMP_LARGE_CAP_MEMORY_ALLOC`
-* `OMP_CONST_MEMORY_ALLOC`
-* `OMP_HIGH_BW_MEMORY_ALLOC`
-* `OMP_LOW_LAT_MEMORY_ALLOC`
-* `OMPC_GROUP_MEMORY_ALLOC`
-* `OMPP_TEAM_MEMORY_ALLOC`
-* `OMP_THREAD_MEMORY_ALLOC`
-* `OMP_USER_DEFINED_MEMORY_ALLOC`
 
 </details>
 
@@ -1404,7 +4686,7 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="AttributeKind"></a>AttributeKind</summary>
+<details><summary><a name="AttrKind"></a>AttrKind</summary>
 
 Available enumerations:
 
@@ -1582,7 +4864,7 @@ Available enumerations:
 * `LOCK_RETURNED`
 * `LOCKS_EXCLUDED`
 * `M68_KINTERRUPT`
-* `MIG_SERVER_ROUTINE__`
+* `MIG_SERVER_ROUTINE`
 * `MS_ALLOCATOR`
 * `MS_INHERITANCE`
 * `MS_NO_V_TABLE`
@@ -1836,24 +5118,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="BlockType"></a>BlockType</summary>
-
-Available enumerations:
-
-* `BY_REFERENCE`
-
-</details>
-
-<details><summary><a name="BranchStateTy"></a>BranchStateTy</summary>
-
-Available enumerations:
-
-* `UNDEFINED`
-* `INBRANCH`
-* `NOTINBRANCH`
-
-</details>
-
 <details><summary><a name="CallingConv"></a>CallingConv</summary>
 
 Available enumerations:
@@ -2046,27 +5310,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="ConsumedState"></a>ConsumedState</summary>
-
-Available enumerations:
-
-* `UNKNOWN`
-* `CONSUMED`
-* `UNCONSUMED`
-
-</details>
-
-<details><summary><a name="ConventionKind"></a>ConventionKind</summary>
-
-Available enumerations:
-
-* `NONE`
-* `NON_NULL_ERROR`
-* `ZERO_ARGUMENT`
-* `NON_ZERO_ARGUMENT`
-
-</details>
-
 <details><summary><a name="CoreFoundationABI"></a>CoreFoundationABI</summary>
 
 Available enumerations:
@@ -2116,16 +5359,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="DevTypeTy"></a>DevTypeTy</summary>
-
-Available enumerations:
-
-* `HOST`
-* `NO_HOST`
-* `ANY`
-
-</details>
-
 <details><summary><a name="DiagnosticLevelMask"></a>DiagnosticLevelMask</summary>
 
 Available enumerations:
@@ -2136,15 +5369,6 @@ Available enumerations:
 * `WARNING`
 * `ERROR`
 * `ALL`
-
-</details>
-
-<details><summary><a name="DiagnosticType"></a>DiagnosticType</summary>
-
-Available enumerations:
-
-* `ERROR`
-* `WARNING`
 
 </details>
 
@@ -2315,19 +5539,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="FamilyKind"></a>FamilyKind</summary>
-
-Available enumerations:
-
-* `NONE`
-* `ALLOC`
-* `COPY`
-* `INITIALIZER`
-* `MUTABLE_COPY`
-* `NEW`
-
-</details>
-
 <details><summary><a name="FiniteLoopsKind"></a>FiniteLoopsKind</summary>
 
 Available enumerations:
@@ -2392,14 +5603,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="GuardArg"></a>GuardArg</summary>
-
-Available enumerations:
-
-* `NOCF`
-
-</details>
-
 <details><summary><a name="ID"></a>ID</summary>
 
 Available enumerations:
@@ -2440,19 +5643,6 @@ Available enumerations:
 * `ALWAYS`
 * `NEVER`
 * `ALWAYSARG1`
-
-</details>
-
-<details><summary><a name="ImplicitReason"></a>ImplicitReason</summary>
-
-Available enumerations:
-
-* `NONE`
-* `ARC_FORBIDDEN_TYPE`
-* `FORBIDDEN_WEAK`
-* `ARC_FORBIDDEN_CONVERSION`
-* `ARC_INIT_RETURNS_UNRELATED`
-* `ARC_FIELD_WITH_OWNERSHIP`
 
 </details>
 
@@ -2514,29 +5704,6 @@ Available enumerations:
 * `NORMAL_INLINING`
 * `ONLY_HINT_INLINING`
 * `ONLY_ALWAYS_INLINING`
-
-</details>
-
-<details><summary><a name="InteropType"></a>InteropType</summary>
-
-Available enumerations:
-
-* `TARGET`
-* `TARGET_SYNC`
-* `TARGET_TARGET_SYNC`
-
-</details>
-
-<details><summary><a name="InterruptType"></a>InterruptType</summary>
-
-Available enumerations:
-
-* `IRQ`
-* `FIQ`
-* `SWI`
-* `ABORT`
-* `UNDEF`
-* `GENERIC`
 
 </details>
 
@@ -2696,20 +5863,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="LoopHintState"></a>LoopHintState</summary>
-
-Available enumerations:
-
-* `ENABLE`
-* `DISABLE`
-* `NUMERIC`
-* `FIXED_WIDTH`
-* `SCALABLE_WIDTH`
-* `ASSUME_SAFETY`
-* `FULL`
-
-</details>
-
 <details><summary><a name="MSInheritanceModel"></a>MSInheritanceModel</summary>
 
 Available enumerations:
@@ -2745,15 +5898,6 @@ Available enumerations:
 * `NEVER`
 * `FOR_VIRTUAL_BASE_OVERRIDE`
 * `FOR_VF_TABLE`
-
-</details>
-
-<details><summary><a name="MapTypeTy"></a>MapTypeTy</summary>
-
-Available enumerations:
-
-* `TO`
-* `LINK`
 
 </details>
 
@@ -2830,15 +5974,6 @@ Available enumerations:
 * `NONE`
 * `DEPENDENT_INSTANTIATION`
 * `ALL`
-
-</details>
-
-<details><summary><a name="NewtypeKind"></a>NewtypeKind</summary>
-
-Available enumerations:
-
-* `STRUCT`
-* `ENUM`
 
 </details>
 
@@ -3203,25 +6338,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="OptionType"></a>OptionType</summary>
-
-Available enumerations:
-
-* `VECTORIZE`
-* `VECTORIZE_WIDTH`
-* `INTERLEAVE`
-* `INTERLEAVE_COUNT`
-* `UNROLL`
-* `UNROLL_COUNT`
-* `UNROLL_AND_JAM`
-* `UNROLL_AND_JAM_COUNT`
-* `PIPELINE_DISABLED`
-* `PIPELINE_INITIATION_INTERVAL`
-* `DISTRIBUTE`
-* `VECTORIZE_PREDICATE`
-
-</details>
-
 <details><summary><a name="OverloadedOperatorKind"></a>OverloadedOperatorKind</summary>
 
 Available enumerations:
@@ -3281,25 +6397,6 @@ Available enumerations:
 
 * `ALL`
 * `BEST`
-
-</details>
-
-<details><summary><a name="OwnershipKind"></a>OwnershipKind</summary>
-
-Available enumerations:
-
-* `HOLDS`
-* `RETURNS`
-* `TAKES`
-
-</details>
-
-<details><summary><a name="PCSType"></a>PCSType</summary>
-
-Available enumerations:
-
-* `AAPCS`
-* `VFP`
 
 </details>
 
@@ -3623,17 +6720,6 @@ Available enumerations:
 * `TYPE_SPEC_WITH_TEMPLATE`
 * `GLOBAL`
 * `SUPER`
-
-</details>
-
-<details><summary><a name="Spelling"></a>Spelling</summary>
-
-Available enumerations:
-
-* `GNU_AARCH64_VECTOR_PCS`
-* `CXX11_CLANG_AARCH64_VECTOR_PCS`
-* `C2_XCLANG_AARCH64_VECTOR_PCS`
-* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -4691,13 +7777,18 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="VisibilityType"></a>VisibilityType</summary>
+<details><summary><a name="AttributeSyntax"></a>AttributeSyntax</summary>
 
 Available enumerations:
 
-* `DEFAULT`
-* `HIDDEN`
-* `PROTECTED`
+* `GNU`
+* `CXX11`
+* `C2_X`
+* `DECLSPEC`
+* `MICROSOFT`
+* `KEYWORD`
+* `PRAGMA`
+* `CONTEXT_SENSITIVE_KEYWORD`
 
 </details>
 
@@ -5710,7 +8801,7 @@ This table also includes all of the fields contained in [`Type`](#Type).
 | Name | Type | `NOT NULL` | References |
 | --- | --- | --- | --- |
 | `desugar` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
-| `attribute_kind` | `INTEGER` | :heavy_check_mark: | [`AttributeKind`](#AttributeKind) |
+| `attribute_kind` | `INTEGER` | :heavy_check_mark: | [`AttrKind`](#AttrKind) |
 | `equivalent_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
 | `immediate_nullability` | `INTEGER` | :x: | |
 | `modified_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
